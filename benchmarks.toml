@@ -1,0 +1,38 @@
+[datasets]
+# Disaggregated datasets
+crsp_returns = true
+crsp_compustat = true
+finra_trace = false
+sp500_options = false
+commodity_futures = false
+
+# Aggregated datasets
+fed_yield_curve = true
+ff_25_portfolios = false
+us_govt_bonds = false
+us_corp_bonds = false
+sovereign_bonds = false
+forex_portfolios = false
+cds_portfolios = false
+industrial_production = false
+
+[models]
+# Traditional Time Series Models
+var = true  # Vector Autoregression
+vecm = true  # Vector Error Correction Model
+
+# Deep Learning Models
+lstm = true  # Long Short-Term Memory
+transformer = true  # Transformer Architecture
+temporal_fusion = false  # Temporal Fusion Transformer
+neural_prophet = false  # Neural Prophet
+
+# Hybrid Models
+deep_ar = false  # Deep AutoRegressive
+deep_state = false  # Deep State Space
+deep_factors = false  # Deep Factor Model
+
+# Ensemble Methods
+random_forest_ts = true  # Random Forest for Time Series
+xgboost_ts = true  # XGBoost for Time Series
+lightgbm_ts = false  # LightGBM for Time Series

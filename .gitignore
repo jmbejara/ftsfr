@@ -161,7 +161,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+.env*
+!.env.example
 .venv
 env/
 venv/
@@ -202,3 +203,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+_data/
+_output/
+
+**/.DS_Store
