@@ -22,7 +22,9 @@ class TimeSeriesModel:
             raise ValueError(
                 "Only one of 'n_forecasting' and 'forecasting_start_date' should be provided."
             )
-        self.y = self.organize_time_series(y, filter_start_date, filter_end_date)
+        self.y = self.organize_time_series(
+            y, filter_start_date, filter_end_date, enforce_not_none=True
+        )
         self.X = self.organize_time_series(X, filter_start_date, filter_end_date)
         self.start_date = start_date
         self.n_forecasting = n_forecasting
@@ -31,10 +33,16 @@ class TimeSeriesModel:
         self.intersect_forecasting = intersect_forecasting
         self.time_frequency = time_frequency
         self.rolling = rolling
-        self.forecasting_divisions = None
+        self.divisions = {}
 
     @staticmethod
-    def organize_time_series(time_series, filter_start_date, filter_end_date):
+    def organize_time_series(
+        time_series, filter_start_date, filter_end_date, enforce_not_none=False
+    ):
+        if time_series is None:
+            if enforce_not_none:
+                raise ValueError("Time series cannot be None.")
+            return None
         if isinstance(time_series, pd.Series):
             time_series = time_series.to_frame()
         if "date" in list(time_series.columns.str.lower()):
@@ -56,21 +64,31 @@ class TimeSeriesModel:
             if self.forecasting_start_date is not None
             else self.y.index[end_index]
         )
-        delta_index = 1 if self.rolling else self.step_size
+        delta_index = 1 if self.intersect_forecasting else self.step_size
+        idx = 0
+
         while (
             n_forecasting_left > 0
             or forecasting_start_date <= self.y.index[start_index]
         ):
-            self.forecasting_divisions.append(
-                {
-                    "y": self.build_new_division(self.y, start_index, end_index),
-                    "X": self.build_new_division(self.X, start_index, end_index),
-                }
+            self.divisions[idx] = self.build_new_forecasting_division(
+                self.y, self.X, start_index, end_index
             )
             end_index = end_index - delta_index
             start_index = end_index - self.step_size + 1
             n_forecasting_left -= 1
+            idx += 1
 
-    def build_new_division(self, time_series, start_index, end_index):
-        time_series = time_series.copy()
-        return time_series.iloc[start_index:end_index]
+    @staticmethod
+    def build_new_division(y, X, start_index, end_index):
+        y = y.copy()
+        forecasting = {"forecasting": {"y": y.iloc[start_index:end_index], "X": None}}
+        if X is not None:
+            X = X.copy()
+            forecasting = forecasting["forecasting"]["X"] = X.iloc[
+                start_index:end_index
+            ]
+        training = {"training": {"y": y.iloc[:start_index], "X": None}}
+        if X is not None:
+            training["training"]["X"] = X.iloc[:start_index]
+        return {**training, **forecasting}
