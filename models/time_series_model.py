@@ -1,6 +1,9 @@
+from abc import abstractmethod
 from typing import Union, List
 import datetime
 import pandas as pd
+from models.dataset import Dataset
+from models.error_metrics import ErrorMetrics
 
 
 class TimeSeriesModel:
@@ -16,44 +19,28 @@ class TimeSeriesModel:
         n_forecasting=None,
         intersect_forecasting: bool = False,
         rolling: bool = False,
-        time_frequency="M",
     ):
         if n_forecasting is not None and forecasting_start_date is not None:
             raise ValueError(
                 "Only one of 'n_forecasting' and 'forecasting_start_date' should be provided."
             )
-        self.y = self.organize_time_series(
-            y, filter_start_date, filter_end_date, enforce_not_none=True
-        )
-        self.X = self.organize_time_series(X, filter_start_date, filter_end_date)
+        self.dataset = Dataset(y, X, filter_start_date, filter_end_date)
         self.start_date = start_date
         self.n_forecasting = n_forecasting
         self.forecasting_start_date = forecasting_start_date
         self.step_size = step_size
         self.intersect_forecasting = intersect_forecasting
-        self.time_frequency = time_frequency
         self.rolling = rolling
+        self.error_metrics = ErrorMetrics()
         self.divisions = {}
 
-    @staticmethod
-    def organize_time_series(
-        time_series, filter_start_date, filter_end_date, enforce_not_none=False
-    ):
-        if time_series is None:
-            if enforce_not_none:
-                raise ValueError("Time series cannot be None.")
-            return None
-        if isinstance(time_series, pd.Series):
-            time_series = time_series.to_frame()
-        if "date" in list(time_series.columns.str.lower()):
-            time_series = time_series.set_index("date")
-        time_series.index = pd.to_datetime(time_series.index)
-        time_series = time_series.sort_index()
-        if filter_end_date is not None:
-            time_series = time_series.loc[:filter_end_date]
-        if filter_start_date is not None:
-            time_series = time_series.loc[filter_start_date:]
-        return time_series
+    @property
+    def y(self):
+        return self.dataset.y
+
+    @property
+    def X(self):
+        return self.dataset.X
 
     def build_divisions(self):
         end_index = len(self.y) - 1
@@ -83,12 +70,49 @@ class TimeSeriesModel:
     def build_new_division(y, X, start_index, end_index):
         y = y.copy()
         forecasting = {"forecasting": {"y": y.iloc[start_index:end_index], "X": None}}
+        forecasting = {
+            "forecasting": Dataset.create_from_y(y.iloc[start_index:end_index])
+        }
         if X is not None:
             X = X.copy()
-            forecasting = forecasting["forecasting"]["X"] = X.iloc[
-                start_index:end_index
-            ]
-        training = {"training": {"y": y.iloc[:start_index], "X": None}}
+            forecasting = forecasting["forecasting"].set_X(
+                X.iloc[start_index:end_index]
+            )
+
+        training = {"training": Dataset.create_from_y(y.iloc[:start_index])}
         if X is not None:
-            training["training"]["X"] = X.iloc[:start_index]
+            training["training"].set_X(X.iloc[:start_index])
         return {**training, **forecasting}
+
+    @abstractmethod
+    def fit(self, y, X):
+        pass
+
+    @abstractmethod
+    def forecast(self, X):
+        pass
+
+    def assess_error(self):
+        all_y_true = pd.DataFrame()
+        all_y_pred = pd.DataFrame()
+        for division in self.divisions.values():
+            all_y_true = pd.concat(
+                [all_y_true, division["forecasting"].get_y()], axis=0
+            )
+            all_y_pred = pd.concat(
+                [all_y_pred, division["forecasting"].get_y_pred()], axis=0
+            )
+        self.error_metrics.calculate_error_metrics(all_y_true, all_y_pred)
+
+    def run(self):
+        for division in self.divisions.values():
+            self.fit(division["training"].get_y(), division["training"].get_X())
+            y_pred = self.forecast(
+                division["forecasting"].get_y(), division["forecasting"].get_X()
+            )
+            division["forecasting"].set_y_pred(y_pred)
+
+    def assess_error(self):
+        y_true = self.y
+        y_pred = self.y_pred
+        return self.error_metrics.calculate_error_metrics(y_true, y_pred)
