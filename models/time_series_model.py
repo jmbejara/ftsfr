@@ -17,17 +17,25 @@ class TimeSeriesModel:
         forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
         n_forecasting=None,
         intersect_forecasting: bool = False,
+        only_consider_last_of_each_intersection: bool = False,
         rolling: bool = False,
     ):
         if n_forecasting is not None and forecasting_start_date is not None:
             raise ValueError(
                 "Only one of 'n_forecasting' and 'forecasting_start_date' should be provided."
             )
+        if only_consider_last_of_each_intersection and not intersect_forecasting:
+            raise ValueError(
+                "'only_consider_last_of_each_intersection' can only be True if 'intersect_forecasting' is True."
+            )
         self.dataset = Dataset(y, X, filter_start_date, filter_end_date)
         self.n_forecasting = n_forecasting
         self.forecasting_start_date = forecasting_start_date
         self.step_size = step_size
         self.intersect_forecasting = intersect_forecasting
+        self.only_consider_last_of_each_intersection = (
+            only_consider_last_of_each_intersection
+        )
         self.rolling = rolling
         self.error_metrics = ErrorMetrics()
         self.divisions = {}
@@ -110,16 +118,29 @@ class TimeSeriesModel:
     def forecast(self, X):
         pass
 
-    def assess_error(self):
+    def _join_predictions(self):
         all_y_true = pd.DataFrame()
         all_y_pred = pd.DataFrame()
         for division in self.divisions.values():
-            all_y_true = pd.concat(
-                [all_y_true, division["forecasting"].get_y()], axis=0
-            )
-            all_y_pred = pd.concat(
-                [all_y_pred, division["forecasting"].get_y_pred()], axis=0
-            )
+            new_y_true = division["forecasting"].get_y()
+            if (
+                self.only_consider_last_of_each_intersection
+                and self.intersect_forecasting
+            ):
+                new_y_true = new_y_true.iloc[-1, :]
+            all_y_true = pd.concat([all_y_true, new_y_true], axis=0)
+
+            new_y_pred = division["forecasting"].get_y_pred()
+            if (
+                self.only_consider_last_of_each_intersection
+                and self.intersect_forecasting
+            ):
+                new_y_pred = new_y_pred.iloc[-1, :]
+            all_y_pred = pd.concat([all_y_pred, new_y_pred], axis=0)
+        return all_y_true, all_y_pred
+
+    def assess_error(self):
+        all_y_true, all_y_pred = self._join_predictions()
         self.error_metrics.calculate_error_metrics(all_y_true, all_y_pred)
 
     def run(self):
