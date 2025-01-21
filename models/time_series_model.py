@@ -12,7 +12,6 @@ class TimeSeriesModel:
         y: Union[pd.DataFrame, pd.Series],
         X: pd.DataFrame,
         step_size: int,
-        start_date: Union[datetime.date, datetime.datetime],
         filter_start_date: Union[datetime.date, datetime.datetime] = None,
         filter_end_date: Union[datetime.date, datetime.datetime] = None,
         forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
@@ -25,7 +24,6 @@ class TimeSeriesModel:
                 "Only one of 'n_forecasting' and 'forecasting_start_date' should be provided."
             )
         self.dataset = Dataset(y, X, filter_start_date, filter_end_date)
-        self.start_date = start_date
         self.n_forecasting = n_forecasting
         self.forecasting_start_date = forecasting_start_date
         self.step_size = step_size
@@ -33,6 +31,26 @@ class TimeSeriesModel:
         self.rolling = rolling
         self.error_metrics = ErrorMetrics()
         self.divisions = {}
+
+    @classmethod
+    def from_dataset(
+        cls,
+        dataset: Dataset,
+        step_size: int,
+        forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
+        n_forecasting=None,
+        intersect_forecasting: bool = False,
+        rolling: bool = False,
+    ):
+        new_model = cls.__new__(cls)
+        new_model.dataset = dataset
+        new_model.step_size = step_size
+        new_model.forecasting_start_date = forecasting_start_date
+        new_model.n_forecasting = n_forecasting
+        new_model.intersect_forecasting = intersect_forecasting
+        new_model.rolling = rolling
+        new_model.error_metrics = ErrorMetrics()
+        new_model.divisions = {}
 
     @property
     def y(self):
@@ -107,9 +125,7 @@ class TimeSeriesModel:
     def run(self):
         for division in self.divisions.values():
             self.fit(division["training"].get_y(), division["training"].get_X())
-            y_pred = self.forecast(
-                division["forecasting"].get_y(), division["forecasting"].get_X()
-            )
+            y_pred = self.forecast(division["forecasting"].get_X())
             division["forecasting"].set_y_pred(y_pred)
 
     def assess_error(self):
