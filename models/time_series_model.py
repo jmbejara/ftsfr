@@ -10,11 +10,11 @@ class TimeSeriesModel:
     def __init__(
         self,
         y: Union[pd.DataFrame, pd.Series],
-        X: pd.DataFrame,
-        step_size: int,
-        filter_start_date: Union[datetime.date, datetime.datetime] = None,
-        filter_end_date: Union[datetime.date, datetime.datetime] = None,
-        forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
+        X: pd.DataFrame = None,
+        step_size: int = 1,
+        filter_start_date: Union[datetime.date, datetime.datetime, str] = None,
+        filter_end_date: Union[datetime.date, datetime.datetime, str] = None,
+        forecasting_start_date: Union[datetime.date, datetime.datetime, str] = None,
         n_forecasting=None,
         intersect_forecasting: bool = False,
         only_consider_last_of_each_intersection: bool = False,
@@ -30,7 +30,9 @@ class TimeSeriesModel:
             )
         self.dataset = Dataset(y, X, filter_start_date, filter_end_date)
         self.n_forecasting = n_forecasting
-        self.forecasting_start_date = forecasting_start_date
+        self.forecasting_start_date = Dataset._validate_datetime(
+            forecasting_start_date, "forecasting_start_date"
+        )
         self.step_size = step_size
         self.intersect_forecasting = intersect_forecasting
         self.only_consider_last_of_each_intersection = (
@@ -84,25 +86,46 @@ class TimeSeriesModel:
             n_forecasting_left > 0
             or forecasting_start_date <= self.y.index[start_index]
         ):
-            self.divisions[idx] = self.build_new_forecasting_division(
+            self.divisions[idx] = self.build_new_division(
                 self.y, self.X, start_index, end_index
             )
             end_index = end_index - delta_index
             start_index = end_index - self.step_size + 1
             n_forecasting_left -= 1
             idx += 1
+        self._reindex_divisions()
+
+    def _reindex_divisions(self):
+        max_idx = max(self.divisions.keys())
+        divisions_copy = self.divisions.copy()
+        for idx, division in self.divisions.items():
+            new_idx = idx - max_idx
+            divisions_copy[abs(new_idx)] = division
+        self.divisions = dict(sorted(divisions_copy.items()))
+
+    def get_training_div(self, idx):
+        if self.divisions is None:
+            raise ValueError("Divisions have not been built yet.")
+        return self.divisions[idx]["training"]
+
+    def get_forecasting_div(self, idx):
+        if self.divisions is None:
+            raise ValueError("Divisions have not been built yet.")
+        return self.divisions[idx]["forecasting"]
 
     @staticmethod
     def build_new_division(y, X, start_index, end_index):
         y = y.copy()
-        forecasting = {"forecasting": {"y": y.iloc[start_index:end_index], "X": None}}
         forecasting = {
-            "forecasting": Dataset.create_from_y(y.iloc[start_index:end_index])
+            "forecasting": {"y": y.iloc[start_index : end_index + 1], "X": None}
+        }
+        forecasting = {
+            "forecasting": Dataset.create_from_y(y.iloc[start_index : end_index + 1])
         }
         if X is not None:
             X = X.copy()
             forecasting = forecasting["forecasting"].set_X(
-                X.iloc[start_index:end_index]
+                X.iloc[start_index : end_index + 1]
             )
 
         training = {"training": Dataset.create_from_y(y.iloc[:start_index])}

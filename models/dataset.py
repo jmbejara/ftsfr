@@ -13,7 +13,10 @@ class Dataset:
         time_frequency=None,
     ):
         self.y = self.organize_time_series(
-            y, filter_start_date, filter_end_date, enforce_not_none=True
+            y,
+            self._validate_datetime(filter_start_date, "filter_start_date"),
+            self._validate_datetime(filter_end_date, "filter_end_date"),
+            enforce_not_none=True,
         )
         self.X = self.organize_time_series(X, filter_start_date, filter_end_date)
         self.time_frequency = time_frequency
@@ -30,6 +33,21 @@ class Dataset:
         new_dataset.X = X
         new_dataset.time_frequency = time_frequency
         return new_dataset
+
+    @staticmethod
+    def _validate_datetime(date, date_name):
+        if isinstance(date, str):
+            return pd.to_datetime(date)
+        elif (
+            isinstance(date, datetime.date)
+            or isinstance(date, datetime.datetime)
+            or date is None
+        ):
+            return date
+        else:
+            raise ValueError(
+                f"'{date_name}' must be a string, datetime.date, datetime.datetime, None"
+            )
 
     @classmethod
     def create_from_y(cls, y, time_frequency=None):
@@ -68,6 +86,7 @@ class Dataset:
             return None
         if isinstance(time_series, pd.Series):
             time_series = time_series.to_frame()
+        time_series.columns = time_series.columns.map(lambda x: str(x))
         if "date" in list(time_series.columns.str.lower()):
             time_series = time_series.set_index("date")
         time_series.index = pd.to_datetime(time_series.index)
