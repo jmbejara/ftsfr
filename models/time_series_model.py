@@ -138,7 +138,7 @@ class TimeSeriesModel:
         pass
 
     @abstractmethod
-    def forecast(self, X):
+    def forecast(self, y, X):
         pass
 
     def _join_predictions(self):
@@ -169,7 +169,9 @@ class TimeSeriesModel:
     def run(self):
         for division in self.divisions.values():
             self.fit(division["training"].get_y(), division["training"].get_X())
-            y_pred = self.forecast(division["forecasting"].get_X())
+            y_pred = self.forecast(
+                division["training"].get_y(), division["forecasting"].get_X()
+            )
             division["forecasting"].set_y_pred(y_pred)
 
     def assess_error(self):
