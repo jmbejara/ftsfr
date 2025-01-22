@@ -94,5 +94,6 @@ if __name__ == "__main__":
     scripts_to_file(
         "migrations", ["py", "ini"], "Migrations files:", "scripts/migrations"
     )
+    scripts_to_file("models", ["py"], "Model files:", "scripts/models")
     scripts_to_file("scripts", "txt", ALL_EXPLANATION, "scripts/all")
     os.system("cat scripts/all.txt | pbcopy")
