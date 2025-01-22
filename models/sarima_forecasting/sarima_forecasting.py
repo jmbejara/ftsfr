@@ -1,5 +1,7 @@
 # sarima_forecasting.py
 
+import datetime
+from typing import Union
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -7,6 +9,10 @@ from models.time_series_model import TimeSeriesModel
 
 
 class SarimaForecasting(TimeSeriesModel):
+    virtual_env = "ftsf"
+    python_version = "3.12.6"
+    requirements_file = "requirements.txt"
+
     def __init__(
         self,
         y: Union[pd.DataFrame, pd.Series],

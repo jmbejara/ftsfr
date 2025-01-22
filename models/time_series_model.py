@@ -6,7 +6,22 @@ from models.dataset import Dataset
 from models.error_metrics import ErrorMetrics
 
 
+MODELS_PATH = "models"
+
+
 class TimeSeriesModel:
+    virtual_env = "ftsf"
+    python_version = "3.12.6"
+    requirements_file = "requirements.txt"
+
+    @classmethod
+    def get_virtual_env(cls):
+        return cls.virtual_env
+
+    @classmethod
+    def get_python_version(cls):
+        return cls.python_version
+
     def __init__(
         self,
         y: Union[pd.DataFrame, pd.Series],
@@ -19,6 +34,7 @@ class TimeSeriesModel:
         intersect_forecasting: bool = False,
         only_consider_last_of_each_intersection: bool = False,
         rolling: bool = False,
+        time_frequency: str = None,
     ):
         if n_forecasting is not None and forecasting_start_date is not None:
             raise ValueError(
@@ -28,7 +44,7 @@ class TimeSeriesModel:
             raise ValueError(
                 "'only_consider_last_of_each_intersection' can only be True if 'intersect_forecasting' is True."
             )
-        self.dataset = Dataset(y, X, filter_start_date, filter_end_date)
+        self.dataset = Dataset(y, X, filter_start_date, filter_end_date, time_frequency)
         self.n_forecasting = n_forecasting
         self.forecasting_start_date = Dataset._validate_datetime(
             forecasting_start_date, "forecasting_start_date"

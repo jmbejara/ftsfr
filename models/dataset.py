@@ -3,6 +3,9 @@ import datetime
 import pandas as pd
 
 
+TIME_FREQUENCY_OPTIONS = ["D", "DU", "W", "M", "Q", "Y"]
+
+
 class Dataset:
     def __init__(
         self,
@@ -19,8 +22,16 @@ class Dataset:
             enforce_not_none=True,
         )
         self.X = self.organize_time_series(X, filter_start_date, filter_end_date)
-        self.time_frequency = time_frequency
+        self.time_frequency = self._validate_time_frequency(time_frequency)
         self.y_pred = None
+
+    @staticmethod
+    def _validate_time_frequency(time_frequency):
+        if time_frequency is not None and time_frequency not in TIME_FREQUENCY_OPTIONS:
+            raise ValueError(
+                f"'time_frequency' must be one of {TIME_FREQUENCY_OPTIONS} or None"
+            )
+        return time_frequency
 
     def __len__(self):
         return len(self.y)
