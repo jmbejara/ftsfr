@@ -19,6 +19,10 @@ class TimeSeriesModel:
         return cls.virtual_env
 
     @classmethod
+    def get_requirements_file_path(cls):
+        return cls.requirements_file
+
+    @classmethod
     def get_python_version(cls):
         return cls.python_version
 

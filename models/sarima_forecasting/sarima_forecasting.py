@@ -1,18 +1,15 @@
 # sarima_forecasting.py
 
-import datetime
-from typing import Union
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from models.time_series_model import TimeSeriesModel
+from typing import Union
+from dataset import FREQUENCY_SEASONAL_MAP
+import datetime
 
 
 class SarimaForecasting(TimeSeriesModel):
-    virtual_env = "ftsf"
-    python_version = "3.12.6"
-    requirements_file = "requirements.txt"
-
     def __init__(
         self,
         y: Union[pd.DataFrame, pd.Series],
@@ -25,10 +22,21 @@ class SarimaForecasting(TimeSeriesModel):
         intersect_forecasting: bool = False,
         only_consider_last_of_each_intersection: bool = False,
         rolling: bool = False,
+        time_frequency: str = None,
         order=(1, 1, 1),
         seasonal_order=(0, 0, 0, 0),
         selection_criterion="aic",
+        max_p=2,
+        max_q=2,
+        max_d=1,
+        max_seasonal_p=1,
+        max_seasonal_q=1,
+        max_seasonal_d=1,
     ):
+        if time_frequency not in FREQUENCY_SEASONAL_MAP.keys():
+            raise ValueError(
+                f"'time_frequency' must be one of {list(FREQUENCY_SEASONAL_MAP.keys())}"
+            )
         super().__init__(
             y,
             X,
@@ -40,10 +48,17 @@ class SarimaForecasting(TimeSeriesModel):
             intersect_forecasting,
             only_consider_last_of_each_intersection,
             rolling,
+            time_frequency,
         )
         self.order = order
         self.seasonal_order = seasonal_order
         self.selection_criterion = selection_criterion
+        self.max_p = max_p
+        self.max_q = max_q
+        self.max_d = max_d
+        self.max_seasonal_p = max_seasonal_p
+        self.max_seasonal_q = max_seasonal_q
+        self.max_seasonal_d = max_seasonal_d
         self.model = None
         self.fitted_model = None
 
@@ -51,13 +66,18 @@ class SarimaForecasting(TimeSeriesModel):
         best_score = np.inf
         best_order = None
         best_seasonal_order = None
-        for p in range(3):
-            for d in range(2):
-                for q in range(3):
-                    for P in range(2):
-                        for D in range(2):
-                            for Q in range(2):
-                                for m in [0, 12]:  # Monthly seasonal order
+
+        seasonal_frequencies = FREQUENCY_SEASONAL_MAP.get(
+            self.dataset.time_frequency, [0]
+        )
+
+        for p in range(self.max_p + 1):
+            for d in range(self.max_d + 1):
+                for q in range(self.max_q + 1):
+                    for P in range(self.max_seasonal_p + 1):
+                        for D in range(self.max_seasonal_d + 1):
+                            for Q in range(self.max_seasonal_q + 1):
+                                for m in seasonal_frequencies:
                                     try:
                                         model = SARIMAX(
                                             y,

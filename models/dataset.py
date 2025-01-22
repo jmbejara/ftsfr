@@ -3,7 +3,14 @@ import datetime
 import pandas as pd
 
 
-TIME_FREQUENCY_OPTIONS = ["D", "DU", "W", "M", "Q", "Y"]
+FREQUENCY_SEASONAL_MAP = {
+    "DU": [5, 20, 21, 22, 42, 63],
+    "D": [7, 30, 90, 365],
+    "W": [4, 13, 26, 52],
+    "M": [3, 4, 6, 12],
+    "Q": [2, 4],
+    "Y": [1, 2, 3],
+}
 
 
 class Dataset:
@@ -27,9 +34,11 @@ class Dataset:
 
     @staticmethod
     def _validate_time_frequency(time_frequency):
-        if time_frequency is not None and time_frequency not in TIME_FREQUENCY_OPTIONS:
+        if time_frequency is not None and time_frequency not in list(
+            FREQUENCY_SEASONAL_MAP.keys()
+        ):
             raise ValueError(
-                f"'time_frequency' must be one of {TIME_FREQUENCY_OPTIONS} or None"
+                f"'time_frequency' must be one of {list(FREQUENCY_SEASONAL_MAP.keys())} or None"
             )
         return time_frequency
 
