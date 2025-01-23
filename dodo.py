@@ -109,3 +109,44 @@ def task_pull_data():
             "clean": [],
         }
     # fmt: on
+
+    if datasets["crsp_treasury"]:
+        # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
+        # The code right now only pulls them separately.
+        from pull_CRSP_treasury import SUBFOLDER as subfolder
+
+        yield {
+            "name": "crsp_treasury",
+            "actions": [
+                "ipython ./src/pull_treasury_auction_stats.py",
+                "ipython ./src/calculate_ontherun.py",
+                "ipython ./src/pull_CRSP_treasury.py",
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "treasury_auction_stats.csv",
+                DATA_DIR / subfolder / "issue_dates.csv",
+                DATA_DIR / subfolder / "ontherun.csv",
+                DATA_DIR / subfolder / "CRSP_TFZ_DAILY.parquet",
+                DATA_DIR / subfolder / "CRSP_TFZ_INFO.parquet",
+                DATA_DIR / subfolder / "CRSP_TFZ_CONSOLIDATED.parquet",
+            ],
+            "file_dep": [
+                "./src/pull_treasury_auction_stats.py",
+                "./src/calculate_ontherun.py",
+                "./src/pull_CRSP_treasury.py",
+            ],
+            "clean": [],
+        }
+
+
+# def task_run_benchmarks():
+#     """Run selected model benchmarks based on benchmarks.toml configuration"""
+#     models = BENCHMARKS['models']
+
+#     if models["var"]:
+#         yield {
+#             "actions": ["ipython ./src/models/var_benchmark.py"],
+#             "targets": [OUTPUT_DIR / "var_results.parquet"],
+#             "file_dep": ["./src/models/var_benchmark.py"],
+#             "clean": [],
+#         }

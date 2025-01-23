@@ -13,6 +13,7 @@ us_govt_bonds = false
 commodity_futures = false
 crsp_compustat = true
 crsp_returns = true
+crsp_treasury = true
 finra_trace = false
 sp500_options = false
 
