@@ -7,7 +7,6 @@ sys.path.insert(1, "./src/")
 
 from settings import config
 
-BASE_DIR = Path(config("BASE_DIR"))
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 
@@ -93,11 +92,11 @@ def task_pull_data():
         }
     # fmt: off
     if datasets["us_corp_bonds"]:
-        from pull_corp_bonds_duration_matched import DATA_INFO
-        from pull_corp_bonds_duration_matched import SUBFOLDER as subfolder
+        from pull_corp_bonds import DATA_INFO
+        from pull_corp_bonds import SUBFOLDER as subfolder
         yield {
             "name": "us_corp_bonds",
-            "actions": ["ipython ./src/pull_corp_bonds_duration_matched.py"],
+            "actions": ["ipython ./src/pull_corp_bonds.py"],
             "targets": [
                 DATA_DIR / subfolder / info["parquet"]
                 for info in DATA_INFO.values()
@@ -106,7 +105,7 @@ def task_pull_data():
                 DATA_DIR / subfolder / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
                 for info in DATA_INFO.values()
             ],
-            "file_dep": ["./src/pull_corp_bonds_duration_matched.py"],
+            "file_dep": ["./src/pull_corp_bonds.py"],
             "clean": [],
         }
     # fmt: on

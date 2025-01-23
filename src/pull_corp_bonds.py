@@ -9,7 +9,7 @@ from settings import config
 DATA_DIR = config("DATA_DIR")
 MIN_N_ROWS_EXPECTED = 500
 
-SUBFOLDER = "bond_returns"
+SUBFOLDER = "us_corp_bonds"
 DATA_INFO = {
     "Treasury Bond Returns": {
         "url": "https://openbondassetpricing.com/wp-content/uploads/2024/06/bondret_treasury.csv",

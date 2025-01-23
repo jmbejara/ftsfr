@@ -1,10 +1,5 @@
-import os
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from pathlib import Path
-import itertools
 
-import numpy as np
 import pandas as pd
 import wrds
 
@@ -61,7 +56,7 @@ def pull_CRSP_treasury_daily(
 
 
 def pull_CRSP_treasury_info(wrds_username=WRDS_USERNAME):
-    query = f"""
+    query = """
         SELECT kytreasno, kycrspid, tcusip, tdatdt, tmatdt, tcouprt, itype,
             ROUND((tmatdt - tdatdt) / 365.0) AS term
         FROM crspm.tfz_iss AS iss
@@ -89,7 +84,9 @@ def pull_CRSP_treasury_consolidated(
             crspm.tfz_dly AS tfz
         LEFT JOIN
             crspm.tfz_iss AS iss
-            ON tfz.kytreasno = iss.kytreasno AND tfz.kycrspid = iss.kycrspid
+        ON
+            tfz.kytreasno = iss.kytreasno AND
+            tfz.kycrspid = iss.kycrspid
         WHERE
             tfz.caldt BETWEEN '{start_date}' AND '{end_date}'
             AND iss.itype IN (1, 2)
@@ -98,20 +95,21 @@ def pull_CRSP_treasury_consolidated(
     db = wrds.Connection(wrds_username=wrds_username)
     df = db.raw_sql(query, date_cols=["caldt", "tdatdt", "tmatdt"])
     df = df.reset_index(drop=True)
-    df = calc_runness_(df)
+    df = calc_runness(df)
     db.close()
     return df
 
 
-def calc_runness_(data):
+def calc_runness(data):
     """
     Calculate runness for the securities issued in 1980 or later.
 
     This is due to the following condition of Gurkaynak, Sack, and Wright (2007):
-        iv) Exclude on-the-run issues and 1st off-the-run issues for 2,3,5, 7, 10, 20, 30 years securities issued in 1980 or later.
+        iv) Exclude on-the-run issues and 1st off-the-run issues for 2,3,5,7,
+            10, 20, 30 years securities issued in 1980 or later.
     """
 
-    def __calc_runness(df):
+    def _calc_runness(df):
         temp = df.sort_values(by=["caldt", "term", "tdatdt"])
         return (
             temp.groupby(["caldt", "term"])["tdatdt"].rank(
@@ -121,7 +119,7 @@ def calc_runness_(data):
         )
 
     data_run_ = data[data.caldt >= "1980"]
-    runs = __calc_runness(data_run_)
+    runs = _calc_runness(data_run_)
     data["run"] = 0
     data.loc[data_run_.index, "run"] = runs
     return data
