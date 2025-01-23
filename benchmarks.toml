@@ -1,20 +1,20 @@
 [datasets]
+# Aggregated datasets
+cds_portfolios = false
+fed_yield_curve = true
+ff_25_portfolios = true
+forex_portfolios = false
+industrial_production = false
+sovereign_bonds = false
+us_corp_bonds = false
+us_govt_bonds = false
+
 # Disaggregated datasets
-crsp_returns = true
+commodity_futures = false
 crsp_compustat = true
+crsp_returns = true
 finra_trace = false
 sp500_options = false
-commodity_futures = false
-
-# Aggregated datasets
-fed_yield_curve = true
-ff_25_portfolios = false
-us_govt_bonds = false
-us_corp_bonds = false
-sovereign_bonds = false
-forex_portfolios = false
-cds_portfolios = false
-industrial_production = false
 
 [models]
 # Traditional Time Series Models

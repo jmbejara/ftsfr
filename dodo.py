@@ -37,6 +37,31 @@ def task_pull_data():
     """Pull selected datasets based on benchmarks.toml configuration"""
     datasets = BENCHMARKS["datasets"]
 
+    ## Aggregate datasets
+    if datasets["fed_yield_curve"]:
+        yield {
+            "name": "fed_yield_curve",
+            "actions": ["ipython ./src/pull_fed_yield_curve.py"],
+            "targets": [DATA_DIR / "fed_yield_curve.parquet"],
+            "file_dep": ["./src/pull_fed_yield_curve.py"],
+            "clean": [],
+        }
+
+    if datasets["ff_25_portfolios"]:
+        from pull_fama_french_25_portfolios import DATA_INFO
+
+        yield {
+            "name": "ff_25_portfolios",
+            "actions": ["ipython ./src/pull_fama_french_25_portfolios.py"],
+            "targets": [
+                DATA_DIR / "ff_25_portfolios" / info["parquet"]
+                for info in DATA_INFO.values()
+            ],
+            "file_dep": ["./src/pull_fama_french_25_portfolios.py"],
+            "clean": [],
+        }
+
+    ## Disaggregated datasets
     if datasets["crsp_returns"]:
         yield {
             "name": "crsp_returns",
@@ -59,14 +84,6 @@ def task_pull_data():
                 DATA_DIR / "FF_FACTORS.parquet",
             ],
             "file_dep": ["./src/pull_CRSP_Compustat.py"],
-            "clean": [],
-        }
-    if datasets["fed_yield_curve"]:
-        yield {
-            "name": "fed_yield_curve",
-            "actions": ["ipython ./src/pull_fed_yield_curve.py"],
-            "targets": [DATA_DIR / "fed_yield_curve.parquet"],
-            "file_dep": ["./src/pull_fed_yield_curve.py"],
             "clean": [],
         }
 

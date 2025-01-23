@@ -1,14 +1,13 @@
-import pandas as pd
-import requests
+import os
 import zipfile
 from pathlib import Path
-import os
 
+import pandas as pd
+import requests
 
-DATA_DIR = Path("_data")
-DATA_DIR.mkdir(exist_ok=True)
-OUTPUT_DIR = DATA_DIR / "output"
-OUTPUT_DIR.mkdir(exist_ok=True)
+from settings import config
+
+DATA_DIR = config("DATA_DIR")
 MIN_N_ROWS_EXPECTED = 500
 
 DATA_INFO = {
@@ -73,11 +72,17 @@ def download_and_extract_data(url, zip, csv, data_dir=DATA_DIR):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(data_dir)
 
+    # Check if the file was extracted with uppercase extension, change to lowercase
+    # Some of the Ken French files have .CSV as an extension instead of .csv
+    uppercase_csv_path = data_dir / csv.upper()
+    if uppercase_csv_path.exists():
+        uppercase_csv_path.rename(extracted_csv_path)
+
     return extracted_csv_path
 
 
 def load_data_into_dataframe(
-    csv_path, equal_weighted: bool = False, check_n_rows: bool = True
+    csv_path: Path, equal_weighted: bool = False, check_n_rows: bool = True
 ):
     """
     Loads the extracted CSV file into a Pandas DataFrame, dynamically starting
@@ -118,7 +123,7 @@ def load_data_into_dataframe(
 
     df.columns = [col.strip() for col in df.columns]
 
-    if csv_path.lower().contains("daily"):
+    if "daily" in csv_path.name.lower():
         df["date"] = pd.to_datetime(df["date"], format="%Y%m%d", errors="coerce")
     else:
         df["date"] = pd.to_datetime(df["date"], format="%Y%m", errors="coerce")
@@ -135,44 +140,33 @@ def load_data_into_dataframe(
 
 
 def save_dataframe_to_parquet(
-    df, parquet_name, output_dir=OUTPUT_DIR, equal_weighted=False
+    df, parquet_name, data_dir=DATA_DIR, equal_weighted=False
 ):
     """
     Saves the DataFrame to a Parquet file.
 
     Parameters:
         df (pd.DataFrame): The DataFrame to save.
-        output_dir (Path): Directory where the Parquet file will be saved.
+        data_dir (Path): Directory where the Parquet file will be saved.
     """
     if equal_weighted:
         parquet_name = parquet_name.replace(".parquet", "_equal_weighted.parquet")
 
-    output_path = output_dir / parquet_name
+    output_path = data_dir / parquet_name
     df.to_parquet(output_path)
-
-
-def delete_csv_and_zip_files():
-    """
-    Deletes the CSV and ZIP files after the data has been extracted.
-    """
-    for info in DATA_INFO.values():
-        csv_path = DATA_DIR / info["csv"]
-        zip_path = DATA_DIR / info["zip"]
-        os.remove(csv_path)
-        os.remove(zip_path)
 
 
 if __name__ == "__main__":
     for port, info in DATA_INFO.items():
-        try:
-            csv_path = download_and_extract_data(
-                info["url"], info["zip"], info["csv"], data_dir=DATA_DIR
+        data_dir = DATA_DIR / "ff_25_portfolios"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        csv_path = download_and_extract_data(
+            info["url"], info["zip"], info["csv"], data_dir=data_dir
+        )
+        for equal_weighted in [False, True]:
+            df = load_data_into_dataframe(csv_path, equal_weighted=equal_weighted)
+            save_dataframe_to_parquet(
+                df, info["parquet"], data_dir=data_dir, equal_weighted=equal_weighted
             )
-            for equal_weighted in [False, True]:
-                df = load_data_into_dataframe(csv_path, equal_weighted=equal_weighted)
-                save_dataframe_to_parquet(
-                    df, info["parquet"], equal_weighted=equal_weighted
-                )
-        except Exception as e:
-            continue
-    delete_csv_and_zip_files()
+        os.remove(data_dir / info["csv"])
+        os.remove(data_dir / info["zip"])
