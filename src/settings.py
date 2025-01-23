@@ -114,8 +114,10 @@ def config(*args, **kwargs):
     return var
 
 
-if __name__ == "__main__":
-    ## If they don't exist, create the _data and _output directories
+def create_directories():
     d["DATA_DIR"].mkdir(parents=True, exist_ok=True)
     d["OUTPUT_DIR"].mkdir(parents=True, exist_ok=True)
-    # (d["BASE_DIR"] / "_docs").mkdir(parents=True, exist_ok=True)
+
+
+if __name__ == "__main__":
+    create_directories()

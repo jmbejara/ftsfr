@@ -1,7 +1,7 @@
-from doit.tools import run_once
 import sys
-import toml
 from pathlib import Path
+
+import toml
 
 sys.path.insert(1, "./src/")
 
@@ -17,16 +17,17 @@ with open("benchmarks.toml", "r") as f:
 
 
 def task_config():
-    """Basic configuration setup"""
+    """Create empty directories for data and output if they don't exist"""
     file_dep = [
         "./src/settings.py",
     ]
+    targets = [DATA_DIR, OUTPUT_DIR]
 
     return {
         "actions": [
             "ipython ./src/settings.py",
         ],
-        "targets": [],
+        "targets": targets,
         "file_dep": file_dep,
         "clean": [],
     }
