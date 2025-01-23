@@ -2,7 +2,7 @@
 # Aggregated datasets
 cds_portfolios = false
 fed_yield_curve = true
-ff_25_portfolios = true
+ken_french_portfolios = true
 forex_portfolios = false
 industrial_production = false
 sovereign_bonds = false

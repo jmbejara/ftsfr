@@ -109,3 +109,13 @@ GluonTS is focused on probabilistic forecasting, allowing users to generate conf
 https://github.com/awslabs/gluonts
 
 https://ts.gluon.ai/stable/
+
+
+# Useful Commands
+
+(We can delete this later. I'm putting these here as they're useful for me while I'm developing)
+
+To run pre-commit hooks on all files:
+```bash
+pre-commit run --all-files
+```

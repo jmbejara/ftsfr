@@ -7,7 +7,7 @@ import requests
 
 from settings import config
 
-SUBFOLDER = "french_25_portfolios"
+SUBFOLDER = "ken_french_portfolios"
 DATA_DIR = config("DATA_DIR")
 MIN_N_ROWS_EXPECTED = 500
 

@@ -11,6 +11,7 @@ from io import BytesIO
 from pathlib import Path
 from settings import config
 
+SUBFOLDER = "fed_yield_curve"
 DATA_DIR = config("DATA_DIR")
 
 
@@ -37,5 +38,7 @@ def load_fed_yield_curve(data_dir=DATA_DIR):
 
 if __name__ == "__main__":
     df = pull_fed_yield_curve()
-    path = Path(DATA_DIR) / "fed_yield_curve.parquet"
+    data_dir = DATA_DIR / SUBFOLDER
+    data_dir.mkdir(parents=True, exist_ok=True)
+    path = data_dir / "fed_yield_curve.parquet"
     df.to_parquet(path)

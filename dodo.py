@@ -36,25 +36,26 @@ def task_config():
 def task_pull_data():
     """Pull selected datasets based on benchmarks.toml configuration"""
     datasets = BENCHMARKS["datasets"]
+    from pull_fed_yield_curve import SUBFOLDER as subfolder
 
     ## Aggregate datasets
     if datasets["fed_yield_curve"]:
         yield {
             "name": "fed_yield_curve",
             "actions": ["ipython ./src/pull_fed_yield_curve.py"],
-            "targets": [DATA_DIR / "fed_yield_curve.parquet"],
+            "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
             "file_dep": ["./src/pull_fed_yield_curve.py"],
             "clean": [],
         }
 
-    if datasets["ff_25_portfolios"]:
+    if datasets["ken_french_portfolios"]:
         from pull_fama_french_25_portfolios import DATA_INFO
 
         yield {
-            "name": "ff_25_portfolios",
+            "name": "ken_french_portfolios",
             "actions": ["ipython ./src/pull_fama_french_25_portfolios.py"],
             "targets": [
-                DATA_DIR / "ff_25_portfolios" / info["parquet"]
+                DATA_DIR / "ken_french_portfolios" / info["parquet"]
                 for info in DATA_INFO.values()
             ],
             "file_dep": ["./src/pull_fama_french_25_portfolios.py"],
