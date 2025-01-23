@@ -28,6 +28,7 @@ import wrds
 
 from settings import config
 
+SUBFOLDER = "crsp_stock"
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("1925-01-01")
@@ -176,13 +177,13 @@ def pull_CRSP_index_files(
 
 
 def load_CRSP_monthly_file(data_dir=DATA_DIR):
-    path = Path(data_dir) / "CRSP_MSF_INDEX_INPUTS.parquet"
+    path = Path(data_dir) / SUBFOLDER / "CRSP_MSF_INDEX_INPUTS.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def load_CRSP_index_files(data_dir=DATA_DIR):
-    path = Path(data_dir) / f"CRSP_MSIX.parquet"
+    path = Path(data_dir) / SUBFOLDER / "CRSP_MSIX.parquet"
     df = pd.read_parquet(path)
     return df
 
@@ -193,11 +194,12 @@ def _demo():
 
 
 if __name__ == "__main__":
+    # Create subfolder
+    data_dir = DATA_DIR / SUBFOLDER
+    data_dir.mkdir(parents=True, exist_ok=True)
 
     df_msf = pull_CRSP_monthly_file(start_date=START_DATE, end_date=END_DATE)
-    path = Path(DATA_DIR) / "CRSP_MSF_INDEX_INPUTS.parquet"
-    df_msf.to_parquet(path)
+    df_msf.to_parquet(data_dir / "CRSP_MSF_INDEX_INPUTS.parquet")
 
     df_msix = pull_CRSP_index_files(start_date=START_DATE, end_date=END_DATE)
-    path = Path(DATA_DIR) / f"CRSP_MSIX.parquet"
-    df_msix.to_parquet(path)
+    df_msix.to_parquet(data_dir / "CRSP_MSIX.parquet")

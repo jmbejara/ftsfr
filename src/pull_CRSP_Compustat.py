@@ -35,7 +35,7 @@ import wrds
 from settings import config
 from pathlib import Path
 
-OUTPUT_DIR = Path(config("OUTPUT_DIR"))
+SUBFOLDER = "crsp_compustat"
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 # START_DATE = config("START_DATE")
@@ -176,25 +176,25 @@ def pull_Fama_French_factors(wrds_username=WRDS_USERNAME):
 
 
 def load_compustat(data_dir=DATA_DIR):
-    path = Path(data_dir) / "Compustat.parquet"
+    path = Path(data_dir) / SUBFOLDER / "Compustat.parquet"
     comp = pd.read_parquet(path)
     return comp
 
 
 def load_CRSP_stock_ciz(data_dir=DATA_DIR):
-    path = Path(data_dir) / "CRSP_stock_ciz.parquet"
+    path = Path(data_dir) / SUBFOLDER / "CRSP_stock_ciz.parquet"
     crsp = pd.read_parquet(path)
     return crsp
 
 
 def load_CRSP_Comp_Link_Table(data_dir=DATA_DIR):
-    path = Path(data_dir) / "CRSP_Comp_Link_Table.parquet"
+    path = Path(data_dir) / SUBFOLDER / "CRSP_Comp_Link_Table.parquet"
     ccm = pd.read_parquet(path)
     return ccm
 
 
 def load_Fama_French_factors(data_dir=DATA_DIR):
-    path = Path(data_dir) / "FF_FACTORS.parquet"
+    path = Path(data_dir) / SUBFOLDER / "FF_FACTORS.parquet"
     ff = pd.read_parquet(path)
     return ff
 
@@ -207,14 +207,18 @@ def _demo():
 
 
 if __name__ == "__main__":
+    # Create subfolder
+    data_dir = DATA_DIR / SUBFOLDER
+    data_dir.mkdir(parents=True, exist_ok=True)
+
     comp = pull_compustat(wrds_username=WRDS_USERNAME)
-    comp.to_parquet(DATA_DIR / "Compustat.parquet")
+    comp.to_parquet(data_dir / "Compustat.parquet")
 
     crsp = pull_CRSP_stock_ciz(wrds_username=WRDS_USERNAME)
-    crsp.to_parquet(DATA_DIR / "CRSP_stock_ciz.parquet")
+    crsp.to_parquet(data_dir / "CRSP_stock_ciz.parquet")
 
     ccm = pull_CRSP_Comp_Link_Table(wrds_username=WRDS_USERNAME)
-    ccm.to_parquet(DATA_DIR / "CRSP_Comp_Link_Table.parquet")
+    ccm.to_parquet(data_dir / "CRSP_Comp_Link_Table.parquet")
 
     ff = pull_Fama_French_factors(wrds_username=WRDS_USERNAME)
-    ff.to_parquet(DATA_DIR / "FF_FACTORS.parquet")
+    ff.to_parquet(data_dir / "FF_FACTORS.parquet")

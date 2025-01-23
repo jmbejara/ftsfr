@@ -63,59 +63,49 @@ def task_pull_data():
 
     ## Disaggregated datasets
     if datasets["crsp_returns"]:
+        from pull_CRSP_stock import SUBFOLDER as subfolder
+
         yield {
             "name": "crsp_returns",
             "actions": ["ipython ./src/pull_CRSP_stock.py"],
             "targets": [
-                DATA_DIR / "CRSP_MSF_INDEX_INPUTS.parquet",
-                DATA_DIR / "CRSP_MSIX.parquet",
+                DATA_DIR / subfolder / "CRSP_MSF_INDEX_INPUTS.parquet",
+                DATA_DIR / subfolder / "CRSP_MSIX.parquet",
             ],
             "file_dep": ["./src/pull_CRSP_stock.py"],
             "clean": [],
         }
     if datasets["crsp_compustat"]:
+        from pull_CRSP_Compustat import SUBFOLDER as subfolder
+
         yield {
             "name": "crsp_compustat",
             "actions": ["ipython ./src/pull_CRSP_Compustat.py"],
             "targets": [
-                DATA_DIR / "Compustat.parquet",
-                DATA_DIR / "CRSP_stock_ciz.parquet",
-                DATA_DIR / "CRSP_Comp_Link_Table.parquet",
-                DATA_DIR / "FF_FACTORS.parquet",
+                DATA_DIR / subfolder / "Compustat.parquet",
+                DATA_DIR / subfolder / "CRSP_stock_ciz.parquet",
+                DATA_DIR / subfolder / "CRSP_Comp_Link_Table.parquet",
+                DATA_DIR / subfolder / "FF_FACTORS.parquet",
             ],
             "file_dep": ["./src/pull_CRSP_Compustat.py"],
             "clean": [],
         }
-
+    # fmt: off
     if datasets["us_corp_bonds"]:
         from pull_corp_bonds_duration_matched import DATA_INFO
-
+        from pull_corp_bonds_duration_matched import SUBFOLDER as subfolder
         yield {
             "name": "us_corp_bonds",
             "actions": ["ipython ./src/pull_corp_bonds_duration_matched.py"],
             "targets": [
-                DATA_DIR / "bond_returns" / info["parquet"]
+                DATA_DIR / subfolder / info["parquet"]
                 for info in DATA_INFO.values()
             ]
             + [
-                DATA_DIR
-                / "bond_returns"
-                / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
+                DATA_DIR / subfolder / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
                 for info in DATA_INFO.values()
             ],
             "file_dep": ["./src/pull_corp_bonds_duration_matched.py"],
             "clean": [],
         }
-
-
-# def task_run_benchmarks():
-#     """Run selected model benchmarks based on benchmarks.toml configuration"""
-#     models = BENCHMARKS['models']
-
-#     if models["var"]:
-#         yield {
-#             "actions": ["ipython ./src/models/var_benchmark.py"],
-#             "targets": [OUTPUT_DIR / "var_results.parquet"],
-#             "file_dep": ["./src/models/var_benchmark.py"],
-#             "clean": [],
-#         }
+    # fmt: on
