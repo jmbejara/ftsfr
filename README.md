@@ -34,118 +34,6 @@ Finally, download the data using the following command:
 doit
 ```
 
-# Migrations
-## On macOS/Linux
-```bash
-export FLASK_APP=run.py
-```
-
-```bash
-export FLASK_ENV=development
-```
-
-```bash
-python -m flask db init
-```
-
-```bash
-python -m flask db migrate -m "Initial migration for Development SQLite"
-```
-
-```bash
-python -m flask db upgrade
-```
-
-```bash
-export FLASK_ENV=production
-```
-
-```bash
-python -m flask db init
-```
-
-```bash
-python -m flask db migrate -m "Initial migration for Production SQLite"
-```
-
-```bash
-python -m flask db upgrade
-```
-
-## On Windows (Command Prompt)
-```bash
-set FLASK_APP=run.py
-```
-
-```bash
-set FLASK_ENV=development
-```
-
-```bash
-python -m flask db init
-```
-
-```bash
-python -m flask db migrate -m "Initial migration for Development SQLite"
-```
-
-```bash
-python -m flask db upgrade
-```
-
-```bash
-set FLASK_ENV=production
-```
-
-```bash
-python -m flask db init
-```
-
-```bash
-python -m flask db migrate -m "Initial migration for Production SQLite"
-```
-
-```bash
-python -m flask db upgrade
-```
-
-## On Windows (PowerShell)
-```powershell
-$env:FLASK_APP="run.py"
-```
-
-```powershell
-$env:FLASK_ENV="development"
-```
-
-```powershell
-python -m flask db init
-```
-
-```powershell
-python -m flask db migrate -m "Initial migration for Development SQLite"
-```
-
-```powershell
-python -m flask db upgrade
-```
-
-```powershell
-$env:FLASK_ENV="production"
-```
-
-```powershell
-python -m flask db init
-```
-
-```powershell
-python -m flask db migrate -m "Initial migration for Production SQLite"
-```
-
-```powershell
-python -m flask db upgrade
-```
-
 # Datasets
 
 ## Datasets I've Already Included
@@ -153,7 +41,6 @@ python -m flask db upgrade
 - CRSP Returns (with and without dividends)
 
 ## Potential Datasets to Include in the Future (Notes, Work in Progress)
-
 
 The paper would reference data from a few papers. The datasets would mostly be organized by the paper in which they are references.
 
@@ -196,3 +83,29 @@ Other options. It's probably best to stick to those above for simplicity
 - Dividend futures, dividends, S&P 500 returns
 - Average within-firm predictability
 	- Match asset returns and Compustat financials within firms. That is, for a given company (e.g., via PERCMO), find the stock return, dividend payment, bond returns, associated single name CDS, options connected with that firms stocks, and various Compustat financials all associated with that company. Calculate the predictability within this firm. Then, do this for all firms. Measure the average predictability among firms.
+
+# Interesting Packages to Use
+## Darts
+Darts offers a consistent fit() and predict() interface across various forecasting models (from ARIMA to deep learning models). Easy to understand, compare and switch.
+
+https://github.com/unit8co/darts
+
+## Prophet
+Prophet is specifically designed for users with limited statistical knowledge.
+
+https://github.com/facebook/prophet
+
+## SKTime
+SKtime provides a scikit-learn-compatible framework for time series analysis. Allows for easy model tuning, validation, and deployment.
+You can also use embedded scikit-learn data transformers for feature generation.
+
+https://github.com/sktime/sktime
+
+https://www.sktime.net/en/stable/
+
+## GluonTS
+GluonTS is focused on probabilistic forecasting, allowing users to generate confidence intervals.
+
+https://github.com/awslabs/gluonts
+
+https://ts.gluon.ai/stable/

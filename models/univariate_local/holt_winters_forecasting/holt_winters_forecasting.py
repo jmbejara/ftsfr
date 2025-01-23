@@ -43,6 +43,7 @@ class HoltWintersForecasting(TimeSeriesModel):
         self.model = None
         self.fitted_model = None
 
+    @TimeSeriesModel._fitted
     def fit(self, y, X=None):
         seasonal_periods = self._get_seasonal_periods()
         self.model = ExponentialSmoothing(

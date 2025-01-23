@@ -14,6 +14,14 @@ class TimeSeriesModel:
     python_version = "3.12.6"
     requirements_file = "requirements.txt"
 
+    @staticmethod
+    def _fitted(fit_func):
+        def wrapper(self, y, X=None):
+            fit_func(self, y, X)
+            self.is_fitted = True
+
+        return wrapper
+
     @classmethod
     def get_virtual_env(cls):
         return cls.virtual_env
@@ -40,6 +48,7 @@ class TimeSeriesModel:
         rolling: bool = False,
         time_frequency: str = None,
     ):
+        self.is_fitted = False
         if n_forecasting is not None and forecasting_start_date is not None:
             raise ValueError(
                 "Only one of 'n_forecasting' and 'forecasting_start_date' should be provided."

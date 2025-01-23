@@ -3,10 +3,11 @@ import numpy as np
 from models.time_series_model import TimeSeriesModel
 
 
-class NaiveForecasting(TimeSeriesModel):
+class MeanForecasting(TimeSeriesModel):
 
+    @TimeSeriesModel._fitted
     def fit(self, y, X=None):
-        self.prediction = y.iloc[:, -1].values
+        self.prediction = y.iloc[:, 0].dropna().values.mean()
 
     def forecast(self, y, X=None):
         return pd.DataFrame(

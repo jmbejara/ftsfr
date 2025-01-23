@@ -62,6 +62,7 @@ class SarimaForecasting(TimeSeriesModel):
         self.model = None
         self.fitted_model = None
 
+    @TimeSeriesModel._fitted
     def fit(self, y, X=None):
         best_score = np.inf
         best_order = None
