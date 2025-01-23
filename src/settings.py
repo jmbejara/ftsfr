@@ -69,10 +69,6 @@ d["OS_TYPE"] = get_os()
 d["BASE_DIR"] = Path(__file__).absolute().parent.parent
 
 # fmt: off
-## Other .env variables
-d["START_DATE"] = _config("START_DATE", default="1913-01-01", cast=to_datetime)
-d["END_DATE"] = _config("END_DATE", default="2024-01-01", cast=to_datetime)
-
 ## Paths
 d["DATA_DIR"] = if_relative_make_abs(_config('DATA_DIR', default=Path('_data'), cast=Path))
 d["MANUAL_DATA_DIR"] = if_relative_make_abs(_config('MANUAL_DATA_DIR', default=Path('data_manual'), cast=Path))
