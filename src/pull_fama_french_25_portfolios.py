@@ -7,6 +7,7 @@ import requests
 
 from settings import config
 
+SUBFOLDER = "french_25_portfolios"
 DATA_DIR = config("DATA_DIR")
 MIN_N_ROWS_EXPECTED = 500
 
@@ -158,7 +159,7 @@ def save_dataframe_to_parquet(
 
 if __name__ == "__main__":
     for port, info in DATA_INFO.items():
-        data_dir = DATA_DIR / "ff_25_portfolios"
+        data_dir = DATA_DIR / SUBFOLDER
         data_dir.mkdir(parents=True, exist_ok=True)
         csv_path = download_and_extract_data(
             info["url"], info["zip"], info["csv"], data_dir=data_dir
