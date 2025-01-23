@@ -87,6 +87,26 @@ def task_pull_data():
             "clean": [],
         }
 
+    if datasets["us_corp_bonds"]:
+        from pull_corp_bonds_duration_matched import DATA_INFO
+
+        yield {
+            "name": "us_corp_bonds",
+            "actions": ["ipython ./src/pull_corp_bonds_duration_matched.py"],
+            "targets": [
+                DATA_DIR / "bond_returns" / info["parquet"]
+                for info in DATA_INFO.values()
+            ]
+            + [
+                DATA_DIR
+                / "bond_returns"
+                / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
+                for info in DATA_INFO.values()
+            ],
+            "file_dep": ["./src/pull_corp_bonds_duration_matched.py"],
+            "clean": [],
+        }
+
 
 # def task_run_benchmarks():
 #     """Run selected model benchmarks based on benchmarks.toml configuration"""

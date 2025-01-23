@@ -6,7 +6,7 @@ ff_25_portfolios = true
 forex_portfolios = false
 industrial_production = false
 sovereign_bonds = false
-us_corp_bonds = false
+us_corp_bonds = true
 us_govt_bonds = false
 
 # Disaggregated datasets
