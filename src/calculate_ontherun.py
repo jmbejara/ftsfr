@@ -97,10 +97,11 @@ if __name__ == "__main__":
 
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=pd.errors.DtypeWarning)
-        dat = pd.read_csv(
-            data_dir / "treasury_auction_stats.csv",
-            parse_dates=["issueDate", "maturityDate"],
-        )
+        # dat = pd.read_csv(
+        #     data_dir / "treasury_auction_stats.csv",
+        #     parse_dates=["issueDate", "maturityDate"],
+        # )
+        dat = pd.read_parquet(data_dir / "treasury_auction_stats.parquet")
 
     sub_cols = [
         "cusip",
