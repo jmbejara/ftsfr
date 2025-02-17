@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pandas as pd
 import wrds
+from calculate_cdsreturns import calc_cds_return
+import pull_fed_yield_curve
 
 from settings import config
 
@@ -77,8 +79,25 @@ def pull_cds_data(wrds_username=WRDS_USERNAME):
     combined_df = combine_cds_data(cds_data)
     return combined_df
 
+def calc_cds_rets(cds_spreads = None, start_date = START_DATE, end_date = END_DATE):
+    """
+    Calculates the daily returns of the parspread for each ticker in the DataFrame.
+
+    Args:
+        cds_spreads (pd.DataFrame): A DataFrame containing CDS data with columns "date",
+        "ticker", and "parspread".
+
+    Returns:
+        cds_returns (pd.DataFrame): returns calculated
+    """
+    raw_rates = pull_fed_yield_curve()
+    cds_returns = calc_cds_return(cds_spreads, raw_rates, start_date, end_date) # This is daily returns, can concert to monthly to compare with He Kelly
+    return cds_returns
+
 
 if __name__ == "__main__":
     combined_df = pull_cds_data(wrds_username=WRDS_USERNAME)
+    cds_returns = calc_cds_rets(combined_df, START_DATE, END_DATE)
     (DATA_DIR / SUBFOLDER).mkdir(parents=True, exist_ok=True)
     combined_df.to_parquet(DATA_DIR / SUBFOLDER / "markit_cds.parquet")
+    cds_returns.to_parquet(DATA_DIR / SUBFOLDER / "markit_cds_returns.parquet")
