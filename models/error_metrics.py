@@ -1,20 +1,33 @@
 import numpy as np
+import pandas as pd
+import csv
+import os
+
+
+PATH_ERROR_METRICS_RESULTS = "models/results/error_metrics/error_metrics.csv"
+TEST_PATH_ERROR_METRICS_RESULTS = "models/results/tests/error_metrics/error_metrics.csv"
 
 
 METRICS = {
     "MSE": lambda y_true, y_pred: np.mean((y_true - y_pred) ** 2),
     "RMSE": lambda y_true, y_pred: np.sqrt(np.mean((y_true - y_pred) ** 2)),
     "MAE": lambda y_true, y_pred: np.mean(np.abs(y_true - y_pred)),
-    "MASE": lambda y_true, y_pred: np.mean(np.abs(y_true - y_pred))
-    / np.mean(np.abs(y_true - np.roll(y_true, 1))),
-    "SMAPE": lambda y_true, y_pred: 2
-    * np.mean(np.abs(y_true - y_pred) / (np.abs(y_true) + np.abs(y_pred))),
+    "MASE": (
+        lambda y_true, y_pred: np.mean(np.abs(y_true - y_pred))
+        / np.mean(np.abs(y_true - np.roll(y_true, 1)))
+    ),
+    "SMAPE": (
+        lambda y_true, y_pred: 2
+        * np.mean(np.abs(y_true - y_pred) / (np.abs(y_true) + np.abs(y_pred)))
+    ),
 }
 
 
 class ErrorMetrics:
-    def __init__(self):
+    def __init__(self, y_name=None, model_name=None, id=None):
         self.error_metrics = dict(zip(METRICS.keys(), [None for _ in METRICS.keys()]))
+        self.y_name = y_name
+        self.model_name = model_name
 
     def calculate_error_metrics(self, y_true, y_pred):
         organized_y_true = np.squeeze(y_true.iloc[:, 0].values)
@@ -23,3 +36,48 @@ class ErrorMetrics:
             name: metric(organized_y_true, organized_y_pred)
             for name, metric in METRICS.items()
         }
+
+    def get(self):
+        return self.error_metrics
+
+    def __repr__(self):
+        return str(self.to_pandas())
+
+    def to_pandas(self):
+        error_metrics_plus_info = self.error_metrics
+        error_metrics_plus_info["model"] = self.model_name
+        error_metrics_plus_info["y"] = self.y_name
+        error_metrics_frame = pd.DataFrame(error_metrics_plus_info, index=[0])
+        return error_metrics_frame[["model", "y"] + list(METRICS.keys())]
+
+    @classmethod
+    def multiple_to_pandas(cls, list_error_metrics, reset_index: bool = True):
+        if isinstance(list_error_metrics, cls):
+            list_error_metrics = [list_error_metrics]
+        mult_error_metrics = pd.concat(
+            [error_metrics.to_pandas() for error_metrics in list_error_metrics], axis=0
+        )
+        if reset_index:
+            mult_error_metrics.reset_index(drop=True, inplace=True)
+        return mult_error_metrics
+
+    def save(self, test_path=False):
+        self._create_results_file()
+        self.to_pandas().to_csv(
+            path_or_buf=(
+                PATH_ERROR_METRICS_RESULTS
+                if not test_path
+                else TEST_PATH_ERROR_METRICS_RESULTS
+            ),
+            mode="a",
+            header=False,
+            index=False,
+        )
+
+    @staticmethod
+    def _create_results_file():
+        if not os.path.exists(PATH_ERROR_METRICS_RESULTS):
+            columns = ["model", "y"] + list(METRICS.keys())
+            pd.DataFrame(columns=columns).to_csv(
+                PATH_ERROR_METRICS_RESULTS, index=False
+            )

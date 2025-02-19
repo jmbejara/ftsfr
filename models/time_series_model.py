@@ -4,12 +4,21 @@ import datetime
 import pandas as pd
 from models.dataset import Dataset
 from models.error_metrics import ErrorMetrics
+import os
 
 
 MODELS_PATH = "models"
+PATH_TIME_SERIES_MODELS_RESULTS = (
+    "models/results/tests/time_series_models/time_series_models.csv"
+)
+TEST_PATH_TIME_SERIES_MODELS_RESULTS = (
+    "models/results/tests/time_series_models/time_series_models.csv"
+)
 
 
 class TimeSeriesModel:
+    name = None
+    code = None
     virtual_env = "ftsf"
     python_version = "3.12.6"
     requirements_file = "requirements.txt"
@@ -22,6 +31,12 @@ class TimeSeriesModel:
 
         return wrapper
 
+    def get_model_name(self):
+        return self.name
+
+    def get_model_code(self):
+        return self.code
+
     @classmethod
     def get_virtual_env(cls):
         return cls.virtual_env
@@ -33,6 +48,13 @@ class TimeSeriesModel:
     @classmethod
     def get_python_version(cls):
         return cls.python_version
+
+    def _create_id(self):
+        time = datetime.datetime.now(datetime.timezone())
+        code = self.get_model_code()
+        if code is None or not isinstance(code, str):
+            raise ValueError("Model code must be a string.")
+        return f"{code}_{time.strftime('%Y%m%d%H%M%S%f')}"
 
     def __init__(
         self,
@@ -48,6 +70,8 @@ class TimeSeriesModel:
         rolling: bool = False,
         time_frequency: str = None,
     ):
+        self.id = self._create_id()
+        self.is_error_assessed = False
         self.is_fitted = False
         if n_forecasting is not None and forecasting_start_date is not None:
             raise ValueError(
@@ -68,7 +92,11 @@ class TimeSeriesModel:
             only_consider_last_of_each_intersection
         )
         self.rolling = rolling
-        self.error_metrics = ErrorMetrics()
+        self.error_metrics = ErrorMetrics(
+            model_name=self.get_model_name(),
+            y_name=self.dataset.y.columns[0],
+            id=self.id,
+        )
         self.divisions = {}
 
     @classmethod
@@ -82,14 +110,22 @@ class TimeSeriesModel:
         rolling: bool = False,
     ):
         new_model = cls.__new__(cls)
+        new_model.id = new_model._create_id()
+        new_model.is_error_assessed = False
+        new_model.is_fitted = False
         new_model.dataset = dataset
         new_model.step_size = step_size
         new_model.forecasting_start_date = forecasting_start_date
         new_model.n_forecasting = n_forecasting
         new_model.intersect_forecasting = intersect_forecasting
         new_model.rolling = rolling
-        new_model.error_metrics = ErrorMetrics()
+        new_model.error_metrics = ErrorMetrics(
+            model_name=new_model.get_model_name(),
+            y_name=new_model.dataset.y.columns[0],
+            id=self.id,
+        )
         new_model.divisions = {}
+        return new_model
 
     @property
     def y(self):
@@ -199,11 +235,65 @@ class TimeSeriesModel:
         for division in self.divisions.values():
             self.fit(division["training"].get_y(), division["training"].get_X())
             y_pred = self.forecast(
-                division["training"].get_y(), division["forecasting"].get_X()
+                division["forecasting"].get_y(), division["forecasting"].get_X()
             )
             division["forecasting"].set_y_pred(y_pred)
+        self.y_pred = pd.DataFrame()
+        for division in self.divisions.values():
+            self.y_pred = pd.concat(
+                [self.y_pred, division["forecasting"].get_y_pred()], axis=0
+            )
 
     def assess_error(self):
         y_true = self.y
         y_pred = self.y_pred
-        return self.error_metrics.calculate_error_metrics(y_true, y_pred)
+        y_true = y_true.loc[lambda s: s.index.isin(y_pred.index)]
+        self.error_metrics.calculate_error_metrics(y_true, y_pred)
+        self.is_error_assessed = True
+
+    def info_to_pandas(self):
+        info = {
+            "model": self.get_model_name(),
+            "id": self.id,
+            "y": self.dataset.y.columns[0],
+            "time_frequency": self.dataset.time_frequency,
+            "step_size": self.step_size,
+            "forecasting_start_date": self.divisions[0]["forecasting"].get_y().index[0],
+            "n_forecasting": len(self.divisions.values()),
+            "intersect_forecasting": self.intersect_forecasting,
+            "only_consider_last_of_each_intersection": self.only_consider_last_of_each_intersection,
+            "rolling": self.rolling,
+        }
+        return pd.DataFrame(info, index=[0])
+
+    def get_error_metrics(self):
+        if not self.is_error_assessed:
+            self.assess_error()
+        return self.error_metrics.get()
+
+    def get_error_metrics_frame(self):
+        if not self.is_error_assessed:
+            self.assess_error()
+        return self.error_metrics.to_pandas()
+
+    def save(self, save_error_metrics=True, test_path=False):
+        self._create_results_file()
+        self.to_pandas().to_csv(
+            path_or_buf=(
+                PATH_TIME_SERIES_MODELS_RESULTS
+                if not test_path
+                else TEST_PATH_TIME_SERIES_MODELS_RESULTS
+            ),
+            mode="a",
+            header=False,
+            index=False,
+        )
+        if save_error_metrics:
+            self.error_metrics.save(test_path=test_path)
+
+    def _create_results_file(self):
+        if not os.path.exists(PATH_TIME_SERIES_MODELS_RESULTS):
+            columns = list(self.to_pandas().columns)
+            pd.DataFrame(columns=columns).to_csv(
+                PATH_TIME_SERIES_MODELS_RESULTS, index=False
+            )

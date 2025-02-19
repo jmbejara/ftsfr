@@ -5,11 +5,14 @@ import numpy as np
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from models.time_series_model import TimeSeriesModel
 from typing import Union
-from dataset import FREQUENCY_SEASONAL_MAP
+from models.dataset import FREQUENCY_SEASONAL_MAP
 import datetime
 
 
 class SarimaForecasting(TimeSeriesModel):
+    name = "SARIMA Forecasting"
+    code = "SAR"
+
     def __init__(
         self,
         y: Union[pd.DataFrame, pd.Series],

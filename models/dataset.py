@@ -5,7 +5,7 @@ import pandas as pd
 
 FREQUENCY_SEASONAL_MAP = {
     "DU": [5, 20, 21, 22, 42, 63],
-    "D": [7, 30, 90, 365],
+    "D": [7, 30],
     "W": [4, 13, 26, 52],
     "M": [3, 4, 6, 12],
     "Q": [2, 4],
@@ -44,6 +44,9 @@ class Dataset:
 
     def __len__(self):
         return len(self.y)
+
+    def __repr__(self):
+        return pd.concat([self.y, self.X], axis=1).to_string()
 
     @classmethod
     def from_organized_time_series(cls, y, X, time_frequency=None):

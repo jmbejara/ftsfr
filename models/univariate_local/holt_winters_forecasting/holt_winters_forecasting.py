@@ -3,10 +3,13 @@
 import pandas as pd
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from models.time_series_model import TimeSeriesModel
-from dataset import FREQUENCY_SEASONAL_MAP
+from models.dataset import FREQUENCY_SEASONAL_MAP
 
 
 class HoltWintersForecasting(TimeSeriesModel):
+    name = "Holt-Winters Forecasting"
+    code = "HWT"
+
     def __init__(
         self,
         y: pd.DataFrame,

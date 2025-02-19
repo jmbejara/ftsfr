@@ -4,6 +4,8 @@ from models.time_series_model import TimeSeriesModel
 
 
 class NaiveForecasting(TimeSeriesModel):
+    name = "Naive Forecasting"
+    code = "NAI"
 
     @TimeSeriesModel._fitted
     def fit(self, y, X=None):
