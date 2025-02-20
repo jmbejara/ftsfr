@@ -123,12 +123,13 @@ def task_pull_data():
                 "ipython ./src/pull_CRSP_treasury.py",
             ],
             "targets": [
-                DATA_DIR / subfolder / "treasury_auction_stats.csv",
+                DATA_DIR / subfolder / "treasury_auction_stats.parquet",
                 DATA_DIR / subfolder / "issue_dates.csv",
                 DATA_DIR / subfolder / "ontherun.csv",
                 DATA_DIR / subfolder / "CRSP_TFZ_DAILY.parquet",
                 DATA_DIR / subfolder / "CRSP_TFZ_INFO.parquet",
                 DATA_DIR / subfolder / "CRSP_TFZ_CONSOLIDATED.parquet",
+                DATA_DIR / subfolder / "CRSP_TFZ_with_runness.parquet",
             ],
             "file_dep": [
                 "./src/pull_treasury_auction_stats.py",

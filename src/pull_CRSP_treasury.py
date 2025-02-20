@@ -1,23 +1,10 @@
-from pathlib import Path
+"""Pull and load CRSP Treasury Data from WRDS.
 
-import pandas as pd
-import wrds
-
-from settings import config
-
-SUBFOLDER = "crsp_treasury"
-DATA_DIR = Path(config("DATA_DIR"))
-WRDS_USERNAME = config("WRDS_USERNAME")
-START_DATE = pd.Timestamp("1925-01-01")
-END_DATE = pd.Timestamp("2024-01-01")
-
-
-"""
 Reference:
     CRSP US TREASURY DATABASE GUIDE
     https://www.crsp.org/wp-content/uploads/guides/CRSP_US_Treasury_Database_Guide_for_SAS_ASCII_EXCEL_R.pdf
 
-Data Description
+Data Description:
     TFZ_DLY ( DAILY TIME SERIES ITEMS)
         kytreasno: TREASURY RECORD IDENTIFIER
         kycrspid: CRSP-ASSIGNED UNIQUE ID
@@ -34,68 +21,55 @@ Data Description
         tcouprt: COUPON RATE
         itype: TYPE OF ISSUE (1: NONCALLABLE BONDS, 2: NONCALLABLE NOTES)
 
+Thank you to Younghun Lee for preparing this script for use in class.
 """
 
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
+import wrds
+
+from settings import config
+
+DATA_DIR = Path(config("DATA_DIR"))
+WRDS_USERNAME = config("WRDS_USERNAME")
+SUBFOLDER = "crsp_treasury"
 
 def pull_CRSP_treasury_daily(
-    start_date=START_DATE,
-    end_date=END_DATE,
+    start_date="1970-01-01",
+    end_date="2023-12-31",
     wrds_username=WRDS_USERNAME,
 ):
     query = f"""
-        SELECT kytreasno, kycrspid, caldt, tdbid, tdask, tdaccint, tdyld,
+    SELECT 
+        kytreasno, kycrspid, caldt, tdbid, tdask, tdaccint, tdyld,
         ((tdbid + tdask) / 2.0 + tdaccint) AS price
-        FROM crspm.tfz_dly AS tfz
-        WHERE tfz.caldt BETWEEN '{start_date}' AND '{end_date}'
+    FROM 
+        crspm.tfz_dly
+    WHERE 
+        caldt BETWEEN '{start_date}' AND '{end_date}'
     """
 
     db = wrds.Connection(wrds_username=wrds_username)
-    df = db.raw_sql(query, date_cols=["caldt"]).reset_index(drop=True)
+    df = db.raw_sql(query, date_cols=["tdatdt", "tmatdt"])
     db.close()
     return df
 
 
 def pull_CRSP_treasury_info(wrds_username=WRDS_USERNAME):
     query = """
-        SELECT kytreasno, kycrspid, tcusip, tdatdt, tmatdt, tcouprt, itype,
-            ROUND((tmatdt - tdatdt) / 365.0) AS term
-        FROM crspm.tfz_iss AS iss
-        WHERE iss.itype IN (1, 2)
-    """
-
-    db = wrds.Connection(wrds_username=wrds_username)
-    df = db.raw_sql(query, date_cols=["tdatdt", "tmatdt"]).reset_index(drop=True)
-    db.close()
-    return df
-
-
-def pull_CRSP_treasury_consolidated(
-    start_date=START_DATE,
-    end_date=END_DATE,
-    wrds_username=WRDS_USERNAME,
-):
-    query = f"""
-        SELECT
-            tfz.kytreasno, tfz.kycrspid, tfz.caldt, tfz.tdbid, tfz.tdask, tfz.tdaccint, tfz.tdyld,
-            ((tfz.tdbid + tfz.tdask) / 2.0 + tfz.tdaccint) AS price,
-            iss.tcusip, iss.tdatdt, iss.tmatdt, iss.tcouprt, iss.itype,
-            ROUND((iss.tmatdt - iss.tdatdt) / 365.0) AS term
-        FROM
-            crspm.tfz_dly AS tfz
-        LEFT JOIN
+        SELECT 
+            kytreasno, kycrspid, tcusip, tdatdt, tmatdt, tcouprt, itype,
+            ROUND((tmatdt - tdatdt) / 365.0) AS original_maturity
+        FROM 
             crspm.tfz_iss AS iss
-        ON
-            tfz.kytreasno = iss.kytreasno AND
-            tfz.kycrspid = iss.kycrspid
-        WHERE
-            tfz.caldt BETWEEN '{start_date}' AND '{end_date}'
-            AND iss.itype IN (1, 2)
+        WHERE 
+            iss.itype IN (1, 2)
     """
 
     db = wrds.Connection(wrds_username=wrds_username)
-    df = db.raw_sql(query, date_cols=["caldt", "tdatdt", "tmatdt"])
-    df = df.reset_index(drop=True)
-    df = calc_runness(df)
+    df = db.raw_sql(query, date_cols=["tdatdt", "tmatdt"])
     db.close()
     return df
 
@@ -105,62 +79,159 @@ def calc_runness(data):
     Calculate runness for the securities issued in 1980 or later.
 
     This is due to the following condition of Gurkaynak, Sack, and Wright (2007):
-        iv) Exclude on-the-run issues and 1st off-the-run issues for 2,3,5,7,
-            10, 20, 30 years securities issued in 1980 or later.
+        iv) Exclude on-the-run issues and 1st off-the-run issues
+        for 2,3,5, 7, 10, 20, 30 years securities issued in 1980 or later.
     """
 
     def _calc_runness(df):
-        temp = df.sort_values(by=["caldt", "term", "tdatdt"])
-        return (
-            temp.groupby(["caldt", "term"])["tdatdt"].rank(
+        temp = df.sort_values(by=["caldt", "original_maturity", "tdatdt"])
+        next_temp = (
+            temp.groupby(["caldt", "original_maturity"])["tdatdt"].rank(
                 method="first", ascending=False
             )
             - 1
         )
+        return next_temp
 
-    data_run_ = data[data.caldt >= "1980"]
+    data_run_ = data[data["caldt"] >= "1980"]
     runs = _calc_runness(data_run_)
     data["run"] = 0
     data.loc[data_run_.index, "run"] = runs
     return data
 
 
+def pull_CRSP_treasury_consolidated(
+    start_date="1970-01-01",
+    end_date=datetime.today().strftime("%Y-%m-%d"),
+    wrds_username=WRDS_USERNAME,
+):
+    """Pull consolidated CRSP Treasury data with all relevant fields.
+
+    Includes fields from these tables:
+    - tfz_dly (daily quotes): bid/ask prices, accrued interest, yields
+    - tfz_iss (issue info): CUSIP, dates, coupon rates, issue types
+
+    Price Terminology:
+    - Clean Price = (bid + ask)/2 = quoted price without accrued interest
+    - Dirty Price = Clean Price + Accrued Interest = actual transaction price
+
+    Date Fields:
+    - Quote Date (caldt): Date of the price observation
+    - Date Dated (tdatdt): Original issue date when interest starts accruing
+    - Maturity Date (tmatdt): Date when the security matures
+
+    Returns:
+    - Unadjusted Return (tdretnua): Simple price change plus accrued interest,
+      not accounting for tax effects or reinvestment
+
+    Fields are based on CRSP Daily US Treasury Database Guide specifications.
+    """
+
+    query = f"""
+    SELECT 
+        -- Identification
+        tfz.kytreasno, tfz.kycrspid, iss.tcusip,
+        
+        -- Dates
+        tfz.caldt,                  -- Quote date: Date of price observation
+        iss.tdatdt,                 -- Date dated: Original issue date when interest starts accruing
+        iss.tmatdt,                 -- Maturity date: When principal is repaid
+        iss.tfcaldt,                -- First call date (0 if not callable)
+        
+        -- Prices and Yields
+        tfz.tdbid,                  -- Bid price (clean)
+        tfz.tdask,                  -- Ask price (clean)
+        tfz.tdaccint,               -- Accrued interest since last coupon
+        tfz.tdyld,                  -- Bond equivalent yield
+        ((tfz.tdbid + tfz.tdask) / 2.0 + tfz.tdaccint) AS price,  
+                                    -- Dirty price (clean price + accrued interest)
+        
+        -- Issue Characteristics
+        iss.tcouprt,                -- Coupon rate (annual)
+        iss.itype,                  -- Type of issue (1: bonds, 2: notes)
+        ROUND((iss.tmatdt - iss.tdatdt) / 365.0) AS original_maturity,  
+                                    -- Original maturity at issuance
+        
+        -- Additional Derived Fields
+        ROUND((iss.tmatdt - tfz.caldt) / 365.0) AS years_to_maturity,  
+                                    -- Remaining time to maturity
+        
+        -- Trading info (if available)
+        tfz.tdduratn,               -- Duration: Price sensitivity to yield changes
+        tfz.tdretnua                -- Return (unadjusted): Simple price change + accrued interest
+        
+    FROM 
+        crspm.tfz_dly AS tfz
+    LEFT JOIN 
+        crspm.tfz_iss AS iss 
+    ON 
+        tfz.kytreasno = iss.kytreasno AND 
+        tfz.kycrspid = iss.kycrspid
+    WHERE 
+        tfz.caldt BETWEEN '{start_date}' AND '{end_date}' AND 
+        iss.itype IN (1, 2)  -- Only include Treasury bonds (1) and notes (2)
+    """
+
+    db = wrds.Connection(wrds_username=wrds_username)
+    df = db.raw_sql(query, date_cols=["caldt", "tdatdt", "tmatdt", "tfcaldt"])
+    df["days_to_maturity"] = (df["tmatdt"] - df["caldt"]).dt.days
+    df["tfcaldt"] = pd.to_datetime(df["tfcaldt"]).fillna(pd.Timestamp(0))
+    df["callable"] = df["tfcaldt"] != pd.Timestamp(0)
+    db.close()
+    df = df.reset_index(drop=True)
+    return df
+
+
 def load_CRSP_treasury_daily(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "CRSP_TFZ_DAILY.parquet"
+    path = data_dir / SUBFOLDER / "TFZ_DAILY.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def load_CRSP_treasury_info(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "CRSP_TFZ_INFO.parquet"
+    path = data_dir / SUBFOLDER / "TFZ_INFO.parquet"
     df = pd.read_parquet(path)
     return df
 
 
-def load_CRSP_treasury_consolidated(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "CRSP_TFZ_CONSOLIDATED.parquet"
+def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
+    if with_runness:
+        path = data_dir / SUBFOLDER / "TFZ_with_runness.parquet"
+    else:
+        path = data_dir / SUBFOLDER / "TFZ_consolidated.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def _demo():
-    df_daily = load_CRSP_treasury_daily()
-    df_info = load_CRSP_treasury_info()
-    df_consolidated = load_CRSP_treasury_consolidated()
+    df = pull_CRSP_treasury_daily(data_dir=DATA_DIR)
+    df.info()
+    df = pull_CRSP_treasury_info(data_dir=DATA_DIR)
+    df.info()
+    df = pull_CRSP_treasury_consolidated(data_dir=DATA_DIR)
+    df.info()
+    df = calc_runness(df)
+    df.info()
+    return df
 
 
 if __name__ == "__main__":
-    # Create subfolder
-    data_dir = DATA_DIR / SUBFOLDER
-    data_dir.mkdir(parents=True, exist_ok=True)
-
-    df_daily = pull_CRSP_treasury_daily(start_date=START_DATE, end_date=END_DATE)
-    df_daily.to_parquet(data_dir / "CRSP_TFZ_DAILY.parquet")
-
-    df_info = pull_CRSP_treasury_info()
-    df_info.to_parquet(data_dir / "CRSP_TFZ_INFO.parquet")
-
-    df_consolidated = pull_CRSP_treasury_consolidated(
-        start_date=START_DATE, end_date=END_DATE
+    df = pull_CRSP_treasury_daily(
+        start_date="1970-01-01",
+        end_date="2023-12-31",
+        wrds_username=WRDS_USERNAME,
     )
-    df_consolidated.to_parquet(data_dir / "CRSP_TFZ_CONSOLIDATED.parquet")
+    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_DAILY.parquet"
+    df.to_parquet(path)
+
+    df = pull_CRSP_treasury_info(wrds_username=WRDS_USERNAME)
+    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_INFO.parquet"
+    df.to_parquet(path)
+
+    df = pull_CRSP_treasury_consolidated(wrds_username=WRDS_USERNAME)
+    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_consolidated.parquet"
+    df.to_parquet(path)
+
+    df = calc_runness(df)
+    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_with_runness.parquet"
+    df.to_parquet(path)
