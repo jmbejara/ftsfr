@@ -4,8 +4,6 @@ from models.time_series_model import TimeSeriesModel
 
 
 class MeanForecasting(TimeSeriesModel):
-    name = "Mean Forecasting"
-    code = "MEA"
 
     @TimeSeriesModel._fitted
     def fit(self, y, X=None):

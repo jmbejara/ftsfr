@@ -17,8 +17,8 @@ TEST_PATH_TIME_SERIES_MODELS_RESULTS = (
 
 
 class TimeSeriesModel:
-    name = None
-    code = None
+    name = "Time Series Abstract Model"
+    code = "TSA"
     virtual_env = "ftsf"
     python_version = "3.12.6"
     requirements_file = "requirements.txt"
@@ -50,7 +50,7 @@ class TimeSeriesModel:
         return cls.python_version
 
     def _create_id(self):
-        time = datetime.datetime.now(datetime.timezone())
+        time = datetime.datetime.now(datetime.timezone(offset=datetime.timedelta(0)))
         code = self.get_model_code()
         if code is None or not isinstance(code, str):
             raise ValueError("Model code must be a string.")
@@ -122,7 +122,7 @@ class TimeSeriesModel:
         new_model.error_metrics = ErrorMetrics(
             model_name=new_model.get_model_name(),
             y_name=new_model.dataset.y.columns[0],
-            id=self.id,
+            id=new_model.id,
         )
         new_model.divisions = {}
         return new_model
@@ -251,7 +251,8 @@ class TimeSeriesModel:
         self.error_metrics.calculate_error_metrics(y_true, y_pred)
         self.is_error_assessed = True
 
-    def info_to_pandas(self):
+    def to_pandas(self):
+        last_division = self.divisions[max(self.divisions.keys())]
         info = {
             "model": self.get_model_name(),
             "id": self.id,
@@ -259,6 +260,9 @@ class TimeSeriesModel:
             "time_frequency": self.dataset.time_frequency,
             "step_size": self.step_size,
             "forecasting_start_date": self.divisions[0]["forecasting"].get_y().index[0],
+            "forecasting_last_date": self.divisions[last_division].get_y().index[-1],
+            "training_first_date": self.divisions[0]["training"].get_y().index[0],
+            "n_obs": len(self.dataset.get_y()),
             "n_forecasting": len(self.divisions.values()),
             "intersect_forecasting": self.intersect_forecasting,
             "only_consider_last_of_each_intersection": self.only_consider_last_of_each_intersection,

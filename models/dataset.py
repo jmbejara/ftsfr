@@ -13,7 +13,40 @@ FREQUENCY_SEASONAL_MAP = {
 }
 
 
+PATH_DATA_OUTPUT = "_data/output"
+
+
 class Dataset:
+    all_datasets = {}
+
+    @classmethod
+    def from_parquet(
+        cls,
+        y,
+        X,
+        filter_start_date: Union[datetime.date, datetime.datetime] = None,
+        filter_end_date: Union[datetime.date, datetime.datetime] = None,
+        time_frequency=None,
+    ):
+        y = cls._get_variable(y)
+        if isinstance(X, str):
+            X = [X]
+        X_frame = pd.DataFrame()
+        for x in X:
+            X_frame = X_frame.join(cls._get_variable(x), how="outer")
+        return cls(y, X_frame, filter_start_date, filter_end_date, time_frequency)
+
+    @classmethod
+    def _get_variable(cls, path):
+        variable_name = path.split("/")[-1].split("\\")[-1]
+        path_name = PATH_DATA_OUTPUT + "/" + "/".join(path.split("/")[:-1])
+        if cls.all_datasets.get(path_name) is None:
+            cls.all_datasets[path_name] = pd.read_parquet(path_name + ".parquet")
+        if variable_name in cls.all_datasets[path_name].columns:
+            return cls.all_datasets[path_name][variable_name]
+        else:
+            raise ValueError(f"Variable {variable_name} not found in {path_name}")
+
     def __init__(
         self,
         y,
