@@ -17,33 +17,81 @@ PATH_DATA_OUTPUT = "_data/output"
 
 
 class Dataset:
-    all_datasets = {}
+    all_tables = {}
+
+    @classmethod
+    def get_in_memory_tables(cls):
+        return cls.all_tables
+
+    @classmethod
+    def get_in_memory_tables_names(cls):
+        return list(cls.all_tables.keys())
+
+    @classmethod
+    def get_table_from_memory(cls, table_name):
+        if table_name.endswith(".parquet"):
+            table_name = table_name[:-8]
+        table = cls.all_tables.get(table_name)
+        if table is None:
+            table = cls.all_tables.get(PATH_DATA_OUTPUT + "/" + table_name)
+        if table is None:
+            raise ValueError(f"Table {table_name} not found in memory")
+        return table
 
     @classmethod
     def from_parquet(
         cls,
         y,
-        X,
+        X=None,
         filter_start_date: Union[datetime.date, datetime.datetime] = None,
         filter_end_date: Union[datetime.date, datetime.datetime] = None,
         time_frequency=None,
     ):
         y = cls._get_variable(y)
-        if isinstance(X, str):
-            X = [X]
-        X_frame = pd.DataFrame()
-        for x in X:
-            X_frame = X_frame.join(cls._get_variable(x), how="outer")
+        if X is None:
+            X_frame = None
+        else:
+            if isinstance(X, str):
+                X = [X]
+            X_frame = pd.DataFrame()
+            for x in X:
+                X_frame = X_frame.join(cls._get_variable(x), how="outer")
         return cls(y, X_frame, filter_start_date, filter_end_date, time_frequency)
+
+    @classmethod
+    def from_parquet_all_from_table(
+        cls,
+        y_table,
+        X=None,
+        filter_start_date: Union[datetime.date, datetime.datetime] = None,
+        filter_end_date: Union[datetime.date, datetime.datetime] = None,
+        time_frequency=None,
+        ignore_columns: List[str] = [],
+    ):
+        path_name = PATH_DATA_OUTPUT + "/" + y_table
+        if cls.all_tables.get(path_name) is None:
+            cls.all_tables[path_name] = pd.read_parquet(path_name + ".parquet")
+        datasets_from_table = []
+        for y in list(cls.all_tables[path_name].columns):
+            if y.lower() in ignore_columns or y.lower() == "date":
+                continue
+            new_dataset = cls.from_parquet(
+                y_table + "/" + y, X, filter_start_date, filter_end_date, time_frequency
+            )
+            datasets_from_table.append(new_dataset)
+        return datasets_from_table
 
     @classmethod
     def _get_variable(cls, path):
         variable_name = path.split("/")[-1].split("\\")[-1]
         path_name = PATH_DATA_OUTPUT + "/" + "/".join(path.split("/")[:-1])
-        if cls.all_datasets.get(path_name) is None:
-            cls.all_datasets[path_name] = pd.read_parquet(path_name + ".parquet")
-        if variable_name in cls.all_datasets[path_name].columns:
-            return cls.all_datasets[path_name][variable_name]
+        if cls.all_tables.get(path_name) is None:
+            cls.all_tables[path_name] = pd.read_parquet(path_name + ".parquet")
+        if variable_name in cls.all_tables[path_name].columns:
+            variable = cls.all_tables[path_name][variable_name]
+            if "date" in list(cls.all_tables[path_name].columns.str.lower()):
+                variable.index = cls.all_tables[path_name]["date"]
+            return variable
         else:
             raise ValueError(f"Variable {variable_name} not found in {path_name}")
 

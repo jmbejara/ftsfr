@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from models.utils import create_simulated_X, create_simulated_y
 from models.time_series_model import TimeSeriesModel
-from tests.utils import del_test_files
+from tests.utils import del_test_files, del_files
 from models.univariate_local import (
     HoltWintersForecasting,
     MeanForecasting,
@@ -18,28 +18,6 @@ from models.univariate_local import (
 
 from models.time_series_model import TEST_PATH_TIME_SERIES_MODELS_RESULTS
 from models.error_metrics import TEST_PATH_ERROR_METRICS_RESULTS
-
-
-UNIVARIATE_LOCAL = [
-    HoltWintersForecasting,
-    MeanForecasting,
-    NaiveForecasting,
-    SarimaForecasting,
-]
-
-
-def del_files(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            result = func(*args, **kwargs)
-            del_test_files()
-            return result
-        except Exception as e:
-            del_test_files()
-            raise e
-
-    return wrapper
 
 
 @del_files
