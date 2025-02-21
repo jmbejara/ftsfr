@@ -13,7 +13,7 @@ FREQUENCY_SEASONAL_MAP = {
 }
 
 
-PATH_DATA_OUTPUT = "_data/output"
+PATH_DATA_OUTPUT = "_data"
 
 
 class Dataset:
@@ -22,6 +22,10 @@ class Dataset:
     @classmethod
     def get_in_memory_tables(cls):
         return cls.all_tables
+
+    @classmethod
+    def reset_tables_in_memory(cls):
+        cls.all_tables = {}
 
     @classmethod
     def get_in_memory_tables_names(cls):
@@ -194,6 +198,19 @@ class Dataset:
         if "date" in list(time_series.columns.str.lower()):
             time_series = time_series.set_index("date")
         time_series.index = pd.to_datetime(time_series.index)
+        index_counts = (
+            time_series.index.value_counts()
+            .sort_values(ascending=False)
+            .loc[lambda df: df.values > 1]
+        )
+        if len(index_counts) > 0:
+            not_unique_indexes = index_counts.index.to_list()
+            if len(not_unique_indexes) > 10:
+                not_unique_indexes = not_unique_indexes[:9] + ["..."]
+            not_unique_indexes = ", ".join(not_unique_indexes)
+            raise ValueError(
+                f"Time series index contains non-unique values: {not_unique_indexes}"
+            )
         time_series = time_series.sort_index()
         if filter_end_date is not None:
             time_series = time_series.loc[:filter_end_date]

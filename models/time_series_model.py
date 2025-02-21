@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import random
 from typing import Union, List
 import datetime
 import pandas as pd
@@ -22,6 +23,7 @@ class TimeSeriesModel:
     virtual_env = "ftsf"
     python_version = "3.12.6"
     requirements_file = "requirements.txt"
+    run_code = None
 
     @staticmethod
     def _fitted(fit_func):
@@ -45,16 +47,22 @@ class TimeSeriesModel:
     def get_requirements_file_path(cls):
         return cls.requirements_file
 
+    def _get_run_code(self):
+        if self.__class__.run_code is None:
+            self.__class__.run_code = f"{random.randint(1, 9999):04d}"
+        return self.__class__.run_code
+
     @classmethod
     def get_python_version(cls):
         return cls.python_version
 
     def _create_id(self):
         time = datetime.datetime.now(datetime.timezone(offset=datetime.timedelta(0)))
+        run_code = self._get_run_code()
         code = self.get_model_code()
         if code is None or not isinstance(code, str):
             raise ValueError("Model code must be a string.")
-        return f"{code}_{time.strftime('%Y%m%d%H%M%S%f')}"
+        return f"R{run_code}M{code}D{time.strftime('%Y%m%d%H%M%S%f')}"
 
     def __init__(
         self,
@@ -107,6 +115,7 @@ class TimeSeriesModel:
         forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
         n_forecasting=None,
         intersect_forecasting: bool = False,
+        only_consider_last_of_each_intersection: bool = False,
         rolling: bool = False,
     ):
         new_model = cls.__new__(cls)
@@ -118,6 +127,9 @@ class TimeSeriesModel:
         new_model.forecasting_start_date = forecasting_start_date
         new_model.n_forecasting = n_forecasting
         new_model.intersect_forecasting = intersect_forecasting
+        new_model.only_consider_last_of_each_intersection = (
+            only_consider_last_of_each_intersection
+        )
         new_model.rolling = rolling
         new_model.error_metrics = ErrorMetrics(
             model_name=new_model.get_model_name(),
@@ -252,7 +264,7 @@ class TimeSeriesModel:
         self.is_error_assessed = True
 
     def to_pandas(self):
-        last_division = self.divisions[max(self.divisions.keys())]
+        last_division = max(self.divisions.keys())
         info = {
             "model": self.get_model_name(),
             "id": self.id,
@@ -260,7 +272,9 @@ class TimeSeriesModel:
             "time_frequency": self.dataset.time_frequency,
             "step_size": self.step_size,
             "forecasting_start_date": self.divisions[0]["forecasting"].get_y().index[0],
-            "forecasting_last_date": self.divisions[last_division].get_y().index[-1],
+            "forecasting_last_date": self.divisions[last_division]["forecasting"]
+            .get_y()
+            .index[-1],
             "training_first_date": self.divisions[0]["training"].get_y().index[0],
             "n_obs": len(self.dataset.get_y()),
             "n_forecasting": len(self.divisions.values()),
@@ -269,6 +283,27 @@ class TimeSeriesModel:
             "rolling": self.rolling,
         }
         return pd.DataFrame(info, index=[0])
+
+    def is_it_already_in_results(self, test_path=False, not_check_cols=["id"]):
+        if isinstance(not_check_cols, str):
+            not_check_cols = [not_check_cols]
+        if not os.path.exists(PATH_TIME_SERIES_MODELS_RESULTS):
+            return False
+        results = (
+            pd.read_csv(TEST_PATH_TIME_SERIES_MODELS_RESULTS)
+            if test_path
+            else pd.read_csv(PATH_TIME_SERIES_MODELS_RESULTS)
+        )
+        if results.empty:
+            return False
+        current_result = self.to_pandas()
+        for col in current_result.columns:
+            if col in not_check_cols:
+                continue
+            results = results.loc[lambda df: df[col] == current_result[col].iloc[0], :]
+            if results.empty:
+                return False
+        return True
 
     def get_error_metrics(self):
         if not self.is_error_assessed:
