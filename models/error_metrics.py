@@ -6,6 +6,7 @@ import os
 
 PATH_ERROR_METRICS_RESULTS = "models/results/error_metrics/error_metrics.csv"
 TEST_PATH_ERROR_METRICS_RESULTS = "models/results/tests/error_metrics/error_metrics.csv"
+EXTRA_COLUMNS = ["model", "y", "id", "parquet_path"]
 
 
 METRICS = {
@@ -24,10 +25,15 @@ METRICS = {
 
 
 class ErrorMetrics:
-    def __init__(self, y_name=None, model_name=None, id=None):
+    def __init__(self, y_name=None, model_name=None, id=None, parquet_path=None):
         self.error_metrics = dict(zip(METRICS.keys(), [None for _ in METRICS.keys()]))
+        self.id = id
         self.y_name = y_name
         self.model_name = model_name
+        self.parquet_path = parquet_path
+
+    def set_parquet_path(self, parquet_path):
+        self.parquet_path = parquet_path
 
     def calculate_error_metrics(self, y_true, y_pred):
         organized_y_true = np.squeeze(y_true.iloc[:, 0].values)
@@ -36,6 +42,14 @@ class ErrorMetrics:
             name: metric(organized_y_true, organized_y_pred)
             for name, metric in METRICS.items()
         }
+
+    def get_results_file(self, test_path=False):
+        file = (
+            TEST_PATH_ERROR_METRICS_RESULTS if test_path else PATH_ERROR_METRICS_RESULTS
+        )
+        if not os.path.exists(file):
+            raise FileNotFoundError(f"File '{file}' not found.")
+        return pd.read_csv(file)
 
     def get(self):
         return self.error_metrics
@@ -47,8 +61,10 @@ class ErrorMetrics:
         error_metrics_plus_info = self.error_metrics
         error_metrics_plus_info["model"] = self.model_name
         error_metrics_plus_info["y"] = self.y_name
+        error_metrics_plus_info["id"] = self.id
+        error_metrics_plus_info["parquet_path"] = self.parquet_path
         error_metrics_frame = pd.DataFrame(error_metrics_plus_info, index=[0])
-        return error_metrics_frame[["model", "y"] + list(METRICS.keys())]
+        return error_metrics_frame[EXTRA_COLUMNS + list(METRICS.keys())]
 
     @classmethod
     def multiple_to_pandas(cls, list_error_metrics, reset_index: bool = True):
@@ -77,7 +93,6 @@ class ErrorMetrics:
     @staticmethod
     def _create_results_file():
         if not os.path.exists(PATH_ERROR_METRICS_RESULTS):
-            columns = ["model", "y"] + list(METRICS.keys())
-            pd.DataFrame(columns=columns).to_csv(
+            pd.DataFrame(columns=EXTRA_COLUMNS + list(METRICS.keys())).to_csv(
                 PATH_ERROR_METRICS_RESULTS, index=False
             )

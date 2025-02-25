@@ -15,5 +15,6 @@ seaborn==0.13.2
 setuptools==75.6.0
 statsmodels==0.14.3
 toml
+torch==2.6.0
 wrds==3.2.0
 yfinance==0.2.43

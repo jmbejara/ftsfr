@@ -7,6 +7,7 @@ from models.time_series_model import TimeSeriesModel
 from typing import Union
 from models.dataset import FREQUENCY_SEASONAL_MAP, Dataset
 import datetime
+import warnings
 
 
 class SarimaForecasting(TimeSeriesModel):
@@ -125,14 +126,16 @@ class SarimaForecasting(TimeSeriesModel):
                             for Q in range(self.max_seasonal_q + 1):
                                 for m in seasonal_frequencies:
                                     try:
-                                        model = SARIMAX(
-                                            y,
-                                            order=(p, d, q),
-                                            seasonal_order=(P, D, Q, m),
-                                            enforce_stationarity=False,
-                                            enforce_invertibility=False,
-                                        )
-                                        results = model.fit(disp=False)
+                                        with warnings.catch_warnings():
+                                            warnings.simplefilter("ignore")
+                                            model = SARIMAX(
+                                                endog=y,
+                                                order=(p, d, q),
+                                                seasonal_order=(P, D, Q, m),
+                                                enforce_stationarity=False,
+                                                enforce_invertibility=False,
+                                            )
+                                            results = model.fit(disp=False)
                                         score = (
                                             results.aic
                                             if self.selection_criterion == "aic"

@@ -9,7 +9,7 @@ class NaiveForecasting(TimeSeriesModel):
 
     @TimeSeriesModel._fitted
     def fit(self, y, X=None):
-        self.prediction = y.iloc[:, -1].values
+        self.prediction = y.iloc[-1, 0]
 
     def forecast(self, y, X=None):
         return pd.DataFrame(

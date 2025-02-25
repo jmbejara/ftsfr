@@ -1,15 +1,17 @@
 from typing import Union, List
 import datetime
 import pandas as pd
+from models.utils import _calc_periods_per_year
 
 
 FREQUENCY_SEASONAL_MAP = {
     "DU": [5, 20, 21, 22, 42, 63],
     "D": [7, 30],
     "W": [4, 13, 26, 52],
-    "M": [3, 4, 6, 12],
-    "Q": [2, 4],
-    "Y": [1, 2, 3],
+    "ME": [3, 4, 6, 12],
+    "BQ": [3, 4, 6, 12],
+    "BA": [2, 4, 6, 10],
+    "A": [1, 2, 3],
 }
 
 
@@ -50,8 +52,12 @@ class Dataset:
         filter_start_date: Union[datetime.date, datetime.datetime] = None,
         filter_end_date: Union[datetime.date, datetime.datetime] = None,
         time_frequency=None,
+        parquet_path=None,
     ):
-        y = cls._get_variable(y)
+        if parquet_path is not None:
+            y = cls._get_variable(y, return_path=False)
+        else:
+            y, parquet_path = cls._get_variable(y, return_path=True)
         if X is None:
             X_frame = None
         else:
@@ -60,7 +66,9 @@ class Dataset:
             X_frame = pd.DataFrame()
             for x in X:
                 X_frame = X_frame.join(cls._get_variable(x), how="outer")
-        return cls(y, X_frame, filter_start_date, filter_end_date, time_frequency)
+        return cls(
+            y, X_frame, filter_start_date, filter_end_date, time_frequency, parquet_path
+        )
 
     @classmethod
     def from_parquet_all_from_table(
@@ -82,11 +90,25 @@ class Dataset:
             new_dataset = cls.from_parquet(
                 y_table + "/" + y, X, filter_start_date, filter_end_date, time_frequency
             )
+            new_dataset.parquet_path = path_name
             datasets_from_table.append(new_dataset)
         return datasets_from_table
 
+    def get_parquet_path(self):
+        return self.parquet_path
+
+    def get_y_name(self):
+        if isinstance(self.y, pd.DataFrame):
+            return (
+                '"["' + '", "'.join(list(self.y.columns)) + '"]"'
+                if len(self.y.columns) > 1
+                else '"' + self.y.columns[0] + '"'
+            )
+        else:
+            return self.y.name
+
     @classmethod
-    def _get_variable(cls, path):
+    def _get_variable(cls, path, return_path=False):
         variable_name = path.split("/")[-1].split("\\")[-1]
         path_name = PATH_DATA_OUTPUT + "/" + "/".join(path.split("/")[:-1])
         if cls.all_tables.get(path_name) is None:
@@ -95,7 +117,10 @@ class Dataset:
             variable = cls.all_tables[path_name][variable_name]
             if "date" in list(cls.all_tables[path_name].columns.str.lower()):
                 variable.index = cls.all_tables[path_name]["date"]
-            return variable
+            if not return_path:
+                return variable
+            else:
+                return variable, path_name
         else:
             raise ValueError(f"Variable {variable_name} not found in {path_name}")
 
@@ -106,6 +131,7 @@ class Dataset:
         filter_start_date: Union[datetime.date, datetime.datetime] = None,
         filter_end_date: Union[datetime.date, datetime.datetime] = None,
         time_frequency=None,
+        parquet_path=None,
     ):
         self.y = self.organize_time_series(
             y,
@@ -116,21 +142,28 @@ class Dataset:
         self.X = self.organize_time_series(X, filter_start_date, filter_end_date)
         self.time_frequency = self._validate_time_frequency(time_frequency)
         self.y_pred = None
+        self.parquet_path = parquet_path
 
-    @staticmethod
-    def _validate_time_frequency(time_frequency):
+    def _validate_time_frequency(self, time_frequency):
+        if time_frequency == "M":
+            return "ME"
         if time_frequency is not None and time_frequency not in list(
             FREQUENCY_SEASONAL_MAP.keys()
         ):
             raise ValueError(
                 f"'time_frequency' must be one of {list(FREQUENCY_SEASONAL_MAP.keys())} or None"
             )
+        elif time_frequency is None:
+            time_frequency = _calc_periods_per_year(list(self.y.index))
         return time_frequency
 
     def __len__(self):
         return len(self.y)
 
     def __repr__(self):
+        return f"Dataset(y={self.get_y_name()}, len={len(self.y.index)}, time_frequency={self.time_frequency})"
+
+    def print(self):
         return pd.concat([self.y, self.X], axis=1).to_string()
 
     @classmethod
@@ -156,6 +189,9 @@ class Dataset:
             raise ValueError(
                 f"'{date_name}' must be a string, datetime.date, datetime.datetime, None"
             )
+
+    def get_last_y_date(self):
+        return self.y.index[-1]
 
     @classmethod
     def create_from_y(cls, y, time_frequency=None):

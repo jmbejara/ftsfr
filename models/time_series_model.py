@@ -10,11 +10,17 @@ import os
 
 MODELS_PATH = "models"
 PATH_TIME_SERIES_MODELS_RESULTS = (
-    "models/results/tests/time_series_models/time_series_models.csv"
+    "models/results/time_series_models/time_series_models.csv"
 )
 TEST_PATH_TIME_SERIES_MODELS_RESULTS = (
     "models/results/tests/time_series_models/time_series_models.csv"
 )
+
+DATE_COLUMNS = [
+    "forecasting_start_date",
+    "forecasting_last_date",
+    "training_first_date",
+]
 
 
 class TimeSeriesModel:
@@ -78,8 +84,10 @@ class TimeSeriesModel:
         rolling: bool = False,
         time_frequency: str = None,
     ):
+        self.base_model = None
         self.id = self._create_id()
         self.is_error_assessed = False
+        self.is_div_built
         self.is_fitted = False
         if n_forecasting is not None and forecasting_start_date is not None:
             raise ValueError(
@@ -119,8 +127,10 @@ class TimeSeriesModel:
         rolling: bool = False,
     ):
         new_model = cls.__new__(cls)
+        new_model.base_model = None
         new_model.id = new_model._create_id()
         new_model.is_error_assessed = False
+        new_model.is_div_built = False
         new_model.is_fitted = False
         new_model.dataset = dataset
         new_model.step_size = step_size
@@ -135,6 +145,7 @@ class TimeSeriesModel:
             model_name=new_model.get_model_name(),
             y_name=new_model.dataset.y.columns[0],
             id=new_model.id,
+            parquet_path=new_model.dataset.get_parquet_path(),
         )
         new_model.divisions = {}
         return new_model
@@ -171,6 +182,7 @@ class TimeSeriesModel:
             n_forecasting_left -= 1
             idx += 1
         self._reindex_divisions()
+        self.is_div_built = True
 
     def _reindex_divisions(self):
         max_idx = max(self.divisions.keys())
@@ -269,6 +281,7 @@ class TimeSeriesModel:
             "model": self.get_model_name(),
             "id": self.id,
             "y": self.dataset.y.columns[0],
+            "parquet_path": self.dataset.get_parquet_path(),
             "time_frequency": self.dataset.time_frequency,
             "step_size": self.step_size,
             "forecasting_start_date": self.divisions[0]["forecasting"].get_y().index[0],
@@ -285,14 +298,18 @@ class TimeSeriesModel:
         return pd.DataFrame(info, index=[0])
 
     def is_it_already_in_results(self, test_path=False, not_check_cols=["id"]):
+        if self.is_div_built is False:
+            raise ValueError(
+                "Divisions have not been built yet. Use 'build_divisions' method before assessing if results already exist."
+            )
         if isinstance(not_check_cols, str):
             not_check_cols = [not_check_cols]
         if not os.path.exists(PATH_TIME_SERIES_MODELS_RESULTS):
             return False
         results = (
-            pd.read_csv(TEST_PATH_TIME_SERIES_MODELS_RESULTS)
+            pd.read_csv(TEST_PATH_TIME_SERIES_MODELS_RESULTS, parse_dates=DATE_COLUMNS)
             if test_path
-            else pd.read_csv(PATH_TIME_SERIES_MODELS_RESULTS)
+            else pd.read_csv(PATH_TIME_SERIES_MODELS_RESULTS, parse_dates=DATE_COLUMNS)
         )
         if results.empty:
             return False
@@ -300,6 +317,13 @@ class TimeSeriesModel:
         for col in current_result.columns:
             if col in not_check_cols:
                 continue
+            if "date" == col[:4]:
+                # convert to date
+                results = results.loc[
+                    lambda df: pd.to_datetime(df[col])
+                    == pd.to_datetime(current_result[col].iloc[0]),
+                    :,
+                ]
             results = results.loc[lambda df: df[col] == current_result[col].iloc[0], :]
             if results.empty:
                 return False
@@ -328,7 +352,23 @@ class TimeSeriesModel:
             index=False,
         )
         if save_error_metrics:
+            self.error_metrics.set_parquet_path(self.dataset.get_parquet_path())
             self.error_metrics.save(test_path=test_path)
+
+    @classmethod
+    def get_results_file(cls, test_path=False):
+        file = (
+            TEST_PATH_TIME_SERIES_MODELS_RESULTS
+            if test_path
+            else PATH_TIME_SERIES_MODELS_RESULTS
+        )
+        if not os.path.exists(file):
+            raise FileNotFoundError(f"File '{file}' not found.")
+        return pd.read_csv(file, parse_dates=DATE_COLUMNS)
+
+    @classmethod
+    def get_error_metrics_file(cls, test_path=False):
+        return ErrorMetrics.get_results_file(test_path=test_path)
 
     def _create_results_file(self):
         if not os.path.exists(PATH_TIME_SERIES_MODELS_RESULTS):
