@@ -2,17 +2,22 @@
 This scripts pulls the Markit CDS data from WRDS.
 Code by Kausthub Kesheva
 """
-
+# Add src directory to Python path
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import os
+
 import pandas as pd
+import pull_fed_yield_curve
 import wrds
 from calculate_cdsreturns import calc_cds_return
-import pull_fed_yield_curve
 
 from settings import config
 
-SUBFOLDER = "markit_cds"
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("1925-01-01")
@@ -36,12 +41,22 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
         table_name = f"markit.CDS{year}"  # Generate table name dynamically
         query = f"""
         SELECT
-            date, ticker, parspread
+            date, -- The date on which points on a curve were calculated
+            ticker, -- The Markit ticker for the organization.
+            RedCode, -- The RED Code for identification of the entity. 
+            parspread, -- The par spread associated to the contributed CDS curve.
+            convspreard, -- The conversion spread associated to the contributed CDS curve.
+            tenor
         FROM
             {table_name} a
         WHERE
-            a.tenor = '5Y' AND
-            a.country = 'United States'
+            -- a.country = 'United States'
+            a.currency = 'USD' AND
+            a.docclause LIKE 'XR%%' AND 
+                -- The documentation clause. Values are: MM (Modified
+                -- Modified Restructuring), MR (Modified Restructuring), CR
+                -- (Old Restructuring), XR (No Restructuring).
+            a.tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
         """
         cds_data[year] = db.raw_sql(query, date_cols=["date"])
     return cds_data
@@ -79,7 +94,8 @@ def pull_cds_data(wrds_username=WRDS_USERNAME):
     combined_df = combine_cds_data(cds_data)
     return combined_df
 
-def calc_cds_rets(cds_spreads = None, start_date = START_DATE, end_date = END_DATE):
+
+def calc_cds_rets(cds_spreads=None, start_date=START_DATE, end_date=END_DATE):
     """
     Calculates the daily returns of the parspread for each ticker in the DataFrame.
 
@@ -91,7 +107,9 @@ def calc_cds_rets(cds_spreads = None, start_date = START_DATE, end_date = END_DA
         cds_returns (pd.DataFrame): returns calculated
     """
     raw_rates = pull_fed_yield_curve()
-    cds_returns = calc_cds_return(cds_spreads, raw_rates, start_date, end_date) # This is daily returns, can concert to monthly to compare with He Kelly
+    cds_returns = calc_cds_return(
+        cds_spreads, raw_rates, start_date, end_date
+    )  # This is daily returns, can concert to monthly to compare with He Kelly
     return cds_returns
 
 

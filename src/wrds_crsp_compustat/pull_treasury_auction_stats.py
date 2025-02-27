@@ -2,8 +2,13 @@
 Downloads treasury auction data from TreasuryDirect.gov
 See here: https://treasurydirect.gov/TA_WS/securities/jqsearch
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import json
+import os
 import urllib.request
 from pathlib import Path
 
@@ -11,7 +16,8 @@ import pandas as pd
 
 from settings import config
 
-SUBFOLDER = "crsp_treasury"
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 
 

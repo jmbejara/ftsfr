@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import os
 import zipfile
 from pathlib import Path
@@ -7,7 +12,8 @@ import requests
 
 from settings import config
 
-SUBFOLDER = "ken_french_portfolios"
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = config("DATA_DIR")
 MIN_N_ROWS_EXPECTED = 500
 

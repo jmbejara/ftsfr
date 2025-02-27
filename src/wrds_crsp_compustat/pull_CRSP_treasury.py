@@ -23,7 +23,12 @@ Data Description:
 
 Thank you to Younghun Lee for preparing this script for use in class.
 """
+import sys
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -34,7 +39,10 @@ from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
-SUBFOLDER = "crsp_treasury"
+
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
+
 
 def pull_CRSP_treasury_daily(
     start_date="1970-01-01",

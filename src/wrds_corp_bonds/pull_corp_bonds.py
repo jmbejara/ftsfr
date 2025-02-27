@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import os
 from pathlib import Path
 
@@ -9,7 +14,9 @@ from settings import config
 DATA_DIR = config("DATA_DIR")
 MIN_N_ROWS_EXPECTED = 500
 
-SUBFOLDER = "us_corp_bonds"
+
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_INFO = {
     "Treasury Bond Returns": {
         "url": "https://openbondassetpricing.com/wp-content/uploads/2024/06/bondret_treasury.csv",
