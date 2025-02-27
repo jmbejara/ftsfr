@@ -1,9 +1,6 @@
 arch==7.1.0
 datetime==3.0.3
 doit
-Flask==3.1.0
-Flask-Migrate==4.0.7
-Flask-SQLAlchemy==3.1.1
 ipywidgets==8.1.5
 matplotlib
 numpy
@@ -18,5 +15,6 @@ seaborn==0.13.2
 setuptools==75.6.0
 statsmodels==0.14.3
 toml
+torch==2.6.0
 wrds==3.2.0
 yfinance==0.2.43

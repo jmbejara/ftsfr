@@ -5,11 +5,15 @@ import numpy as np
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from models.time_series_model import TimeSeriesModel
 from typing import Union
-from dataset import FREQUENCY_SEASONAL_MAP
+from models.dataset import FREQUENCY_SEASONAL_MAP, Dataset
 import datetime
+import warnings
 
 
 class SarimaForecasting(TimeSeriesModel):
+    name = "SARIMA Forecasting"
+    code = "SAR"
+
     def __init__(
         self,
         y: Union[pd.DataFrame, pd.Series],
@@ -62,6 +66,48 @@ class SarimaForecasting(TimeSeriesModel):
         self.model = None
         self.fitted_model = None
 
+    @classmethod
+    def from_dataset(
+        cls,
+        dataset: Dataset,
+        step_size: int,
+        forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
+        n_forecasting=None,
+        intersect_forecasting: bool = False,
+        only_consider_last_of_each_intersection: bool = False,
+        rolling: bool = False,
+        order=(1, 1, 1),
+        seasonal_order=(0, 0, 0, 0),
+        selection_criterion="aic",
+        max_p=2,
+        max_q=2,
+        max_d=1,
+        max_seasonal_p=1,
+        max_seasonal_q=1,
+        max_seasonal_d=1,
+    ):
+        self = super().from_dataset(
+            dataset,
+            step_size,
+            forecasting_start_date,
+            n_forecasting,
+            intersect_forecasting,
+            only_consider_last_of_each_intersection,
+            rolling,
+        )
+        self.order = order
+        self.seasonal_order = seasonal_order
+        self.selection_criterion = selection_criterion
+        self.max_p = max_p
+        self.max_q = max_q
+        self.max_d = max_d
+        self.max_seasonal_p = max_seasonal_p
+        self.max_seasonal_q = max_seasonal_q
+        self.max_seasonal_d = max_seasonal_d
+        self.model = None
+        self.fitted_model = None
+        return self
+
     @TimeSeriesModel._fitted
     def fit(self, y, X=None):
         best_score = np.inf
@@ -80,14 +126,16 @@ class SarimaForecasting(TimeSeriesModel):
                             for Q in range(self.max_seasonal_q + 1):
                                 for m in seasonal_frequencies:
                                     try:
-                                        model = SARIMAX(
-                                            y,
-                                            order=(p, d, q),
-                                            seasonal_order=(P, D, Q, m),
-                                            enforce_stationarity=False,
-                                            enforce_invertibility=False,
-                                        )
-                                        results = model.fit(disp=False)
+                                        with warnings.catch_warnings():
+                                            warnings.simplefilter("ignore")
+                                            model = SARIMAX(
+                                                endog=y,
+                                                order=(p, d, q),
+                                                seasonal_order=(P, D, Q, m),
+                                                enforce_stationarity=False,
+                                                enforce_invertibility=False,
+                                            )
+                                            results = model.fit(disp=False)
                                         score = (
                                             results.aic
                                             if self.selection_criterion == "aic"
