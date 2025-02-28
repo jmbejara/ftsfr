@@ -38,8 +38,8 @@ def pull_fed_yield_curve():
     return df[cols]
 
 
-def load_fed_yield_curve(data_dir=DATA_DIR):
-    path = data_dir / "fed_yield_curve.parquet"
+def load_fed_yield_curve(data_dir=DATA_DIR, subfolder=SUBFOLDER):
+    path = data_dir / subfolder / "fed_yield_curve.parquet"
     _df = pd.read_parquet(path)
     return _df
 

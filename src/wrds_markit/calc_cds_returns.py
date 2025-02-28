@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -5,8 +6,18 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import numpy as np
 import pandas as pd
+import pull_fed_yield_curve
+import pull_markit_cds
 from scipy.interpolate import CubicSpline
 
+from settings import config
+
+DATA_DIR = config("DATA_DIR")
+START_DATE = pull_markit_cds.START_DATE
+END_DATE = pull_markit_cds.END_DATE
+
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 
 def process_rates(raw_rates, start_date, end_date):
     """
@@ -225,3 +236,13 @@ def calc_cds_return(cds_spread, raw_rates, start_date, end_date):
     )
     cds_return.dropna(inplace=True)
     return cds_return
+    
+if __name__ == "__main__":
+    raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR)
+    cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR)
+    cds_returns = calc_cds_return(
+        cds_spreads, raw_rates, START_DATE, END_DATE
+    )  # This is daily returns, can concert to monthly to compare with He Kelly
+    
+    (DATA_DIR / SUBFOLDER).mkdir(parents=True, exist_ok=True)
+    cds_returns.to_parquet(DATA_DIR / SUBFOLDER / "markit_cds_returns.parquet")

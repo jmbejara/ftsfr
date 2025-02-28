@@ -48,6 +48,7 @@ def task_pull_data():
 
     if data_sources["ken_french_data_library"]:
         from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
+
         subfolder = "ken_french_data_library"
         yield {
             "name": "ken_french_data_library",
@@ -134,6 +135,27 @@ def task_pull_data():
             "clean": [],
         }
     # fmt: on
+
+    if data_sources["wrds_markit"]:
+        subfolder = "wrds_markit"
+        yield {
+            "name": "wrds_markit",
+            "actions": [
+                f"ipython ./src/{subfolder}/pull_fed_yield_curve.py",
+                f"ipython ./src/{subfolder}/pull_markit_cds.py",
+                # f"ipython ./src/{subfolder}/calc_cds_returns.py", # TODO
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "markit_cds.parquet",
+                # DATA_DIR / subfolder / "markit_cds_returns.parquet", # TODO
+                DATA_DIR / subfolder / "fed_yield_curve.parquet",
+            ],
+            "file_dep": [
+                f"./src/{subfolder}/pull_markit_cds.py",
+                f"./src/{subfolder}/pull_fed_yield_curve.py",
+            ],
+            "clean": [],
+        }
 
 
 # def task_run_benchmarks():
