@@ -1,21 +1,12 @@
-[datasets]
-# Aggregated datasets
-cds_portfolios = false
+[data_sources]
+# Set to true if subscription is available, data will be pulled from source
 fed_yield_curve = true
-ken_french_portfolios = true
-forex_portfolios = false
-industrial_production = false
-sovereign_bonds = false
-us_corp_bonds = true
-us_govt_bonds = false
-
-# Disaggregated datasets
-commodity_futures = false
-crsp_compustat = true
-crsp_returns = true
-crsp_treasury = true
-finra_trace = false
-sp500_options = false
+ken_french_data_library = true
+wrds_compustat = false
+wrds_corp_bonds = true
+wrds_crsp_compustat = true
+wrds_markit = true
+wrds_optionmetrics = false
 
 [models]
 # Traditional Time Series Models

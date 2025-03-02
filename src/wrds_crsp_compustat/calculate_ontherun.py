@@ -1,13 +1,19 @@
-import warnings
-from datetime import datetime
+import sys
 from pathlib import Path
 
-import pandas as pd
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import os
+import warnings
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
 
 from settings import config
 
-SUBFOLDER = "crsp_treasury"
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 
 

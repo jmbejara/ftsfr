@@ -12,7 +12,7 @@ OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 
 # Load benchmarks configuration
 with open("benchmarks.toml", "r") as f:
-    BENCHMARKS = toml.load(f)
+    benchmarks_file = toml.load(f)
 
 
 def task_config():
@@ -33,70 +33,96 @@ def task_config():
 
 
 def task_pull_data():
-    """Pull selected datasets based on benchmarks.toml configuration"""
-    datasets = BENCHMARKS["datasets"]
-    from pull_fed_yield_curve import SUBFOLDER as subfolder
+    """Pull selected data_sources based on benchmarks.toml configuration"""
+    data_sources = benchmarks_file["data_sources"]
 
-    ## Aggregate datasets
-    if datasets["fed_yield_curve"]:
+    if data_sources["fed_yield_curve"]:
+        subfolder = "fed_yield_curve"
         yield {
-            "name": "fed_yield_curve",
-            "actions": ["ipython ./src/pull_fed_yield_curve.py"],
+            "name": subfolder,
+            "actions": [f"ipython ./src/{subfolder}/pull_fed_yield_curve.py"],
             "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
-            "file_dep": ["./src/pull_fed_yield_curve.py"],
+            "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
             "clean": [],
         }
 
-    if datasets["ken_french_portfolios"]:
-        from pull_fama_french_25_portfolios import DATA_INFO
+    if data_sources["ken_french_data_library"]:
+        from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
 
+        subfolder = "ken_french_data_library"
         yield {
-            "name": "ken_french_portfolios",
-            "actions": ["ipython ./src/pull_fama_french_25_portfolios.py"],
+            "name": "ken_french_data_library",
+            "actions": [f"ipython ./src/{subfolder}/pull_fama_french_25_portfolios.py"],
             "targets": [
-                DATA_DIR / "ken_french_portfolios" / info["parquet"]
+                DATA_DIR / "ken_french_data_library" / info["parquet"]
                 for info in DATA_INFO.values()
             ],
-            "file_dep": ["./src/pull_fama_french_25_portfolios.py"],
+            "file_dep": [f"./src/{subfolder}/pull_fama_french_25_portfolios.py"],
             "clean": [],
         }
 
-    ## Disaggregated datasets
-    if datasets["crsp_returns"]:
-        from pull_CRSP_stock import SUBFOLDER as subfolder
-
+    if data_sources["wrds_crsp_compustat"]:
+        subfolder = "wrds_crsp_compustat"
         yield {
-            "name": "crsp_returns",
-            "actions": ["ipython ./src/pull_CRSP_stock.py"],
+            "name": "wrds_crsp_stock",
+            "actions": [f"ipython ./src/{subfolder}/pull_CRSP_stock.py"],
             "targets": [
                 DATA_DIR / subfolder / "CRSP_MSF_INDEX_INPUTS.parquet",
                 DATA_DIR / subfolder / "CRSP_MSIX.parquet",
             ],
-            "file_dep": ["./src/pull_CRSP_stock.py"],
+            "file_dep": [f"./src/{subfolder}/pull_CRSP_stock.py"],
             "clean": [],
         }
-    if datasets["crsp_compustat"]:
-        from pull_CRSP_Compustat import SUBFOLDER as subfolder
+
+        # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
+        # The code right now only pulls them separately.
 
         yield {
-            "name": "crsp_compustat",
-            "actions": ["ipython ./src/pull_CRSP_Compustat.py"],
+            "name": "wrds_crsp_treasury",
+            "actions": [
+                f"ipython ./src/{subfolder}/pull_treasury_auction_stats.py",
+                f"ipython ./src/{subfolder}/calculate_ontherun.py",
+                f"ipython ./src/{subfolder}/pull_CRSP_treasury.py",
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "treasury_auction_stats.parquet",
+                DATA_DIR / subfolder / "issue_dates.csv",
+                DATA_DIR / subfolder / "ontherun.csv",
+                DATA_DIR / subfolder / "CRSP_TFZ_DAILY.parquet",
+                DATA_DIR / subfolder / "CRSP_TFZ_INFO.parquet",
+                DATA_DIR / subfolder / "CRSP_TFZ_CONSOLIDATED.parquet",
+                DATA_DIR / subfolder / "CRSP_TFZ_with_runness.parquet",
+            ],
+            "file_dep": [
+                f"./src/{subfolder}/pull_treasury_auction_stats.py",
+                f"./src/{subfolder}/calculate_ontherun.py",
+                f"./src/{subfolder}/pull_CRSP_treasury.py",
+            ],
+            "clean": [],
+        }
+
+    if data_sources["wrds_crsp_compustat"]:
+        subfolder = "wrds_crsp_compustat"
+        yield {
+            "name": "wrds_crsp_compustat",
+            "actions": [f"ipython ./src/{subfolder}/pull_CRSP_Compustat.py"],
             "targets": [
                 DATA_DIR / subfolder / "Compustat.parquet",
                 DATA_DIR / subfolder / "CRSP_stock_ciz.parquet",
                 DATA_DIR / subfolder / "CRSP_Comp_Link_Table.parquet",
                 DATA_DIR / subfolder / "FF_FACTORS.parquet",
             ],
-            "file_dep": ["./src/pull_CRSP_Compustat.py"],
+            "file_dep": [f"./src/{subfolder}/pull_CRSP_Compustat.py"],
             "clean": [],
         }
+
     # fmt: off
-    if datasets["us_corp_bonds"]:
-        from pull_corp_bonds import DATA_INFO
-        from pull_corp_bonds import SUBFOLDER as subfolder
+    if data_sources["wrds_corp_bonds"]:
+        from wrds_corp_bonds.pull_corp_bonds import DATA_INFO
+        from wrds_corp_bonds.pull_corp_bonds import SUBFOLDER as subfolder
         yield {
-            "name": "us_corp_bonds",
-            "actions": ["ipython ./src/pull_corp_bonds.py"],
+            "name": "wrds_corp_bonds",
+            "actions": [f"ipython ./src/{subfolder}/pull_corp_bonds.py"],
             "targets": [
                 DATA_DIR / subfolder / info["parquet"]
                 for info in DATA_INFO.values()
@@ -105,35 +131,28 @@ def task_pull_data():
                 DATA_DIR / subfolder / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
                 for info in DATA_INFO.values()
             ],
-            "file_dep": ["./src/pull_corp_bonds.py"],
+            "file_dep": [f"./src/{subfolder}/pull_corp_bonds.py"],
             "clean": [],
         }
     # fmt: on
 
-    if datasets["crsp_treasury"]:
-        # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
-        # The code right now only pulls them separately.
-        from pull_CRSP_treasury import SUBFOLDER as subfolder
-
+    if data_sources["wrds_markit"]:
+        subfolder = "wrds_markit"
         yield {
-            "name": "crsp_treasury",
+            "name": "wrds_markit",
             "actions": [
-                "ipython ./src/pull_treasury_auction_stats.py",
-                "ipython ./src/calculate_ontherun.py",
-                "ipython ./src/pull_CRSP_treasury.py",
+                f"ipython ./src/{subfolder}/pull_fed_yield_curve.py",
+                f"ipython ./src/{subfolder}/pull_markit_cds.py",
+                # f"ipython ./src/{subfolder}/calc_cds_returns.py", # TODO
             ],
             "targets": [
-                DATA_DIR / subfolder / "treasury_auction_stats.csv",
-                DATA_DIR / subfolder / "issue_dates.csv",
-                DATA_DIR / subfolder / "ontherun.csv",
-                DATA_DIR / subfolder / "CRSP_TFZ_DAILY.parquet",
-                DATA_DIR / subfolder / "CRSP_TFZ_INFO.parquet",
-                DATA_DIR / subfolder / "CRSP_TFZ_CONSOLIDATED.parquet",
+                DATA_DIR / subfolder / "markit_cds.parquet",
+                # DATA_DIR / subfolder / "markit_cds_returns.parquet", # TODO
+                DATA_DIR / subfolder / "fed_yield_curve.parquet",
             ],
             "file_dep": [
-                "./src/pull_treasury_auction_stats.py",
-                "./src/calculate_ontherun.py",
-                "./src/pull_CRSP_treasury.py",
+                f"./src/{subfolder}/pull_markit_cds.py",
+                f"./src/{subfolder}/pull_fed_yield_curve.py",
             ],
             "clean": [],
         }
@@ -141,7 +160,7 @@ def task_pull_data():
 
 # def task_run_benchmarks():
 #     """Run selected model benchmarks based on benchmarks.toml configuration"""
-#     models = BENCHMARKS['models']
+#     models = benchmarks_file['models']
 
 #     if models["var"]:
 #         yield {

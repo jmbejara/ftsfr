@@ -1,0 +1,183 @@
+---
+description: Usual formatting of functions, naming, settings, etc
+globs: *.py, *.ipynb
+---
+# Usage of settings.py
+
+Every file should use settings.py to handle environment variables, such at DATA_DIR and OUTPUT_DIR.
+This is loaded as
+```python
+from settings import config
+
+DATA_DIR = config("DATA_DIR")
+```
+
+# Pull and Load
+
+
+## Naming
+
+- Functions that load data from disk should start with `load_`. Functions that pull from the web, or some external API, etc, should start with `pull_`. A file that contains a defined `pull_` function should also be named `pull_XYZ.py`.
+
+- In a pull file, there should be a `pull_` function and a `load_` function. The pull function pulls from the web into a pandas DataFrame. 
+
+## Separation of Concerns for Data Pulls and Loads
+
+- Files should to some degree separate concerns, but don't go overboard. At the very least, there should be a separate file dedicated to pulling data from the web for each separate source of data. So, for example, you could have a `pull_CRSP.py` file and a `pull_markit.py` file. On occasion, it's ok to have a file like `pull_CRSP_Compustat.py`, since those datasets are so often merged. That file, pull_CRSP_Compustat.py, contains the merge code, so it doesn't have to be reimplemented all the time when used elsewhere. The idea is that you are packaging up code that can be easily reused in other projects in the future. Merging in that case is probably something you'll do in many other projects.
+
+- If the data cleaning process is very involved, you might consider breaking it up and putting it into another .py file. However, I think the most important consideration regarding breaking it up is to ask yourself, is my cleaning procedure specific to this project? Or will I use this cleaning procedure over and over again in future projects? If it's project-specific, break it up into its own file. If you think every future project will use the same cleaning process, keep it in the data pull/load file.
+
+
+## if __name__ == "__main__": block
+
+In the block `if __name__ == "__main__":` block, the pull function should be invoked and the resulting dataframe should be saved to disk as a parquet file. Then, the file should have a load function that loads that loads that parquet from disk.
+
+Other files that use the data will use the data in a pattern that looks something like this
+
+```python
+import pull_CRSP_Compustat
+
+df = pull_CRSP_Compustat.load_merged_crsp_compustat(data_dir=DATA_DIR)
+```
+
+Here's an example of what it might look like:
+```python
+import pandas as pd
+import requests
+from io import BytesIO
+import sys
+sys.path.insert(1, "./src/")
+
+from settings import config
+import os
+
+# Set SUBFOLDER to the folder containing this file
+DATA_DIR = config("DATA_DIR")
+
+
+def pull_fed_yield_curve():
+    """
+    Download the latest yield curve from the Federal Reserve
+
+    This is the published data using Gurkaynak, Sack, and Wright (2007) model
+    """
+
+    url = "https://www.federalreserve.gov/data/yield-curve-tables/feds200628.csv"
+    response = requests.get(url)
+    pdf_stream = BytesIO(response.content)
+    df = pd.read_csv(pdf_stream, skiprows=9, index_col=0, parse_dates=True)
+    cols = ["SVENY" + str(i).zfill(2) for i in range(1, 31)]
+    return df[cols]
+
+
+def load_fed_yield_curve(data_dir=DATA_DIR):
+    path = data_dir / "fed_yield_curve.parquet"
+    _df = pd.read_parquet(path)
+    return _df
+
+
+if __name__ == "__main__":
+    df = pull_fed_yield_curve()
+    data_dir = DATA_DIR
+    data_dir.mkdir(parents=True, exist_ok=True)
+    path = data_dir / "fed_yield_curve.parquet"
+    df.to_parquet(path)
+```
+
+Note that in order to make this work, the saving of the file is in the `if __name__ == "__main__"` block.
+
+## Predictability of actions
+
+When a function is called a "load_" function or a "pull_" function, you should know what you're getting.
+Thus, when you run a load function, it really should load from disk and not pull from the internet. 
+So, don't write a function like this:
+```python
+def load_all_optm_data(
+    data_dir=DATA_DIR, secid=108105, startDate="1996-01-01", endDate="2012-01-31"
+):
+    startDate = pd.to_datetime(startDate)
+    endDate = pd.to_datetime(endDate)
+    startYearMonth = startDate.strftime("%Y-%m")[:7]
+    endYearMonth = endDate.strftime("%Y-%m")[:7]
+
+    file_name = f"spx_options_{startYearMonth}_{endYearMonth}.parquet"
+    file_path = Path(data_dir) / file_name
+
+    t0 = time.time()
+    if file_path.exists():
+        print(f">> Reading from file: {file_path}")
+        df = pd.read_parquet(file_path)
+    else:
+        print(">> Pulling data from WRDS...")
+        pull_all_optm_data(
+            data_dir=data_dir,
+            wrds_username=WRDS_USERNAME,
+            secid=secid,
+            startDate=startDate,
+            endDate=endDate,
+        )
+        df = pd.read_parquet(file_path)
+
+    df = clean_optm_data(df)
+    t1 = round(time.time() - t0, 2)
+    print(f"Loading Data took {t1} seconds")
+    return df
+```
+where a load function pulls the data if it can't find it. Instead, such a function will just 
+raise an error. You don't need to write the error handling, it will just happen because you won't find
+the file with the correct name.
+
+
+Note that this predictability also implies that a pull function must ONLY pull. It doesn't even save the file to disk.
+The action of saving the file to disk is done somewhere else. In this template, I want you to save the file to disk
+in the `if __name__ == "__main__"` block.
+
+
+# Structure
+
+## imports
+
+I always prefer to avoid importing homemade modules with an abbreviation.
+
+So, you should almost never write
+```python
+import pull_options_data as pod
+```
+and instead write 
+```python
+import pull_options_data
+```
+
+However, for commonly-used external package where this is common, please stick to the standard.
+So, always write
+```python
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+import seaborn as sns
+```
+for example.
+.
+
+# Misc
+
+## Print statements
+
+I also don't like for functions to print to the screen when something is loaded or pulled. This just adds extra noise. So, you should almost never use print statements.
+
+## Style
+
+Please always use snake_case instead of camelCase
+
+With names, a function should be called "plot_..." when the function plots something. If it plots something, it should not do anything else. 
+
+## Functional programming
+
+The code should use a functional programming style. That is, functions should not have side effects and should avoid using externally defined variables (variables defined out of scope). Don't use classes and objects, unless there is an extremely good reason to.
+
+Each function should do one thing and one thing well. Naming should make it clear what it does. Functions that plot stuff should be called "plot_...", functions that pull from the internet or API should be "pull_", functions that load from disk should be "load_"
+
+## Refactoring
+
+When you refactor the code, like breaking up functions into smaller more well-defined functions, don't worry about keeping old function around for compatibility. Just go ahead and make edits everywhere needed to make the refactor successful.
+

@@ -3,10 +3,15 @@
 import pandas as pd
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from models.time_series_model import TimeSeriesModel
-from dataset import FREQUENCY_SEASONAL_MAP
+from models.dataset import FREQUENCY_SEASONAL_MAP, Dataset
+from typing import Union
+import datetime
 
 
 class HoltWintersForecasting(TimeSeriesModel):
+    name = "Holt-Winters Forecasting"
+    code = "HWT"
+
     def __init__(
         self,
         y: pd.DataFrame,
@@ -42,6 +47,36 @@ class HoltWintersForecasting(TimeSeriesModel):
         self.damped_trend = damped_trend
         self.model = None
         self.fitted_model = None
+
+    @classmethod
+    def from_dataset(
+        cls,
+        dataset: Dataset,
+        step_size: int,
+        forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
+        n_forecasting=None,
+        intersect_forecasting: bool = False,
+        only_consider_last_of_each_intersection: bool = False,
+        rolling: bool = False,
+        seasonal: str = "add",
+        trend: str = "add",
+        damped_trend: bool = False,
+    ):
+        self = super().from_dataset(
+            dataset,
+            step_size,
+            forecasting_start_date,
+            n_forecasting,
+            intersect_forecasting,
+            only_consider_last_of_each_intersection,
+            rolling,
+        )
+        self.seasonal = seasonal
+        self.trend = trend
+        self.damped_trend = damped_trend
+        self.model = None
+        self.fitted_model = None
+        return self
 
     @TimeSeriesModel._fitted
     def fit(self, y, X=None):

@@ -25,17 +25,22 @@ https://wrds-www.wharton.upenn.edu/documents/400/CRSP_Programmers_Guide.pdf
 
 
 """
-
-import pandas as pd
-from pandas.tseries.offsets import MonthEnd, YearEnd
-
-import numpy as np
-import wrds
-
-from settings import config
+import sys
 from pathlib import Path
 
-SUBFOLDER = "crsp_compustat"
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import os
+from pathlib import Path
+
+import pandas as pd
+import wrds
+from pandas.tseries.offsets import MonthEnd
+
+from settings import config
+
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 # START_DATE = config("START_DATE")

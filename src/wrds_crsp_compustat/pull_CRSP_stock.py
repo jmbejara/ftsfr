@@ -17,9 +17,12 @@ about the new CIZ format can be found here:
  - CRSP Metadata Guide: https://wrds-www.wharton.upenn.edu/documents/1941/CRSP_METADATA_GUIDE_STOCK_INDEXES_FLAT_FILE_FORMAT_2_0_CIZ_09232022v.pdf
 
 """
+import sys
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import os
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from pathlib import Path
 
 import numpy as np
@@ -28,7 +31,8 @@ import wrds
 
 from settings import config
 
-SUBFOLDER = "crsp_stock"
+# Set SUBFOLDER to the folder containing this file
+SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("1925-01-01")
