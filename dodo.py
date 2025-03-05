@@ -38,6 +38,25 @@ data_sources = benchmarks_file["data_sources"]
 def task_pull_subscription_data():
     """Pull selected data_sources based on benchmarks.toml configuration"""
 
+    if data_sources["wrds_bank_premium"]:
+        subfolder = "wrds_bank_premium"
+        yield {
+            "name": "wrds_bank_premium",
+            "actions": [f"ipython ./src/{subfolder}/pull_wrds_bank_premium.py"],
+            "targets": [
+                DATA_DIR / subfolder / "wrds_struct_rel_ultimate.parquet",
+                DATA_DIR / subfolder / "wrds_call_research.parquet",
+                DATA_DIR / subfolder / "wrds_bank_crsp_link.parquet",
+                DATA_DIR / subfolder / "idrssd_to_lei.parquet",
+                DATA_DIR / subfolder / "lei_main.parquet",
+                DATA_DIR / subfolder / "lei_legalevents.parquet",
+                DATA_DIR / subfolder / "lei_otherentnames.parquet",
+                DATA_DIR / subfolder / "lei_successorentity.parquet",
+            ],
+            "file_dep": [f"./src/{subfolder}/pull_wrds_bank_premium.py"],
+            "clean": [],
+        }
+
     if data_sources["wrds_crsp_compustat"]:
         subfolder = "wrds_crsp_compustat"
         yield {

@@ -2,12 +2,12 @@
 
 ## Subscription data sets. Subscription needed, api key needed.
 # Set to true if subscription is available, data will be pulled from source
+wrds_bank_premium = true
 wrds_compustat = false
 wrds_corp_bonds = true
 wrds_crsp_compustat = true
 wrds_markit = true
 wrds_optionmetrics = false
-wrds_bank_premium = false
 
 ## Public data sets. No subscription needed, no api key needed.
 # Default to true to download the data
