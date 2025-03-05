@@ -1,67 +1,79 @@
-*.db
-*.csv
-*.xlsx
-*.xls
-*.log
-*.pdf
-*.docx
-*.doc
-*.pptx
-*.ppt
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.svg
-*.mp4
-*.mp3
-*.wav
-*.avi
-*.mov
-*.wmv
-*.flv
-*.mkv
-*.webm
-*.zip
-*.rar
-*.tar
-*.gz
+
+##########################
+# Project Input and Output
+##########################
+
+# Exclude _data folder, since it should all be pulled automatically (unless in the manual folder)
+/_data/*
+
+# Exclude _output directory since it's should generated automatically
+/_output/*
+
+# Exclude PDFs generated from source LaTeX files, which are kept in the reports directory
+/reports/*.pdf
+
+# Secrets saved in environment files
+.env*
+# Allow example environment file
+!.env.example*
+
+# Other
+temp*.csv
+*/_build/
+drafts/draft_bp.pdf
+
+# venv virtual environment folder
+/venv/*
+/.venv/*
+/.venv/*
+
+# Sphinx build files
+_docs/
 
 
+##############
+#Excluded PDFs
+##############
+# I've decided to exclude all PDFs unless they're in the literature or papers directory.
+# http://stackoverflow.com/questions/1248570/git-ignore-everything-except-subdirectory
 
-models/logs/*
+# !/related_literature/*
+# !/related_literature/
+# !/related_literature/*/*
+# !/Papers/*
+# !/papers/*
+# !/literature/*
 
-
+#########################
+# Exclude Compiled Files
+#########################
+bin/
+*.pyc
+*.exe
+SourceCode/build/
+bin/
+a.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
-
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
-scripts/
-migrations/
 dist/
 downloads/
 eggs/
-.eggs/
 lib/
 lib64/
 parts/
 sdist/
 var/
-wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -76,17 +88,10 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
-.nox/
 .coverage
-.coverage.*
 .cache
 nosetests.xml
 coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
 
 # Translations
 *.mo
@@ -94,121 +99,153 @@ cover/
 
 # Django stuff:
 *.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/
+/docs_src/apidocs
+
 
 # PyBuilder
-.pybuilder/
 target/
 
-# Jupyter Notebook
+# emacs
+*~
+# C extensions
+*.so
+
+##############
+# LaTex Files
+##############
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.nav
+*.pdfsync
+*.synctex.gz
+*.bak
+*.snm
+*.toc
+*.tdo
+*.run.xml
+*.loe
+
+
+##########
+# R Files
+##########
+.Rproj.user
+.Rhistory
+.RData
+.Rapp.history
+
+################
+# Database Files
+################
+*.hdf5
+*.npz
+
+###################################
+# Exclude Output From Scripted Jobs
+###################################
+*.o*
+
+####################################
+# Exclude Sublime Text project files
+####################################
+*.sublime*
+
+####################################
+# Exclude Mac OSX system files
+####################################
+.DS_Store
+
+####################################
+# IPython/Jupyter Checkpoints
+####################################
 .ipynb_checkpoints
+.ipynb_checkpoints/
 
-# IPython
-profile_default/
-ipython_config.py
+####################################
+# Vagrant
+####################################
+.vagrant/
 
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
+######################################
+## R files ##
+######################################
+# History files
+.Rhistory
+.Rapp.history
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+# Session Data files
+.RData
 
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#uv.lock
+# User-specific files
+.Ruserdata
 
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
+# Example code in package build process
+*-Ex.R
 
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
-.pdm.toml
-.pdm-python
-.pdm-build/
+# Output files from R CMD build
+/*.tar.gz
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
+# Output files from R CMD check
+/*.Rcheck/
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+# RStudio files
+.Rproj.user/
 
-# SageMath parsed files
-*.sage.py
+# produced vignettes
+vignettes/*.html
+vignettes/*.pdf
 
-# Environments
-.env*
-!.env.example
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
+.httr-oauth
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# knitr and R markdown default cache directories
+*_cache/
+/cache/
 
-# Rope project settings
-.ropeproject
+# Temporary files created by R markdown
+*.utf8.md
+*.knit.md
 
-# mkdocs documentation
-/site
+# R Environment Variables
+.Renviron
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+########
+# MISC.
+########
+# *.zip
+# *.tar.gz
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.dat
+*.dir
+*.fdb_latexmk
+*.fls
+*.graphml
+*.gz
+*.ini
+*.log
+*.out
+*.vrb
+*.xdv
+*.xdv
+\.pytest_cache/
+~$*
 
-# Pyre type checker
-.pyre/
+.doit.db.db
+.doit-db.sqlite
 
-# pytype static type analyzer
-.pytype/
+src/z_scratch_project_template.ipynb
 
-# Cython debug symbols
-cython_debug/
+*Thumbs.db
 
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
-
-# PyPI configuration file
-.pypirc
-
-_data/
-_output/
-
-**/.DS_Store
+src/z_scratch_pipeline_template.ipynb

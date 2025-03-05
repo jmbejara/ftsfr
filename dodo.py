@@ -32,34 +32,11 @@ def task_config():
     }
 
 
-def task_pull_data():
+data_sources = benchmarks_file["data_sources"]
+
+
+def task_pull_subscription_data():
     """Pull selected data_sources based on benchmarks.toml configuration"""
-    data_sources = benchmarks_file["data_sources"]
-
-    if data_sources["fed_yield_curve"]:
-        subfolder = "fed_yield_curve"
-        yield {
-            "name": subfolder,
-            "actions": [f"ipython ./src/{subfolder}/pull_fed_yield_curve.py"],
-            "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
-            "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
-            "clean": [],
-        }
-
-    if data_sources["ken_french_data_library"]:
-        from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
-
-        subfolder = "ken_french_data_library"
-        yield {
-            "name": "ken_french_data_library",
-            "actions": [f"ipython ./src/{subfolder}/pull_fama_french_25_portfolios.py"],
-            "targets": [
-                DATA_DIR / "ken_french_data_library" / info["parquet"]
-                for info in DATA_INFO.values()
-            ],
-            "file_dep": [f"./src/{subfolder}/pull_fama_french_25_portfolios.py"],
-            "clean": [],
-        }
 
     if data_sources["wrds_crsp_compustat"]:
         subfolder = "wrds_crsp_compustat"
@@ -154,6 +131,45 @@ def task_pull_data():
                 f"./src/{subfolder}/pull_markit_cds.py",
                 f"./src/{subfolder}/pull_fed_yield_curve.py",
             ],
+            "clean": [],
+        }
+
+
+def task_pull_public_data():
+    """Pull selected data_sources based on benchmarks.toml configuration"""
+
+    if data_sources["fed_yield_curve"]:
+        subfolder = "fed_yield_curve"
+        yield {
+            "name": subfolder,
+            "actions": [f"ipython ./src/{subfolder}/pull_fed_yield_curve.py"],
+            "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
+            "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
+            "clean": [],
+        }
+
+    if data_sources["ken_french_data_library"]:
+        from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
+
+        subfolder = "ken_french_data_library"
+        yield {
+            "name": "ken_french_data_library",
+            "actions": [f"ipython ./src/{subfolder}/pull_fama_french_25_portfolios.py"],
+            "targets": [
+                DATA_DIR / "ken_french_data_library" / info["parquet"]
+                for info in DATA_INFO.values()
+            ],
+            "file_dep": [f"./src/{subfolder}/pull_fama_french_25_portfolios.py"],
+            "clean": [],
+        }
+
+    if data_sources["nyu_call_report"]:
+        subfolder = "nyu_call_report"
+        yield {
+            "name": subfolder,
+            "actions": [f"ipython ./src/{subfolder}/pull_nyu_call_report.py"],
+            "targets": [DATA_DIR / subfolder / "nyu_call_report.parquet"],
+            "file_dep": [f"./src/{subfolder}/pull_nyu_call_report.py"],
             "clean": [],
         }
 
