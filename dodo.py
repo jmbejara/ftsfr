@@ -59,6 +59,20 @@ def task_pull_subscription_data():
 
     if data_sources["wrds_crsp_compustat"]:
         subfolder = "wrds_crsp_compustat"
+
+        yield {
+            "name": "wrds_crsp_compustat",
+            "actions": [f"ipython ./src/{subfolder}/pull_CRSP_Compustat.py"],
+            "targets": [
+                DATA_DIR / subfolder / "Compustat.parquet",
+                DATA_DIR / subfolder / "CRSP_stock_ciz.parquet",
+                DATA_DIR / subfolder / "CRSP_Comp_Link_Table.parquet",
+                DATA_DIR / subfolder / "FF_FACTORS.parquet",
+            ],
+            "file_dep": [f"./src/{subfolder}/pull_CRSP_Compustat.py"],
+            "clean": [],
+        }
+
         yield {
             "name": "wrds_crsp_stock",
             "actions": [f"ipython ./src/{subfolder}/pull_CRSP_stock.py"],
@@ -94,21 +108,6 @@ def task_pull_subscription_data():
                 f"./src/{subfolder}/calculate_ontherun.py",
                 f"./src/{subfolder}/pull_CRSP_treasury.py",
             ],
-            "clean": [],
-        }
-
-    if data_sources["wrds_crsp_compustat"]:
-        subfolder = "wrds_crsp_compustat"
-        yield {
-            "name": "wrds_crsp_compustat",
-            "actions": [f"ipython ./src/{subfolder}/pull_CRSP_Compustat.py"],
-            "targets": [
-                DATA_DIR / subfolder / "Compustat.parquet",
-                DATA_DIR / subfolder / "CRSP_stock_ciz.parquet",
-                DATA_DIR / subfolder / "CRSP_Comp_Link_Table.parquet",
-                DATA_DIR / subfolder / "FF_FACTORS.parquet",
-            ],
-            "file_dep": [f"./src/{subfolder}/pull_CRSP_Compustat.py"],
             "clean": [],
         }
 
