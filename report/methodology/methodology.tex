@@ -1,0 +1,71 @@
+For each of the series forecasted, we calculate multiple error metrics: MSE, RMSE, MAE, MASE, and SMAPE. A detailed explanation of the metrics is given in Appendix~\ref{sec:error_metrics}.
+
+The error is calculated based on all the available forecasts for each series.
+
+Different models perform distinctly for different forecasting horizons; according to [REFERENCE], SARIMA models are better for short-term forecasts, while LSTM models are better for long-term forecasts. Viewing those differences, we provide predictions for each time-series and model using different options of:
+\begin{itemize}
+    \item Number of forecasting ($n$)
+    \item Forecasting horizons ($h$)
+    \item Intersecting forecasting
+    \item Rolling and expanding training sample
+\end{itemize}
+Each of those parameters is explained below.
+
+\subsection{Number of Forecasts}
+
+The number of forecasts refers to the number of times a model trains and predicts. Each time it predicts, it goes forward to use the previous prediction data as part of the training data, then aiming to predict the next date not yet predict.
+
+When the number of forecasts is defined, we organize divisions of training and prediction dates in a way that the last division predicts the last chunck of dates available in the series.
+
+After all are predicted, the forecasts are compared with the actual values to generate the error metrics.
+
+\subsection{Forecasting Horizon (Step Size)}
+
+The forecasting horizon is the number of periods ahead that the model is predicting. For each of the forecasts made, we define the prediction period based on the forecasting horizon.
+
+For example, consider the forecasting horizon equals to 1, the number of forecasts equals to 12, monthly data and December 2025 being the last date available. In this case, we create 12 divisions. For the first one, the training data goes until December 2024, and it predicts the value for January 2025. The second division has the training data until January 2025 and predicts the value for February 2025, and so on until the last division predicts December 2025 using data until November 2025 to train the model. The predictions are gathered and compared with the actual values to generate the error metrics.
+
+\begin{figure}[H]
+The following graphic illustrates a forecast with number of forecasts equal to 6 and forecast horizon equals to 1.
+
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{../images/forecasting_explanation/forecasting_example_nf6_step1.png}
+    \end{center}
+\end{figure}
+
+Using the same example, if the forecasting horizon is 3, we must start predicting from earlier dates. The first division uses training data until December 2022 to predict January, February and March 2023. The second division trains its model using data until March 2023 to predict April, May and June 2023, and so on until the last division predicts October, November and December 2025 using data until September 2025 to train the model.
+
+\begin{figure}[H]
+The following graphic illustrates a forecast with number of forecasts equal to 6 and forecast horizon equals to 3.
+
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{../images/forecasting_explanation/forecasting_example_nf6_step1.png}
+    \end{center}
+\end{figure}
+
+\begin{figure}[H]
+For larger forecasting horizons, the first division will have considerably less training data. The following illustrates 4 forecasts with 12 months forecasting horizon.
+
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{../images/forecasting_explanation/forecasting_example_nf4_step12.png}
+    \end{center}
+\end{figure}
+
+\subsection{Intersecting Forecasting}
+
+By default, when the forecasting horizon is bigger than 1, the predictions are made in a non-intersecting way, meaning that each division has prediction dates without any overlap with other division.
+
+However, we also provide the option to make the predictions in an intersecting way. In this case, the training and prediction dates always advance one step at a time.
+
+For instance, if the forecasting horizon is 3, the number of forecasts is equal to 12, and the last date available is December 2025, the first division uses data until October 2024 to predict November, December 2024 and January 2025. The second division uses data until November 2024 to predict December 2024, January and February 2025 (different from the example above). The last division predicts October, November and December 2025 using data until September 2025 to train the model.
+
+After the forecasts are completed, we only use the last prediction of each division to calculate the error metrics. This way prioritizes exclusively the long-term predictions. The non-intersecting way of forecasting analyzes the short and long-term predictions equally by comparing predictions and actual values for dates that are one step ahead of the training data and dates that are the furthest from the training data. The intersecting way provides a more truthful analysis of the performance only in the longer horizon.
+
+\begin{figure}[H]
+    The graphic below provides 6 forecasts with step size of 3 similarly to graphic XX. The difference with the previous one occurs due to the use of intersecting dates of the divisions.
+
+    CHANGE GRAPHIC
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{../images/forecasting_explanation/forecasting_example_nf4_step12.png}
+    \end{center}
+\end{figure}
