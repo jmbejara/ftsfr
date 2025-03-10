@@ -69,3 +69,7 @@ After the forecasts are completed, we only use the last prediction of each divis
         \includegraphics[width=0.8\textwidth]{../images/forecasting_explanation/forecasting_example_nf4_step12.png}
     \end{center}
 \end{figure}
+
+\subsection{Rolling vs Expanding Training Sample}
+
+By default, the expanding training sample is used, meaning that the training data always starts from the same date for all the divisions and expands until the last date before the prediction dates. In the rolling sample, after running the first division, we move the training start date by the forecasting horizon to run the next division. In this way, the data training always has the same size for all the divisions.
