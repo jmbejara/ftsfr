@@ -87,7 +87,7 @@ class TimeSeriesModel:
         self.base_model = None
         self.id = self._create_id()
         self.is_error_assessed = False
-        self.is_div_built
+        self.is_div_built = False
         self.is_fitted = False
         if n_forecasting is not None and forecasting_start_date is not None:
             raise ValueError(
@@ -274,6 +274,10 @@ class TimeSeriesModel:
         y_true = y_true.loc[lambda s: s.index.isin(y_pred.index)]
         self.error_metrics.calculate_error_metrics(y_true, y_pred)
         self.is_error_assessed = True
+
+    @property
+    def time_frequency(self):
+        return self.dataset.time_frequency
 
     def to_pandas(self):
         last_division = max(self.divisions.keys())
