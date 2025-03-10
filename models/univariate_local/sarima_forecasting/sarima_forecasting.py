@@ -159,7 +159,9 @@ class SarimaForecasting(TimeSeriesModel):
         if not valid_results:
             raise Exception("No valid SARIMA model found with the given parameters.")
 
-        best_score, best_order, best_seasonal_order = min(valid_results, key=lambda x: x[0])
+        best_score, best_order, best_seasonal_order = min(
+            valid_results, key=lambda x: x[0]
+        )
 
         self.order = best_order
         self.seasonal_order = best_seasonal_order

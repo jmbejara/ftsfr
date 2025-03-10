@@ -32,7 +32,6 @@ from models.error_metrics import EXTRA_COLUMNS
 #     error_metrics = error_metrics.drop(EXTRA_COLUMNS, axis=1)
 #     error_metrics = error_metrics.iloc[0, :].values
 #     assert all([isinstance(x, (int, float)) for x in error_metrics])
-    
 
 
 def test_multiple_steps_sarima():
@@ -55,7 +54,3 @@ def test_multiple_steps_sarima():
     model.run()
     model.assess_error()
     model.save(test_path=True)
-
-
-
-
