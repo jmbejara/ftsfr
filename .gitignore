@@ -26,6 +26,11 @@ drafts/draft_bp.pdf
 /venv/*
 /.venv/*
 /.venv/*
+models/logs
+models/results/error_metrics/*
+models/results/time_series_models/*
+models/results/tests/error_metrics/*
+models/results/tests/time_series_models/*
 
 # Sphinx build files
 _docs/
