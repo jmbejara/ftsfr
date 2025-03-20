@@ -23,6 +23,9 @@ START_DATE = pd.Timestamp("1925-01-01")
 END_DATE = pd.Timestamp("2024-01-01")
 
 
+
+
+
 def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
     """
     Connects to a WRDS (Wharton Research Data Services) database and fetches Credit Default Swap (CDS) data
@@ -55,6 +58,8 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
                 -- The documentation clause. Values are: MM (Modified
                 -- Modified Restructuring), MR (Modified Restructuring), CR
                 -- (Old Restructuring), XR (No Restructuring).
+                -- Among all the data, these are the unique values for docclause:
+                --  CR, CR14, MM, MM14, MR, MR14, XR, XR14
             a.tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
         """
         cds_data[year] = db.raw_sql(query, date_cols=["date"])
@@ -99,7 +104,87 @@ def load_cds_data(data_dir=DATA_DIR, subfolder=SUBFOLDER):
     return pd.read_parquet(path)
 
 
+def get_unique_doc_clauses(wrds_username=WRDS_USERNAME):
+    """
+    -- The documentation clause. Values are: MM (Modified
+    -- Modified Restructuring), MR (Modified Restructuring), CR
+    -- (Old Restructuring), XR (No Restructuring).
+    -- Among all the data, these are the unique values for docclause:
+    --  CR, CR14, MM, MM14, MR, MR14, XR, XR14
+    """
+    db = wrds.Connection(wrds_username=wrds_username)
+    
+    # The SQL query as defined above
+    query = """
+    WITH all_doc_clauses AS (
+        SELECT DISTINCT docclause FROM markit.CDS2001
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2002
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2003
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2004
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2005
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2006
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2007
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2008
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2009
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2010
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2011
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2012
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2013
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2014
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2015
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2016
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2017
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2018
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2019
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2020
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2021
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2022
+        UNION
+        SELECT DISTINCT docclause FROM markit.CDS2023
+    )
+    SELECT DISTINCT
+        docclause
+    FROM 
+        all_doc_clauses
+    GROUP BY 
+        docclause
+    ORDER BY 
+        docclause;
+    """
+    
+    result = db.raw_sql(query)
+    return result
+
+def _demo():
+    # Call the function and display results
+    unique_clauses = get_unique_doc_clauses() 
+    print(unique_clauses) # CR, CR14, MM, MM14, MR, MR14, XR, XR14
+
+
 if __name__ == "__main__":
     combined_df = pull_cds_data(wrds_username=WRDS_USERNAME)
     (DATA_DIR / SUBFOLDER).mkdir(parents=True, exist_ok=True)
     combined_df.to_parquet(DATA_DIR / SUBFOLDER / "markit_cds.parquet")
+
+
