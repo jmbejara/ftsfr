@@ -113,3 +113,37 @@ def load_dataset(dataset_name="nyu_call_report_leverage", dataframe_type="pandas
         )
 
     return df
+
+def collect_ftsfa_dataset_info(data_dir=DATA_DIR):
+    """
+    Collect information about the FTSFA datasets. Go through the data_dir and
+    find all the parquet files that start with "ftsfa_". Look through the
+    data_dir recursively.
+
+    Returns a dict with the dataset name as the key and the file path, relative
+    to data_dir, as the value.
+    """
+    data_dir = Path(data_dir)
+    ftsfa_files = list(data_dir.glob("**/ftsfa_*.parquet"))
+    
+    dataset_info = {}
+    for file in ftsfa_files:
+        # Extract dataset name by removing the 'ftsfa_' prefix and '.parquet' extension
+        dataset_name = file.stem.replace('ftsfa_', '')
+        # Store relative path
+        rel_path = file.relative_to(data_dir)
+        dataset_info[dataset_name] = rel_path
+    
+    return dataset_info
+
+def save_dataset_info(dataset_info, output_file="ftsfa_datasets_paths.toml"):
+    # when paths in dataset_info are of Path type, convert them to str
+    dataset_info = {k: str(v) if isinstance(v, Path) else v for k, v in dataset_info.items()}
+    with open(output_file, "w") as f:
+        toml.dump(dataset_info, f)
+
+if __name__ == "__main__":
+    ftsfa_files = collect_ftsfa_dataset_info(data_dir=DATA_DIR)
+    save_dataset_info(ftsfa_files, output_file=DATA_DIR / "ftsfa_datasets_paths.toml")
+
+

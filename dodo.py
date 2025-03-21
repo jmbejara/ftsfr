@@ -245,6 +245,15 @@ def task_source():
             "clean": [],
         }
 
+def task_collect_ftsfa_datasets_info():
+    return {
+        "actions": [
+            "python ./src/load_ftsfa_datasets.py",
+        ],
+        "file_dep": ["./src/load_ftsfa_datasets.py"],
+        "targets": [DATA_DIR / "ftsfa_datasets_paths.toml"],
+        "clean": [],
+    }
 
 # def task_convert_pdfs_to_markdown():
 #     """Convert PDFs to Markdown"""
