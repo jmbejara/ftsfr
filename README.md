@@ -119,3 +119,7 @@ To run pre-commit hooks on all files:
 ```bash
 pre-commit run --all-files
 ```
+to format all files and fix linting errors:
+```bash
+ruff format . && ruff check --select I --fix . && ruff check --fix .
+```
