@@ -246,6 +246,25 @@ def task_source():
         }
 
 
+# def task_convert_pdfs_to_markdown():
+#     """Convert PDFs to Markdown"""
+
+#     return {
+#         "actions": [
+#             "python ./src/mistral_ocr.py",
+#         ],
+#         "targets": [
+#             "./notes/monash_time_series_forecasting_appendix.md",
+#             "./notes/monash_time_series_forecasting.md",
+#         ],
+#         "file_dep": [
+#             "./references/309_monash_time_series_forecasting-Supplementary_Material.pdf",
+#             "./references/309_monash_time_series_forecasting.pdf",
+#         ],
+#         "clean": True,
+#         "verbosity": 2,
+#     }
+
 # def task_run_benchmarks():
 #     """Run selected model benchmarks based on benchmarks.toml configuration"""
 #     models = benchmarks_file['models']
