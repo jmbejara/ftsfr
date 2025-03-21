@@ -2,13 +2,13 @@
 Downloads treasury auction data from TreasuryDirect.gov
 See here: https://treasurydirect.gov/TA_WS/securities/jqsearch
 """
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import json
-import os
 import urllib.request
 from pathlib import Path
 
@@ -16,8 +16,6 @@ import pandas as pd
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 
 
@@ -85,7 +83,7 @@ def pull_treasury_auction_data():
 
 
 def load_treasury_auction_data(data_dir: Path):
-    df = pd.read_parquet(data_dir / SUBFOLDER / "treasury_auction_stats.parquet")
+    df = pd.read_parquet(data_dir / "treasury_auction_stats.parquet")
     return df
 
 
@@ -100,8 +98,7 @@ def _demo():
 
 
 if __name__ == "__main__":
-    # Create subfolder
-    dir_path = DATA_DIR / SUBFOLDER
+    dir_path = DATA_DIR
     dir_path.mkdir(parents=True, exist_ok=True)
 
     df = pull_treasury_auction_data()

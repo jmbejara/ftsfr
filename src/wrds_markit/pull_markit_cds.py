@@ -8,22 +8,16 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-import os
 
 import pandas as pd
 import wrds
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("1925-01-01")
 END_DATE = pd.Timestamp("2024-01-01")
-
-
-
 
 
 def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
@@ -50,17 +44,17 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
             convspreard, -- The conversion spread associated to the contributed CDS curve.
             tenor
         FROM
-            {table_name} a
+            {table_name}
         WHERE
-            -- a.country = 'United States'
-            a.currency = 'USD' AND
-            a.docclause LIKE 'XR%%' AND 
+            -- country = 'United States'
+            currency = 'USD' AND
+            docclause LIKE 'XR%%' AND 
                 -- The documentation clause. Values are: MM (Modified
                 -- Modified Restructuring), MR (Modified Restructuring), CR
                 -- (Old Restructuring), XR (No Restructuring).
                 -- Among all the data, these are the unique values for docclause:
                 --  CR, CR14, MM, MM14, MR, MR14, XR, XR14
-            a.tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
+            tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
         """
         cds_data[year] = db.raw_sql(query, date_cols=["date"])
     return cds_data
@@ -99,8 +93,8 @@ def pull_cds_data(wrds_username=WRDS_USERNAME):
     return combined_df
 
 
-def load_cds_data(data_dir=DATA_DIR, subfolder=SUBFOLDER):
-    path = data_dir / subfolder / "markit_cds.parquet"
+def load_cds_data(data_dir=DATA_DIR):
+    path = data_dir / "markit_cds.parquet"
     return pd.read_parquet(path)
 
 
@@ -113,7 +107,7 @@ def get_unique_doc_clauses(wrds_username=WRDS_USERNAME):
     --  CR, CR14, MM, MM14, MR, MR14, XR, XR14
     """
     db = wrds.Connection(wrds_username=wrds_username)
-    
+
     # The SQL query as defined above
     query = """
     WITH all_doc_clauses AS (
@@ -172,19 +166,18 @@ def get_unique_doc_clauses(wrds_username=WRDS_USERNAME):
     ORDER BY 
         docclause;
     """
-    
+
     result = db.raw_sql(query)
     return result
 
+
 def _demo():
     # Call the function and display results
-    unique_clauses = get_unique_doc_clauses() 
-    print(unique_clauses) # CR, CR14, MM, MM14, MR, MR14, XR, XR14
+    unique_clauses = get_unique_doc_clauses()
+    print(unique_clauses)  # CR, CR14, MM, MM14, MR, MR14, XR, XR14
 
 
 if __name__ == "__main__":
     combined_df = pull_cds_data(wrds_username=WRDS_USERNAME)
-    (DATA_DIR / SUBFOLDER).mkdir(parents=True, exist_ok=True)
-    combined_df.to_parquet(DATA_DIR / SUBFOLDER / "markit_cds.parquet")
-
-
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    combined_df.to_parquet(DATA_DIR / "markit_cds.parquet")

@@ -23,12 +23,12 @@ Data Description:
 
 Thank you to Younghun Lee for preparing this script for use in class.
 """
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -39,9 +39,6 @@ from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
-
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 
 
 def pull_CRSP_treasury_daily(
@@ -191,22 +188,22 @@ def pull_CRSP_treasury_consolidated(
 
 
 def load_CRSP_treasury_daily(data_dir=DATA_DIR):
-    path = data_dir / SUBFOLDER / "TFZ_DAILY.parquet"
+    path = data_dir / "TFZ_DAILY.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def load_CRSP_treasury_info(data_dir=DATA_DIR):
-    path = data_dir / SUBFOLDER / "TFZ_INFO.parquet"
+    path = data_dir / "TFZ_INFO.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
     if with_runness:
-        path = data_dir / SUBFOLDER / "TFZ_with_runness.parquet"
+        path = data_dir / "TFZ_with_runness.parquet"
     else:
-        path = data_dir / SUBFOLDER / "TFZ_consolidated.parquet"
+        path = data_dir / "TFZ_consolidated.parquet"
     df = pd.read_parquet(path)
     return df
 
@@ -229,17 +226,17 @@ if __name__ == "__main__":
         end_date="2023-12-31",
         wrds_username=WRDS_USERNAME,
     )
-    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_DAILY.parquet"
+    path = DATA_DIR / "CRSP_TFZ_DAILY.parquet"
     df.to_parquet(path)
 
     df = pull_CRSP_treasury_info(wrds_username=WRDS_USERNAME)
-    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_INFO.parquet"
+    path = DATA_DIR / "CRSP_TFZ_INFO.parquet"
     df.to_parquet(path)
 
     df = pull_CRSP_treasury_consolidated(wrds_username=WRDS_USERNAME)
-    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_consolidated.parquet"
+    path = DATA_DIR / "CRSP_TFZ_consolidated.parquet"
     df.to_parquet(path)
 
     df = calc_runness(df)
-    path = DATA_DIR / SUBFOLDER / "CRSP_TFZ_with_runness.parquet"
+    path = DATA_DIR / "CRSP_TFZ_with_runness.parquet"
     df.to_parquet(path)

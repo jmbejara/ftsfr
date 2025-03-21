@@ -25,12 +25,12 @@ https://wrds-www.wharton.upenn.edu/documents/400/CRSP_Programmers_Guide.pdf
 
 
 """
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import os
 from pathlib import Path
 
 import pandas as pd
@@ -39,8 +39,6 @@ from pandas.tseries.offsets import MonthEnd
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 # START_DATE = config("START_DATE")
@@ -181,39 +179,43 @@ def pull_Fama_French_factors(wrds_username=WRDS_USERNAME):
 
 
 def load_compustat(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "Compustat.parquet"
+    path = Path(data_dir) / "Compustat.parquet"
     comp = pd.read_parquet(path)
     return comp
 
 
 def load_CRSP_stock_ciz(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "CRSP_stock_ciz.parquet"
+    path = Path(data_dir) / "CRSP_stock_ciz.parquet"
     crsp = pd.read_parquet(path)
     return crsp
 
 
 def load_CRSP_Comp_Link_Table(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "CRSP_Comp_Link_Table.parquet"
+    path = Path(data_dir) / "CRSP_Comp_Link_Table.parquet"
     ccm = pd.read_parquet(path)
     return ccm
 
 
 def load_Fama_French_factors(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "FF_FACTORS.parquet"
+    path = Path(data_dir) / "FF_FACTORS.parquet"
     ff = pd.read_parquet(path)
     return ff
 
 
 def _demo():
     comp = load_compustat(data_dir=DATA_DIR)
+    comp.info()
     crsp = load_CRSP_stock_ciz(data_dir=DATA_DIR)
+    crsp.info()
     ccm = load_CRSP_Comp_Link_Table(data_dir=DATA_DIR)
+    ccm.info()
     ff = load_Fama_French_factors(data_dir=DATA_DIR)
+    ff.info()
 
 
 if __name__ == "__main__":
     # Create subfolder
-    data_dir = DATA_DIR / SUBFOLDER
+    data_dir = DATA_DIR
     data_dir.mkdir(parents=True, exist_ok=True)
 
     comp = pull_compustat(wrds_username=WRDS_USERNAME)

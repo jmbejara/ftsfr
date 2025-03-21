@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-import os
 from pathlib import Path
 
 import pandas as pd
@@ -14,11 +13,8 @@ import wrds
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME_BANK_PREMIUM = config("WRDS_USERNAME_BANK_PREMIUM")
-END_DATE = config("END_DATE")
 
 
 def pull_selected_premium_tables(wrds_username=WRDS_USERNAME_BANK_PREMIUM):
@@ -92,10 +88,10 @@ available_tables = [
 ]
 
 
-def load_table(table_name, data_dir=DATA_DIR, subfolder=SUBFOLDER):
+def load_table(table_name, data_dir=DATA_DIR):
     if table_name not in available_tables:
         raise ValueError(f"Table {table_name} not available")
-    return pd.read_parquet(data_dir / subfolder / f"{table_name}.parquet")
+    return pd.read_parquet(data_dir / f"{table_name}.parquet")
 
 
 def _demo():
@@ -116,7 +112,7 @@ def _demo():
 
 if __name__ == "__main__":
     # Create subfolder
-    dest_dir = DATA_DIR / SUBFOLDER
+    dest_dir = DATA_DIR
     dest_dir.mkdir(parents=True, exist_ok=True)
 
     # Pull data

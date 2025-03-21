@@ -10,7 +10,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import os
 from io import BytesIO
 
 import pandas as pd
@@ -18,8 +17,6 @@ import requests
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = config("DATA_DIR")
 
 
@@ -46,7 +43,6 @@ def load_fed_yield_curve(data_dir=DATA_DIR):
 
 if __name__ == "__main__":
     df = pull_fed_yield_curve()
-    data_dir = DATA_DIR / SUBFOLDER
-    data_dir.mkdir(parents=True, exist_ok=True)
-    path = data_dir / "fed_yield_curve.parquet"
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    path = DATA_DIR / "fed_yield_curve.parquet"
     df.to_parquet(path)

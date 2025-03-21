@@ -19,26 +19,22 @@ import pandas as pd
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = config("DATA_DIR")
 
 
-def pull_nyu_call_report(
-    data_dir=DATA_DIR, subfolder=SUBFOLDER, delete_temp_files=True
-):
+def pull_nyu_call_report(data_dir=DATA_DIR, delete_temp_files=True):
     # Download the file
     url = "https://pages.stern.nyu.edu/~pschnabl/research/callreports_1976_2020_WRDS.dta.zip"
-    zip_path = data_dir / subfolder / "callreports_1976_2020_WRDS.dta.zip"
-    os.makedirs(data_dir / subfolder, exist_ok=True)
+    zip_path = data_dir / "callreports_1976_2020_WRDS.dta.zip"
+    os.makedirs(data_dir, exist_ok=True)
     urllib.request.urlretrieve(url, zip_path)
 
     # Unzip the file
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        zip_ref.extractall(data_dir / subfolder)
+        zip_ref.extractall(data_dir)
 
     # Load the file into a pandas dataframe
-    data_path = data_dir / subfolder / "callreports_1976_2020_WRDS.dta"
+    data_path = data_dir / "callreports_1976_2020_WRDS.dta"
     df = pd.read_stata(data_path)
 
     if delete_temp_files:
@@ -71,8 +67,8 @@ def pull_nyu_call_report(
     return df
 
 
-def load_nyu_call_report(data_dir=DATA_DIR, subfolder=SUBFOLDER):
-    parquet_path = data_dir / subfolder / "nyu_call_report.parquet"
+def load_nyu_call_report(data_dir=DATA_DIR):
+    parquet_path = data_dir / "nyu_call_report.parquet"
     df = pd.read_parquet(parquet_path)
     return df
 
@@ -84,9 +80,8 @@ def _demo():
 
 
 if __name__ == "__main__":
-    df = pull_nyu_call_report(data_dir=DATA_DIR, subfolder=SUBFOLDER)
+    df = pull_nyu_call_report(data_dir=DATA_DIR)
     # Save the dataframe as a parquet file
-    destination_dir = DATA_DIR / SUBFOLDER
-    os.makedirs(destination_dir, exist_ok=True)
-    parquet_path = destination_dir / "nyu_call_report.parquet"
+    os.makedirs(DATA_DIR, exist_ok=True)
+    parquet_path = DATA_DIR / "nyu_call_report.parquet"
     df.to_parquet(parquet_path)

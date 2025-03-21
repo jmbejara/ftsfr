@@ -17,11 +17,11 @@ about the new CIZ format can be found here:
  - CRSP Metadata Guide: https://wrds-www.wharton.upenn.edu/documents/1941/CRSP_METADATA_GUIDE_STOCK_INDEXES_FLAT_FILE_FORMAT_2_0_CIZ_09232022v.pdf
 
 """
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -31,8 +31,6 @@ import wrds
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("1925-01-01")
@@ -181,25 +179,27 @@ def pull_CRSP_index_files(
 
 
 def load_CRSP_monthly_file(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "CRSP_MSF_INDEX_INPUTS.parquet"
+    path = Path(data_dir) / "CRSP_MSF_INDEX_INPUTS.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def load_CRSP_index_files(data_dir=DATA_DIR):
-    path = Path(data_dir) / SUBFOLDER / "CRSP_MSIX.parquet"
+    path = Path(data_dir) / "CRSP_MSIX.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def _demo():
     df_msf = load_CRSP_monthly_file(data_dir=DATA_DIR)
+    df_msf.info()
     df_msix = load_CRSP_index_files(data_dir=DATA_DIR)
+    df_msix.info()
 
 
 if __name__ == "__main__":
     # Create subfolder
-    data_dir = DATA_DIR / SUBFOLDER
+    data_dir = DATA_DIR
     data_dir.mkdir(parents=True, exist_ok=True)
 
     df_msf = pull_CRSP_monthly_file(start_date=START_DATE, end_date=END_DATE)
