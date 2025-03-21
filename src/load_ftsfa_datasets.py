@@ -6,6 +6,11 @@ List of datasets:
 
 - treas_yield_curve_zero_coupon: Federal Reserve yield curve
 - .. todo
+- nyu_call_report_leverage: Total assets / Total equity
+- nyu_call_report_holding_company_leverage: Total assets / Total equity
+- nyu_call_report_cash_liquidity: Cash / Total assets
+- nyu_call_report_holding_company_cash_liquidty: Cash flow / Total assets
+- .. todo
 - CRSP_monthly_stock_ret: CRSP stock returns
 - CRSP_monthly_stock_retx: CRSP stock returns (without dividends)
 
@@ -44,58 +49,60 @@ with open(BASE_DIR / "benchmarks.toml", "r") as f:
 
 data_sources = benchmarks["data_sources"]
 
-data_sets_and_required_sources = {
-    "treas_yield_curve_zero_coupon": {
-        "fed_yield_curve",
-    },
-    "CRSP_monthly_stock_ret": {
-        "wrds_crsp_compustat",
-    },
-    "CRSP_monthly_stock_retx": {
-        "wrds_crsp_compustat",
-    },
-    "SPX_option_ret": {
-        "wrds_optionmetrics",
-    },
-}
+# data_sets_and_required_sources = {
+#     "treas_yield_curve_zero_coupon": {
+#         "fed_yield_curve",
+#     },
+#     "CRSP_monthly_stock_ret": {
+#         "wrds_crsp_compustat",
+#     },
+#     "CRSP_monthly_stock_retx": {
+#         "wrds_crsp_compustat",
+#     },
+#     "SPX_option_ret": {
+#         "wrds_optionmetrics",
+#     },
+# }
 
 
-# available_datasets is the list of all datasets that can be loaded.
-# It is calculated by checking if the sources for each dataset are available,
-# as marked as "true" in the benchmarks.toml file.
-available_datasets = [
-    data_set
-    for data_set in data_sets_and_required_sources.keys()
-    if all(
-        source in data_sources and data_sources[source]
-        for source in data_sets_and_required_sources[data_set]
-    )
-]
+# # available_datasets is the list of all datasets that can be loaded.
+# # It is calculated by checking if the sources for each dataset are available,
+# # as marked as "true" in the benchmarks.toml file.
+# available_datasets = [
+#     data_set
+#     for data_set in data_sets_and_required_sources.keys()
+#     if all(
+#         source in data_sources and data_sources[source]
+#         for source in data_sets_and_required_sources[data_set]
+#     )
+# ]
 
 
-def load_dataset(dataset_name="CRSP_monthly_stock_ret", dataframe_type="pandas"):
-    if dataset_name not in available_datasets:
-        raise ValueError(
-            f"Dataset {dataset_name} not found in available_datasets. Please check the benchmarks.toml file."
-        )
-
+def load_dataset(dataset_name="nyu_call_report_leverage", dataframe_type="pandas"):
+    # if dataset_name not in available_datasets:
+    #     raise ValueError(
+    #         f"Dataset {dataset_name} not found in available_datasets. Please check the benchmarks.toml file."
+    #     )
+    # fmt: off
     if dataset_name == "CRSP_monthly_stock_ret":
-        file_path = (
-            DATA_DIR / "wrds_crsp_compustat" / "ftsfa_CRSP_monthly_stock_ret.parquet"
-        )
-
+        file_path = DATA_DIR / "wrds_crsp_compustat" / "ftsfa_CRSP_monthly_stock_ret.parquet"
     elif dataset_name == "CRSP_monthly_stock_retx":
-        file_path = (
-            DATA_DIR / "wrds_crsp_compustat" / "ftsfa_CRSP_monthly_stock_retx.parquet"
-        )
-
+        file_path = DATA_DIR / "wrds_crsp_compustat" / "ftsfa_CRSP_monthly_stock_retx.parquet"
     elif dataset_name == "SPX_option_ret":
         file_path = DATA_DIR / "wrds_optionmetrics" / "ftsfa_SPX_option_ret.parquet"
+    elif dataset_name == "nyu_call_report_leverage":
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_leverage.parquet"
+    elif dataset_name == "nyu_call_report_holding_company_leverage":
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_holding_company_leverage.parquet"
+    elif dataset_name == "nyu_call_report_cash_liquidity":
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_cash_liquidity.parquet"
+    elif dataset_name == "nyu_call_report_holding_company_cash_liquidity":
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet"
     else:
         raise ValueError(
             f"Dataset {dataset_name} not found in available_datasets. Please check the benchmarks.toml file."
         )
-
+    # fmt: on
     if dataframe_type == "pandas":
         df = pd.read_parquet(file_path)
     elif dataframe_type == "polars":
@@ -106,4 +113,3 @@ def load_dataset(dataset_name="CRSP_monthly_stock_ret", dataframe_type="pandas")
         )
 
     return df
-

@@ -49,15 +49,18 @@ def task_source():
             "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
             "clean": [],
         }
-        # yield {
-        #     "name": f"{subfolder}:create_ftsf_datasets",
-        #     "actions": [
-        #         f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
-        #         ],
-        #     "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
-        #     "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
-        #     "clean": [],
-        # }
+        yield {
+            "name": f"{subfolder}:format",
+            "actions": [
+                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                ],
+            "targets": [DATA_DIR / subfolder / "ftsfa_treas_yield_curve_zero_coupon.parquet"],
+            "file_dep": [
+                f"./src/{subfolder}/pull_fed_yield_curve.py",
+                f"./src/{subfolder}/create_ftsf_datasets.py",
+                ],
+            "clean": [],
+        }
 
     if data_sources["ken_french_data_library"]:
         from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
@@ -85,6 +88,23 @@ def task_source():
             ],
             "targets": [DATA_DIR / subfolder / "nyu_call_report.parquet"],
             "file_dep": [f"./src/{subfolder}/pull_nyu_call_report.py"],
+            "clean": [],
+        }
+        yield {
+            "name": f"{subfolder}:format",
+            "actions": [
+                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                ],
+            "targets": [
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_leverage.parquet",
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_holding_company_leverage.parquet",
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_cash_liquidity.parquet",
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet",
+                ],
+            "file_dep": [
+                f"./src/{subfolder}/pull_nyu_call_report.py",
+                f"./src/{subfolder}/create_ftsf_datasets.py",
+                ],
             "clean": [],
         }
 

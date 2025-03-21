@@ -4,7 +4,7 @@ It is used to load the datasets into memory.
 
 List of datasets:
 
-- ftsfa_treas_yield_curve_zero_coupon: Federal Reserve yield curve
+- treas_yield_curve_zero_coupon: Federal Reserve yield curve
 
 """
 
@@ -15,7 +15,7 @@ from settings import config
 DATA_DIR = config("DATA_DIR")
 
 
-## ftsfa_treas_yield_curve_zero_coupon
+## treas_yield_curve_zero_coupon
 df_all = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR)
 # df_all.info()
 df = df_all.reset_index()

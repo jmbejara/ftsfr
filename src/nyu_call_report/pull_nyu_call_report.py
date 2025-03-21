@@ -64,6 +64,8 @@ def pull_nyu_call_report(data_dir=DATA_DIR, delete_temp_files=True):
     # df[columns_to_convert_to_int].head()
     # df[columns_to_convert_to_int].isna().sum()
 
+    df["date"] = pd.to_datetime(df["date"])
+
     return df
 
 
