@@ -12,7 +12,7 @@ wrds_bank_premium = true
 wrds_compustat = true
 wrds_corp_bonds = true
 wrds_crsp_compustat = true
-wrds_markit = false
+wrds_markit = true
 wrds_optionmetrics = false
 
 [models]

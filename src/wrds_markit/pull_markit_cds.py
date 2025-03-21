@@ -36,7 +36,7 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
     for year in range(2001, 2024):  # Loop from 2001 to 2005
         table_name = f"markit.CDS{year}"  # Generate table name dynamically
         query = f"""
-        SELECT
+        SELECT DISTINCT
             date, -- The date on which points on a curve were calculated
             ticker, -- The Markit ticker for the organization.
             RedCode, -- The RED Code for identification of the entity. 
@@ -57,6 +57,7 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
             tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
         """
         cds_data[year] = db.raw_sql(query, date_cols=["date"])
+    # cds_data = cds_data.drop_duplicates()
     return cds_data
 
 
