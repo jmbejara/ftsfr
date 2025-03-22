@@ -7,7 +7,28 @@ from models.time_series_model import TimeSeriesModel
 from typing import Union
 from models.dataset import FREQUENCY_SEASONAL_MAP, Dataset
 import datetime
+from joblib import Parallel, delayed
 import warnings
+import itertools
+
+
+def _try_sarima(params, y, selection_criterion):
+    p, d, q, P, D, Q, m = params
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            model = SARIMAX(
+                endog=y,
+                order=(p, d, q),
+                seasonal_order=(P, D, Q, m),
+                enforce_stationarity=False,
+                enforce_invertibility=False,
+            )
+            results = model.fit(disp=False)
+        score = results.aic if selection_criterion == "aic" else results.bic
+        return (score, (p, d, q), (P, D, Q, m))
+    except Exception:
+        return None
 
 
 class SarimaForecasting(TimeSeriesModel):
@@ -37,10 +58,6 @@ class SarimaForecasting(TimeSeriesModel):
         max_seasonal_q=1,
         max_seasonal_d=1,
     ):
-        if time_frequency not in FREQUENCY_SEASONAL_MAP.keys():
-            raise ValueError(
-                f"'time_frequency' must be one of {list(FREQUENCY_SEASONAL_MAP.keys())}"
-            )
         super().__init__(
             y,
             X,
@@ -54,6 +71,10 @@ class SarimaForecasting(TimeSeriesModel):
             rolling,
             time_frequency,
         )
+        if self.time_frequency not in FREQUENCY_SEASONAL_MAP.keys():
+            raise ValueError(
+                f"'time_frequency' must be one of {list(FREQUENCY_SEASONAL_MAP.keys())}"
+            )
         self.order = order
         self.seasonal_order = seasonal_order
         self.selection_criterion = selection_criterion
@@ -114,42 +135,37 @@ class SarimaForecasting(TimeSeriesModel):
         best_order = None
         best_seasonal_order = None
 
-        seasonal_frequencies = FREQUENCY_SEASONAL_MAP.get(
-            self.dataset.time_frequency, [0]
+        seasonal_frequencies = FREQUENCY_SEASONAL_MAP[self.time_frequency]
+
+        param_combinations = list(
+            itertools.product(
+                range(self.max_p + 1),
+                range(self.max_d + 1),
+                range(self.max_q + 1),
+                range(self.max_seasonal_p + 1),
+                range(self.max_seasonal_d + 1),
+                range(self.max_seasonal_q + 1),
+                seasonal_frequencies,
+            )
         )
 
-        for p in range(self.max_p + 1):
-            for d in range(self.max_d + 1):
-                for q in range(self.max_q + 1):
-                    for P in range(self.max_seasonal_p + 1):
-                        for D in range(self.max_seasonal_d + 1):
-                            for Q in range(self.max_seasonal_q + 1):
-                                for m in seasonal_frequencies:
-                                    try:
-                                        with warnings.catch_warnings():
-                                            warnings.simplefilter("ignore")
-                                            model = SARIMAX(
-                                                endog=y,
-                                                order=(p, d, q),
-                                                seasonal_order=(P, D, Q, m),
-                                                enforce_stationarity=False,
-                                                enforce_invertibility=False,
-                                            )
-                                            results = model.fit(disp=False)
-                                        score = (
-                                            results.aic
-                                            if self.selection_criterion == "aic"
-                                            else results.bic
-                                        )
-                                        if score < best_score:
-                                            best_score = score
-                                            best_order = (p, d, q)
-                                            best_seasonal_order = (P, D, Q, m)
-                                    except Exception as e:
-                                        continue
+        results = Parallel(n_jobs=-1)(
+            delayed(_try_sarima)(params, y, self.selection_criterion)
+            for params in param_combinations
+        )
+
+        valid_results = [res for res in results if res is not None]
+
+        if not valid_results:
+            raise Exception("No valid SARIMA model found with the given parameters.")
+
+        best_score, best_order, best_seasonal_order = min(
+            valid_results, key=lambda x: x[0]
+        )
 
         self.order = best_order
         self.seasonal_order = best_seasonal_order
+
         self.model = SARIMAX(
             y,
             order=self.order,
@@ -164,5 +180,5 @@ class SarimaForecasting(TimeSeriesModel):
         if not self.fitted_model:
             raise ValueError("The model must be fitted before forecasting.")
         forecast = self.fitted_model.get_forecast(steps=forecast_length)
-        forecast_df = forecast.summary_frame()["mean"]
+        forecast_df = forecast.summary_frame()["mean"].iloc[-forecast_length:].values
         return pd.DataFrame(forecast_df, index=y.index, columns=["forecast"])

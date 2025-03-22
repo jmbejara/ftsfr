@@ -4,7 +4,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import os
-from pathlib import Path
 
 import pandas as pd
 import requests
@@ -15,8 +14,6 @@ DATA_DIR = config("DATA_DIR")
 MIN_N_ROWS_EXPECTED = 500
 
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_INFO = {
     "Treasury Bond Returns": {
         "url": "https://openbondassetpricing.com/wp-content/uploads/2024/06/bondret_treasury.csv",
@@ -35,12 +32,13 @@ DATA_INFO = {
 
 def _demo():
     df_treasury_bond_returns = pd.read_parquet(
-        DATA_DIR / SUBFOLDER / "treasury_bond_returns.parquet"
+        DATA_DIR / "treasury_bond_returns.parquet"
     )
     df_treasury_bond_returns.info()
     df_corporate_bond_returns = pd.read_parquet(
-        DATA_DIR / SUBFOLDER / "corporate_bond_returns.parquet"
+        DATA_DIR / "corporate_bond_returns.parquet"
     )
+    df_corporate_bond_returns.info()
 
 
 def download_file(url, output_path):
@@ -104,7 +102,7 @@ def load_data_into_dataframe(csv_path: Path, check_n_rows: bool = True):
 
 if __name__ == "__main__":
     for dataset, info in DATA_INFO.items():
-        data_dir = DATA_DIR / SUBFOLDER
+        data_dir = DATA_DIR
         data_dir.mkdir(parents=True, exist_ok=True)
 
         # Download and process data file

@@ -1,0 +1,110 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{url}
+\bibliographystyle{apalike2}
+\usepackage{natbib}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{lscape}
+\usepackage{ifthen}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\numberwithin{equation}{section}
+
+% Define the header
+\fancyfoot[L]{}
+\fancyfoot[C]{}
+\fancyfoot[R]{Jeremy Bejarano, \ Fernando Rocha Urbano}
+\renewcommand{\footrulewidth}{0.2pt}
+\fancyhead[L]{}
+\fancyhead[C]{}
+\fancyhead[R]{}
+
+\usepackage{graphicx}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\newcommand{\divider}{\vspace{1em}\hrule\vspace{1em}}
+
+\definecolor{codegreen}{rgb}{0, 0.6, 0}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+\newenvironment{colorparagraph}[1]{\par\color{#1}}{\par}
+\definecolor{questioncolor}{RGB}{20, 40, 150}
+\definecolor{annotationcolor}{RGB}{20, 200, 20}
+
+\title{Financial Time-Series Forecasting Archive}
+\author{Jeremy Bejarano\footnote{jbejarano@uchicago.edu}, \ Fernando Rocha Urbano\footnote{fernandourbano@uchicago.edu}}
+
+\lstset{
+    language=python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{gray},
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    breaklines=true,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    escapeinside={(*@}{@*)}
+}
+
+\lstset{
+    language=sql,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{gray},
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    breaklines=true,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    escapeinside={(*@}{@*)}
+}
+
+\usetikzlibrary{arrows.meta, positioning}
+
+\begin{document}
+
+\begin{titlepage}
+    \vfill
+    \maketitle
+    \vfill
+\end{titlepage}
+
+\section{Abstract}
+
+\section{Methodology}
+
+\input{../methodology/methodology.tex}
+
+\newpage
+
+\section{Appendix}
+
+\subsection{Error Metrics}
+\label{sec:error_metrics}
+
+\input{../appendix/error_metrics.tex}
+
+\end{document}

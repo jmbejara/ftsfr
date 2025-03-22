@@ -1,0 +1,746 @@
+Model files:
+
+================================================================================
+
+FILE NAME: models/run.py
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+import pandas as pd
+from models.dataset import Dataset
+from models.time_series_model import TimeSeriesModel
+from models.univariate_local import (
+    HoltWintersForecasting,
+    MeanForecasting,
+    NaiveForecasting,
+    SarimaForecasting,
+)
+
+if __name__ == "__main__":
+    Dataset.reset_tables_in_memory()
+    dataset = Dataset.from_parquet(
+        y="ken_french_portfolios/french_portfolios_25_monthly_size_and_bm/SMALL LoBM",
+        time_frequency="M",
+    )
+    models = [
+        HoltWintersForecasting,
+        MeanForecasting,
+        NaiveForecasting,
+        SarimaForecasting,
+    ]
+    for model in models:
+        model_instance = model.from_dataset(
+            dataset=dataset,
+            step_size=1,
+            n_forecasting=12,
+        )
+        model_instance.build_divisions()
+        model_instance.run()
+        model_instance.assess_error()
+        model_instance.save()
+
+
+================================================================================
+
+FILE NAME: models/__init__.py
+
+
+
+================================================================================
+
+FILE NAME: models/dataset.py
+
+from typing import Union, List
+import datetime
+import pandas as pd
+
+
+FREQUENCY_SEASONAL_MAP = {
+    "DU": [5, 20, 21, 22, 42, 63],
+    "D": [7, 30],
+    "W": [4, 13, 26, 52],
+    "M": [3, 4, 6, 12],
+    "Q": [2, 4],
+    "Y": [1, 2, 3],
+}
+
+
+PATH_DATA_OUTPUT = "_data"
+
+
+class Dataset:
+    all_tables = {}
+
+    @classmethod
+    def get_in_memory_tables(cls):
+        return cls.all_tables
+
+    @classmethod
+    def reset_tables_in_memory(cls):
+        cls.all_tables = {}
+
+    @classmethod
+    def get_in_memory_tables_names(cls):
+        return list(cls.all_tables.keys())
+
+    @classmethod
+    def get_table_from_memory(cls, table_name):
+        if table_name.endswith(".parquet"):
+            table_name = table_name[:-8]
+        table = cls.all_tables.get(table_name)
+        if table is None:
+            table = cls.all_tables.get(PATH_DATA_OUTPUT + "/" + table_name)
+        if table is None:
+            raise ValueError(f"Table {table_name} not found in memory")
+        return table
+
+    @classmethod
+    def from_parquet(
+        cls,
+        y,
+        X=None,
+        filter_start_date: Union[datetime.date, datetime.datetime] = None,
+        filter_end_date: Union[datetime.date, datetime.datetime] = None,
+        time_frequency=None,
+    ):
+        y = cls._get_variable(y)
+        if X is None:
+            X_frame = None
+        else:
+            if isinstance(X, str):
+                X = [X]
+            X_frame = pd.DataFrame()
+            for x in X:
+                X_frame = X_frame.join(cls._get_variable(x), how="outer")
+        return cls(y, X_frame, filter_start_date, filter_end_date, time_frequency)
+
+    @classmethod
+    def from_parquet_all_from_table(
+        cls,
+        y_table,
+        X=None,
+        filter_start_date: Union[datetime.date, datetime.datetime] = None,
+        filter_end_date: Union[datetime.date, datetime.datetime] = None,
+        time_frequency=None,
+        ignore_columns: List[str] = [],
+    ):
+        path_name = PATH_DATA_OUTPUT + "/" + y_table
+        if cls.all_tables.get(path_name) is None:
+            cls.all_tables[path_name] = pd.read_parquet(path_name + ".parquet")
+        datasets_from_table = []
+        for y in list(cls.all_tables[path_name].columns):
+            if y.lower() in ignore_columns or y.lower() == "date":
+                continue
+            new_dataset = cls.from_parquet(
+                y_table + "/" + y, X, filter_start_date, filter_end_date, time_frequency
+            )
+            datasets_from_table.append(new_dataset)
+        return datasets_from_table
+
+    @classmethod
+    def _get_variable(cls, path):
+        variable_name = path.split("/")[-1].split("\\")[-1]
+        path_name = PATH_DATA_OUTPUT + "/" + "/".join(path.split("/")[:-1])
+        if cls.all_tables.get(path_name) is None:
+            cls.all_tables[path_name] = pd.read_parquet(path_name + ".parquet")
+        if variable_name in cls.all_tables[path_name].columns:
+            variable = cls.all_tables[path_name][variable_name]
+            if "date" in list(cls.all_tables[path_name].columns.str.lower()):
+                variable.index = cls.all_tables[path_name]["date"]
+            return variable
+        else:
+            raise ValueError(f"Variable {variable_name} not found in {path_name}")
+
+    def __init__(
+        self,
+        y,
+        X,
+        filter_start_date: Union[datetime.date, datetime.datetime] = None,
+        filter_end_date: Union[datetime.date, datetime.datetime] = None,
+        time_frequency=None,
+    ):
+        self.y = self.organize_time_series(
+            y,
+            self._validate_datetime(filter_start_date, "filter_start_date"),
+            self._validate_datetime(filter_end_date, "filter_end_date"),
+            enforce_not_none=True,
+        )
+        self.X = self.organize_time_series(X, filter_start_date, filter_end_date)
+        self.time_frequency = self._validate_time_frequency(time_frequency)
+        self.y_pred = None
+
+    @staticmethod
+    def _validate_time_frequency(time_frequency):
+        if time_frequency is not None and time_frequency not in list(
+            FREQUENCY_SEASONAL_MAP.keys()
+        ):
+            raise ValueError(
+                f"'time_frequency' must be one of {list(FREQUENCY_SEASONAL_MAP.keys())} or None"
+            )
+        return time_frequency
+
+    def __len__(self):
+        return len(self.y)
+
+    def __repr__(self):
+        return pd.concat([self.y, self.X], axis=1).to_string()
+
+    @classmethod
+    def from_organized_time_series(cls, y, X, time_frequency=None):
+        # Not using __init__ to avoid reorganizing the time series
+        new_dataset = cls.__new__(cls)
+        new_dataset.y = y
+        new_dataset.X = X
+        new_dataset.time_frequency = time_frequency
+        return new_dataset
+
+    @staticmethod
+    def _validate_datetime(date, date_name):
+        if isinstance(date, str):
+            return pd.to_datetime(date)
+        elif (
+            isinstance(date, datetime.date)
+            or isinstance(date, datetime.datetime)
+            or date is None
+        ):
+            return date
+        else:
+            raise ValueError(
+                f"'{date_name}' must be a string, datetime.date, datetime.datetime, None"
+            )
+
+    @classmethod
+    def create_from_y(cls, y, time_frequency=None):
+        return cls.from_organized_time_series(y, None, time_frequency)
+
+    def set_X(self, X):
+        self.X = self.organize_time_series(
+            X, filter_start_date=self.y.index[0], filter_end_date=self.y.index[-1]
+        )
+
+    def get_y(self):
+        return self.y
+
+    def get_X(self):
+        return self.X
+
+    def set_y_pred(self, y_pred, organize=False):
+        if organize:
+            self.y_pred = self.organize_time_series(
+                y_pred,
+                filter_start_date=self.y.index[0],
+                filter_end_date=self.y.index[-1],
+            )
+        self.y_pred = y_pred
+
+    def get_y_pred(self):
+        return self.y_pred
+
+    @staticmethod
+    def organize_time_series(
+        time_series, filter_start_date, filter_end_date, enforce_not_none=False
+    ):
+        if time_series is None:
+            if enforce_not_none:
+                raise ValueError("Time series cannot be None.")
+            return None
+        if isinstance(time_series, pd.Series):
+            time_series = time_series.to_frame()
+        time_series.columns = time_series.columns.map(lambda x: str(x))
+        if "date" in list(time_series.columns.str.lower()):
+            time_series = time_series.set_index("date")
+        time_series.index = pd.to_datetime(time_series.index)
+        index_counts = (
+            time_series.index.value_counts()
+            .sort_values(ascending=False)
+            .loc[lambda df: df.values > 1]
+        )
+        if len(index_counts) > 0:
+            not_unique_indexes = index_counts.index.to_list()
+            if len(not_unique_indexes) > 10:
+                not_unique_indexes = not_unique_indexes[:9] + ["..."]
+            not_unique_indexes = ", ".join(not_unique_indexes)
+            raise ValueError(
+                f"Time series index contains non-unique values: {not_unique_indexes}"
+            )
+        time_series = time_series.sort_index()
+        if filter_end_date is not None:
+            time_series = time_series.loc[:filter_end_date]
+        if filter_start_date is not None:
+            time_series = time_series.loc[filter_start_date:]
+        return time_series
+
+
+================================================================================
+
+FILE NAME: models/utils.py
+
+import numpy as np
+import pandas as pd
+
+
+def create_simulated_y(
+    start="2020-01-01", freq="D", n_periods=1000, to_frame=False, std=1
+):
+    if n_periods % 1 == 0:
+        n_periods = int(n_periods)
+    else:
+        raise ValueError("n_periods must be an integer.")
+    y = pd.Series(
+        np.random.normal(0, std, n_periods),
+        index=pd.date_range(start=start, periods=n_periods, freq=freq),
+        name="y",
+    )
+    return y.to_frame(name="y") if to_frame else y
+
+
+def create_simulated_X(
+    start="2020-01-01", freq="D", n_periods=1000, n_features=10, std=1
+):
+    X = pd.DataFrame(
+        np.random.normal(0, std, (n_periods, n_features)),
+        index=pd.date_range(start=start, periods=n_periods, freq=freq),
+        columns=[f"x{i}" for i in range(n_features)],
+    )
+    return X
+
+
+================================================================================
+
+FILE NAME: models/time_series_model.py
+
+from abc import abstractmethod
+import random
+from typing import Union, List
+import datetime
+import pandas as pd
+from models.dataset import Dataset
+from models.error_metrics import ErrorMetrics
+import os
+
+
+MODELS_PATH = "models"
+PATH_TIME_SERIES_MODELS_RESULTS = (
+    "models/results/time_series_models/time_series_models.csv"
+)
+TEST_PATH_TIME_SERIES_MODELS_RESULTS = (
+    "models/results/tests/time_series_models/time_series_models.csv"
+)
+
+
+class TimeSeriesModel:
+    name = "Time Series Abstract Model"
+    code = "TSA"
+    virtual_env = "ftsf"
+    python_version = "3.12.6"
+    requirements_file = "requirements.txt"
+    run_code = None
+
+    @staticmethod
+    def _fitted(fit_func):
+        def wrapper(self, y, X=None):
+            fit_func(self, y, X)
+            self.is_fitted = True
+
+        return wrapper
+
+    def get_model_name(self):
+        return self.name
+
+    def get_model_code(self):
+        return self.code
+
+    @classmethod
+    def get_virtual_env(cls):
+        return cls.virtual_env
+
+    @classmethod
+    def get_requirements_file_path(cls):
+        return cls.requirements_file
+
+    def _get_run_code(self):
+        if self.__class__.run_code is None:
+            self.__class__.run_code = f"{random.randint(1, 9999):04d}"
+        return self.__class__.run_code
+
+    @classmethod
+    def get_python_version(cls):
+        return cls.python_version
+
+    def _create_id(self):
+        time = datetime.datetime.now(datetime.timezone(offset=datetime.timedelta(0)))
+        run_code = self._get_run_code()
+        code = self.get_model_code()
+        if code is None or not isinstance(code, str):
+            raise ValueError("Model code must be a string.")
+        return f"R{run_code}M{code}D{time.strftime('%Y%m%d%H%M%S%f')}"
+
+    def __init__(
+        self,
+        y: Union[pd.DataFrame, pd.Series],
+        X: pd.DataFrame = None,
+        step_size: int = 1,
+        filter_start_date: Union[datetime.date, datetime.datetime, str] = None,
+        filter_end_date: Union[datetime.date, datetime.datetime, str] = None,
+        forecasting_start_date: Union[datetime.date, datetime.datetime, str] = None,
+        n_forecasting=None,
+        intersect_forecasting: bool = False,
+        only_consider_last_of_each_intersection: bool = False,
+        rolling: bool = False,
+        time_frequency: str = None,
+    ):
+        self.id = self._create_id()
+        self.is_error_assessed = False
+        self.is_fitted = False
+        if n_forecasting is not None and forecasting_start_date is not None:
+            raise ValueError(
+                "Only one of 'n_forecasting' and 'forecasting_start_date' should be provided."
+            )
+        if only_consider_last_of_each_intersection and not intersect_forecasting:
+            raise ValueError(
+                "'only_consider_last_of_each_intersection' can only be True if 'intersect_forecasting' is True."
+            )
+        self.dataset = Dataset(y, X, filter_start_date, filter_end_date, time_frequency)
+        self.n_forecasting = n_forecasting
+        self.forecasting_start_date = Dataset._validate_datetime(
+            forecasting_start_date, "forecasting_start_date"
+        )
+        self.step_size = step_size
+        self.intersect_forecasting = intersect_forecasting
+        self.only_consider_last_of_each_intersection = (
+            only_consider_last_of_each_intersection
+        )
+        self.rolling = rolling
+        self.error_metrics = ErrorMetrics(
+            model_name=self.get_model_name(),
+            y_name=self.dataset.y.columns[0],
+            id=self.id,
+        )
+        self.divisions = {}
+
+    @classmethod
+    def from_dataset(
+        cls,
+        dataset: Dataset,
+        step_size: int,
+        forecasting_start_date: Union[datetime.date, datetime.datetime] = None,
+        n_forecasting=None,
+        intersect_forecasting: bool = False,
+        only_consider_last_of_each_intersection: bool = False,
+        rolling: bool = False,
+    ):
+        new_model = cls.__new__(cls)
+        new_model.id = new_model._create_id()
+        new_model.is_error_assessed = False
+        new_model.is_fitted = False
+        new_model.dataset = dataset
+        new_model.step_size = step_size
+        new_model.forecasting_start_date = forecasting_start_date
+        new_model.n_forecasting = n_forecasting
+        new_model.intersect_forecasting = intersect_forecasting
+        new_model.only_consider_last_of_each_intersection = (
+            only_consider_last_of_each_intersection
+        )
+        new_model.rolling = rolling
+        new_model.error_metrics = ErrorMetrics(
+            model_name=new_model.get_model_name(),
+            y_name=new_model.dataset.y.columns[0],
+            id=new_model.id,
+        )
+        new_model.divisions = {}
+        return new_model
+
+    @property
+    def y(self):
+        return self.dataset.y
+
+    @property
+    def X(self):
+        return self.dataset.X
+
+    def build_divisions(self):
+        end_index = len(self.y) - 1
+        start_index = end_index - self.step_size + 1
+        n_forecasting_left = self.n_forecasting if self.n_forecasting is not None else 0
+        forecasting_start_date = (
+            self.forecasting_start_date
+            if self.forecasting_start_date is not None
+            else self.y.index[end_index]
+        )
+        delta_index = 1 if self.intersect_forecasting else self.step_size
+        idx = 0
+
+        while (
+            n_forecasting_left > 0
+            or forecasting_start_date <= self.y.index[start_index]
+        ):
+            self.divisions[idx] = self.build_new_division(
+                self.y, self.X, start_index, end_index
+            )
+            end_index = end_index - delta_index
+            start_index = end_index - self.step_size + 1
+            n_forecasting_left -= 1
+            idx += 1
+        self._reindex_divisions()
+
+    def _reindex_divisions(self):
+        max_idx = max(self.divisions.keys())
+        divisions_copy = self.divisions.copy()
+        for idx, division in self.divisions.items():
+            new_idx = idx - max_idx
+            divisions_copy[abs(new_idx)] = division
+        self.divisions = dict(sorted(divisions_copy.items()))
+
+    def get_training_div(self, idx):
+        if self.divisions is None:
+            raise ValueError("Divisions have not been built yet.")
+        return self.divisions[idx]["training"]
+
+    def get_forecasting_div(self, idx):
+        if self.divisions is None:
+            raise ValueError("Divisions have not been built yet.")
+        return self.divisions[idx]["forecasting"]
+
+    @staticmethod
+    def build_new_division(y, X, start_index, end_index):
+        y = y.copy()
+        forecasting = {
+            "forecasting": {"y": y.iloc[start_index : end_index + 1], "X": None}
+        }
+        forecasting = {
+            "forecasting": Dataset.create_from_y(y.iloc[start_index : end_index + 1])
+        }
+        if X is not None:
+            X = X.copy()
+            forecasting = forecasting["forecasting"].set_X(
+                X.iloc[start_index : end_index + 1]
+            )
+
+        training = {"training": Dataset.create_from_y(y.iloc[:start_index])}
+        if X is not None:
+            training["training"].set_X(X.iloc[:start_index])
+        return {**training, **forecasting}
+
+    @abstractmethod
+    def fit(self, y, X):
+        pass
+
+    @abstractmethod
+    def forecast(self, y, X):
+        pass
+
+    def _join_predictions(self):
+        all_y_true = pd.DataFrame()
+        all_y_pred = pd.DataFrame()
+        for division in self.divisions.values():
+            new_y_true = division["forecasting"].get_y()
+            if (
+                self.only_consider_last_of_each_intersection
+                and self.intersect_forecasting
+            ):
+                new_y_true = new_y_true.iloc[-1, :]
+            all_y_true = pd.concat([all_y_true, new_y_true], axis=0)
+
+            new_y_pred = division["forecasting"].get_y_pred()
+            if (
+                self.only_consider_last_of_each_intersection
+                and self.intersect_forecasting
+            ):
+                new_y_pred = new_y_pred.iloc[-1, :]
+            all_y_pred = pd.concat([all_y_pred, new_y_pred], axis=0)
+        return all_y_true, all_y_pred
+
+    def assess_error(self):
+        all_y_true, all_y_pred = self._join_predictions()
+        self.error_metrics.calculate_error_metrics(all_y_true, all_y_pred)
+
+    def run(self):
+        for division in self.divisions.values():
+            self.fit(division["training"].get_y(), division["training"].get_X())
+            y_pred = self.forecast(
+                division["forecasting"].get_y(), division["forecasting"].get_X()
+            )
+            division["forecasting"].set_y_pred(y_pred)
+        self.y_pred = pd.DataFrame()
+        for division in self.divisions.values():
+            self.y_pred = pd.concat(
+                [self.y_pred, division["forecasting"].get_y_pred()], axis=0
+            )
+
+    def assess_error(self):
+        y_true = self.y
+        y_pred = self.y_pred
+        y_true = y_true.loc[lambda s: s.index.isin(y_pred.index)]
+        self.error_metrics.calculate_error_metrics(y_true, y_pred)
+        self.is_error_assessed = True
+
+    def to_pandas(self):
+        last_division = max(self.divisions.keys())
+        info = {
+            "model": self.get_model_name(),
+            "id": self.id,
+            "y": self.dataset.y.columns[0],
+            "time_frequency": self.dataset.time_frequency,
+            "step_size": self.step_size,
+            "forecasting_start_date": self.divisions[0]["forecasting"].get_y().index[0],
+            "forecasting_last_date": self.divisions[last_division]["forecasting"]
+            .get_y()
+            .index[-1],
+            "training_first_date": self.divisions[0]["training"].get_y().index[0],
+            "n_obs": len(self.dataset.get_y()),
+            "n_forecasting": len(self.divisions.values()),
+            "intersect_forecasting": self.intersect_forecasting,
+            "only_consider_last_of_each_intersection": self.only_consider_last_of_each_intersection,
+            "rolling": self.rolling,
+        }
+        return pd.DataFrame(info, index=[0])
+
+    def is_it_already_in_results(self, test_path=False, not_check_cols=["id"]):
+        if isinstance(not_check_cols, str):
+            not_check_cols = [not_check_cols]
+        if not os.path.exists(PATH_TIME_SERIES_MODELS_RESULTS):
+            return False
+        results = (
+            pd.read_csv(TEST_PATH_TIME_SERIES_MODELS_RESULTS)
+            if test_path
+            else pd.read_csv(PATH_TIME_SERIES_MODELS_RESULTS)
+        )
+        if results.empty:
+            return False
+        current_result = self.to_pandas()
+        for col in current_result.columns:
+            if col in not_check_cols:
+                continue
+            results = results.loc[lambda df: df[col] == current_result[col].iloc[0], :]
+            if results.empty:
+                return False
+        return True
+
+    def get_error_metrics(self):
+        if not self.is_error_assessed:
+            self.assess_error()
+        return self.error_metrics.get()
+
+    def get_error_metrics_frame(self):
+        if not self.is_error_assessed:
+            self.assess_error()
+        return self.error_metrics.to_pandas()
+
+    def save(self, save_error_metrics=True, test_path=False):
+        self._create_results_file()
+        self.to_pandas().to_csv(
+            path_or_buf=(
+                PATH_TIME_SERIES_MODELS_RESULTS
+                if not test_path
+                else TEST_PATH_TIME_SERIES_MODELS_RESULTS
+            ),
+            mode="a",
+            header=False,
+            index=False,
+        )
+        if save_error_metrics:
+            self.error_metrics.save(test_path=test_path)
+
+    def _create_results_file(self):
+        if not os.path.exists(PATH_TIME_SERIES_MODELS_RESULTS):
+            columns = list(self.to_pandas().columns)
+            pd.DataFrame(columns=columns).to_csv(
+                PATH_TIME_SERIES_MODELS_RESULTS, index=False
+            )
+
+
+================================================================================
+
+FILE NAME: models/error_metrics.py
+
+import numpy as np
+import pandas as pd
+import csv
+import os
+
+
+PATH_ERROR_METRICS_RESULTS = "models/results/error_metrics/error_metrics.csv"
+TEST_PATH_ERROR_METRICS_RESULTS = "models/results/tests/error_metrics/error_metrics.csv"
+
+
+METRICS = {
+    "MSE": lambda y_true, y_pred: np.mean((y_true - y_pred) ** 2),
+    "RMSE": lambda y_true, y_pred: np.sqrt(np.mean((y_true - y_pred) ** 2)),
+    "MAE": lambda y_true, y_pred: np.mean(np.abs(y_true - y_pred)),
+    "MASE": (
+        lambda y_true, y_pred: np.mean(np.abs(y_true - y_pred))
+        / np.mean(np.abs(y_true - np.roll(y_true, 1)))
+    ),
+    "SMAPE": (
+        lambda y_true, y_pred: 2
+        * np.mean(np.abs(y_true - y_pred) / (np.abs(y_true) + np.abs(y_pred)))
+    ),
+}
+
+
+class ErrorMetrics:
+    def __init__(self, y_name=None, model_name=None, id=None):
+        self.error_metrics = dict(zip(METRICS.keys(), [None for _ in METRICS.keys()]))
+        self.id = id
+        self.y_name = y_name
+        self.model_name = model_name
+
+    def calculate_error_metrics(self, y_true, y_pred):
+        organized_y_true = np.squeeze(y_true.iloc[:, 0].values)
+        organized_y_pred = np.squeeze(y_pred.iloc[:, 0].values)
+        self.error_metrics = {
+            name: metric(organized_y_true, organized_y_pred)
+            for name, metric in METRICS.items()
+        }
+
+    def get(self):
+        return self.error_metrics
+
+    def __repr__(self):
+        return str(self.to_pandas())
+
+    def to_pandas(self):
+        error_metrics_plus_info = self.error_metrics
+        error_metrics_plus_info["model"] = self.model_name
+        error_metrics_plus_info["y"] = self.y_name
+        error_metrics_plus_info["id"] = self.id
+        error_metrics_frame = pd.DataFrame(error_metrics_plus_info, index=[0])
+        return error_metrics_frame[["id", "model", "y"] + list(METRICS.keys())]
+
+    @classmethod
+    def multiple_to_pandas(cls, list_error_metrics, reset_index: bool = True):
+        if isinstance(list_error_metrics, cls):
+            list_error_metrics = [list_error_metrics]
+        mult_error_metrics = pd.concat(
+            [error_metrics.to_pandas() for error_metrics in list_error_metrics], axis=0
+        )
+        if reset_index:
+            mult_error_metrics.reset_index(drop=True, inplace=True)
+        return mult_error_metrics
+
+    def save(self, test_path=False):
+        self._create_results_file()
+        self.to_pandas().to_csv(
+            path_or_buf=(
+                PATH_ERROR_METRICS_RESULTS
+                if not test_path
+                else TEST_PATH_ERROR_METRICS_RESULTS
+            ),
+            mode="a",
+            header=False,
+            index=False,
+        )
+
+    @staticmethod
+    def _create_results_file():
+        if not os.path.exists(PATH_ERROR_METRICS_RESULTS):
+            columns = ["id", "model", "y"] + list(METRICS.keys())
+            pd.DataFrame(columns=columns).to_csv(
+                PATH_ERROR_METRICS_RESULTS, index=False
+            )
+
+
+================================================================================

@@ -32,17 +32,33 @@ def task_config():
     }
 
 
-def task_pull_data():
+data_sources = benchmarks_file["data_sources"]
+
+
+def task_source():
     """Pull selected data_sources based on benchmarks.toml configuration"""
-    data_sources = benchmarks_file["data_sources"]
 
     if data_sources["fed_yield_curve"]:
         subfolder = "fed_yield_curve"
         yield {
-            "name": subfolder,
-            "actions": [f"ipython ./src/{subfolder}/pull_fed_yield_curve.py"],
+            "name": f"{subfolder}:pull",
+            "actions": [
+                f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
+            ],
             "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
             "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
+            "clean": [],
+        }
+        yield {
+            "name": f"{subfolder}:format",
+            "actions": [
+                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                ],
+            "targets": [DATA_DIR / subfolder / "ftsfa_treas_yield_curve_zero_coupon.parquet"],
+            "file_dep": [
+                f"./src/{subfolder}/pull_fed_yield_curve.py",
+                f"./src/{subfolder}/create_ftsf_datasets.py",
+                ],
             "clean": [],
         }
 
@@ -51,8 +67,10 @@ def task_pull_data():
 
         subfolder = "ken_french_data_library"
         yield {
-            "name": "ken_french_data_library",
-            "actions": [f"ipython ./src/{subfolder}/pull_fama_french_25_portfolios.py"],
+            "name": f"{subfolder}:pull",
+            "actions": [
+                f"python ./src/{subfolder}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / subfolder}"
+            ],
             "targets": [
                 DATA_DIR / "ken_french_data_library" / info["parquet"]
                 for info in DATA_INFO.values()
@@ -61,11 +79,96 @@ def task_pull_data():
             "clean": [],
         }
 
+    if data_sources["nyu_call_report"]:
+        subfolder = "nyu_call_report"
+        yield {
+            "name": f"{subfolder}:pull",
+            "actions": [
+                f"python ./src/{subfolder}/pull_nyu_call_report.py --DATA_DIR={DATA_DIR / subfolder}"
+            ],
+            "targets": [DATA_DIR / subfolder / "nyu_call_report.parquet"],
+            "file_dep": [f"./src/{subfolder}/pull_nyu_call_report.py"],
+            "clean": [],
+        }
+        yield {
+            "name": f"{subfolder}:format",
+            "actions": [
+                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                ],
+            "targets": [
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_leverage.parquet",
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_holding_company_leverage.parquet",
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_cash_liquidity.parquet",
+                DATA_DIR / subfolder / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet",
+                ],
+            "file_dep": [
+                f"./src/{subfolder}/pull_nyu_call_report.py",
+                f"./src/{subfolder}/create_ftsf_datasets.py",
+                ],
+            "clean": [],
+        }
+
+    if data_sources["wrds_bank_premium"]:
+        subfolder = "wrds_bank_premium"
+        yield {
+            "name": f"{subfolder}:pull",
+            "actions": [
+                f"python ./src/{subfolder}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / subfolder}"
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "wrds_struct_rel_ultimate.parquet",
+                DATA_DIR / subfolder / "wrds_call_research.parquet",
+                DATA_DIR / subfolder / "wrds_bank_crsp_link.parquet",
+                DATA_DIR / subfolder / "idrssd_to_lei.parquet",
+                DATA_DIR / subfolder / "lei_main.parquet",
+                DATA_DIR / subfolder / "lei_legalevents.parquet",
+                DATA_DIR / subfolder / "lei_otherentnames.parquet",
+                DATA_DIR / subfolder / "lei_successorentity.parquet",
+            ],
+            "file_dep": [f"./src/{subfolder}/pull_wrds_bank_premium.py"],
+            "clean": [],
+        }
+
     if data_sources["wrds_crsp_compustat"]:
         subfolder = "wrds_crsp_compustat"
+
         yield {
-            "name": "wrds_crsp_stock",
-            "actions": [f"ipython ./src/{subfolder}/pull_CRSP_stock.py"],
+            "name": f"{subfolder}:pull",
+            "actions": [
+                f"python ./src/{subfolder}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "Compustat.parquet",
+                DATA_DIR / subfolder / "CRSP_stock_ciz.parquet",
+                DATA_DIR / subfolder / "CRSP_Comp_Link_Table.parquet",
+                DATA_DIR / subfolder / "FF_FACTORS.parquet",
+            ],
+            "file_dep": [f"./src/{subfolder}/pull_CRSP_Compustat.py"],
+            "clean": [],
+        }
+        yield {
+            "name": f"data_sets_{subfolder}",
+            "actions": [
+                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "ftsfa_CRSP_monthly_stock_ret.parquet",
+                DATA_DIR / subfolder / "ftsfa_CRSP_monthly_stock_retx.parquet",
+            ],
+            "file_dep": [
+                f"./src/{subfolder}/create_ftsf_datasets.py",
+                f"./src/{subfolder}/pull_CRSP_Compustat.py",
+                f"./src/{subfolder}/calc_Fama_French_1993.py",
+            ],
+            "clean": [],
+        }
+
+        yield {
+            "name": "CRSP_stock:pull",
+            "actions": [
+                f"python ./src/{subfolder}/pull_CRSP_stock.py --DATA_DIR={DATA_DIR / subfolder}"
+            ],
             "targets": [
                 DATA_DIR / subfolder / "CRSP_MSF_INDEX_INPUTS.parquet",
                 DATA_DIR / subfolder / "CRSP_MSIX.parquet",
@@ -78,11 +181,11 @@ def task_pull_data():
         # The code right now only pulls them separately.
 
         yield {
-            "name": "wrds_crsp_treasury",
+            "name": "CRSP_treasury:pull",
             "actions": [
-                f"ipython ./src/{subfolder}/pull_treasury_auction_stats.py",
-                f"ipython ./src/{subfolder}/calculate_ontherun.py",
-                f"ipython ./src/{subfolder}/pull_CRSP_treasury.py",
+                f"python ./src/{subfolder}/pull_treasury_auction_stats.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/calculate_ontherun.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_CRSP_treasury.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
                 DATA_DIR / subfolder / "treasury_auction_stats.parquet",
@@ -101,28 +204,13 @@ def task_pull_data():
             "clean": [],
         }
 
-    if data_sources["wrds_crsp_compustat"]:
-        subfolder = "wrds_crsp_compustat"
-        yield {
-            "name": "wrds_crsp_compustat",
-            "actions": [f"ipython ./src/{subfolder}/pull_CRSP_Compustat.py"],
-            "targets": [
-                DATA_DIR / subfolder / "Compustat.parquet",
-                DATA_DIR / subfolder / "CRSP_stock_ciz.parquet",
-                DATA_DIR / subfolder / "CRSP_Comp_Link_Table.parquet",
-                DATA_DIR / subfolder / "FF_FACTORS.parquet",
-            ],
-            "file_dep": [f"./src/{subfolder}/pull_CRSP_Compustat.py"],
-            "clean": [],
-        }
-
     # fmt: off
     if data_sources["wrds_corp_bonds"]:
         from wrds_corp_bonds.pull_corp_bonds import DATA_INFO
-        from wrds_corp_bonds.pull_corp_bonds import SUBFOLDER as subfolder
+        subfolder = "wrds_corp_bonds"
         yield {
-            "name": "wrds_corp_bonds",
-            "actions": [f"ipython ./src/{subfolder}/pull_corp_bonds.py"],
+            "name": f"{subfolder}:pull",
+            "actions": [f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}"],
             "targets": [
                 DATA_DIR / subfolder / info["parquet"]
                 for info in DATA_INFO.values()
@@ -139,10 +227,10 @@ def task_pull_data():
     if data_sources["wrds_markit"]:
         subfolder = "wrds_markit"
         yield {
-            "name": "wrds_markit",
+            "name": f"{subfolder}:pull",
             "actions": [
-                f"ipython ./src/{subfolder}/pull_fed_yield_curve.py",
-                f"ipython ./src/{subfolder}/pull_markit_cds.py",
+                f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_markit_cds.py --DATA_DIR={DATA_DIR / subfolder}",
                 # f"ipython ./src/{subfolder}/calc_cds_returns.py", # TODO
             ],
             "targets": [
@@ -151,8 +239,8 @@ def task_pull_data():
                 DATA_DIR / subfolder / "fed_yield_curve.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/pull_markit_cds.py",
                 f"./src/{subfolder}/pull_fed_yield_curve.py",
+                f"./src/{subfolder}/pull_markit_cds.py",
             ],
             "clean": [],
         }

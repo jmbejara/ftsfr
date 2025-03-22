@@ -1,0 +1,44 @@
+Mean Squared Error (MSE)
+
+\begin{equation}
+    \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+\end{equation}
+
+Penalizes large errors more than small ones due to squaring, making it useful for detecting significant deviations.
+Sensitive to outliers, which can dominate the error measure.
+
+Root Mean Squared Error (RMSE)
+
+\begin{equation}
+    \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
+\end{equation}
+
+Maintains the same unit as the target variable, making it more interpretable than MSE.
+Still sensitive to outliers due to squaring before averaging.
+
+Mean Absolute Error (MAE)
+
+\begin{equation}
+    \text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+\end{equation}
+
+Less sensitive to outliers than MSE and RMSE.
+Does not differentiate between small and large errors as effectively as squared errors.
+
+Mean Absolute Scaled Error (MASE)
+
+\begin{equation}
+    \text{MASE} = \frac{\frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|}{\frac{1}{n} \sum_{i=2}^{n} |y_i - y_{i-1}|}
+\end{equation}
+
+Scale-independent, making it useful for comparing forecast errors across different datasets.
+Requires a meaningful benchmark (like a naive forecast) to be interpreted correctly.
+
+Symmetric Mean Absolute Percentage Error (SMAPE)
+
+\begin{equation}
+    \text{SMAPE} = \frac{2}{n} \sum_{i=1}^{n} \frac{|y_i - \hat{y}_i|}{|y_i| + |\hat{y}_i|}
+\end{equation}
+
+Bounded between 0 and 200\%, preventing extreme values.
+Can be unstable when the denominator is close to zero, leading to high error values.

@@ -3,7 +3,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import os
 import warnings
 from pathlib import Path
 
@@ -12,8 +11,6 @@ import pandas as pd
 
 from settings import config
 
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = Path(config("DATA_DIR"))
 
 
@@ -98,7 +95,7 @@ def process_ontherun(df, start_date="1800-01-01"):
 
 
 if __name__ == "__main__":
-    data_dir = DATA_DIR / SUBFOLDER
+    data_dir = DATA_DIR
     data_dir.mkdir(parents=True, exist_ok=True)
 
     with warnings.catch_warnings():
