@@ -255,6 +255,21 @@ def task_collect_ftsfa_datasets_info():
         "clean": [],
     }
 
+
+models = benchmarks_file["models"]
+
+
+# def task_forecast():
+#     if models["arima"]:
+#         yield {
+#             "name": "arima",
+#             "actions": ["python ./forecast_scripts/arima/main.py"],
+#             "targets": [DATA_DIR / "forecast_scripts/arima/arima_results.csv"],
+#             "file_dep": ["./forecast_scripts/arima/main.py"],
+#             "clean": [],
+#         }
+
+
 # def task_convert_pdfs_to_markdown():
 #     """Convert PDFs to Markdown"""
 
