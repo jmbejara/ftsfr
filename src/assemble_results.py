@@ -26,3 +26,8 @@ results_files = [
 results = pd.concat([pd.read_csv(file) for file in results_files])
 
 results.to_csv(OUTPUT_DIR / "results_all.csv", index=False)
+
+latex_string = results.to_latex(index=False, escape=True)
+# print(latex_string)
+with open(OUTPUT_DIR / "results_all.tex", "w") as f:
+    f.write(latex_string)

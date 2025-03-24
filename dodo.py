@@ -306,14 +306,41 @@ def task_assemble_results():
         "actions": [
             "python ./src/assemble_results.py",
         ],
-        "targets": [OUTPUT_DIR / "results_all.csv"],
-        "file_dep": results_files,
+        "targets": [
+            OUTPUT_DIR / "results_all.csv",
+            OUTPUT_DIR / "results_all.tex",
+        ],
+        "file_dep": [
+            *results_files,
+            "./src/assemble_results.py",
+        ],
         "clean": [],
     }
 
+
+
+def task_compile_latex_docs():
+    """Compile the LaTeX documents to PDFs"""
+
+    return {
+        "actions": [
+            "latexmk -xelatex -halt-on-error -cd ./reports/main.tex",  # Compile
+            "latexmk -xelatex -halt-on-error -c -cd ./reports/main.tex",  # Clean
+        ],
+        "targets": [
+            "./reports/main.pdf",
+        ],
+        "file_dep": [
+            "./reports/main.tex",
+            "./src/assemble_results.py",
+        ],
+        "clean": True,
+    }
+
+
 # def task_convert_pdfs_to_markdown():
 #     """Convert PDFs to Markdown"""
-
+#
 #     return {
 #         "actions": [
 #             "python ./src/mistral_ocr.py",

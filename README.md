@@ -4,6 +4,11 @@ This repository contains a collection of financial time-series forecasting model
 
 ## Create Virtual Environment
 
+Requirements:
+- Pixi: https://pixi.sh/latest/
+- Conda: Perhaps move everything over to Pixi soon.
+- TeX Live: https://www.tug.org/texlive/
+
 Please start by installing Pixi. Instructions are here: https://docs.pixi.com/getting-started/installation . In short, on MacOS or Linux, you can run this:
 ```bash
 curl -fsSL https://pixi.sh/install.sh | zsh

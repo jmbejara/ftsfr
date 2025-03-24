@@ -9,8 +9,6 @@
 # Exclude _output directory since it's should generated automatically
 /_output/*
 
-# Exclude PDFs generated from source LaTeX files, which are kept in the reports directory
-/reports/*.pdf
 
 # Secrets saved in environment files
 .env*
