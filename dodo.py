@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import toml
+from doit.action import CmdAction
 
 sys.path.insert(1, "./src/")
 
@@ -53,12 +54,14 @@ def task_source():
             "name": f"{subfolder}:format",
             "actions": [
                 f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
-                ],
-            "targets": [DATA_DIR / subfolder / "ftsfa_treas_yield_curve_zero_coupon.parquet"],
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "ftsfa_treas_yield_curve_zero_coupon.parquet"
+            ],
             "file_dep": [
                 f"./src/{subfolder}/pull_fed_yield_curve.py",
                 f"./src/{subfolder}/create_ftsf_datasets.py",
-                ],
+            ],
             "clean": [],
         }
 
@@ -94,17 +97,21 @@ def task_source():
             "name": f"{subfolder}:format",
             "actions": [
                 f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
-                ],
+            ],
             "targets": [
                 DATA_DIR / subfolder / "ftsfa_nyu_call_report_leverage.parquet",
-                DATA_DIR / subfolder / "ftsfa_nyu_call_report_holding_company_leverage.parquet",
+                DATA_DIR
+                / subfolder
+                / "ftsfa_nyu_call_report_holding_company_leverage.parquet",
                 DATA_DIR / subfolder / "ftsfa_nyu_call_report_cash_liquidity.parquet",
-                DATA_DIR / subfolder / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet",
-                ],
+                DATA_DIR
+                / subfolder
+                / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet",
+            ],
             "file_dep": [
                 f"./src/{subfolder}/pull_nyu_call_report.py",
                 f"./src/{subfolder}/create_ftsf_datasets.py",
-                ],
+            ],
             "clean": [],
         }
 
@@ -245,6 +252,7 @@ def task_source():
             "clean": [],
         }
 
+
 def task_collect_ftsfa_datasets_info():
     return {
         "actions": [
@@ -257,18 +265,51 @@ def task_collect_ftsfa_datasets_info():
 
 
 models = benchmarks_file["models"]
+models_activated = [model for model in models if models[model]]
+
+def task_forecast():
+    if models["simple_exponential_smoothing"]:
+        yield {
+            "name": "simple_exponential_smoothing",
+            "actions": [
+                CmdAction(
+                    "pixi run main", cwd="./forecasts/simple_exponential_smoothing"
+                )
+            ],
+            "targets": [OUTPUT_DIR / "raw_results" / "ses_results.csv"],
+            "file_dep": [
+                "./forecasts/simple_exponential_smoothing/main.R",
+                "./forecasts/simple_exponential_smoothing/pixi.toml",
+            ],
+            "clean": [],
+        }
+
+    if models["arima"]:
+        yield {
+            "name": "arima",
+            "actions": [CmdAction("pixi run main", cwd="./forecasts/arima")],
+            "targets": [OUTPUT_DIR / "raw_results" / "arima_results.csv"],
+            "file_dep": [
+                "./forecasts/arima/main.py",
+                "./forecasts/arima/pixi.toml",
+            ],
+            "clean": [],
+        }
 
 
-# def task_forecast():
-#     if models["arima"]:
-#         yield {
-#             "name": "arima",
-#             "actions": ["python ./forecast_scripts/arima/main.py"],
-#             "targets": [DATA_DIR / "forecast_scripts/arima/arima_results.csv"],
-#             "file_dep": ["./forecast_scripts/arima/main.py"],
-#             "clean": [],
-#         }
-
+def task_assemble_results():
+    results_files = [
+        OUTPUT_DIR / "raw_results" / f"{model}_results.csv"
+        for model in models_activated
+    ]
+    return {
+        "actions": [
+            "python ./src/assemble_results.py",
+        ],
+        "targets": [OUTPUT_DIR / "results_all.csv"],
+        "file_dep": results_files,
+        "clean": [],
+    }
 
 # def task_convert_pdfs_to_markdown():
 #     """Convert PDFs to Markdown"""
@@ -282,21 +323,9 @@ models = benchmarks_file["models"]
 #             "./notes/monash_time_series_forecasting.md",
 #         ],
 #         "file_dep": [
-#             "./references/309_monash_time_series_forecasting-Supplementary_Material.pdf",
-#             "./references/309_monash_time_series_forecasting.pdf",
+#             "./references_md/309_monash_time_series_forecasting-Supplementary_Material.pdf",
+#             "./references_md/309_monash_time_series_forecasting.pdf",
 #         ],
 #         "clean": True,
 #         "verbosity": 2,
 #     }
-
-# def task_run_benchmarks():
-#     """Run selected model benchmarks based on benchmarks.toml configuration"""
-#     models = benchmarks_file['models']
-
-#     if models["var"]:
-#         yield {
-#             "actions": ["ipython ./src/models/var_benchmark.py"],
-#             "targets": [OUTPUT_DIR / "var_results.parquet"],
-#             "file_dep": ["./src/models/var_benchmark.py"],
-#             "clean": [],
-#         }

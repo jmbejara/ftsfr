@@ -232,6 +232,8 @@ def config(
 def create_directories():
     config("DATA_DIR").mkdir(parents=True, exist_ok=True)
     config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
+    raw_results_dir = config("OUTPUT_DIR") / "raw_results"
+    raw_results_dir.mkdir(parents=True, exist_ok=True)
 
 
 if __name__ == "__main__":

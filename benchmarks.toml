@@ -16,8 +16,11 @@ wrds_markit = true
 wrds_optionmetrics = false
 
 [models]
+# Naive Models
+simple_exponential_smoothing = true  # Simple Exponential Smoothing
+
 # Traditional Time Series Models
-var = false  # Vector Autoregression
+arima = true  # Vector Autoregression
 vecm = false  # Vector Error Correction Model
 
 # Deep Learning Models

@@ -1,0 +1,17 @@
+[workspace]
+channels = ["conda-forge"]
+name = "simple-exponential-smoothing"
+platforms = ["linux-64", "osx-arm64", "win-64"]
+
+[tasks]
+main = "Rscript main.R"
+
+[dependencies]
+r-base = ">=4.2"
+r-arrow = "*"
+r-dplyr = "*"
+r-forecast = "*"
+r-stringr = "*"
+r-here = "*"
+r-rcpptoml = "*"
+r-pbapply = "*"

@@ -3,6 +3,16 @@
 This repository contains a collection of financial time-series forecasting models. It produces esting a benchmark for prac
 
 ## Create Virtual Environment
+
+Please start by installing Pixi. Instructions are here: https://docs.pixi.com/getting-started/installation . In short, on MacOS or Linux, you can run this:
+```bash
+curl -fsSL https://pixi.sh/install.sh | zsh
+```
+and on Windows, you can run this:
+```bash
+winget install prefix-dev.pixi
+```
+
 The virtual environment is created using conda. It is used to manage the dependencies of the package.
 
 The following steps are used to create the virtual environment.
@@ -32,6 +42,12 @@ Set environment variables in `.env` file. Use the `.env.example` file as a refer
 Finally, download the data using the following command:
 ```bash
 doit
+```
+## Tips
+
+For local development on forecasting scripts, you can activate a pixi environment and open a new shell with that environment activated using the following command:
+```bash
+pixi shell
 ```
 
 # Datasets
