@@ -44,7 +44,20 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
             parspread, -- The par spread associated to the contributed CDS curve.
             convspreard, -- The conversion spread associated to the contributed CDS curve.
             tenor,
-            country
+            country,
+            creditdv01, -- If the submission is in par spread, the values will match
+            -- those in ContributedLevel(X).
+            riskypv01, -- The risky annuity of a trade of the maturity of the CDS
+            -- instrument calculated from the CDS Composite curve.
+            irdv01, -- The change in the mark to market from a basis point change
+            -- in the interest rate
+            rec01, -- The change in the mark to market from a change in the
+            -- recovery rate by 1 percent
+            dp, -- The implied default probability of the reference entity,
+            jtd, -- The jump to default of the reference entity. The change in 
+            -- mark to market assuming an instantaneous credit event
+            dtz -- The jump to zero. The change in the mark to market
+            -- assuming an instantaneous credit event and a recovery rate of 0
         FROM
             {table_name}
         WHERE
@@ -56,6 +69,7 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
                 -- (Old Restructuring), XR (No Restructuring).
                 -- Among all the data, these are the unique values for docclause:
                 --  CR, CR14, MM, MM14, MR, MR14, XR, XR14
+            CompositeDepth5Y >= 3 AND
             tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
         """
         cds_data[year] = db.raw_sql(query, date_cols=["date"])
@@ -151,7 +165,7 @@ def pull_markit_red_crsp_link(wrds_username=WRDS_USERNAME):
     sources, such as CRSP and TRACE for equity and fixed income respectively.
 
     Connecting with CRSP We illustrate below how to link RED data to CRSP data using
-    the new CIZ format of CRSP data. The logic would be the the same for the legacy
+    the new CIZ format of CRSP data. The logic would be the same for the legacy
     SIZ format of CRSP data, just with different database syntax.
 
     The primary linking key is through the 6-digit CUSIP. We also try to establish
@@ -289,6 +303,64 @@ def _demo():
     print(value_counts)
     # batch       count
     # 0   EOD  1023341647
+
+    ## Explore quotes
+    db = wrds.Connection(wrds_username=WRDS_USERNAME)
+    year = 2021
+    table_name = f"markit.CDS{year}"  # Generate table name dynamically
+    query = f"""
+        SELECT DISTINCT
+            date, -- The date on which points on a curve were calculated
+            ticker, -- The Markit ticker for the organization.
+            RedCode, -- The RED Code for identification of the entity. 
+            parspread, -- The par spread associated to the contributed CDS curve.
+            convspreard, -- The conversion spread associated to the contributed CDS curve.
+            tenor,
+            country,
+            quotesdepthcontr,
+            quotesdepthpassed,
+            dealersclearingcountcruve,
+            dealersquotescountcurve,
+            dealersquotescountcurve1wma,
+            dealersquotescountcurve1mma,
+            dealersquotescounttenor,
+            quotescountcurve,
+            quotescountcurve1wma,
+            quotescountcurve1mma,
+            quotescounttenor,
+            CompositeDepth5Y,
+            creditdv01, -- If the submission is in par spread, the values will match
+            -- those in ContributedLevel(X).
+            riskypv01, -- The risky annuity of a trade of the maturity of the CDS
+            -- instrument calculated from the CDS Composite curve.
+            irdv01, -- The change in the mark to market from a basis point change
+            -- in the interest rate
+            rec01, -- The change in the mark to market from a change in the
+            -- recovery rate by 1 percent
+            dp, -- The implied default probability of the reference entity,
+            jtd, -- The jump to default of the reference entity. The change in 
+            -- mark to market assuming an instantaneous credit event
+            dtz -- The jump to zero. The change in the mark to market
+            -- assuming an instantaneous credit event and a recovery rate of 0
+        FROM
+            {table_name}
+        WHERE
+            -- country = 'United States'
+            currency = 'USD' AND
+            docclause LIKE 'XR%%' AND 
+                -- The documentation clause. Values are: MM (Modified
+                -- Modified Restructuring), MR (Modified Restructuring), CR
+                -- (Old Restructuring), XR (No Restructuring).
+                -- Among all the data, these are the unique values for docclause:
+                --  CR, CR14, MM, MM14, MR, MR14, XR, XR14
+            CompositeDepth5Y >= 3 AND
+            tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
+        LIMIT 100
+        """
+    df = db.raw_sql(query, date_cols=["date"])
+    import polars as pl
+    df = pl.from_pandas(df)
+    df.glimpse()
 
 
 if __name__ == "__main__":
