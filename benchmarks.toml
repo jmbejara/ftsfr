@@ -1,3 +1,6 @@
+[cache]
+use_cache = false # Doesn't work most of the time.
+
 [data_sources]
 
 ## Public data sets. No subscription needed, no api key needed.

@@ -33,8 +33,9 @@ def task_config():
     }
 
 
-data_sources = benchmarks_file["data_sources"]
 
+
+data_sources = benchmarks_file["data_sources"]
 
 def task_source():
     """Pull selected data_sources based on benchmarks.toml configuration"""
