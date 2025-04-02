@@ -38,3 +38,6 @@ deep_factors = false  # Deep Factor Model
 random_forest_ts = false  # Random Forest for Time Series
 xgboost_ts = false  # XGBoost for Time Series
 lightgbm_ts = false  # LightGBM for Time Series
+
+[reports]
+is_latex_installed = true

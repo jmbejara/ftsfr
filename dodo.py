@@ -267,6 +267,7 @@ def task_collect_ftsfa_datasets_info():
 models = benchmarks_file["models"]
 models_activated = [model for model in models if models[model]]
 
+
 def task_forecast():
     if models["simple_exponential_smoothing"]:
         yield {
@@ -318,24 +319,30 @@ def task_assemble_results():
     }
 
 
-
 def task_compile_latex_docs():
     """Compile the LaTeX documents to PDFs"""
-
-    return {
-        "actions": [
-            "latexmk -xelatex -halt-on-error -cd ./reports/main.tex",  # Compile
-            "latexmk -xelatex -halt-on-error -c -cd ./reports/main.tex",  # Clean
-        ],
-        "targets": [
-            "./reports/main.pdf",
-        ],
-        "file_dep": [
-            "./reports/main.tex",
-            "./src/assemble_results.py",
-        ],
-        "clean": True,
-    }
+    if benchmarks_file["reports"]["is_latex_installed"]:
+        return {
+            "actions": [
+                "latexmk -xelatex -halt-on-error -cd ./reports/draft_ftsfa.tex",  # Compile
+                "latexmk -xelatex -halt-on-error -c -cd ./reports/draft_ftsfa.tex",  # Clean
+            ],
+            "targets": [
+                "./reports/draft_ftsfa.pdf",
+            ],
+            "file_dep": [
+                "./reports/draft_ftsfa.tex",
+                "./src/assemble_results.py",
+            ],
+            "clean": True,
+        }
+    else:
+        return {
+            "actions": [],
+            "targets": [],
+            "file_dep": [],
+            "clean": [],
+        }
 
 
 # def task_convert_pdfs_to_markdown():
