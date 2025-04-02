@@ -64,6 +64,99 @@ pixi shell
 
 # Datasets
 
+Overview of datasets:
+
+**Misc**
+
+[x] CRSP Returns (with and without dividends)
+[x] Fama-French Portfolio Returns
+[x] Treasury Yield Curve
+[x] Bank Call Report Data
+[x] Treasury Yield Curve
+
+**He, Kelly, Manela Test Portfolios**
+
+We can just use the test portfolios as downloaded from their website, though it
+would be nice to use data up until the present day.
+
+[x] Equity CLOSE
+[.] Treasury Securities
+[.] Corporate Bonds
+[.] Sovereign Bonds
+[.] Options
+[.] Foreign Exchange
+[.] Commodities CLOSE
+[.] CDS CLOSE
+
+**He, Kelly, Manela Disaggregated Data**
+
+[.] Equity
+[ ] Treasury Securities
+[ ] Corporate Bonds
+[ ] Sovereign Bonds
+[ ] Options
+[ ] Foreign Exchange
+[ ] Commodities
+
+**Segmented Arbitrage, Arbitrage Spreads**
+
+[ ] CIP
+[ ] Box Spread
+[.] Equity Spot-Futures
+[.] Treasury Spot-Futures
+[.] Treasury Swap
+[.] TIPS-Treasury
+[ ] CDS-Bond Basis
+
+## Equity Options Arbitrage
+
+From the main Segmented Arbitrage paper, 
+
+> Equity Options Arbitrage (Box Arbitrage) We infer riskless rates and arbitrage spreads from
+> S&P 500 (SPX) equity options based on the put-call parity relationship. As discussed in Ronn and
+> Ronn (1989) and van Binsbergen et al. (2019), implied riskless rates from put-call parity are often
+> called box rates in practice. We adopt this naming convention and refer to this arbitrage as the box
+> trade for the remainder of the paper. We take box rates for six, twelve, and eighteen month tenors
+> directly from van Binsbergen et al. (2019), who estimate them using minute-by-minute pricing
+> data for SPX options through 2018. We then follow van Binsbergen et al. (2019)’s methodology
+> to extend the data to 2020 using SPX option data purchased directly from the CBOE. Arbitrage
+> spreads are then computed by subtracting off a maturity-matched OIS rate.
+
+And in the appendix, they provide the following description:
+
+```
+Put-call parity is a no-arbitrage condition relating the difference between the price of European put
+and call options. For time t, tenor τ, and strike price Ki, let pi,t,τ denote the price of a put option
+and ci,t,τ denote the price of call option. Put-call parity states the difference between two equals the
+discounted strike price Ki and spot price (st ) and an adjustment for any dividend cash flows (Ct,τ ):
+pi,t,τ −ci,t,τ = (Ct,τ −st)+exp(−r f
+t,ττ)Ki, (A.3)
+where r f
+t,τ is the implied riskless rate from the option pair. van Binsbergen et al. (2019) compute the
+r f
+t,τ using a cross-section of call and put options via the following regression:
+pi−ci = α +βKi+εi (A.4)
+This cross-sectional regression is estimated over all strikes for each time t and tenor τ, and avoids
+the need to estimate cash flows Ct,τ . The estimated β can then be used to back out the implied
+riskless rate. van Binsbergen et al. (2019) estimate minute-by-minute implied riskless rates from
+SPX options and then aggregate to the daily level by taking medians. The equity box arbitrage
+spread equals the difference between the option implied and maturity-matched OIS riskless rates.
+We combine estimates from van Binsbergen et al. (2019), which are available on their websites,
+with OIS rates from Bloomberg. The data from van Binsbergen et al. (2019) ends in March 2018.
+To better match the rest of our sample, we have also updated their series by applying their same
+methodology to minute-level SPX options data that runs through the end of our sample. These data
+were purchased directly through the CBOE. To verify the accuracy of our extended series, we have
+compared our option-implied riskless rates to those in van Binsbergen et al. (2019) for the period in
+which the two series overlap. When regressing their implied riskless rates on ours, the regression
+constants for the 6,12, and 18m series are -0.68, 0.27, and 0.37 bps, respectively. The estimated
+slopes are 1.01 in all cases and the R2s all exceed 0.9996.
+Figure A1b plots daily raw values for 6, 12, and 18 month equity box arbitrage spreads. When
+the equity box arbitrage spread is positive, the asset implied risk-free rate from put-call parity is
+greater than the OIS dollar risk-free rate.
+```
+
+Do have access to the data to get this up to the present day?
+
 ## Datasets I've Already Included
 
 - CRSP Returns (with and without dividends)
