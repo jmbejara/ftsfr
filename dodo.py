@@ -274,13 +274,13 @@ def task_forecast():
             "name": "simple_exponential_smoothing",
             "actions": [
                 CmdAction(
-                    "pixi run main", cwd="./forecasts/simple_exponential_smoothing"
+                    "pixi run main", cwd="./models/simple_exponential_smoothing"
                 )
             ],
             "targets": [OUTPUT_DIR / "raw_results" / "ses_results.csv"],
             "file_dep": [
-                "./forecasts/simple_exponential_smoothing/main.R",
-                "./forecasts/simple_exponential_smoothing/pixi.toml",
+                "./models/simple_exponential_smoothing/main.R",
+                "./models/simple_exponential_smoothing/pixi.toml",
             ],
             "clean": [],
         }
@@ -288,11 +288,11 @@ def task_forecast():
     if models["arima"]:
         yield {
             "name": "arima",
-            "actions": [CmdAction("pixi run main", cwd="./forecasts/arima")],
+            "actions": [CmdAction("pixi run main", cwd="./models/arima")],
             "targets": [OUTPUT_DIR / "raw_results" / "arima_results.csv"],
             "file_dep": [
-                "./forecasts/arima/main.py",
-                "./forecasts/arima/pixi.toml",
+                "./models/arima/main.py",
+                "./models/arima/pixi.toml",
             ],
             "clean": [],
         }
