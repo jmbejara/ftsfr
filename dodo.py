@@ -275,7 +275,7 @@ def task_forecast():
             "actions": [
                 CmdAction("pixi run main", cwd="./models/simple_exponential_smoothing")
             ],
-            "targets": [OUTPUT_DIR / "raw_results" / "ses_results.csv"],
+            "targets": [OUTPUT_DIR / "raw_results" / "simple_exponential_smoothing_results.csv"],
             "file_dep": [
                 "./models/simple_exponential_smoothing/main.R",
                 "./models/simple_exponential_smoothing/pixi.toml",
