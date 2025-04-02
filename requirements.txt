@@ -20,3 +20,7 @@ toml
 torch==2.6.0
 wrds==3.2.0
 yfinance==0.2.43
+ruff
+pydata-sphinx-theme==0.16.1
+pytest==8.3.4
+# mistralai
