@@ -1,14 +1,15 @@
-import pandas as pd
+import datetime
+import itertools
+from typing import Any, Dict, List, Union
+
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-from models.time_series_model import TimeSeriesModel
-from typing import Union, Dict, Any, List
-from models.dataset import Dataset
-import datetime
-import itertools
 
+from models.dataset import Dataset
+from models.time_series_model import TimeSeriesModel
 
 PARAM_GRID_DEFAULT = {
     "hidden_size": [32, 64],

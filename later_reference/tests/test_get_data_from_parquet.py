@@ -1,25 +1,17 @@
-import pytest
-import pandas as pd
-import sys
 import os
-import functools
+import sys
+
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from models.utils import create_simulated_X, create_simulated_y
-from models.time_series_model import TimeSeriesModel
+
 from models.dataset import Dataset
-from tests.utils import del_test_files
 from models.univariate_local import (
     HoltWintersForecasting,
     MeanForecasting,
     NaiveForecasting,
     SarimaForecasting,
 )
-
-from models.time_series_model import TEST_PATH_TIME_SERIES_MODELS_RESULTS
-from models.error_metrics import TEST_PATH_ERROR_METRICS_RESULTS
-
 
 UNIVARIATE_LOCAL = [
     HoltWintersForecasting,

@@ -1,11 +1,10 @@
-import sys
 import os
+import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import pandas as pd
+
 from models.dataset import Dataset
-from models.time_series_model import TimeSeriesModel
 from models.univariate_local import (
     HoltWintersForecasting,
     MeanForecasting,

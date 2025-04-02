@@ -1,13 +1,12 @@
-import pytest
-import pandas as pd
-import sys
 import os
+import sys
+
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from models.utils import create_simulated_X, create_simulated_y
-from models.univariate_local import SarimaForecasting
 from models.error_metrics import EXTRA_COLUMNS
+from models.univariate_local import SarimaForecasting
+from models.utils import create_simulated_y
 
 
 def test_one_step_sarima():

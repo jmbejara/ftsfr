@@ -273,9 +273,7 @@ def task_forecast():
         yield {
             "name": "simple_exponential_smoothing",
             "actions": [
-                CmdAction(
-                    "pixi run main", cwd="./models/simple_exponential_smoothing"
-                )
+                CmdAction("pixi run main", cwd="./models/simple_exponential_smoothing")
             ],
             "targets": [OUTPUT_DIR / "raw_results" / "ses_results.csv"],
             "file_dep": [

@@ -1,7 +1,8 @@
-from models.time_series_model import TEST_PATH_TIME_SERIES_MODELS_RESULTS
-from models.error_metrics import TEST_PATH_ERROR_METRICS_RESULTS
-import os
 import functools
+import os
+
+from models.error_metrics import TEST_PATH_ERROR_METRICS_RESULTS
+from models.time_series_model import TEST_PATH_TIME_SERIES_MODELS_RESULTS
 
 
 def del_test_files():

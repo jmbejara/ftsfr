@@ -1,9 +1,7 @@
-import numpy as np
-import pandas as pd
-import os
 import glob
-
+import os
 import subprocess
+
 
 
 def save_tree_output_to_file(output_file):
@@ -13,7 +11,7 @@ def save_tree_output_to_file(output_file):
         with open(output_file, "w") as file:
             file.write(result.stdout)
 
-    except Exception as e:
+    except Exception:
         pass
 
 

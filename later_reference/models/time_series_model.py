@@ -1,12 +1,13 @@
-from abc import abstractmethod
-import random
-from typing import Union, List
 import datetime
+import os
+import random
+from abc import abstractmethod
+from typing import Union
+
 import pandas as pd
+
 from models.dataset import Dataset
 from models.error_metrics import ErrorMetrics
-import os
-
 
 MODELS_PATH = "models"
 PATH_TIME_SERIES_MODELS_RESULTS = (

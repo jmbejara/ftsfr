@@ -1,7 +1,7 @@
 import pandas as pd
-import numpy as np
-from models.time_series_model import TimeSeriesModel
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
+
+from models.time_series_model import TimeSeriesModel
 
 
 class ThetaForecasting(TimeSeriesModel):

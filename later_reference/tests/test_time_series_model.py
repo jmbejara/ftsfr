@@ -1,12 +1,12 @@
-import pytest
-import pandas as pd
-import sys
 import os
+import sys
+
+import pandas as pd
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from models.utils import create_simulated_X, create_simulated_y
 from models.time_series_model import TimeSeriesModel
+from models.utils import create_simulated_X, create_simulated_y
 
 
 def test_instanciate_time_series_model():

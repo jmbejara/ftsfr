@@ -1,8 +1,9 @@
-from typing import Union, List
 import datetime
-import pandas as pd
-from models.utils import _calc_periods_per_year
+from typing import List, Union
 
+import pandas as pd
+
+from models.utils import _calc_periods_per_year
 
 FREQUENCY_SEASONAL_MAP = {
     "DU": [5, 20, 21, 22, 42, 63],

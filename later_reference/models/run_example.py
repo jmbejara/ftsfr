@@ -1,17 +1,15 @@
-import sys
+import datetime
+import logging
 import os
 import re
-import logging
-import datetime
 import signal
+import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import pandas as pd
-from models.dataset import Dataset
-from models.time_series_model import TimeSeriesModel
-import models.univariate_local as mul
 
+import models.univariate_local as mul
+from models.dataset import Dataset
 
 log_file_name = f"logs/log_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
 logging.basicConfig(

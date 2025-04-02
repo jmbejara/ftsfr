@@ -11,7 +11,7 @@ def ocr_url_pdf_to_markdown(url, client):
 
     full_doc = "\n\n".join(
         [
-            f"### Page {i+1}\n{ocr_response.pages[i].markdown}"
+            f"### Page {i + 1}\n{ocr_response.pages[i].markdown}"
             for i in range(len(ocr_response.pages))
         ]
     )

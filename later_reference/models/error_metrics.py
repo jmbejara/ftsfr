@@ -1,8 +1,7 @@
-import numpy as np
-import pandas as pd
-import csv
 import os
 
+import numpy as np
+import pandas as pd
 
 PATH_ERROR_METRICS_RESULTS = "models/results/error_metrics/error_metrics.csv"
 TEST_PATH_ERROR_METRICS_RESULTS = "models/results/tests/error_metrics/error_metrics.csv"
