@@ -45,6 +45,7 @@ import sys
 from pathlib import Path
 from platform import system
 
+import toml
 from decouple import config as _config
 
 
@@ -234,6 +235,15 @@ def create_directories():
     config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
     raw_results_dir = config("OUTPUT_DIR") / "raw_results"
     raw_results_dir.mkdir(parents=True, exist_ok=True)
+
+    # Load benchmarks configuration
+    with open("benchmarks.toml", "r") as f:
+        benchmarks_file = toml.load(f)
+    data_sources = benchmarks_file["data_sources"]
+    for data_source in data_sources:
+        if data_sources[data_source]:
+            data_source_dir = config("DATA_DIR") / data_source
+            data_source_dir.mkdir(parents=True, exist_ok=True)
 
 
 if __name__ == "__main__":
