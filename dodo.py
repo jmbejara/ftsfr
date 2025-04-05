@@ -238,16 +238,17 @@ def task_source():
             "actions": [
                 f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_markit_cds.py --DATA_DIR={DATA_DIR / subfolder}",
-                # f"ipython ./src/{subfolder}/calc_cds_returns.py", # TODO
+                f"ipython ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}", 
             ],
             "targets": [
                 DATA_DIR / subfolder / "markit_cds.parquet",
-                # DATA_DIR / subfolder / "markit_cds_returns.parquet", # TODO
+                DATA_DIR / subfolder / "markit_cds_returns.parquet", 
                 DATA_DIR / subfolder / "fed_yield_curve.parquet",
             ],
             "file_dep": [
                 f"./src/{subfolder}/pull_fed_yield_curve.py",
                 f"./src/{subfolder}/pull_markit_cds.py",
+                f"./src/{subfolder}/calc_cds_returns.py",
             ],
             "clean": [],
         }
