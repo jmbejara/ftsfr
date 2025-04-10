@@ -34,15 +34,20 @@ def task_config():
 
 
 data_sources = benchmarks_file["data_sources"]
+use_cache = benchmarks_file["cache"]["use_cache"]
+# If use_cache is True, set all data_sources to pull = False
+if use_cache:
+    for data_source in data_sources:
+        data_sources[data_source] = False
 
 
-def task_source():
+def task_data():
     """Pull selected data_sources based on benchmarks.toml configuration"""
 
     if data_sources["fed_yield_curve"]:
         subfolder = "fed_yield_curve"
         yield {
-            "name": f"{subfolder}:pull",
+            "name": f"pull:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
@@ -51,7 +56,7 @@ def task_source():
             "clean": [],
         }
         yield {
-            "name": f"{subfolder}:format",
+            "name": f"format:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
@@ -70,7 +75,7 @@ def task_source():
 
         subfolder = "ken_french_data_library"
         yield {
-            "name": f"{subfolder}:pull",
+            "name": f"pull:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / subfolder}"
             ],
@@ -85,7 +90,7 @@ def task_source():
     if data_sources["nyu_call_report"]:
         subfolder = "nyu_call_report"
         yield {
-            "name": f"{subfolder}:pull",
+            "name": f"pull:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/pull_nyu_call_report.py --DATA_DIR={DATA_DIR / subfolder}"
             ],
@@ -94,7 +99,7 @@ def task_source():
             "clean": [],
         }
         yield {
-            "name": f"{subfolder}:format",
+            "name": f"format:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
@@ -118,7 +123,7 @@ def task_source():
     if data_sources["wrds_bank_premium"]:
         subfolder = "wrds_bank_premium"
         yield {
-            "name": f"{subfolder}:pull",
+            "name": f"pull:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / subfolder}"
             ],
@@ -140,7 +145,7 @@ def task_source():
         subfolder = "wrds_crsp_compustat"
 
         yield {
-            "name": f"{subfolder}:pull",
+            "name": f"pull:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
@@ -216,7 +221,7 @@ def task_source():
         from wrds_corp_bonds.pull_corp_bonds import DATA_INFO
         subfolder = "wrds_corp_bonds"
         yield {
-            "name": f"{subfolder}:pull",
+            "name": f"pull:{subfolder}",
             "actions": [f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}"],
             "targets": [
                 DATA_DIR / subfolder / info["parquet"]
@@ -234,7 +239,7 @@ def task_source():
     if data_sources["wrds_markit"]:
         subfolder = "wrds_markit"
         yield {
-            "name": f"{subfolder}:pull",
+            "name": f"pull:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_markit_cds.py --DATA_DIR={DATA_DIR / subfolder}",
