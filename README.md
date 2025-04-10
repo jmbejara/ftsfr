@@ -72,7 +72,6 @@ Overview of datasets:
 [x] Fama-French Portfolio Returns
 [x] Treasury Yield Curve
 [x] Bank Call Report Data
-[x] Treasury Yield Curve
 
 **He, Kelly, Manela Test Portfolios**
 
@@ -97,6 +96,7 @@ would be nice to use data up until the present day.
 [ ] Options
 [ ] Foreign Exchange
 [ ] Commodities
+[ ] CDS
 
 **Segmented Arbitrage, Arbitrage Spreads**
 
