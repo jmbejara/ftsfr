@@ -177,7 +177,7 @@ def task_data():
         }
 
         yield {
-            "name": "CRSP_stock:pull",
+            "name": "pull:CRSP_stock",
             "actions": [
                 f"python ./src/{subfolder}/pull_CRSP_stock.py --DATA_DIR={DATA_DIR / subfolder}"
             ],
@@ -193,7 +193,7 @@ def task_data():
         # The code right now only pulls them separately.
 
         yield {
-            "name": "CRSP_treasury:pull",
+            "name": "pull:CRSP_treasury",
             "actions": [
                 f"python ./src/{subfolder}/pull_treasury_auction_stats.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/calculate_ontherun.py --DATA_DIR={DATA_DIR / subfolder}",
@@ -243,7 +243,7 @@ def task_data():
             "actions": [
                 f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_markit_cds.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"ipython ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}", 
+                f"python ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}", 
             ],
             "targets": [
                 DATA_DIR / subfolder / "markit_cds.parquet",
@@ -257,6 +257,29 @@ def task_data():
             ],
             "clean": [],
         }
+
+    # cds_bond_basis = (data_sources["wrds_mergent"] and data_sources["wrds_bond_returns"] and data_sources["wrds_markit"])
+    # if cds_bond_basis:
+    #     subfolder = "cds_bond_basis"
+    #     yield {
+    #         "name": f"pull:{subfolder}",
+    #         "actions": [
+    #             f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
+    #             f"python ./src/{subfolder}/pull_wrds_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}",
+    #             f"python ./src/{subfolder}/pull_wrds_mergent.py --DATA_DIR={DATA_DIR / subfolder}",
+    #             f"python ./src/{subfolder}/create_cds_bond_basis.py --DATA_DIR={DATA_DIR / subfolder}",
+    #         ],
+    #         "targets": [
+    #             DATA_DIR / subfolder / "cds_bond_basis.parquet",
+    #         ],
+    #         "file_dep": [
+    #             f"./src/{subfolder}/pull_wrds_markit.py",
+    #             f"./src/{subfolder}/pull_wrds_bond_returns.py",
+    #             f"./src/{subfolder}/pull_wrds_mergent.py",
+    #             f"./src/{subfolder}/create_cds_bond_basis.py",
+    #         ],
+    #         "clean": [],
+    #     }
 
 
 def task_collect_ftsfa_datasets_info():

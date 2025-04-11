@@ -17,6 +17,8 @@ wrds_corp_bonds = true
 wrds_crsp_compustat = true
 wrds_markit = true
 wrds_optionmetrics = false
+wrds_mergent = true
+wrds_bond_returns = true
 
 [models]
 # Naive Models
