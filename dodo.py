@@ -1,3 +1,4 @@
+import re
 import sys
 from pathlib import Path
 
@@ -10,6 +11,39 @@ from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
+OS_TYPE = config("OS_TYPE")
+
+
+## Helpers for handling Jupyter Notebook tasks
+# fmt: off
+## Helper functions for automatic execution of Jupyter notebooks
+def jupyter_execute_notebook(notebook_path):
+    return f"jupyter nbconvert --execute --to notebook --ClearMetadataPreprocessor.enabled=True --inplace {notebook_path}"
+def jupyter_to_html(notebook_path, output_dir=OUTPUT_DIR):
+    return f"jupyter nbconvert --to html --output-dir={output_dir} {notebook_path}"
+def jupyter_to_md(notebook_path, output_dir=OUTPUT_DIR):
+    """Requires jupytext"""
+    return f"jupytext --to markdown --output-dir={output_dir} {notebook_path}"
+def jupyter_to_python(notebook_path, notebook, build_dir):
+    """Convert a notebook to a python script"""
+    return f"jupyter nbconvert --to python {notebook_path} --output _{notebook}.py --output-dir {build_dir}"
+def jupyter_clear_output(notebook_path):
+    """Clear the output of a notebook"""
+    return f"jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --inplace {notebook_path}"
+# fmt: on
+
+
+def copy_notebook_to_folder(notebook_path, destination_folder, notebook_name):
+    """Copy a notebook to a folder"""
+    notebook_path = Path(notebook_path)
+    destination_folder = Path(destination_folder)
+    destination_folder.mkdir(parents=True, exist_ok=True)
+    if OS_TYPE == "nix":
+        command = f"cp {notebook_path} {destination_folder / f'{notebook_name}.ipynb'}"
+    else:
+        command = f"copy  {notebook_path} {destination_folder / f'{notebook_name}.ipynb'}"
+    return command
+
 
 # Load benchmarks configuration
 with open("benchmarks.toml", "r") as f:
@@ -243,20 +277,30 @@ def task_data():
             "actions": [
                 f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_markit_cds.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}", 
             ],
             "targets": [
                 DATA_DIR / subfolder / "markit_cds.parquet",
-                DATA_DIR / subfolder / "markit_cds_returns.parquet", 
                 DATA_DIR / subfolder / "fed_yield_curve.parquet",
             ],
             "file_dep": [
                 f"./src/{subfolder}/pull_fed_yield_curve.py",
                 f"./src/{subfolder}/pull_markit_cds.py",
-                f"./src/{subfolder}/calc_cds_returns.py",
             ],
             "clean": [],
         }
+        # yield {
+        #     "name": "calc_cds_returns",
+        #     "actions": [
+        #         f"python ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}",
+        #     ],
+        #     "targets": [
+        #         DATA_DIR / subfolder / "markit_cds_returns.parquet",
+        #     ],
+        #     "file_dep": [
+        #         f"./src/{subfolder}/calc_cds_returns.py",
+        #     ],
+        #     "clean": [],
+        # }
 
     # cds_bond_basis = (data_sources["wrds_mergent"] and data_sources["wrds_bond_returns"] and data_sources["wrds_markit"])
     # if cds_bond_basis:
@@ -304,7 +348,9 @@ def task_forecast():
             "actions": [
                 CmdAction("pixi run main", cwd="./models/simple_exponential_smoothing")
             ],
-            "targets": [OUTPUT_DIR / "raw_results" / "simple_exponential_smoothing_results.csv"],
+            "targets": [
+                OUTPUT_DIR / "raw_results" / "simple_exponential_smoothing_results.csv"
+            ],
             "file_dep": [
                 "./models/simple_exponential_smoothing/main.R",
                 "./models/simple_exponential_smoothing/pixi.toml",
@@ -343,6 +389,94 @@ def task_assemble_results():
             "./src/assemble_results.py",
         ],
         "clean": [],
+    }
+
+
+notebook_tasks = {
+    "example_notebook_markit": {
+        "path": "./src/wrds_markit/example_notebook_markit.ipynb",
+        "file_dep": [],
+        "targets": [],
+    },
+}
+
+
+def task_convert_notebooks_to_scripts():
+    """Convert notebooks to script form to detect changes to source code rather
+    than to the notebook's metadata.
+    """
+    build_dir = Path(OUTPUT_DIR)
+    build_dir.mkdir(parents=True, exist_ok=True)
+
+    for notebook in notebook_tasks.keys():
+        notebook_path = notebook_tasks[notebook]["path"]
+        yield {
+            "name": notebook,
+            "actions": [
+                jupyter_clear_output(notebook_path),
+                jupyter_to_python(notebook_path, notebook, build_dir),
+            ],
+            "file_dep": [notebook_path],
+            "targets": [OUTPUT_DIR / f"_{notebook}.py"],
+            "clean": True,
+            "verbosity": 0,
+        }
+
+
+# fmt: off
+def task_run_notebooks():
+    """Preps the notebooks for presentation format.
+    Execute notebooks if the script version of it has been changed.
+    """
+
+    for notebook in notebook_tasks.keys():
+        notebook_path = notebook_tasks[notebook]["path"]
+        yield {
+            "name": notebook,
+            "actions": [
+                """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+                jupyter_execute_notebook(notebook_path),
+                jupyter_to_html(notebook_path),
+                copy_notebook_to_folder(notebook_path, "./docs_src/_notebook_build/", notebook),
+                jupyter_clear_output(notebook_path),
+                """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+            ],
+            "file_dep": [
+                OUTPUT_DIR / f"_{notebook}.py",
+                *notebook_tasks[notebook]["file_dep"],
+            ],
+            "targets": [
+                OUTPUT_DIR / f"{notebook}.html",
+                *notebook_tasks[notebook]["targets"],
+            ],
+            "clean": True,
+            # "verbosity": 1,
+        }
+# fmt: on
+
+sphinx_targets = [
+    "./docs/html/index.html",
+    "./docs/html/myst_markdown_demos.html",
+]
+
+
+def task_compile_sphinx_docs():
+    """Compile Sphinx Docs"""
+    file_dep = [
+        "./docs_src/conf.py",
+        "./docs_src/index.md",
+        "./docs_src/myst_markdown_demos.md",
+    ]
+
+    return {
+        "actions": [
+            "sphinx-build -M html ./docs_src/ ./docs"
+        ],  # Use docs as build destination
+        # "actions": ["sphinx-build -M html ./docs/ ./docs/_build"], # Previous standard organization
+        "targets": sphinx_targets,
+        "file_dep": file_dep,
+        "task_dep": ["run_notebooks"],
+        "clean": True,
     }
 
 

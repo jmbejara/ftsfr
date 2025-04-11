@@ -3,7 +3,11 @@ arch==7.1.0
 datetime==3.0.3
 doit
 ipywidgets==8.1.5
+jupyter
+linkify-it-py
 matplotlib
+myst-nb
+myst-parser
 numpy
 openpyxl==3.1.3
 pandas==2.2.3
@@ -18,6 +22,7 @@ scikit-learn
 scipy
 seaborn==0.13.2
 setuptools==75.6.0
+sphinx-book-theme
 statsmodels==0.14.3
 thefuzz
 toml
