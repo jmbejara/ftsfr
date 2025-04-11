@@ -24,6 +24,20 @@
                 "PYTHONPATH": "${workspaceFolder}"
             },
             "console": "integratedTerminal",
+        },
+        {
+            "name": "Python Debugger: Run calc_cds_returns.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/wrds_markit/calc_cds_returns.py",
+            "args": [
+                "--DATA_DIR=/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_markit"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

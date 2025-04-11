@@ -4,15 +4,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import datetime
+import io
+
 import numpy as np
 import pandas as pd
+import polars as pl
 import pull_fed_yield_curve
 import pull_markit_cds
-from scipy.interpolate import CubicSpline
-import datetime
-import polars as pl
 import requests
-import io
+from scipy.interpolate import CubicSpline
+
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
@@ -35,7 +37,7 @@ def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE
     Returns:
     - DataFrame: Processed interest rate data with maturity values as column names and rates in decimal form.
     """
-    raw_rates = raw_rates.dropna()
+    raw_rates = raw_rates.copy().dropna()
     short_tenor_rates = pull_swap_rates(pd.to_datetime(start_date))
     short_tenor_rates_renamed = short_tenor_rates.rename(columns={
     'DGS3MO': 0.25,
@@ -45,7 +47,7 @@ def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE
     rates = raw_rates[
         (raw_rates.index >= pd.to_datetime(start_date)) &
         (raw_rates.index <= pd.to_datetime(end_date))
-    ] / 100  # Convert percentages to decimal format
+    ] # / 100  # Convert percentages to decimal format
 
     merged_rates = pd.merge(rates, short_tenor_rates_renamed, left_index=True, right_index=True, how='inner').sort_values('Date')
     cols = merged_rates.columns.tolist()
@@ -53,7 +55,7 @@ def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE
     merged_rates = merged_rates[ordered_cols]
     return merged_rates
 
-def pull_swap_rates(start_year = datetime.date(START_DATE)):
+def pull_swap_rates(start_year = START_DATE):
     urls = {
         "DGS6MO": "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23ebf3fb&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=803&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=DGS6MO&scale=left&cosd=1981-09-01&coed=2025-03-12&line_color=%230073e6&link_values=false&line_style=solid&mark_type=none&mw=3&lw=3&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2025-03-14&revision_date=2025-03-14&nd=1981-09-01",
         "DGS3MO": "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23ebf3fb&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=803&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=DGS3MO&scale=left&cosd=1981-09-01&coed=2025-03-12&line_color=%230073e6&link_values=false&line_style=solid&mark_type=none&mw=3&lw=3&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2025-03-14&revision_date=2025-03-14&nd=1981-09-01"
@@ -109,12 +111,12 @@ def extrapolate_rates(rates = None):
     df_quarterly.index = rates.index
     return df_quarterly
 
-def calc_discount(df = None, start_date = START_DATE, end_date = END_DATE):
+def calc_discount(raw_rates = None, start_date = START_DATE, end_date = END_DATE):
     """
     Calculates the discount factor for given interest rate data using quarterly rates.
 
     Parameters:
-    - df (DataFrame): The raw interest rate data.
+    - raw_rates (DataFrame): The raw interest rate data.
     - start_date (str or datetime): The start date for filtering.
     - end_date (str or datetime): The end date for filtering.
 
@@ -122,7 +124,7 @@ def calc_discount(df = None, start_date = START_DATE, end_date = END_DATE):
     - DataFrame: Discount factors for various maturities.
     """
     # Call the function to get rates
-    rates_data = process_rates(df, start_date, end_date)
+    rates_data = process_rates(raw_rates, start_date, end_date)
     if rates_data is None:
         print("No data available for the given date range.")
         return None
@@ -139,14 +141,14 @@ def calc_discount(df = None, start_date = START_DATE, end_date = END_DATE):
 
     return quarterly_discount
 
-def get_portfolio_dict(start_date = START_DATE, end_date = END_DATE, cds_spread = None):
+def get_portfolio_dict(start_date = START_DATE, end_date = END_DATE, cds_spreads = None):
     """
     Creates a dictionary of credit portfolios based on the CDS spread data.
 
     Parameters:
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
-    - cds_spread (DataFrame): CDS spread data.
+    - cds_spreads (pl.DataFrame): CDS spread data.
     
     Returns:
     - dict: Dictionary where keys are tenor-quantile pairs and values are Polars DataFrames.
@@ -156,8 +158,10 @@ def get_portfolio_dict(start_date = START_DATE, end_date = END_DATE, cds_spread 
         start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
     if isinstance(end_date, str):
         end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+    if isinstance(cds_spreads, pd.DataFrame):
+        cds_spreads = pl.from_pandas(cds_spreads)
     # Filter DataFrame
-    filtered_cds_spread = cds_spread.filter(
+    filtered_cds_spread = cds_spreads.filter(
         (pl.col("date") >= start_date) & (pl.col("date") <= end_date)
     )
     filtered_cds_spread_us_only = filtered_cds_spread.filter(pl.col("country") == "United States")
@@ -340,6 +344,17 @@ def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, star
         )
 
         discount_filtered = discount_filtered.rename({"Date": "date"})
+        
+        # set intersection of dates
+        dates_df = discount_filtered.select("date")
+        dates_spf = survival_probs_filtered.select("date")
+        dates_df = dates_df.join(dates_spf, on="date", how="inner")
+        discount_filtered = discount_filtered.filter(
+            pl.col("date").is_in(dates_df["date"])
+        )
+        survival_probs_filtered = survival_probs_filtered.filter(
+            pl.col("date").is_in(dates_df["date"])
+        )
 
         # Compute risky duration
         date_column = survival_probs_filtered.select("date")
@@ -350,6 +365,8 @@ def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, star
         # Reattach the "Date" column after multiplication
         temp_df = temp_df.with_columns(date_column)
         
+
+
         # Ensure "Date" is present in both DataFrames
         risky_duration = risky_duration.join(temp_df, on="date", how="left")
 
@@ -461,7 +478,7 @@ def run_cds_calculation(raw_rates = None, cds_spreads = None, start_date = START
     """
     rates_data = process_rates(raw_rates, start_date, end_date)
     portfolio_dict = get_portfolio_dict(start_date, end_date, cds_spreads)
-    daily_returns_dict = calc_cds_return_for_portfolios(portfolio_dict, rates_data, start_date, end_date)
+    daily_returns_dict = calc_cds_return_for_portfolios(portfolio_dict, raw_rates, start_date, end_date)
     monthly_returns_dict = calculate_monthly_returns(daily_returns_dict)
     return monthly_returns_dict
 
