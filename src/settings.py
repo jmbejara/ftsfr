@@ -175,6 +175,7 @@ defaults = {
     "DATA_DIR": if_relative_make_abs(Path("_data")),
     "MANUAL_DATA_DIR": if_relative_make_abs(Path("data_manual")),
     "OUTPUT_DIR": if_relative_make_abs(Path("_output")),
+    "DOCS_BUILD_DIR": if_relative_make_abs(Path("_docs")),
     **defaults,
 }
 
@@ -233,6 +234,8 @@ def config(
 def create_directories():
     config("DATA_DIR").mkdir(parents=True, exist_ok=True)
     config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
+    config("DOCS_BUILD_DIR").mkdir(parents=True, exist_ok=True)
+    
     raw_results_dir = config("OUTPUT_DIR") / "raw_results"
     raw_results_dir.mkdir(parents=True, exist_ok=True)
 

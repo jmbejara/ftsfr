@@ -1,4 +1,3 @@
-import re
 import sys
 from pathlib import Path
 
@@ -41,7 +40,21 @@ def copy_notebook_to_folder(notebook_path, destination_folder, notebook_name):
     if OS_TYPE == "nix":
         command = f"cp {notebook_path} {destination_folder / f'{notebook_name}.ipynb'}"
     else:
-        command = f"copy  {notebook_path} {destination_folder / f'{notebook_name}.ipynb'}"
+        command = (
+            f"copy  {notebook_path} {destination_folder / f'{notebook_name}.ipynb'}"
+        )
+    return command
+
+
+def copy_dir_contents_to_folder(dir_path, destination_folder):
+    """Copy a directory to a folder"""
+    dir_path = Path(dir_path)
+    destination_folder = Path(destination_folder)
+    destination_folder.mkdir(parents=True, exist_ok=True)
+    if OS_TYPE == "nix":
+        command = f"cp -r {dir_path}/ {destination_folder}"
+    else:
+        command = f"xcopy /E /I {dir_path}/ {destination_folder}"
     return command
 
 
@@ -437,7 +450,7 @@ def task_run_notebooks():
                 """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
                 jupyter_execute_notebook(notebook_path),
                 jupyter_to_html(notebook_path),
-                copy_notebook_to_folder(notebook_path, "./docs_src/_notebook_build/", notebook),
+                copy_notebook_to_folder(notebook_path, OUTPUT_DIR / "_notebook_build", notebook),
                 jupyter_clear_output(notebook_path),
                 """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
             ],
@@ -470,7 +483,10 @@ def task_compile_sphinx_docs():
 
     return {
         "actions": [
-            "sphinx-build -M html ./docs_src/ ./docs"
+            copy_dir_contents_to_folder("./docs_src", "./_docs"),
+            copy_dir_contents_to_folder(OUTPUT_DIR / "_notebook_build", "./_docs/"),
+            "sphinx-build -M html ./_docs/ ./_docs/_build",
+            copy_dir_contents_to_folder("./_docs/_build/html", "./docs"),
         ],  # Use docs as build destination
         # "actions": ["sphinx-build -M html ./docs/ ./docs/_build"], # Previous standard organization
         "targets": sphinx_targets,
