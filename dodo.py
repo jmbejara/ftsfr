@@ -315,28 +315,32 @@ def task_data():
         #     "clean": [],
         # }
 
-    # cds_bond_basis = (data_sources["wrds_mergent"] and data_sources["wrds_bond_returns"] and data_sources["wrds_markit"])
-    # if cds_bond_basis:
-    #     subfolder = "cds_bond_basis"
-    #     yield {
-    #         "name": f"pull:{subfolder}",
-    #         "actions": [
-    #             f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
-    #             f"python ./src/{subfolder}/pull_wrds_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}",
-    #             f"python ./src/{subfolder}/pull_wrds_mergent.py --DATA_DIR={DATA_DIR / subfolder}",
-    #             f"python ./src/{subfolder}/create_cds_bond_basis.py --DATA_DIR={DATA_DIR / subfolder}",
-    #         ],
-    #         "targets": [
-    #             DATA_DIR / subfolder / "cds_bond_basis.parquet",
-    #         ],
-    #         "file_dep": [
-    #             f"./src/{subfolder}/pull_wrds_markit.py",
-    #             f"./src/{subfolder}/pull_wrds_bond_returns.py",
-    #             f"./src/{subfolder}/pull_wrds_mergent.py",
-    #             f"./src/{subfolder}/create_cds_bond_basis.py",
-    #         ],
-    #         "clean": [],
-    #     }
+    cds_bond_basis = (data_sources["wrds_mergent"] and data_sources["wrds_bond_returns"] and data_sources["wrds_markit"])
+    if cds_bond_basis:
+        subfolder = "cds_bond_basis"
+        yield {
+            "name": f"pull:{subfolder}",
+            "actions": [
+                f"python ./src/{subfolder}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / subfolder}",
+                # f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
+                # f"python ./src/{subfolder}/pull_wrds_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}",
+                # f"python ./src/{subfolder}/pull_wrds_mergent.py --DATA_DIR={DATA_DIR / subfolder}",
+                # f"python ./src/{subfolder}/create_cds_bond_basis.py --DATA_DIR={DATA_DIR / subfolder}",
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "bondret_treasury.csv",
+                DATA_DIR / subfolder / "bondret_treasury.parquet",
+                # DATA_DIR / subfolder / "cds_bond_basis.parquet",
+            ],
+            "file_dep": [
+                f"./src/{subfolder}/pull_open_source_bond.py",
+                # f"./src/{subfolder}/pull_wrds_markit.py",
+                # f"./src/{subfolder}/pull_wrds_bond_returns.py",
+                # f"./src/{subfolder}/pull_wrds_mergent.py",
+                # f"./src/{subfolder}/create_cds_bond_basis.py",
+            ],
+            "clean": [],
+        }
 
 
 def task_collect_ftsfa_datasets_info():
@@ -468,8 +472,8 @@ def task_run_notebooks():
 # fmt: on
 
 sphinx_targets = [
-    "./docs/html/index.html",
-    "./docs/html/myst_markdown_demos.html",
+    "./docs/index.html",
+    "./docs/myst_markdown_demos.html",
 ]
 
 
@@ -484,7 +488,7 @@ def task_compile_sphinx_docs():
     return {
         "actions": [
             copy_dir_contents_to_folder("./docs_src", "./_docs"),
-            copy_dir_contents_to_folder(OUTPUT_DIR / "_notebook_build", "./_docs/"),
+            copy_dir_contents_to_folder(OUTPUT_DIR / "_notebook_build", "./_docs/_notebook_build"),
             "sphinx-build -M html ./_docs/ ./_docs/_build",
             copy_dir_contents_to_folder("./_docs/_build/html", "./docs"),
         ],  # Use docs as build destination
