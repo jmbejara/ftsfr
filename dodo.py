@@ -92,14 +92,14 @@ def task_data():
         yield {
             "name": f"format:{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
                 DATA_DIR / subfolder / "ftsfa_treas_yield_curve_zero_coupon.parquet"
             ],
             "file_dep": [
                 f"./src/{subfolder}/pull_fed_yield_curve.py",
-                f"./src/{subfolder}/create_ftsf_datasets.py",
+                f"./src/{subfolder}/create_ftsfa_datasets.py",
             ],
             "clean": [],
         }
@@ -135,7 +135,7 @@ def task_data():
         yield {
             "name": f"format:{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
                 DATA_DIR / subfolder / "ftsfa_nyu_call_report_leverage.parquet",
@@ -149,7 +149,7 @@ def task_data():
             ],
             "file_dep": [
                 f"./src/{subfolder}/pull_nyu_call_report.py",
-                f"./src/{subfolder}/create_ftsf_datasets.py",
+                f"./src/{subfolder}/create_ftsfa_datasets.py",
             ],
             "clean": [],
         }
@@ -182,7 +182,7 @@ def task_data():
             "name": f"pull:{subfolder}",
             "actions": [
                 f"python ./src/{subfolder}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
                 DATA_DIR / subfolder / "Compustat.parquet",
@@ -196,14 +196,14 @@ def task_data():
         yield {
             "name": f"data_sets_{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/create_ftsf_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
                 DATA_DIR / subfolder / "ftsfa_CRSP_monthly_stock_ret.parquet",
                 DATA_DIR / subfolder / "ftsfa_CRSP_monthly_stock_retx.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/create_ftsf_datasets.py",
+                f"./src/{subfolder}/create_ftsfa_datasets.py",
                 f"./src/{subfolder}/pull_CRSP_Compustat.py",
                 f"./src/{subfolder}/calc_Fama_French_1993.py",
             ],
