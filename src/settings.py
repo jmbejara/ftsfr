@@ -231,6 +231,17 @@ def config(
     return _config(var_name, default=default, cast=cast)
 
 
+def validate_dot_env_file(base_dir=defaults["BASE_DIR"]):
+    """Validate that the .env file exists and is readable."""
+    dot_env_path = base_dir / ".env"
+    if not dot_env_path.exists():
+        raise FileNotFoundError(f"The .env file does not exist at the project root: {dot_env_path}. Please use .env.example as a template to create one.")
+    if not dot_env_path.is_file():
+        raise FileNotFoundError(f"The .env file is not a file: {dot_env_path}.")
+    if not dot_env_path.is_readable():
+        raise PermissionError(f"The .env file is not readable: {dot_env_path}.")
+        
+
 def create_directories():
     config("DATA_DIR").mkdir(parents=True, exist_ok=True)
     config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
@@ -248,6 +259,6 @@ def create_directories():
             data_source_dir = config("DATA_DIR") / data_source
             data_source_dir.mkdir(parents=True, exist_ok=True)
 
-
+validate_dot_env_file(base_dir=defaults["BASE_DIR"])
 if __name__ == "__main__":
     create_directories()
