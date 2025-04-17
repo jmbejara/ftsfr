@@ -238,8 +238,6 @@ def validate_dot_env_file(base_dir=defaults["BASE_DIR"]):
         raise FileNotFoundError(f"The .env file does not exist at the project root: {dot_env_path}. Please use .env.example as a template to create one.")
     if not dot_env_path.is_file():
         raise FileNotFoundError(f"The .env file is not a file: {dot_env_path}.")
-    if not dot_env_path.is_readable():
-        raise PermissionError(f"The .env file is not readable: {dot_env_path}.")
         
 
 def create_directories():
