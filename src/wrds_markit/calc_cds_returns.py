@@ -171,7 +171,7 @@ def get_portfolio_dict(start_date = START_DATE, end_date = END_DATE, cds_spreads
 
     # Remove duplicates
     cds_spread_unique = cds_spread_noNA.unique()
-    cds_spread_unique = cds_spread_unique.filter(pl.col("parspread") <= 0.5)
+    cds_spread_unique = cds_spread_unique.filter(pl.col("parspread") <= 0.5) #Done by Palhares, remove spreads grater than 50%
 
     # Convert date column to year-month format
     cds_spread_unique = cds_spread_unique.with_columns(
@@ -283,15 +283,12 @@ def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, star
 
     fiveY_lambda_dict = {}
 
+    #Obtain the lambdas to use; Lambda is calculating using the cds spreads of the 5 year tenor
     for key, portfolio_df in portfolio_dict.items():
         if key.startswith("5Y_Q"):
-            print(f"Calculating lambda for 5Y quintile: {key}")
-
             # Ensure pivot_table is structured correctly in Polars
-            pivot_table = (
-                portfolio_df.pivot(index="date", columns="tenor", values="rep_parspread")
-                .sort("date")
-            )
+            pivot_table = portfolio_df.pivot(index="date", on="tenor", values="rep_parspread")
+
 
             # Check if the 5Y tenor exists
             if "5Y" in pivot_table.columns:
@@ -307,13 +304,9 @@ def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, star
 
     # Iterate over each portfolio in portfolio_dict
     for key, portfolio_df in portfolio_dict.items():
-        print(f"Processing portfolio: {key}")
 
         # Ensure pivot_table is structured correctly in Polars
-        pivot_table = (
-            portfolio_df.pivot(index="date", columns="tenor", values="rep_parspread")
-            .sort("date")  # Ensure proper time-series ordering
-        )
+        pivot_table = portfolio_df.pivot(index="date", on="tenor", values="rep_parspread")
 
         pivot_table = pivot_table.rename({col: f"{key}" for col in pivot_table.columns if col != "date"})
         # Compute lambda using He-Kelly formula, set the loss given default as constant 0.6
@@ -327,11 +320,19 @@ def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, star
         # Step 3: Compute risky duration
         risky_duration = pivot_table.select("date").clone()  # Initialize with date column
 
-        survival_probs = pl.DataFrame(
-            {"date": pivot_table["date"]}
-        ).with_columns([
-            pl.lit(np.exp(-q * lambda_constant.flatten())).alias(str(q)) for q in quarters
-        ])
+        lambda_vals = lambda_constant.flatten()
+
+# Ensure lambda_vals matches pivot_table length
+        if len(lambda_vals) > len(pivot_table):
+            lambda_vals = lambda_vals[:len(pivot_table)]
+        elif len(lambda_vals) < len(pivot_table):
+            raise ValueError("lambda_constant has fewer rows than pivot_table. Cannot continue.")
+
+        # Now use lambda_vals instead of lambda_constant.flatten()
+        survival_probs = pl.DataFrame({"date": pivot_table["date"]}).with_columns([
+    pl.Series(name=str(q), values=np.exp(-q * lambda_vals)) for q in quarters
+])
+
 
         # Convert Pandas-based discount factors into Polars before filtering
         discount_filtered = quarterly_discount.select(["Date"] + [
@@ -483,8 +484,8 @@ def run_cds_calculation(raw_rates = None, cds_spreads = None, start_date = START
     return monthly_returns_dict
 
 if __name__ == "__main__":
-    raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR)
-    cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR)
+    raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR / "wrds_markit")
+    cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR/ "wrds_markit")
     cds_returns = run_cds_calculation(raw_rates = raw_rates, cds_spreads = cds_spreads, start_date = START_DATE, end_date = END_DATE)
     (DATA_DIR / SUBFOLDER).mkdir(parents=True, exist_ok=True)
     cds_returns.to_parquet(DATA_DIR / SUBFOLDER / "markit_cds_returns.parquet")
