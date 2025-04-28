@@ -20,6 +20,9 @@ from settings import config
 DATA_DIR = config("DATA_DIR")
 START_DATE = pull_markit_cds.START_DATE
 END_DATE = pull_markit_cds.END_DATE
+# Uncomment for testing smaller timeframe
+# START_DATE = pd.Timestamp("2015-01-01")
+# END_DATE = pd.Timestamp("2020-01-01")
 
 # Set SUBFOLDER to the folder containing this file
 SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
@@ -425,11 +428,11 @@ def calculate_monthly_returns(daily_returns_dict = None):
                 df.group_by("Month")
                 .agg(
                     (pl.col(key) + 1).product() - 1  # Aggregate to compute monthly returns
-                ).rename({f"{key}": "Monthly Return"})  # Rename column
+                ).rename({f"{key}": f"{key} Monthly Return"})  # Rename column
             )
 
             # Calculate the volatility of monthly returns
-            vol = monthly_returns.select("Monthly Return").std().item()
+            vol = monthly_returns.select(f"{key} Monthly Return").std().item()
             fiveY_vol_dict[key] = vol
 
     for key, df in daily_returns_dict.items():
@@ -441,11 +444,11 @@ def calculate_monthly_returns(daily_returns_dict = None):
             df.group_by("Month")
             .agg(
                 (pl.col(key) + 1).product() - 1  # Directly apply product aggregation
-            ).rename({f"{key}": "Monthly Return"})  # Rename column
+            ).rename({f"{key}": f"{key} Monthly Return"})  # Rename column
         )
 
         # Calculate monthly volatility of the portfolio
-        portfolio_std = monthly_returns.select("Monthly Return").std().item()
+        portfolio_std = monthly_returns.select(f"{key} Monthly Return").std().item()
 
         # Identify the corresponding 5Y quintile for volatility scaling
         vol_target_key = "5Y_Q" + key.split("_Q")[-1]
@@ -457,12 +460,29 @@ def calculate_monthly_returns(daily_returns_dict = None):
             
             # Scale the monthly returns
             monthly_returns = monthly_returns.with_columns(
-                (pl.col("Monthly Return") * scale_factor).alias("Scaled Monthly Return")
+                (pl.col(f"{key} Monthly Return") * scale_factor).alias(f"{key} Scaled Monthly Return")
             )
 
         # Store in the dictionary with the same key
         monthly_returns_dict[key] = monthly_returns
-    return monthly_returns_dict
+    frames = []
+    for key, df in monthly_returns_dict.items():
+        scaled_col_name = [col for col in df.columns if "Scaled" in col][0]
+        small_df = df.select([
+            pl.col("Month"),
+            pl.col(scaled_col_name).alias(key)  # Rename the scaled column to the dictionary key
+        ])
+        frames.append(small_df)
+    month_df = frames[0].select("Month")
+
+    # Now extract the value columns (excluding Month)
+    value_dfs = [df.select(key) for df, key in zip(frames, monthly_returns_dict.keys())]
+
+    # Horizontally concatenate
+    final_df = pl.concat([month_df] + value_dfs, how="horizontal")
+    final_df = final_df.sort("Month")
+
+    return final_df
 
 def run_cds_calculation(raw_rates = None, cds_spreads = None, start_date = START_DATE, end_date = END_DATE):
     """
@@ -480,12 +500,12 @@ def run_cds_calculation(raw_rates = None, cds_spreads = None, start_date = START
     rates_data = process_rates(raw_rates, start_date, end_date)
     portfolio_dict = get_portfolio_dict(start_date, end_date, cds_spreads)
     daily_returns_dict = calc_cds_return_for_portfolios(portfolio_dict, raw_rates, start_date, end_date)
-    monthly_returns_dict = calculate_monthly_returns(daily_returns_dict)
-    return monthly_returns_dict
+    monthly_returns = calculate_monthly_returns(daily_returns_dict)
+    return monthly_returns
 
 if __name__ == "__main__":
-    raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR / "wrds_markit")
-    cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR/ "wrds_markit")
+    raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR )
+    cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR )
     cds_returns = run_cds_calculation(raw_rates = raw_rates, cds_spreads = cds_spreads, start_date = START_DATE, end_date = END_DATE)
     (DATA_DIR / SUBFOLDER).mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(cds_returns).to_parquet(DATA_DIR / SUBFOLDER / "markit_cds_returns.parquet")
+    cds_returns.write_parquet(DATA_DIR / SUBFOLDER / "markit_cds_returns.parquet")
