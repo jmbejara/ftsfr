@@ -602,6 +602,7 @@ def task_compile_sphinx_docs():
     ]
 
     file_dep = [
+        "./docs_src/logo.png",
         "./docs_src/conf.py",
         "./docs_src/index.md",
         "./docs_src/myst_markdown_demos.md",
