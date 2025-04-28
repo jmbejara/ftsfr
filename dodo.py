@@ -104,6 +104,24 @@ def task_pull():
             "clean": [],
         }
 
+    if pull_sources["he_kelly_manela"]:
+        subfolder = "he_kelly_manela"
+        yield {
+            "name": f"{subfolder}",
+            "actions": [
+                f"python ./src/{subfolder}/pull_he_kelly_manela.py --DATA_DIR={DATA_DIR / subfolder}"
+            ],
+            "targets": [
+                DATA_DIR
+                / subfolder
+                / "He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv",
+                DATA_DIR / subfolder / "He_Kelly_Manela_Factors_monthly.csv",
+                DATA_DIR / subfolder / "He_Kelly_Manela_Factors_daily.csv",
+            ],
+            "file_dep": [f"./src/{subfolder}/pull_he_kelly_manela.py"],
+            "clean": [],
+        }
+
     if pull_sources["ken_french_data_library"]:
         from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
 
