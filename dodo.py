@@ -395,19 +395,19 @@ def task_format():
 
     if data_sources["wrds_markit"]:
         subfolder = "wrds_markit"
-        yield {
-            "name": "calc_cds_returns",
-            "actions": [
-                f"python ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}",
-            ],
-            "targets": [
-                DATA_DIR / subfolder / "markit_cds_returns.parquet",
-            ],
-            "file_dep": [
-                f"./src/{subfolder}/calc_cds_returns.py",
-            ],
-            "clean": [],
-        }
+        # yield {
+        #     "name": "calc_cds_returns",
+        #     "actions": [
+        #         f"python ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}",
+        #     ],
+        #     "targets": [
+        #         DATA_DIR / subfolder / "markit_cds_returns.parquet",
+        #     ],
+        #     "file_dep": [
+        #         f"./src/{subfolder}/calc_cds_returns.py",
+        #     ],
+        #     "clean": [],
+        # }
 
     # cds_bond_basis = (data_sources["wrds_mergent"] and data_sources["wrds_bond_returns"] and data_sources["wrds_markit"])
     # if cds_bond_basis:
