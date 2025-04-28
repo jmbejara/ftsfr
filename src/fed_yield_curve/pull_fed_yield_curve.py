@@ -12,7 +12,6 @@ import requests
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-print(DATA_DIR)
 
 
 def pull_fed_yield_curve():

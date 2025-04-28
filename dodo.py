@@ -151,7 +151,6 @@ def task_pull():
             "clean": [],
         }
 
-
     if pull_sources["wrds_bank_premium"]:
         subfolder = "wrds_bank_premium"
         yield {
@@ -258,7 +257,11 @@ def task_pull():
             "clean": [],
         }
 
-    cds_bond_basis = (pull_sources["wrds_mergent"] and pull_sources["wrds_bond_returns"] and pull_sources["wrds_markit"])
+    cds_bond_basis = (
+        pull_sources["wrds_mergent"]
+        and pull_sources["wrds_bond_returns"]
+        and pull_sources["wrds_markit"]
+    )
     if cds_bond_basis:
         subfolder = "cds_bond_basis"
         yield {
@@ -523,8 +526,8 @@ notebook_tasks = {
         "file_dep": [],
         "targets": [],
     },
-    "cds_return_notebook": {
-        "path": "./src/wrds_markit/cds_return_notebook.ipynb",
+    "cds_returns_summary": {
+        "path": "./src/wrds_markit/cds_returns_summary.ipynb",
         "file_dep": [],
         "targets": [],
     },
@@ -584,29 +587,42 @@ def task_run_notebooks():
         }
 # fmt: on
 
-sphinx_targets = [
-    "./docs/index.html",
-    "./docs/myst_markdown_demos.html",
-]
-
 
 def task_compile_sphinx_docs():
     """Compile Sphinx Docs"""
+
+    # Get all paths from the notebook_tasks dictionary
+    notebook_paths = [
+        notebook_tasks[notebook]["path"] for notebook in notebook_tasks.keys()
+    ]
+
     file_dep = [
         "./docs_src/conf.py",
         "./docs_src/index.md",
         "./docs_src/myst_markdown_demos.md",
+        *notebook_paths,
     ]
+
+    def touch_file(file_path):
+        """Touch a file"""
+        Path(file_path).touch()
 
     return {
         "actions": [
             copy_dir_contents_to_folder("./docs_src", "./_docs"),
-            copy_dir_contents_to_folder(OUTPUT_DIR / "_notebook_build", "./_docs/_notebook_build"),
+            copy_dir_contents_to_folder(
+                OUTPUT_DIR / "_notebook_build", "./_docs/_notebook_build"
+            ),
             "sphinx-build -M html ./_docs/ ./_docs/_build",
             copy_dir_contents_to_folder("./_docs/_build/html", "./docs"),
+            touch_file("./docs/.nojekyll"),
         ],  # Use docs as build destination
         # "actions": ["sphinx-build -M html ./docs/ ./docs/_build"], # Previous standard organization
-        "targets": sphinx_targets,
+        "targets": [
+            "./docs/index.html",
+            "./docs/myst_markdown_demos.html",
+            "./docs/.nojekyll",
+        ],
         "file_dep": file_dep,
         "task_dep": ["run_notebooks"],
         "clean": True,
