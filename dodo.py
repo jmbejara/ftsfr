@@ -603,9 +603,9 @@ def task_compile_sphinx_docs():
         *notebook_paths,
     ]
 
-    def touch_file(file_path):
+    def touch_file():
         """Touch a file"""
-        Path(file_path).touch()
+        Path("./docs/.nojekyll").touch()
 
     return {
         "actions": [
@@ -615,7 +615,7 @@ def task_compile_sphinx_docs():
             ),
             "sphinx-build -M html ./_docs/ ./_docs/_build",
             copy_dir_contents_to_folder("./_docs/_build/html", "./docs"),
-            touch_file("./docs/.nojekyll"),
+            touch_file,
         ],  # Use docs as build destination
         # "actions": ["sphinx-build -M html ./docs/ ./docs/_build"], # Previous standard organization
         "targets": [
