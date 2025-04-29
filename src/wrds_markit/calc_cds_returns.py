@@ -507,5 +507,4 @@ if __name__ == "__main__":
     raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR )
     cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR )
     cds_returns = run_cds_calculation(raw_rates = raw_rates, cds_spreads = cds_spreads, start_date = START_DATE, end_date = END_DATE)
-    (DATA_DIR / SUBFOLDER).mkdir(parents=True, exist_ok=True)
-    cds_returns.write_parquet(DATA_DIR / SUBFOLDER / "markit_cds_returns.parquet")
+    cds_returns.write_parquet(DATA_DIR / "markit_cds_returns.parquet")
