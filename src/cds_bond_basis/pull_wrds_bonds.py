@@ -18,7 +18,8 @@ from settings import config
 
 # Set SUBFOLDER to the folder containing this file
 SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = Path(config("DATA_DIR"))
+# DATA_DIR = Path(config("DATA_DIR"))
+DATA_DIR = Path('../../FS-project_files')
 WRDS_USERNAME = config("WRDS_USERNAME")
 
 
@@ -51,7 +52,8 @@ def get_bond_data_as_dict(wrds_username=WRDS_USERNAME):
         offering_price, -- Offering Price
         price_eom, -- Price-End of Month
         t_spread, -- Avg Bid/Ask Spread
-        principal_amt -- The face or par value of a single bond (i.e., the sum that is to be paid at maturity, usually $1000).
+        principal_amt, -- The face or par value of a single bond (i.e., the sum that is to be paid at maturity, usually $1000).
+        duration -- the duration of the corporate bond
     FROM
         {table_name} AS a
     WHERE
@@ -92,6 +94,6 @@ def filter_data(data):
 
 if __name__ == "__main__":
     combined_df = get_bond_data_as_dict(wrds_username=WRDS_USERNAME)
-    filered = filter_data(combined_df)
+    filtered = filter_data(combined_df)
     (DATA_DIR).mkdir(parents=True, exist_ok=True)
-    filered.to_parquet(DATA_DIR / "wrds_bond.parquet")
+    filtered.to_parquet(DATA_DIR / "wrds_bond_mod.parquet")

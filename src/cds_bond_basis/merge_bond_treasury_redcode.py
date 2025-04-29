@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import ctypes
 
-from settings import config
+# from settings import config
 
 
-DATA_DIR = config("DATA_DIR")
+# DATA_DIR = config("DATA_DIR")
 TREASURY_ISSUE_FILE_NAME = "issue_data.parquet"
 TREASURY_MONTHLY_FILE_NAME = "monthly_ts_data.parquet"
 CORPORATES_MONTHLY_FILE_NAME = "wrds_bond.parquet"

@@ -17,7 +17,8 @@ from settings import config
 
 # Set SUBFOLDER to the folder containing this file
 SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = Path(config("DATA_DIR"))
+# DATA_DIR = Path(config("DATA_DIR"))
+DATA_DIR = Path('../../FS-project_files')
 WRDS_USERNAME = config("WRDS_USERNAME")
 
 
@@ -40,6 +41,7 @@ def get_monthly_ts_data_as_dict(wrds_username=WRDS_USERNAME):
         kytreasno,
         mcaldt,
         tmpubout,
+        tmduratn,
         tmyld
     FROM
         {table_name} AS a
@@ -75,5 +77,5 @@ if __name__ == "__main__":
     df1 = get_monthly_ts_data_as_dict(wrds_username=WRDS_USERNAME)
     df2 = get_issue_data_as_dict(wrds_username=WRDS_USERNAME)
     (DATA_DIR).mkdir(parents=True, exist_ok=True)
-    df1.to_parquet(DATA_DIR / "monthly_ts_data.parquet")
-    df2.to_parquet(DATA_DIR / "issue_data.parquet")
+    df1.to_parquet(DATA_DIR / "monthly_ts_data_mod.parquet") # added mod to name
+    df2.to_parquet(DATA_DIR / "issue_data_mod.parquet") # added mod to name
