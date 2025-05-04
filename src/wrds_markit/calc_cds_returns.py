@@ -12,6 +12,7 @@ import pandas as pd
 import polars as pl
 import pull_fed_yield_curve
 import pull_markit_cds
+import pull_fred
 import requests
 from scipy.interpolate import CubicSpline
 
@@ -27,6 +28,8 @@ END_DATE = pull_markit_cds.END_DATE
 # Set SUBFOLDER to the folder containing this file
 SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 
+swap_rates = pull_fred.load_fred(data_dir=DATA_DIR)
+
 def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE):
     """
     Processes raw interest rate data by filtering within a specified date range
@@ -41,7 +44,7 @@ def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE
     - DataFrame: Processed interest rate data with maturity values as column names and rates in decimal form.
     """
     raw_rates = raw_rates.copy().dropna()
-    short_tenor_rates = pull_swap_rates(pd.to_datetime(start_date))
+    short_tenor_rates = swap_rates[["DGS3MO", "DGS6MO"]]
     short_tenor_rates_renamed = short_tenor_rates.rename(columns={
     'DGS3MO': 0.25,
     'DGS6MO': 0.5
@@ -57,30 +60,6 @@ def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE
     ordered_cols = [0.25, 0.5] + [col for col in cols if col not in [0.25, 0.5]]
     merged_rates = merged_rates[ordered_cols]
     return merged_rates
-
-def pull_swap_rates(start_year = START_DATE):
-    urls = {
-        "DGS6MO": "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23ebf3fb&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=803&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=DGS6MO&scale=left&cosd=1981-09-01&coed=2025-03-12&line_color=%230073e6&link_values=false&line_style=solid&mark_type=none&mw=3&lw=3&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2025-03-14&revision_date=2025-03-14&nd=1981-09-01",
-        "DGS3MO": "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23ebf3fb&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=803&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=DGS3MO&scale=left&cosd=1981-09-01&coed=2025-03-12&line_color=%230073e6&link_values=false&line_style=solid&mark_type=none&mw=3&lw=3&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2025-03-14&revision_date=2025-03-14&nd=1981-09-01"
-    }
-
-    dataframes = {}
-    for key, url in urls.items():
-        response = requests.get(url)
-        response.raise_for_status()  
-        
-        df = pd.read_csv(io.StringIO(response.text), parse_dates=["observation_date"])
-        df.columns = ["observation_date", key]  
-        dataframes[key] = df
-
-    # Merge dataframes on DATE
-    df_merged = dataframes["DGS3MO"].merge(dataframes["DGS6MO"], on="observation_date", how="outer")
-    df_merged = df_merged.rename(columns = {"observation_date": "Date"})
-    df_merged = df_merged.set_index("Date")
-    df_merged = df_merged[start_year:]
-    df_merged = df_merged.dropna(axis=0)
-    df_merged = df_merged / 100
-    return df_merged
 
 def extrapolate_rates(rates = None):
     """

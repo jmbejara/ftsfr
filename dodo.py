@@ -245,14 +245,17 @@ def task_pull():
             "actions": [
                 f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_markit_cds.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_fred.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
                 DATA_DIR / subfolder / "markit_cds.parquet",
                 DATA_DIR / subfolder / "fed_yield_curve.parquet",
+                DATA_DIR / subfolder / "fred.parquet",
             ],
             "file_dep": [
                 f"./src/{subfolder}/pull_fed_yield_curve.py",
                 f"./src/{subfolder}/pull_markit_cds.py",
+                f"./src/{subfolder}/pull_fred.py",
             ],
             "clean": [],
         }
