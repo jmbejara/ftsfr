@@ -325,6 +325,23 @@ def task_data():
     #         "clean": [],
     #     }
 
+    #Adding tasks from Alex Vincent project
+    if data_sources["wrds_bond_returns"]:    #Rename as needed to conform to formating
+        subfolder = "wrds_bond_returns"   #refers to subfolder in src instead of cds_bond_basis
+        yield {
+            "name": f"pull:{subfolder}",
+            "actions": [
+                f"python ./src/{subfolder}/pull_wrds_bonds.py --DATA_DIR={DATA_DIR / subfolder}",
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "wrds_bond_mod.parquet",
+            ],
+            "file_dep": [
+                f"./src/{subfolder}/pull_wrds_bonds.py",
+            ],
+            "clean": [],
+        }
+
 
 def task_collect_ftsfa_datasets_info():
     return {
