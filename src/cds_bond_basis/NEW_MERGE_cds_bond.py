@@ -10,7 +10,7 @@ from scipy.interpolate import CubicSpline
 
 
 # DATA_DIR = config("DATA_DIR")
-BOND_RED_CODE_FILE_NAME = "merged_bond_treasuries_redcode.parquet"
+BOND_RED_CODE_FILE_NAME = "corporate_bond_returns.parquet"
 CDS_FILE_NAME = "cds_final.parquet"
 FINAL_ANALYSIS_FILE_NAME = "final_data.parquet"
 RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"

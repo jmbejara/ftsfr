@@ -4,7 +4,7 @@ from settings import config
 
 DATA_DIR = config("DATA_DIR")
 
-data = pd.read_parquet(f"{DATA_DIR}/merged_bond_treasuries_redcode.parquet")
+data = pd.read_parquet(f"{DATA_DIR}/corporate_bond_returns.parquet")
 data['year'] = data["date"].dt.year
 
 red_code_dict = {}
