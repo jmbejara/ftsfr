@@ -41,12 +41,97 @@ and compare to
 
 """
 
+import os
 import sys
+import warnings
 from pathlib import Path
 from platform import system
 
 import toml
-from decouple import config as _config
+from decouple import Config, RepositoryEnv, undefined
+from decouple import config as _config_decouple
+
+
+def find_project_root():
+    """Find the project root directory using environment variables or marker files.
+
+    The function determines the project root directory based on the following
+    order of precedence:
+
+    1.  Checks for the `BASE_DIR` environment variable. If set, its value is
+        returned as the project root path.
+    2.  If `BASE_DIR` is not set, it searches upwards from the current working
+        directory (`Path.cwd()`) for specific marker files or directories.
+    3.  The search checks for the following markers in each parent directory,
+        in this order:
+        - `pyproject.toml` (file)
+        - `.env` (file)
+        - `requirements.txt` (file)
+        - `.git` (directory)
+        - `LICENSE` (file)
+    4.  The directory containing the first marker found is returned as the
+        project root.
+    5.  If the search reaches the filesystem root without finding any marker,
+        a warning is issued, and the current working directory is returned.
+
+    Returns
+    -------
+    pathlib.Path
+        The absolute path to the determined project root directory, or the
+        current working directory if no root could be determined.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the `BASE_DIR` environment variable is not set and no marker
+        file/directory could be found by traversing up from the current
+        working directory.
+    """
+    # 1. Check for BASE_DIR environment variable
+    base_dir_env = os.environ.get("BASE_DIR")
+    if base_dir_env:
+        return Path(base_dir_env).resolve()
+
+    # 2. Search upwards for markers
+    original_cwd = Path.cwd().resolve()
+    current_dir = original_cwd
+    markers = [
+        ("pyproject.toml", "file"),
+        (".env", "file"),
+        ("requirements.txt", "file"),
+        (".git", "dir"),
+        ("LICENSE", "file"),
+    ]
+
+    while True:
+        for marker_name, marker_type in markers:
+            marker_path = current_dir / marker_name
+            found = False
+            if marker_type == "file" and marker_path.is_file():
+                found = True
+            elif marker_type == "dir" and marker_path.is_dir():
+                found = True
+
+            if found:
+                return current_dir
+
+        # Move to parent directory
+        parent_dir = current_dir.parent
+
+        # Check if we have reached the root directory
+        if parent_dir == current_dir:
+            break
+
+        current_dir = parent_dir
+
+    # 5. If no marker found after reaching the root, issue warning and return cwd
+    warning_message = (
+        "Could not find project root marker. Set the BASE_DIR environment variable or ensure "
+        f"one of the following markers exists in the root or parent directories: "
+        f"{[m[0] for m in markers]}. Returning current working directory: {original_cwd}"
+    )
+    warnings.warn(warning_message, UserWarning)
+    return original_cwd
 
 
 def find_all_caps_cli_vars(argv=sys.argv):
@@ -98,57 +183,21 @@ def find_all_caps_cli_vars(argv=sys.argv):
     return result
 
 
-cli_vars = find_all_caps_cli_vars()
-
-########################################################
-## Define defaults
-########################################################
-defaults = {}
-
-# Absolute path to root directory of the project
-if "BASE_DIR" in cli_vars:
-    defaults["BASE_DIR"] = Path(cli_vars["BASE_DIR"])
-else:
-    defaults["BASE_DIR"] = Path(__file__).absolute().parent.parent
-
-
-# OS type
-def get_os():
-    os_name = system()
-    if os_name == "Windows":
-        return "windows"
-    elif os_name == "Darwin":
-        return "nix"
-    elif os_name == "Linux":
-        return "nix"
-    else:
-        return "unknown"
+def load_config():
+    # candidate paths: ./env then ../.env, then ../../.env
+    estimated_project_root = find_project_root()
+    candidates = [
+        Path.cwd() / ".env",
+        estimated_project_root / ".env",
+    ]
+    env_file = next((p for p in candidates if p.is_file()), None)
+    if not env_file:
+        warning_message = f"No .env found in {candidates}."
+        warnings.warn(warning_message, UserWarning)
+        return _config_decouple
+    return Config(repository=RepositoryEnv(str(env_file)))
 
 
-if "OS_TYPE" in cli_vars:
-    defaults["OS_TYPE"] = cli_vars["OS_TYPE"]
-else:
-    defaults["OS_TYPE"] = get_os()
-
-
-## Stata executable
-def get_stata_exe():
-    """Get the name of the Stata executable based on the OS type."""
-    if defaults["OS_TYPE"] == "windows":
-        return "StataMP-64.exe"
-    elif defaults["OS_TYPE"] == "nix":
-        return "stata-mp"
-    else:
-        raise ValueError("Unknown OS type")
-
-
-if "STATA_EXE" in cli_vars:
-    defaults["STATA_EXE"] = cli_vars["STATA_EXE"]
-else:
-    defaults["STATA_EXE"] = get_stata_exe()
-
-
-## File paths
 def if_relative_make_abs(path):
     """If a relative path is given, make it absolute, assuming
     that it is relative to the project root directory (BASE_DIR)
@@ -171,6 +220,71 @@ def if_relative_make_abs(path):
     return abs_path
 
 
+########################################################
+## Define defaults
+########################################################
+cli_vars = find_all_caps_cli_vars()
+_config = load_config()
+defaults = {}
+
+
+# OS type
+def get_os():
+    os_name = system()
+    if os_name == "Windows":
+        return "windows"
+    elif os_name == "Darwin" or os_name == "Linux":
+        return "nix"
+    else:
+        return "unknown"
+
+
+if "OS_TYPE" in cli_vars:
+    defaults["OS_TYPE"] = cli_vars["OS_TYPE"]
+else:
+    defaults["OS_TYPE"] = get_os()
+
+
+# Absolute path to root directory of the project
+if "BASE_DIR" in cli_vars:
+    defaults["BASE_DIR"] = Path(cli_vars["BASE_DIR"])
+else:
+    defaults["BASE_DIR"] = find_project_root()
+
+# User name
+if defaults["OS_TYPE"] == "windows":
+    USERPROFILE = os.environ["USERPROFILE"]
+    USER = Path(USERPROFILE).name
+elif defaults["OS_TYPE"] == "nix":
+    USER = _config("USER", default="")
+else:
+    raise ValueError(f"Unsupported OS type: {defaults['OS_TYPE']}")
+
+# Org Stuff
+defaults["USER"] = USER
+defaults["DATA_DIR"] = if_relative_make_abs(
+    _config("DATA_DIR", default=Path("_data"), cast=Path)
+)
+
+
+## Stata executable
+def get_stata_exe():
+    """Get the name of the Stata executable based on the OS type."""
+    if defaults["OS_TYPE"] == "windows":
+        return "StataMP-64.exe"
+    elif defaults["OS_TYPE"] == "nix":
+        return "stata-mp"
+    else:
+        raise ValueError("Unknown OS type")
+
+
+if "STATA_EXE" in cli_vars:
+    defaults["STATA_EXE"] = cli_vars["STATA_EXE"]
+else:
+    defaults["STATA_EXE"] = get_stata_exe()
+
+
+## File paths
 defaults = {
     "DATA_DIR": if_relative_make_abs(Path("_data")),
     "MANUAL_DATA_DIR": if_relative_make_abs(Path("data_manual")),
@@ -182,9 +296,8 @@ defaults = {
 
 def config(
     var_name,
-    default=None,
-    cast=None,
-    settings_py_defaults=defaults,
+    default=undefined,
+    cast=undefined,
     cli_vars=cli_vars,
     convert_dir_vars_to_abs_path=True,
 ):
@@ -201,7 +314,7 @@ def config(
     if var_name in cli_vars and cli_vars[var_name] is not None:
         value = cli_vars[var_name]
         # Apply cast if provided
-        if cast is not None:
+        if cast is not undefined:
             value = cast(value)
         if "DIR" in var_name and convert_dir_vars_to_abs_path:
             value = if_relative_make_abs(Path(value))
@@ -213,7 +326,7 @@ def config(
     env_value = _config(var_name, default=env_sentinel)
     if env_value is not env_sentinel:
         # Found in environment
-        if cast is not None:
+        if cast is not undefined:
             env_value = cast(env_value)
         if "DIR" in var_name and convert_dir_vars_to_abs_path:
             env_value = if_relative_make_abs(Path(env_value))
@@ -223,7 +336,7 @@ def config(
     if var_name in defaults:
         default_value = defaults[var_name]
         # If default_value is directly usable (not a dict with metadata)
-        if cast is not None:
+        if cast is not undefined:
             default_value = cast(default_value)
         return default_value
 
@@ -231,20 +344,11 @@ def config(
     return _config(var_name, default=default, cast=cast)
 
 
-def validate_dot_env_file(base_dir=defaults["BASE_DIR"]):
-    """Validate that the .env file exists and is readable."""
-    dot_env_path = base_dir / ".env"
-    if not dot_env_path.exists():
-        raise FileNotFoundError(f"The .env file does not exist at the project root: {dot_env_path}. Please use .env.example as a template to create one.")
-    if not dot_env_path.is_file():
-        raise FileNotFoundError(f"The .env file is not a file: {dot_env_path}.")
-        
-
 def create_directories():
     config("DATA_DIR").mkdir(parents=True, exist_ok=True)
     config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
     config("DOCS_BUILD_DIR").mkdir(parents=True, exist_ok=True)
-    
+
     raw_results_dir = config("OUTPUT_DIR") / "raw_results"
     raw_results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -257,6 +361,6 @@ def create_directories():
             data_source_dir = config("DATA_DIR") / data_source
             data_source_dir.mkdir(parents=True, exist_ok=True)
 
-validate_dot_env_file(base_dir=defaults["BASE_DIR"])
+
 if __name__ == "__main__":
     create_directories()
