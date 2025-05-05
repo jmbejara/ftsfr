@@ -67,65 +67,85 @@ def process_cb_spread(df):
 
 
 def generate_graph(df, col='rfr', col2=None, two=False):
-    '''
-    Generates a time series plot for given columns based on bond ratings.
+    """
+    Generates a time series plot for given columns based on c_rating.
     
     Parameters:
-    - df: DataFrame containing financial data.
-    - col: Primary column to graph (default is 'rfr').
-    - col2: Secondary column to graph if two=True.
-    - two: Boolean flag indicating whether to plot a second column with a secondary axis.
-    '''
+    - df: DataFrame with columns ['date', 'c_rating', col, (col2)]
+    - col: primary series name (default 'rfr')
+    - col2: secondary series name if two=True
+    - two: if True, plots col2 on a secondary y-axis
+    """
+    # ensure datetime
+    df = df.copy()
     df['date'] = pd.to_datetime(df['date'])
-
-    # Compute the mean of the specified column(s) per (date, rating) pair
-    df_grouped = df.groupby(['date', 'size_ig'])[col].mean().reset_index()
-
-    if two and col2 is not None:
-        df_grouped[col2] = df.groupby(['date', 'rating'])[col2].mean().reset_index()[col2]
-
-    # Create the figure and primary axis
-    fig, ax1 = plt.subplots(figsize=(12, 6))
-
-    # Plot for Investment Grade (IG) (rating = 0) on primary axis
-    df_ig = df_grouped[df_grouped['rating'] == 0]
-    ax1.plot(df_ig['date'], df_ig[col], label=f"IG - {col}", linestyle='-', marker='o', color='tab:blue')
-
-    # Plot for High Yield (HY) (rating = 1) on primary axis
-    df_hy = df_grouped[df_grouped['rating'] == 1]
-    ax1.plot(df_hy['date'], df_hy[col], label=f"HY - {col}", linestyle='-', marker='s', color='tab:orange')
-
-    # Configure primary axis
-    ax1.set_xlabel("Date")
-    ax1.set_ylabel(f"{col} (Primary Axis)", color='tab:blue')
-    ax1.tick_params(axis='y', labelcolor='tab:blue')
-    ax1.legend(loc='upper left')
-    ax1.grid(True)
-
-    # Add secondary axis if two=True and col2 is provided
-    if two and col2 is not None:
-        ax2 = ax1.twinx()  # Create secondary y-axis
-        
-        # Plot for Investment Grade (IG) (rating = 0) on secondary axis
-        ax2.plot(df_ig['date'], df_ig[col2], label=f"IG - {col2}", linestyle='--', marker='x', color='tab:green')
-        
-        # Plot for High Yield (HY) (rating = 1) on secondary axis
-        ax2.plot(df_hy['date'], df_hy[col2], label=f"HY - {col2}", linestyle='--', marker='d', color='tab:red')
-
-        # Configure secondary axis
-        ax2.set_ylabel(f"{col2} (Secondary Axis)", color='tab:green')
-        ax2.tick_params(axis='y', labelcolor='tab:green')
-        ax2.legend(loc='upper right')
-
-    # Set title
-    title = f"Time Series Plot of {col}" + (f" and {col2}" if two and col2 is not None else "")
-    plt.title(title)
     
-    plt.savefig(OUTPUT_DIR / title)
-
-    # Show the plot
+    # group once for both columns
+    if two and col2 is not None:
+        df_grouped = (
+            df.groupby(['date', 'c_rating'])[[col, col2]]
+              .mean()
+              .reset_index()
+        )
+    else:
+        df_grouped = (
+            df.groupby(['date', 'c_rating'])[col]
+              .mean()
+              .reset_index()
+        )
+    
+    # prepare figure
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    
+    # colors/markers for up to 3 categories—extend as needed
+    primary_colors = ['tab:blue', 'tab:orange', 'tab:green']
+    primary_markers = ['o', 's', '^']
+    
+    # plot each c_rating on primary axis
+    for idx, rating in enumerate(sorted(df_grouped['c_rating'].unique())):
+        series = df_grouped[df_grouped['c_rating'] == rating]
+        ax1.plot(
+            series['date'],
+            series[col],
+            label=f"rating {rating} → {col}",
+            color=primary_colors[idx % len(primary_colors)],
+            marker=primary_markers[idx % len(primary_markers)],
+            linestyle='-'
+        )
+    
+    ax1.set_xlabel("Date")
+    ax1.set_ylabel(f"{col}", color='black')
+    ax1.tick_params(axis='y', labelcolor='black')
+    ax1.grid(True)
+    ax1.legend(loc='upper left')
+    
+    # secondary axis for col2
+    if two and col2 is not None:
+        ax2 = ax1.twinx()
+        secondary_markers = ['x', 'd', 'P']
+        secondary_colors  = ['tab:red', 'tab:purple', 'tab:cyan']
+        
+        for idx, rating in enumerate(sorted(df_grouped['c_rating'].unique())):
+            series = df_grouped[df_grouped['c_rating'] == rating]
+            ax2.plot(
+                series['date'],
+                series[col2],
+                label=f"rating {rating}: {col2}",
+                color=secondary_colors[idx % len(secondary_colors)],
+                marker=secondary_markers[idx % len(secondary_markers)],
+                linestyle='--'
+            )
+        
+        ax2.set_ylabel(f"{col2}", color='black')
+        ax2.tick_params(axis='y', labelcolor='black')
+        ax2.legend(loc='upper right')
+    
+    # title & save
+    title = f"Time Series of {col}" + (f" vs {col2}" if two and col2 else "")
+    plt.title(title)
+    # outpath = OUTPUT_DIR / f"{title.replace(' ', '_')}.png"
+    # fig.savefig(outpath, bbox_inches='tight')
     plt.show()
-
     
 
 
