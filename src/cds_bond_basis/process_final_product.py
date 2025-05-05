@@ -1,5 +1,5 @@
 from pathlib import Path
-from settings import config
+# from settings import config
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -10,41 +10,58 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 
-OUTPUT_DIR = config("OUTPUT_DIR")
-DATA_DIR = config("DATA_DIR")
+# OUTPUT_DIR = config("OUTPUT_DIR")
+# DATA_DIR = config("DATA_DIR")
 
-FINAL_ANALYSIS_FILE_NAME = "final_data.parquet"
+# FINAL_ANALYSIS_FILE_NAME = "final_data.parquet"
 
 
 def process_cb_spread(df):
     '''
     INPUT WAS PREVIOUS FINAL PRODUCT
     df: dataframe with par spread values merged into all values where there was a possible cubic spline
-       'cusip', -- unique bond tag
        'date', -- reporting date
-       'maturity', -- maturity date of bond
-       'yield', -- corporate bond yield
-       'rating', -- rating: 1 for HY, 0 for IG
-       'treas_yld', -- treasury yield for similar maturity and same report date
+       'mat_days', -- days till maturity
+       BOND_YIELD, -- MMN adjusted bond yield
+       'CS', -- credit spread
+        'size_ig', -- 0 if no ig bonds in portfolio, 1 if yes
+        'size_jk', -- 0 if no junk bonds in portfolio, 1 if yes
        'par_spread', -- parspread of CDS, backed out by Cubic Spline
-       't_spread', -- bid ask spread on bond
-       'price_eom', -- End Of Month Price of bond
-       'amount_outstanding' -- face value outstanding
 
     output:
         additional columns:
         FR: Z-spread of the bond
-            FR = yield - treas_yld
+            FR = CS column
         CB: implied return on CDS-bond spread
             CB = par_spread - FR
         rfr: implied risk free rate
-            rfr = treas_yld - CB
+            rfr = (BOND_YIELD - CS) - CB
+        contain_rating: if it has IG or Junk bonds
+            0 if it contains Junk
+            1 if it contains IG
+        c_rating: IG, Junk, or combo
+            0 if it only contains Junk
+            1 if it only contains IG
+            2 if it contains both
     '''
-    df['FR'] = df['yield'] - df['treas_yld']
+    df['FR'] = df['CS']
     df['CB'] = df['par_spread'] - df['FR']
-    df['rfr'] = df['treas_yld'] - df['CB']
+    df['rfr'] = df['BOND_YIELD'] - df['CS'] - df['CB']
 
-    df = df[df['rfr'] < 1] # remove unreasonable data, rfr is in absolute space
+    df = df[df['rfr'].abs() < 1] # remove unreasonable data, rfr is in absolute space
+
+    rating_map = {
+        (0, 1): 0,
+        (1, 0): 1,
+        (1, 1): 2
+    }
+
+    # build a tuple series, then map
+    df['c_rating'] = (
+        df[['size_ig', 'size_jk']]
+        .apply(tuple, axis=1)
+        .map(rating_map)
+    )
 
     return df
 
@@ -62,7 +79,7 @@ def generate_graph(df, col='rfr', col2=None, two=False):
     df['date'] = pd.to_datetime(df['date'])
 
     # Compute the mean of the specified column(s) per (date, rating) pair
-    df_grouped = df.groupby(['date', 'rating'])[col].mean().reset_index()
+    df_grouped = df.groupby(['date', 'size_ig'])[col].mean().reset_index()
 
     if two and col2 is not None:
         df_grouped[col2] = df.groupby(['date', 'rating'])[col2].mean().reset_index()[col2]
