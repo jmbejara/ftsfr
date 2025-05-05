@@ -55,7 +55,7 @@ def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE
         (raw_rates.index <= pd.to_datetime(end_date))
     ] # / 100  # Convert percentages to decimal format
 
-    merged_rates = pd.merge(rates, short_tenor_rates_renamed, left_index=True, right_index=True, how='inner').sort_values('Date')
+    merged_rates = pd.merge(rates, short_tenor_rates_renamed, left_index=True, right_index=True, how='inner').sort_index()
     cols = merged_rates.columns.tolist()
     ordered_cols = [0.25, 0.5] + [col for col in cols if col not in [0.25, 0.5]]
     merged_rates = merged_rates[ordered_cols]
@@ -317,16 +317,16 @@ def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, star
 
 
         # Convert Pandas-based discount factors into Polars before filtering
-        discount_filtered = quarterly_discount.select(["Date"] + [
+        discount_filtered = quarterly_discount.select(["index"] + [
             str(q) for q in quarters if str(q) in quarterly_discount.columns
         ])
 
         # Align dates between quarterly discount and survival probabilities
         survival_probs_filtered = survival_probs.filter(
-            pl.col("date").is_in(quarterly_discount["Date"])
+            pl.col("date").is_in(quarterly_discount["index"])
         )
 
-        discount_filtered = discount_filtered.rename({"Date": "date"})
+        discount_filtered = discount_filtered.rename({"index": "date"})
         
         # set intersection of dates
         dates_df = discount_filtered.select("date")
