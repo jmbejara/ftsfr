@@ -1,7 +1,6 @@
 import os
 import sys
 from pathlib import Path
-import pull_corp_bonds
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -12,9 +11,6 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 DATA_DIR = config("DATA_DIR")
-# Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
-
 
 def assign_cs_deciles(df):
     """

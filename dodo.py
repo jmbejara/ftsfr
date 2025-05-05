@@ -65,17 +65,13 @@ with open("benchmarks.toml", "r") as f:
 
 def task_config():
     """Create empty directories for data and output if they don't exist"""
-    file_dep = [
-        "./src/settings.py",
-    ]
-    targets = [DATA_DIR, OUTPUT_DIR]
 
     return {
         "actions": [
             "ipython ./src/settings.py",
         ],
-        "targets": targets,
-        "file_dep": file_dep,
+        "targets": [DATA_DIR, OUTPUT_DIR],
+        "file_dep": ["./src/settings.py", "./benchmarks.toml"],
         "clean": [],
     }
 
@@ -397,25 +393,17 @@ def task_format():
         # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
         # The code right now only pulls them separately.
 
-    # # fmt: off
-    # if data_sources["wrds_corp_bonds"]:
-    #     from wrds_corp_bonds.pull_corp_bonds import DATA_INFO
-    #     subfolder = "wrds_corp_bonds"
-    #     yield {
-    #         "name": f"pull:{subfolder}",
-    #         "actions": [f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}"],
-    #         "targets": [
-    #             DATA_DIR / subfolder / info["parquet"]
-    #             for info in DATA_INFO.values()
-    #         ]
-    #         + [
-    #             DATA_DIR / subfolder / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
-    #             for info in DATA_INFO.values()
-    #         ],
-    #         "file_dep": [f"./src/{subfolder}/pull_corp_bonds.py"],
-    #         "clean": [],
-    #     }
-    # # fmt: on
+    if data_sources["wrds_corp_bonds"]:
+        subfolder = "wrds_corp_bonds"
+        yield {
+            "name": f"{subfolder}",
+            "actions": [
+                f"python ./src/{subfolder}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}"
+            ],
+            "targets": [DATA_DIR / subfolder / "corp_bond_portfolio_returns.parquet"],
+            "file_dep": [f"./src/{subfolder}/calc_corp_bond_returns.py"],
+            "clean": [],
+        }
 
     if data_sources["wrds_markit"]:
         subfolder = "wrds_markit"
