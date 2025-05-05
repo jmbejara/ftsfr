@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -6,10 +10,10 @@ from tqdm import tqdm
 import ctypes
 from scipy.interpolate import CubicSpline
 
-# from settings import config
+from settings import config
 
 
-# DATA_DIR = config("DATA_DIR")
+DATA_DIR = config("DATA_DIR")
 BOND_RED_CODE_FILE_NAME = "corporate_bond_returns.parquet"
 CDS_FILE_NAME = "cds_final.parquet"
 FINAL_ANALYSIS_FILE_NAME = "final_data.parquet"
@@ -182,6 +186,20 @@ def main():
     Main function to load data, process it, and merge Treasury data into Bonds.
     """
     print("Loading data...")
+    #Keeping these global vars down here for now for ease of reference
+    RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
+    CORPORATES_MONTHLY_FILE_NAME = "corporate_bond_returns.parquet"
+    CDS_FILE_NAME = "markit_cds.parquet"   #Assuming this is the file name from Kaustaub's script
+
+    corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
+    red_data = pd.read_parquet(f"{DATA_DIR}/{RED_CODE_FILE_NAME}")
+    cds_data = pd.read_parquet(f"{DATA_DIR}/{CDS_FILE_NAME}")
+    corp_red_data = merge_red_code_into_bond_treas(corp_bonds_data, red_data)
+
+
+
+
+
     CDS1 = pd.read_parquet(f"{DATA_DIR}/markit_cds_1.parquet")
     CDS2 = pd.read_parquet(f"{DATA_DIR}/markit_cds_2.parquet")
     CDSs = pd.concat([CDS1, CDS2], ignore_index=True)
