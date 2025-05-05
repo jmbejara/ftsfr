@@ -17,10 +17,11 @@ RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
 
 def merge_red_code_into_bond_treas(bond_treas_df, red_c_df):
     '''
-    bond_treas_df: dataframe containing merged corporate bond and treasury data
+    bond_treas_df: dataframe containing merged corporate bond and treasury data, we will only use the below columnes
         date, -- date when data was collected
         cusip, -- cusip of bond itself
         issuer_cusip, -- cusip of issuing firm
+        'BOND_YIELD', -- yield of bond removing market microstructure effects
         CS, -- Credit Spread we replace Z-spread with
         size_ig, -- 0 if no ig bonds in portfolio, 1 if yes
         size_jk, -- 0 if no junk bonds in portfolio, 1 if yes
@@ -55,7 +56,7 @@ def merge_red_code_into_bond_treas(bond_treas_df, red_c_df):
     merged_df = bond_treas_df.merge(red_c_df, on='issuer_cusip', how='inner')
     merged_df['mat_days'] = merged_df['tmt'] * 30 # for maturity days, easier to cubic spline
 
-    return merged_df
+    return merged_df[['date', 'cusip', 'issuer_cusip', 'BOND_YIELD', 'CS', 'size_ig', 'size_jk', 'mat_days', 'redcode']]
 
 
 def merge_cds_into_bonds(bond_red_df, cds_df):
@@ -156,7 +157,7 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
     par_df = par_df.dropna(subset=['par_spread'])
 
     # keep only the important columns
-    par_df = par_df[['cusip', 'date', 'mat_days', 'CS', 'size_ig', 'size_jk', 'par_spread']]
+    par_df = par_df[['cusip', 'date', 'mat_days', 'BOND_YIELD', 'CS', 'size_ig', 'size_jk', 'par_spread']]
     # have had issues with a phantom array column
     def safe_convert(x):
         """Convert lists and arrays to tuples while keeping other data types unchanged."""
@@ -174,7 +175,7 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
     return par_df
 
 
-
+# THIS MAIN FUNCTION IS NOT DONE YET, WILL BE RESOLVED SOON or not at all
 
 def main():
     """
