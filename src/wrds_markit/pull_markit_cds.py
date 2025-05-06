@@ -17,7 +17,7 @@ from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
-START_DATE = pd.Timestamp("1925-01-01")
+START_DATE = pd.Timestamp("2001-01-01")
 END_DATE = pd.Timestamp("2024-01-01")
 
 

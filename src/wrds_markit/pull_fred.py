@@ -9,8 +9,8 @@ import pandas_datareader.data as web
 
 from settings import config
 
-DATA_DIR = config("DATA_DIR")
-START_DATE = config("START_DATE", default="1900-01-01")
+DATA_DIR = config("DATA_DIR") / "wrds_markit"
+START_DATE = config("START_DATE", default="2001-01-01")
 END_DATE = config("END_DATE", default="2025-01-01")
 
 series_to_pull = {
