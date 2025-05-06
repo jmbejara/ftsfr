@@ -91,23 +91,23 @@ would be nice to use data up until the present day.
 **He, Kelly, Manela Disaggregated Data**
 
 - [.] Equity
-- [ ] Treasury Securities
-- [ ] Corporate Bonds
+- [.] Treasury Securities
+- [.] Corporate Bonds
 - [ ] Sovereign Bonds
-- [ ] Options
+- [.] Options
 - [ ] Foreign Exchange
 - [ ] Commodities
-- [ ] CDS
+- [.] CDS
 
 **Segmented Arbitrage, Arbitrage Spreads**
 
 - [ ] CIP
-- [ ] Box Spread
+- [.] Box Spread
 - [.] Equity Spot-Futures
 - [.] Treasury Spot-Futures
 - [.] Treasury Swap
 - [.] TIPS-Treasury
-- [ ] CDS-Bond Basis
+- [.] CDS-Bond Basis
 
 ## Equity Options Arbitrage
 

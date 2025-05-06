@@ -89,6 +89,14 @@ def load_data_into_dataframe(csv_path: Path, check_n_rows: bool = True):
     return df
 
 
+def load_treasury_returns(data_dir=DATA_DIR):
+    return pd.read_parquet(data_dir / "treasury_bond_returns.parquet")
+
+
+def load_corporate_bond_returns(data_dir=DATA_DIR):
+    return pd.read_parquet(data_dir / "corporate_bond_returns.parquet")
+
+
 def _demo():
     treas = pd.read_parquet(DATA_DIR / "treasury_bond_returns.parquet")
     treas.info()
