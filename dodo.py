@@ -93,7 +93,7 @@ def task_pull():
         yield {
             "name": f"{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
             "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
@@ -125,25 +125,43 @@ def task_pull():
         yield {
             "name": f"{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / subfolder}"
+                f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / subfolder}"
             ],
             "targets": [
-                DATA_DIR / "ken_french_data_library" / info["parquet"]
-                for info in DATA_INFO.values()
+                DATA_DIR / subfolder / "markit_cds.parquet",
+                DATA_DIR / subfolder / "markit_red_crsp_link.parquet",
+                DATA_DIR / subfolder / "markit_cds_subsetted_to_crsp.parquet",
+                DATA_DIR / subfolder / "RED_and_ISIN_mapping.parquet",
             ],
-            "file_dep": [f"./src/{subfolder}/pull_fama_french_25_portfolios.py"],
+            "file_dep": [
+                f"./src/{subfolder}/pull_wrds_markit.py",
+                f"./src/{subfolder}/pull_markit_mapping.py",
+            ],
             "clean": [],
         }
 
     if pull_sources["nyu_call_report"]:
         subfolder = "nyu_call_report"
+    if data_sources["wrds_corp_bonds"] and data_sources["wrds_markit"]:
+    #This step is merging the pulls from the past two steps
+        subfolder = "cds_bond_basis"
         yield {
             "name": f"{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/pull_nyu_call_report.py --DATA_DIR={DATA_DIR / subfolder}"
+                f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [DATA_DIR / subfolder / "nyu_call_report.parquet"],
             "file_dep": [f"./src/{subfolder}/pull_nyu_call_report.py"],
+            "clean": [],
+        }
+            "targets": [
+                DATA_DIR / subfolder / "Red_Data.parquet",
+                DATA_DIR / subfolder / "Final_data.parquet", #Remember to change these if NEW_MERGE_cds_bond.py changes 
+            ],
+            "file_dep": [
+                f"./src/{subfolder}/NEW_MERGE_cds_bond.py",
+            ],
             "clean": [],
         }
 
@@ -443,6 +461,7 @@ def task_format():
     #         ],
     #         "clean": [],
     #     }
+
 
 
 def task_collect_ftsfa_datasets_info():
