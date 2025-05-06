@@ -68,45 +68,46 @@ Overview of datasets:
 
 **Misc**
 
-[x] CRSP Returns (with and without dividends)
-[x] Fama-French Portfolio Returns
-[x] Treasury Yield Curve
-[x] Bank Call Report Data
+- [x] CRSP Returns (with and without dividends)
+- [ ] Compustat Panel Data
+- [x] Fama-French Portfolio Returns
+- [x] Treasury Yield Curve
+- [x] Bank Call Report Data
 
 **He, Kelly, Manela Test Portfolios**
 
 We can just use the test portfolios as downloaded from their website, though it
 would be nice to use data up until the present day.
 
-[x] Equity CLOSE
-[.] Treasury Securities
-[.] Corporate Bonds
-[.] Sovereign Bonds
-[.] Options
-[.] Foreign Exchange
-[.] Commodities CLOSE
-[.] CDS CLOSE
+- [x] Equity CLOSE
+- [.] Treasury Securities
+- [.] Corporate Bonds
+- [.] Sovereign Bonds
+- [.] Options
+- [.] Foreign Exchange
+- [.] Commodities CLOSE
+- [.] CDS CLOSE
 
 **He, Kelly, Manela Disaggregated Data**
 
-[.] Equity
-[ ] Treasury Securities
-[ ] Corporate Bonds
-[ ] Sovereign Bonds
-[ ] Options
-[ ] Foreign Exchange
-[ ] Commodities
-[ ] CDS
+- [.] Equity
+- [ ] Treasury Securities
+- [ ] Corporate Bonds
+- [ ] Sovereign Bonds
+- [ ] Options
+- [ ] Foreign Exchange
+- [ ] Commodities
+- [ ] CDS
 
 **Segmented Arbitrage, Arbitrage Spreads**
 
-[ ] CIP
-[ ] Box Spread
-[.] Equity Spot-Futures
-[.] Treasury Spot-Futures
-[.] Treasury Swap
-[.] TIPS-Treasury
-[ ] CDS-Bond Basis
+- [ ] CIP
+- [ ] Box Spread
+- [.] Equity Spot-Futures
+- [.] Treasury Spot-Futures
+- [.] Treasury Swap
+- [.] TIPS-Treasury
+- [ ] CDS-Bond Basis
 
 ## Equity Options Arbitrage
 
