@@ -119,6 +119,23 @@ def task_data():
             "clean": [],
         }
 
+    if data_sources["wrds_corp_bonds"] and data_sources["wrds_markit"]:
+    #This step is merging the pulls from the past two steps
+        subfolder = "cds_bond_basis"
+        yield {
+            "name": f"pull:{subfolder}",
+            "actions": [
+                f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
+            ],
+            "targets": [
+                DATA_DIR / subfolder / "Red_Data.parquet",
+                DATA_DIR / subfolder / "Final_data.parquet", #Remember to change these if NEW_MERGE_cds_bond.py changes 
+            ],
+            "file_dep": [
+                f"./src/{subfolder}/NEW_MERGE_cds_bond.py",
+            ],
+            "clean": [],
+        }
     # if data_sources["fed_yield_curve"]:
     #     subfolder = "fed_yield_curve"
     #     yield {

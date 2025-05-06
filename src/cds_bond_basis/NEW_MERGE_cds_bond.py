@@ -194,25 +194,14 @@ def main():
     corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
     red_data = pd.read_parquet(f"{DATA_DIR}/{RED_CODE_FILE_NAME}")
     cds_data = pd.read_parquet(f"{DATA_DIR}/{CDS_FILE_NAME}")
+
     corp_red_data = merge_red_code_into_bond_treas(corp_bonds_data, red_data)
-
-
-
-
-
-    CDS1 = pd.read_parquet(f"{DATA_DIR}/markit_cds_1.parquet")
-    CDS2 = pd.read_parquet(f"{DATA_DIR}/markit_cds_2.parquet")
-    CDSs = pd.concat([CDS1, CDS2], ignore_index=True)
-    CDSs.to_parquet(f"{DATA_DIR}/{CDS_FILE_NAME}")
-
-    # Load DataFrames
-    bond_red_df = pd.read_parquet(f"{DATA_DIR}/{BOND_RED_CODE_FILE_NAME}")
-    
-    print("Merging CDS into Bonds...")
-    fin_df = merge_cds_into_bonds(bond_red_df, CDSs)
+    final_data = merge_cds_into_bonds(corp_red_data, cds_data)
+    #Missing a step of "process final data" from the ipynb
 
     print("Saving processed data...")
-    fin_df.to_parquet(f"{DATA_DIR}/{FINAL_ANALYSIS_FILE_NAME}")
+    corp_red_data.to_parquet(f"{DATA_DIR}/{'Red_Data.parquet'}") #change name of file as needed
+    final_data.to_parquet(f"{DATA_DIR}/{'Final_data.parquet'}")
 
     print("Processing complete. Data saved.")
 
