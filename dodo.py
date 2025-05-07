@@ -125,43 +125,26 @@ def task_pull():
         yield {
             "name": f"{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / subfolder}"
+                f"python ./src/{subfolder}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / subfolder}"
             ],
             "targets": [
-                DATA_DIR / subfolder / "markit_cds.parquet",
-                DATA_DIR / subfolder / "markit_red_crsp_link.parquet",
-                DATA_DIR / subfolder / "markit_cds_subsetted_to_crsp.parquet",
-                DATA_DIR / subfolder / "RED_and_ISIN_mapping.parquet",
+                DATA_DIR / "ken_french_data_library" / info["parquet"]
+                for info in DATA_INFO.values()
             ],
-            "file_dep": [
-                f"./src/{subfolder}/pull_wrds_markit.py",
-                f"./src/{subfolder}/pull_markit_mapping.py",
-            ],
+            "file_dep": [f"./src/{subfolder}/pull_fama_french_25_portfolios.py"],
             "clean": [],
         }
 
+
     if pull_sources["nyu_call_report"]:
         subfolder = "nyu_call_report"
-    if data_sources["wrds_corp_bonds"] and data_sources["wrds_markit"]:
-    #This step is merging the pulls from the past two steps
-        subfolder = "cds_bond_basis"
         yield {
             "name": f"{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_nyu_call_report.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [DATA_DIR / subfolder / "nyu_call_report.parquet"],
             "file_dep": [f"./src/{subfolder}/pull_nyu_call_report.py"],
-            "clean": [],
-        }
-            "targets": [
-                DATA_DIR / subfolder / "Red_Data.parquet",
-                DATA_DIR / subfolder / "Final_data.parquet", #Remember to change these if NEW_MERGE_cds_bond.py changes 
-            ],
-            "file_dep": [
-                f"./src/{subfolder}/NEW_MERGE_cds_bond.py",
-            ],
             "clean": [],
         }
 
@@ -274,16 +257,13 @@ def task_pull():
             "clean": [],
         }
 
-    cds_bond_basis = (
-        pull_sources["wrds_mergent"]
-        and pull_sources["wrds_bond_returns"]
-        and pull_sources["wrds_markit"]
-    )
+    cds_bond_basis = data_sources["wrds_corp_bonds"] and data_sources["wrds_markit"]
     if cds_bond_basis:
         subfolder = "cds_bond_basis"
         yield {
             "name": f"{subfolder}",
             "actions": [
+                f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / subfolder}",
                 # f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
                 # f"python ./src/{subfolder}/pull_wrds_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}",
@@ -291,11 +271,16 @@ def task_pull():
                 # f"python ./src/{subfolder}/create_cds_bond_basis.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
+                DATA_DIR / subfolder / "Red_Data.parquet",
+                DATA_DIR
+                / subfolder
+                / "Final_data.parquet",  # Remember to change these if NEW_MERGE_cds_bond.py changes
                 DATA_DIR / subfolder / "bondret_treasury.csv",
                 DATA_DIR / subfolder / "bondret_treasury.parquet",
                 # DATA_DIR / subfolder / "cds_bond_basis.parquet",
             ],
             "file_dep": [
+                f"./src/{subfolder}/NEW_MERGE_cds_bond.py",
                 f"./src/{subfolder}/pull_open_source_bond.py",
                 # f"./src/{subfolder}/pull_wrds_markit.py",
                 # f"./src/{subfolder}/pull_wrds_bond_returns.py",
@@ -461,7 +446,6 @@ def task_format():
     #         ],
     #         "clean": [],
     #     }
-
 
 
 def task_collect_ftsfa_datasets_info():
