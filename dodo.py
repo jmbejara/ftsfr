@@ -80,10 +80,12 @@ def task_data():
 
     #Adding tasks from Alex Vincent project, simply working out of the cds_bond_basis
     #folder and not using sub folders for now
+
+
     if data_sources["wrds_corp_bonds"]:    #Rename as needed to conform to formating
         subfolder = "cds_bond_basis"   #refers to subfolder in src instead of cds_bond_basis
         yield {
-            "name": f"pull:{subfolder}",
+            "name": f"pull:{subfolder}_corp_and_treas",
             "actions": [
                 f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
@@ -97,11 +99,12 @@ def task_data():
             "clean": [],
         }
 
+
     if data_sources["wrds_markit"]:    #Rename as needed to conform to formating
         subfolder = "cds_bond_basis"   #refers to subfolder in src instead of cds_bond_basis
         #This pull invokes two pull scripts
         yield {
-            "name": f"pull:{subfolder}",
+            "name": f"pull:{subfolder}_markit",
             "actions": [
                 f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / subfolder}"
@@ -123,7 +126,7 @@ def task_data():
     #This step is merging the pulls from the past two steps
         subfolder = "cds_bond_basis"
         yield {
-            "name": f"pull:{subfolder}",
+            "name": f"pull:{subfolder}_merge",
             "actions": [
                 f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
@@ -136,6 +139,8 @@ def task_data():
             ],
             "clean": [],
         }
+
+
     # if data_sources["fed_yield_curve"]:
     #     subfolder = "fed_yield_curve"
     #     yield {
