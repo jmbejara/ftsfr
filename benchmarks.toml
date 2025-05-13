@@ -20,6 +20,7 @@ wrds_markit = true
 wrds_optionmetrics = false
 wrds_mergent = true
 wrds_bond_returns = true
+fed_FX = true
 
 [models]
 # Naive Models
