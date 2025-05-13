@@ -547,11 +547,11 @@ notebook_tasks = {
         "file_dep": [],
         "targets": [],
     },
-    # "cds_returns_summary": {
-    #     "path": "./src/wrds_markit/cds_returns_summary.ipynb",
-    #     "file_dep": [],
-    #     "targets": [],
-    # },
+    "cds_returns_summary": {
+        "path": "./src/wrds_markit/cds_returns_summary.ipynb",
+        "file_dep": [],
+        "targets": [],
+    },
     "cds_bond_basis_summary": {
         "path": "./src/cds_bond_basis/cds_bond_basis_summary.ipynb",
         "file_dep": [],
