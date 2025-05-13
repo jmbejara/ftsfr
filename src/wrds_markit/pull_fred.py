@@ -6,12 +6,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pandas as pd
 import pandas_datareader.data as web
+import pull_markit_cds
 
 from settings import config
 
 DATA_DIR = config("DATA_DIR") / "wrds_markit"
-START_DATE = config("START_DATE", default="2001-01-01")
-END_DATE = config("END_DATE", default="2025-01-01")
+START_DATE = pull_markit_cds.START_DATE
+END_DATE = pull_markit_cds.END_DATE
 
 series_to_pull = {
     ## Interest Rates

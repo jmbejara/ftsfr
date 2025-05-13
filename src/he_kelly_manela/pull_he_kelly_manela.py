@@ -10,9 +10,7 @@ import requests
 
 from settings import config
 
-DATA_DIR = config("DATA_DIR") 
-# TODO: why here he_kelly_manela
-# DATA_DIR = DATA_DIR / "he_kelly_manela"
+DATA_DIR = config("DATA_DIR") / "he_kelly_manela"
 URL = "https://apps.olin.wustl.edu/faculty/manela/hkm/intermediarycapitalrisk/He_Kelly_Manela_Factors.zip"
 
 
@@ -44,7 +42,6 @@ def load_he_kelly_manela_all(data_dir=DATA_DIR):
     _df = pd.read_csv(path)
     _df["date"] = pd.to_datetime(_df["yyyymm"], format="%Y%m")
     return _df
-
 
 if __name__ == "__main__":
     data_dir = DATA_DIR

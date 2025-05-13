@@ -5,15 +5,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import datetime
-import io
 
 import numpy as np
 import pandas as pd
 import polars as pl
-import pull_fed_yield_curve
-import pull_markit_cds
-import pull_fred
-import requests
+import pull_fed_yield_curve, pull_markit_cds, pull_fred
 from scipy.interpolate import CubicSpline
 
 from settings import config
@@ -21,28 +17,27 @@ from settings import config
 DATA_DIR = config("DATA_DIR") / "wrds_markit"
 START_DATE = pull_markit_cds.START_DATE
 END_DATE = pull_markit_cds.END_DATE
-# Uncomment for testing smaller timeframe
-# START_DATE = pd.Timestamp("2015-01-01")
-# END_DATE = pd.Timestamp("2020-01-01")
 
 # Set SUBFOLDER to the folder containing this file
-SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
+# SUBFOLDER = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 
-swap_rates = pull_fred.load_fred(data_dir=DATA_DIR)
 
-def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE):
+
+def process_rates(raw_rates = None, swap_rates= None, start_date = START_DATE, end_date = END_DATE):
     """
     Processes raw interest rate data by filtering within a specified date range
     and converting column names to numerical maturity values.
 
     Parameters:
     - raw_rates (DataFrame): Raw interest rate data with column names like 'SVENY01', 'SVENY02', etc.
+    - swap_rates (DataFrame): Raw interest rate table that includes 3-month and 6-month treasury yield data.
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
 
     Returns:
     - DataFrame: Processed interest rate data with maturity values as column names and rates in decimal form.
     """
+    swap_rates = swap_rates.copy().dropna()
     raw_rates = raw_rates.copy().dropna()
     short_tenor_rates = swap_rates[["DGS3MO", "DGS6MO"]]
     short_tenor_rates_renamed = short_tenor_rates.rename(columns={
@@ -53,7 +48,7 @@ def process_rates(raw_rates = None, start_date = START_DATE, end_date = END_DATE
     rates = raw_rates[
         (raw_rates.index >= pd.to_datetime(start_date)) &
         (raw_rates.index <= pd.to_datetime(end_date))
-    ] # / 100  # Convert percentages to decimal format
+    ]
 
     merged_rates = pd.merge(rates, short_tenor_rates_renamed, left_index=True, right_index=True, how='inner').sort_index()
     cols = merged_rates.columns.tolist()
@@ -93,12 +88,13 @@ def extrapolate_rates(rates = None):
     df_quarterly.index = rates.index
     return df_quarterly
 
-def calc_discount(raw_rates = None, start_date = START_DATE, end_date = END_DATE):
+def calc_discount(raw_rates = None, swap_rates= None, start_date = START_DATE, end_date = END_DATE):
     """
     Calculates the discount factor for given interest rate data using quarterly rates.
 
     Parameters:
-    - raw_rates (DataFrame): The raw interest rate data.
+    - raw_rates (DataFrame): Raw interest rate data with column names like 'SVENY01', 'SVENY02', etc.
+    - swap_rates (DataFrame): Raw interest rate table that includes 3-month and 6-month treasury yield data.
     - start_date (str or datetime): The start date for filtering.
     - end_date (str or datetime): The end date for filtering.
 
@@ -106,7 +102,7 @@ def calc_discount(raw_rates = None, start_date = START_DATE, end_date = END_DATE
     - DataFrame: Discount factors for various maturities.
     """
     # Call the function to get rates
-    rates_data = process_rates(raw_rates, start_date, end_date)
+    rates_data = process_rates(raw_rates, swap_rates, start_date, end_date)
     if rates_data is None:
         print("No data available for the given date range.")
         return None
@@ -240,7 +236,7 @@ def get_portfolio_dict(start_date = START_DATE, end_date = END_DATE, cds_spreads
             portfolio_dict[key] = portfolio_df
     return portfolio_dict
 
-def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, start_date = START_DATE, end_date = END_DATE):
+def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, swap_rates= None, start_date = START_DATE, end_date = END_DATE):
     """
     Calculates CDS returns for each portfolio in the portfolio_dict using the He-Kelly formula.
 
@@ -254,7 +250,7 @@ def calc_cds_return_for_portfolios(portfolio_dict = None, raw_rates = None, star
     - dict: Dictionary where keys are tenor-quantile pairs and values are Polars DataFrames of CDS returns.
     """
     # Step 1: Compute discount rates
-    quarterly_discount_pd = calc_discount(raw_rates, start_date, end_date)  # Output is Pandas
+    quarterly_discount_pd = calc_discount(raw_rates, swap_rates, start_date, end_date)  # Output is Pandas
     quarterly_discount_pd = quarterly_discount_pd.iloc[:-1]  # Remove last row
 
     # Convert Pandas quarterly discount to Polars for compatibility
@@ -463,12 +459,13 @@ def calculate_monthly_returns(daily_returns_dict = None):
 
     return final_df
 
-def run_cds_calculation(raw_rates = None, cds_spreads = None, start_date = START_DATE, end_date = END_DATE):
+def run_cds_calculation(raw_rates = None, swap_rates = None, cds_spreads = None, start_date = START_DATE, end_date = END_DATE):
     """
     Runs the entire CDS return calculation process.
 
     Parameters:
     - raw_rates (DataFrame): Raw interest rate data.
+    - swap_rates(DataFrame): Raw swap rate data.
     - cds_spreads (DataFrame): CDS spread data.
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
@@ -476,11 +473,11 @@ def run_cds_calculation(raw_rates = None, cds_spreads = None, start_date = START
     Returns:
     - dict: Dictionary where keys are tenor-quantile pairs and values are Polars DataFrames of monthly returns.
     """
-    rates_data = process_rates(raw_rates, start_date, end_date)
     portfolio_dict = get_portfolio_dict(start_date, end_date, cds_spreads)
-    daily_returns_dict = calc_cds_return_for_portfolios(portfolio_dict, raw_rates, start_date, end_date)
+    daily_returns_dict = calc_cds_return_for_portfolios(portfolio_dict, raw_rates, swap_rates, start_date, end_date)
     monthly_returns = calculate_monthly_returns(daily_returns_dict)
     return monthly_returns
+
 
 def load_portfolio(data_dir = DATA_DIR):
     """
@@ -491,7 +488,8 @@ def load_portfolio(data_dir = DATA_DIR):
     return df
 
 if __name__ == "__main__":
+    swap_rates = pull_fred.load_fred(data_dir=DATA_DIR)
     raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR )
     cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR )
-    cds_returns = run_cds_calculation(raw_rates = raw_rates, cds_spreads = cds_spreads, start_date = START_DATE, end_date = END_DATE)
+    cds_returns = run_cds_calculation(raw_rates = raw_rates, swap_rates = swap_rates, cds_spreads = cds_spreads, start_date = START_DATE, end_date = END_DATE)
     cds_returns.write_parquet(DATA_DIR / "markit_cds_returns.parquet")
