@@ -263,25 +263,47 @@ def task_pull():
         yield {
             "name": f"{subfolder}",
             "actions": [
+                f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / subfolder}",
+
+            #pull_open_source_bond.py is not used by Alex + Vincent proj, i've left it here for now
+            #in case it's needed
+
                 # f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
                 # f"python ./src/{subfolder}/pull_wrds_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}",
                 # f"python ./src/{subfolder}/pull_wrds_mergent.py --DATA_DIR={DATA_DIR / subfolder}",
                 # f"python ./src/{subfolder}/create_cds_bond_basis.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
+                DATA_DIR / subfolder / "corporate_bond_returns.parquet",
+                DATA_DIR / subfolder / "treasury_bond_returns.parquet",
+                DATA_DIR / subfolder / "markit_cds.parquet",
+                DATA_DIR / subfolder / "markit_red_crsp_link.parquet",
+                DATA_DIR / subfolder / "markit_cds_subsetted_to_crsp.parquet",
+                DATA_DIR / subfolder / "RED_and_ISIN_mapping.parquet",
                 DATA_DIR / subfolder / "Red_Data.parquet",
                 DATA_DIR
                 / subfolder
                 / "Final_data.parquet",  # Remember to change these if NEW_MERGE_cds_bond.py changes
+
                 DATA_DIR / subfolder / "bondret_treasury.csv",
                 DATA_DIR / subfolder / "bondret_treasury.parquet",
+
+
                 # DATA_DIR / subfolder / "cds_bond_basis.parquet",
             ],
             "file_dep": [
+                f"./src/{subfolder}/pull_corp_bonds.py",
+                f"./src/{subfolder}/pull_wrds_markit.py",
+                f"./src/{subfolder}/pull_markit_mapping.py",
                 f"./src/{subfolder}/NEW_MERGE_cds_bond.py",
+            
                 f"./src/{subfolder}/pull_open_source_bond.py",
+
+
                 # f"./src/{subfolder}/pull_wrds_markit.py",
                 # f"./src/{subfolder}/pull_wrds_bond_returns.py",
                 # f"./src/{subfolder}/pull_wrds_mergent.py",
