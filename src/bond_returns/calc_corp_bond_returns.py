@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import warnings
 
 import pandas as pd
-import pull_corp_bonds
+import pull_open_source_bond
 
 from settings import config
 
@@ -42,7 +42,7 @@ def calc_value_weighted_decile_returns(df, value_col="BOND_VALUE"):
     return pivoted
 
 def calc_corp_bond_returns(data_dir=DATA_DIR):
-    bond_returns = pull_corp_bonds.load_corporate_bond_returns(data_dir=data_dir)
+    bond_returns = pull_open_source_bond.load_corporate_bond_returns(data_dir=data_dir)
     deciled_bond_returns = assign_cs_deciles(bond_returns)
     # Value-weighted returns
     value_weighted = calc_value_weighted_decile_returns(
@@ -51,7 +51,7 @@ def calc_corp_bond_returns(data_dir=DATA_DIR):
     return value_weighted
 
 if __name__ == "__main__":
-    bond_returns = pull_corp_bonds.load_corporate_bond_returns(data_dir=DATA_DIR)
+    bond_returns = pull_open_source_bond.load_corporate_bond_returns(data_dir=DATA_DIR)
     deciled_bond_returns = assign_cs_deciles(bond_returns)
     # Value-weighted returns
     value_weighted = calc_value_weighted_decile_returns(

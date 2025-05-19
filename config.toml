@@ -14,7 +14,7 @@ he_kelly_manela = true
 # Set to false if subscription is available, data will be pulled from source
 wrds_bank_premium = true
 wrds_compustat = true
-wrds_corp_bonds = true
+open_source_bond = true
 wrds_crsp_compustat = true
 wrds_markit = true
 wrds_optionmetrics = false

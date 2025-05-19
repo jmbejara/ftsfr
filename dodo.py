@@ -93,7 +93,7 @@ def task_pull():
         yield {
             "name": f"{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
             "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
@@ -216,12 +216,12 @@ def task_pull():
         }
 
     # fmt: off
-    if pull_sources["wrds_corp_bonds"]:
-        from wrds_corp_bonds.pull_corp_bonds import DATA_INFO
-        subfolder = "wrds_corp_bonds"
+    if pull_sources["open_source_bond"]:
+        from bond_returns.pull_open_source_bond import DATA_INFO
+        subfolder = "bond_returns"
         yield {
             "name": f"{subfolder}",
-            "actions": [f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}"],
+            "actions": [f"python ./src/{subfolder}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / subfolder}"],
             "targets": [
                 DATA_DIR / subfolder / info["parquet"]
                 for info in DATA_INFO.values()
@@ -230,7 +230,7 @@ def task_pull():
                 DATA_DIR / subfolder / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
                 for info in DATA_INFO.values()
             ],
-            "file_dep": [f"./src/{subfolder}/pull_corp_bonds.py"],
+            "file_dep": [f"./src/{subfolder}/pull_open_source_bond.py"],
             "clean": [],
         }
     # fmt: on
@@ -257,25 +257,15 @@ def task_pull():
             "clean": [],
         }
 
-    cds_bond_basis = data_sources["wrds_corp_bonds"] and data_sources["wrds_markit"]
+    cds_bond_basis = data_sources["open_source_bond"] and data_sources["wrds_markit"]
     if cds_bond_basis:
         subfolder = "cds_bond_basis"
         yield {
             "name": f"{subfolder}",
             "actions": [
-                f"python ./src/{subfolder}/pull_corp_bonds.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / subfolder}",
                 f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / subfolder}",
-
-            #pull_open_source_bond.py is not used by Alex + Vincent proj, i've left it here for now
-            #in case it's needed
-
-                # f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
-                # f"python ./src/{subfolder}/pull_wrds_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}",
-                # f"python ./src/{subfolder}/pull_wrds_mergent.py --DATA_DIR={DATA_DIR / subfolder}",
-                # f"python ./src/{subfolder}/create_cds_bond_basis.py --DATA_DIR={DATA_DIR / subfolder}",
             ],
             "targets": [
                 DATA_DIR / subfolder / "corporate_bond_returns.parquet",
@@ -296,7 +286,7 @@ def task_pull():
                 # DATA_DIR / subfolder / "cds_bond_basis.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/pull_corp_bonds.py",
+                f"./src/{subfolder}/pull_open_source_bond.py",
                 f"./src/{subfolder}/pull_wrds_markit.py",
                 f"./src/{subfolder}/pull_markit_mapping.py",
                 f"./src/{subfolder}/NEW_MERGE_cds_bond.py",
@@ -418,8 +408,8 @@ def task_format():
         # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
         # The code right now only pulls them separately.
 
-    if data_sources["wrds_corp_bonds"]:
-        subfolder = "wrds_corp_bonds"
+    if data_sources["open_source_bond"]:
+        subfolder = "bond_returns"
         yield {
             "name": f"{subfolder}",
             "actions": [
@@ -543,7 +533,7 @@ notebook_tasks = {
         "targets": [],
     },
     "bond_returns_summary": {
-        "path": "./src/wrds_corp_bonds/bond_returns_summary.ipynb",
+        "path": "./src/bond_returns/bond_returns_summary.ipynb",
         "file_dep": [],
         "targets": [],
     },

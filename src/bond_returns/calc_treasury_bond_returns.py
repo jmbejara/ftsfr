@@ -7,7 +7,7 @@ import warnings
 
 import pandas as pd
 import numpy as np
-import pull_corp_bonds
+import pull_open_source_bond
 
 from settings import config
 
@@ -47,11 +47,11 @@ def group_portfolios(bond_returns = None):
     return pivoted
 
 def calc_treasury_bond_returns():
-    bond_returns = pull_corp_bonds.load_treasury_returns(data_dir=DATA_DIR)
+    bond_returns = pull_open_source_bond.load_treasury_returns(data_dir=DATA_DIR)
     portfolio_returns = group_portfolios(bond_returns)
     return portfolio_returns
 
 if __name__ == "__main__":
-    bond_returns = pull_corp_bonds.load_treasury_returns(data_dir=DATA_DIR)
+    bond_returns = pull_open_source_bond.load_treasury_returns(data_dir=DATA_DIR)
     portfolio_returns = group_portfolios(bond_returns)
     portfolio_returns.to_parquet(DATA_DIR / "treasury_bond_portfolio_returns.parquet")
