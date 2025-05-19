@@ -1,6 +1,7 @@
 ---
 description: Usual formatting of functions, naming, settings, etc
 globs: *.py, *.ipynb
+alwaysApply: false
 ---
 # Usage of settings.py
 
@@ -51,7 +52,6 @@ sys.path.insert(1, "./src/")
 from settings import config
 import os
 
-# Set SUBFOLDER to the folder containing this file
 DATA_DIR = config("DATA_DIR")
 
 

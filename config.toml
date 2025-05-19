@@ -1,4 +1,5 @@
 [cache]
+# If use_cache is True, then the pull step for all data sources will be skipped in dodo.py
 use_cache = false
 
 [data_sources]
@@ -6,21 +7,22 @@ use_cache = false
 ## Public data sets. No subscription needed, no api key needed.
 # Set to true to download the data
 fed_yield_curve = true
+he_kelly_manela = true
 ken_french_data_library = true
 nyu_call_report = true
-he_kelly_manela = true
 open_source_bond = true
 
 ## Subscription data sets. Subscription needed, api key needed.
 # Set to false if subscription is available, data will be pulled from source
 wrds_bank_premium = true
-wrds_compustat = true
-wrds_crsp_compustat = true
-wrds_markit = true
-wrds_optionmetrics = false
-wrds_mergent = true
 wrds_bond_returns = true
-fed_FX = true
+wrds_compustat = true
+wrds_crsp = true
+wrds_crsp_compustat = true
+wrds_fx = true
+wrds_markit = true
+wrds_mergent = true
+wrds_optionmetrics = false
 
 [models]
 # Naive Models

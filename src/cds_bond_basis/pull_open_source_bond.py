@@ -30,17 +30,6 @@ DATA_INFO = {
 }
 
 
-def _demo():
-    df_treasury_bond_returns = pd.read_parquet(
-        DATA_DIR / "treasury_bond_returns.parquet"
-    )
-    df_treasury_bond_returns.info()
-    df_corporate_bond_returns = pd.read_parquet(
-        DATA_DIR / "corporate_bond_returns.parquet"
-    )
-    df_corporate_bond_returns.info()
-
-
 def download_file(url, output_path):
     """
     Downloads a file from the given URL.
@@ -98,6 +87,24 @@ def load_data_into_dataframe(csv_path: Path, check_n_rows: bool = True):
             )
 
     return df
+
+
+def load_treasury_returns(data_dir=DATA_DIR):
+    return pd.read_parquet(data_dir / "treasury_bond_returns.parquet")
+
+
+def load_corporate_bond_returns(data_dir=DATA_DIR):
+    return pd.read_parquet(data_dir / "corporate_bond_returns.parquet")
+
+
+def _demo():
+    treas = pd.read_parquet(DATA_DIR / "treasury_bond_returns.parquet")
+    treas.info()
+    treas.head()
+
+    bonds = pd.read_parquet(DATA_DIR / "corporate_bond_returns.parquet")
+    bonds.info()
+    bonds.head()
 
 
 if __name__ == "__main__":

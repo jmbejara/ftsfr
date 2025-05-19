@@ -10,7 +10,7 @@ import pull_markit_cds
 
 from settings import config
 
-DATA_DIR = config("DATA_DIR") / "wrds_markit"
+DATA_DIR = config("DATA_DIR")
 START_DATE = pull_markit_cds.START_DATE
 END_DATE = pull_markit_cds.END_DATE
 

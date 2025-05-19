@@ -344,6 +344,22 @@ def config(
     return _config(var_name, default=default, cast=cast)
 
 
+def get_data_module_directories(path_to_src_dir=defaults["BASE_DIR"] / "src"):
+    """
+    Get the directories for the data modules.
+
+    Walk through the src directory and return a list of all the directories
+    (not the files, just the folder names).
+    """
+    data_module_dirs = []
+    for dir_path, dir_names, file_names in os.walk(path_to_src_dir):
+        for dir_name in dir_names:
+            if dir_name.startswith("_"):
+                continue
+            data_module_dirs.append(dir_name)
+    return data_module_dirs
+
+
 def create_directories():
     config("DATA_DIR").mkdir(parents=True, exist_ok=True)
     config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
@@ -352,15 +368,11 @@ def create_directories():
     raw_results_dir = config("OUTPUT_DIR") / "raw_results"
     raw_results_dir.mkdir(parents=True, exist_ok=True)
 
-    # Load benchmarks configuration
-    with open("config.toml", "r") as f:
-        benchmarks_file = toml.load(f)
-    data_sources = benchmarks_file["data_sources"]
-    for data_source in data_sources:
-        if data_sources[data_source]:
-            data_source_dir = config("DATA_DIR") / data_source
-            data_source_dir.mkdir(parents=True, exist_ok=True)
-
+    # Create directories for each data module
+    data_module_dirs = get_data_module_directories()
+    for data_module_dir in data_module_dirs:
+        data_module_dir = config("DATA_DIR") / data_module_dir
+        data_module_dir.mkdir(parents=True, exist_ok=True)
 
 if __name__ == "__main__":
     create_directories()

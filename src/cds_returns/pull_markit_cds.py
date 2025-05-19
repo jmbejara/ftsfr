@@ -16,7 +16,7 @@ import polars as pl
 
 from settings import config
 
-DATA_DIR = Path(config("DATA_DIR")) / "wrds_markit"
+DATA_DIR = config("DATA_DIR")
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("2001-01-01")
 END_DATE = pd.Timestamp("2025-01-01")

@@ -77,114 +77,125 @@ def task_config():
 
 
 data_sources = benchmarks_file["data_sources"].copy()
-pull_sources = data_sources.copy()
-use_cache = benchmarks_file["cache"]["use_cache"]
-# If use_cache is True, set all data_sources to pull = False
-if use_cache:
-    for source in pull_sources:
-        pull_sources[source] = False
 
+# fmt: off
+module_requirements = {}
+module_requirements["bond_returns"] = data_sources["open_source_bond"]
+module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
+module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
+module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
+module_requirements["foreign_exchange"] = data_sources["wrds_crsp_compustat"] and data_sources["wrds_fx"]
+module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
+module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
+module_requirements["nyu_call_report"] = data_sources["nyu_call_report"]
+module_requirements["wrds_bank_premium"] = data_sources["wrds_bank_premium"]
+module_requirements["wrds_crsp_compustat"] = (
+    data_sources["wrds_compustat"]
+    and data_sources["wrds_crsp"]
+    and data_sources["wrds_crsp_compustat"]
+)
+module_requirements["wrds_fx"] = data_sources["wrds_fx"]
+# fmt: on
+
+use_cache = benchmarks_file["cache"]["use_cache"]
 
 def task_pull():
     """Pull selected data_sources based on config.toml configuration"""
-
-    if pull_sources["fed_yield_curve"]:
-        subfolder = "fed_yield_curve"
+    data_module = "fed_yield_curve"
+    if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
             ],
-            "targets": [DATA_DIR / subfolder / "fed_yield_curve.parquet"],
-            "file_dep": [f"./src/{subfolder}/pull_fed_yield_curve.py"],
+            "targets": [DATA_DIR / data_module / "fed_yield_curve.parquet"],
+            "file_dep": [f"./src/{data_module}/pull_fed_yield_curve.py"],
             "clean": [],
         }
 
-    if pull_sources["he_kelly_manela"]:
-        subfolder = "he_kelly_manela"
+    data_module = "he_kelly_manela"
+    if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_he_kelly_manela.py --DATA_DIR={DATA_DIR / subfolder}"
+                f"python ./src/{data_module}/pull_he_kelly_manela.py --DATA_DIR={DATA_DIR / data_module}"
             ],
             "targets": [
                 DATA_DIR
-                / subfolder
+                / data_module
                 / "He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv",
-                DATA_DIR / subfolder / "He_Kelly_Manela_Factors_monthly.csv",
-                DATA_DIR / subfolder / "He_Kelly_Manela_Factors_daily.csv",
+                DATA_DIR / data_module / "He_Kelly_Manela_Factors_monthly.csv",
+                DATA_DIR / data_module / "He_Kelly_Manela_Factors_daily.csv",
             ],
-            "file_dep": [f"./src/{subfolder}/pull_he_kelly_manela.py"],
+            "file_dep": [f"./src/{data_module}/pull_he_kelly_manela.py"],
             "clean": [],
         }
 
-    if pull_sources["ken_french_data_library"]:
+    data_module = "ken_french_data_library"
+    if module_requirements[data_module] and not use_cache:
         from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
-
-        subfolder = "ken_french_data_library"
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / subfolder}"
+                f"python ./src/{data_module}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / data_module}"
             ],
             "targets": [
                 DATA_DIR / "ken_french_data_library" / info["parquet"]
                 for info in DATA_INFO.values()
             ],
-            "file_dep": [f"./src/{subfolder}/pull_fama_french_25_portfolios.py"],
+            "file_dep": [f"./src/{data_module}/pull_fama_french_25_portfolios.py"],
             "clean": [],
         }
 
-
-    if pull_sources["nyu_call_report"]:
-        subfolder = "nyu_call_report"
+    data_module = "nyu_call_report"
+    if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_nyu_call_report.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/pull_nyu_call_report.py --DATA_DIR={DATA_DIR / data_module}",
             ],
-            "targets": [DATA_DIR / subfolder / "nyu_call_report.parquet"],
-            "file_dep": [f"./src/{subfolder}/pull_nyu_call_report.py"],
+            "targets": [DATA_DIR / data_module / "nyu_call_report.parquet"],
+            "file_dep": [f"./src/{data_module}/pull_nyu_call_report.py"],
             "clean": [],
         }
 
-    if pull_sources["wrds_bank_premium"]:
-        subfolder = "wrds_bank_premium"
+    data_module = "wrds_bank_premium"
+    if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / subfolder}"
+                f"python ./src/{data_module}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / data_module}"
             ],
             "targets": [
-                DATA_DIR / subfolder / "wrds_struct_rel_ultimate.parquet",
-                DATA_DIR / subfolder / "wrds_call_research.parquet",
-                DATA_DIR / subfolder / "wrds_bank_crsp_link.parquet",
-                DATA_DIR / subfolder / "idrssd_to_lei.parquet",
-                DATA_DIR / subfolder / "lei_main.parquet",
-                DATA_DIR / subfolder / "lei_legalevents.parquet",
-                DATA_DIR / subfolder / "lei_otherentnames.parquet",
-                DATA_DIR / subfolder / "lei_successorentity.parquet",
+                DATA_DIR / data_module / "wrds_struct_rel_ultimate.parquet",
+                DATA_DIR / data_module / "wrds_call_research.parquet",
+                DATA_DIR / data_module / "wrds_bank_crsp_link.parquet",
+                DATA_DIR / data_module / "idrssd_to_lei.parquet",
+                DATA_DIR / data_module / "lei_main.parquet",
+                DATA_DIR / data_module / "lei_legalevents.parquet",
+                DATA_DIR / data_module / "lei_otherentnames.parquet",
+                DATA_DIR / data_module / "lei_successorentity.parquet",
             ],
-            "file_dep": [f"./src/{subfolder}/pull_wrds_bank_premium.py"],
+            "file_dep": [f"./src/{data_module}/pull_wrds_bank_premium.py"],
             "clean": [],
         }
 
-    if pull_sources["wrds_crsp_compustat"]:
-        subfolder = "wrds_crsp_compustat"
+    data_module = "wrds_crsp_compustat"
+    if module_requirements[data_module] and not use_cache:
 
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "Compustat.parquet",
-                DATA_DIR / subfolder / "CRSP_stock_ciz.parquet",
-                DATA_DIR / subfolder / "CRSP_Comp_Link_Table.parquet",
-                DATA_DIR / subfolder / "FF_FACTORS.parquet",
+                DATA_DIR / data_module / "Compustat.parquet",
+                DATA_DIR / data_module / "CRSP_stock_ciz.parquet",
+                DATA_DIR / data_module / "CRSP_Comp_Link_Table.parquet",
+                DATA_DIR / data_module / "FF_FACTORS.parquet",
             ],
-            "file_dep": [f"./src/{subfolder}/pull_CRSP_Compustat.py"],
+            "file_dep": [f"./src/{data_module}/pull_CRSP_Compustat.py"],
             "clean": [],
         }
 
@@ -194,110 +205,90 @@ def task_pull():
         yield {
             "name": "CRSP_treasury",
             "actions": [
-                f"python ./src/{subfolder}/pull_treasury_auction_stats.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/calculate_ontherun.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/pull_CRSP_treasury.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/pull_treasury_auction_stats.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/calculate_ontherun.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_CRSP_treasury.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "treasury_auction_stats.parquet",
-                DATA_DIR / subfolder / "issue_dates.csv",
-                DATA_DIR / subfolder / "ontherun.csv",
-                DATA_DIR / subfolder / "CRSP_TFZ_DAILY.parquet",
-                DATA_DIR / subfolder / "CRSP_TFZ_INFO.parquet",
-                DATA_DIR / subfolder / "CRSP_TFZ_CONSOLIDATED.parquet",
-                DATA_DIR / subfolder / "CRSP_TFZ_with_runness.parquet",
+                DATA_DIR / data_module / "treasury_auction_stats.parquet",
+                DATA_DIR / data_module / "issue_dates.csv",
+                DATA_DIR / data_module / "ontherun.csv",
+                DATA_DIR / data_module / "CRSP_TFZ_DAILY.parquet",
+                DATA_DIR / data_module / "CRSP_TFZ_INFO.parquet",
+                DATA_DIR / data_module / "CRSP_TFZ_CONSOLIDATED.parquet",
+                DATA_DIR / data_module / "CRSP_TFZ_with_runness.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/pull_treasury_auction_stats.py",
-                f"./src/{subfolder}/calculate_ontherun.py",
-                f"./src/{subfolder}/pull_CRSP_treasury.py",
+                f"./src/{data_module}/pull_treasury_auction_stats.py",
+                f"./src/{data_module}/calculate_ontherun.py",
+                f"./src/{data_module}/pull_CRSP_treasury.py",
             ],
             "clean": [],
         }
 
     # fmt: off
-    if pull_sources["open_source_bond"]:
+    data_module = "bond_returns"
+    if module_requirements[data_module] and not use_cache:
         from bond_returns.pull_open_source_bond import DATA_INFO
-        subfolder = "bond_returns"
         yield {
-            "name": f"{subfolder}",
-            "actions": [f"python ./src/{subfolder}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / subfolder}"],
+            "name": f"{data_module}",
+            "actions": [f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}"],
             "targets": [
-                DATA_DIR / subfolder / info["parquet"]
+                DATA_DIR / data_module / info["parquet"]
                 for info in DATA_INFO.values()
             ]
             + [
-                DATA_DIR / subfolder / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
+                DATA_DIR / data_module / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
                 for info in DATA_INFO.values()
             ],
-            "file_dep": [f"./src/{subfolder}/pull_open_source_bond.py"],
+            "file_dep": [f"./src/{data_module}/pull_open_source_bond.py"],
             "clean": [],
         }
     # fmt: on
 
-    if pull_sources["wrds_markit"]:
-        subfolder = "wrds_markit"
+    data_module = "cds_returns"
+    if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/pull_markit_cds.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/pull_fred.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_markit_cds.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_fred.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "markit_cds.parquet",
-                DATA_DIR / subfolder / "fed_yield_curve.parquet",
-                DATA_DIR / subfolder / "fred.parquet",
+                DATA_DIR / data_module / "markit_cds.parquet",
+                DATA_DIR / data_module / "fed_yield_curve.parquet",
+                DATA_DIR / data_module / "fred.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/pull_fed_yield_curve.py",
-                f"./src/{subfolder}/pull_markit_cds.py",
-                f"./src/{subfolder}/pull_fred.py",
+                f"./src/{data_module}/pull_fed_yield_curve.py",
+                f"./src/{data_module}/pull_markit_cds.py",
+                f"./src/{data_module}/pull_fred.py",
             ],
             "clean": [],
         }
 
-    cds_bond_basis = data_sources["open_source_bond"] and data_sources["wrds_markit"]
-    if cds_bond_basis:
-        subfolder = "cds_bond_basis"
+    data_module = "cds_bond_basis"
+    if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / subfolder}",
-                f"python ./src/{subfolder}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "corporate_bond_returns.parquet",
-                DATA_DIR / subfolder / "treasury_bond_returns.parquet",
-                DATA_DIR / subfolder / "markit_cds.parquet",
-                DATA_DIR / subfolder / "markit_red_crsp_link.parquet",
-                DATA_DIR / subfolder / "markit_cds_subsetted_to_crsp.parquet",
-                DATA_DIR / subfolder / "RED_and_ISIN_mapping.parquet",
-                DATA_DIR / subfolder / "Red_Data.parquet",
-                DATA_DIR
-                / subfolder
-                / "Final_data.parquet",  # Remember to change these if NEW_MERGE_cds_bond.py changes
-
-                DATA_DIR / subfolder / "bondret_treasury.csv",
-                DATA_DIR / subfolder / "bondret_treasury.parquet",
-
-
-                # DATA_DIR / subfolder / "cds_bond_basis.parquet",
+                DATA_DIR / data_module / "corporate_bond_returns.parquet",
+                DATA_DIR / data_module / "treasury_bond_returns.parquet",
+                DATA_DIR / data_module / "markit_cds.parquet",
+                DATA_DIR / data_module / "markit_red_crsp_link.parquet",
+                DATA_DIR / data_module / "markit_cds_subsetted_to_crsp.parquet",
+                DATA_DIR / data_module / "RED_and_ISIN_mapping.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/pull_open_source_bond.py",
-                f"./src/{subfolder}/pull_wrds_markit.py",
-                f"./src/{subfolder}/pull_markit_mapping.py",
-                f"./src/{subfolder}/NEW_MERGE_cds_bond.py",
-            
-                f"./src/{subfolder}/pull_open_source_bond.py",
-
-
-                # f"./src/{subfolder}/pull_wrds_markit.py",
-                # f"./src/{subfolder}/pull_wrds_bond_returns.py",
-                # f"./src/{subfolder}/pull_wrds_mergent.py",
-                # f"./src/{subfolder}/create_cds_bond_basis.py",
+                f"./src/{data_module}/pull_open_source_bond.py",
+                f"./src/{data_module}/pull_wrds_markit.py",
+                f"./src/{data_module}/pull_markit_mapping.py",
             ],
             "clean": [],
         }
@@ -306,19 +297,19 @@ def task_pull():
 def task_format():
     """Pull selected data_sources based on config.toml configuration"""
 
-    if data_sources["fed_yield_curve"]:
-        subfolder = "fed_yield_curve"
+    data_module = "fed_yield_curve"
+    if module_requirements[data_module]:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "ftsfa_treas_yield_curve_zero_coupon.parquet"
+                DATA_DIR / data_module / "ftsfa_treas_yield_curve_zero_coupon.parquet"
             ],
             "file_dep": [
-                f"./src/{subfolder}/pull_fed_yield_curve.py",
-                f"./src/{subfolder}/create_ftsfa_datasets.py",
+                f"./src/{data_module}/pull_fed_yield_curve.py",
+                f"./src/{data_module}/create_ftsfa_datasets.py",
             ],
             "clean": [],
         }
@@ -326,81 +317,81 @@ def task_format():
     # if data_sources["ken_french_data_library"]:
     #     from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
 
-    #     subfolder = "ken_french_data_library"
+    #     data_module = "ken_french_data_library"
     #     yield {
-    #         "name": f"pull:{subfolder}",
+    #         "name": f"pull:{data_module}",
     #         "actions": [
-    #             f"python ./src/{subfolder}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / subfolder}"
+    #             f"python ./src/{data_module}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / data_module}"
     #         ],
     #         "targets": [
     #             DATA_DIR / "ken_french_data_library" / info["parquet"]
     #             for info in DATA_INFO.values()
     #         ],
-    #         "file_dep": [f"./src/{subfolder}/pull_fama_french_25_portfolios.py"],
+    #         "file_dep": [f"./src/{data_module}/pull_fama_french_25_portfolios.py"],
     #         "clean": [],
     #     }
 
-    if data_sources["nyu_call_report"]:
-        subfolder = "nyu_call_report"
+    data_module = "nyu_call_report"
+    if module_requirements[data_module]:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "ftsfa_nyu_call_report_leverage.parquet",
+                DATA_DIR / data_module / "ftsfa_nyu_call_report_leverage.parquet",
                 DATA_DIR
-                / subfolder
+                / data_module
                 / "ftsfa_nyu_call_report_holding_company_leverage.parquet",
-                DATA_DIR / subfolder / "ftsfa_nyu_call_report_cash_liquidity.parquet",
+                DATA_DIR / data_module / "ftsfa_nyu_call_report_cash_liquidity.parquet",
                 DATA_DIR
-                / subfolder
+                / data_module
                 / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/pull_nyu_call_report.py",
-                f"./src/{subfolder}/create_ftsfa_datasets.py",
+                f"./src/{data_module}/pull_nyu_call_report.py",
+                f"./src/{data_module}/create_ftsfa_datasets.py",
             ],
             "clean": [],
         }
 
     # if data_sources["wrds_bank_premium"]:
-    #     subfolder = "wrds_bank_premium"
+    #     data_module = "wrds_bank_premium"
     #     yield {
-    #         "name": f"pull:{subfolder}",
+    #         "name": f"pull:{data_module}",
     #         "actions": [
-    #             f"python ./src/{subfolder}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / subfolder}"
+    #             f"python ./src/{data_module}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / data_module}"
     #         ],
     #         "targets": [
-    #             DATA_DIR / subfolder / "wrds_struct_rel_ultimate.parquet",
-    #             DATA_DIR / subfolder / "wrds_call_research.parquet",
-    #             DATA_DIR / subfolder / "wrds_bank_crsp_link.parquet",
-    #             DATA_DIR / subfolder / "idrssd_to_lei.parquet",
-    #             DATA_DIR / subfolder / "lei_main.parquet",
-    #             DATA_DIR / subfolder / "lei_legalevents.parquet",
-    #             DATA_DIR / subfolder / "lei_otherentnames.parquet",
-    #             DATA_DIR / subfolder / "lei_successorentity.parquet",
+    #             DATA_DIR / data_module / "wrds_struct_rel_ultimate.parquet",
+    #             DATA_DIR / data_module / "wrds_call_research.parquet",
+    #             DATA_DIR / data_module / "wrds_bank_crsp_link.parquet",
+    #             DATA_DIR / data_module / "idrssd_to_lei.parquet",
+    #             DATA_DIR / data_module / "lei_main.parquet",
+    #             DATA_DIR / data_module / "lei_legalevents.parquet",
+    #             DATA_DIR / data_module / "lei_otherentnames.parquet",
+    #             DATA_DIR / data_module / "lei_successorentity.parquet",
     #         ],
-    #         "file_dep": [f"./src/{subfolder}/pull_wrds_bank_premium.py"],
+    #         "file_dep": [f"./src/{data_module}/pull_wrds_bank_premium.py"],
     #         "clean": [],
     #     }
 
-    if data_sources["wrds_crsp_compustat"]:
-        subfolder = "wrds_crsp_compustat"
+    data_module = "wrds_crsp_compustat"
+    if module_requirements[data_module]:
 
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "ftsfa_CRSP_monthly_stock_ret.parquet",
-                DATA_DIR / subfolder / "ftsfa_CRSP_monthly_stock_retx.parquet",
+                DATA_DIR / data_module / "ftsfa_CRSP_monthly_stock_ret.parquet",
+                DATA_DIR / data_module / "ftsfa_CRSP_monthly_stock_retx.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/create_ftsfa_datasets.py",
-                f"./src/{subfolder}/pull_CRSP_Compustat.py",
-                f"./src/{subfolder}/calc_Fama_French_1993.py",
+                f"./src/{data_module}/create_ftsfa_datasets.py",
+                f"./src/{data_module}/pull_CRSP_Compustat.py",
+                f"./src/{data_module}/calc_Fama_French_1993.py",
             ],
             "clean": [],
         }
@@ -408,56 +399,50 @@ def task_format():
         # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
         # The code right now only pulls them separately.
 
-    if data_sources["open_source_bond"]:
-        subfolder = "bond_returns"
+    data_module = "bond_returns"
+    if module_requirements[data_module]:
         yield {
-            "name": f"{subfolder}",
+            "name": f"{data_module}",
             "actions": [
-                f"python ./src/{subfolder}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / subfolder}"
+                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
             ],
-            "targets": [DATA_DIR / subfolder / "corp_bond_portfolio_returns.parquet"],
-            "file_dep": [f"./src/{subfolder}/calc_corp_bond_returns.py"],
+            "targets": [DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet"],
+            "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
             "clean": [],
         }
 
-    if data_sources["wrds_markit"]:
-        subfolder = "wrds_markit"
+    data_module = "cds_returns"
+    if module_requirements[data_module]:
         yield {
             "name": "calc_cds_returns",
             "actions": [
-                f"python ./src/{subfolder}/calc_cds_returns.py --DATA_DIR={DATA_DIR / subfolder}",
+                f"python ./src/{data_module}/calc_cds_returns.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / subfolder / "markit_cds_returns.parquet",
+                DATA_DIR / data_module / "markit_cds_returns.parquet",
             ],
             "file_dep": [
-                f"./src/{subfolder}/calc_cds_returns.py",
+                f"./src/{data_module}/calc_cds_returns.py",
             ],
             "clean": [],
         }
 
-    # cds_bond_basis = (data_sources["wrds_mergent"] and data_sources["wrds_bond_returns"] and data_sources["wrds_markit"])
-    # if cds_bond_basis:
-    #     subfolder = "cds_bond_basis"
-    #     yield {
-    #         "name": f"{subfolder}",
-    #         "actions": [
-    #             # f"python ./src/{subfolder}/create_cds_bond_basis.py --DATA_DIR={DATA_DIR / subfolder}",
-    #         ],
-    #         "targets": [
-    #             DATA_DIR / subfolder / "bondret_treasury.csv",
-    #             DATA_DIR / subfolder / "bondret_treasury.parquet",
-    #             # DATA_DIR / subfolder / "cds_bond_basis.parquet",
-    #         ],
-    #         "file_dep": [
-    #             f"./src/{subfolder}/pull_open_source_bond.py",
-    #             # f"./src/{subfolder}/pull_wrds_markit.py",
-    #             # f"./src/{subfolder}/pull_wrds_bond_returns.py",
-    #             # f"./src/{subfolder}/pull_wrds_mergent.py",
-    #             # f"./src/{subfolder}/create_cds_bond_basis.py",
-    #         ],
-    #         "clean": [],
-    #     }
+    data_module = "cds_bond_basis"
+    if module_requirements[data_module]:
+        yield {
+            "name": f"{data_module}",
+            "actions": [
+                f"python ./src/{data_module}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "Red_Data.parquet",
+                DATA_DIR / data_module / "Final_data.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/NEW_MERGE_cds_bond.py",
+            ],
+            "clean": [],
+        }
 
 
 def task_collect_ftsfa_datasets_info():
@@ -528,7 +513,7 @@ def task_assemble_results():
 
 notebook_tasks = {
     "example_notebook_markit": {
-        "path": "./src/wrds_markit/example_notebook_markit.ipynb",
+        "path": "./src/cds_returns/example_notebook_markit.ipynb",
         "file_dep": [],
         "targets": [],
     },
@@ -538,7 +523,7 @@ notebook_tasks = {
         "targets": [],
     },
     "cds_returns_summary": {
-        "path": "./src/wrds_markit/cds_returns_summary.ipynb",
+        "path": "./src/cds_returns/cds_returns_summary.ipynb",
         "file_dep": [],
         "targets": [],
     },

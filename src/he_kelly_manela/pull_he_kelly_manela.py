@@ -10,7 +10,7 @@ import requests
 
 from settings import config
 
-DATA_DIR = config("DATA_DIR") / "he_kelly_manela"
+DATA_DIR = config("DATA_DIR")
 URL = "https://apps.olin.wustl.edu/faculty/manela/hkm/intermediarycapitalrisk/He_Kelly_Manela_Factors.zip"
 
 
