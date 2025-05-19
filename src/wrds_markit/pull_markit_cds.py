@@ -12,13 +12,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import pandas as pd
 import wrds
 from thefuzz import fuzz
+import polars as pl
 
 from settings import config
 
-DATA_DIR = Path(config("DATA_DIR"))
+DATA_DIR = Path(config("DATA_DIR")) / "wrds_markit"
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("2001-01-01")
-END_DATE = pd.Timestamp("2024-01-01")
+END_DATE = pd.Timestamp("2025-01-01")
 
 
 def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
@@ -358,7 +359,7 @@ def _demo():
         LIMIT 100
         """
     df = db.raw_sql(query, date_cols=["date"])
-    import polars as pl
+
     df = pl.from_pandas(df)
     df.glimpse()
 
