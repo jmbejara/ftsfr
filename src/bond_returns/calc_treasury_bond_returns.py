@@ -46,8 +46,8 @@ def group_portfolios(bond_returns = None):
 
     return pivoted
 
-def calc_treasury_bond_returns():
-    bond_returns = pull_open_source_bond.load_treasury_returns(data_dir=DATA_DIR)
+def calc_treasury_bond_returns(data_dir=DATA_DIR):
+    bond_returns = pull_open_source_bond.load_treasury_returns(data_dir=data_dir)
     portfolio_returns = group_portfolios(bond_returns)
     return portfolio_returns
 

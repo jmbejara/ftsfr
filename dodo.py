@@ -99,6 +99,7 @@ module_requirements["wrds_fx"] = data_sources["wrds_fx"]
 
 use_cache = benchmarks_file["cache"]["use_cache"]
 
+
 def task_pull():
     """Pull selected data_sources based on config.toml configuration"""
     data_module = "fed_yield_curve"
@@ -134,6 +135,7 @@ def task_pull():
     data_module = "ken_french_data_library"
     if module_requirements[data_module] and not use_cache:
         from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
+
         yield {
             "name": f"{data_module}",
             "actions": [
@@ -182,7 +184,6 @@ def task_pull():
 
     data_module = "wrds_crsp_compustat"
     if module_requirements[data_module] and not use_cache:
-
         yield {
             "name": f"{data_module}",
             "actions": [
@@ -378,7 +379,6 @@ def task_format():
 
     data_module = "wrds_crsp_compustat"
     if module_requirements[data_module]:
-
         yield {
             "name": f"{data_module}",
             "actions": [
@@ -512,26 +512,32 @@ def task_assemble_results():
 
 
 notebook_tasks = {
-    "example_notebook_markit": {
-        "path": "./src/cds_returns/example_notebook_markit.ipynb",
-        "file_dep": [],
-        "targets": [],
-    },
-    "bond_returns_summary": {
-        "path": "./src/bond_returns/bond_returns_summary.ipynb",
-        "file_dep": [],
-        "targets": [],
-    },
+    # "corp_bond_returns_summary": {
+    #     "path": "./src/bond_returns/corp_bond_returns_summary.ipynb",
+    #     "file_dep": ["./src/bond_returns/calc_corp_bond_returns.py",],
+    #     "targets": [],
+    # },
+    # "treasury_bond_returns_summary": {
+    #     "path": "./src/bond_returns/treasury_bond_returns_summary.ipynb",
+    #     "file_dep": [
+    #         "./src/bond_returns/calc_treasury_bond_returns.py",
+    #     ],
+    #     "targets": [],
+    # },
     "cds_returns_summary": {
         "path": "./src/cds_returns/cds_returns_summary.ipynb",
-        "file_dep": [],
+        "file_dep": [
+            "./src/cds_returns/calc_cds_returns.py",
+        ],
         "targets": [],
     },
-    "cds_bond_basis_summary": {
-        "path": "./src/cds_bond_basis/cds_bond_basis_summary.ipynb",
-        "file_dep": [],
-        "targets": [],
-    },
+    # "cds_bond_basis_summary": {
+    #     "path": "./src/cds_bond_basis/cds_bond_basis_summary.ipynb",
+    #     "file_dep": [
+    #         "./src/cds_bond_basis/NEW_MERGE_cds_bond.py",
+    #     ],
+    #     "targets": [],
+    # },
 }
 
 
