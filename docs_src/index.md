@@ -3,6 +3,8 @@
 ```{toctree}
 :maxdepth: 1
 :caption: Contents
+data_sources_and_modules.md.md
+ftsfa_datasets_info.md
 _notebook_build/example_notebook_markit.ipynb
 _notebook_build/cds_returns_summary.ipynb
 _notebook_build/cds_bond_basis_summary.ipynb

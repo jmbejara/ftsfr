@@ -62,9 +62,9 @@ For local development on forecasting scripts, you can activate a pixi environmen
 pixi shell
 ```
 
-# Datasets
+# Data Modules
 
-Overview of datasets:
+Overview of data modules:
 
 **Misc**
 

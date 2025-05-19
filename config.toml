@@ -9,12 +9,12 @@ fed_yield_curve = true
 ken_french_data_library = true
 nyu_call_report = true
 he_kelly_manela = true
+open_source_bond = true
 
 ## Subscription data sets. Subscription needed, api key needed.
 # Set to false if subscription is available, data will be pulled from source
 wrds_bank_premium = true
 wrds_compustat = true
-open_source_bond = true
 wrds_crsp_compustat = true
 wrds_markit = true
 wrds_optionmetrics = false
