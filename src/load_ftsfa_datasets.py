@@ -43,8 +43,8 @@ from settings import config
 BASE_DIR = config("BASE_DIR")
 DATA_DIR = config("DATA_DIR")
 
-# Read benchmarks.toml
-with open(BASE_DIR / "benchmarks.toml", "r") as f:
+# Read config.toml
+with open(BASE_DIR / "config.toml", "r") as f:
     benchmarks = toml.load(f)
 
 data_sources = benchmarks["data_sources"]
@@ -67,7 +67,7 @@ data_sources = benchmarks["data_sources"]
 
 # # available_datasets is the list of all datasets that can be loaded.
 # # It is calculated by checking if the sources for each dataset are available,
-# # as marked as "true" in the benchmarks.toml file.
+# # as marked as "true" in the config.toml file.
 # available_datasets = [
 #     data_set
 #     for data_set in data_sets_and_required_sources.keys()
@@ -81,7 +81,7 @@ data_sources = benchmarks["data_sources"]
 def load_dataset(dataset_name="nyu_call_report_leverage", dataframe_type="pandas"):
     # if dataset_name not in available_datasets:
     #     raise ValueError(
-    #         f"Dataset {dataset_name} not found in available_datasets. Please check the benchmarks.toml file."
+    #         f"Dataset {dataset_name} not found in available_datasets. Please check the config.toml file."
     #     )
     # fmt: off
     if dataset_name == "CRSP_monthly_stock_ret":
@@ -100,7 +100,7 @@ def load_dataset(dataset_name="nyu_call_report_leverage", dataframe_type="pandas
         file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet"
     else:
         raise ValueError(
-            f"Dataset {dataset_name} not found in available_datasets. Please check the benchmarks.toml file."
+            f"Dataset {dataset_name} not found in available_datasets. Please check the config.toml file."
         )
     # fmt: on
     if dataframe_type == "pandas":

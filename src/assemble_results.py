@@ -11,8 +11,8 @@ from settings import config
 BASE_DIR = config("BASE_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
 
-# Read benchmarks.toml
-with open(BASE_DIR / "benchmarks.toml", "r") as f:
+# Read config.toml
+with open(BASE_DIR / "config.toml", "r") as f:
     benchmarks = toml.load(f)
 
 models = benchmarks["models"]

@@ -59,7 +59,7 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
 
 
 # Load benchmarks configuration
-with open("benchmarks.toml", "r") as f:
+with open("config.toml", "r") as f:
     benchmarks_file = toml.load(f)
 
 
@@ -71,7 +71,7 @@ def task_config():
             "ipython ./src/settings.py",
         ],
         "targets": [DATA_DIR, OUTPUT_DIR],
-        "file_dep": ["./src/settings.py", "./benchmarks.toml"],
+        "file_dep": ["./src/settings.py", "./config.toml"],
         "clean": [],
     }
 
@@ -86,7 +86,7 @@ if use_cache:
 
 
 def task_pull():
-    """Pull selected data_sources based on benchmarks.toml configuration"""
+    """Pull selected data_sources based on config.toml configuration"""
 
     if pull_sources["fed_yield_curve"]:
         subfolder = "fed_yield_curve"
@@ -314,7 +314,7 @@ def task_pull():
 
 
 def task_format():
-    """Pull selected data_sources based on benchmarks.toml configuration"""
+    """Pull selected data_sources based on config.toml configuration"""
 
     if data_sources["fed_yield_curve"]:
         subfolder = "fed_yield_curve"

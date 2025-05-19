@@ -17,7 +17,7 @@ FILE NAME: scripts/tree_output.txt
 │       ├── french_portfolios_25_monthly_size_and_bm.parquet
 │       ├── french_portfolios_25_monthly_size_and_inv.parquet
 │       └── french_portfolios_25_monthly_size_and_op.parquet
-├── benchmarks.toml
+├── config.toml
 ├── config.py
 ├── dodo.py
 ├── join_files.py

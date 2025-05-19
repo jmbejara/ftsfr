@@ -46,7 +46,7 @@ pip install -r requirements.txt
 
 Then, follow the pattern in the `.env.example` file to set your environment variables in a `.env` file.
 
-Then, set the values in `benchmarks.toml` to your desired values. This file is used to configure the datasets that will be downloaded, based of the subscriptions that you have, and the benchmarks that will be run.
+Then, set the values in `config.toml` to your desired values. This file is used to configure the datasets that will be downloaded, based of the subscriptions that you have, and the benchmarks that will be run.
 
 Finally, download the data using the following command:
 

@@ -353,7 +353,7 @@ def create_directories():
     raw_results_dir.mkdir(parents=True, exist_ok=True)
 
     # Load benchmarks configuration
-    with open("benchmarks.toml", "r") as f:
+    with open("config.toml", "r") as f:
         benchmarks_file = toml.load(f)
     data_sources = benchmarks_file["data_sources"]
     for data_source in data_sources:
