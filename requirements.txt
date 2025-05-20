@@ -2,6 +2,7 @@
 arch==7.1.0
 datetime==3.0.3
 doit
+ipynb-py-convert
 ipywidgets==8.1.5
 jupyter
 linkify-it-py
@@ -10,10 +11,10 @@ myst-nb
 myst-parser
 numpy
 openpyxl==3.1.3
-pandas==2.2.3
 pandas-datareader
-polars
+pandas==2.2.3
 plotly
+polars
 psycopg2-binary==2.9.10
 pyarrow
 pydata-sphinx-theme==0.16.1

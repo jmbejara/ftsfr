@@ -32,17 +32,15 @@ def jupyter_clear_output(notebook_path):
 # fmt: on
 
 
-def copy_notebook_to_folder(notebook_path, destination_folder, notebook_name):
+def mv(from_path, to_path):
     """Copy a notebook to a folder"""
-    notebook_path = Path(notebook_path)
-    destination_folder = Path(destination_folder)
-    destination_folder.mkdir(parents=True, exist_ok=True)
+    from_path = Path(from_path)
+    to_path = Path(to_path)
+    to_path.mkdir(parents=True, exist_ok=True)
     if OS_TYPE == "nix":
-        command = f"cp {notebook_path} {destination_folder / f'{notebook_name}.ipynb'}"
+        command = f"mv {from_path} {to_path}"
     else:
-        command = (
-            f"copy  {notebook_path} {destination_folder / f'{notebook_name}.ipynb'}"
-        )
+        command = f"move {from_path} {to_path}"
     return command
 
 
@@ -524,8 +522,8 @@ notebook_tasks = {
     #     ],
     #     "targets": [],
     # },
-    "cds_returns_summary": {
-        "path": "./src/cds_returns/cds_returns_summary.ipynb",
+    "01_cds_returns_summary": {
+        "path": "./src/cds_returns/01_cds_returns_summary.py",
         "file_dep": [
             "./src/cds_returns/calc_cds_returns.py",
         ],
@@ -541,28 +539,6 @@ notebook_tasks = {
 }
 
 
-def task_convert_notebooks_to_scripts():
-    """Convert notebooks to script form to detect changes to source code rather
-    than to the notebook's metadata.
-    """
-    build_dir = Path(OUTPUT_DIR)
-    build_dir.mkdir(parents=True, exist_ok=True)
-
-    for notebook in notebook_tasks.keys():
-        notebook_path = notebook_tasks[notebook]["path"]
-        yield {
-            "name": notebook,
-            "actions": [
-                jupyter_clear_output(notebook_path),
-                jupyter_to_python(notebook_path, notebook, build_dir),
-            ],
-            "file_dep": [notebook_path],
-            "targets": [OUTPUT_DIR / f"_{notebook}.py"],
-            "clean": True,
-            "verbosity": 0,
-        }
-
-
 # fmt: off
 def task_run_notebooks():
     """Preps the notebooks for presentation format.
@@ -570,19 +546,20 @@ def task_run_notebooks():
     """
 
     for notebook in notebook_tasks.keys():
-        notebook_path = notebook_tasks[notebook]["path"]
+        pyfile_path = Path(notebook_tasks[notebook]["path"])
+        notebook_path = pyfile_path.with_suffix(".ipynb")
         yield {
             "name": notebook,
             "actions": [
                 """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+                f"ipynb-py-convert {pyfile_path} {notebook_path}",
                 jupyter_execute_notebook(notebook_path),
                 jupyter_to_html(notebook_path),
-                copy_notebook_to_folder(notebook_path, OUTPUT_DIR / "_notebook_build", notebook),
-                jupyter_clear_output(notebook_path),
+                mv(notebook_path, OUTPUT_DIR / "_notebook_build"),
                 """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
             ],
             "file_dep": [
-                OUTPUT_DIR / f"_{notebook}.py",
+                pyfile_path,
                 *notebook_tasks[notebook]["file_dep"],
             ],
             "targets": [
@@ -607,7 +584,7 @@ def task_compile_sphinx_docs():
         "./docs_src/logo.png",
         "./docs_src/conf.py",
         "./docs_src/index.md",
-        "./docs_src/data_sources.md",
+        "./docs_src/data_sources_and_modules.md",
         "./docs_src/myst_markdown_demos.md",
         *notebook_paths,
     ]
