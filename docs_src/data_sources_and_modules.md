@@ -22,7 +22,7 @@ This document lists all data sources used in the codebase, the specific database
 
 Data modules are subfolders in the `src` directory that contain a set of scripts that generate 1 or more related datasets. These data sets are grouped together because they use the same data sources. The following lists the data modules, such as `cds_bond_basis`, along with the data sources used in each module.
 
- - `bond_returns`: Calculates returns for corporate bonds, sovereign bonds, and treasury bonds. Uses Open Source Bond Asset Pricing and WRDS Bond Returns.
+ - `corp_bond_returns`: Calculates returns for corporate bonds, sovereign bonds, and treasury bonds. Uses Open Source Bond Asset Pricing and WRDS Bond Returns.
  - `cds_bond_basis`: Uses Open Source Bond Asset Pricing and WRDS Markit CDS.
  - `fed_yield_curve`: Uses Fed Yield Curve data downloaded from the US Federal Reserve Board of Governors website.
  - `foreign_exchange`: Uses ...

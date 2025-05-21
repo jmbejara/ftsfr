@@ -78,7 +78,7 @@ data_sources = config_toml["data_sources"].copy()
 
 # fmt: off
 module_requirements = {}
-module_requirements["bond_returns"] = data_sources["open_source_bond"]
+module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
 module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
 module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
 module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
@@ -86,6 +86,7 @@ module_requirements["foreign_exchange"] = data_sources["wrds_crsp_compustat"] an
 module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
 module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
 module_requirements["nyu_call_report"] = data_sources["nyu_call_report"]
+module_requirements["us_treasury_returns"] = data_sources["wrds_crsp"]
 module_requirements["wrds_bank_premium"] = data_sources["wrds_bank_premium"]
 module_requirements["wrds_crsp_compustat"] = (
     data_sources["wrds_compustat"]
@@ -226,9 +227,9 @@ def task_pull():
         }
 
     # fmt: off
-    data_module = "bond_returns"
+    data_module = "corp_bond_returns"
     if module_requirements[data_module] and not use_cache:
-        from bond_returns.pull_open_source_bond import DATA_INFO
+        from corp_bond_returns.pull_open_source_bond import DATA_INFO
         yield {
             "name": f"{data_module}",
             "actions": [f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}"],
@@ -397,7 +398,7 @@ def task_format():
         # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
         # The code right now only pulls them separately.
 
-    data_module = "bond_returns"
+    data_module = "corp_bond_returns"
     if module_requirements[data_module]:
         yield {
             "name": f"{data_module}",
@@ -511,14 +512,14 @@ def task_assemble_results():
 
 notebook_tasks = {
     # "corp_bond_returns_summary": {
-    #     "path": "./src/bond_returns/corp_bond_returns_summary.ipynb",
-    #     "file_dep": ["./src/bond_returns/calc_corp_bond_returns.py",],
+    #     "path": "./src/corp_bond_returns/corp_bond_returns_summary.ipynb",
+    #     "file_dep": ["./src/corp_bond_returns/calc_corp_bond_returns.py",],
     #     "targets": [],
     # },
     # "treasury_bond_returns_summary": {
-    #     "path": "./src/bond_returns/treasury_bond_returns_summary.ipynb",
+    #     "path": "./src/corp_bond_returns/treasury_bond_returns_summary.ipynb",
     #     "file_dep": [
-    #         "./src/bond_returns/calc_treasury_bond_returns.py",
+    #         "./src/corp_bond_returns/calc_treasury_bond_returns.py",
     #     ],
     #     "targets": [],
     # },
