@@ -101,10 +101,78 @@ use_cache = config_toml["cache"]["use_cache"]
 
 def task_pull():
     """Pull selected data_sources based on config.toml configuration"""
+
+    data_module = "cds_bond_basis"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "corporate_bond_returns.parquet",
+                DATA_DIR / data_module / "treasury_bond_returns.parquet",
+                DATA_DIR / data_module / "markit_cds.parquet",
+                DATA_DIR / data_module / "markit_red_crsp_link.parquet",
+                DATA_DIR / data_module / "markit_cds_subsetted_to_crsp.parquet",
+                DATA_DIR / data_module / "RED_and_ISIN_mapping.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/pull_open_source_bond.py",
+                f"./src/{data_module}/pull_wrds_markit.py",
+                f"./src/{data_module}/pull_markit_mapping.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "cds_returns"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_markit_cds.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_fred.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "markit_cds.parquet",
+                DATA_DIR / data_module / "fed_yield_curve.parquet",
+                DATA_DIR / data_module / "fred.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/pull_fed_yield_curve.py",
+                f"./src/{data_module}/pull_markit_cds.py",
+                f"./src/{data_module}/pull_fred.py",
+            ],
+            "clean": [],
+        }
+
+    # fmt: off
+    data_module = "corp_bond_returns"
+    if module_requirements[data_module] and not use_cache:
+        from corp_bond_returns.pull_open_source_bond import DATA_INFO
+        yield {
+            "name": data_module,
+            "actions": [f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}"],
+            "targets": [
+                DATA_DIR / data_module / info["parquet"]
+                for info in DATA_INFO.values()
+            ]
+            + [
+                DATA_DIR / data_module / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
+                for info in DATA_INFO.values()
+            ],
+            "file_dep": [f"./src/{data_module}/pull_open_source_bond.py"],
+            "clean": [],
+        }
+    # fmt: on
+
     data_module = "fed_yield_curve"
     if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
             ],
@@ -116,7 +184,7 @@ def task_pull():
     data_module = "he_kelly_manela"
     if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_he_kelly_manela.py --DATA_DIR={DATA_DIR / data_module}"
             ],
@@ -136,7 +204,7 @@ def task_pull():
         from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
 
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / data_module}"
             ],
@@ -151,7 +219,7 @@ def task_pull():
     data_module = "nyu_call_report"
     if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_nyu_call_report.py --DATA_DIR={DATA_DIR / data_module}",
             ],
@@ -160,50 +228,13 @@ def task_pull():
             "clean": [],
         }
 
-    data_module = "wrds_bank_premium"
+    data_module = "us_treasury_returns"
     if module_requirements[data_module] and not use_cache:
-        yield {
-            "name": f"{data_module}",
-            "actions": [
-                f"python ./src/{data_module}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / data_module}"
-            ],
-            "targets": [
-                DATA_DIR / data_module / "wrds_struct_rel_ultimate.parquet",
-                DATA_DIR / data_module / "wrds_call_research.parquet",
-                DATA_DIR / data_module / "wrds_bank_crsp_link.parquet",
-                DATA_DIR / data_module / "idrssd_to_lei.parquet",
-                DATA_DIR / data_module / "lei_main.parquet",
-                DATA_DIR / data_module / "lei_legalevents.parquet",
-                DATA_DIR / data_module / "lei_otherentnames.parquet",
-                DATA_DIR / data_module / "lei_successorentity.parquet",
-            ],
-            "file_dep": [f"./src/{data_module}/pull_wrds_bank_premium.py"],
-            "clean": [],
-        }
-
-    data_module = "wrds_crsp_compustat"
-    if module_requirements[data_module] and not use_cache:
-        yield {
-            "name": f"{data_module}",
-            "actions": [
-                f"python ./src/{data_module}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "Compustat.parquet",
-                DATA_DIR / data_module / "CRSP_stock_ciz.parquet",
-                DATA_DIR / data_module / "CRSP_Comp_Link_Table.parquet",
-                DATA_DIR / data_module / "FF_FACTORS.parquet",
-            ],
-            "file_dep": [f"./src/{data_module}/pull_CRSP_Compustat.py"],
-            "clean": [],
-        }
-
         # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
         # The code right now only pulls them separately.
 
         yield {
-            "name": "CRSP_treasury",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_treasury_auction_stats.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/calculate_ontherun.py --DATA_DIR={DATA_DIR / data_module}",
@@ -226,70 +257,42 @@ def task_pull():
             "clean": [],
         }
 
-    # fmt: off
-    data_module = "corp_bond_returns"
-    if module_requirements[data_module] and not use_cache:
-        from corp_bond_returns.pull_open_source_bond import DATA_INFO
-        yield {
-            "name": f"{data_module}",
-            "actions": [f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}"],
-            "targets": [
-                DATA_DIR / data_module / info["parquet"]
-                for info in DATA_INFO.values()
-            ]
-            + [
-                DATA_DIR / data_module / f"{info['parquet'].replace('.parquet', '_README.pdf')}"
-                for info in DATA_INFO.values()
-            ],
-            "file_dep": [f"./src/{data_module}/pull_open_source_bond.py"],
-            "clean": [],
-        }
-    # fmt: on
-
-    data_module = "cds_returns"
+    data_module = "wrds_bank_premium"
     if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/pull_markit_cds.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/pull_fred.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_wrds_bank_premium.py --DATA_DIR={DATA_DIR / data_module}"
             ],
             "targets": [
-                DATA_DIR / data_module / "markit_cds.parquet",
-                DATA_DIR / data_module / "fed_yield_curve.parquet",
-                DATA_DIR / data_module / "fred.parquet",
+                DATA_DIR / data_module / "wrds_struct_rel_ultimate.parquet",
+                DATA_DIR / data_module / "wrds_call_research.parquet",
+                DATA_DIR / data_module / "wrds_bank_crsp_link.parquet",
+                DATA_DIR / data_module / "idrssd_to_lei.parquet",
+                DATA_DIR / data_module / "lei_main.parquet",
+                DATA_DIR / data_module / "lei_legalevents.parquet",
+                DATA_DIR / data_module / "lei_otherentnames.parquet",
+                DATA_DIR / data_module / "lei_successorentity.parquet",
             ],
-            "file_dep": [
-                f"./src/{data_module}/pull_fed_yield_curve.py",
-                f"./src/{data_module}/pull_markit_cds.py",
-                f"./src/{data_module}/pull_fred.py",
-            ],
+            "file_dep": [f"./src/{data_module}/pull_wrds_bank_premium.py"],
             "clean": [],
         }
 
-    data_module = "cds_bond_basis"
+    data_module = "wrds_crsp_compustat"
     if module_requirements[data_module] and not use_cache:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "corporate_bond_returns.parquet",
-                DATA_DIR / data_module / "treasury_bond_returns.parquet",
-                DATA_DIR / data_module / "markit_cds.parquet",
-                DATA_DIR / data_module / "markit_red_crsp_link.parquet",
-                DATA_DIR / data_module / "markit_cds_subsetted_to_crsp.parquet",
-                DATA_DIR / data_module / "RED_and_ISIN_mapping.parquet",
+                DATA_DIR / data_module / "Compustat.parquet",
+                DATA_DIR / data_module / "CRSP_stock_ciz.parquet",
+                DATA_DIR / data_module / "CRSP_Comp_Link_Table.parquet",
+                DATA_DIR / data_module / "FF_FACTORS.parquet",
             ],
-            "file_dep": [
-                f"./src/{data_module}/pull_open_source_bond.py",
-                f"./src/{data_module}/pull_wrds_markit.py",
-                f"./src/{data_module}/pull_markit_mapping.py",
-            ],
+            "file_dep": [f"./src/{data_module}/pull_CRSP_Compustat.py"],
             "clean": [],
         }
 
@@ -300,7 +303,7 @@ def task_format():
     data_module = "fed_yield_curve"
     if module_requirements[data_module]:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
@@ -334,7 +337,7 @@ def task_format():
     data_module = "nyu_call_report"
     if module_requirements[data_module]:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
@@ -379,7 +382,7 @@ def task_format():
     data_module = "wrds_crsp_compustat"
     if module_requirements[data_module]:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
@@ -401,7 +404,7 @@ def task_format():
     data_module = "corp_bond_returns"
     if module_requirements[data_module]:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
             ],
@@ -429,7 +432,7 @@ def task_format():
     data_module = "cds_bond_basis"
     if module_requirements[data_module]:
         yield {
-            "name": f"{data_module}",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
             ],
