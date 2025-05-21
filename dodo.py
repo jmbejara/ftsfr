@@ -58,7 +58,7 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
 
 # Load benchmarks configuration
 with open("config.toml", "r") as f:
-    benchmarks_file = toml.load(f)
+    config_toml = toml.load(f)
 
 
 def task_config():
@@ -74,7 +74,7 @@ def task_config():
     }
 
 
-data_sources = benchmarks_file["data_sources"].copy()
+data_sources = config_toml["data_sources"].copy()
 
 # fmt: off
 module_requirements = {}
@@ -95,7 +95,7 @@ module_requirements["wrds_crsp_compustat"] = (
 module_requirements["wrds_fx"] = data_sources["wrds_fx"]
 # fmt: on
 
-use_cache = benchmarks_file["cache"]["use_cache"]
+use_cache = config_toml["cache"]["use_cache"]
 
 
 def task_pull():
@@ -454,7 +454,7 @@ def task_collect_ftsfa_datasets_info():
     }
 
 
-models = benchmarks_file["models"]
+models = config_toml["models"]
 models_activated = [model for model in models if models[model]]
 
 
@@ -617,7 +617,7 @@ def task_compile_sphinx_docs():
 
 def task_compile_latex_docs():
     """Compile the LaTeX documents to PDFs"""
-    if benchmarks_file["reports"]["is_latex_installed"]:
+    if config_toml["reports"]["is_latex_installed"]:
         return {
             "actions": [
                 "latexmk -xelatex -halt-on-error -cd ./reports/draft_ftsfa.tex",  # Compile
