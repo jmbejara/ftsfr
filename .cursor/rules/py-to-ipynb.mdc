@@ -1,0 +1,284 @@
+---
+description: Example of how to write a .py file that will be converted to a .ipynb file
+globs: 
+alwaysApply: false
+---
+When you write a .py file with the intention of using ipynb-py-convert to convert it to a .ipynb file, you might encounter some problems creating markdown cells. For information about this package, see here: https://pypi.org/project/ipynb-py-convert/ 
+
+Here's an example of a .py that works, in that it correctly transforms into a .ipynb file:
+
+```
+# %%
+"""
+# Transaction Volume Sensitivity Analysis
+
+This script analyzes how different covered reporter prioritization strategies
+during trade deduplication affect the calculated total daily transaction volume.
+
+Methodology:
+1.  Load NCCBR `post` data.
+2.  Define a function to calculate daily transaction volume after applying
+    deduplication using a specified reporter priority order.
+3.  Calculate daily volumes using:
+    a.  Default alphabetical reporter ordering.
+    b.  Reverse alphabetical reporter ordering.
+    c.  An ensemble of multiple randomized reporter orderings.
+4.  For the ensemble results, calculate the median, minimum, and maximum
+    daily transaction volume for each day.
+5.  Plot the median, minimum, and maximum daily transaction volumes from the
+    ensemble to visualize the sensitivity.
+"""
+
+# %%
+import polars as pl
+from pathlib import Path
+import random
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates # For date formatting on plot
+
+from chartbase.settings import config
+import pull_nccbr
+from clean_deduplicate_by_reporter import (
+    get_covered_leis_from_data,
+    annotate_inter_reporter_trades,
+    drop_inter_reporter_duplicates,
+)
+
+DATA_DIR = config("DATA_DIR", default="./data")
+VOLUME_COLUMN = "start_leg_amount" # Assuming this is the relevant volume column
+DATE_COLUMN = "file_observation_date"
+N_ENSEMBLE_RUNS = 50 # Number of randomized shuffles
+
+
+# %%
+"""
+## 1. Load and Prepare Data
+Load the NCCBR `post` table and prepare essential columns.
+"""
+
+# %%
+def load_and_prepare_data(data_dir: Path, date_col: str) -> pl.DataFrame:
+    """Loads and prepares the NCCBR post data."""
+    df = pull_nccbr.load_post(data_dir=data_dir)
+    
+    # Ensure date column is parsed correctly
+    if date_col not in df.columns:
+        raise ValueError(f"Date column '{date_col}' not found in DataFrame.")
+    if df.schema[date_col] != pl.Date:
+        df = df.with_columns(
+            pl.col(date_col).str.strptime(pl.Date, "%Y%m%d", strict=False).alias(date_col)
+        )
+    
+    # Ensure volume column exists and is numeric
+    if VOLUME_COLUMN not in df.columns:
+        raise ValueError(f"Volume column '{VOLUME_COLUMN}' not found.")
+    if not isinstance(df.schema[VOLUME_COLUMN], (pl.datatypes.Float64, pl.datatypes.Int64)):
+         df = df.with_columns(pl.col(VOLUME_COLUMN).cast(pl.Float64, strict=False))
+            
+    return df
+
+post_data = load_and_prepare_data(DATA_DIR, DATE_COLUMN)
+covered_leis_set = get_covered_leis_from_data(post_data)
+covered_leis_list_master = sorted(list(covered_leis_set))
+
+
+# %%
+pl.DataFrame(covered_leis_list_master)
+
+# %%
+"""
+## 2. Core Volume Calculation Function
+This function takes a DataFrame and a reporter priority order,
+applies deduplication, and calculates total daily volume.
+"""
+
+# %%
+def calculate_daily_volume(
+    df: pl.DataFrame,
+    covered_leis: set,
+    volume_col: str,
+    date_col: str,
+    reporter_priority_order: list = None,
+) -> pl.DataFrame:
+    """
+    Calculates total daily transaction volume after deduplication.
+    """
+    annotated_df = annotate_inter_reporter_trades(
+        df, covered_leis=covered_leis, reporter_priority_order=reporter_priority_order
+    )
+    deduplicated_df = drop_inter_reporter_duplicates(annotated_df)
+    
+    daily_volume = (
+        deduplicated_df.group_by(date_col)
+        .agg(pl.col(volume_col).sum().alias("total_volume"))
+        .sort(date_col)
+    )
+    return daily_volume
+
+# %%
+"""
+## 3. Calculate Volumes with Specific Prioritization Strategies
+"""
+
+# %%
+# Default (Alphabetical)
+volume_default_alpha = calculate_daily_volume(
+    post_data, 
+    covered_leis=covered_leis_set, 
+    volume_col=VOLUME_COLUMN, 
+    date_col=DATE_COLUMN, 
+    reporter_priority_order=None # Uses alphabetical by default
+)
+
+# Reverse Alphabetical
+covered_leis_reverse_alpha = covered_leis_list_master[::-1]
+volume_reverse_alpha = calculate_daily_volume(
+    post_data,
+    covered_leis=covered_leis_set,
+    volume_col=VOLUME_COLUMN,
+    date_col=DATE_COLUMN,
+    reporter_priority_order=covered_leis_reverse_alpha,
+)
+
+
+# %%
+"""
+## 4. Randomized Prioritization Ensemble
+Run multiple calculations with shuffled reporter priority lists.
+"""
+
+# %%
+ensemble_daily_volumes_list = []
+
+for i in range(N_ENSEMBLE_RUNS):
+    shuffled_leis = covered_leis_list_master[:] # Create a copy
+    random.shuffle(shuffled_leis)
+    
+    daily_volume_run = calculate_daily_volume(
+        post_data,
+        covered_leis=covered_leis_set,
+        volume_col=VOLUME_COLUMN,
+        date_col=DATE_COLUMN,
+        reporter_priority_order=shuffled_leis,
+    )
+    # Add a run identifier
+    daily_volume_run = daily_volume_run.with_columns(pl.lit(i).alias("run_id"))
+    ensemble_daily_volumes_list.append(daily_volume_run)
+
+
+# %%
+"""
+## 5. Aggregate Ensemble Results
+Combine results from all ensemble runs and calculate median, min, and max volumes.
+"""
+
+# %%
+if ensemble_daily_volumes_list:
+    combined_ensemble_volumes = pl.concat(ensemble_daily_volumes_list)
+
+    ensemble_summary = (
+        combined_ensemble_volumes.group_by(DATE_COLUMN)
+        .agg(
+            pl.median("total_volume").alias("median_volume"),
+            pl.min("total_volume").alias("min_volume"),
+            pl.max("total_volume").alias("max_volume"),
+        )
+        .sort(DATE_COLUMN)
+    )
+else:
+    # Create an empty DataFrame with the expected schema if no ensemble runs happened
+    # This might happen if N_ENSEMBLE_RUNS = 0 or if post_data was empty.
+    schema = {
+        DATE_COLUMN: pl.Date,
+        "median_volume": pl.Float64,
+        "min_volume": pl.Float64,
+        "max_volume": pl.Float64,
+    }
+    ensemble_summary = pl.DataFrame(schema=schema)
+
+
+# %%
+"""
+## 6. Plotting the Results
+Visualize the median daily volume along with the min/max range from the ensemble.
+"""
+
+# %%
+if not ensemble_summary.is_empty():
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Convert Polars Date to Python datetime for Matplotlib if necessary
+    dates = ensemble_summary[DATE_COLUMN].to_numpy() # Matplotlib can often handle Polars dates directly via numpy
+                                                     # or use .to_datetime() for explicit conversion
+
+    ax.plot(dates, ensemble_summary["median_volume"], label="Median Volume (Ensemble)", color="blue", linewidth=2)
+    ax.plot(dates, ensemble_summary["min_volume"], label="Min Volume (Ensemble)", color="gray", linestyle="--", alpha=0.7)
+    ax.plot(dates, ensemble_summary["max_volume"], label="Max Volume (Ensemble)", color="gray", linestyle="--", alpha=0.7)
+    
+    # Fill between min and max
+    ax.fill_between(dates, ensemble_summary["min_volume"], ensemble_summary["max_volume"], color="lightgray", alpha=0.5, label="Ensemble Min-Max Range")
+
+    # Optional: Plot default and reverse alphabetical for comparison
+    if not volume_default_alpha.is_empty():
+        ax.plot(volume_default_alpha[DATE_COLUMN].to_numpy(), volume_default_alpha["total_volume"], label="Default Alpha Volume", color="green", linestyle=":")
+    if not volume_reverse_alpha.is_empty():
+        ax.plot(volume_reverse_alpha[DATE_COLUMN].to_numpy(), volume_reverse_alpha["total_volume"], label="Reverse Alpha Volume", color="red", linestyle=":")
+
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Total Transaction Volume")
+    ax.set_title("Sensitivity of Daily Transaction Volume to Reporter Prioritization")
+    
+    # Format dates on x-axis for better readability
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+    plt.xticks(rotation=45)
+    
+    ax.legend()
+    ax.grid(True, linestyle="--", alpha=0.7)
+    
+    plt.tight_layout() # Adjust layout to prevent labels from overlapping
+    plt.show()
+else:
+    pass # Or print a message that there's nothing to plot.
+
+
+# %%
+```
+
+
+- **Narrative Cells**
+  - Use a plain `# %%` at the start of each narrative cell (e.g., no `[markdown]` suffix).
+  - Immediately follow with a triple-quoted string (`"""`) containing the markdown content.
+  - Ensure you include a blank line between the closing `"""` and the next `# %%` delimiter.
+
+  Example:
+  ```python
+  # %%
+  """
+  ## Scenario 1: Large Trade Split into 3 Legs
+  Dealers sometimes report a single large trade split into legs...
+  """
+
+  # %%
+  def scenario_example() -> pl.DataFrame:
+      # build DataFrame
+      return df
+  df = scenario_example()
+  df
+  ```
+
+- **Code Cells**
+  - Use a plain `# %%` at the start of each code cell (for definitions, imports, execution).
+  - All Python definitions, imports, and execution logic go below this delimiter.
+  - To render DataFrame or variables as notebook output, end the cell with the variable name on its own line.
+
+  Example:
+  ```python
+  # %%
+  def scenario_example() -> pl.DataFrame:
+      # build DataFrame
+      return df
+  df = scenario_example()
+  df
+  ```
+
+

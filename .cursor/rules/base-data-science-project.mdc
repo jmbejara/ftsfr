@@ -13,14 +13,27 @@ from settings import config
 DATA_DIR = config("DATA_DIR")
 ```
 
+# File Constants
+
+Avoid defining filenames as global constants (e.g., `INPUT_FILENAME = "..."`).
+Instead, define the file path directly where it's used, typically within the
+`if __name__ == "__main__":` block or inside the function that needs it.
+This keeps the scope limited and makes scripts easier to understand independently.
+
 # Pull and Load
 
+
+## Data types
+Responsibility for correct data types rests with the `pull_*.py` script that initially loads or retrieves the data. Subsequent data cleaning and processing scripts should assume that the input DataFrames have the correct `dtypes`.
+Avoid defensive type casting (e.g., using `strict=False`) in processing scripts unless essential for a specific operation; type issues should ideally be fixed upstream in the relevant `pull_*.py` file.
 
 ## Naming
 
 - Functions that load data from disk should start with `load_`. Functions that pull from the web, or some external API, etc, should start with `pull_`. A file that contains a defined `pull_` function should also be named `pull_XYZ.py`.
 
 - In a pull file, there should be a `pull_` function and a `load_` function. The pull function pulls from the web into a pandas DataFrame. 
+
+Use descriptive names for functions and variables that clearly indicate their purpose. Avoid overly generic names like `pipeline`, `process_data`, or `temp_df`.
 
 ## Separation of Concerns for Data Pulls and Loads
 
@@ -164,20 +177,41 @@ for example.
 ## Print statements
 
 I also don't like for functions to print to the screen when something is loaded or pulled. This just adds extra noise. So, you should almost never use print statements.
+For example, several times you have written lines of code like this:
+```python
+print("Pulling S&P CUSIP issue table...")
+```
+Don't do that.
+
+Also, avoid print statements at the end of scripts confirming that a file was saved (e.g., `print(f"Saved data to {filepath}")`). The script completing without error implies success.
 
 ## Style
 
+### Naming
 Please always use snake_case instead of camelCase
 
 With names, a function should be called "plot_..." when the function plots something. If it plots something, it should not do anything else. 
+
+### Unneccesary checks
+
+Avoid explicitly checking if a file exists (e.g., using `os.path.exists` or `pathlib.Path.exists`) before attempting to load it with functions like `pd.read_parquet` or `pl.read_parquet`. These loading functions will typically raise informative errors (like `FileNotFoundError`) themselves if the file is missing, making the explicit check redundant.
+
 
 ## Functional programming
 
 The code should use a functional programming style. That is, functions should not have side effects and should avoid using externally defined variables (variables defined out of scope). Don't use classes and objects, unless there is an extremely good reason to.
 
-Each function should do one thing and one thing well. Naming should make it clear what it does. Functions that plot stuff should be called "plot_...", functions that pull from the internet or API should be "pull_", functions that load from disk should be "load_"
+Each function should do one thing and one thing well. Naming should make it clear what it does. Functions that plot stuff should be called "plot_...", functions that pull from the internet or API should be "pull_", functions that load from disk should be "load_".
+
+Break down complex operations into smaller, well-defined functions rather than having one large function handle multiple steps. This improves readability, testability, and maintainability.
 
 ## Refactoring
 
 When you refactor the code, like breaking up functions into smaller more well-defined functions, don't worry about keeping old function around for compatibility. Just go ahead and make edits everywhere needed to make the refactor successful.
+
+When refactoring or making edits, **remove unused or old code entirely** instead of commenting it out. This keeps the codebase clean and avoids confusion.
+
+## Python Library Versions
+
+When writing polars code, make sure that the syntax is for polars version 1 or greater.
 

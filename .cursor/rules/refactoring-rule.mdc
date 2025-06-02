@@ -1,0 +1,961 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+I'm in the process of refactoring this code base. All .py files should end up using tools such as chartbase and chartbase.trino so that it ends up looking something like this.
+
+```python
+"""
+pull_nccbr.py
+>>> post = load_post(data_dir=DATA_DIR)
+>>> post.glimpse(max_items_per_column=0)
+Rows: 12758392
+Columns: 50
+$ ofr_serial_number                               <str> 
+$ file_observation_date                           <str> 
+$ covered_reporter_lei                            <str> 
+$ cash_lender_lei                                 <str> 
+$ cash_lender_name                                <str> 
+$ cash_borrower_name                              <str> 
+$ cash_borrower_lei                               <str> 
+$ guarantee                                      <bool> 
+$ transaction_id                                  <str> 
+$ unique_transaction_id                           <str> 
+$ trading_platform                                <str> 
+$ trade_timestamp                        <datetime[μs]> 
+$ start_date                                     <date> 
+$ end_date                                       <date> 
+$ minimum_maturity_date                          <date> 
+$ cash_lender_internal_identifier                 <str> 
+$ cash_borrower_internal_identifier               <str> 
+$ start_leg_amount                                <f64> 
+$ close_leg_amount                                <f64> 
+$ current_cash_amount                             <f64> 
+$ start_leg_currency                              <str> 
+$ rate                                            <f64> 
+$ floating_rate_benchmark                         <str> 
+$ floating_rate_reset_frequency                   <f64> 
+$ spread                                          <f64> 
+$ securities_identifier_type                      <str> 
+$ security_identifier                             <str> 
+$ securities_quantity                             <f64> 
+$ securities_value                                <f64> 
+$ securities_value_at_inception                   <f64> 
+$ securities_value_currency                       <str> 
+$ haircut                                         <f64> 
+$ special_instructions_notes_or_comments          <str> 
+$ ofr_file_name                                   <str> 
+$ ofr_sub_count                                   <i64> 
+$ ofr_dv_logic_flags                              <str> 
+$ ofr_file_dv_pass_percent                        <f64> 
+$ ofr_dq_logic_flags                              <str> 
+$ ofr_file_dq_pass_percent                        <f64> 
+$ ofr_exclude_flag                               <bool> 
+$ ofr_resub_requested_flag                       <bool> 
+$ ofr_resub_requested_flag_ts                     <str> 
+$ ofr_resub_received_flag                        <bool> 
+$ ofr_resub_received_flag_ts                      <str> 
+$ ofr_file_ingest_ts                     <datetime[ms]> 
+$ ofr_dataops_signoff_ts                 <datetime[ms]> 
+$ ofr_dcu_username                                <str> 
+$ ofr_dcu_ts                             <datetime[ms]> 
+$ ofr_partition                                   <str> 
+$ date                                           <date> 
+
+"""
+import polars as pl
+from chartbase import trino
+from chartbase.settings import config
+
+DATA_DIR = config("DATA_DIR")
+NCCBR_DATE = config("NCCBR_DATE", default="20250424")
+FILEPATH = DATA_DIR / f"{NCCBR_DATE}sortedNCCBR.parquet"
+
+###
+# Data Ops gets data by 11 am the day after the file_date, and pushes to the post table by EOD
+# That means our pipeline is operating off a 2 day lag.
+# curs.execute('Select * from collab_nccbr.mock_data')
+
+
+def create_query(date=NCCBR_DATE):
+    query = f"""
+SELECT
+    file_observation_date ,
+    covered_reporter_lei ,
+    cash_lender_lei ,
+    cash_lender_name ,
+    cash_borrower_lei ,
+    cash_borrower_name ,
+    guarantee ,
+    transaction_id ,
+    unique_transaction_id ,
+    trading_platform ,
+    trade_timestamp ,
+    start_date ,
+    end_date ,
+    minimum_maturity_date ,
+    cash_lender_internal_identifier ,
+    cash_borrower_internal_identifier ,
+    start_leg_amount ,
+    close_leg_amount ,
+    current_cash_amount , 
+    start_leg_currency ,
+    rate ,
+    floating_rate_benchmark ,
+    floating_rate_reset_frequency ,
+    spread ,
+    securities_identifier_type ,
+    security_identifier ,
+    securities_quantity ,
+    securities_value ,
+    securities_value_at_inception ,
+    securities_value_currency ,
+    haircut ,
+    special_instructions_notes_or_comments ,
+    ofr_serial_number ,
+    OFR_File_DQ_Pass_Percent AS File_DQ_Pass_Percent,
+    OFR_File_DV_Pass_Percent AS File_DV_Pass_Percent,
+    array_join(OFR_DQ_Logic_Flags, '') AS DQ_Logic_Flags  ,
+    array_join(OFR_DV_Logic_Flags, '') AS DV_Logic_Flags,
+    OFR_File_Name ,
+    OFR_Exclude_Flag as Exclude_Flag,
+    ofr_dcu_username as covered_reporter_nam
+from 
+    ofr_sft_2.post
+WHERE (
+    OFR_DV_Logic_Flags is NULL or 
+    (
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%001%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%004%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%007%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%011%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%018%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%020%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%022%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%045%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%046%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%047%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%048%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%049%' and 
+        array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%052%'
+    )
+) and 
+-- file_observation_date = (Select MAX(file_observation_date) from ofr_sft_2.post)
+file_observation_date = '{NCCBR_DATE}'
+;
+"""
+    return query
+
+
+def pull_single_day_filtered(date=NCCBR_DATE, data_dir=DATA_DIR):
+    query = create_query(date=date)
+    # print(query)
+    trino.kinit()
+    data = trino.submit_query(query, to="polars")
+
+    ###
+    # Now I find aggregate trades inside the data
+    # There are a couple ways to do this:
+    # 1) everything is the same except transaction id and all but 1 transaction is $50m quantity
+    # 2) both counterparties report the transaction and total transaction volumes match
+    # Since I'm not guaranteed that both counterparties are covered reporters, I'll go route 1.
+    # Specifically, I'll be looking for matching or sequential trade ids, and matching or within 1 second trade timestamps, if available
+
+    # I'll do this as a single pass through the dataframe by sorting and comparing records pair-wise
+    agg_df = data.sort(
+        [
+            "file_observation_date",
+            "covered_reporter_lei",
+            "cash_lender_lei",
+            "cash_borrower_lei",
+            "guarantee",
+            "trading_platform",
+            "start_date",
+            "end_date",
+            "minimum_maturity_date",
+            "start_leg_currency",
+            "rate",
+            "floating_rate_benchmark",
+            "floating_rate_reset_frequency",
+            "spread",
+            "securities_identifier_type",
+            "security_identifier",
+            "securities_value_currency",
+            "haircut",
+            "start_leg_amount",
+            "close_leg_amount",
+            "current_cash_amount",
+            "securities_value",
+            "securities_value_at_inception",
+            "securities_quantity",
+            "trade_timestamp",
+            "transaction_id",
+        ]
+    )
+
+    agg_df = agg_df.with_row_index(name="ofr_id").with_columns(
+        ofr_id=pl.col("ofr_id").cast(pl.String)
+    )
+    return agg_df
+
+
+def pull_and_save_single_day_filtered(date=NCCBR_DATE, filepath=FILEPATH):
+    agg_df = pull_single_day_filtered(date=NCCBR_DATE, data_dir=DATA_DIR)
+    agg_df.write_parquet(filepath)
+
+
+def pull_post(single_day=None):
+    """
+    Example, single_day="20250424"
+    """
+    trino.kinit()
+    query = """
+    SELECT * 
+    FROM ofr_sft_2.post
+    WHERE (
+        OFR_DV_Logic_Flags is NULL or 
+        (
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%001%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%004%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%007%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%011%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%018%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%020%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%022%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%045%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%046%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%047%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%048%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%049%' and 
+            array_join(OFR_DV_Logic_Flags, '') NOT LIKE '%052%'
+        )
+    ) 
+    """
+    if single_day is not None:
+        query = query + " AND file_observation_date = '{single_day}';"
+    else:
+        query = query + ";"
+
+    post = trino.submit_query(query, to="polars")
+
+    # post.glimpse()
+    post = post.with_columns(
+        pl.col(pl.String).replace(
+            {
+                "null": None,
+                "nan": None,
+                "na": None,
+                "NULL": None,
+                "NAN": None,
+                "NA": None,
+                "": None,
+            }
+        )
+    )
+
+    ## parse booleans
+    def parse_bool_column(post, col):
+        # Convert guarantee to boolean
+        post = post.with_columns(
+            pl.col(col)
+            .str.to_lowercase()  # Normalize case first
+            .replace_strict(
+                {"true": True, "false": False}
+            )  # Map strings to boolean values
+            # .str.parse_bool()
+            .alias(col)  # Replace the original column
+        )
+        return post
+
+    post = parse_bool_column(post, "guarantee")
+    post = parse_bool_column(post, "ofr_exclude_flag")
+    post = parse_bool_column(post, "ofr_resub_requested_flag")
+    post = parse_bool_column(post, "ofr_resub_received_flag")
+
+    ## parse timestamps
+    fmt1 = "%Y%m%dT%H:%M:%S%.fZ"  # e.g. 20241226T00:00:00.000Z
+    fmt2 = "%Y-%m-%d %H:%M:%S%.f"  # e.g. 2024-11-27 13:35:49.0
+
+    def parse_timestamp_col(post, col):
+        post = (
+            post.with_columns(
+                [
+                    # try parsing with fmt1, fall back to null on failure
+                    pl.col(col)
+                    .str.strptime(pl.Datetime, fmt1, strict=False)
+                    .alias("_ts1"),
+                    # try parsing with fmt2
+                    pl.col(col)
+                    .str.strptime(pl.Datetime, fmt2, strict=False)
+                    .alias("_ts2"),
+                ]
+            )
+            # coalesce picks the first non-null value in each row
+            .with_columns(
+                pl.coalesce([pl.col("_ts1"), pl.col("_ts2")]).alias("_ts_parsed")
+            )
+            .drop(["_ts1", "_ts2"])
+        )
+        # Check if dates are dropped correctly
+        assert post["_ts_parsed"].null_count() == post[col].null_count()
+        post = post.with_columns(pl.col("_ts_parsed").alias(col)).drop("_ts_parsed")
+        return post
+
+    post = parse_timestamp_col(post, "trade_timestamp")
+    post = parse_timestamp_col(post, "start_date")
+    post = parse_timestamp_col(post, "end_date")
+
+    ts_cols = [
+        "ofr_file_ingest_ts",
+        "ofr_dataops_signoff_ts",
+        "ofr_dcu_ts",
+    ]
+    post = post.with_columns(
+        pl.col(ts_cols).str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S.%3f")
+    )
+
+    ## parse dates
+    post = post.with_columns(
+        # parse YYYYMMDD -> Date
+        date=pl.col("file_observation_date").str.strptime(pl.Date, "%Y%m%d"),
+        minimum_maturity_date=pl.col("minimum_maturity_date").str.strptime(
+            pl.Date, "%Y%m%d"
+        ),
+    )
+    post = post.with_columns(
+        pl.col("start_date").dt.date(), pl.col("end_date").dt.date()
+    )
+
+    # parse floats
+    post = post.with_columns(
+        pl.col(
+            [
+                "start_leg_amount",
+                "close_leg_amount",
+                "current_cash_amount",
+                "rate",
+                "spread",
+                "securities_quantity",
+                "securities_value",
+                "securities_value_at_inception",
+                "haircut",
+                "ofr_file_dv_pass_percent",
+                "ofr_file_dq_pass_percent",
+                "floating_rate_reset_frequency",
+            ]
+        ).cast(pl.Float64)
+    )
+
+    # parse ints
+    post = post.with_columns(
+        pl.col(
+            ["ofr_sub_count"]
+        ).cast(pl.Int64)
+    )
+
+    return post
+
+
+def load_post(data_dir=DATA_DIR):
+    filepath = DATA_DIR / "post.parquet"
+    post = pl.read_parquet(filepath)
+    return post
+
+
+if __name__ == "__main__":
+    # pull_and_save_single_day_filtered(date=NCCBR_DATE, filepath=FILEPATH)
+    post = pull_post()
+    filepath = DATA_DIR / "post.parquet"
+    post.write_parquet(filepath)
+
+```
+
+
+Now, here is an example of how files get transfored from their old state to the new, refactored state. So, here we start with the old state of a file:
+```python
+# clean_nccbr_figi_converter.py OLD
+#This script creates FIGI and CUSIP columns and tries its best to populate them using the FIGI crosswalk table
+#%%
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+import os
+import config
+from pathlib import Path
+import math
+import json
+import base64
+
+OUTPUT_DIR = Path(config.OUTPUT_DIR)
+DATA_DIR = Path(config.DATA_DIR)
+#%%
+#Start by updating the figi crosswalk table. (Courtesy of Jonathan Becker)
+#After this block, collab_nccbr.figi_crosswalk_temp will be as complete as possible
+
+
+#Pull the crosswalk table into memory for easy access
+#%%
+import jaydebeapi
+keytab = '/data/unixhome/'+os.getenv('USER')+'/'+os.getenv('USER')+'.keytab'
+config = {
+        'user': os.getenv('USER'),
+        'KerberosPrincipal': os.getenv('USER')+'@OFR.TREAS.GOV',
+        'SSL': 'true',
+        'KerberosRemoteServiceName': 'trino',
+        'KerberosKeytabPath': keytab,
+        }
+conn = jaydebeapi.connect('io.trino.jdbc.TrinoDriver',
+        'jdbc:trino://trino.emr.ofr.treas.gov:8446/hive',
+        config,
+        "/opt/aws_ofropt/presto/trino-jdbc-403-amzn-0.jar")
+curs = conn.cursor()
+curs.execute('Select count(*) From fdic_ris_ver2.financials')
+print(curs.fetchall())
+
+#%%
+data =  pd.read_parquet(DATA_DIR / (os.getenv('NCCBR_DATE')+'sortedNCCBR.parquet'))
+
+import util_nccbr_figi_crosswalk_updater # JEREMY NOTE: Comment this out if you don't have access to the figi_crosswalk collab folder
+util_nccbr_figi_crosswalk_updater.update_figi_crosswalk() # JEREMY NOTE: Comment this out if you don't have access to the figi_crosswalk collab folder
+cusipListStr = "'" + data['security_identifier'].drop_duplicates().astype(str).str.cat(sep="', '" , na_rep=",'") + "'"
+
+curs.execute('Select distinct securityidentifiertype, securityidentifier, figi from collab_nccbr.figi_crosswalk_temp where securityidentifier in (' + cusipListStr +') or figi in (' + cusipListStr + ')')
+figidata = curs.fetchall()
+figiCrosswalk = pd.DataFrame(figidata, columns = [desc[0] for desc in curs.description])
+# os.environ['figiCrosswalk'] = base64.b64encode(figiCrosswalk.to_json().encode()).decode()
+
+#        figiCrosswalk =  pd.read_json(base64.b64decode(os.environ.get('figiCrosswalk').encode()).decode())
+
+#%%
+
+
+#Initialize the new columns
+data['figi'] = ''
+data['cusip'] = ''
+
+def isinToCusip(ISIN):
+    if ((ISIN[:2] == 'US') or (ISIN[:2] == 'CA')):
+        return ISIN[2:11]
+    else:
+        return ''
+
+
+
+#Populate the columns using the following sequence:
+"""
+ISINs get converted to CUSIPs, if possible, and added to the CUSIP column
+CUSIPs get added to the cusip column
+FIGIs get added to the figi column
+The cusip column gets converted into figis and added to the figi column, using the first matching figi
+The figi column gets converted where cusip is missing and added to the cusip column, where possible.
+For any column where I have a figi but no cusip, check if I already have a mapped cusip and fill the blank
+The last case will trigger for ISINs that can't be directly mapped to CUSIP but can be mapped to FIGI
+"""
+#1-3: The easy conversions (ISIN to cusip, CUSIP to cusip, and FIGI to figi)
+data.loc[data['securities_identifier_type']=='ISIN','cusip'] = data.loc[data['securities_identifier_type']=='ISIN','security_identifier'].apply(isinToCusip)
+data.loc[data['securities_identifier_type']=='CUSIP','cusip'] = data.loc[data['securities_identifier_type']=='CUSIP','security_identifier']
+data.loc[data['securities_identifier_type']=='FIGI','figi'] = data.loc[data['securities_identifier_type']=='FIGI','security_identifier']
+#%%
+#4 use the figi-crosswalk to turn all CUSIPs into FIGIs. Should be 100% coverage if the util converter was invoked earlier
+#Some CUSIPS map to multiple FIGIs, so I explicitly downselect to the first matching CUSIP
+data.loc[data['securities_identifier_type']=='ISIN','figi'] = pd.merge(data.loc[data['securities_identifier_type']=='ISIN','security_identifier'], figiCrosswalk.loc[figiCrosswalk['securityidentifiertype'] == 'ID_ISIN', ['securityidentifier', 'figi']].drop_duplicates(subset='securityidentifier', keep='first'), how='left', left_on='security_identifier', right_on='securityidentifier').fillna('')['figi'].values
+data.loc[data['securities_identifier_type']=='CUSIP','figi'] = pd.merge(data.loc[data['securities_identifier_type']=='CUSIP','security_identifier'], figiCrosswalk.loc[figiCrosswalk['securityidentifiertype'].isin(['ID_CUSIP', 'ID_CINS']), ['securityidentifier', 'figi']].drop_duplicates(subset='securityidentifier', keep='first'), how='left', left_on='security_identifier', right_on='securityidentifier').fillna('')['figi'].values
+#Final pass for ISINs that weren't matched; is their CUSIP conversion matched?
+data.loc[(data['securities_identifier_type']=='ISIN') & (data['figi'] == '') ,'figi'] = pd.merge(data.loc[(data['securities_identifier_type']=='ISIN') & (data['figi']  == '') ,'cusip'], figiCrosswalk.loc[figiCrosswalk['securityidentifiertype'].isin(['ID_CUSIP', 'ID_CINS']), ['securityidentifier', 'figi']].drop_duplicates(subset='securityidentifier', keep='first'), how='left', left_on='cusip', right_on='securityidentifier').fillna('')['figi'].values
+#%%
+#convert FIGIs to CUSIPs
+#I downselect to a single CUSIP per FIGI, in case there was an issue with the crosswalk table. The CUSIP mapping should always be unique. 
+data.loc[data['securities_identifier_type']=='FIGI','cusip'] =  pd.merge(data.loc[data['securities_identifier_type']=='FIGI','security_identifier'], figiCrosswalk.loc[figiCrosswalk['securityidentifiertype'].isin(['ID_CUSIP', 'ID_CINS']), ['securityidentifier', 'figi']].drop_duplicates(subset='figi', keep='first'), how='left', left_on='security_identifier', right_on='figi').fillna('')['securityidentifier'].values
+
+#Bonus step, for any row with a FIGI but no CUSIP, check if I know the CUSIP for the FIGI and assign it. 
+#Same in the other direction as well to correct nan issues in the figi crosswalk
+figiCusipDf = data.groupby('figi', as_index=False)['cusip'].max()
+data.loc[(data['figi']!='') & (data['cusip']==''),'cusip'] = pd.merge(data.loc[(data['figi']!='') & (data['cusip']=='')],figiCusipDf, how='left', on='figi').fillna('')['cusip_y'].values
+figiCusipDf = data.loc[data['figi'] != 'nan'].groupby('cusip', as_index=False)['figi'].max()
+data.loc[(data['figi']=='nan') & (data['cusip']!=''),'figi'] = pd.merge(data.loc[(data['figi']=='nan') & (data['cusip']!='')],figiCusipDf, how='left', on='cusip').fillna('')['figi_y'].values
+
+#Replace nan with blank to assist downstream processing
+data.loc[data['figi']=='nan','figi'] = ''
+#%%
+import os
+data = data.astype(str)
+data.to_parquet(DATA_DIR / (os.getenv('NCCBR_DATE')+'figiConverted.parquet'))
+```
+
+And here is the new, refactored state of that same file:
+```python
+# clean_nccbr_figi_converter.py NEW
+"""
+clean_figi_converter.py
+
+Read raw NCCBR trade data and enrich it with CUSIP and FIGI identifiers.
+
+Process:
+  1. Load raw NCCBR data and FIGI crosswalk.
+  2. Initialize new columns `cusip` and `figi`:
+     - ISIN → CUSIP via prefix strip for US/CA ISINs.
+     - Copy original CUSIPs and FIGIs directly.
+  3. Deduplicate the crosswalk to enforce one-to-one mappings.
+  4. Left-join CUSIP → FIGI, coalesce to fill missing FIGIs.
+  5. Left-join FIGI → CUSIP, coalesce to fill missing CUSIPs.
+  6. Replace nulls with empty strings and cast to Utf8.
+
+Warnings:
+  - CUSIP → FIGI mapping can introduce share-class/exchange ambiguity
+    because one CUSIP may map to multiple FIGIs.
+  - FIGI → CUSIP mapping is guaranteed one-to-one upstream.
+
+Notes:
+
+>>> post = pull_nccbr.load_post(data_dir=DATA_DIR)
+>>> post.select(["securities_identifier_type", "security_identifier"]).glimpse()
+Rows: 12758392
+Columns: 2
+$ securities_identifier_type <str> 'CUSIP', 'CUSIP', 'CUSIP', 'FIGI', 'FIGI', 'FIGI', 'CUSIP', 'CUSIP', 'CUSIP', 'CUSIP'
+$ security_identifier        <str> '91282CJS1', '91282CLM1', '91282CBT7', 'BBG01MLLRG23', 'BBG00ZF0P8K8', 'BBG019BY6ZV4', '91282CGM7', '91282CCP4', '91282CKL4', '3140A2YB5'
+
+>>> post["securities_identifier_type"].unique()
+shape: (4,)
+Series: 'securities_identifier_type' [str]
+[
+        "NO IDENTIFIER TYPE"
+        "ISIN"
+        "CUSIP"
+        "FIGI"
+]
+>>> post.filter(
+    pl.col("securities_identifier_type") == "NO IDENTIFIER TYPE"
+).select(["securities_identifier_type", "security_identifier"]).glimpse()
+Rows: 775
+Columns: 2
+$ securities_identifier_type <str> 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE', 'NO IDENTIFIER TYPE'
+$ security_identifier        <str> 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER', 'NO IDENTIFIER'
+
+>>> figi_crosswalk = pull_figi_crosswalk.load_figi_crosswalk(data_dir=DATA_DIR)
+>>> figi_crosswalk.glimpse()
+Rows: 11762806
+Columns: 12
+$ figi                   <str> 'BBG019V1LP30', 'BBG0010L4W41', 'BBG002CC9H35', 'BBG0012NBFK6', 'BBG0009F79J9', 'BBG0011SSF28', 'BBG0029DXZQ5', 'BBG0099X0Y12', 'BBG019PLS8G0', 'BBG0006162G2'
+$ name                   <str> 'FN BS6743', 'JEANNETTE SD', 'EDGEWOOD-REF', 'CONEJO VY USD 1998-B', 'FN 68744', 'FAIRFIELD SD', 'FG Q05057', 'BAYTOWN-REF', 'GNR 2022-169 IO', 'FEDERAL HOME LOAN BANK'
+$ ticker                 <str> 'FN BS6743', 'PA JEASCD 4 12/15/2024', 'KY EDG 2 12/01/2020', 'CA CJVSCD 4 08/01/2004', 'FN 68744', 'PA FFDSCD 3.9 06/01/2004', 'FG Q05057', 'TX BYT 5 02/01/2027', 'GNR 2022-169 IO', 'FHLB 2.375 10/29/02 BW02'
+$ exchcode               <str> None, None, None, None, None, None, None, None, None, None
+$ compositefigi          <str> None, None, None, None, None, None, None, None, None, None
+$ securitytype           <str> 'MBS Other', 'FIXED, OID', 'FIXED', 'FIXED, OID', 'MBS ARM', 'FIXED', 'MBS 30yr', 'FIXED', 'Agncy CMBS', 'US DOMESTIC'
+$ marketsector           <str> 'Mtge', 'Muni', 'Muni', 'Muni', 'Mtge', 'Muni', 'Mtge', 'Muni', 'Mtge', 'Govt'
+$ shareclassfigi         <str> None, None, None, None, None, None, None, None, None, None
+$ securitytype2          <str> 'Pool', 'Muni', 'Muni', 'Muni', 'Pool', 'Muni', 'Pool', 'Muni', 'CMBS', 'Govt'
+$ securitydescription    <str> 'FN BS6743', None, None, None, 'FN 68744', None, 'FG Q05057', None, 'GNR 2022-169 IO', 'FHLB 2 3/8 10/29/02'
+$ securityidentifiertype <str> 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP', 'ID_CUSIP'
+$ securityidentifier     <str> '3140LHP53', '472286JB0', '280448BH3', '206849CW9', '31362RLZ8', '304702FS7', '3132GLJA3', '073186KD9', '38381HTD3', '3133MJKL3'
+"""
+
+import polars as pl
+from chartbase.settings import config
+
+import pull_figi_crosswalk
+import pull_nccbr
+
+DATA_DIR = config("DATA_DIR")
+NCCBR_DATE = config("NCCBR_DATE", default="20250424")
+
+
+def add_cusip_and_figi_to_post(
+    post,
+    cw,
+) -> pl.DataFrame:
+    """
+    Enrich an NCCBR Polars DataFrame with CUSIP and FIGI columns using a crosswalk.
+
+    Parameters
+    ----------
+    post : pl.DataFrame
+        The NCCBR trade data, with columns including 'securities_identifier_type' and 'security_identifier'.
+    cw : pl.DataFrame
+        The FIGI crosswalk table, with columns including 'securityidentifiertype', 'securityidentifier', and 'figi'.
+
+    Returns
+    -------
+    pl.DataFrame
+        The input DataFrame with two new columns:
+        - 'cusip': CUSIP identifier (from ISIN, CUSIP, or FIGI→CUSIP mapping)
+        - 'figi': FIGI identifier (from FIGI or CUSIP→FIGI mapping)
+    """
+    # a) Initialize 'cusip' and 'figi' columns with vectorized Polars expressions
+    post = post.with_columns(
+        [
+            pl.when(
+                (pl.col("securities_identifier_type") == "ISIN")
+                & pl.col("security_identifier").str.slice(0, 2).is_in(["US", "CA"])
+            )
+            .then(pl.col("security_identifier").str.slice(2, 9))
+            .when(pl.col("securities_identifier_type") == "CUSIP")
+            .then(pl.col("security_identifier"))
+            .otherwise(None)
+            .alias("cusip"),
+            pl.when(pl.col("securities_identifier_type") == "FIGI")
+            .then(pl.col("security_identifier"))
+            .otherwise(None)
+            .alias("figi"),
+        ]
+    )
+
+    # b) Prepare one-to-one crosswalk lookups
+    cw_by_cusip = (
+        cw.filter(pl.col("securityidentifiertype").is_in(["ID_CUSIP", "ID_CINS"]))
+        .select(
+            [
+                pl.col("securityidentifier").alias("cusip_key"),
+                pl.col("figi").alias("figi_from_cusip"),
+            ]
+        )
+        .unique(subset=["cusip_key"])
+    )
+
+    cw_by_figi = (
+        cw.filter(pl.col("securityidentifiertype").is_in(["ID_CUSIP", "ID_CINS"]))
+        .select(
+            [
+                pl.col("figi").alias("figi_key"),
+                pl.col("securityidentifier").alias("cusip_from_figi"),
+            ]
+        )
+        .unique(subset=["figi_key"])
+    )
+
+    # c) Left-join CUSIP -> FIGI
+    post = post.join(cw_by_cusip, left_on="cusip", right_on="cusip_key", how="left")
+    post = post.with_columns(
+        pl.coalesce([pl.col("figi"), pl.col("figi_from_cusip")]).alias("figi")
+    ).drop(["figi_from_cusip"])
+
+    # d) Left-join FIGI -> CUSIP
+    post = post.join(cw_by_figi, left_on="figi", right_on="figi_key", how="left")
+    post = post.with_columns(
+        pl.coalesce([pl.col("cusip"), pl.col("cusip_from_figi")]).alias("cusip")
+    ).drop(["cusip_from_figi"])
+
+    # e) Final clean-up: fill nulls and enforce Utf8
+    post = post.with_columns(
+        [
+            pl.col("cusip").cast(pl.Utf8),
+            pl.col("figi").cast(pl.Utf8),
+        ]
+    )
+    # post.glimpse()
+    # post[["cusip", "figi"]].null_count()
+    return post
+
+
+if __name__ == "__main__":
+    post = pull_nccbr.load_post(data_dir=DATA_DIR)
+    cw = pull_figi_crosswalk.load_figi_crosswalk(data_dir=DATA_DIR)
+    result = add_cusip_and_figi_to_post(post, cw)
+    filepath = DATA_DIR / "post_with_figi_cusip.parquet"
+    result.write_parquet(filepath)
+
+```
+
+
+And here is another example. Here is the old version:
+```python
+#This is Robert Mann's incomplete algorithm for binning CUSIPs
+#%%
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+import os
+import config
+from pathlib import Path
+#The first time I have to dump the mock data to Trino
+#After that I start by pulling data from trino
+OUTPUT_DIR = Path(config.OUTPUT_DIR)
+DATA_DIR = Path(config.DATA_DIR)
+
+#%%
+import jaydebeapi
+keytab = '/data/unixhome/'+os.getenv('USER')+'/'+os.getenv('USER')+'.keytab'
+config = {
+        'user': os.getenv('USER'),
+        'KerberosPrincipal': os.getenv('USER')+'@OFR.TREAS.GOV',
+        'SSL': 'true',
+        'KerberosRemoteServiceName': 'trino',
+        'KerberosKeytabPath': keytab,
+        }
+conn = jaydebeapi.connect('io.trino.jdbc.TrinoDriver',
+        'jdbc:trino://trino.emr.ofr.treas.gov:8446/hive',
+        config,
+        "/opt/aws_ofropt/presto/trino-jdbc-403-amzn-0.jar")
+curs = conn.cursor()
+curs.execute('Select count(*) From fdic_ris_ver2.financials')
+print(curs.fetchall())
+#%%
+data =  pd.read_parquet(DATA_DIR / (os.getenv('NCCBR_DATE')+'figiConverted.parquet'))
+tp = data
+
+cusipListStr = "'" + data['cusip'].drop_duplicates().astype(str).str.cat(sep="', '" , na_rep=",'") + "'"
+
+sql_clean = """select distinct * from (select b.*, c.issue_additional_info, c.issue_description, c.security_type_description, 
+c.maturity_date, c.currency_code from (select security_identifier, cusip, substring(cusip,1,6) as issuer_num, 
+substring(cusip,7,2) as issue_num from (select distinct security_identifier, case 
+when length(security_identifier) = 9 then security_identifier
+            when (length(security_identifier)>9 and substring(security_identifier, 1, 2) IN ('US','CA')) then 
+            substring(security_identifier,3,9)
+                            else 'NULL' end as cusip
+                                    from (VALUES """ + cusipListStr + """) as a (security_identifier) )) as b
+             left join
+              (select issuer_num, issue_num, issue_description, issue_additional_info, maturity_date, currency_code, security_type_description from sandp_cusip.issue) as c
+              on b.issue_num = c.issue_num and c.issuer_num = b.issuer_num)
+              as d
+              left join 
+              (select issuer_number, issuer_name, issuer_type, legal_entity_name from sandp_cusip.issuer) as e
+              on d.issuer_num = e.issuer_number
+"""
+
+curs.execute(sql_clean)
+column_names = [desc[0] for desc in curs.description]
+data = curs.fetchall()
+dcusip= pd.DataFrame(data, columns=column_names)
+#%%
+dcusip['type'] = 'Other' # Default to other collateral
+
+dcusip.loc[dcusip['issuer_type']=='G','type'] = 'Agency ABS/MBS' # For government securities, default to Agency MBS
+
+dcusip.loc[(dcusip['issuer_type']=='G') & 
+           ((dcusip['security_type_description'] == 'Mortgage Backed') | 
+            (dcusip['security_type_description'] == 'Asset Backed')),'type'] = 'Agency ABS/MBS' # Mortgage backed government securities
+                                                                                                # SHOULD be agency ABS/MBS
+
+dcusip.loc[(dcusip['issuer_type']=='G') & 
+           ((dcusip['security_type_description'] == 'Note') | 
+            (dcusip['security_type_description'] == 'Medium Term Note') | 
+            (dcusip['security_type_description'] == 'Corporate Debt')),'type'] = 'Agency Note' # Default non-asset backed securities
+                                                                                               # to agency notes
+
+dcusip.loc[dcusip['legal_entity_name']=='United States Department Of The Treasury','type'] = 'U.S. Treasury' # These are Treasuries
+
+dcusip.loc[(dcusip['issuer_type']=='C') 
+           & (dcusip['security_type_description'] == 'Corporate Debt'), 'type'] = 'Corporate Debt' # True corporate securities
+
+dcusip.loc[(dcusip['issuer_type']=='C') & 
+           ((dcusip['security_type_description'] == 'Mortgage Backed') |
+            (dcusip['security_type_description'] == 'Asset Backed')),'type'] = 'Private label ABS/MBS' # Non-government ABS/MBS
+                                                                                                       # by definition private label
+
+dcusip.loc[(dcusip['issuer_type']=='S'),'type'] = 'Sovereign Debt' # Sovereigns by definition
+dcusip.loc[(dcusip['issuer_type']=='M'),'type'] = 'Municipal Debt' # Munis by definition
+
+dcusip.loc[(dcusip['issuer_type']=='C') & 
+           ((dcusip['security_type_description'] == 'Note') |
+            (dcusip['security_type_description'] == 'Medium Term Note')),'type'] = 'Corporate Debt' # Also corporate debt
+
+dcusip.loc[(dcusip['security_identifier'].str.slice(0,4) == '3133') &
+           (dcusip['security_type_description'] != 'Note') 
+           & (dcusip['security_type_description'] != 'Medium Term Note'), 'type'] = 'Agency ABS/MBS' # These weren't mapped
+                                                                                                     # but appear to be ABS
+
+dcusip.loc[(dcusip['type'] == 'Other') & 
+       (dcusip['security_identifier'].str.slice(0,2) == 'JP'), 'type'] = 'Sovereign Debt' # Japanese government bonds
+
+dcusip.loc[(dcusip['type'] == 'Other') & 
+       (dcusip['security_identifier'].str.slice(0,2) == 'CA'), 'type'] = 'Sovereign Debt' # Canadian bonds
+
+dcusip.loc[(dcusip['type'] == 'Other')
+           & (dcusip['security_type_description'] == 'Structured Products'),'type'] = 'Structured Products' # This is where I gave up
+
+
+typedict = dcusip.groupby('security_identifier')['type'].first().to_dict() # Create a dictionary that maps to type
+
+tp['security_bin']=tp['cusip'].map(typedict)
+
+#%%
+import os
+tp.to_parquet(DATA_DIR / (os.getenv('NCCBR_DATE')+'collateralMapped.parquet'))
+
+```
+And here is the new version:
+
+```python
+"""
+clean_collateral_mapper.py
+
+Classifies securities into collateral asset classes based on CUSIP and S&P data.
+
+Input:
+- NCCBR trade data with a 'cusip' column (e.g., 'post_with_figi_cusip.parquet').
+- S&P CUSIP Issue data ('sandp_cusip_issue.parquet').
+- S&P CUSIP Issuer data ('sandp_cusip_issuer.parquet').
+
+Output:
+- NCCBR trade data enriched with an 'asset_class' column.
+  (e.g., 'post_with_collateral_bins.parquet' - filename will be updated).
+
+Process:
+1. Load the three input datasets.
+2. Prepare S&P data:
+   - Rename 'issuer_number' to 'issuer_num' in the issuer table.
+   - Join issue and issuer tables on 'issuer_num'.
+   - Select key columns needed for classification.
+3. Prepare CUSIPs for lookup:
+   - Extract distinct CUSIPs from the input trade data.
+   - Derive 'issuer_num' (first 6 chars) and 'issue_num' (chars 7-8).
+4. Join CUSIPs with S&P data on 'issuer_num' and 'issue_num'.
+5. Apply classification rules using Polars `when/then/otherwise`:
+   - Default to 'Other'.
+   - Apply rules hierarchically based on S&P fields and CUSIP prefixes:
+     - Check for 'United States Department Of The Treasury' -> 'U.S. Treasury'.
+     - Check issuer_type 'G' (Government):
+       - If security_type is Note/MTN/Corp Debt -> 'Agency Note'.
+       - Otherwise -> 'Agency ABS/MBS'.
+     - Check issuer_type 'C' (Corporate):
+       - If security_type is MBS/ABS -> 'Private label ABS/MBS'.
+       - If security_type is Corp Debt/Note/MTN -> 'Corporate Debt'.
+       - If security_type is Structured Products -> 'Structured Products'.
+       - Otherwise -> 'Other Corporate'.
+     - Check issuer_type 'S' -> 'Sovereign Debt'.
+     - Check issuer_type 'M' -> 'Municipal Debt'.
+     - Check specific CUSIP prefix '3133' (non-Note/MTN) -> 'Agency ABS/MBS'.
+     - Check security_type 'Structured Products' (non-Corporate) -> 'Structured Products'.
+     - Check CUSIP prefix 'JP' -> 'Sovereign Debt'.
+     - Check CUSIP prefix 'CA' -> 'Sovereign Debt'.
+     - Final fallback remains 'Other'.
+6. Create a mapping DataFrame with 'cusip' and derived 'asset_class'.
+7. Join this mapping back to the original input trade data on 'cusip'.
+8. Save the enriched data to a new parquet file.
+"""
+
+import polars as pl
+from chartbase.settings import config
+
+import pull_sandp_cusip  # To load the S&P data
+
+# Assuming the input file comes from the figi converter step
+# We might need to adjust this based on the actual preceding script's output name
+
+
+DATA_DIR = config("DATA_DIR")
+
+
+def add_collateral_bin(
+    post_with_cusip: pl.DataFrame,
+    sandp_issue: pl.DataFrame,
+    sandp_issuer: pl.DataFrame,
+) -> pl.DataFrame:
+    """Enriches NCCBR data with collateral asset class based on CUSIP and S&P data."""
+
+    # --- 2. Prepare S&P Data ---
+    issuer_renamed = sandp_issuer.rename({"issuer_number": "issuer_num"})
+
+    sp_joined = sandp_issue.join(issuer_renamed, on="issuer_num", how="left")
+
+    # Select only necessary columns and keep distinct issue identifiers
+    sp_relevant = sp_joined.select(
+        [
+            "issuer_num",
+            "issue_num",
+            "security_type_description",
+            "issuer_type",
+            "legal_entity_name",
+        ]
+    ).unique(subset=["issuer_num", "issue_num"])
+
+    # --- 3. Prepare CUSIPs for Lookup ---
+    distinct_cusips = (
+        post_with_cusip.select("cusip")
+        .filter(pl.col("cusip").is_not_null() & (pl.col("cusip").str.len_chars() >= 8))
+        .unique()
+        .with_columns(
+            [
+                pl.col("cusip").str.slice(0, 6).alias("issuer_num"),
+                pl.col("cusip").str.slice(6, 2).alias("issue_num"),
+            ]
+        )
+    )
+
+    # --- 4. Join CUSIPs with S&P Data ---
+    cusips_with_sp_data = distinct_cusips.join(
+        sp_relevant, on=["issuer_num", "issue_num"], how="left"
+    )
+
+    # --- 5. Apply Classification Rules (Polars) ---
+    classified_cusips = cusips_with_sp_data.with_columns(
+        pl.when(
+            pl.col("legal_entity_name") == "United States Department Of The Treasury"
+        )
+        .then(pl.lit("U.S. Treasury"))
+        .when(pl.col("issuer_type") == "G")
+        .then(
+            pl.when(
+                pl.col("security_type_description").is_in(
+                    ["Note", "Medium Term Note", "Corporate Debt"]
+                )
+            )
+            .then(pl.lit("Agency Note"))
+            .otherwise(pl.lit("Agency ABS/MBS"))
+        )
+        .when(pl.col("issuer_type") == "C")
+        .then(
+            pl.when(
+                pl.col("security_type_description").is_in(
+                    ["Mortgage Backed", "Asset Backed"]
+                )
+            )
+            .then(pl.lit("Private label ABS/MBS"))
+            .when(
+                pl.col("security_type_description").is_in(
+                    ["Corporate Debt", "Note", "Medium Term Note"]
+                )
+            )
+            .then(pl.lit("Corporate Debt"))
+            .when(pl.col("security_type_description") == "Structured Products")
+            .then(pl.lit("Structured Products"))
+            .otherwise(pl.lit("Other Corporate"))  # Assign remaining Corporates
+        )
+        .when(pl.col("issuer_type") == "S")
+        .then(pl.lit("Sovereign Debt"))
+        .when(pl.col("issuer_type") == "M")
+        .then(pl.lit("Municipal Debt"))
+        .when(
+            (pl.col("issuer_type").is_null() | (pl.col("issuer_type") != "G"))
+            & pl.col("cusip").str.starts_with("3133")
+            & pl.col("security_type_description")
+            .is_in(["Note", "Medium Term Note"])
+            .not_()
+        )
+        .then(pl.lit("Agency ABS/MBS"))
+        .when(
+            (pl.col("issuer_type").is_null() | (pl.col("issuer_type") == "C").not_())
+            & (pl.col("security_type_description") == "Structured Products")
+        )
+        .then(pl.lit("Structured Products"))
+        .when(pl.col("cusip").str.slice(0, 2) == "JP")
+        .then(pl.lit("Sovereign Debt"))
+        .when(pl.col("cusip").str.slice(0, 2) == "CA")
+        .then(pl.lit("Sovereign Debt"))
+        .otherwise(pl.lit("Other"))
+        .alias("asset_class")
+    )
+
+    # --- 6. Select Final Mapping ---
+    cusip_to_asset_class = classified_cusips.select(["cusip", "asset_class"])
+
+    # --- 7. Join Back to Post Data ---
+    post_enriched = post_with_cusip.join(cusip_to_asset_class, on="cusip", how="left")
+
+    return post_enriched
+
+
+if __name__ == "__main__":
+    # --- 1. Load Data ---
+    input_filepath = DATA_DIR / "post_with_figi_cusip.parquet"
+    post_data = pl.read_parquet(input_filepath)
+
+    sandp_issue_data = pull_sandp_cusip.load_sandp_cusip_issue(data_dir=DATA_DIR)
+    sandp_issuer_data = pull_sandp_cusip.load_sandp_cusip_issuer(data_dir=DATA_DIR)
+    result = add_collateral_bin(post_data, sandp_issue_data, sandp_issuer_data)
+
+    # --- 8. Save Output ---
+    output_filepath = DATA_DIR / "post_with_asset_class.parquet"
+    result.write_parquet(output_filepath)
+
+```

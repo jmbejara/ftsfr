@@ -1,0 +1,466 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## literate-unit-tests
+
+This cursor rule provides comprehensive, step-by-step instructions for creating "literate unit tests" — Python files that serve simultaneously as fully discoverable `pytest` test modules and as rich, interactive Jupyter-style notebooks when converted via `ipynb-py-convert`. It captures all essential best practices, layout conventions, and common pitfalls in extreme detail for future prompts or models to reference. If this rule has been applied in the context of creating a unit test, assume that you are writing such a file as described below.
+
+---
+
+### 1. Dual Purpose File Goals
+
+Every test file authored under this rule must satisfy two objectives:
+
+1. **pytest Compatibility**
+   - Each unit test must be a top-level `def test_*()` function, discoverable by standard pytest commands (`pytest -q`, `pytest -k`).
+   - Running `pytest` on the `.py` file should execute all tests without errors.
+
+2. **Notebook-Ready Conversion**
+   - The same `.py` file must convert cleanly into a `.ipynb` via `ipynb-py-convert`, resulting in an ordered sequence of markdown and code cells.
+   - Markdown cells should render educational narrative and data frame outputs should display interactively.
+   - Narrative and demonstration cells must be exceptionally verbose and pedagogical, akin to textbook chapters: explain domain context, data shapes, test intent, and step-by-step reasoning for readers unfamiliar with the codebase or dataset.
+   - The purpose of the exposition is to introduce newcomers to the codebase and dataset. So, please use this as an opportunity to explain the codebase and dataset in great detail, where you assume little prior knowledge.
+
+### 2. Educational Principles
+
+The primary purpose of these literate unit tests is education. Follow these principles to create truly instructional content:
+
+1. **Explain Domain Context First**
+   - Begin with substantial domain explanation before showing code
+   - Define industry-specific terminology and concepts
+   - Explain why this functionality matters in the real world
+   - Use everyday analogies for complex technical concepts
+
+2. **Progressive Disclosure**
+   - Start with high-level concepts, then drill down into details
+   - Introduce one concept at a time in a logical sequence
+   - Connect each test scenario to a real-world use case or problem
+   - Show the "evolution" of data through each transformation step
+
+3. **Show, Don't Just Assert**
+   - Display input data, intermediate states, and outputs visually
+   - Include explanatory visualizations of before/after states
+   - Highlight key differences between input and output
+   - Show what "correct" vs "incorrect" outputs look like
+   - To explain the tests, you may also use plot if you would like. However, make sure the plots don't show up when running on the console, e.g., via `pytest`. The plots should only show up when running as a notebook.
+
+4. **Connect to Business Value**
+   - Explain why each test matters from a business perspective
+   - Articulate risks or consequences of failures
+   - Relate technical functions to stakeholder needs
+   - Make explicit connections between tests and requirements
+
+---
+
+### 3. Cell Delimiters and Types
+
+- **Narrative Cells**
+  - Use a plain `# %%` at the start of each narrative cell (e.g., no `[markdown]` suffix).
+  - Immediately follow with a triple-quoted string (`"""`) containing the markdown content.
+  - Ensure you include a blank line between the closing `"""` and the next `# %%` delimiter.
+  - Narrative cells should be substantial - often longer than the code itself.
+  - Include headers, lists, and formatting to organize content visually.
+
+  Example:
+  ```python
+  # %%
+  """
+  ## Scenario 1: Handling Partial Trade Settlements
+  
+  In financial markets, large trades are often settled in multiple smaller transactions over time.
+  These "partial settlements" pose challenges for reporting and risk management because:
+  
+  1. **Regulatory requirements** mandate reporting the complete trade
+  2. **Risk systems** need to track outstanding settlement obligations
+  3. **Accounting systems** must recognize P&L appropriately
+  
+  This test demonstrates how our aggregation logic identifies and combines related partial 
+  settlements into a single logical trade. The key matching criteria are:
+  
+  - Same counterparty identifiers
+  - Same security identifier
+  - Same settlement date
+  - Trade references that follow our partial settlement naming convention
+  
+  Our function should detect these partial settlements and combine their quantities while 
+  preserving other attributes from the primary record.
+  """
+
+  # %%
+  def scenario_partial_settlements() -> pl.DataFrame:
+      # build DataFrame with multiple partial settlements
+      return df
+  ```
+
+- **Code Cells**
+  - Use a plain `# %%` at the start of each code cell (for definitions, imports, execution).
+  - All Python definitions, imports, and execution logic go below this delimiter.
+  - Include inline comments to explain complex logic.
+  - To render DataFrame or variables as notebook output, end the cell with the variable name on its own line.
+
+  Example:
+  ```python
+  # %%
+  def scenario_example() -> pl.DataFrame:
+      # Create sample data with key characteristics:
+      # - Multiple trades with the same trade reference pattern
+      # - Same settlement date and counterparty
+      # - Different quantities representing partial fills
+      df = pl.DataFrame({...})
+      
+      # Apply the function under test
+      result = aggregate_partial_settlements(df)
+      return result
+      
+  # Display the result
+  result = scenario_example()
+  result
+  ```
+  - Code cells should not contain the line `sys.path.insert(0, os.path.dirname(__file__))` or anything that uses `__file__`, because that is not defined in a Jupyter notebook and will not work.
+
+- **Visualization Cells**
+  - Place visualization imports (e.g., matplotlib) in the top-level imports cell, not in visualization cells.
+  - When creating plots that should only display in notebook mode (not during pytest execution), use this pattern:
+
+  ```python
+  # %%
+  # Create visualization
+  fig, ax = plt.subplots(figsize=(10, 6))
+  ax.plot(x_values, y_values)
+  ax.set_title("Example Visualization")
+  ax.set_xlabel("X Axis")
+  ax.set_ylabel("Y Axis")
+  plt.tight_layout()
+  
+  # Only show plots when running in notebook mode, not during pytest execution
+  try:
+      # This will only succeed in IPython/Jupyter environments
+      ipy_str = str(type(get_ipython()))
+      if 'zmqshell' in ipy_str:
+          plt.show()
+  except NameError:
+      # Not in IPython/Jupyter, so don't show the plot
+      pass
+      
+  # Always close the figure to release resources
+  plt.close(fig)
+  ```
+  
+  - This approach prevents plots from blocking pytest execution in the console while still allowing them to display in notebook mode.
+  - Always close figures with `plt.close(fig)` to release resources.
+  - For complex visualizations that would be redundant or unnecessary in console mode, consider wrapping the entire plot creation in the IPython detection block.
+
+---
+
+### 4. Recommended File Structure
+
+1. **Opening Narrative Cell** (`# %%` + triple-quoted string)
+   - High-level title (e.g., `# My Test Suite: Narrative Notebook`)
+   - Comprehensive introduction to the domain area and key concepts
+   - Explanation of why this functionality matters to the business
+   - Overview of the main components/systems involved
+   - Instructions on how to convert (`ipynb-py-convert src/file.py dest.ipynb`).
+
+2. **Imports Code Cell** (`# %%`)
+   - All necessary imports at once: `datetime`, `polars`, pipeline functions under test, and any test utilities.
+   - No print statements in import cells.
+
+3. **Scenario Blocks** (repeat for each scenario)
+   3.1. **Scenario Narrative Cell** (`# %%` + triple-quoted string)
+        - Title (`## Scenario N: Descriptive Title`)
+        - Thorough business context and real-world relevance
+        - Detailed explanation of the problem being solved
+        - Expectations (input→output behavior) with reasoning
+        - Why this specific scenario is important to test
+        - Edge cases or special considerations covered
+   3.2. **Scenario Helper Function** (`# %%`)
+        - Define `def scenario_name() -> TYPE:`
+        - Build synthetic data (e.g., Polars DataFrame) that clearly demonstrates the scenario
+        - Add explanatory comments for complex data construction
+        - Invoke production code (`aggregate_partial_settlements`, etc.)
+        - Return result
+   3.3. **Demonstration Cells** (multiple cells showing progression)
+        - Input data cell: Show and explain the raw input data
+          ```python
+          # %%
+          # Input data for Scenario 1: Three partial settlements of the same trade
+          input_df = create_test_data_for_scenario()
+          # Highlight the key fields that identify these as partial settlements:
+          input_df.select(["trade_id", "settlement_date", "quantity", "status"])
+          ```
+        - Expected transformation cell: Explain the expected changes
+          ```python
+          # %%
+          """
+          ### Expected Transformation
+          
+          The function should aggregate these three partial settlements by:
+          1. Summing the quantities across all partial records
+          2. Preserving the earliest execution timestamp
+          3. Setting the status to "COMPLETED" when all partials are settled
+          """
+          ```
+        - Actual result cell: Show the function output and highlight key changes
+          ```python
+          # %%
+          # Result of aggregation showing combined quantities
+          result = scenario_partial_settlements()
+          # Note how three partials (100, 200, 300) become one row with quantity 600
+          result.select(["trade_id", "total_quantity", "status"])
+          ```
+
+4. **PyTest Test Definitions** (`# %%`)
+   - Define `def test_scenario_name():` for each scenario
+   - Within each test, call the scenario helper, perform `assert` statements
+   - Include explanatory comments for each assertion, explaining its business significance
+   - Keep tests minimal: one assertion block per scenario for clear feedback
+
+5. **Optional CLI Preview** (`# %%`)
+   - Under `if __name__ == '__main__':`, loop through scenarios or print concise summaries
+   - This cell should not affect pytest discovery
+   - Consider adding visual separators or formatted output to improve readability
+
+---
+
+### 5. Content Quality Guidelines
+
+1. **Depth of Domain Explanation**
+   - Aim for at least 100-200 words of domain explanation per scenario
+   - Define all technical and industry-specific terms
+   - Include real-world analogies for complex concepts
+   - Relate the test to actual business processes or requirements
+
+2. **Visual Progression of Data**
+   - Show the data at each stage of transformation
+   - Highlight key fields relevant to the test
+   - Use filtering to focus on relevant columns
+   - Consider using formatting or inline calculations to emphasize important values
+   - When appropriate, include before/after comparisons in the same view
+
+3. **Clarity of Purpose**
+   - Every scenario should clearly state:
+     - What is being tested (specific functionality)
+     - Why it matters (business importance)
+     - How it works (technical approach)
+     - When it applies (conditions and context)
+   - Explicitly connect technical functions to business requirements
+
+4. **Educational Scaffolding**
+   - Begin with foundational concepts before complex scenarios
+   - Build knowledge incrementally across scenarios
+   - Reference previous scenarios when building on concepts
+   - Include "Further Reading" references where appropriate
+
+---
+
+### 6. Detailed Template
+
+Below is a more comprehensive template for a dual-purpose pytest test file and teaching notebook:
+
+```python
+# %%
+"""
+# Securities Identifier Standardization: CUSIP/ISIN/FIGI Crosswalk
+
+This notebook demonstrates and tests the functionality that standardizes securities identifiers
+across different formats (CUSIP, ISIN, FIGI) in our regulatory reporting pipeline.
+
+## Business Context
+
+Financial institutions often use different identifier systems for securities:
+- CUSIPs: 9-character North American standard
+- ISINs: 12-character international standard (includes country code)
+- FIGIs: Bloomberg's identifier format
+
+Regulatory reports require consistent identification across all submissions. Our crosswalk
+system ensures that securities are consistently identified regardless of the format used
+by the reporting institution.
+
+To convert this script into a Jupyter notebook, run:
+```bash
+ipynb-py-convert src/test_identifier_crosswalk.py notebooks/identifier_crosswalk.ipynb
+```
+"""
+
+# %%
+import datetime
+import polars as pl
+from identifier_crosswalk import standardize_identifiers
+from testing_utils import create_test_security
+
+# %%
+"""
+## Scenario 1: Basic Identifier Mapping
+
+This scenario tests the core functionality of mapping between different identifier systems.
+Each security can be identified by multiple standards, and our system should establish
+the appropriate crosswalk between them.
+
+For North American securities:
+- ISINs contain an embedded CUSIP (digits 3-11)
+- CUSIPs may map to multiple FIGIs (different exchanges/share classes)
+- FIGIs typically map to exactly one CUSIP
+
+Our standardization logic should:
+1. Extract CUSIPs from ISINs where possible
+2. Map CUSIPs to preferred FIGIs
+3. Map FIGIs back to CUSIPs
+4. Maintain all original identifiers
+"""
+
+# %%
+def scenario_basic_mapping() -> pl.DataFrame:
+    """
+    Create test data with different identifier types and apply standardization.
+    
+    This scenario includes:
+    - A security with only a CUSIP
+    - A security with only an ISIN (containing an embedded CUSIP)
+    - A security with only a FIGI
+    - A security with multiple identifiers
+    
+    Returns a DataFrame with standardized identifiers across all records.
+    """
+    # Create test securities with different identifier combinations
+    securities = [
+        create_test_security(cusip="123456789", isin=None, figi=None),
+        create_test_security(cusip=None, isin="US987654321", figi=None),
+        create_test_security(cusip=None, isin=None, figi="BBG000123"),
+        create_test_security(cusip="555555555", isin="US555555555", figi="BBG000555")
+    ]
+    
+    # Combine into a single DataFrame
+    input_df = pl.concat(securities)
+    
+    # Apply the standardization function
+    result = standardize_identifiers(input_df)
+    return result
+
+# %%
+"""
+### Input Data Examination
+
+Let's examine our test securities before standardization. Notice how each record
+has a different combination of identifier fields populated:
+"""
+
+# %%
+# Create our test securities
+input_securities = pl.concat([
+    create_test_security(cusip="123456789", isin=None, figi=None),
+    create_test_security(cusip=None, isin="US987654321", figi=None),
+    create_test_security(cusip=None, isin=None, figi="BBG000123"),
+    create_test_security(cusip="555555555", isin="US555555555", figi="BBG000555")
+])
+
+# Display the input data, focusing on identifier columns
+input_securities.select(["security_name", "cusip", "isin", "figi"])
+
+# %%
+"""
+### Expected Transformation
+
+After standardization, we expect:
+
+1. The security with only a CUSIP will have derived ISIN (US + CUSIP + check digit)
+2. The security with only an ISIN will have the embedded CUSIP extracted
+3. The security with only a FIGI will have the corresponding CUSIP from the crosswalk
+4. The security with multiple identifiers will maintain internal consistency
+
+This ensures that downstream systems can use any identifier system consistently.
+"""
+
+# %%
+# Process through our standardization function
+standardized = scenario_basic_mapping()
+
+# Display the result, focusing on the identifier columns
+standardized.select(["security_name", "cusip", "isin", "figi", "primary_identifier"])
+
+# %%
+"""
+### Observations
+
+Notice how the standardization function has:
+
+1. Filled in missing identifiers where possible
+2. Established a "primary_identifier" for each security
+3. Ensured consistency across different identifier systems
+4. Preserved all original identifiers
+
+This enables downstream systems to choose their preferred identifier system
+while maintaining data consistency.
+"""
+
+# %%
+def test_basic_identifier_mapping():
+    """
+    Test that securities with different identifier combinations are properly standardized.
+    
+    Verifies:
+    1. CUSIPs are extracted from ISINs
+    2. ISINs are derived from CUSIPs
+    3. FIGIs are mapped to corresponding CUSIPs
+    4. All original identifiers are preserved
+    """
+    result = scenario_basic_mapping()
+    
+    # Verify ISIN extraction worked (row 1)
+    assert result.filter(pl.col("cusip") == "123456789")["isin"][0].startswith("US123456")
+    
+    # Verify CUSIP extraction from ISIN worked (row 2)
+    assert result.filter(pl.col("isin") == "US987654321")["cusip"][0] == "987654321"
+    
+    # Verify FIGI to CUSIP mapping worked (row 3)
+    assert result.filter(pl.col("figi") == "BBG000123")["cusip"][0] is not None
+    
+    # Verify identifiers remained consistent for multi-identifier security (row 4)
+    multi_id_row = result.filter(pl.col("cusip") == "555555555")
+    assert multi_id_row["isin"][0] == "US555555555"
+    assert multi_id_row["figi"][0] == "BBG000555"
+
+# %%
+if __name__ == "__main__":
+    print("===== Securities Identifier Standardization Tests =====")
+    result = scenario_basic_mapping()
+    print(f"Basic mapping: {result.height} securities standardized")
+    # Display a sample row showing all identifiers filled
+    sample = result.filter(pl.col("cusip") == "555555555")
+    print(f"Sample complete security: {sample.select(['cusip', 'isin', 'figi']).to_dict(as_series=False)}")
+```
+
+### 7. Common Pitfalls & Troubleshooting
+
+- **Insufficient Explanation**: Narrative cells should be substantially more detailed than code cells.
+  - ❌ "This test checks if the function works correctly."
+  - ✅ "This test verifies that when partial settlements arrive out of sequence, they are still correctly aggregated by trade date rather than processing time."
+
+- **Missing Domain Context**: Always relate technical functions to business purpose.
+  - ❌ "The function joins two DataFrames and sorts the result."
+  - ✅ "The function merges trade and reference data, enabling downstream risk calculations that depend on accurate security attributes like duration and credit rating."
+
+- **Poor Visual Progression**: Show the data transformation journey.
+  - ❌ Only showing final output without intermediate steps
+  - ✅ Showing input → transformation → output with highlighted changes
+
+- **Disconnected Tests**: Keep a narrative flow between test scenarios.
+  - ❌ Random assortment of unrelated test cases
+  - ✅ Progressive scenarios that build on previous concepts and increase in complexity
+
+- **Technical over Educational**: Focus on teaching, not just testing.
+  - ❌ Complex test with minimal explanation
+  - ✅ Simple test with thorough explanation of business significance
+
+- **Triple-quoted strings** at cell top can create extra unwanted code cells. Always use `# %%` (no `[markdown]` suffix) for narrative markdown cells.
+
+- **Absence of a blank line** between triple-quote block and next `# %%` can break cell detection. Always insert one blank line.
+
+- **Print statements** inside scenario functions or import cells add noise. Avoid them; rely on pytest and notebook rendering.
+
+- **Cell ordering**: ensure scenario helper definitions precede demonstration or test cells.
+
+- **DataFrame rendering**: end code cells with the variable name to display.
+
+Remember, the primary goal is education with verification as a secondary objective. Your code should teach someone unfamiliar with the domain how the system works, why it matters, and how to verify it's working correctly.
