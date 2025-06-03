@@ -1,6 +1,6 @@
 [workspace]
 channels = ["conda-forge"]
-name = "ftsfa"
+name = "ftsfr"
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tasks]

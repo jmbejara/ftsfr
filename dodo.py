@@ -284,7 +284,7 @@ def task_pull():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_CRSP_Compustat.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "Compustat.parquet",
@@ -305,14 +305,14 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "ftsfa_treas_yield_curve_zero_coupon.parquet"
+                DATA_DIR / data_module / "ftsfr_treas_yield_curve_zero_coupon.parquet"
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_fed_yield_curve.py",
-                f"./src/{data_module}/create_ftsfa_datasets.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
@@ -339,21 +339,21 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "ftsfa_nyu_call_report_leverage.parquet",
+                DATA_DIR / data_module / "ftsfr_nyu_call_report_leverage.parquet",
                 DATA_DIR
                 / data_module
-                / "ftsfa_nyu_call_report_holding_company_leverage.parquet",
-                DATA_DIR / data_module / "ftsfa_nyu_call_report_cash_liquidity.parquet",
+                / "ftsfr_nyu_call_report_holding_company_leverage.parquet",
+                DATA_DIR / data_module / "ftsfr_nyu_call_report_cash_liquidity.parquet",
                 DATA_DIR
                 / data_module
-                / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet",
+                / "ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_nyu_call_report.py",
-                f"./src/{data_module}/create_ftsfa_datasets.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
@@ -384,14 +384,14 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/create_ftsfa_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "ftsfa_CRSP_monthly_stock_ret.parquet",
-                DATA_DIR / data_module / "ftsfa_CRSP_monthly_stock_retx.parquet",
+                DATA_DIR / data_module / "ftsfr_CRSP_monthly_stock_ret.parquet",
+                DATA_DIR / data_module / "ftsfr_CRSP_monthly_stock_retx.parquet",
             ],
             "file_dep": [
-                f"./src/{data_module}/create_ftsfa_datasets.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
                 f"./src/{data_module}/pull_CRSP_Compustat.py",
                 f"./src/{data_module}/calc_Fama_French_1993.py",
             ],
@@ -447,13 +447,13 @@ def task_format():
         }
 
 
-def task_collect_ftsfa_datasets_info():
+def task_collect_ftsfr_datasets_info():
     return {
         "actions": [
-            "python ./src/load_ftsfa_datasets.py",
+            "python ./src/load_ftsfr_datasets.py",
         ],
-        "file_dep": ["./src/load_ftsfa_datasets.py"],
-        "targets": [DATA_DIR / "ftsfa_datasets_paths.toml"],
+        "file_dep": ["./src/load_ftsfr_datasets.py"],
+        "targets": [DATA_DIR / "ftsfr_datasets_paths.toml"],
         "clean": [],
     }
 
@@ -641,14 +641,14 @@ def task_compile_latex_docs():
     if config_toml["reports"]["is_latex_installed"]:
         return {
             "actions": [
-                "latexmk -xelatex -halt-on-error -cd ./reports/draft_ftsfa.tex",  # Compile
-                "latexmk -xelatex -halt-on-error -c -cd ./reports/draft_ftsfa.tex",  # Clean
+                "latexmk -xelatex -halt-on-error -cd ./reports/draft_ftsfr.tex",  # Compile
+                "latexmk -xelatex -halt-on-error -c -cd ./reports/draft_ftsfr.tex",  # Clean
             ],
             "targets": [
-                "./reports/draft_ftsfa.pdf",
+                "./reports/draft_ftsfr.pdf",
             ],
             "file_dep": [
-                "./reports/draft_ftsfa.tex",
+                "./reports/draft_ftsfr.tex",
                 "./src/assemble_results.py",
             ],
             "clean": True,

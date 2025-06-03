@@ -91,21 +91,21 @@ copr_bonds_hkm.isnull().sum()
 """
 ---
 
-## 📊 FTSFA Dataset — Based on TRACE Data from OpenBondAssetPricing.com
+## 📊 FTSFR Dataset — Based on TRACE Data from OpenBondAssetPricing.com
 
-The **FTSFA** (Financial Time Series for Fixed-income Analysis) dataset is constructed using the TRACE (Trade Reporting and Compliance Engine) data available at [openbondassetpricing.com](https://openbondassetpricing.com/). This dataset provides a comprehensive collection of corporate bond data, including market microstructure-adjusted prices and returns, as detailed in the [Monthly TRACE Data README](https://openbondassetpricing.com/wp-content/uploads/2024/07/DRR-README.pdf).
+The **FTSFR** (Financial Time Series for Fixed-income Analysis) dataset is constructed using the TRACE (Trade Reporting and Compliance Engine) data available at [openbondassetpricing.com](https://openbondassetpricing.com/). This dataset provides a comprehensive collection of corporate bond data, including market microstructure-adjusted prices and returns, as detailed in the [Monthly TRACE Data README](https://openbondassetpricing.com/wp-content/uploads/2024/07/DRR-README.pdf).
 
 ---
 
 ## 🧹 Data Cleaning and Construction — *Following Nozawa (2017)*
 
-The FTSFA dataset adheres to the rigorous data cleaning methodology established by Nozawa (2017), ensuring high-quality and reliable corporate bond return data. The key cleaning steps are mentioned above.
+The FTSFR dataset adheres to the rigorous data cleaning methodology established by Nozawa (2017), ensuring high-quality and reliable corporate bond return data. The key cleaning steps are mentioned above.
 
 ---
 
 ## 🔍 Understanding the TRACE Dataset
 
-The TRACE dataset, as utilized in the FTSFA dataset, is meticulously curated to provide accurate and comprehensive corporate bond data. Key aspects include:
+The TRACE dataset, as utilized in the FTSFR dataset, is meticulously curated to provide accurate and comprehensive corporate bond data. Key aspects include:
 
 * **Market Microstructure Adjustments**:
 
@@ -120,7 +120,7 @@ The TRACE dataset, as utilized in the FTSFA dataset, is meticulously curated to 
     * Removal of bonds with insufficient outstanding amounts or missing critical information.
 
 
-By leveraging the TRACE dataset from openbondassetpricing.com, the FTSFA dataset ensures a robust foundation for analyzing corporate bond returns, adhering to established methodologies and incorporating comprehensive data cleaning procedures.
+By leveraging the TRACE dataset from openbondassetpricing.com, the FTSFR dataset ensures a robust foundation for analyzing corporate bond returns, adhering to established methodologies and incorporating comprehensive data cleaning procedures.
 
 ---
 
@@ -156,7 +156,7 @@ This weighting ensures that larger bonds have a proportionally larger impact on 
 
 # %%
 """
-## Comparing FTSFA with He Kelly Manela 
+## Comparing FTSFR with He Kelly Manela 
 """
 
 # %%
@@ -210,11 +210,11 @@ for i in range(10):
 """
 ---
 
-## 📈 Comparison of Corporate Bond Portfolio Returns: FTSFA Deciles vs. HKM Portfolios
+## 📈 Comparison of Corporate Bond Portfolio Returns: FTSFR Deciles vs. HKM Portfolios
 
 The figure above compares the time-series returns of corporate bond portfolios:
 
-* **Deciles 1–10** (in blue): Portfolios constructed by **FTSFA**, where bonds are sorted into deciles based on a chosen signal.
+* **Deciles 1–10** (in blue): Portfolios constructed by **FTSFR**, where bonds are sorted into deciles based on a chosen signal.
 * **HKM Portfolios 11–20** (in red): Portfolios from **He, Kelly, and Manella (HKM)** that correspond to the same strategy but are indexed from 11 to 20.
 
 
@@ -232,7 +232,7 @@ The HKM portfolios are indexed from **11 to 20**, with portfolio 11 correspondin
 
 ## 🔍 Observations
 
-* The plotted returns between **FTSFA deciles (blue)** and **HKM portfolios (red)** are **visibly similar**, indicating that both datasets reflect consistent underlying return dynamics.
+* The plotted returns between **FTSFR deciles (blue)** and **HKM portfolios (red)** are **visibly similar**, indicating that both datasets reflect consistent underlying return dynamics.
 * Particularly during volatile periods like the **2008 financial crisis**, both series exhibit synchronized spikes or drops, reflecting shared exposure to credit market risk.
 * Deviations are expected due to:
 
@@ -241,6 +241,6 @@ The HKM portfolios are indexed from **11 to 20**, with portfolio 11 correspondin
 
 ---
 
-These comparisons validate that the FTSFA replication accurately captures the structure and behavior of the HKM portfolio.
+These comparisons validate that the FTSFR replication accurately captures the structure and behavior of the HKM portfolio.
 
 """

@@ -24,15 +24,15 @@ Total files: 55
 #### Format: Corp Bond Returns
 - [`corp_bond_portfolio_returns.parquet`](#corp-bond-portfolio-returns-parquet)
 #### Format: Fed Yield Curve
-- [`ftsfa_treas_yield_curve_zero_coupon.parquet`](#ftsfa-treas-yield-curve-zero-coupon-parquet)
+- [`ftsfr_treas_yield_curve_zero_coupon.parquet`](#ftsfr-treas-yield-curve-zero-coupon-parquet)
 #### Format: Nyu Call Report
-- [`ftsfa_nyu_call_report_cash_liquidity.parquet`](#ftsfa-nyu-call-report-cash-liquidity-parquet)
-- [`ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet`](#ftsfa-nyu-call-report-holding-company-cash-liquidity-parquet)
-- [`ftsfa_nyu_call_report_holding_company_leverage.parquet`](#ftsfa-nyu-call-report-holding-company-leverage-parquet)
-- [`ftsfa_nyu_call_report_leverage.parquet`](#ftsfa-nyu-call-report-leverage-parquet)
+- [`ftsfr_nyu_call_report_cash_liquidity.parquet`](#ftsfr-nyu-call-report-cash-liquidity-parquet)
+- [`ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`](#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet)
+- [`ftsfr_nyu_call_report_holding_company_leverage.parquet`](#ftsfr-nyu-call-report-holding-company-leverage-parquet)
+- [`ftsfr_nyu_call_report_leverage.parquet`](#ftsfr-nyu-call-report-leverage-parquet)
 #### Format: Wrds Crsp Compustat
-- [`ftsfa_CRSP_monthly_stock_ret.parquet`](#ftsfa-crsp-monthly-stock-ret-parquet)
-- [`ftsfa_CRSP_monthly_stock_retx.parquet`](#ftsfa-crsp-monthly-stock-retx-parquet)
+- [`ftsfr_CRSP_monthly_stock_ret.parquet`](#ftsfr-crsp-monthly-stock-ret-parquet)
+- [`ftsfr_CRSP_monthly_stock_retx.parquet`](#ftsfr-crsp-monthly-stock-retx-parquet)
 
 ### Pull
 #### Pull: Cds Bond Basis
@@ -90,7 +90,7 @@ Total files: 55
 ---
 
 ## Final_data.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/Final_data.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Final_data.parquet`
 **Size:** 1038200 bytes | **Type:** Parquet | **Shape:** 28,667 rows × 9 columns
 
 ### Columns
@@ -120,7 +120,7 @@ __index_level_0__: min=10402, max=1391540, mean=689133.61, median=699948.0
 ---
 
 ## RED_and_ISIN_mapping.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/RED_and_ISIN_mapping.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/RED_and_ISIN_mapping.parquet`
 **Size:** 235779 bytes | **Type:** Parquet | **Shape:** 10,484 rows × 5 columns
 
 ### Columns
@@ -135,7 +135,7 @@ tier                                     String
 ---
 
 ## Red_Data.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/Red_Data.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Red_Data.parquet`
 **Size:** 20.3 MB | **Type:** Parquet | **Shape:** 1,392,506 rows × 9 columns
 
 ### Columns
@@ -163,7 +163,7 @@ mat_days: min=360.99999999999994, max=36525.0, mean=3766.73, median=2480.0
 ---
 
 ## corporate_bond_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/corporate_bond_returns.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/corporate_bond_returns.parquet`
 **Size:** 271.5 MB | **Type:** Parquet | **Shape:** 1,572,384 rows × 49 columns
 
 ### Columns
@@ -271,7 +271,7 @@ bondpar_mil: min=0.001, max=15000.0, mean=555.96, median=400.0
 ---
 
 ## markit_cds.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/markit_cds.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_cds.parquet`
 **Size:** 1.4 GB | **Type:** Parquet | **Shape:** 36,673,117 rows × 15 columns
 
 ### Columns
@@ -310,7 +310,7 @@ year: min=2001, max=2023, mean=2013.61, median=2014.0
 ---
 
 ## markit_cds_subsetted_to_crsp.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/markit_cds_subsetted_to_crsp.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_cds_subsetted_to_crsp.parquet`
 **Size:** 1.0 GB | **Type:** Parquet | **Shape:** 25,702,712 rows × 20 columns
 
 ### Columns
@@ -358,7 +358,7 @@ __index_level_0__: min=0, max=26699662, mean=12953193.77, median=12877477.5
 ---
 
 ## markit_red_crsp_link.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/markit_red_crsp_link.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_red_crsp_link.parquet`
 **Size:** 538772 bytes | **Type:** Parquet | **Shape:** 4,762 rows × 25 columns
 
 ### Columns
@@ -400,7 +400,7 @@ nameRatio: min=20, max=100, mean=79.54, median=86.0
 ---
 
 ## treasury_bond_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_bond_basis/treasury_bond_returns.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/treasury_bond_returns.parquet`
 **Size:** 36.6 MB | **Type:** Parquet | **Shape:** 2,381,340 rows × 5 columns
 
 ### Columns
@@ -423,7 +423,7 @@ tau: min=-0.167123288, max=180.1260274, mean=7.98, median=4.7123287671
 ---
 
 ## fed_yield_curve.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_returns/fed_yield_curve.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/fed_yield_curve.parquet`
 **Size:** 3.2 MB | **Type:** Parquet | **Shape:** 16,673 rows × 31 columns
 
 ### Columns
@@ -498,7 +498,7 @@ SVENY30: min=1.2503000497818, max=10.7618, mean=5.28, median=4.89400009460449
 ---
 
 ## fred.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_returns/fred.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/fred.parquet`
 **Size:** 121451 bytes | **Type:** Parquet | **Shape:** 6,359 rows × 7 columns
 
 ### Columns
@@ -525,7 +525,7 @@ DGS3: min=0.1, max=5.26, mean=2.24, median=1.89
 ---
 
 ## markit_cds.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_returns/markit_cds.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/markit_cds.parquet`
 **Size:** 1.4 GB | **Type:** Parquet | **Shape:** 36,673,117 rows × 15 columns
 
 ### Columns
@@ -564,7 +564,7 @@ year: min=2001, max=2023, mean=2013.61, median=2014.0
 ---
 
 ## markit_cds_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/cds_returns/markit_cds_returns.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/markit_cds_returns.parquet`
 **Size:** 51617 bytes | **Type:** Parquet | **Shape:** 276 rows × 21 columns
 
 ### Columns
@@ -619,7 +619,7 @@ Month                                    Datetime(time_unit='ns', time_zone=None
 ---
 
 ## corp_bond_portfolio_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/corp_bond_returns/corp_bond_portfolio_returns.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/corp_bond_portfolio_returns.parquet`
 **Size:** 30687 bytes | **Type:** Parquet | **Shape:** 242 rows × 11 columns
 
 ### Columns
@@ -654,7 +654,7 @@ date                                     Datetime(time_unit='ns', time_zone=None
 ---
 
 ## corporate_bond_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/corp_bond_returns/corporate_bond_returns.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/corporate_bond_returns.parquet`
 **Size:** 271.5 MB | **Type:** Parquet | **Shape:** 1,572,384 rows × 49 columns
 
 ### Columns
@@ -762,7 +762,7 @@ bondpar_mil: min=0.001, max=15000.0, mean=555.96, median=400.0
 ---
 
 ## treasury_bond_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/corp_bond_returns/treasury_bond_returns.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/treasury_bond_returns.parquet`
 **Size:** 36.6 MB | **Type:** Parquet | **Shape:** 2,381,340 rows × 5 columns
 
 ### Columns
@@ -785,7 +785,7 @@ tau: min=-0.167123288, max=180.1260274, mean=7.98, median=4.7123287671
 ---
 
 ## fed_yield_curve.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/fed_yield_curve/fed_yield_curve.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/fed_yield_curve/fed_yield_curve.parquet`
 **Size:** 3.2 MB | **Type:** Parquet | **Shape:** 16,673 rows × 31 columns
 
 ### Columns
@@ -859,8 +859,8 @@ SVENY30: min=1.2503000497818, max=10.7618, mean=5.28, median=4.89400009460449
 
 ---
 
-## ftsfa_treas_yield_curve_zero_coupon.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/fed_yield_curve/ftsfa_treas_yield_curve_zero_coupon.parquet`
+## ftsfr_treas_yield_curve_zero_coupon.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/fed_yield_curve/ftsfr_treas_yield_curve_zero_coupon.parquet`
 **Size:** 3.6 MB | **Type:** Parquet | **Shape:** 500,190 rows × 3 columns
 
 ### Columns
@@ -878,7 +878,7 @@ value: min=0.0554, max=16.462, mean=5.61, median=5.328
 ---
 
 ## He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/he_kelly_manela/He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/he_kelly_manela/He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv`
 **Size:** 729670 bytes | **Type:** Csv | **Shape:** 516 rows × 257 columns
 
 ### Columns
@@ -1272,7 +1272,7 @@ All_124: min=-0.0849, max=0.1822, mean=0.01, median=0.0067
 ---
 
 ## He_Kelly_Manela_Factors_daily.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/he_kelly_manela/He_Kelly_Manela_Factors_daily.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/he_kelly_manela/He_Kelly_Manela_Factors_daily.csv`
 **Size:** 431266 bytes | **Type:** Csv | **Shape:** 4,766 rows × 5 columns
 
 ### Columns
@@ -1296,7 +1296,7 @@ intermediary_leverage_ratio_squared: min=33.2005893688213, max=4698.062377977052
 ---
 
 ## He_Kelly_Manela_Factors_monthly.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/he_kelly_manela/He_Kelly_Manela_Factors_monthly.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/he_kelly_manela/He_Kelly_Manela_Factors_monthly.csv`
 **Size:** 25659 bytes | **Type:** Csv | **Shape:** 587 rows × 5 columns
 
 ### Columns
@@ -1320,7 +1320,7 @@ intermediary_leverage_ratio_squared: min=55.7145, max=2012.9658, mean=368.19, me
 ---
 
 ## french_portfolios_25_daily_size_and_bm.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/ken_french_data_library/french_portfolios_25_daily_size_and_bm.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_daily_size_and_bm.parquet`
 **Size:** 1.2 MB | **Type:** Parquet | **Shape:** 25,901 rows × 26 columns
 
 ### Columns
@@ -1385,7 +1385,7 @@ BIG HiBM: min=-0.183, max=0.2397, mean=0.00, median=0.0005
 ---
 
 ## french_portfolios_25_daily_size_and_inv.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/ken_french_data_library/french_portfolios_25_daily_size_and_inv.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_daily_size_and_inv.parquet`
 **Size:** 746935 bytes | **Type:** Parquet | **Shape:** 15,481 rows × 26 columns
 
 ### Columns
@@ -1450,7 +1450,7 @@ BIG HiINV: min=-0.1801, max=0.1323, mean=0.00, median=0.0006
 ---
 
 ## french_portfolios_25_daily_size_and_op.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/ken_french_data_library/french_portfolios_25_daily_size_and_op.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_daily_size_and_op.parquet`
 **Size:** 747924 bytes | **Type:** Parquet | **Shape:** 15,481 rows × 26 columns
 
 ### Columns
@@ -1515,7 +1515,7 @@ BIG HiOP: min=-0.18460000000000001, max=0.1363, mean=0.00, median=0.0006
 ---
 
 ## french_portfolios_25_monthly_size_and_bm.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_bm.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_bm.parquet`
 **Size:** 302876 bytes | **Type:** Parquet | **Shape:** 1,182 rows × 26 columns
 
 ### Columns
@@ -1580,7 +1580,7 @@ BIG HiBM: min=-0.45555599999999996, max=0.9803919999999999, mean=0.01, median=0.
 ---
 
 ## french_portfolios_25_monthly_size_and_inv.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_inv.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_inv.parquet`
 **Size:** 193158 bytes | **Type:** Parquet | **Shape:** 738 rows × 26 columns
 
 ### Columns
@@ -1645,7 +1645,7 @@ BIG HiINV: min=-0.22860399999999997, max=0.241056, mean=0.01, median=0.0123075
 ---
 
 ## french_portfolios_25_monthly_size_and_op.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_op.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_op.parquet`
 **Size:** 192922 bytes | **Type:** Parquet | **Shape:** 738 rows × 26 columns
 
 ### Columns
@@ -1709,8 +1709,8 @@ BIG HiOP: min=-0.224114, max=0.17295100000000002, mean=0.01, median=0.0111969999
 
 ---
 
-## ftsfa_nyu_call_report_cash_liquidity.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/nyu_call_report/ftsfa_nyu_call_report_cash_liquidity.parquet`
+## ftsfr_nyu_call_report_cash_liquidity.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_cash_liquidity.parquet`
 **Size:** 15.5 MB | **Type:** Parquet | **Shape:** 1,919,810 rows × 3 columns
 
 ### Columns
@@ -1727,8 +1727,8 @@ value: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
 
 ---
 
-## ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/nyu_call_report/ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet`
+## ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`
 **Size:** 15.4 MB | **Type:** Parquet | **Shape:** 1,919,810 rows × 3 columns
 
 ### Columns
@@ -1745,8 +1745,8 @@ value: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
 
 ---
 
-## ftsfa_nyu_call_report_holding_company_leverage.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/nyu_call_report/ftsfa_nyu_call_report_holding_company_leverage.parquet`
+## ftsfr_nyu_call_report_holding_company_leverage.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet`
 **Size:** 6.8 MB | **Type:** Parquet | **Shape:** 833,187 rows × 3 columns
 
 ### Columns
@@ -1763,8 +1763,8 @@ value: min=-61371.42307692308, max=inf, mean=inf, median=10.980478367317396
 
 ---
 
-## ftsfa_nyu_call_report_leverage.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/nyu_call_report/ftsfa_nyu_call_report_leverage.parquet`
+## ftsfr_nyu_call_report_leverage.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_leverage.parquet`
 **Size:** 15.1 MB | **Type:** Parquet | **Shape:** 1,919,810 rows × 3 columns
 
 ### Columns
@@ -1782,7 +1782,7 @@ value: min=-61371.42307692308, max=inf, mean=inf, median=11.125577574699662
 ---
 
 ## nyu_call_report.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/nyu_call_report/nyu_call_report.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/nyu_call_report.parquet`
 **Size:** 376.4 MB | **Type:** Parquet | **Shape:** 1,919,810 rows × 187 columns
 
 ### Columns
@@ -2159,7 +2159,7 @@ intexptimedepge250k: min=-4056.0, max=522042.0, mean=507.17, median=29.0
 ---
 
 ## CRSP_TFZ_CONSOLIDATED.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/us_treasury_returns/CRSP_TFZ_CONSOLIDATED.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_CONSOLIDATED.parquet`
 **Size:** 93.0 MB | **Type:** Parquet | **Shape:** 2,465,193 rows × 23 columns
 
 ### Columns
@@ -2212,7 +2212,7 @@ days_to_maturity: min=1, max=11053, mean=2258.49, median=1209.0
 ---
 
 ## CRSP_TFZ_DAILY.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/us_treasury_returns/CRSP_TFZ_DAILY.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_DAILY.parquet`
 **Size:** 123.4 MB | **Type:** Parquet | **Shape:** 3,183,517 rows × 14 columns
 
 ### Columns
@@ -2252,7 +2252,7 @@ __index_level_0__: min=0, max=499999, mean=240877.51, median=234706.0
 ---
 
 ## CRSP_TFZ_INFO.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/us_treasury_returns/CRSP_TFZ_INFO.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_INFO.parquet`
 **Size:** 78436 bytes | **Type:** Parquet | **Shape:** 2,219 rows × 8 columns
 
 ### Columns
@@ -2278,7 +2278,7 @@ original_maturity: min=1.0, max=40.0, mean=6.04, median=5.0
 ---
 
 ## CRSP_TFZ_with_runness.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/us_treasury_returns/CRSP_TFZ_with_runness.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_with_runness.parquet`
 **Size:** 93.1 MB | **Type:** Parquet | **Shape:** 2,465,193 rows × 24 columns
 
 ### Columns
@@ -2333,7 +2333,7 @@ run: min=0, max=84, mean=18.91, median=14.0
 ---
 
 ## issue_dates.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/us_treasury_returns/issue_dates.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/issue_dates.csv`
 **Size:** 39772 bytes | **Type:** Csv | **Shape:** 1,009 rows × 3 columns
 
 ### Columns
@@ -2352,7 +2352,7 @@ totalAccepted: min=0.0, max=255492688300.0, mean=56010628275.22, median=34532638
 ---
 
 ## ontherun.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/us_treasury_returns/ontherun.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/ontherun.csv`
 **Size:** 83.3 MB | **Type:** Csv | **Shape:** 10,000 rows × 5 columns
 
 ### Columns
@@ -2372,7 +2372,7 @@ run: min=0, max=16, mean=2.41, median=1.0
 ---
 
 ## treasury_auction_stats.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/us_treasury_returns/treasury_auction_stats.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/treasury_auction_stats.parquet`
 **Size:** 1.9 MB | **Type:** Parquet | **Shape:** 10,538 rows × 120 columns
 
 ### Columns
@@ -2518,7 +2518,7 @@ totalTendered: min=72950000.0, max=287396859400.0, mean=79506064072.70, median=5
 ---
 
 ## idrssd_to_lei.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/idrssd_to_lei.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/idrssd_to_lei.parquet`
 **Size:** 2.0 MB | **Type:** Parquet | **Shape:** 36,715 rows × 8 columns
 
 ### Columns
@@ -2542,7 +2542,7 @@ match_type: min=1.0, max=6.0, mean=2.72, median=1.0
 ---
 
 ## lei_legalevents.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/lei_legalevents.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/lei_legalevents.parquet`
 **Size:** 30.3 MB | **Type:** Parquet | **Shape:** 1,404,312 rows × 13 columns
 
 ### Columns
@@ -2570,7 +2570,7 @@ __index_level_0__: min=0, max=499999, mean=236224.85, median=234051.5
 ---
 
 ## lei_main.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/lei_main.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/lei_main.parquet`
 **Size:** 588.6 MB | **Type:** Parquet | **Shape:** 33,620,169 rows × 9 columns
 
 ### Columns
@@ -2596,7 +2596,7 @@ __index_level_0__: min=0, max=499999, mean=249320.68, median=249103.0
 ---
 
 ## lei_otherentnames.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/lei_otherentnames.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/lei_otherentnames.parquet`
 **Size:** 37.4 MB | **Type:** Parquet | **Shape:** 1,222,254 rows × 8 columns
 
 ### Columns
@@ -2621,7 +2621,7 @@ __index_level_0__: min=0, max=499999, mean=224746.91, median=203708.5
 ---
 
 ## lei_successorentity.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/lei_successorentity.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/lei_successorentity.parquet`
 **Size:** 3.2 MB | **Type:** Parquet | **Shape:** 63,369 rows × 7 columns
 
 ### Columns
@@ -2638,7 +2638,7 @@ rec_edate                                Date
 ---
 
 ## wrds_bank_crsp_link.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/wrds_bank_crsp_link.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/wrds_bank_crsp_link.parquet`
 **Size:** 48541 bytes | **Type:** Parquet | **Shape:** 1,471 rows × 6 columns
 
 ### Columns
@@ -2654,7 +2654,7 @@ dt_end                                   Date
 ---
 
 ## wrds_call_research.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/wrds_call_research.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/wrds_call_research.parquet`
 **Size:** 806.0 MB | **Type:** Parquet | **Shape:** 2,002,806 rows × 373 columns
 
 ### Columns
@@ -3405,7 +3405,7 @@ __index_level_0__: min=0, max=499999, mean=249651.21, median=249649.0
 ---
 
 ## wrds_struct_rel_ultimate.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_bank_premium/wrds_struct_rel_ultimate.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/wrds_struct_rel_ultimate.parquet`
 **Size:** 246.0 MB | **Type:** Parquet | **Shape:** 12,539,074 rows × 12 columns
 
 ### Columns
@@ -3436,7 +3436,7 @@ __index_level_0__: min=0, max=499999, mean=249281.34, median=249218.0
 ---
 
 ## CRSP_Comp_Link_Table.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_crsp_compustat/CRSP_Comp_Link_Table.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/CRSP_Comp_Link_Table.parquet`
 **Size:** 752275 bytes | **Type:** Parquet | **Shape:** 39,192 rows × 6 columns
 
 ### Columns
@@ -3457,7 +3457,7 @@ permno: min=10000.0, max=93436.0, mean=51742.16, median=53502.0
 ---
 
 ## CRSP_stock_ciz.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_crsp_compustat/CRSP_stock_ciz.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/CRSP_stock_ciz.parquet`
 **Size:** 99.3 MB | **Type:** Parquet | **Shape:** 5,117,080 rows × 17 columns
 
 ### Columns
@@ -3495,7 +3495,7 @@ __index_level_0__: min=0, max=499999, mean=245618.85, median=244145.5
 ---
 
 ## Compustat.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_crsp_compustat/Compustat.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/Compustat.parquet`
 **Size:** 10.9 MB | **Type:** Parquet | **Shape:** 577,272 rows × 10 columns
 
 ### Columns
@@ -3527,7 +3527,7 @@ __index_level_0__: min=0, max=499999, mean=221706.91, median=211363.5
 ---
 
 ## FF_FACTORS.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_crsp_compustat/FF_FACTORS.parquet`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/FF_FACTORS.parquet`
 **Size:** 43782 bytes | **Type:** Parquet | **Shape:** 1,182 rows × 9 columns
 
 ### Columns
@@ -3553,8 +3553,8 @@ month: min=1.0, max=12.0, mean=6.52, median=7.0
 
 ---
 
-## ftsfa_CRSP_monthly_stock_ret.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_crsp_compustat/ftsfa_CRSP_monthly_stock_ret.parquet`
+## ftsfr_CRSP_monthly_stock_ret.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_ret.parquet`
 **Size:** 37.3 MB | **Type:** Parquet | **Shape:** 3,826,457 rows × 4 columns
 
 ### Columns
@@ -3574,8 +3574,8 @@ __index_level_0__: min=0, max=499999, mean=246934.99, median=247938.0
 
 ---
 
-## ftsfa_CRSP_monthly_stock_retx.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_crsp_compustat/ftsfa_CRSP_monthly_stock_retx.parquet`
+## ftsfr_CRSP_monthly_stock_retx.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_retx.parquet`
 **Size:** 33.9 MB | **Type:** Parquet | **Shape:** 3,826,457 rows × 4 columns
 
 ### Columns
@@ -3596,7 +3596,7 @@ __index_level_0__: min=0, max=499999, mean=246934.99, median=247938.0
 ---
 
 ## arima_results.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_output/raw_results/arima_results.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_results.csv`
 **Size:** 109 bytes | **Type:** Csv | **Shape:** 1 rows × 5 columns
 
 ### Columns
@@ -3619,7 +3619,7 @@ entity_count: min=30, max=30, mean=30.00, median=30.0
 ---
 
 ## simple_exponential_smoothing_results.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_output/raw_results/simple_exponential_smoothing_results.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/simple_exponential_smoothing_results.csv`
 **Size:** 133 bytes | **Type:** Csv | **Shape:** 1 rows × 5 columns
 
 ### Columns
@@ -3642,7 +3642,7 @@ entity_count: min=30, max=30, mean=30.00, median=30.0
 ---
 
 ## results_all.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfa/_output/results_all.csv`
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/results_all.csv`
 **Size:** 177 bytes | **Type:** Csv | **Shape:** 2 rows × 5 columns
 
 ### Columns

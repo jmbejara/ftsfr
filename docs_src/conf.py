@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "Financial Time Series Forecasting Archive"
+project = "Financial Time Series Forecasting Repository"
 copyright = "2024, Jeremiah Bejarano"
 author = "Jeremiah Bejarano"
 
@@ -105,7 +105,7 @@ html_theme_options = {
         "colab_url": "",
     },
     "path_to_docs": "docs_src",
-    "repository_url": "https://github.com/jmbejara/ftsfa",
+    "repository_url": "https://github.com/jmbejara/ftsfr",
     "repository_branch": "master",
     "extra_footer": "",
     "home_page_in_toc": True,
@@ -116,7 +116,7 @@ html_theme_options = {
     "use_issues_button": True,
 }
 html_logo = "./logo.png"
-html_title = "Financial Time Series Forecasting Archive"
+html_title = "Financial Time Series Forecasting Repository"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".

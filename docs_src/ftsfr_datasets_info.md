@@ -1,10 +1,10 @@
-# FTSFA Datasets Info
+# FTSFR Datasets Info
 
 ## Storage
-This note contains information about the FTSFA datasets.
+This note contains information about the FTSFR datasets.
 
 All of the datasets are stored in the `DATA_DIR` directory, which is set to
-`./_data` by default. Inside this directory, there is a `ftsfa_datasets.toml` file,
+`./_data` by default. Inside this directory, there is a `ftsfr_datasets.toml` file,
 which contains the dataset key and the relative path to the dataset file.
 
 The datasets are grouped by subfolder. For example, all of the NYU Call Report

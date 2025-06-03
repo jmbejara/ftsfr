@@ -28,7 +28,7 @@ df = (
     .reset_index(drop=True)
 )
 df = df.rename(columns={"rssdid": "entity", "date": "date", "leverage": "value"})
-df.to_parquet(DATA_DIR / "ftsfa_nyu_call_report_leverage.parquet")
+df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_leverage.parquet")
 
 ## nyu_call_report_holding_company_leverage
 # Group by bhcid, sum the assets, equity, and cash to create a dataset at the holding company level
@@ -46,7 +46,7 @@ df = (
     .reset_index(drop=True)
 )
 df = df.rename(columns={"bhcid": "entity", "date": "date", "leverage": "value"})
-df.to_parquet(DATA_DIR / "ftsfa_nyu_call_report_holding_company_leverage.parquet")
+df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_leverage.parquet")
 
 ## nyu_call_report_cash_liquidity
 df_all["cash_liquidity"] = df_all["cash"] / df_all["assets"]
@@ -56,7 +56,7 @@ df = (
     .reset_index(drop=True)
 )
 df = df.rename(columns={"rssdid": "entity", "date": "date", "cash_liquidity": "value"})
-df.to_parquet(DATA_DIR / "ftsfa_nyu_call_report_cash_liquidity.parquet")
+df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
 
 ## nyu_call_report_holding_company_cash_liquidity
 df = (
@@ -65,4 +65,4 @@ df = (
     .reset_index(drop=True)
 )
 df = df.rename(columns={"bhcid": "entity", "date": "date", "cash_liquidity": "value"})
-df.to_parquet(DATA_DIR / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet")
+df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet")

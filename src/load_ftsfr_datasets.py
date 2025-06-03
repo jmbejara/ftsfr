@@ -85,19 +85,19 @@ def load_dataset(dataset_name="nyu_call_report_leverage", dataframe_type="pandas
     #     )
     # fmt: off
     if dataset_name == "CRSP_monthly_stock_ret":
-        file_path = DATA_DIR / "wrds_crsp_compustat" / "ftsfa_CRSP_monthly_stock_ret.parquet"
+        file_path = DATA_DIR / "wrds_crsp_compustat" / "ftsfr_CRSP_monthly_stock_ret.parquet"
     elif dataset_name == "CRSP_monthly_stock_retx":
-        file_path = DATA_DIR / "wrds_crsp_compustat" / "ftsfa_CRSP_monthly_stock_retx.parquet"
+        file_path = DATA_DIR / "wrds_crsp_compustat" / "ftsfr_CRSP_monthly_stock_retx.parquet"
     elif dataset_name == "SPX_option_ret":
-        file_path = DATA_DIR / "wrds_optionmetrics" / "ftsfa_SPX_option_ret.parquet"
+        file_path = DATA_DIR / "wrds_optionmetrics" / "ftsfr_SPX_option_ret.parquet"
     elif dataset_name == "nyu_call_report_leverage":
-        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_leverage.parquet"
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfr_nyu_call_report_leverage.parquet"
     elif dataset_name == "nyu_call_report_holding_company_leverage":
-        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_holding_company_leverage.parquet"
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfr_nyu_call_report_holding_company_leverage.parquet"
     elif dataset_name == "nyu_call_report_cash_liquidity":
-        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_cash_liquidity.parquet"
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfr_nyu_call_report_cash_liquidity.parquet"
     elif dataset_name == "nyu_call_report_holding_company_cash_liquidity":
-        file_path = DATA_DIR / "nyu_call_report" / "ftsfa_nyu_call_report_holding_company_cash_liquidity.parquet"
+        file_path = DATA_DIR / "nyu_call_report" / "ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet"
     else:
         raise ValueError(
             f"Dataset {dataset_name} not found in available_datasets. Please check the config.toml file."
@@ -115,22 +115,22 @@ def load_dataset(dataset_name="nyu_call_report_leverage", dataframe_type="pandas
     return df
 
 
-def collect_ftsfa_dataset_info(data_dir=DATA_DIR):
+def collect_ftsfr_dataset_info(data_dir=DATA_DIR):
     """
-    Collect information about the FTSFA datasets. Go through the data_dir and
-    find all the parquet files that start with "ftsfa_". Look through the
+    Collect information about the FTSFR datasets. Go through the data_dir and
+    find all the parquet files that start with "ftsfr_". Look through the
     data_dir recursively.
 
     Returns a dict with the dataset name as the key and the file path, relative
     to data_dir, as the value.
     """
     data_dir = Path(data_dir)
-    ftsfa_files = list(data_dir.glob("**/ftsfa_*.parquet"))
+    ftsfr_files = list(data_dir.glob("**/ftsfr_*.parquet"))
 
     dataset_info = {}
-    for file in ftsfa_files:
-        # Extract dataset name by removing the 'ftsfa_' prefix and '.parquet' extension
-        dataset_name = file.stem.replace("ftsfa_", "")
+    for file in ftsfr_files:
+        # Extract dataset name by removing the 'ftsfr_' prefix and '.parquet' extension
+        dataset_name = file.stem.replace("ftsfr_", "")
         # Store relative path
         rel_path = file.relative_to(data_dir)
         dataset_info[dataset_name] = rel_path
@@ -138,7 +138,7 @@ def collect_ftsfa_dataset_info(data_dir=DATA_DIR):
     return dataset_info
 
 
-def save_dataset_info(dataset_info, output_file="ftsfa_datasets_paths.toml"):
+def save_dataset_info(dataset_info, output_file="ftsfr_datasets_paths.toml"):
     # when paths in dataset_info are of Path type, convert them to str
     dataset_info = {
         k: str(v) if isinstance(v, Path) else v for k, v in dataset_info.items()
@@ -148,5 +148,5 @@ def save_dataset_info(dataset_info, output_file="ftsfa_datasets_paths.toml"):
 
 
 if __name__ == "__main__":
-    ftsfa_files = collect_ftsfa_dataset_info(data_dir=DATA_DIR)
-    save_dataset_info(ftsfa_files, output_file=DATA_DIR / "ftsfa_datasets_paths.toml")
+    ftsfr_files = collect_ftsfr_dataset_info(data_dir=DATA_DIR)
+    save_dataset_info(ftsfr_files, output_file=DATA_DIR / "ftsfr_datasets_paths.toml")

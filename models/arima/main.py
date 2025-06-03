@@ -93,7 +93,7 @@ DATA_DIR = config(
 OUTPUT_DIR = config(
     "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
 )
-datasets_info = toml.load(DATA_DIR / "ftsfa_datasets_paths.toml")
+datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
 
 file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
 df = pd.read_parquet(file_path)

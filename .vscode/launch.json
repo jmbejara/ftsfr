@@ -31,7 +31,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/src/wrds_markit/calc_cds_returns.py",
             "args": [
-                "--DATA_DIR=/Users/jbejarano/GitRepositories/ftsfa/_data/wrds_markit"
+                "--DATA_DIR=/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_markit"
             ],
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"

@@ -1,4 +1,4 @@
-# Financial Time-Series Forecasting Archive
+# Financial Time-Series Forecasting Repository
 
 This repository contains a collection of financial time-series forecasting models. It produces esting a benchmark for prac
 
@@ -29,13 +29,13 @@ Then, install Conda using the instructions here: <https://docs.conda.io/en/lates
 Then, create a virtual environment and activate it:
 
 ```bash
-conda create -n ftsfa python=3.12.6
+conda create -n ftsfr python=3.12.6
 ```
 
 Activate virtual environment:
 
 ```bash
-conda activate ftsfa
+conda activate ftsfr
 ```
 
 Install packages:

@@ -16,7 +16,7 @@ OUTPUT_DIR <- Sys.getenv("OUTPUT_DIR", unset = file.path(dirname(dirname(getwd()
 
 
 # Load dataset paths
-datasets_info <- parseTOML(file.path(DATA_DIR, "ftsfa_datasets_paths.toml"))
+datasets_info <- parseTOML(file.path(DATA_DIR, "ftsfr_datasets_paths.toml"))
 
 # Calculate MASE (Mean Absolute Scaled Error)
 calculate_mase <- function(y_true, y_pred, training_set, seasonality = 1) {

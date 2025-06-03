@@ -23,7 +23,7 @@ DATA_DIR = Path(config("DATA_DIR"))
 """
 # Treasury Bond Returns Summary
 
-By leveraging the TRACE dataset from openbondassetpricing.com, the FTSFA dataset ensures a robust foundation for analyzing treasury bond returns, adhering to established methodologies and incorporating comprehensive data cleaning procedures.
+By leveraging the TRACE dataset from openbondassetpricing.com, the FTSFR dataset ensures a robust foundation for analyzing treasury bond returns, adhering to established methodologies and incorporating comprehensive data cleaning procedures.
 
 ## Data Cleaning and Construction
 
@@ -95,7 +95,7 @@ treas_bond_returns.describe()
 
 # %%
 """
-### Comparing FTSFA with He Kelly Manela 
+### Comparing FTSFR with He Kelly Manela 
 """
 
 # %%
@@ -153,11 +153,11 @@ for i in range(10):
 """
 ---
 
-### 📈 Comparison of Treasury Bond Portfolio Returns: FTSFA Portfolios vs. HKM Portfolios
+### 📈 Comparison of Treasury Bond Portfolio Returns: FTSFR Portfolios vs. HKM Portfolios
 
 The figure above compares the time-series returns of **Treasury bond portfolios**:
 
-* **Portfolios 1–10** (in blue): Portfolios constructed by **FTSFA**, where Treasury bonds are sorted by **time remaining to maturity**, in 6-month intervals:
+* **Portfolios 1–10** (in blue): Portfolios constructed by **FTSFR**, where Treasury bonds are sorted by **time remaining to maturity**, in 6-month intervals:
 
   * **Portfolio 1**: 0 to 6 months
   * **Portfolio 2**: 6 months to 1 year
@@ -176,7 +176,7 @@ The figure above compares the time-series returns of **Treasury bond portfolios*
 
 ### 🔍 Observations
 
-* The returns between **FTSFA portfolios (blue)** and **HKM portfolios (red)** show **close alignment**, indicating a consistent term-structure pattern across both datasets.
+* The returns between **FTSFR portfolios (blue)** and **HKM portfolios (red)** show **close alignment**, indicating a consistent term-structure pattern across both datasets.
 * During periods of heightened volatility—such as the **2008 financial crisis** —portfolios with longer time to maturity generally exhibit greater return sensitivity, seen consistently in both series.
 * Small return differences may result from:
 
@@ -185,6 +185,6 @@ The figure above compares the time-series returns of **Treasury bond portfolios*
 
 ---
 
-This comparison confirms that the **FTSFA replication tracks** the structure and return behavior of the HKM maturity-sorted Treasury portfolios.
+This comparison confirms that the **FTSFR replication tracks** the structure and return behavior of the HKM maturity-sorted Treasury portfolios.
 
 """
