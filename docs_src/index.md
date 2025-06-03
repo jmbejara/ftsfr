@@ -105,7 +105,7 @@ data_glimpses
 
 ```{toctree}
 :maxdepth: 1
-:caption: 📊 Dataset Summaries
+:caption: 📊 Data Cleaning Procedure Summaries
 
 _notebook_build/summary_corp_bond_returns_ipynb.ipynb
 _notebook_build/summary_treasury_bond_returns_ipynb.ipynb
