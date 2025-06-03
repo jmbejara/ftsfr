@@ -8,7 +8,6 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-import os
 
 import pandas as pd
 import wrds
@@ -23,7 +22,7 @@ END_DATE = pd.Timestamp("2024-01-01")
 
 def get_daily_data(wrds_username=WRDS_USERNAME):
     """
-    Connects to a WRDS (Wharton Research Data Services) database and fetches data 
+    Connects to a WRDS (Wharton Research Data Services) database and fetches data
     Fed reserve FX table named `frb_all`. The data fetched includes the mapping between ISIN
     and REDCODE for our bond&CDS pairs of interest.
 
@@ -34,7 +33,7 @@ def get_daily_data(wrds_username=WRDS_USERNAME):
     db = wrds.Connection(wrds_username=wrds_username)
     daily_data = {}
 
-    table_name = "frb_all.fx_daily" 
+    table_name = "frb_all.fx_daily"
     query = f"""
     SELECT
         *
@@ -44,9 +43,10 @@ def get_daily_data(wrds_username=WRDS_USERNAME):
     daily_data = db.raw_sql(query, date_cols=["date"])
     return daily_data
 
+
 def get_monthly_data(wrds_username=WRDS_USERNAME):
     """
-    Connects to a WRDS (Wharton Research Data Services) database and fetches data 
+    Connects to a WRDS (Wharton Research Data Services) database and fetches data
     Fed reserve FX table named `frb_all`. The data fetched includes the mapping between ISIN
     and REDCODE for our bond&CDS pairs of interest.
 
@@ -57,7 +57,7 @@ def get_monthly_data(wrds_username=WRDS_USERNAME):
     db = wrds.Connection(wrds_username=wrds_username)
     monthly_data = {}
 
-    table_name = "frb_all.fx_monthly" 
+    table_name = "frb_all.fx_monthly"
     query = f"""
     SELECT
         *
@@ -66,6 +66,7 @@ def get_monthly_data(wrds_username=WRDS_USERNAME):
     """
     monthly_data = db.raw_sql(query, date_cols=["date"])
     return monthly_data
+
 
 if __name__ == "__main__":
     daily_df = get_daily_data(wrds_username=WRDS_USERNAME)

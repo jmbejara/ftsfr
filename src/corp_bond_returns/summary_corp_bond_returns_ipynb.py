@@ -11,10 +11,11 @@ sys.path.insert(0, "../../src")
 sys.path.insert(0, "./src")
 
 import pandas as pd
-#import polars as pl
 
+from corp_bond_returns import calc_corp_bond_returns
+
+# import polars as pl
 from he_kelly_manela import pull_he_kelly_manela
-from corp_bond_returns import pull_open_source_bond , calc_corp_bond_returns
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -79,9 +80,11 @@ This rigorous cleaning pipeline underpins Nozawa's variance decomposition framew
 """
 
 # %%
-hkm = pull_he_kelly_manela.load_he_kelly_manela_all(data_dir=DATA_DIR / "he_kelly_manela")
-copr_bonds_hkm = hkm.iloc[:,44:54].copy()
-copr_bonds_hkm['yyyymm'] = hkm['yyyymm']
+hkm = pull_he_kelly_manela.load_he_kelly_manela_all(
+    data_dir=DATA_DIR / "he_kelly_manela"
+)
+copr_bonds_hkm = hkm.iloc[:, 44:54].copy()
+copr_bonds_hkm["yyyymm"] = hkm["yyyymm"]
 copr_bonds_hkm.head()
 copr_bonds_hkm.tail()
 copr_bonds_hkm.describe()
@@ -127,7 +130,9 @@ By leveraging the TRACE dataset from openbondassetpricing.com, the FTSFR dataset
 """
 
 # %%
-corp_bonds_returns = calc_corp_bond_returns.calc_corp_bond_returns(data_dir=DATA_DIR / "corp_bond_returns")
+corp_bonds_returns = calc_corp_bond_returns.calc_corp_bond_returns(
+    data_dir=DATA_DIR / "corp_bond_returns"
+)
 
 # %%
 corp_bonds_returns.describe()
@@ -161,19 +166,33 @@ This weighting ensures that larger bonds have a proportionally larger impact on 
 
 # %%
 # Convert yyyymm to datetime (last day of each month)
-copr_bonds_hkm['date'] = pd.to_datetime(copr_bonds_hkm['yyyymm'].astype(int).astype(str), format='%Y%m') + pd.offsets.MonthEnd(0)
-copr_bonds_hkm.set_index('date', inplace=True)
+copr_bonds_hkm["date"] = pd.to_datetime(
+    copr_bonds_hkm["yyyymm"].astype(int).astype(str), format="%Y%m"
+) + pd.offsets.MonthEnd(0)
+copr_bonds_hkm.set_index("date", inplace=True)
 
 # Now both DataFrames have datetime index with last day of month
 print("HKM Corporate Bonds shape:", copr_bonds_hkm.shape)
 print("Corporate Bond Returns shape:", corp_bonds_returns.shape)
 
 # Display the date ranges to verify alignment
-print("\nHKM Corporate Bonds date range:", copr_bonds_hkm.index.min(), "to", copr_bonds_hkm.index.max())
-print("Corporate Bond Returns date range:", corp_bonds_returns.index.min(), "to", corp_bonds_returns.index.max())
+print(
+    "\nHKM Corporate Bonds date range:",
+    copr_bonds_hkm.index.min(),
+    "to",
+    copr_bonds_hkm.index.max(),
+)
+print(
+    "Corporate Bond Returns date range:",
+    corp_bonds_returns.index.min(),
+    "to",
+    corp_bonds_returns.index.max(),
+)
 
 # Merge the dataframes
-merged_df = pd.merge(corp_bonds_returns, copr_bonds_hkm, left_index=True, right_index=True, how='inner')
+merged_df = pd.merge(
+    corp_bonds_returns, copr_bonds_hkm, left_index=True, right_index=True, how="inner"
+)
 
 # Create subplots for each pair of columns
 import matplotlib.pyplot as plt
@@ -183,15 +202,15 @@ axes = axes.flatten()
 
 for i in range(10):
     col1 = i + 1  # Column from corp_bonds_returns
-    col2 = f"US_bonds_{i+11}"  # Column from copr_bonds_hkm
-    
+    col2 = f"US_bonds_{i + 11}"  # Column from copr_bonds_hkm
+
     ax = axes[i]
-    ax.plot(merged_df.index, merged_df[col1], label=f'Decile {i+1}', color='blue')
-    ax.plot(merged_df.index, merged_df[col2], label=f'HKM {i+11}', color='red')
-    ax.set_title(f'Comparison: Decile {i+1} vs HKM {i+11}')
+    ax.plot(merged_df.index, merged_df[col1], label=f"Decile {i + 1}", color="blue")
+    ax.plot(merged_df.index, merged_df[col2], label=f"HKM {i + 11}", color="red")
+    ax.set_title(f"Comparison: Decile {i + 1} vs HKM {i + 11}")
     ax.legend()
     ax.grid(True)
-    
+
     # Rotate x-axis labels for better readability
     plt.setp(ax.get_xticklabels(), rotation=45)
 
@@ -202,9 +221,9 @@ plt.show()
 print("\nCorrelations between corresponding columns:")
 for i in range(10):
     col1 = i + 1
-    col2 = f"US_bonds_{i+11}"
+    col2 = f"US_bonds_{i + 11}"
     corr = merged_df[col1].corr(merged_df[col2])
-    print(f"Decile {i+1} vs HKM {i+11}: {corr:.4f}")
+    print(f"Decile {i + 1} vs HKM {i + 11}: {corr:.4f}")
 
 # %%
 """

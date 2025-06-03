@@ -35,7 +35,7 @@ extensions = [
     # "autodoc2",
     "sphinx.ext.intersphinx",
     # "numpydoc",
-    'myst_nb',
+    "myst_nb",
 ]
 
 ## Use autodoc2 to generate documentation from the source code
@@ -122,5 +122,7 @@ html_title = "Financial Time Series Forecasting Repository"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-html_js_files = ["https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"]
+html_js_files = [
+    "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"
+]
 html_css_files = ["custom.css"]

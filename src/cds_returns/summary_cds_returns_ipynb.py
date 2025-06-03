@@ -73,11 +73,12 @@ for i in range(10, 21):
 
 # %%
 he_kelly_df = he_kelly[col_lst].dropna(axis=0)
-he_kelly_df["Month"] = pd.to_datetime(he_kelly_df["yyyymm"].astype(int).astype(str), format="%Y%m")
+he_kelly_df["Month"] = pd.to_datetime(
+    he_kelly_df["yyyymm"].astype(int).astype(str), format="%Y%m"
+)
 he_kelly_df = he_kelly_df.drop(columns="yyyymm")
 he_kelly_df = he_kelly_df.set_index("Month")
-plt.plot(he_kelly_df);
-
+plt.plot(he_kelly_df)
 # %%
 """
 ## 2. Data Retrieval
@@ -261,38 +262,34 @@ replication_df = final_result["2001-02-01":"2012-12-01"]
 replication_df.head(5)
 
 # %%
-plt.plot(replication_df);
-
+plt.plot(replication_df)
 # %%
-plt.plot(he_kelly_df);
-
+plt.plot(he_kelly_df)
 # %%
 nan_rows_rep = replication_df[replication_df.isna().any(axis=1)]
 nan_rows_rep
-#TODO: why?
+# TODO: why?
 
 # %%
 replication_df = replication_df.ffill()
 
 # %%
-from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
 X = replication_df.T
 Y = he_kelly_df.T
 
 similarity_matrix = pd.DataFrame(
-    cosine_similarity(X, Y),
-    index=X.index,
-    columns=Y.index
+    cosine_similarity(X, Y), index=X.index, columns=Y.index
 )
 
 similarity_matrix.round(2)
 
 
 # %%
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 plt.figure(figsize=(14, 8))
 
@@ -301,7 +298,7 @@ sns.heatmap(similarity_matrix, annot=True, fmt=".2f", cmap="coolwarm", center=0)
 plt.title("Replicated vs Benchmark Portfolio: Cosine Similarity Heatmap")
 plt.xlabel("Benchmark Portfolios (he_kelly_df)")
 plt.ylabel("Replicated Portfolios (replication_df)")
-plt.xticks(rotation=45, ha='right')
+plt.xticks(rotation=45, ha="right")
 plt.tight_layout()
 plt.show()
 
@@ -312,7 +309,9 @@ correlation_matrix = pd.DataFrame(index=X.index, columns=Y.index)
 
 for rep_col in X.index:
     for bench_col in Y.index:
-        correlation_matrix.loc[rep_col, bench_col] = X.loc[rep_col].corr(Y.loc[bench_col])
+        correlation_matrix.loc[rep_col, bench_col] = X.loc[rep_col].corr(
+            Y.loc[bench_col]
+        )
 
 correlation_matrix = correlation_matrix.astype(float)
 
@@ -320,8 +319,8 @@ correlation_matrix.round(2)
 
 
 # %%
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 plt.figure(figsize=(14, 8))
 
@@ -330,11 +329,11 @@ sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm", center=0
 plt.title("Replicated vs Benchmark Portfolio: Pearson Correlation Heatmap")
 plt.xlabel("Benchmark Portfolios (he_kelly_df)")
 plt.ylabel("Replicated Portfolios (replication_df)")
-plt.xticks(rotation=45, ha='right')
+plt.xticks(rotation=45, ha="right")
 plt.tight_layout()
 plt.show()
 
 
 # %%
-plt.plot(replication_df["10Y_Q5"]);
-plt.plot(he_kelly_df["CDS_19"]);
+plt.plot(replication_df["10Y_Q5"])
+plt.plot(he_kelly_df["CDS_19"])

@@ -10,11 +10,11 @@ from pathlib import Path
 sys.path.insert(0, "../../src")
 sys.path.insert(0, "./src")
 
-import pandas as pd
-#import polars as pl
-
-from he_kelly_manela import pull_he_kelly_manela
 import calc_treasury_bond_returns
+import pandas as pd
+
+# import polars as pl
+from he_kelly_manela import pull_he_kelly_manela
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -78,9 +78,11 @@ This cleaning process ensures a high-quality dataset for analyzing Treasury bond
 """
 
 # %%
-hkm = pull_he_kelly_manela.load_he_kelly_manela_all(data_dir=DATA_DIR / "he_kelly_manela")
-treas_hkm = hkm.iloc[:,34:44].copy()
-treas_hkm['yyyymm'] = hkm['yyyymm']
+hkm = pull_he_kelly_manela.load_he_kelly_manela_all(
+    data_dir=DATA_DIR / "he_kelly_manela"
+)
+treas_hkm = hkm.iloc[:, 34:44].copy()
+treas_hkm["yyyymm"] = hkm["yyyymm"]
 treas_hkm.head()
 treas_hkm.tail()
 treas_hkm.describe()
@@ -88,7 +90,8 @@ treas_hkm.isnull().sum()
 
 # %%
 treas_bond_returns = calc_treasury_bond_returns.calc_treasury_bond_returns(
-    data_dir=DATA_DIR / "corp_bond_returns")
+    data_dir=DATA_DIR / "corp_bond_returns"
+)
 
 # %%
 treas_bond_returns.describe()
@@ -100,17 +103,31 @@ treas_bond_returns.describe()
 
 # %%
 
-treas_hkm['date'] = pd.to_datetime(treas_hkm['yyyymm'].astype(int).astype(str), format='%Y%m') + pd.offsets.MonthEnd(0)
-treas_hkm['date'] = treas_hkm['date'].dt.strftime('%Y%m%d').astype(int)
-merged_df = pd.merge(treas_bond_returns, treas_hkm, left_on='DATE', right_on='date', how='inner')
+treas_hkm["date"] = pd.to_datetime(
+    treas_hkm["yyyymm"].astype(int).astype(str), format="%Y%m"
+) + pd.offsets.MonthEnd(0)
+treas_hkm["date"] = treas_hkm["date"].dt.strftime("%Y%m%d").astype(int)
+merged_df = pd.merge(
+    treas_bond_returns, treas_hkm, left_on="DATE", right_on="date", how="inner"
+)
 
 # Now both DataFrames have datetime index with last day of month
 print("HKM Treasury Bonds shape:", treas_hkm.shape)
 print("Treasury Bond Returns shape:", treas_bond_returns.shape)
 
 # Display the date ranges to verify alignment
-print("\nHKM Treasury Bonds date range:", treas_hkm.index.min(), "to", treas_hkm.index.max())
-print("Treasury Bond Returns date range:", treas_bond_returns.index.min(), "to", treas_bond_returns.index.max())
+print(
+    "\nHKM Treasury Bonds date range:",
+    treas_hkm.index.min(),
+    "to",
+    treas_hkm.index.max(),
+)
+print(
+    "Treasury Bond Returns date range:",
+    treas_bond_returns.index.min(),
+    "to",
+    treas_bond_returns.index.max(),
+)
 
 # Create subplots for each pair of columns
 import matplotlib.pyplot as plt
@@ -121,17 +138,17 @@ axes = axes.flatten()
 for i in range(10):
     col1 = str(i + 1)  # Column from treas_bond_returns
     if i == 9:
-        col2 = f"US_bonds_10"  # Column from treas_hkm
+        col2 = "US_bonds_10"  # Column from treas_hkm
     else:
         col2 = f"US_bonds_0{i + 1}"  # Column from treas_hkm
-    
+
     ax = axes[i]
-    ax.plot(merged_df.index, merged_df[col1], label=f'Portfolio {i+1}', color='blue')
-    ax.plot(merged_df.index, merged_df[col2], label=f'HKM {i + 1}', color='red')
-    ax.set_title(f'Comparison: Portfolio {i+1} vs HKM {i + 1}')
+    ax.plot(merged_df.index, merged_df[col1], label=f"Portfolio {i + 1}", color="blue")
+    ax.plot(merged_df.index, merged_df[col2], label=f"HKM {i + 1}", color="red")
+    ax.set_title(f"Comparison: Portfolio {i + 1} vs HKM {i + 1}")
     ax.legend()
     ax.grid(True)
-    
+
     # Rotate x-axis labels for better readability
     plt.setp(ax.get_xticklabels(), rotation=45)
 
@@ -143,11 +160,11 @@ print("\nCorrelations between corresponding columns:")
 for i in range(10):
     col1 = str(i + 1)
     if i == 9:
-        col2 = f"US_bonds_10" 
+        col2 = "US_bonds_10"
     else:
         col2 = f"US_bonds_0{i + 1}"
     corr = merged_df[col1].corr(merged_df[col2])
-    print(f"Portfolio {i+1} vs HKM {i + 1}: {corr:.4f}")
+    print(f"Portfolio {i + 1} vs HKM {i + 1}: {corr:.4f}")
 
 # %%
 """

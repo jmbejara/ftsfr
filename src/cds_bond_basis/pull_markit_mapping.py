@@ -1,5 +1,5 @@
 """
-This scripts pulls a table that maps RED codes from the Markit CDS database to 
+This scripts pulls a table that maps RED codes from the Markit CDS database to
 ISIN codes in the Mergent Bond database.
 Code by adjusted by Alex Wang
 """
@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-import os
 
 import pandas as pd
 import wrds
@@ -35,7 +34,7 @@ def get_mapping(wrds_username=WRDS_USERNAME):
     db = wrds.Connection(wrds_username=wrds_username)
     bond_data = {}
 
-    table_name = "markit_red.redobllookup" 
+    table_name = "markit_red.redobllookup"
     query = f"""
     SELECT
         redcode, -- REDCODE (Markit Primary Entity ID)
@@ -51,6 +50,7 @@ def get_mapping(wrds_username=WRDS_USERNAME):
     """
     bond_data = db.raw_sql(query, date_cols=["date"])
     return bond_data
+
 
 if __name__ == "__main__":
     combined_df = get_mapping(wrds_username=WRDS_USERNAME)

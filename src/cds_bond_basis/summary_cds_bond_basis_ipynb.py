@@ -50,12 +50,11 @@ sys.path.insert(0, "../../src")
 sys.path.insert(0, "./src")
 
 import pandas as pd
+import pull_open_source_bond
 from NEW_MERGE_cds_bond import *
 from process_final_product import *
 
 from settings import config
-import pull_open_source_bond
-import pull_wrds_markit
 
 # %load_ext autoreload
 # %autoreload 2
@@ -139,7 +138,6 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 """
 
 # %%
-
 
 
 RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"

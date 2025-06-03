@@ -1,6 +1,7 @@
 import sys
-from pathlib import Path
 import zipfile
+from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from io import BytesIO
@@ -31,11 +32,13 @@ def load_he_kelly_manela_factors_monthly(data_dir=DATA_DIR):
     _df["date"] = pd.to_datetime(_df["yyyymm"], format="%Y%m")
     return _df
 
+
 def load_he_kelly_manela_factors_daily(data_dir=DATA_DIR):
     path = data_dir / "He_Kelly_Manela_Factors_daily.csv"
     _df = pd.read_csv(path)
     _df["date"] = pd.to_datetime(_df["yyyymmdd"], format="%Y%m%d")
     return _df
+
 
 def load_he_kelly_manela_all(data_dir=DATA_DIR):
     path = data_dir / "He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv"
@@ -43,11 +46,8 @@ def load_he_kelly_manela_all(data_dir=DATA_DIR):
     _df["date"] = pd.to_datetime(_df["yyyymm"], format="%Y%m")
     return _df
 
+
 if __name__ == "__main__":
     data_dir = DATA_DIR
     pull_he_kelly_manela(data_dir=data_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
-    
-
-
-

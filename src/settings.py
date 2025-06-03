@@ -47,7 +47,6 @@ import warnings
 from pathlib import Path
 from platform import system
 
-import toml
 from decouple import Config, RepositoryEnv, undefined
 from decouple import config as _config_decouple
 
@@ -373,6 +372,7 @@ def create_directories():
     for data_module_dir in data_module_dirs:
         data_module_dir = config("DATA_DIR") / data_module_dir
         data_module_dir.mkdir(parents=True, exist_ok=True)
+
 
 if __name__ == "__main__":
     create_directories()

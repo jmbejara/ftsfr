@@ -191,9 +191,9 @@ def pull_markit_red_crsp_link(wrds_username=WRDS_USERNAME):
         .reset_index()
         .rename(columns={"entity_cusip": "cusipCnt"})
     )
-    assert (
-        redcnt.cusipCnt.max() == 1
-    ), "Each redcode should be mapped to only one entity"
+    assert redcnt.cusipCnt.max() == 1, (
+        "Each redcode should be mapped to only one entity"
+    )
 
     ### Get information from CRSP header table
     crspHdr = conn.raw_sql(
@@ -359,6 +359,7 @@ def _demo():
         """
     df = db.raw_sql(query, date_cols=["date"])
     import polars as pl
+
     df = pl.from_pandas(df)
     df.glimpse()
 

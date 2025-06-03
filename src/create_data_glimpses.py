@@ -26,28 +26,30 @@ def parse_dodo_tasks():
     """Use doit's internal API to get all tasks and their associated data files."""
     import sys
     from pathlib import Path
-    
+
     # Add the project root to the Python path
     project_root = Path(__file__).parent.parent
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
-    
+
     import dodo
-    
+
     # Get all task functions from the dodo module
-    task_functions = [getattr(dodo, name) for name in dir(dodo) if name.startswith('task_')]
-    
+    task_functions = [
+        getattr(dodo, name) for name in dir(dodo) if name.startswith("task_")
+    ]
+
     # Dictionary to store task_name -> list of files
     task_files = {}
-    
+
     # Generate tasks from each task function
     for task_func in task_functions:
         try:
             # Call the task function to get task(s)
             result = task_func()
-            
+
             # Handle both single tasks and generators
-            if hasattr(result, '__iter__') and not isinstance(result, (str, dict)):
+            if hasattr(result, "__iter__") and not isinstance(result, (str, dict)):
                 # It's a generator or list of tasks
                 for task_dict in result:
                     if isinstance(task_dict, dict):
@@ -58,41 +60,41 @@ def parse_dodo_tasks():
         except Exception as e:
             print(f"Warning: Could not process task function {task_func.__name__}: {e}")
             continue
-    
+
     return task_files
 
 
 def process_task_dict(task_dict, base_name, task_files):
     """Process a single task dictionary to extract files."""
     # Get the task name
-    if 'name' in task_dict:
+    if "name" in task_dict:
         # For subtasks, combine base name with task name
-        if base_name.startswith('task_'):
+        if base_name.startswith("task_"):
             base_name = base_name[5:]  # Remove 'task_' prefix
         task_name = f"{base_name}:{task_dict['name']}"
     else:
         # For simple tasks without names
-        if base_name.startswith('task_'):
+        if base_name.startswith("task_"):
             task_name = base_name[5:]  # Remove 'task_' prefix
         else:
             task_name = base_name
-    
+
     files = set()
-    
+
     # Extract files from targets
-    if 'targets' in task_dict and task_dict['targets']:
-        for target in task_dict['targets']:
+    if "targets" in task_dict and task_dict["targets"]:
+        for target in task_dict["targets"]:
             target_str = str(target)
-            if target_str.endswith(('.csv', '.parquet')):
+            if target_str.endswith((".csv", ".parquet")):
                 files.add(target_str)
-    
+
     # Extract files from file_dep
-    if 'file_dep' in task_dict and task_dict['file_dep']:
-        for dep in task_dict['file_dep']:
+    if "file_dep" in task_dict and task_dict["file_dep"]:
+        for dep in task_dict["file_dep"]:
             dep_str = str(dep)
-            if dep_str.endswith(('.csv', '.parquet')):
+            if dep_str.endswith((".csv", ".parquet")):
                 files.add(dep_str)
-    
+
     if files:
         task_files[task_name] = sorted(files)
 
@@ -218,11 +220,11 @@ def filename_to_anchor(filename):
     # Convert to lowercase and replace non-alphanumeric characters with hyphens
     # Keep the full filename including extension since section headers include it
     anchor = filename.lower()
-    anchor = ''.join(c if c.isalnum() else '-' for c in anchor)
+    anchor = "".join(c if c.isalnum() else "-" for c in anchor)
     # Remove multiple consecutive hyphens and leading/trailing hyphens
-    while '--' in anchor:
-        anchor = anchor.replace('--', '-')
-    anchor = anchor.strip('-')
+    while "--" in anchor:
+        anchor = anchor.replace("--", "-")
+    anchor = anchor.strip("-")
     return anchor
 
 
@@ -268,7 +270,7 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True):
     for category in sorted(task_grouped.keys()):
         category_formatted = format_task_name(category)
         output_lines.append(f"### {category_formatted}")
-        
+
         for task in sorted(task_grouped[category].keys()):
             if ":" in task:
                 # This is a subtask, show it as a subheading
@@ -312,7 +314,7 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True):
         output_lines.append("### Columns")
         output_lines.append("```")
         for col in report["columns"]:
-            null_info = f" ({col['pct_null']:.1f}% null)" if col['pct_null'] > 0 else ""
+            null_info = f" ({col['pct_null']:.1f}% null)" if col["pct_null"] > 0 else ""
             output_lines.append(f"{col['name']:<40} {col['dtype']:<15}{null_info}")
         output_lines.append("```")
         output_lines.append("")
@@ -432,13 +434,21 @@ def create_xml_report(existing_files):
 def main():
     """Main function to create the data glimpses files in both XML and TXT formats."""
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Generate data glimpses report from dodo.py tasks")
-    parser.add_argument("--no-samples", action="store_true", 
-                       help="Exclude sample values sections from the report")
-    parser.add_argument("--no-stats", action="store_true", 
-                       help="Exclude numeric column statistics sections from the report")
+    parser = argparse.ArgumentParser(
+        description="Generate data glimpses report from dodo.py tasks"
+    )
+    parser.add_argument(
+        "--no-samples",
+        action="store_true",
+        help="Exclude sample values sections from the report",
+    )
+    parser.add_argument(
+        "--no-stats",
+        action="store_true",
+        help="Exclude numeric column statistics sections from the report",
+    )
     args = parser.parse_args()
-    
+
     print("Parsing dodo.py for tasks and data files...")
     task_files = parse_dodo_tasks()
 
@@ -460,13 +470,15 @@ def main():
     print("\nGenerating TXT report...")
     include_samples = not args.no_samples
     include_stats = not args.no_stats
-    
+
     if args.no_samples:
         print("  - Excluding sample values sections")
     if args.no_stats:
         print("  - Excluding numeric statistics sections")
-    
-    txt_content = create_txt_report(existing_files, include_samples=include_samples, include_stats=include_stats)
+
+    txt_content = create_txt_report(
+        existing_files, include_samples=include_samples, include_stats=include_stats
+    )
     # txt_output_file = OUTPUT_DIR / "data_glimpses.txt"
     txt_output_file = BASE_DIR / "docs_src" / "data_glimpses.md"
     with open(txt_output_file, "w", encoding="utf-8") as f:

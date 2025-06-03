@@ -10,9 +10,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pandas as pd
+import polars as pl
 import wrds
 from thefuzz import fuzz
-import polars as pl
 
 from settings import config
 
@@ -192,9 +192,9 @@ def pull_markit_red_crsp_link(wrds_username=WRDS_USERNAME):
         .reset_index()
         .rename(columns={"entity_cusip": "cusipCnt"})
     )
-    assert (
-        redcnt.cusipCnt.max() == 1
-    ), "Each redcode should be mapped to only one entity"
+    assert redcnt.cusipCnt.max() == 1, (
+        "Each redcode should be mapped to only one entity"
+    )
 
     ### Get information from CRSP header table
     crspHdr = conn.raw_sql(

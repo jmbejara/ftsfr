@@ -47,10 +47,10 @@ def pull_CRSP_treasury_daily(
     wrds_username=WRDS_USERNAME,
 ):
     """Pull daily CRSP Treasury data from WRDS within the specified date range.
-    
+
     This function queries the CRSP Treasury database's daily time series (tfz_dly)
     table for the specified date range.
-    
+
     Parameters
     ----------
     start_date : str
@@ -59,12 +59,12 @@ def pull_CRSP_treasury_daily(
         End date for the query in 'YYYY-MM-DD' format.
     wrds_username : str
         WRDS username to use for the connection.
-        
+
     Returns
     -------
     pd.DataFrame
         DataFrame containing daily CRSP Treasury data with the following columns:
-        
+
         - kytreasno: Treasury record identifier
         - kycrspid: CRSP-assigned unique ID
         - caldt: Quotation date
@@ -78,14 +78,14 @@ def pull_CRSP_treasury_daily(
         - tdpubout: Publicly Held Face Value Outstanding integer
         - tdtotout: Face Value Outstanding integer
         - pdint: Interest Paid on the interest payment date
-        
+
     Notes
     -----
     Field Details:
     - tdretnua: Unadjusted return, which represents the simple price change plus accrued interest
-    - tdpubout: Publicly Held Face Value Outstanding, the amount (face value) held by the public 
+    - tdpubout: Publicly Held Face Value Outstanding, the amount (face value) held by the public
       in millions of dollars
-    - tdtotout: Face Value Outstanding, the total amount (face value) issued and still outstanding 
+    - tdtotout: Face Value Outstanding, the total amount (face value) issued and still outstanding
       in millions of dollars
     - pdint: Interest Paid on the interest payment date
     """
@@ -112,20 +112,20 @@ def pull_CRSP_treasury_daily(
 
 def pull_CRSP_treasury_info(wrds_username=WRDS_USERNAME):
     """Pull Treasury issue information from CRSP.
-    
+
     This function queries the CRSP Treasury database's issue information (tfz_iss) table
     for bonds and notes (itype 1 or 2).
-    
+
     Parameters
     ----------
     wrds_username : str
         WRDS username to use for the connection.
-        
+
     Returns
     -------
     pd.DataFrame
         DataFrame containing Treasury issue information with the following columns:
-        
+
         - kytreasno: Treasury record identifier
         - kycrspid: CRSP-assigned unique ID
         - tcusip: Treasury CUSIP identifier
@@ -134,7 +134,7 @@ def pull_CRSP_treasury_info(wrds_username=WRDS_USERNAME):
         - tcouprt: Coupon rate
         - itype: Type of issue (1: noncallable bonds, 2: noncallable notes)
         - original_maturity: Calculated original maturity at issuance (in years)
-    
+
     Notes
     -----
     DATDT: Date Dated by Treasury, in YYYYMMDD Format integer
@@ -160,35 +160,35 @@ def pull_CRSP_treasury_info(wrds_username=WRDS_USERNAME):
 
 def calc_runness(data):
     """Calculate the 'runness' measure for Treasury securities.
-    
+
     'Runness' refers to how recently a Treasury security was issued relative to
     other securities with similar maturities. This is important because the most
     recently issued securities ('on-the-run') often trade at a premium compared
     to older issues ('off-the-run') due to their higher liquidity.
-    
+
     This function calculates the runness ranking, where:
     - 0 = on-the-run (most recently issued)
     - 1 = first off-the-run
     - 2 = second off-the-run
     - etc.
-    
+
     The calculation follows Gurkaynak, Sack, and Wright (2007) methodology:
     - Security runness is calculated for securities issued in 1980 or later
     - For each date and original maturity, securities are ranked by issue date
-    
+
     Parameters
     ----------
     data : pd.DataFrame
         DataFrame containing Treasury data with at least 'caldt', 'original_maturity',
         and 'tdatdt' columns.
-        
+
     Returns
     -------
     pd.DataFrame
         Input DataFrame with an additional 'run' column indicating the runness
         of each security. On-the-run securities have run=0, first off-the-run
         have run=1, etc.
-        
+
     Notes
     -----
     This is due to the following condition of Gurkaynak, Sack, and Wright (2007):
@@ -231,44 +231,44 @@ def pull_CRSP_treasury_consolidated(
         End date for the query in 'YYYY-MM-DD' format.
     wrds_username : str
         WRDS username to use for the connection.
-        
+
     Returns
     -------
     pd.DataFrame
         DataFrame containing consolidated Treasury data with the following columns:
-        
+
         Identification Fields:
         - kytreasno: Treasury record identifier
         - kycrspid: CRSP-assigned unique ID
         - tcusip: Treasury CUSIP identifier
-        
+
         Date Fields:
         - caldt: Quote date (date of price observation)
         - tdatdt: Date dated (original issue date when interest starts accruing)
         - tmatdt: Maturity date (when principal is repaid)
         - tfcaldt: First call date (0 if not callable)
-        
+
         Price and Yield Fields:
         - tdbid: Bid price (clean)
         - tdask: Ask price (clean)
         - tdaccint: Accrued interest since last coupon
         - tdyld: Bond equivalent yield
         - price: Dirty price (clean price + accrued interest)
-        
+
         Outstanding Amount Fields:
         - tdpubout: Publicly held face value outstanding (in millions of dollars)
         - tdtotout: Face value outstanding in total (in millions of dollars)
         - dqdate: Effective date of amount outstanding values in YYYYMMDD format
-        
+
         Interest Fields:
         - pdint: Interest paid on the interest payment date
-        
+
         Issue Characteristics:
         - tcouprt: Coupon rate (annual)
         - itype: Type of issue (1: bonds, 2: notes)
         - original_maturity: Original maturity at issuance (in years)
         - years_to_maturity: Remaining time to maturity (in years)
-        
+
         Trading Information:
         - tdduratn: Duration (price sensitivity to yield changes)
         - tdretnua: Return (unadjusted) - simple price change + accrued interest
@@ -296,7 +296,7 @@ def pull_CRSP_treasury_consolidated(
     TOTOUT: Face Value Outstanding integer
         Amount (face value) issued and still outstanding in millions of dollars. Set to 0 for unknown
         values up to December 31, 1961 and set to -1 for unknown values thereafter.
-    
+
     tdpubout: Publicly Held Face Value Outstanding integer
         Amount (face value) held by the public in millions of dollars. This is the total amount
         outstanding (TOTOUT) minus the amount held in U.S. Government accounts and Federal Reserve
@@ -304,7 +304,7 @@ def pull_CRSP_treasury_consolidated(
         set to 0 for unknown values up to December 31, 1961 and set to -1 for unavailable values after
         December 31, 1961. After December 31, 1982, these numbers are reported quarterly instead of
         monthly, and the reported values are carried forward the next two months.
-    
+
     PDINT: Interest Paid real*8
         PDINT is the coupon payable on the interest payment date.
     """
@@ -354,12 +354,12 @@ def pull_CRSP_treasury_consolidated(
 
 def load_CRSP_treasury_daily(data_dir=DATA_DIR):
     """Load daily CRSP Treasury data from a Parquet file.
-    
+
     Parameters
     ----------
     data_dir : Path or str
         Directory where the Parquet file is stored
-        
+
     Returns
     -------
     pd.DataFrame
@@ -373,12 +373,12 @@ def load_CRSP_treasury_daily(data_dir=DATA_DIR):
 
 def load_CRSP_treasury_info(data_dir=DATA_DIR):
     """Load CRSP Treasury issue information from a Parquet file.
-    
+
     Parameters
     ----------
     data_dir : Path or str
         Directory where the Parquet file is stored
-        
+
     Returns
     -------
     pd.DataFrame
@@ -392,7 +392,7 @@ def load_CRSP_treasury_info(data_dir=DATA_DIR):
 
 def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
     """Load consolidated CRSP Treasury data from a Parquet file.
-    
+
     Parameters
     ----------
     data_dir : Path or str
@@ -400,7 +400,7 @@ def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
     with_runness : bool, default=True
         If True, load the file with runness information included.
         If False, load the file without runness information.
-        
+
     Returns
     -------
     pd.DataFrame

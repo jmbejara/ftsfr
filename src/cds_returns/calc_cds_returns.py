@@ -1,19 +1,16 @@
-import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import datetime
-import io
 
 import numpy as np
 import pandas as pd
 import polars as pl
 import pull_fed_yield_curve
-import pull_markit_cds
 import pull_fred
-import requests
+import pull_markit_cds
 from scipy.interpolate import CubicSpline
 
 from settings import config
