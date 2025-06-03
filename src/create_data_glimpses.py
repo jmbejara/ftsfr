@@ -215,8 +215,8 @@ def format_file_size(size_bytes):
 
 def filename_to_anchor(filename):
     """Convert a filename to a markdown anchor link format."""
-    # Remove file extension and convert to lowercase
-    # Replace non-alphanumeric characters with hyphens, then clean up
+    # Convert to lowercase and replace non-alphanumeric characters with hyphens
+    # Keep the full filename including extension since section headers include it
     anchor = filename.lower()
     anchor = ''.join(c if c.isalnum() else '-' for c in anchor)
     # Remove multiple consecutive hyphens and leading/trailing hyphens
