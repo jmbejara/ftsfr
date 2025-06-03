@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "../../src")
+sys.path.insert(0, "./src")
 
 import pandas as pd
 #import polars as pl
@@ -160,7 +161,7 @@ This weighting ensures that larger bonds have a proportionally larger impact on 
 
 # %%
 # Convert yyyymm to datetime (last day of each month)
-copr_bonds_hkm['date'] = pd.to_datetime(copr_bonds_hkm['yyyymm'].astype(str), format='%Y%m') + pd.offsets.MonthEnd(0)
+copr_bonds_hkm['date'] = pd.to_datetime(copr_bonds_hkm['yyyymm'].astype(int).astype(str), format='%Y%m') + pd.offsets.MonthEnd(0)
 copr_bonds_hkm.set_index('date', inplace=True)
 
 # Now both DataFrames have datetime index with last day of month

@@ -7,7 +7,7 @@ import warnings
 
 import pandas as pd
 import numpy as np
-import pull_open_source_bond
+from corp_bond_returns import pull_open_source_bond
 
 from settings import config
 
@@ -20,8 +20,8 @@ def group_portfolios(bond_returns = None):
     bins = np.arange(0, 5.5, 0.5)  # [0.0, 0.5, 1.0, ..., 5.0]
     labels = [f"{i+1}" for i in range(len(bins)-1)]  # ['1', '2', ..., '10']
 
-    # Filter for CUSIPs starting with 'G'
-    bond_returns = bond_returns[bond_returns['CUSIP'].str.startswith('91')]
+    # Filter for CUSIPs starting with '91' and make an explicit copy
+    bond_returns = bond_returns[bond_returns['CUSIP'].str.startswith('91')].copy()
     
 
     # Convert tr_return to decimal values by dividing by 100

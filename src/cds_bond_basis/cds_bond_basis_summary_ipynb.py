@@ -20,9 +20,9 @@ where:
 - $FR_{i, t, \tau}$ = time $t$ floating rate spread implied by a fixed-rate corporate bond issued by firm $i$ at tenor $\tau$
 - $CDS_{i, t, \tau}$ = time $t$ Credit Default Swap (CDS) par spread for firm $i$ with tenor $\tau$
 
-A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default. 
+A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
 
-The value of $FR$ is substituted by the paper with **Z-spread** which we also modify in our construction. We will go into the substitution in detail later. 
+The value of $FR$ is substituted by the paper with **Z-spread** which we also modify in our construction. We will go into the substitution in detail later.
 
 The value of $CDS$ is interpolated by the authors using a cubic spline function.
 
@@ -47,33 +47,22 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "../../src")
+sys.path.insert(0, "./src")
 
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-
-import ctypes
-from scipy.interpolate import CubicSpline
-
 from NEW_MERGE_cds_bond import *
 from process_final_product import *
 
-# from he_kelly_manela import pull_he_kelly_manela
-# from wrds_markit import pull_markit_cds, pull_fed_yield_curve
-# from corp_bond_returns import pull_open_source_bond
-# from settings import config
+from settings import config
+import pull_open_source_bond
+import pull_wrds_markit
 
-%load_ext autoreload
-%autoreload 2
+# %load_ext autoreload
+# %autoreload 2
 
 # %%
-# DATA_DIR = Path(config("DATA_DIR"))
-DATA_DIR = "../../../FS-project_files"
-
-RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
-CORPORATES_MONTHLY_FILE_NAME = "corporate_bond_returns.parquet"
-CDS_FILE_NAME = "cds_final.pkl" # CHANGE TO PARQUET WHEN DEPEDENCY IS SORTED
+DATA_DIR = Path(config("DATA_DIR"))
+# DATA_DIR = "../../../FS-project_files"
 
 # %%
 """
@@ -150,7 +139,15 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 """
 
 # %%
-corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
+
+
+
+RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
+CORPORATES_MONTHLY_FILE_NAME = "corporate_bond_returns.parquet"
+CDS_FILE_NAME = "cds_final.pkl"  # CHANGE TO PARQUET WHEN DEPEDENCY IS SORTED
+
+# corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
+corp_bonds_data = pull_open_source_bond.load_corporate_bond_returns(data_dir=DATA_DIR)
 red_data = pd.read_parquet(f"{DATA_DIR}/{RED_CODE_FILE_NAME}")
 cds_data = pd.read_pickle(f"{DATA_DIR}/{CDS_FILE_NAME}")
 
