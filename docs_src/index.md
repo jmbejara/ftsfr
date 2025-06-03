@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Financial Time Series Forecasting Repository (FTSFR) addresses a critical gap in quantitative finance research: the lack of standardized datasets for evaluating and comparing time series forecasting models. This repository provides a comprehensive collection of financial and macroeconomic datasets that have been cleaned, formatted, and standardized according to academic best practices.
+The Financial Time Series Forecasting Repository (FTSFR) addresses a critical gap in quantitative finance research: the lack of standardized datasets for evaluating and comparing time series forecasting models. When researchers evaluate their own forecasting models on their own arbitrarily chosen datasets, apples-to-apples comparisons across forecasting algorithms are not possible. This repository provides a comprehensive collection of financial and macroeconomic datasets that have been cleaned, formatted, and standardized according to academic best practices. We hope that this repository will serve as a useful time series forecasting benchmark.
 
 ## Why FTSFR?
 
@@ -15,35 +15,51 @@ When comparing different time series forecasting algorithms, researchers need **
 - Sampled over the same time periods
 - Formatted in the same way
 
+We are inspired by the work of the Monash Time Series Data Repository (MTSDR), which provides a collection offreely available datasets for benchmarking  time series forecasting models. However, we are motivated by the desire to provide datasets from topics in finance and economics, which are often not freely available (e.g., require a subscription to access).
+
 ### Our Solution
-FTSFR provides a codebase that automates the extract-transform-load (ETL) process for financial and macroeconomic data from various sources. Our standardized approach ensures that researchers can focus on model development rather than data preparation.
+We provide researchers with easy access to a ready-to-use repository of financial and macroeconomic datasets that have been cleaned, formatted, and standardized according to academic best practices. Although most of the data in this repository requires a subscription to access, we provide what we think is the next-best thing: a codebase that automates the end-to-end process for assembling various financial and macroeconomic data, from the data pull step to the final cleaning and transformation step. Most of our code pulls from the Wharton Research Data Services (WRDS), which is a subscription-based service commonly available at most universities. Our quickstart guide provides a short and simple guide to get you started.
 
 ## Key Features
 
-### 🔧 **Automated ETL Pipeline**
-- Streamlined data collection from multiple sources
-- Consistent cleaning and formatting procedures
-- Reproducible data preparation workflows
+- 📡 Streamlined data collection from multiple sources (e.g., WRDS, FRED, etc.)
+- 🎯 Academic Standards: Replicates cleaning procedures for each datasetfrom academic literature
+- 🤖 Fully reproducible data preparation workflows
+- 📈 Spans multiple financial domains:
+    - Equity Markets: Returns, portfolios, and characteristics
+    - Fixed Income: Treasury, corporate, and sovereign bonds
+    - Credit Markets: CDS spreads and bond-CDS basis
+    - Derivatives: Options and futures data
+    - Foreign Exchange: Currency portfolios and rates
+    - Commodities: Futures and spot prices
+    - Banking: Call report data and bank-specific metrics
 
-### 📊 **Comprehensive Coverage**
-Our repository spans multiple financial domains:
-- **Equity Markets**: Returns, portfolios, and characteristics
-- **Fixed Income**: Treasury, corporate, and sovereign bonds
-- **Credit Markets**: CDS spreads and bond-CDS basis
-- **Derivatives**: Options and futures data
-- **Foreign Exchange**: Currency portfolios and rates
-- **Commodities**: Futures and spot prices
-- **Banking**: Call report data and bank-specific metrics
+## Replications of Studies from Academic Literature
 
-### 🎯 **Academic Standards**
-- Data cleaning follows established academic literature
-- Consistent with peer-reviewed research methodologies
-- Suitable for academic publication and peer review
+Each of the cleaned datasets that we provide follow the procedures outlined in a published academic paper. We feel that these benchmarks are most useful when they follow the same procedures commonly used in the literature. We replicate the procedures outlined in or use the data provided via the following papers:
 
-### 📈 **Baseline Benchmarks**
-- Pre-computed performance metrics for baseline forecasting methods
-- Multiple error metrics for comprehensive evaluation
-- Reference points for comparing new forecasting approaches
+ 
+ - Barth, Daniel, and R. Jay Kahn. "Hedge funds and the Treasury cash-futures disconnect." OFR WP (2021): 21-01.
+ - Borri, Nicola, and Adrien Verdelhan. "Sovereign risk premia." (2011).
+ - Constantinides, George M., Jens Carsten Jackwerth, and Alexi Savov. "The puzzle of index option returns." Review of Asset Pricing Studies 3, no. 2 (2013): 229-257.
+ - Drechsler, Itamar, Alexi Savov, and Philipp Schnabl. "The deposits channel of monetary policy." The Quarterly Journal of Economics 132, no. 4 (2017): 1819-1876.
+ - Du, Wenxin, Alexander Tepper, and Adrien Verdelhan. "Deviations from covered interest rate parity." The Journal of Finance 73, no. 3 (2018): 915-957.
+ - Du, Wenxin, Benjamin Hébert, and Wenhao Li. "Intermediary balance sheets and the treasury yield curve." Journal of Financial Economics 150, no. 3 (2023): 103722.
+ - Duffie, Darrell. "Credit swap valuation." Financial Analysts Journal 55, no. 1 (1999): 73-87.
+ - Fama, Eugene F., and Kenneth R. French. "Common risk factors in the returns on stocks and bonds." Journal of financial economics 33, no. 1 (1993): 3-56.
+ - Fleckenstein, Matthias, Francis A. Longstaff, and Hanno Lustig. "The TIPS‐treasury bond puzzle." the Journal of Finance 69, no. 5 (2014): 2151-2197.
+ - Gürkaynak, Refet S., Brian Sack, and Jonathan H. Wright. "The TIPS yield curve and inflation compensation." American Economic Journal: Macroeconomics 2, no. 1 (2010): 70-92.
+ - Gürkaynak, Refet S., Brian Sack, and Jonathan H. Wright. "The US Treasury yield curve: 1961 to the present." Journal of monetary Economics 54, no. 8 (2007): 2291-2304.
+ - He, Zhiguo, Bryan Kelly, and Asaf Manela. "Intermediary asset pricing: New evidence from many asset classes." Journal of Financial Economics 126, no. 1 (2017): 1-35.
+ - J Jermann, Urban. "Negative swap spreads and limited arbitrage." The Review of Financial Studies 33, no. 1 (2020): 212-238.
+ - Lettau, Martin, Matteo Maggiori, and Michael Weber. "Conditional risk premia in currency markets and other asset classes." Journal of Financial Economics 114, no. 2 (2014): 197-225.
+ - Menkhoff, Lukas, Lucio Sarno, Maik Schmeling, and Andreas Schrimpf. "Carry trades and global foreign exchange volatility." The Journal of Finance 67, no. 2 (2012): 681-718.
+ - Nozawa, Yoshio. "What drives the cross‐section of credit spreads?: A variance decomposition approach." The Journal of Finance 72, no. 5 (2017): 2045-2072.
+ - Palhares, Diogo. Cash-flow maturity and risk premia in CDS markets. The University of Chicago, 2013.
+ - Ronn, Aimee Gerbarg, and Ehud I. Ronn. "The box spread arbitrage conditions: theory, tests, and investment strategies." Review of Financial Studies 2, no. 1 (1989): 91-108.
+ - Siriwardane, Emil, Adi Sunderam, and Jonathan L. Wallen. Segmented arbitrage. No. w30561. National Bureau of Economic Research, 2022.
+ - Van Binsbergen, Jules H., William F. Diamond, and Marco Grotteria. "Risk-free interest rates." Journal of Financial Economics 143, no. 1 (2022): 1-29.
+ - Yang, Fan. "Investment shocks and the commodity basis spread." Journal of Financial Economics 110, no. 1 (2013): 164-184.
 
 ## Data Sources
 
@@ -62,9 +78,11 @@ Our repository leverages both **publicly available** and **subscription-based** 
 - WRDS Markit CDS data
 - WRDS Bond Returns
 - WRDS Mergent FISD
+- WRDS Bank Premium
+- Bloomberg Terminal
 
 ```{note}
-While some datasets require paid subscriptions, they are commonly available through academic institutions. Our code automates the data retrieval process once you have the appropriate access credentials.
+While some datasets require paid subscriptions, they are commonly available through academic institutions. Our code automates the data retrieval process once you have the appropriate access credentials. If you don't have access to any of the above data sources, you can still use our code to pull from only the data sources that you have subscriptions for. The code will automatically skip the data sources that you don't have access to. However, in that case, you won't be able to assemble the full suite of benchmark datasets.
 ```
 
 ## Getting Started
