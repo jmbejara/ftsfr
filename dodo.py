@@ -514,32 +514,34 @@ def task_assemble_results():
 
 
 notebook_tasks = {
-    "corp_bond_returns_summary_ipynb": {
-        "path": "./src/corp_bond_returns/corp_bond_returns_summary_ipynb.py",
-        "file_dep": ["./src/corp_bond_returns/calc_corp_bond_returns.py",],
-        "targets": [],
-    },
-    "treasury_bond_returns_summary_ipynb": {
-        "path": "./src/us_treasury_returns/treasury_bond_returns_summary_ipynb.py",
-        "file_dep": [
-            "./src/us_treasury_returns/calc_treasury_bond_returns.py",
-        ],
-        "targets": [],
-    },
-    "01_cds_returns_summary_ipynb": {
-        "path": "./src/cds_returns/01_cds_returns_summary_ipynb.py",
-        "file_dep": [
-            "./src/cds_returns/calc_cds_returns.py",
-        ],
-        "targets": [],
-    },
-    # "cds_bond_basis_summary_ipynb": {
-    #     "path": "./src/cds_bond_basis/cds_bond_basis_summary_ipynb.py",
+    # "summary_cds_bond_basis_ipynb": {
+    #     "path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
     #     "file_dep": [
     #         "./src/cds_bond_basis/NEW_MERGE_cds_bond.py",
     #     ],
     #     "targets": [],
     # },
+    "summary_corp_bond_returns_ipynb": {
+        "path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
+        "file_dep": [
+            "./src/corp_bond_returns/calc_corp_bond_returns.py",
+        ],
+        "targets": [],
+    },
+    "summary_cds_returns_ipynb": {
+        "path": "./src/cds_returns/summary_cds_returns_ipynb.py",
+        "file_dep": [
+            "./src/cds_returns/calc_cds_returns.py",
+        ],
+        "targets": [],
+    },
+    "summary_treasury_bond_returns_ipynb": {
+        "path": "./src/us_treasury_returns/summary_treasury_bond_returns_ipynb.py",
+        "file_dep": [
+            "./src/us_treasury_returns/calc_treasury_bond_returns.py",
+        ],
+        "targets": [],
+    },
 }
 
 

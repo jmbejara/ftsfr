@@ -107,9 +107,9 @@ data_glimpses
 :maxdepth: 1
 :caption: 📊 Dataset Summaries
 
-_notebook_build/corp_bond_returns_summary_ipynb.ipynb
-_notebook_build/treasury_bond_returns_summary_ipynb.ipynb
-_notebook_build/01_cds_returns_summary_ipynb.ipynb
+_notebook_build/summary_corp_bond_returns_ipynb.ipynb
+_notebook_build/summary_treasury_bond_returns_ipynb.ipynb
+_notebook_build/summary_cds_returns_ipynb.ipynb
 ```
 
 ```{toctree}
