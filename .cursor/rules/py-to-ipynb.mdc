@@ -1,6 +1,6 @@
 ---
-description: Example of how to write a .py file that will be converted to a .ipynb file
-globs: 
+description: 
+globs: *_ipynb.py
 alwaysApply: false
 ---
 When you write a .py file with the intention of using ipynb-py-convert to convert it to a .ipynb file, you might encounter some problems creating markdown cells. For information about this package, see here: https://pypi.org/project/ipynb-py-convert/ 

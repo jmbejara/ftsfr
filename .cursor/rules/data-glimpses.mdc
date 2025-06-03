@@ -1,0 +1,6 @@
+---
+description: Request this rule whenever you need to peek into any of the data files (e.g., CSV or parquet) that are used by this project.
+globs: 
+alwaysApply: false
+---
+If you need to view the data available to you, please view the file [data_glimpses.md](mdc:docs_src/data_glimpses.md) . This file is periodically refreshed. You can refresh it yourself by making the following call `python ./src/create_data_glimpses.py`. This script goes through and finds all CSV and parquet files mentioned in [dodo.py](mdc:dodo.py) and describes what's in them.
