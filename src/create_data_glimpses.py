@@ -99,7 +99,7 @@ def process_task_dict(task_dict, base_name, task_files):
         task_files[task_name] = sorted(files)
 
 
-def get_dataset_report(filepath):
+def get_dataset_report(filepath, include_stats=True):
     """Return a dict with file metadata, shape, columns, sample values, numeric stats, and glimpse."""
     report = {}
     try:
@@ -107,18 +107,29 @@ def get_dataset_report(filepath):
         report["file_size_bytes"] = os.path.getsize(filepath)
         report["file_size_mb"] = report["file_size_bytes"] / (1024 * 1024)
         report["file_type"] = Path(filepath).suffix.replace(".", "").upper()
-        # Load data
+        
+        # Load data lazily
         if filepath.endswith(".csv"):
-            df = pl.read_csv(filepath, n_rows=10000)
+            lf = pl.scan_csv(filepath)
         else:
-            df = pl.read_parquet(filepath)
-        # Shape
-        report["n_rows"], report["n_cols"] = df.shape
+            lf = pl.scan_parquet(filepath)
+        
+        # Get schema without loading data
+        schema = lf.collect_schema()
+        report["n_cols"] = len(schema)
+        
+        # Get row count efficiently
+        row_count_df = lf.select(pl.len().alias("count")).collect()
+        report["n_rows"] = row_count_df["count"][0]
+        
+        # Get null counts efficiently
+        null_count_exprs = [pl.col(col).null_count().alias(col) for col in schema]
+        null_counts = lf.select(null_count_exprs).collect().to_dicts()[0]
+        
         # Columns info
-        null_counts = df.null_count().to_dicts()[0]
         columns = []
-        for col in df.columns:
-            dtype = str(df.schema[col])
+        for col in schema:
+            dtype = str(schema[col])
             n_null = null_counts.get(col, 0)
             pct_null = (
                 (n_null / report["n_rows"] * 100) if report["n_rows"] > 0 else 0.0
@@ -127,15 +138,19 @@ def get_dataset_report(filepath):
                 {"name": col, "dtype": dtype, "pct_null": pct_null, "n_null": n_null}
             )
         report["columns"] = columns
-        # Sample values
-        sample = df.head(5).to_dicts()
+        
+        # Sample values - only collect first 5 rows
+        sample_df = lf.head(5).collect()
+        sample = sample_df.to_dicts()
         report["sample_values"] = sample
+        
         # Capture polars text representation of first 5 rows
         output = StringIO()
         with redirect_stdout(output):
-            df.glimpse()
+            sample_df.glimpse()
         report["sample_text"] = output.getvalue()
-        # Numeric stats
+        
+        # Numeric stats (only if requested)
         numeric_types = {
             pl.Int8,
             pl.Int16,
@@ -148,18 +163,22 @@ def get_dataset_report(filepath):
             pl.Float32,
             pl.Float64,
         }
-        numeric_cols = [c for c in df.columns if df.schema[c] in numeric_types]
+        numeric_cols = [c for c in schema if schema[c] in numeric_types]
         numeric_stats = []
-        if numeric_cols:
-            stats_df = df.select(
-                [
-                    *(pl.col(c).min().alias(f"{c}_min") for c in numeric_cols),
-                    *(pl.col(c).max().alias(f"{c}_max") for c in numeric_cols),
-                    *(pl.col(c).mean().alias(f"{c}_mean") for c in numeric_cols),
-                    *(pl.col(c).median().alias(f"{c}_median") for c in numeric_cols),
-                ]
-            )
+        
+        if include_stats and numeric_cols:
+            stats_exprs = []
+            for c in numeric_cols:
+                stats_exprs.extend([
+                    pl.col(c).min().alias(f"{c}_min"),
+                    pl.col(c).max().alias(f"{c}_max"),
+                    pl.col(c).mean().alias(f"{c}_mean"),
+                    pl.col(c).median().alias(f"{c}_median"),
+                ])
+            
+            stats_df = lf.select(stats_exprs).collect()
             stats_dict = stats_df.to_dicts()[0]
+            
             for col in numeric_cols:
                 numeric_stats.append(
                     {
@@ -171,11 +190,14 @@ def get_dataset_report(filepath):
                     }
                 )
         report["numeric_stats"] = numeric_stats
-        # Glimpse
+        
+        # Glimpse - need a larger sample for better representation
+        glimpse_df = lf.head(100).collect()
         output = StringIO()
         with redirect_stdout(output):
-            df.glimpse(max_items_per_column=0)
+            glimpse_df.glimpse(max_items_per_column=0)
         report["glimpse"] = output.getvalue()
+        
     except Exception as e:
         report["error"] = f"ERROR: Could not read file - {str(e)}"
     return report
@@ -293,7 +315,7 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True):
     # Process each file
     for i, f in enumerate(sorted(existing_files), 1):
         filename = Path(f).name
-        report = get_dataset_report(f)
+        report = get_dataset_report(f, include_stats=include_stats)
 
         output_lines.append("")
         output_lines.append(f"## {filename}")
@@ -352,7 +374,7 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True):
     return "\n".join(output_lines)
 
 
-def create_xml_report(existing_files):
+def create_xml_report(existing_files, include_stats=True):
     """Create a machine-readable XML format Data Glimpses Report."""
     output_lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -372,7 +394,7 @@ def create_xml_report(existing_files):
     # Add each dataset
     for f in sorted(existing_files):
         filename = Path(f).name
-        report = get_dataset_report(f)
+        report = get_dataset_report(f, include_stats=include_stats)
         output_lines.append(
             f'    <dataset filename="{saxutils.escape(filename)}" path="{saxutils.escape(str(f))}">'
         )

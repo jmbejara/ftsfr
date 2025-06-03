@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Generated: 2025-06-02 21:40:20
+Generated: 2025-06-03 16:27:59
 Total files: 55
 
 ## Summary of Datasets by Task
@@ -2353,7 +2353,7 @@ totalAccepted: min=0.0, max=255492688300.0, mean=56010628275.22, median=34532638
 
 ## ontherun.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/ontherun.csv`
-**Size:** 83.3 MB | **Type:** Csv | **Shape:** 10,000 rows × 5 columns
+**Size:** 83.3 MB | **Type:** Csv | **Shape:** 2,419,244 rows × 5 columns
 
 ### Columns
 ```
@@ -2366,7 +2366,7 @@ cusip                                    String
 
 ### Numeric Column Statistics
 ```
-run: min=0, max=16, mean=2.41, median=1.0
+run: min=0, max=84, mean=21.35, median=17.0
 ```
 
 ---
