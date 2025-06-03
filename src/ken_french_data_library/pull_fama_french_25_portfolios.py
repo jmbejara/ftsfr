@@ -127,7 +127,8 @@ def load_data_into_dataframe(
         df = df.iloc[:separation_index]
 
     df.columns = [col.strip() for col in df.columns]
-
+    df["date"] = df["date"].str.strip()
+    
     if "daily" in csv_path.name.lower():
         df["date"] = pd.to_datetime(df["date"], format="%Y%m%d", errors="coerce")
     else:

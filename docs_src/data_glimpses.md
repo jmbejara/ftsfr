@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Generated: 2025-06-03 16:27:59
+Generated: 2025-06-03 18:59:26
 Total files: 55
 
 ## Summary of Datasets by Task
@@ -91,7 +91,7 @@ Total files: 55
 
 ## Final_data.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Final_data.parquet`
-**Size:** 1038200 bytes | **Type:** Parquet | **Shape:** 28,667 rows × 9 columns
+**Size:** 1038295 bytes | **Type:** Parquet | **Shape:** 28,667 rows × 9 columns
 
 ### Columns
 ```
@@ -114,14 +114,14 @@ CS: min=-0.2350270544393278, max=0.9440691614682412, mean=0.02, median=0.0196541
 size_ig: min=0.0, max=1.0, mean=0.76, median=1.0
 size_jk: min=0.0, max=1.0, mean=0.98, median=1.0
 par_spread: min=-13.051245732738076, max=45.110770582488456, mean=0.11, median=0.010004951771566519
-__index_level_0__: min=10402, max=1391540, mean=689133.61, median=699948.0
+__index_level_0__: min=10402, max=1391541, mean=689134.38, median=699949.0
 ```
 
 ---
 
 ## RED_and_ISIN_mapping.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/RED_and_ISIN_mapping.parquet`
-**Size:** 235779 bytes | **Type:** Parquet | **Shape:** 10,484 rows × 5 columns
+**Size:** 236426 bytes | **Type:** Parquet | **Shape:** 10,519 rows × 5 columns
 
 ### Columns
 ```
@@ -136,7 +136,7 @@ tier                                     String
 
 ## Red_Data.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Red_Data.parquet`
-**Size:** 20.3 MB | **Type:** Parquet | **Shape:** 1,392,506 rows × 9 columns
+**Size:** 20.2 MB | **Type:** Parquet | **Shape:** 1,392,507 rows × 9 columns
 
 ### Columns
 ```
@@ -311,7 +311,7 @@ year: min=2001, max=2023, mean=2013.61, median=2014.0
 
 ## markit_cds_subsetted_to_crsp.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_cds_subsetted_to_crsp.parquet`
-**Size:** 1.0 GB | **Type:** Parquet | **Shape:** 25,702,712 rows × 20 columns
+**Size:** 1.0 GB | **Type:** Parquet | **Shape:** 25,702,714 rows × 20 columns
 
 ### Columns
 ```
@@ -352,14 +352,14 @@ year: min=2001.0, max=2023.0, mean=2013.26, median=2013.0
 permno: min=10025.0, max=93423.0, mean=55611.95, median=61938.0
 permco: min=7.0, max=60114.0, mean=22285.94, median=21201.0
 nameRatio: min=50, max=100, mean=88.20, median=90.0
-__index_level_0__: min=0, max=26699662, mean=12953193.77, median=12877477.5
+__index_level_0__: min=0, max=26699664, mean=12953166.15, median=12877478.5
 ```
 
 ---
 
 ## markit_red_crsp_link.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_red_crsp_link.parquet`
-**Size:** 538772 bytes | **Type:** Parquet | **Shape:** 4,762 rows × 25 columns
+**Size:** 539274 bytes | **Type:** Parquet | **Shape:** 4,764 rows × 25 columns
 
 ### Columns
 ```
@@ -378,7 +378,7 @@ companynum_type                          String          (85.3% null)
 companynum                               String          (85.3% null)
 alternativenames                         String          (97.2% null)
 recorddate                               Date            (62.9% null)
-validto                                  Date            (58.3% null)
+validto                                  Date            (58.2% null)
 validfrom                                Date            (83.5% null)
 permno                                   Float64        
 permco                                   Float64        
@@ -392,8 +392,8 @@ nameRatio                                Int64
 
 ### Numeric Column Statistics
 ```
-permno: min=10025.0, max=93423.0, mean=62820.25, median=77068.5
-permco: min=7.0, max=60114.0, mean=25026.46, median=21475.0
+permno: min=10025.0, max=93423.0, mean=62816.05, median=77068.5
+permco: min=7.0, max=60114.0, mean=25038.27, median=21480.5
 nameRatio: min=20, max=100, mean=79.54, median=86.0
 ```
 
@@ -424,7 +424,7 @@ tau: min=-0.167123288, max=180.1260274, mean=7.98, median=4.7123287671
 
 ## fed_yield_curve.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/fed_yield_curve.parquet`
-**Size:** 3.2 MB | **Type:** Parquet | **Shape:** 16,673 rows × 31 columns
+**Size:** 3.2 MB | **Type:** Parquet | **Shape:** 16,688 rows × 31 columns
 
 ### Columns
 ```
@@ -443,11 +443,11 @@ SVENY12                                  Float64         (20.0% null)
 SVENY13                                  Float64         (20.0% null)
 SVENY14                                  Float64         (20.0% null)
 SVENY15                                  Float64         (20.0% null)
-SVENY16                                  Float64         (34.4% null)
-SVENY17                                  Float64         (34.4% null)
-SVENY18                                  Float64         (34.4% null)
-SVENY19                                  Float64         (34.4% null)
-SVENY20                                  Float64         (34.4% null)
+SVENY16                                  Float64         (34.3% null)
+SVENY17                                  Float64         (34.3% null)
+SVENY18                                  Float64         (34.3% null)
+SVENY19                                  Float64         (34.3% null)
+SVENY20                                  Float64         (34.3% null)
 SVENY21                                  Float64         (40.9% null)
 SVENY22                                  Float64         (40.9% null)
 SVENY23                                  Float64         (40.9% null)
@@ -463,43 +463,43 @@ Date                                     Datetime(time_unit='ns', time_zone=None
 
 ### Numeric Column Statistics
 ```
-SVENY01: min=0.0554, max=16.462, mean=4.82, median=4.885999999999999
-SVENY02: min=0.102, max=15.9118, mean=5.02, median=4.90185
-SVENY03: min=0.12720000743866, max=15.5746, mean=5.18, median=4.9913
-SVENY04: min=0.168500006198883, max=15.3498, mean=5.32, median=5.1117608326705
-SVENY05: min=0.221799999475479, max=15.1776, mean=5.44, median=5.24395
-SVENY06: min=0.280600011348724, max=15.0611, mean=5.54, median=5.370901038401501
-SVENY07: min=0.341300010681152, max=15.0109, mean=5.63, median=5.457570141669001
-SVENY08: min=0.40200001001358, max=14.9799, mean=5.84, median=5.8219051019035
-SVENY09: min=0.461800009012222, max=14.9572, mean=5.92, median=5.8987746333855
-SVENY10: min=0.52020001411438, max=14.9398, mean=6.00, median=5.954222508486501
-SVENY11: min=0.577000021934509, max=14.934, mean=6.06, median=6.002139450434
-SVENY12: min=0.632300019264221, max=14.9367, mean=6.12, median=6.044152866898
-SVENY13: min=0.685899972915649, max=14.9407, mean=6.17, median=6.075420544469
-SVENY14: min=0.737999975681305, max=14.9684, mean=6.21, median=6.109507685892
-SVENY15: min=0.781599998474121, max=15.0394, mean=6.25, median=6.137743099227
-SVENY16: min=0.817200005054474, max=15.1073, mean=5.87, median=5.306560876366
-SVENY17: min=0.85290002822876, max=15.1716, mean=5.90, median=5.3488
-SVENY18: min=0.888400018215179, max=15.2318, mean=5.93, median=5.3821
-SVENY19: min=0.923600018024445, max=15.2879, mean=5.95, median=5.4094
-SVENY20: min=0.958100020885468, max=15.34, mean=5.97, median=5.436507099905
-SVENY21: min=0.991900026798248, max=10.4856, mean=5.29, median=5.0254
-SVENY22: min=1.02479994297028, max=10.5206, mean=5.30, median=5.020650023651125
-SVENY23: min=1.0566999912262, max=10.5553, mean=5.31, median=5.0074000000000005
-SVENY24: min=1.08759999275208, max=10.5893, mean=5.31, median=4.9956
-SVENY25: min=1.11740005016327, max=10.6217, mean=5.31, median=4.97895
-SVENY26: min=1.14619994163513, max=10.6526, mean=5.31, median=4.96215
-SVENY27: min=1.17379999160767, max=10.6819, mean=5.30, median=4.94625008277893
-SVENY28: min=1.20039999485016, max=10.7099, mean=5.30, median=4.92845010757446
-SVENY29: min=1.22580003738403, max=10.7365, mean=5.29, median=4.9143
-SVENY30: min=1.2503000497818, max=10.7618, mean=5.28, median=4.89400009460449
+SVENY01: min=0.0554, max=16.462, mean=4.82, median=4.8842
+SVENY02: min=0.102, max=15.9118, mean=5.02, median=4.89885
+SVENY03: min=0.12720000743866, max=15.5746, mean=5.18, median=4.9862
+SVENY04: min=0.168500006198883, max=15.3498, mean=5.31, median=5.10844097735
+SVENY05: min=0.221799999475479, max=15.1776, mean=5.43, median=5.241627984691
+SVENY06: min=0.280600011348724, max=15.0611, mean=5.54, median=5.363898211084
+SVENY07: min=0.341300010681152, max=15.0109, mean=5.63, median=5.4548489980134995
+SVENY08: min=0.40200001001358, max=14.9799, mean=5.84, median=5.814072686622
+SVENY09: min=0.461800009012222, max=14.9572, mean=5.92, median=5.893546383434
+SVENY10: min=0.52020001411438, max=14.9398, mean=5.99, median=5.948984640363999
+SVENY11: min=0.577000021934509, max=14.934, mean=6.06, median=5.995439980477
+SVENY12: min=0.632300019264221, max=14.9367, mean=6.12, median=6.037475882346
+SVENY13: min=0.685899972915649, max=14.9407, mean=6.17, median=6.069447042705
+SVENY14: min=0.737999975681305, max=14.9684, mean=6.21, median=6.1054
+SVENY15: min=0.781599998474121, max=15.0394, mean=6.25, median=6.1339
+SVENY16: min=0.817200005054474, max=15.1073, mean=5.86, median=5.3011
+SVENY17: min=0.85290002822876, max=15.1716, mean=5.90, median=5.3458
+SVENY18: min=0.888400018215179, max=15.2318, mean=5.92, median=5.3774
+SVENY19: min=0.923600018024445, max=15.2879, mean=5.95, median=5.4068
+SVENY20: min=0.958100020885468, max=15.34, mean=5.97, median=5.4296
+SVENY21: min=0.991900026798248, max=10.4856, mean=5.29, median=5.032
+SVENY22: min=1.02479994297028, max=10.5206, mean=5.30, median=5.02555
+SVENY23: min=1.0566999912262, max=10.5553, mean=5.31, median=5.0143
+SVENY24: min=1.08759999275208, max=10.5893, mean=5.31, median=5.0004
+SVENY25: min=1.11740005016327, max=10.6217, mean=5.31, median=4.9851
+SVENY26: min=1.14619994163513, max=10.6526, mean=5.31, median=4.9691
+SVENY27: min=1.17379999160767, max=10.6819, mean=5.30, median=4.95385
+SVENY28: min=1.20039999485016, max=10.7099, mean=5.30, median=4.93565
+SVENY29: min=1.22580003738403, max=10.7365, mean=5.29, median=4.91920004119873
+SVENY30: min=1.2503000497818, max=10.7618, mean=5.28, median=4.8985
 ```
 
 ---
 
 ## fred.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/fred.parquet`
-**Size:** 121451 bytes | **Type:** Parquet | **Shape:** 6,359 rows × 7 columns
+**Size:** 121632 bytes | **Type:** Parquet | **Shape:** 6,371 rows × 7 columns
 
 ### Columns
 ```
@@ -515,11 +515,11 @@ DATE                                     Datetime(time_unit='ns', time_zone=None
 ### Numeric Column Statistics
 ```
 DGS1MO: min=0.0, max=6.02, mean=1.60, median=0.95
-DGS3MO: min=0.0, max=5.87, mean=1.72, median=1.06
-DGS6MO: min=0.02, max=5.61, mean=1.81, median=1.19
-DGS1: min=0.04, max=5.49, mean=1.89, median=1.34
-DGS2: min=0.09, max=5.29, mean=2.06, median=1.64
-DGS3: min=0.1, max=5.26, mean=2.24, median=1.89
+DGS3MO: min=0.0, max=5.87, mean=1.73, median=1.06
+DGS6MO: min=0.02, max=5.61, mean=1.82, median=1.19
+DGS1: min=0.04, max=5.49, mean=1.89, median=1.35
+DGS2: min=0.09, max=5.29, mean=2.06, median=1.65
+DGS3: min=0.1, max=5.26, mean=2.24, median=1.9
 ```
 
 ---
@@ -565,7 +565,7 @@ year: min=2001, max=2023, mean=2013.61, median=2014.0
 
 ## markit_cds_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/markit_cds_returns.parquet`
-**Size:** 51617 bytes | **Type:** Parquet | **Shape:** 276 rows × 21 columns
+**Size:** 51628 bytes | **Type:** Parquet | **Shape:** 276 rows × 21 columns
 
 ### Columns
 ```
@@ -594,33 +594,33 @@ Month                                    Datetime(time_unit='ns', time_zone=None
 
 ### Numeric Column Statistics
 ```
-3Y_Q1: min=-0.010259849597794312, max=0.006849533099774506, mean=0.00, median=0.00011093348055741079
-3Y_Q2: min=-0.019767002728050254, max=0.008644438106714846, mean=0.00, median=0.00015495615640561961
-3Y_Q3: min=-0.022872498750837078, max=0.027962641620700515, mean=0.00, median=0.0003145033571775537
-3Y_Q4: min=-0.04706627677574836, max=0.05608443875646086, mean=0.00, median=0.0004175521394515645
-3Y_Q5: min=-0.04824678259231843, max=0.07541294890005618, mean=0.00, median=0.002629543674294424
-5Y_Q1: min=-0.008974482093833227, max=0.0058730552568060385, mean=0.00, median=0.0001693557705989557
-5Y_Q2: min=-0.01602387252124604, max=0.008710605777095148, mean=0.00, median=0.00029591941804940625
-5Y_Q3: min=-0.02647435680024024, max=0.02842421209766921, mean=0.00, median=0.0005368662943705527
-5Y_Q4: min=-0.04084586659124, max=0.05955038598324824, mean=0.00, median=0.000962743936889554
-5Y_Q5: min=-0.05175820319216751, max=0.0762054425669314, mean=0.00, median=0.003352840799661694
-7Y_Q1: min=-0.009708442533278534, max=0.005326666626927841, mean=0.00, median=0.00024387550677401292
-7Y_Q2: min=-0.010401486032845872, max=0.009790524802936126, mean=0.00, median=0.0004932387746350248
-7Y_Q3: min=-0.028581872333502643, max=0.02783756451027471, mean=0.00, median=0.000683066562053036
-7Y_Q4: min=-0.04343091687233342, max=0.064008594451399, mean=0.00, median=0.0012264814028850814
-7Y_Q5: min=-0.045577189715438116, max=0.07143253894099238, mean=0.00, median=0.0038585611211118137
-10Y_Q1: min=-0.009826701757626597, max=0.005150550475957455, mean=0.00, median=0.00032833119826063763
-10Y_Q2: min=-0.01011085983964523, max=0.009203141314483134, mean=0.00, median=0.0006221126122780552
-10Y_Q3: min=-0.029799940746226907, max=0.027759578525485287, mean=0.00, median=0.0007721734732985871
-10Y_Q4: min=-0.04277441116454592, max=0.06513997972925414, mean=0.00, median=0.0013487025628858935
-10Y_Q5: min=-0.04829482913989544, max=0.07073346716602533, mean=0.01, median=0.004072880315180026
+3Y_Q1: min=-0.010237073425261973, max=0.006728589577954508, mean=0.00, median=0.00011224862380873634
+3Y_Q2: min=-0.019774311226019397, max=0.008607912292809617, mean=0.00, median=0.00017842896542141193
+3Y_Q3: min=-0.019907081679009463, max=0.024963096095905645, mean=0.00, median=0.00028135682134962007
+3Y_Q4: min=-0.04700855877211648, max=0.057971162868867096, mean=0.00, median=0.0004370015123595697
+3Y_Q5: min=-0.04930494978195557, max=0.07599834853435619, mean=0.00, median=0.0024379595110414977
+5Y_Q1: min=-0.008974482093833225, max=0.005882471237396603, mean=0.00, median=0.00018176151921378558
+5Y_Q2: min=-0.01602387252124604, max=0.008245009209206344, mean=0.00, median=0.00032439772610404205
+5Y_Q3: min=-0.02328916218257593, max=0.025064662891613132, mean=0.00, median=0.0005290210620294555
+5Y_Q4: min=-0.04299993264768242, max=0.06151360197873212, mean=0.00, median=0.0008241075628705462
+5Y_Q5: min=-0.052688146040345774, max=0.07754088738282583, mean=0.00, median=0.0032291123797243415
+7Y_Q1: min=-0.00962754991385942, max=0.005332811132554004, mean=0.00, median=0.00023963025201368776
+7Y_Q2: min=-0.01093371585959609, max=0.00915835353824349, mean=0.00, median=0.0005312911575823558
+7Y_Q3: min=-0.02516616790255849, max=0.024421250467544217, mean=0.00, median=0.0007140353935970433
+7Y_Q4: min=-0.04509413603326888, max=0.065870503770158, mean=0.00, median=0.0011448186071858569
+7Y_Q5: min=-0.0468429196258693, max=0.07286404169954308, mean=0.00, median=0.0037477660516574934
+10Y_Q1: min=-0.009676504390734133, max=0.0051834750986492545, mean=0.00, median=0.0003242811821382672
+10Y_Q2: min=-0.01079408571027343, max=0.00903514236881222, mean=0.00, median=0.0006501549573219865
+10Y_Q3: min=-0.026273815858410297, max=0.024490897647667355, mean=0.00, median=0.0007954644685382896
+10Y_Q4: min=-0.04443571830606966, max=0.06691886360165679, mean=0.00, median=0.0013643578027061048
+10Y_Q5: min=-0.04934170599811901, max=0.07218763348599493, mean=0.01, median=0.003750528605501725
 ```
 
 ---
 
 ## corp_bond_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/corp_bond_portfolio_returns.parquet`
-**Size:** 30687 bytes | **Type:** Parquet | **Shape:** 242 rows × 11 columns
+**Size:** 30784 bytes | **Type:** Parquet | **Shape:** 242 rows × 11 columns
 
 ### Columns
 ```
@@ -786,7 +786,7 @@ tau: min=-0.167123288, max=180.1260274, mean=7.98, median=4.7123287671
 
 ## fed_yield_curve.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/fed_yield_curve/fed_yield_curve.parquet`
-**Size:** 3.2 MB | **Type:** Parquet | **Shape:** 16,673 rows × 31 columns
+**Size:** 3.2 MB | **Type:** Parquet | **Shape:** 16,688 rows × 31 columns
 
 ### Columns
 ```
@@ -805,11 +805,11 @@ SVENY12                                  Float64         (20.0% null)
 SVENY13                                  Float64         (20.0% null)
 SVENY14                                  Float64         (20.0% null)
 SVENY15                                  Float64         (20.0% null)
-SVENY16                                  Float64         (34.4% null)
-SVENY17                                  Float64         (34.4% null)
-SVENY18                                  Float64         (34.4% null)
-SVENY19                                  Float64         (34.4% null)
-SVENY20                                  Float64         (34.4% null)
+SVENY16                                  Float64         (34.3% null)
+SVENY17                                  Float64         (34.3% null)
+SVENY18                                  Float64         (34.3% null)
+SVENY19                                  Float64         (34.3% null)
+SVENY20                                  Float64         (34.3% null)
 SVENY21                                  Float64         (40.9% null)
 SVENY22                                  Float64         (40.9% null)
 SVENY23                                  Float64         (40.9% null)
@@ -825,43 +825,43 @@ Date                                     Datetime(time_unit='ns', time_zone=None
 
 ### Numeric Column Statistics
 ```
-SVENY01: min=0.0554, max=16.462, mean=4.82, median=4.885999999999999
-SVENY02: min=0.102, max=15.9118, mean=5.02, median=4.90185
-SVENY03: min=0.12720000743866, max=15.5746, mean=5.18, median=4.9913
-SVENY04: min=0.168500006198883, max=15.3498, mean=5.32, median=5.1117608326705
-SVENY05: min=0.221799999475479, max=15.1776, mean=5.44, median=5.24395
-SVENY06: min=0.280600011348724, max=15.0611, mean=5.54, median=5.370901038401501
-SVENY07: min=0.341300010681152, max=15.0109, mean=5.63, median=5.457570141669001
-SVENY08: min=0.40200001001358, max=14.9799, mean=5.84, median=5.8219051019035
-SVENY09: min=0.461800009012222, max=14.9572, mean=5.92, median=5.8987746333855
-SVENY10: min=0.52020001411438, max=14.9398, mean=6.00, median=5.954222508486501
-SVENY11: min=0.577000021934509, max=14.934, mean=6.06, median=6.002139450434
-SVENY12: min=0.632300019264221, max=14.9367, mean=6.12, median=6.044152866898
-SVENY13: min=0.685899972915649, max=14.9407, mean=6.17, median=6.075420544469
-SVENY14: min=0.737999975681305, max=14.9684, mean=6.21, median=6.109507685892
-SVENY15: min=0.781599998474121, max=15.0394, mean=6.25, median=6.137743099227
-SVENY16: min=0.817200005054474, max=15.1073, mean=5.87, median=5.306560876366
-SVENY17: min=0.85290002822876, max=15.1716, mean=5.90, median=5.3488
-SVENY18: min=0.888400018215179, max=15.2318, mean=5.93, median=5.3821
-SVENY19: min=0.923600018024445, max=15.2879, mean=5.95, median=5.4094
-SVENY20: min=0.958100020885468, max=15.34, mean=5.97, median=5.436507099905
-SVENY21: min=0.991900026798248, max=10.4856, mean=5.29, median=5.0254
-SVENY22: min=1.02479994297028, max=10.5206, mean=5.30, median=5.020650023651125
-SVENY23: min=1.0566999912262, max=10.5553, mean=5.31, median=5.0074000000000005
-SVENY24: min=1.08759999275208, max=10.5893, mean=5.31, median=4.9956
-SVENY25: min=1.11740005016327, max=10.6217, mean=5.31, median=4.97895
-SVENY26: min=1.14619994163513, max=10.6526, mean=5.31, median=4.96215
-SVENY27: min=1.17379999160767, max=10.6819, mean=5.30, median=4.94625008277893
-SVENY28: min=1.20039999485016, max=10.7099, mean=5.30, median=4.92845010757446
-SVENY29: min=1.22580003738403, max=10.7365, mean=5.29, median=4.9143
-SVENY30: min=1.2503000497818, max=10.7618, mean=5.28, median=4.89400009460449
+SVENY01: min=0.0554, max=16.462, mean=4.82, median=4.8842
+SVENY02: min=0.102, max=15.9118, mean=5.02, median=4.89885
+SVENY03: min=0.12720000743866, max=15.5746, mean=5.18, median=4.9862
+SVENY04: min=0.168500006198883, max=15.3498, mean=5.31, median=5.10844097735
+SVENY05: min=0.221799999475479, max=15.1776, mean=5.43, median=5.241627984691
+SVENY06: min=0.280600011348724, max=15.0611, mean=5.54, median=5.363898211084
+SVENY07: min=0.341300010681152, max=15.0109, mean=5.63, median=5.4548489980134995
+SVENY08: min=0.40200001001358, max=14.9799, mean=5.84, median=5.814072686622
+SVENY09: min=0.461800009012222, max=14.9572, mean=5.92, median=5.893546383434
+SVENY10: min=0.52020001411438, max=14.9398, mean=5.99, median=5.948984640363999
+SVENY11: min=0.577000021934509, max=14.934, mean=6.06, median=5.995439980477
+SVENY12: min=0.632300019264221, max=14.9367, mean=6.12, median=6.037475882346
+SVENY13: min=0.685899972915649, max=14.9407, mean=6.17, median=6.069447042705
+SVENY14: min=0.737999975681305, max=14.9684, mean=6.21, median=6.1054
+SVENY15: min=0.781599998474121, max=15.0394, mean=6.25, median=6.1339
+SVENY16: min=0.817200005054474, max=15.1073, mean=5.86, median=5.3011
+SVENY17: min=0.85290002822876, max=15.1716, mean=5.90, median=5.3458
+SVENY18: min=0.888400018215179, max=15.2318, mean=5.92, median=5.3774
+SVENY19: min=0.923600018024445, max=15.2879, mean=5.95, median=5.4068
+SVENY20: min=0.958100020885468, max=15.34, mean=5.97, median=5.4296
+SVENY21: min=0.991900026798248, max=10.4856, mean=5.29, median=5.032
+SVENY22: min=1.02479994297028, max=10.5206, mean=5.30, median=5.02555
+SVENY23: min=1.0566999912262, max=10.5553, mean=5.31, median=5.0143
+SVENY24: min=1.08759999275208, max=10.5893, mean=5.31, median=5.0004
+SVENY25: min=1.11740005016327, max=10.6217, mean=5.31, median=4.9851
+SVENY26: min=1.14619994163513, max=10.6526, mean=5.31, median=4.9691
+SVENY27: min=1.17379999160767, max=10.6819, mean=5.30, median=4.95385
+SVENY28: min=1.20039999485016, max=10.7099, mean=5.30, median=4.93565
+SVENY29: min=1.22580003738403, max=10.7365, mean=5.29, median=4.91920004119873
+SVENY30: min=1.2503000497818, max=10.7618, mean=5.28, median=4.8985
 ```
 
 ---
 
 ## ftsfr_treas_yield_curve_zero_coupon.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/fed_yield_curve/ftsfr_treas_yield_curve_zero_coupon.parquet`
-**Size:** 3.6 MB | **Type:** Parquet | **Shape:** 500,190 rows × 3 columns
+**Size:** 3.6 MB | **Type:** Parquet | **Shape:** 500,640 rows × 3 columns
 
 ### Columns
 ```
@@ -872,7 +872,7 @@ value                                    Float64         (25.7% null)
 
 ### Numeric Column Statistics
 ```
-value: min=0.0554, max=16.462, mean=5.61, median=5.328
+value: min=0.0554, max=16.462, mean=5.61, median=5.3232729844415
 ```
 
 ---
@@ -1321,7 +1321,7 @@ intermediary_leverage_ratio_squared: min=55.7145, max=2012.9658, mean=368.19, me
 
 ## french_portfolios_25_daily_size_and_bm.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_daily_size_and_bm.parquet`
-**Size:** 1.2 MB | **Type:** Parquet | **Shape:** 25,901 rows × 26 columns
+**Size:** 1.2 MB | **Type:** Parquet | **Shape:** 25,961 rows × 26 columns
 
 ### Columns
 ```
@@ -1355,38 +1355,38 @@ BIG HiBM                                 Float64
 
 ### Numeric Column Statistics
 ```
-SMALL LoBM: min=-0.48460000000000003, max=1.2793999999999999, mean=0.00, median=0.0005
-ME1 BM2: min=-0.2693, max=0.4579, mean=0.00, median=0.0008
-ME1 BM3: min=-0.198, max=0.3711, mean=0.00, median=0.0008
-ME1 BM4: min=-0.1448, max=0.2451, mean=0.00, median=0.001
+SMALL LoBM: min=-0.9998999999999999, max=1.2793999999999999, mean=0.00, median=0.0005
+ME1 BM2: min=-0.2692, max=0.4579, mean=0.00, median=0.0007000000000000001
+ME1 BM3: min=-0.1979, max=0.371, mean=0.00, median=0.0008
+ME1 BM4: min=-0.1459, max=0.245, mean=0.00, median=0.0009
 SMALL HiBM: min=-0.1868, max=0.2889, mean=0.00, median=0.001
-ME2 BM1: min=-0.1547, max=0.2821, mean=0.00, median=0.0009
-ME2 BM2: min=-0.1331, max=0.31010000000000004, mean=0.00, median=0.0009
-ME2 BM3: min=-0.1471, max=0.19030000000000002, mean=0.00, median=0.0009
-ME2 BM4: min=-0.15439999999999998, max=0.2957, mean=0.00, median=0.0009
-ME2 BM5: min=-0.15710000000000002, max=0.2701, mean=0.00, median=0.001
+ME2 BM1: min=-0.1545, max=0.2821, mean=0.00, median=0.0008
+ME2 BM2: min=-0.1343, max=0.31, mean=0.00, median=0.0008
+ME2 BM3: min=-0.147, max=0.19030000000000002, mean=0.00, median=0.0008
+ME2 BM4: min=-0.1543, max=0.2991, mean=0.00, median=0.0008
+ME2 BM5: min=-0.157, max=0.27, mean=0.00, median=0.0009
 ME3 BM1: min=-0.145, max=0.1375, mean=0.00, median=0.0009
-ME3 BM2: min=-0.1404, max=0.1564, mean=0.00, median=0.0009
-ME3 BM3: min=-0.1942, max=0.23420000000000002, mean=0.00, median=0.0009
-ME3 BM4: min=-0.1521, max=0.23399999999999999, mean=0.00, median=0.0009
-ME3 BM5: min=-0.1912, max=0.3012, mean=0.00, median=0.0009
-ME4 BM1: min=-0.1923, max=0.1407, mean=0.00, median=0.0009
-ME4 BM2: min=-0.166, max=0.22769999999999999, mean=0.00, median=0.0009
-ME4 BM3: min=-0.1566, max=0.256, mean=0.00, median=0.0009
-ME4 BM4: min=-0.1393, max=0.2143, mean=0.00, median=0.0008
-ME4 BM5: min=-0.1794, max=0.33640000000000003, mean=0.00, median=0.0008
-BIG LoBM: min=-0.1844, max=0.1356, mean=0.00, median=0.0006
-ME5 BM2: min=-0.20579999999999998, max=0.1678, mean=0.00, median=0.0006
-ME5 BM3: min=-0.1884, max=0.2078, mean=0.00, median=0.0006
-ME5 BM4: min=-0.20350000000000001, max=0.2364, mean=0.00, median=0.0005
-BIG HiBM: min=-0.183, max=0.2397, mean=0.00, median=0.0005
+ME3 BM2: min=-0.14029999999999998, max=0.1564, mean=0.00, median=0.0008
+ME3 BM3: min=-0.1942, max=0.2341, mean=0.00, median=0.0009
+ME3 BM4: min=-0.1521, max=0.2339, mean=0.00, median=0.0008
+ME3 BM5: min=-0.1911, max=0.3012, mean=0.00, median=0.0008
+ME4 BM1: min=-0.191, max=0.1406, mean=0.00, median=0.0008
+ME4 BM2: min=-0.16269999999999998, max=0.22760000000000002, mean=0.00, median=0.0008
+ME4 BM3: min=-0.1572, max=0.256, mean=0.00, median=0.0008
+ME4 BM4: min=-0.1384, max=0.2143, mean=0.00, median=0.0008
+ME4 BM5: min=-0.1754, max=0.33640000000000003, mean=0.00, median=0.0007000000000000001
+BIG LoBM: min=-0.1844, max=0.1358, mean=0.00, median=0.0006
+ME5 BM2: min=-0.2054, max=0.1677, mean=0.00, median=0.0006
+ME5 BM3: min=-0.1894, max=0.2078, mean=0.00, median=0.0005
+ME5 BM4: min=-0.2041, max=0.2364, mean=0.00, median=0.0005
+BIG HiBM: min=-0.1815, max=0.2396, mean=0.00, median=0.0004
 ```
 
 ---
 
 ## french_portfolios_25_daily_size_and_inv.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_daily_size_and_inv.parquet`
-**Size:** 746935 bytes | **Type:** Parquet | **Shape:** 15,481 rows × 26 columns
+**Size:** 749757 bytes | **Type:** Parquet | **Shape:** 15,541 rows × 26 columns
 
 ### Columns
 ```
@@ -1420,38 +1420,38 @@ BIG HiINV                                Float64
 
 ### Numeric Column Statistics
 ```
-SMALL LoINV: min=-0.1246, max=0.10289999999999999, mean=0.00, median=0.0011
-ME1 INV2: min=-0.1293, max=0.0827, mean=0.00, median=0.001
-ME1 INV3: min=-0.1215, max=0.0883, mean=0.00, median=0.001
-ME1 INV4: min=-0.1379, max=0.0868, mean=0.00, median=0.001
-SMALL HiINV: min=-0.1364, max=0.1056, mean=0.00, median=0.001
-ME2 INV1: min=-0.129, max=0.0962, mean=0.00, median=0.001
-ME2 INV2: min=-0.1323, max=0.09949999999999999, mean=0.00, median=0.0009
-ME2 INV3: min=-0.13699999999999998, max=0.0855, mean=0.00, median=0.0009
-ME2 INV4: min=-0.1294, max=0.0929, mean=0.00, median=0.001
-ME2 INV5: min=-0.15109999999999998, max=0.1047, mean=0.00, median=0.001
-ME3 INV1: min=-0.1458, max=0.1114, mean=0.00, median=0.0009
-ME3 INV2: min=-0.1363, max=0.1003, mean=0.00, median=0.0009
-ME3 INV3: min=-0.1251, max=0.1101, mean=0.00, median=0.0008
-ME3 INV4: min=-0.1307, max=0.1001, mean=0.00, median=0.001
-ME3 INV5: min=-0.1552, max=0.1124, mean=0.00, median=0.001
-ME4 INV1: min=-0.1902, max=0.10490000000000001, mean=0.00, median=0.0008
-ME4 INV2: min=-0.1419, max=0.1233, mean=0.00, median=0.0009
-ME4 INV3: min=-0.14300000000000002, max=0.1023, mean=0.00, median=0.0009
-ME4 INV4: min=-0.1457, max=0.1084, mean=0.00, median=0.0009
-ME4 INV5: min=-0.1818, max=0.12789999999999999, mean=0.00, median=0.0008
-BIG LoINV: min=-0.2079, max=0.1514, mean=0.00, median=0.0007000000000000001
-ME5 INV2: min=-0.18469999999999998, max=0.114, mean=0.00, median=0.0005
-ME5 INV3: min=-0.20079999999999998, max=0.1074, mean=0.00, median=0.0005
-ME5 INV4: min=-0.1929, max=0.11349999999999999, mean=0.00, median=0.0006
-BIG HiINV: min=-0.1801, max=0.1323, mean=0.00, median=0.0006
+SMALL LoINV: min=-0.12560000000000002, max=0.1027, mean=0.00, median=0.0011
+ME1 INV2: min=-0.1281, max=0.08310000000000001, mean=0.00, median=0.001
+ME1 INV3: min=-0.12369999999999999, max=0.08900000000000001, mean=0.00, median=0.001
+ME1 INV4: min=-0.1352, max=0.08710000000000001, mean=0.00, median=0.0009
+SMALL HiINV: min=-0.1328, max=0.10980000000000001, mean=0.00, median=0.0009
+ME2 INV1: min=-0.1305, max=0.0943, mean=0.00, median=0.001
+ME2 INV2: min=-0.141, max=0.10300000000000001, mean=0.00, median=0.0009
+ME2 INV3: min=-0.128, max=0.087, mean=0.00, median=0.0009
+ME2 INV4: min=-0.1354, max=0.09939999999999999, mean=0.00, median=0.0009
+ME2 INV5: min=-0.1501, max=0.10460000000000001, mean=0.00, median=0.001
+ME3 INV1: min=-0.1483, max=0.1108, mean=0.00, median=0.0009
+ME3 INV2: min=-0.1381, max=0.1, mean=0.00, median=0.0009
+ME3 INV3: min=-0.133, max=0.1116, mean=0.00, median=0.0008
+ME3 INV4: min=-0.1249, max=0.1025, mean=0.00, median=0.0009
+ME3 INV5: min=-0.1549, max=0.1134, mean=0.00, median=0.0009
+ME4 INV1: min=-0.18489999999999998, max=0.1054, mean=0.00, median=0.0008
+ME4 INV2: min=-0.1411, max=0.12050000000000001, mean=0.00, median=0.0008
+ME4 INV3: min=-0.14429999999999998, max=0.1035, mean=0.00, median=0.0008
+ME4 INV4: min=-0.1489, max=0.10949999999999999, mean=0.00, median=0.0008
+ME4 INV5: min=-0.1734, max=0.1298, mean=0.00, median=0.0008
+BIG LoINV: min=-0.2089, max=0.1524, mean=0.00, median=0.0006
+ME5 INV2: min=-0.1844, max=0.11289999999999999, mean=0.00, median=0.0005
+ME5 INV3: min=-0.1999, max=0.109, mean=0.00, median=0.0005
+ME5 INV4: min=-0.1953, max=0.1139, mean=0.00, median=0.0005
+BIG HiINV: min=-0.17739999999999997, max=0.1349, mean=0.00, median=0.0006
 ```
 
 ---
 
 ## french_portfolios_25_daily_size_and_op.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_daily_size_and_op.parquet`
-**Size:** 747924 bytes | **Type:** Parquet | **Shape:** 15,481 rows × 26 columns
+**Size:** 750806 bytes | **Type:** Parquet | **Shape:** 15,541 rows × 26 columns
 
 ### Columns
 ```
@@ -1485,38 +1485,38 @@ BIG HiOP                                 Float64
 
 ### Numeric Column Statistics
 ```
-SMALL LoOP: min=-0.1334, max=0.1001, mean=0.00, median=0.001
-ME1 OP2: min=-0.1259, max=0.0989, mean=0.00, median=0.0011
-ME1 OP3: min=-0.1298, max=0.096, mean=0.00, median=0.001
-ME1 OP4: min=-0.22510000000000002, max=0.38189999999999996, mean=0.00, median=0.001
-SMALL HiOP: min=-0.1497, max=0.1035, mean=0.00, median=0.0011
-ME2 OP1: min=-0.14029999999999998, max=0.0931, mean=0.00, median=0.0011
-ME2 OP2: min=-0.1335, max=0.08929999999999999, mean=0.00, median=0.0009
-ME2 OP3: min=-0.11939999999999999, max=0.0911, mean=0.00, median=0.0009
-ME2 OP4: min=-0.1164, max=0.0964, mean=0.00, median=0.0009
-ME2 OP5: min=-0.1433, max=0.1235, mean=0.00, median=0.0011
-ME3 OP1: min=-0.16140000000000002, max=0.1047, mean=0.00, median=0.0009
-ME3 OP2: min=-0.1402, max=0.1059, mean=0.00, median=0.0008
-ME3 OP3: min=-0.1394, max=0.114, mean=0.00, median=0.0009
-ME3 OP4: min=-0.1392, max=0.1011, mean=0.00, median=0.0009
-ME3 OP5: min=-0.1462, max=0.1293, mean=0.00, median=0.001
-ME4 OP1: min=-0.1605, max=0.131, mean=0.00, median=0.0009
-ME4 OP2: min=-0.16510000000000002, max=0.1061, mean=0.00, median=0.0009
-ME4 OP3: min=-0.1472, max=0.1103, mean=0.00, median=0.0008
-ME4 OP4: min=-0.1686, max=0.10880000000000001, mean=0.00, median=0.0008
-ME4 OP5: min=-0.1446, max=0.11449999999999999, mean=0.00, median=0.0009
-BIG LoOP: min=-0.203, max=0.15410000000000001, mean=0.00, median=0.0006
-ME5 OP2: min=-0.1843, max=0.1217, mean=0.00, median=0.0005
-ME5 OP3: min=-0.2039, max=0.1108, mean=0.00, median=0.0006
-ME5 OP4: min=-0.19469999999999998, max=0.1072, mean=0.00, median=0.0006
-BIG HiOP: min=-0.18460000000000001, max=0.1363, mean=0.00, median=0.0006
+SMALL LoOP: min=-0.1334, max=0.0993, mean=0.00, median=0.0009
+ME1 OP2: min=-0.1274, max=0.09609999999999999, mean=0.00, median=0.001
+ME1 OP3: min=-0.1316, max=0.0919, mean=0.00, median=0.0009
+ME1 OP4: min=-0.21719999999999998, max=0.3675, mean=0.00, median=0.001
+SMALL HiOP: min=-0.1496, max=0.1041, mean=0.00, median=0.0011
+ME2 OP1: min=-0.1394, max=0.0932, mean=0.00, median=0.001
+ME2 OP2: min=-0.13390000000000002, max=0.0894, mean=0.00, median=0.0008
+ME2 OP3: min=-0.1193, max=0.091, mean=0.00, median=0.0008
+ME2 OP4: min=-0.1193, max=0.0984, mean=0.00, median=0.0009
+ME2 OP5: min=-0.1432, max=0.1235, mean=0.00, median=0.0011
+ME3 OP1: min=-0.16219999999999998, max=0.1043, mean=0.00, median=0.0009
+ME3 OP2: min=-0.1371, max=0.10710000000000001, mean=0.00, median=0.0008
+ME3 OP3: min=-0.14, max=0.114, mean=0.00, median=0.0008
+ME3 OP4: min=-0.13699999999999998, max=0.09998, mean=0.00, median=0.0009
+ME3 OP5: min=-0.1461, max=0.1292, mean=0.00, median=0.001
+ME4 OP1: min=-0.1553, max=0.131, mean=0.00, median=0.0008
+ME4 OP2: min=-0.1653, max=0.10869999999999999, mean=0.00, median=0.0008
+ME4 OP3: min=-0.1433, max=0.1092, mean=0.00, median=0.0007000000000000001
+ME4 OP4: min=-0.1691, max=0.1092, mean=0.00, median=0.0008
+ME4 OP5: min=-0.1437, max=0.1124, mean=0.00, median=0.0009
+BIG LoOP: min=-0.2059, max=0.154, mean=0.00, median=0.0005
+ME5 OP2: min=-0.18460000000000001, max=0.1213, mean=0.00, median=0.0005
+ME5 OP3: min=-0.20739999999999997, max=0.1109, mean=0.00, median=0.0005
+ME5 OP4: min=-0.18989999999999999, max=0.1074, mean=0.00, median=0.0005
+BIG HiOP: min=-0.1858, max=0.1363, mean=0.00, median=0.0006
 ```
 
 ---
 
 ## french_portfolios_25_monthly_size_and_bm.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_bm.parquet`
-**Size:** 302876 bytes | **Type:** Parquet | **Shape:** 1,182 rows × 26 columns
+**Size:** 304316 bytes | **Type:** Parquet | **Shape:** 1,185 rows × 26 columns
 
 ### Columns
 ```
@@ -1550,38 +1550,38 @@ BIG HiBM                                 Float64
 
 ### Numeric Column Statistics
 ```
-SMALL LoBM: min=-0.49473, max=1.478401, mean=0.01, median=0.0080175
-ME1 BM2: min=-0.352372, max=1.2604680000000001, mean=0.01, median=0.007294
-ME1 BM3: min=-0.339291, max=1.021371, mean=0.01, median=0.012142499999999999
-ME1 BM4: min=-0.34978200000000004, max=1.031955, mean=0.01, median=0.0136075
-SMALL HiBM: min=-0.33110300000000004, max=1.000677, mean=0.02, median=0.0138345
-ME2 BM1: min=-0.32629600000000003, max=0.764962, mean=0.01, median=0.011836
-ME2 BM2: min=-0.319357, max=0.7811790000000001, mean=0.01, median=0.015040000000000001
-ME2 BM3: min=-0.352638, max=0.754858, mean=0.01, median=0.014522
-ME2 BM4: min=-0.304489, max=0.775107, mean=0.01, median=0.015915
-ME2 BM5: min=-0.373877, max=0.899724, mean=0.02, median=0.0168655
-ME3 BM1: min=-0.298395, max=0.569713, mean=0.01, median=0.013678
-ME3 BM2: min=-0.304951, max=0.399642, mean=0.01, median=0.013850999999999999
-ME3 BM3: min=-0.313505, max=0.608932, mean=0.01, median=0.014652000000000002
-ME3 BM4: min=-0.33289799999999997, max=0.70261, mean=0.01, median=0.0154925
-ME3 BM5: min=-0.35861600000000005, max=0.737849, mean=0.01, median=0.0142895
-ME4 BM1: min=-0.295837, max=0.35235500000000003, mean=0.01, median=0.012577499999999998
-ME4 BM2: min=-0.29185500000000003, max=0.568919, mean=0.01, median=0.014126
-ME4 BM3: min=-0.297345, max=0.642649, mean=0.01, median=0.0145635
-ME4 BM4: min=-0.340692, max=0.688873, mean=0.01, median=0.0156395
-ME4 BM5: min=-0.414557, max=0.86604, mean=0.01, median=0.015883500000000002
-BIG LoBM: min=-0.2928, max=0.325595, mean=0.01, median=0.011471499999999999
-ME5 BM2: min=-0.25155, max=0.393502, mean=0.01, median=0.0110405
-ME5 BM3: min=-0.312537, max=0.502559, mean=0.01, median=0.0123235
-ME5 BM4: min=-0.367136, max=0.607343, mean=0.01, median=0.0112
-BIG HiBM: min=-0.45555599999999996, max=0.9803919999999999, mean=0.01, median=0.013854499999999999
+SMALL LoBM: min=-0.49472900000000003, max=1.478401, mean=0.01, median=0.007663
+ME1 BM2: min=-0.352371, max=1.2604680000000001, mean=0.01, median=0.00703
+ME1 BM3: min=-0.34326500000000004, max=0.828824, mean=0.01, median=0.011930000000000001
+ME1 BM4: min=-0.34978200000000004, max=1.048597, mean=0.01, median=0.013332
+SMALL HiBM: min=-0.331102, max=0.9951730000000001, mean=0.02, median=0.013434
+ME2 BM1: min=-0.324848, max=0.764962, mean=0.01, median=0.011215999999999999
+ME2 BM2: min=-0.32177, max=0.7813880000000001, mean=0.01, median=0.015195
+ME2 BM3: min=-0.35196, max=0.755124, mean=0.01, median=0.014702
+ME2 BM4: min=-0.314326, max=0.80107, mean=0.01, median=0.015659
+ME2 BM5: min=-0.37953899999999996, max=0.899723, mean=0.01, median=0.016457
+ME3 BM1: min=-0.296956, max=0.569621, mean=0.01, median=0.013816
+ME3 BM2: min=-0.327129, max=0.410813, mean=0.01, median=0.014443
+ME3 BM3: min=-0.31509, max=0.61247, mean=0.01, median=0.014256
+ME3 BM4: min=-0.350475, max=0.699311, mean=0.01, median=0.015186999999999999
+ME3 BM5: min=-0.358615, max=0.7378480000000001, mean=0.01, median=0.013927
+ME4 BM1: min=-0.314036, max=0.35469700000000004, mean=0.01, median=0.012495000000000001
+ME4 BM2: min=-0.28685700000000003, max=0.56969, mean=0.01, median=0.013576999999999999
+ME4 BM3: min=-0.307526, max=0.642951, mean=0.01, median=0.015017
+ME4 BM4: min=-0.33862200000000003, max=0.689267, mean=0.01, median=0.01569
+ME4 BM5: min=-0.414556, max=0.866039, mean=0.01, median=0.016007
+BIG LoBM: min=-0.284528, max=0.324293, mean=0.01, median=0.011359
+ME5 BM2: min=-0.252044, max=0.39398000000000005, mean=0.01, median=0.011089
+ME5 BM3: min=-0.32183799999999996, max=0.502782, mean=0.01, median=0.011776
+ME5 BM4: min=-0.367136, max=0.624421, mean=0.01, median=0.011057999999999998
+BIG HiBM: min=-0.45555500000000004, max=0.9803919999999999, mean=0.01, median=0.013865
 ```
 
 ---
 
 ## french_portfolios_25_monthly_size_and_inv.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_inv.parquet`
-**Size:** 193158 bytes | **Type:** Parquet | **Shape:** 738 rows × 26 columns
+**Size:** 193954 bytes | **Type:** Parquet | **Shape:** 741 rows × 26 columns
 
 ### Columns
 ```
@@ -1615,38 +1615,38 @@ BIG HiINV                                Float64
 
 ### Numeric Column Statistics
 ```
-SMALL LoINV: min=-0.32953499999999997, max=0.446803, mean=0.01, median=0.013323499999999999
-ME1 INV2: min=-0.276808, max=0.267426, mean=0.01, median=0.0144175
-ME1 INV3: min=-0.289589, max=0.28003900000000004, mean=0.01, median=0.0157225
-ME1 INV4: min=-0.298964, max=0.275237, mean=0.01, median=0.014828500000000001
-SMALL HiINV: min=-0.325135, max=0.30957799999999996, mean=0.01, median=0.0081345
-ME2 INV1: min=-0.301541, max=0.27914, mean=0.01, median=0.015538
-ME2 INV2: min=-0.27814, max=0.202939, mean=0.01, median=0.016333
-ME2 INV3: min=-0.251818, max=0.255971, mean=0.01, median=0.01362
-ME2 INV4: min=-0.286854, max=0.281949, mean=0.01, median=0.015992
-ME2 INV5: min=-0.347236, max=0.27494, mean=0.01, median=0.0111815
-ME3 INV1: min=-0.27711600000000003, max=0.24869, mean=0.01, median=0.015197
-ME3 INV2: min=-0.268637, max=0.220052, mean=0.01, median=0.0148255
-ME3 INV3: min=-0.23566299999999998, max=0.242296, mean=0.01, median=0.0146125
-ME3 INV4: min=-0.252782, max=0.251689, mean=0.01, median=0.0147285
-ME3 INV5: min=-0.300426, max=0.217592, mean=0.01, median=0.011966999999999998
-ME4 INV1: min=-0.292222, max=0.218688, mean=0.01, median=0.015704
-ME4 INV2: min=-0.235106, max=0.22737400000000002, mean=0.01, median=0.013882499999999999
-ME4 INV3: min=-0.21895900000000001, max=0.22575900000000002, mean=0.01, median=0.0138115
-ME4 INV4: min=-0.262551, max=0.193345, mean=0.01, median=0.012298
-ME4 INV5: min=-0.286545, max=0.247895, mean=0.01, median=0.011369
-BIG LoINV: min=-0.19966799999999998, max=0.232475, mean=0.01, median=0.012181500000000001
-ME5 INV2: min=-0.179461, max=0.191443, mean=0.01, median=0.010521
-ME5 INV3: min=-0.19030999999999998, max=0.15251599999999998, mean=0.01, median=0.0103175
-ME5 INV4: min=-0.221258, max=0.19457999999999998, mean=0.01, median=0.010853999999999999
-BIG HiINV: min=-0.22860399999999997, max=0.241056, mean=0.01, median=0.0123075
+SMALL LoINV: min=-0.327046, max=0.44238999999999995, mean=0.01, median=0.012571
+ME1 INV2: min=-0.276557, max=0.267682, mean=0.01, median=0.013368999999999999
+ME1 INV3: min=-0.284616, max=0.282749, mean=0.01, median=0.015946000000000002
+ME1 INV4: min=-0.300799, max=0.277328, mean=0.01, median=0.014918
+SMALL HiINV: min=-0.32182499999999997, max=0.312182, mean=0.01, median=0.007932
+ME2 INV1: min=-0.300918, max=0.278108, mean=0.01, median=0.015496000000000001
+ME2 INV2: min=-0.277692, max=0.200152, mean=0.01, median=0.015885
+ME2 INV3: min=-0.256122, max=0.25766, mean=0.01, median=0.01398
+ME2 INV4: min=-0.285565, max=0.276831, mean=0.01, median=0.015381
+ME2 INV5: min=-0.346901, max=0.27634000000000003, mean=0.01, median=0.012121999999999999
+ME3 INV1: min=-0.273696, max=0.24623, mean=0.01, median=0.015154
+ME3 INV2: min=-0.270008, max=0.219544, mean=0.01, median=0.015025
+ME3 INV3: min=-0.23318899999999998, max=0.242726, mean=0.01, median=0.014237
+ME3 INV4: min=-0.252253, max=0.246289, mean=0.01, median=0.014926
+ME3 INV5: min=-0.30122699999999997, max=0.223137, mean=0.01, median=0.011227000000000001
+ME4 INV1: min=-0.286492, max=0.218808, mean=0.01, median=0.015376
+ME4 INV2: min=-0.23296299999999998, max=0.228431, mean=0.01, median=0.013866
+ME4 INV3: min=-0.213447, max=0.229207, mean=0.01, median=0.013919999999999998
+ME4 INV4: min=-0.253423, max=0.19340900000000003, mean=0.01, median=0.012369000000000002
+ME4 INV5: min=-0.27853300000000003, max=0.243443, mean=0.01, median=0.011578
+BIG LoINV: min=-0.2043, max=0.23276, mean=0.01, median=0.012528999999999998
+ME5 INV2: min=-0.179973, max=0.191565, mean=0.01, median=0.010235000000000001
+ME5 INV3: min=-0.190295, max=0.152946, mean=0.01, median=0.010706
+ME5 INV4: min=-0.223614, max=0.195702, mean=0.01, median=0.01046
+BIG HiINV: min=-0.22681, max=0.23310199999999998, mean=0.01, median=0.012081
 ```
 
 ---
 
 ## french_portfolios_25_monthly_size_and_op.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/ken_french_data_library/french_portfolios_25_monthly_size_and_op.parquet`
-**Size:** 192922 bytes | **Type:** Parquet | **Shape:** 738 rows × 26 columns
+**Size:** 193717 bytes | **Type:** Parquet | **Shape:** 741 rows × 26 columns
 
 ### Columns
 ```
@@ -1680,31 +1680,31 @@ BIG HiOP                                 Float64
 
 ### Numeric Column Statistics
 ```
-SMALL LoOP: min=-0.32764699999999997, max=0.420403, mean=0.01, median=0.0080175
-ME1 OP2: min=-0.283323, max=0.290279, mean=0.01, median=0.0140065
-ME1 OP3: min=-0.290247, max=0.259299, mean=0.01, median=0.015706
-ME1 OP4: min=-0.30145, max=0.9121349999999999, mean=0.01, median=0.0143825
-SMALL HiOP: min=-0.328503, max=0.274771, mean=0.01, median=0.013853
-ME2 OP1: min=-0.33110500000000004, max=0.300629, mean=0.01, median=0.013067
-ME2 OP2: min=-0.305804, max=0.262198, mean=0.01, median=0.0162905
-ME2 OP3: min=-0.267042, max=0.252504, mean=0.01, median=0.014666
-ME2 OP4: min=-0.271422, max=0.281892, mean=0.01, median=0.0147595
-ME2 OP5: min=-0.330395, max=0.268346, mean=0.01, median=0.0160775
-ME3 OP1: min=-0.33433799999999997, max=0.277397, mean=0.01, median=0.011259499999999999
-ME3 OP2: min=-0.28634, max=0.209024, mean=0.01, median=0.013632499999999999
-ME3 OP3: min=-0.24107, max=0.217442, mean=0.01, median=0.0133285
-ME3 OP4: min=-0.255577, max=0.22817900000000002, mean=0.01, median=0.0136505
-ME3 OP5: min=-0.27773, max=0.24068799999999999, mean=0.01, median=0.015501000000000001
-ME4 OP1: min=-0.274437, max=0.220519, mean=0.01, median=0.012126499999999998
-ME4 OP2: min=-0.2415, max=0.19924299999999998, mean=0.01, median=0.0140725
-ME4 OP3: min=-0.232262, max=0.203211, mean=0.01, median=0.013506500000000001
-ME4 OP4: min=-0.254771, max=0.191513, mean=0.01, median=0.012886
-ME4 OP5: min=-0.25539100000000003, max=0.213731, mean=0.01, median=0.015025999999999998
-BIG LoOP: min=-0.275433, max=0.219389, mean=0.01, median=0.009568
-ME5 OP2: min=-0.19811499999999999, max=0.171582, mean=0.01, median=0.0104875
-ME5 OP3: min=-0.20180700000000001, max=0.19917, mean=0.01, median=0.0117205
-ME5 OP4: min=-0.184405, max=0.204361, mean=0.01, median=0.0120765
-BIG HiOP: min=-0.224114, max=0.17295100000000002, mean=0.01, median=0.011196999999999999
+SMALL LoOP: min=-0.32557200000000003, max=0.422028, mean=0.01, median=0.007103000000000001
+ME1 OP2: min=-0.283566, max=0.29440500000000003, mean=0.01, median=0.013439000000000001
+ME1 OP3: min=-0.288344, max=0.267148, mean=0.01, median=0.015121
+ME1 OP4: min=-0.292117, max=0.896401, mean=0.01, median=0.013953
+SMALL HiOP: min=-0.326825, max=0.271516, mean=0.01, median=0.013993
+ME2 OP1: min=-0.330946, max=0.33029000000000003, mean=0.01, median=0.012103999999999998
+ME2 OP2: min=-0.30593800000000004, max=0.262587, mean=0.01, median=0.01592
+ME2 OP3: min=-0.27133, max=0.250255, mean=0.01, median=0.015467
+ME2 OP4: min=-0.270295, max=0.280188, mean=0.01, median=0.014863
+ME2 OP5: min=-0.328563, max=0.26802, mean=0.01, median=0.01599
+ME3 OP1: min=-0.336354, max=0.263965, mean=0.01, median=0.011520999999999998
+ME3 OP2: min=-0.290374, max=0.218189, mean=0.01, median=0.013622
+ME3 OP3: min=-0.241213, max=0.215368, mean=0.01, median=0.013552
+ME3 OP4: min=-0.24647, max=0.22499199999999997, mean=0.01, median=0.013718
+ME3 OP5: min=-0.277793, max=0.243126, mean=0.01, median=0.015392
+ME4 OP1: min=-0.267613, max=0.202632, mean=0.01, median=0.012401
+ME4 OP2: min=-0.229866, max=0.19933499999999998, mean=0.01, median=0.013874
+ME4 OP3: min=-0.233019, max=0.20671199999999998, mean=0.01, median=0.013479000000000001
+ME4 OP4: min=-0.251339, max=0.191918, mean=0.01, median=0.013202
+ME4 OP5: min=-0.25166, max=0.21343, mean=0.01, median=0.015055
+BIG LoOP: min=-0.275389, max=0.219619, mean=0.01, median=0.009831
+ME5 OP2: min=-0.198274, max=0.170909, mean=0.01, median=0.009923
+ME5 OP3: min=-0.20184999999999997, max=0.19799499999999998, mean=0.01, median=0.012341
+ME5 OP4: min=-0.185027, max=0.204984, mean=0.01, median=0.011896
+BIG HiOP: min=-0.223974, max=0.172439, mean=0.01, median=0.010909
 ```
 
 ---
@@ -2160,7 +2160,7 @@ intexptimedepge250k: min=-4056.0, max=522042.0, mean=507.17, median=29.0
 
 ## CRSP_TFZ_CONSOLIDATED.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_CONSOLIDATED.parquet`
-**Size:** 93.0 MB | **Type:** Parquet | **Shape:** 2,465,193 rows × 23 columns
+**Size:** 93.5 MB | **Type:** Parquet | **Shape:** 2,472,446 rows × 23 columns
 
 ### Columns
 ```
@@ -2191,22 +2191,22 @@ callable                                 Boolean
 
 ### Numeric Column Statistics
 ```
-kytreasno: min=200636.0, max=208375.0, mean=204501.86, median=204052.0
-tdbid: min=43.5, max=176.328125, mean=104.61, median=101.0078125
-tdask: min=43.546875, max=176.390625, mean=104.69, median=101.0703125
-tdaccint: min=0.0, max=11.86908390823, mean=1.35, median=0.91620879120879
-tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.0001160368293291
-price: min=44.05672554347826, max=182.7192679558011, mean=106.00, median=102.40109202348066
-tdpubout: min=1.0, max=120001.0, mean=19320.38, median=14281.0
-tdtotout: min=4.0, max=148501.0, mean=24266.05, median=18806.0
+kytreasno: min=200636.0, max=208389.0, mean=204510.76, median=204052.0
+tdbid: min=43.5, max=176.328125, mean=104.57, median=101.0
+tdask: min=43.546875, max=176.390625, mean=104.66, median=101.0625
+tdaccint: min=0.0, max=11.86908390823, mean=1.35, median=0.91542119565218
+tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.00011594084152742999
+price: min=44.05672554347826, max=182.7192679558011, mean=105.97, median=102.38715037983425
+tdpubout: min=1.0, max=120001.0, mean=19402.73, median=14343.0
+tdtotout: min=4.0, max=148501.0, mean=24363.30, median=18824.0
 tdpdint: min=0.0, max=11.913043478261, mean=0.02, median=0.0
-tcouprt: min=0.125, max=16.25, mean=5.43, median=4.875
+tcouprt: min=0.125, max=16.25, mean=5.42, median=4.875
 itype: min=1.0, max=2.0, mean=1.75, median=2.0
-original_maturity: min=1.0, max=40.0, mean=11.01, median=7.0
+original_maturity: min=1.0, max=40.0, mean=11.02, median=7.0
 years_to_maturity: min=0.0, max=30.0, mean=6.19, median=3.0
-tdduratn: min=-1.0, max=9160.066986023601, mean=1646.72, median=1109.5760728122
-tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014410118523215
-days_to_maturity: min=1, max=11053, mean=2258.49, median=1209.0
+tdduratn: min=-1.0, max=9160.066986023601, mean=1647.98, median=1110.00951874115
+tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014474614918609502
+days_to_maturity: min=1, max=11053, mean=2259.87, median=1210.0
 ```
 
 ---
@@ -2253,7 +2253,7 @@ __index_level_0__: min=0, max=499999, mean=240877.51, median=234706.0
 
 ## CRSP_TFZ_INFO.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_INFO.parquet`
-**Size:** 78436 bytes | **Type:** Parquet | **Shape:** 2,219 rows × 8 columns
+**Size:** 78866 bytes | **Type:** Parquet | **Shape:** 2,223 rows × 8 columns
 
 ### Columns
 ```
@@ -2269,17 +2269,17 @@ original_maturity                        Float64         (0.0% null)
 
 ### Numeric Column Statistics
 ```
-kytreasno: min=200018.0, max=208375.0, mean=204529.76, median=204003.0
+kytreasno: min=200018.0, max=208389.0, mean=204536.70, median=204005.0
 tcouprt: min=0.125, max=16.25, mean=4.63, median=4.0
 itype: min=1.0, max=2.0, mean=1.91, median=2.0
-original_maturity: min=1.0, max=40.0, mean=6.04, median=5.0
+original_maturity: min=1.0, max=40.0, mean=6.03, median=5.0
 ```
 
 ---
 
 ## CRSP_TFZ_with_runness.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_with_runness.parquet`
-**Size:** 93.1 MB | **Type:** Parquet | **Shape:** 2,465,193 rows × 24 columns
+**Size:** 93.6 MB | **Type:** Parquet | **Shape:** 2,472,446 rows × 24 columns
 
 ### Columns
 ```
@@ -2311,30 +2311,30 @@ run                                      Int64
 
 ### Numeric Column Statistics
 ```
-kytreasno: min=200636.0, max=208375.0, mean=204501.86, median=204052.0
-tdbid: min=43.5, max=176.328125, mean=104.61, median=101.0078125
-tdask: min=43.546875, max=176.390625, mean=104.69, median=101.0703125
-tdaccint: min=0.0, max=11.86908390823, mean=1.35, median=0.91620879120879
-tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.0001160368293291
-price: min=44.05672554347826, max=182.7192679558011, mean=106.00, median=102.40109202348066
-tdpubout: min=1.0, max=120001.0, mean=19320.38, median=14281.0
-tdtotout: min=4.0, max=148501.0, mean=24266.05, median=18806.0
+kytreasno: min=200636.0, max=208389.0, mean=204510.76, median=204052.0
+tdbid: min=43.5, max=176.328125, mean=104.57, median=101.0
+tdask: min=43.546875, max=176.390625, mean=104.66, median=101.0625
+tdaccint: min=0.0, max=11.86908390823, mean=1.35, median=0.91542119565218
+tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.00011594084152742999
+price: min=44.05672554347826, max=182.7192679558011, mean=105.97, median=102.38715037983425
+tdpubout: min=1.0, max=120001.0, mean=19402.73, median=14343.0
+tdtotout: min=4.0, max=148501.0, mean=24363.30, median=18824.0
 tdpdint: min=0.0, max=11.913043478261, mean=0.02, median=0.0
-tcouprt: min=0.125, max=16.25, mean=5.43, median=4.875
+tcouprt: min=0.125, max=16.25, mean=5.42, median=4.875
 itype: min=1.0, max=2.0, mean=1.75, median=2.0
-original_maturity: min=1.0, max=40.0, mean=11.01, median=7.0
+original_maturity: min=1.0, max=40.0, mean=11.02, median=7.0
 years_to_maturity: min=0.0, max=30.0, mean=6.19, median=3.0
-tdduratn: min=-1.0, max=9160.066986023601, mean=1646.72, median=1109.5760728122
-tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014410118523215
-days_to_maturity: min=1, max=11053, mean=2258.49, median=1209.0
-run: min=0, max=84, mean=18.91, median=14.0
+tdduratn: min=-1.0, max=9160.066986023601, mean=1647.98, median=1110.00951874115
+tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014474614918609502
+days_to_maturity: min=1, max=11053, mean=2259.87, median=1210.0
+run: min=0, max=84, mean=18.94, median=14.0
 ```
 
 ---
 
 ## issue_dates.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/issue_dates.csv`
-**Size:** 39772 bytes | **Type:** Csv | **Shape:** 1,009 rows × 3 columns
+**Size:** 39794 bytes | **Type:** Csv | **Shape:** 1,009 rows × 3 columns
 
 ### Columns
 ```
@@ -2345,15 +2345,15 @@ totalAccepted                            Float64
 
 ### Numeric Column Statistics
 ```
-totalTendered: min=0.0, max=566665759500.0, mean=137332073645.29, median=78452224000.0
-totalAccepted: min=0.0, max=255492688300.0, mean=56010628275.22, median=34532638000.0
+totalTendered: min=72950000.0, max=566665759500.0, mean=137857075625.17, median=78532939000.0
+totalAccepted: min=25000100.0, max=255492688300.0, mean=56234853716.55, median=34536730000.0
 ```
 
 ---
 
 ## ontherun.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/ontherun.csv`
-**Size:** 83.3 MB | **Type:** Csv | **Shape:** 2,419,244 rows × 5 columns
+**Size:** 83.4 MB | **Type:** Csv | **Shape:** 2,422,706 rows × 5 columns
 
 ### Columns
 ```
@@ -2366,14 +2366,14 @@ cusip                                    String
 
 ### Numeric Column Statistics
 ```
-run: min=0, max=84, mean=21.35, median=17.0
+run: min=0, max=84, mean=21.36, median=17.0
 ```
 
 ---
 
 ## treasury_auction_stats.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/treasury_auction_stats.parquet`
-**Size:** 1.9 MB | **Type:** Parquet | **Shape:** 10,538 rows × 120 columns
+**Size:** 1.9 MB | **Type:** Parquet | **Shape:** 10,554 rows × 120 columns
 
 ### Columns
 ```
@@ -2389,22 +2389,22 @@ announcementDate                         Datetime(time_unit='ns', time_zone=None
 auctionDate                              Datetime(time_unit='ns', time_zone=None)
 auctionDateYear                          String         
 datedDate                                Datetime(time_unit='ns', time_zone=None) (74.9% null)
-accruedInterestPer1000                   Float64         (84.9% null)
+accruedInterestPer1000                   Float64         (84.8% null)
 accruedInterestPer100                    Float64         (99.0% null)
-adjustedAccruedInterestPer1000           Float64         (97.6% null)
+adjustedAccruedInterestPer1000           Float64         (97.7% null)
 adjustedPrice                            Float64         (97.6% null)
-allocationPercentage                     Float64         (0.1% null)
+allocationPercentage                     Float64         (0.0% null)
 allocationPercentageDecimals             String         
 announcedCusip                           String         
 auctionFormat                            String         
 averageMedianDiscountRate                Float64         (25.1% null)
 averageMedianInvestmentRate              Float64         (77.6% null)
-averageMedianPrice                       Float64         (53.7% null)
+averageMedianPrice                       Float64         (53.8% null)
 averageMedianDiscountMargin              String         
 averageMedianYield                       String         
 backDated                                Null            (100.0% null)
 backDatedDate                            Datetime(time_unit='ns', time_zone=None) (91.3% null)
-bidToCoverRatio                          Float64         (30.6% null)
+bidToCoverRatio                          Float64         (30.5% null)
 callDate                                 Datetime(time_unit='ns', time_zone=None) (99.8% null)
 callable                                 Null            (100.0% null)
 calledDate                               Datetime(time_unit='ns', time_zone=None) (99.8% null)
@@ -2482,8 +2482,8 @@ strippable                               Null            (100.0% null)
 term                                     String         
 tiinConversionFactorPer1000              String         
 tips                                     Null            (100.0% null)
-totalAccepted                            Float64         (0.1% null)
-totalTendered                            Float64         (0.1% null)
+totalAccepted                            Float64         (0.0% null)
+totalTendered                            Float64         (0.0% null)
 treasuryRetailAccepted                   String         
 treasuryRetailTendersAccepted            String         
 type                                     String         
@@ -2501,18 +2501,18 @@ tintCusip2DueDate                        Datetime(time_unit='ns', time_zone=None
 
 ### Numeric Column Statistics
 ```
-interestRate: min=0.125, max=16.25, mean=4.11, median=3.125
-accruedInterestPer1000: min=0.0, max=36.72798, mean=1.48, median=0.00342
-accruedInterestPer100: min=0.000250021, max=0.940779263, mean=0.19, median=0.071920018
+interestRate: min=0.125, max=16.25, mean=4.11, median=3.25
+accruedInterestPer1000: min=0.0, max=36.72798, mean=1.48, median=0.00345
+accruedInterestPer100: min=0.000250021, max=0.940779263, mean=0.19, median=0.07432667000000001
 adjustedAccruedInterestPer1000: min=0.0, max=9.15983, mean=1.38, median=0.479965
-adjustedPrice: min=81.754227, max=132.953297, mean=101.55, median=100.050217
-allocationPercentage: min=0.01, max=100.0, mean=49.68, median=49.715
-averageMedianDiscountRate: min=0.0, max=18.48, mean=3.47, median=3.06
+adjustedPrice: min=81.754227, max=132.953297, mean=101.54, median=100.067434
+allocationPercentage: min=0.01, max=100.0, mean=49.67, median=49.7
+averageMedianDiscountRate: min=0.0, max=18.48, mean=3.47, median=3.07
 averageMedianInvestmentRate: min=2.73, max=18.88, mean=7.46, median=6.53
 averageMedianPrice: min=0.0, max=105.27, mean=58.24, median=95.758
 bidToCoverRatio: min=1.11, max=10.72, mean=3.08, median=2.91
-totalAccepted: min=25000000.0, max=95686476000.0, mean=26924605767.12, median=23831690650.0
-totalTendered: min=72950000.0, max=287396859400.0, mean=79506064072.70, median=57973982500.0
+totalAccepted: min=25000000.0, max=95686476000.0, mean=26985604608.14, median=23866482500.0
+totalTendered: min=72950000.0, max=287396859400.0, mean=79675051828.44, median=58139869800.0
 ```
 
 ---
@@ -2639,7 +2639,7 @@ rec_edate                                Date
 
 ## wrds_bank_crsp_link.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/wrds_bank_crsp_link.parquet`
-**Size:** 48541 bytes | **Type:** Parquet | **Shape:** 1,471 rows × 6 columns
+**Size:** 48601 bytes | **Type:** Parquet | **Shape:** 1,471 rows × 6 columns
 
 ### Columns
 ```
@@ -3406,7 +3406,7 @@ __index_level_0__: min=0, max=499999, mean=249651.21, median=249649.0
 
 ## wrds_struct_rel_ultimate.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_bank_premium/wrds_struct_rel_ultimate.parquet`
-**Size:** 246.0 MB | **Type:** Parquet | **Shape:** 12,539,074 rows × 12 columns
+**Size:** 246.1 MB | **Type:** Parquet | **Shape:** 12,539,074 rows × 12 columns
 
 ### Columns
 ```
@@ -3437,7 +3437,7 @@ __index_level_0__: min=0, max=499999, mean=249281.34, median=249218.0
 
 ## CRSP_Comp_Link_Table.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/CRSP_Comp_Link_Table.parquet`
-**Size:** 752275 bytes | **Type:** Parquet | **Shape:** 39,192 rows × 6 columns
+**Size:** 752347 bytes | **Type:** Parquet | **Shape:** 39,192 rows × 6 columns
 
 ### Columns
 ```
@@ -3496,7 +3496,7 @@ __index_level_0__: min=0, max=499999, mean=245618.85, median=244145.5
 
 ## Compustat.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/Compustat.parquet`
-**Size:** 10.9 MB | **Type:** Parquet | **Shape:** 577,272 rows × 10 columns
+**Size:** 10.9 MB | **Type:** Parquet | **Shape:** 577,621 rows × 10 columns
 
 ### Columns
 ```
@@ -3514,21 +3514,21 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-at: min=0.0, max=4349731.0, mean=6107.86, median=112.9395
-pstkl: min=-0.421, max=526300.0, mean=35.59, median=0.0
-txditc: min=-285.769, max=92344.0, mean=111.99, median=0.0
-pstkrv: min=-67.0, max=526300.0, mean=36.64, median=0.0
-seq: min=-86154.0, max=649368.0, mean=1058.88, median=43.677
-pstk: min=-252.0, max=139966.0, mean=30.70, median=0.0
-year: min=1959, max=2025, mean=1998.37, median=1999.0
-__index_level_0__: min=0, max=499999, mean=221706.91, median=211363.5
+at: min=0.0, max=4349731.0, mean=6112.47, median=112.841
+pstkl: min=-0.421, max=526300.0, mean=35.58, median=0.0
+txditc: min=-285.769, max=92344.0, mean=111.97, median=0.0
+pstkrv: min=-67.0, max=526300.0, mean=36.62, median=0.0
+seq: min=-86154.0, max=649368.0, mean=1060.03, median=43.651
+pstk: min=-252.0, max=139966.0, mean=30.68, median=0.0
+year: min=1959, max=2025, mean=1998.38, median=1999.0
+__index_level_0__: min=0, max=499999, mean=221619.75, median=211189.0
 ```
 
 ---
 
 ## FF_FACTORS.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/FF_FACTORS.parquet`
-**Size:** 43782 bytes | **Type:** Parquet | **Shape:** 1,182 rows × 9 columns
+**Size:** 44006 bytes | **Type:** Parquet | **Shape:** 1,185 rows × 9 columns
 
 ### Columns
 ```
@@ -3540,15 +3540,15 @@ rf                                       Decimal(precision=5, scale=5)
 year                                     Float64        
 month                                    Float64        
 umd                                      Decimal(precision=6, scale=6) (0.5% null)
-dateff                                   Date           
+dateff                                   Date            (0.3% null)
 ```
 
 ### Numeric Column Statistics
 ```
-smb: min=-0.172, max=0.3656, mean=0.00, median=0.0007
-hml: min=-0.1388, max=0.3561, mean=0.00, median=0.0012
-year: min=1926.0, max=2024.0, mean=1975.25, median=1975.0
-month: min=1.0, max=12.0, mean=6.52, median=7.0
+smb: min=-0.1741, max=0.3596, mean=0.00, median=0.0006
+hml: min=-0.1383, max=0.3552, mean=0.00, median=0.0014
+year: min=1926.0, max=2025.0, mean=1975.37, median=1975.0
+month: min=1.0, max=12.0, mean=6.50, median=7.0
 ```
 
 ---
@@ -3597,7 +3597,7 @@ __index_level_0__: min=0, max=499999, mean=246934.99, median=247938.0
 
 ## arima_results.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_results.csv`
-**Size:** 109 bytes | **Type:** Csv | **Shape:** 1 rows × 5 columns
+**Size:** 108 bytes | **Type:** Csv | **Shape:** 1 rows × 5 columns
 
 ### Columns
 ```
@@ -3611,8 +3611,8 @@ entity_count                             Int64
 ### Numeric Column Statistics
 ```
 seasonality: min=5, max=5, mean=5.00, median=5.0
-mean_mase: min=9.735157240436603, max=9.735157240436603, mean=9.74, median=9.735157240436603
-median_mase: min=9.707426096886913, max=9.707426096886913, mean=9.71, median=9.707426096886913
+mean_mase: min=9.83930260256351, max=9.83930260256351, mean=9.84, median=9.83930260256351
+median_mase: min=9.485053711101472, max=9.485053711101472, mean=9.49, median=9.485053711101472
 entity_count: min=30, max=30, mean=30.00, median=30.0
 ```
 
@@ -3634,8 +3634,8 @@ entity_count                             Int64
 ### Numeric Column Statistics
 ```
 seasonality: min=5, max=5, mean=5.00, median=5.0
-mean_mase: min=9.73977821682938, max=9.73977821682938, mean=9.74, median=9.73977821682938
-median_mase: min=9.70674997013682, max=9.70674997013682, mean=9.71, median=9.70674997013682
+mean_mase: min=9.80730049361067, max=9.80730049361067, mean=9.81, median=9.80730049361067
+median_mase: min=9.47550110922832, max=9.47550110922832, mean=9.48, median=9.47550110922832
 entity_count: min=30, max=30, mean=30.00, median=30.0
 ```
 
@@ -3643,7 +3643,7 @@ entity_count: min=30, max=30, mean=30.00, median=30.0
 
 ## results_all.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/results_all.csv`
-**Size:** 177 bytes | **Type:** Csv | **Shape:** 2 rows × 5 columns
+**Size:** 176 bytes | **Type:** Csv | **Shape:** 2 rows × 5 columns
 
 ### Columns
 ```
@@ -3657,7 +3657,7 @@ entity_count                             Int64
 ### Numeric Column Statistics
 ```
 seasonality: min=5, max=5, mean=5.00, median=5.0
-mean_mase: min=9.735157240436603, max=9.73977821682938, mean=9.74, median=9.737467728632993
-median_mase: min=9.70674997013682, max=9.707426096886913, mean=9.71, median=9.707088033511866
+mean_mase: min=9.80730049361067, max=9.83930260256351, mean=9.82, median=9.823301548087091
+median_mase: min=9.47550110922832, max=9.485053711101472, mean=9.48, median=9.480277410164895
 entity_count: min=30, max=30, mean=30.00, median=30.0
 ```
