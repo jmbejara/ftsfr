@@ -9,6 +9,7 @@ _notebook_build/example_notebook_markit.ipynb
 _notebook_build/01_cds_returns_summary.ipynb
 _notebook_build/01_cds_bond_basis_summary.ipynb
 _notebook_build/01_bond_returns_summary.ipynb
+data_glimpses.md
 myst_markdown_demos.md
 ```
 

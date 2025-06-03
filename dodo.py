@@ -576,6 +576,21 @@ def task_run_notebooks():
 # fmt: on
 
 
+def task_create_data_glimpses():
+    """Create data glimpses"""
+    return {
+        "actions": [
+            # "python ./src/create_data_glimpses.py",
+            "python ./src/create_data_glimpses.py --no-samples",
+            # "python ./src/create_data_glimpses.py --no-samples --no-stats",
+        ],
+        "targets": [
+            "./docs_src/data_glimpses.md",
+        ],
+        "file_dep": ["./src/create_data_glimpses.py"],
+    }
+
+
 def task_compile_sphinx_docs():
     """Compile Sphinx Docs"""
 
@@ -590,6 +605,7 @@ def task_compile_sphinx_docs():
         "./docs_src/index.md",
         "./docs_src/data_sources_and_modules.md",
         "./docs_src/myst_markdown_demos.md",
+        "./docs_src/data_glimpses.md",
         *notebook_paths,
     ]
 
