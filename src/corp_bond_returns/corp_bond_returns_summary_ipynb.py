@@ -24,17 +24,17 @@ DATA_DIR = Path(config("DATA_DIR"))
 
 ---
 
-### 🧹 Data Cleaning — *He, Kelly, and Manella (HKM) follow Nozawa (2017)*
+## 🧹 Data Cleaning — *He, Kelly, and Manella (HKM) follow Nozawa (2017)*
 
 The data cleaning procedure used by **He, Kelly, and Manella** is based on the meticulous framework established in **Nozawa (2017)**. This process ensures consistency, comparability, and robustness in corporate bond return analysis.
 
 ---
 
-### 📄 Data Cleaning Summary — *Nozawa (2017)*
+## 📄 Data Cleaning Summary — *Nozawa (2017)*
 
 Nozawa (2017) constructs a high-quality corporate bond dataset by applying the following key cleaning steps:
 
-#### 🔹 Bond Selection Criteria
+### 🔹 Bond Selection Criteria
 
 * **Exclude bonds** with:
 
@@ -48,7 +48,7 @@ Nozawa (2017) constructs a high-quality corporate bond dataset by applying the f
 
   * Eliminate both return observations if the **product of adjacent returns is < -0.04**, suggesting a data entry error or extreme correction.
 
-#### 🔹 Data Sources Used
+### 🔹 Data Sources Used
 
 * Combined data from:
 
@@ -56,23 +56,23 @@ Nozawa (2017) constructs a high-quality corporate bond dataset by applying the f
   * **Mergent FISD/NAIC Database**
   * **TRACE**
   * **DataStream**
-* Defaults are verified and completed using **Moody’s Default Risk Service**.
+* Defaults are verified and completed using **Moody's Default Risk Service**.
 * **CRSP** and **Compustat** are used to supplement with equity and accounting data.
 
-#### 🔹 Synthetic Treasury Construction
+### 🔹 Synthetic Treasury Construction
 
 * For each corporate bond, a **synthetic Treasury bond** with an identical cash flow structure is constructed.
 * Treasury prices are based on **Federal Reserve constant-maturity yield data**.
 * This enables clean computation of **excess returns** and **credit spreads**, expressed in **price terms** rather than yield spreads, to maintain linearity and reduce approximation error.
 
-#### 🔹 Additional Adjustments
+### 🔹 Additional Adjustments
 
 * Callable bonds are retained and accounted for using **fixed effects** in regression models (callability has minor pricing impact, \~9 bps).
 * The study uses **monthly returns**, avoiding the need for reinvestment assumptions.
 
 ---
 
-This rigorous cleaning pipeline underpins Nozawa’s variance decomposition framework, enabling a reliable split of credit spreads into **expected credit loss** and **risk premium** components.
+This rigorous cleaning pipeline underpins Nozawa's variance decomposition framework, enabling a reliable split of credit spreads into **expected credit loss** and **risk premium** components.
 
 ---
 
@@ -91,19 +91,19 @@ copr_bonds_hkm.isnull().sum()
 """
 ---
 
-### 📊 FTSFA Dataset — Based on TRACE Data from OpenBondAssetPricing.com
+## 📊 FTSFA Dataset — Based on TRACE Data from OpenBondAssetPricing.com
 
 The **FTSFA** (Financial Time Series for Fixed-income Analysis) dataset is constructed using the TRACE (Trade Reporting and Compliance Engine) data available at [openbondassetpricing.com](https://openbondassetpricing.com/). This dataset provides a comprehensive collection of corporate bond data, including market microstructure-adjusted prices and returns, as detailed in the [Monthly TRACE Data README](https://openbondassetpricing.com/wp-content/uploads/2024/07/DRR-README.pdf).
 
 ---
 
-### 🧹 Data Cleaning and Construction — *Following Nozawa (2017)*
+## 🧹 Data Cleaning and Construction — *Following Nozawa (2017)*
 
 The FTSFA dataset adheres to the rigorous data cleaning methodology established by Nozawa (2017), ensuring high-quality and reliable corporate bond return data. The key cleaning steps are mentioned above.
 
 ---
 
-### 🔍 Understanding the TRACE Dataset
+## 🔍 Understanding the TRACE Dataset
 
 The TRACE dataset, as utilized in the FTSFA dataset, is meticulously curated to provide accurate and comprehensive corporate bond data. Key aspects include:
 
@@ -136,7 +136,7 @@ corp_bonds_returns.describe()
 """
 ---
 
-### 🧮 How Returns Are Computed
+## 🧮 How Returns Are Computed
 
 For each decile, the **monthly return** is computed as a **value-weighted average of bond-level returns**:
 
@@ -156,7 +156,7 @@ This weighting ensures that larger bonds have a proportionally larger impact on 
 
 # %%
 """
-### Comparing FTSFA with He Kelly Manela 
+## Comparing FTSFA with He Kelly Manela 
 """
 
 # %%
@@ -210,7 +210,7 @@ for i in range(10):
 """
 ---
 
-### 📈 Comparison of Corporate Bond Portfolio Returns: FTSFA Deciles vs. HKM Portfolios
+## 📈 Comparison of Corporate Bond Portfolio Returns: FTSFA Deciles vs. HKM Portfolios
 
 The figure above compares the time-series returns of corporate bond portfolios:
 
@@ -230,7 +230,7 @@ The HKM portfolios are indexed from **11 to 20**, with portfolio 11 correspondin
 
 ---
 
-### 🔍 Observations
+## 🔍 Observations
 
 * The plotted returns between **FTSFA deciles (blue)** and **HKM portfolios (red)** are **visibly similar**, indicating that both datasets reflect consistent underlying return dynamics.
 * Particularly during volatile periods like the **2008 financial crisis**, both series exhibit synchronized spikes or drops, reflecting shared exposure to credit market risk.
