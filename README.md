@@ -1,5 +1,26 @@
 # Financial Time-Series Forecasting Repository
 
+You can view the current version of the website here: https://jeremybejarano.com/ftsfr/
+
+## Agenda
+
+Alex and Vincent
+ - https://github.com/jmbejara/ftsfr/issues/13
+ - Still relevant? https://github.com/jmbejara/ftsfr/issues/6
+ - https://github.com/Kunj121/CIP FX and then CIP? (I received permission)
+
+
+Kausthub
+ - https://github.com/jmbejara/ftsfr/issues/11
+ - https://github.com/jmbejara/ftsfr/issues/17
+ - Treasuries and Corporate Bonds done? Sovereign Bonds next?
+
+Yangge
+ - https://github.com/jmbejara/ftsfr/issues/8
+ - https://github.com/jmbejara/ftsfr/issues/5
+ - Commodity returns? https://github.com/kyleparran/final_project_group_09 (I received permission)
+
+
 This repository contains a collection of financial time-series forecasting models. It produces esting a benchmark for prac
 
 ## Quickstart

@@ -148,6 +148,12 @@ We welcome contributions from the research community. Whether you're:
 
 Please see our contribution guidelines for more information.
 
+## Acknowledgments
+
+- https://github.com/Kunj121/CIP
+- https://github.com/kyleparran/final_project_group_09
+
+
 ---
 
 ```{note}
