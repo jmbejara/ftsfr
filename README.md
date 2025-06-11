@@ -7,7 +7,7 @@ You can view the current version of the website here: https://jeremybejarano.com
 Alex and Vincent
  - https://github.com/jmbejara/ftsfr/issues/13
  - Still relevant? https://github.com/jmbejara/ftsfr/issues/6
- - https://github.com/Kunj121/CIP FX and then CIP? (I received permission)
+ - https://github.com/Kunj121/CIP FX and then CIP? (I received permission). Blocked by Jeremy, needs to do Bloomberg stuff.
 
 
 Kausthub
@@ -19,6 +19,9 @@ Yangge
  - https://github.com/jmbejara/ftsfr/issues/8
  - https://github.com/jmbejara/ftsfr/issues/5
  - Commodity returns? https://github.com/kyleparran/final_project_group_09 (I received permission)
+
+Jeremy
+ - Do Bloomberg stuff for Alex and Vincent.
 
 
 This repository contains a collection of financial time-series forecasting models. It produces esting a benchmark for prac

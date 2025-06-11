@@ -259,7 +259,7 @@ he_kelly_df.tail(5)
 replication_df = final_result["2001-02-01":"2012-12-01"]
 
 # %%
-replication_df.head(5)
+replication_df.tail(5)
 
 # %%
 plt.plot(replication_df)
