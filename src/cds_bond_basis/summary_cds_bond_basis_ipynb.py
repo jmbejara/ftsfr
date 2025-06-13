@@ -142,12 +142,12 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 
 RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
 CORPORATES_MONTHLY_FILE_NAME = "corporate_bond_returns.parquet"
-CDS_FILE_NAME = "cds_final.pkl"  # CHANGE TO PARQUET WHEN DEPEDENCY IS SORTED
+CDS_FILE_NAME = "cds_final.parquet"  # CHANGE TO PARQUET WHEN DEPEDENCY IS SORTED
 
 # corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
 corp_bonds_data = pull_open_source_bond.load_corporate_bond_returns(data_dir=DATA_DIR)
 red_data = pd.read_parquet(f"{DATA_DIR}/{RED_CODE_FILE_NAME}")
-cds_data = pd.read_pickle(f"{DATA_DIR}/{CDS_FILE_NAME}")
+cds_data = pd.read_parquet(f"{DATA_DIR}/{CDS_FILE_NAME}")
 
 # %%
 corp_bonds_data.info()
