@@ -242,7 +242,7 @@ rfr^{CDS}_{i, t, \tau} = y_{t, \tau} - CB_{i , t, \tau}
 $$
 
 where:
-- $y_{t, \tau}$ = maturity matched treasury yield at time $t$
+- $y_{t, \tau}$ = duration matched treasury yield at time $t$
     - this is constructed via the "BOND_YIELD" - "CS" in the original corporate bond table
 
 We threw out some unreasonable data for the absolute rf values exceeding 1 (risk free annual return of 100%). 
