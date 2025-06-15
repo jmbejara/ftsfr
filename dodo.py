@@ -581,6 +581,11 @@ def task_run_notebooks():
 
 def task_create_data_glimpses():
     """Create data glimpses"""
+    # Get all files in the src directory recursively
+    src_files = list(Path("./src").rglob("*"))
+    # Filter to only include actual files (not directories)
+    src_files = [str(f) for f in src_files if f.is_file()]
+    
     return {
         "actions": [
             # "python ./src/create_data_glimpses.py",
@@ -590,7 +595,7 @@ def task_create_data_glimpses():
         "targets": [
             "./docs_src/data_glimpses.md",
         ],
-        "file_dep": ["./src/create_data_glimpses.py"],
+        "file_dep": src_files,
     }
 
 
