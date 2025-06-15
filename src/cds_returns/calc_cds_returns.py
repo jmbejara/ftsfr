@@ -3,6 +3,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import argparse
 import datetime
 
 import numpy as np
@@ -131,7 +132,7 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
     Parameters:
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
-    - cds_spreads (pl.DataFrame): CDS spread data.
+    - cds_spreads (pl.LazyFrame or pl.DataFrame): CDS spread data.
 
     Returns:
     - dict: Dictionary where keys are tenor-quantile pairs and values are Polars DataFrames.
@@ -143,37 +144,39 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
         end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
     if isinstance(cds_spreads, pd.DataFrame):
         cds_spreads = pl.from_pandas(cds_spreads)
-    # Filter DataFrame
-    filtered_cds_spread = cds_spreads.filter(
-        (pl.col("date") >= start_date) & (pl.col("date") <= end_date)
+    
+    # Work with LazyFrame for memory efficiency
+    if isinstance(cds_spreads, pl.DataFrame):
+        cds_spreads = cds_spreads.lazy()
+    
+    # Build the query lazily - filter and clean data
+    cds_spread_clean = (
+        cds_spreads
+        .filter(
+            (pl.col("date") >= start_date) & 
+            (pl.col("date") <= end_date) &
+            (pl.col("country") == "United States") &
+            (pl.col("parspread").is_not_null()) &
+            (pl.col("parspread") <= 0.5)  # Remove spreads greater than 50%
+        )
+        .drop(["convspreard", "year", "redcode"])
+        .unique()
+        .with_columns(
+            pl.col("date").dt.strftime("%Y-%m").alias("year_month")
+        )
     )
-    filtered_cds_spread_us_only = filtered_cds_spread.filter(
-        pl.col("country") == "United States"
-    )
-    # Data Cleaning and Preparation
-    cds_spread_noNA = filtered_cds_spread_us_only.drop_nulls(subset=["parspread"])
-    cds_spread_noNA = cds_spread_noNA.drop(["convspreard", "year", "redcode"])
 
-    # Remove duplicates
-    cds_spread_unique = cds_spread_noNA.unique()
-    cds_spread_unique = cds_spread_unique.filter(
-        pl.col("parspread") <= 0.5
-    )  # Done by Palhares, remove spreads grater than 50%
-
-    # Convert date column to year-month format
-    cds_spread_unique = cds_spread_unique.with_columns(
-        pl.col("date").dt.strftime("%Y-%m").alias("year_month")
-    )
-
-    # Compute Credit Quantiles
-    spread_5y = cds_spread_unique.filter(pl.col("tenor") == "5Y")
-
+    # Compute Credit Quantiles - need to collect here for quantile calculations
+    spread_5y = cds_spread_clean.filter(pl.col("tenor") == "5Y")
+    
     # Get first available spread for each ticker in each month
     first_spread_5y = (
-        spread_5y.sort("date")
+        spread_5y
+        .sort("date")
         .group_by(["ticker", "year_month"])
         .first()
         .select(["ticker", "year_month", "parspread"])
+        .collect()  # Collect here as we need quantiles
     )
 
     # Compute separate credit quantiles per month
@@ -202,42 +205,47 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
         .alias("credit_quantile")
     ).select(["ticker", "year_month", "credit_quantile"])
 
-    # Assign computed credit quantiles to all tenors
-    cds_spreads_final = cds_spread_unique.join(
-        first_spread_5y, on=["ticker", "year_month"], how="left"
+    # Continue with lazy operations - join back the quantiles
+    cds_spreads_final = (
+        cds_spread_clean
+        .join(first_spread_5y.lazy(), on=["ticker", "year_month"], how="left")
+        .sort("date")
     )
-    cds_spreads_final = cds_spreads_final.sort("date")
 
-    # Compute Representative Parspread
+    # Compute Representative Parspread lazily
     relevant_tenors = ["3Y", "5Y", "7Y", "10Y"]
     relevant_quantiles = [1, 2, 3, 4, 5]
 
-    filtered_df = cds_spreads_final.filter(
-        (pl.col("tenor").is_in(relevant_tenors))
-        & (pl.col("credit_quantile").is_in(relevant_quantiles))
-    )
-
-    rep_parspread_df = filtered_df.group_by(["date", "tenor", "credit_quantile"]).agg(
-        pl.col("parspread").mean().alias("rep_parspread")
-    )
-
-    # Convert 'date' column to month level (truncate to the first day of the month)
-    rep_parspread_df = rep_parspread_df.with_columns(
-        pl.col("date").dt.truncate("1mo").alias("month")
+    rep_parspread_df = (
+        cds_spreads_final
+        .filter(
+            (pl.col("tenor").is_in(relevant_tenors)) &
+            (pl.col("credit_quantile").is_in(relevant_quantiles))
+        )
+        .group_by(["date", "tenor", "credit_quantile"])
+        .agg(pl.col("parspread").mean().alias("rep_parspread"))
+        .with_columns(
+            pl.col("date").dt.truncate("1mo").alias("month")
+        )
     )
 
     portfolio_dict = {}
 
+    # Collect individual portfolio data only when needed
     for tenor in relevant_tenors:
         for quantile in relevant_quantiles:
             key = f"{tenor}_Q{quantile}"  # Example key: "5Y_Q3"
 
-            # Filter dataframe for this specific tenor-quantile pair
-            portfolio_df = rep_parspread_df.filter(
-                (pl.col("tenor") == tenor) & (pl.col("credit_quantile") == quantile)
+            # Filter and collect only this specific portfolio
+            portfolio_df = (
+                rep_parspread_df
+                .filter(
+                    (pl.col("tenor") == tenor) & 
+                    (pl.col("credit_quantile") == quantile)
+                )
+                .sort("date")
+                .collect()  # Only collect the small subset we need
             )
-
-            portfolio_df = portfolio_df.sort("date")
 
             # Store in dictionary
             portfolio_dict[key] = portfolio_df
@@ -339,7 +347,7 @@ def calc_cds_return_for_portfolios(
 
         # Align dates between quarterly discount and survival probabilities
         survival_probs_filtered = survival_probs.filter(
-            pl.col("date").is_in(quarterly_discount["index"])
+            pl.col("date").is_in(quarterly_discount["index"].to_list())
         )
 
         discount_filtered = discount_filtered.rename({"index": "date"})
@@ -349,10 +357,10 @@ def calc_cds_return_for_portfolios(
         dates_spf = survival_probs_filtered.select("date")
         dates_df = dates_df.join(dates_spf, on="date", how="inner")
         discount_filtered = discount_filtered.filter(
-            pl.col("date").is_in(dates_df["date"])
+            pl.col("date").is_in(dates_df["date"].to_list())
         )
         survival_probs_filtered = survival_probs_filtered.filter(
-            pl.col("date").is_in(dates_df["date"])
+            pl.col("date").is_in(dates_df["date"].to_list())
         )
 
         # Compute risky duration
@@ -501,14 +509,13 @@ def run_cds_calculation(
 
     Parameters:
     - raw_rates (DataFrame): Raw interest rate data.
-    - cds_spreads (DataFrame): CDS spread data.
+    - cds_spreads (pl.LazyFrame or DataFrame): CDS spread data.
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
 
     Returns:
-    - dict: Dictionary where keys are tenor-quantile pairs and values are Polars DataFrames of monthly returns.
+    - pl.DataFrame: DataFrame with monthly returns for all portfolios.
     """
-    rates_data = process_rates(raw_rates, start_date, end_date)
     portfolio_dict = get_portfolio_dict(start_date, end_date, cds_spreads)
     daily_returns_dict = calc_cds_return_for_portfolios(
         portfolio_dict, raw_rates, start_date, end_date
@@ -527,12 +534,21 @@ def load_portfolio(data_dir=DATA_DIR):
 
 
 if __name__ == "__main__":
-    raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR)
-    cds_spreads = pull_markit_cds.load_cds_data(data_dir=DATA_DIR)
+    parser = argparse.ArgumentParser(description="Calculate CDS returns with memory optimization")
+    parser.add_argument("--DATA_DIR", type=str, default=None, 
+                       help="Data directory path (overrides config)")
+    args = parser.parse_args()
+    
+    # Use command line argument if provided, otherwise use config
+    data_dir = Path(args.DATA_DIR) if args.DATA_DIR else DATA_DIR
+    
+    raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=data_dir)
+    # Load CDS data as LazyFrame for memory efficiency
+    cds_spreads = pl.scan_parquet(data_dir / "markit_cds.parquet")
     cds_returns = run_cds_calculation(
         raw_rates=raw_rates,
         cds_spreads=cds_spreads,
         start_date=START_DATE,
         end_date=END_DATE,
     )
-    cds_returns.write_parquet(DATA_DIR / "markit_cds_returns.parquet")
+    cds_returns.write_parquet(data_dir / "markit_cds_returns.parquet")
