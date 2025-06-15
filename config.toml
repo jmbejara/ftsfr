@@ -19,6 +19,7 @@ wrds_bond_returns = true
 wrds_compustat = true
 wrds_crsp = true
 wrds_crsp_compustat = true
+wrds_datastream = true
 wrds_fx = true
 wrds_markit = true
 wrds_mergent = true

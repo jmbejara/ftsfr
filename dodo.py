@@ -83,6 +83,7 @@ module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and dat
 module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
 module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
 module_requirements["foreign_exchange"] = data_sources["wrds_crsp_compustat"] and data_sources["wrds_fx"]
+module_requirements["futures_returns"] = data_sources["wrds_datastream"]
 module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
 module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
 module_requirements["nyu_call_report"] = data_sources["nyu_call_report"]
@@ -168,6 +169,18 @@ def task_pull():
             "clean": [],
         }
     # fmt: on
+
+    data_module = "futures_returns"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_wrds_futures.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [DATA_DIR / data_module / "wrds_futures.parquet"],
+            "file_dep": [f"./src/{data_module}/pull_wrds_futures.py"],
+            "clean": [],
+        }
 
     data_module = "fed_yield_curve"
     if module_requirements[data_module] and not use_cache:
@@ -316,6 +329,24 @@ def task_format():
             ],
             "clean": [],
         }
+
+    data_module = "futures_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_futures_returns.py --DATA_DIR={DATA_DIR / data_module}",
+                # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "futures_returns.parquet"
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_futures_returns.py",
+            ],
+            "clean": [],
+        }
+
 
     # if data_sources["ken_french_data_library"]:
     #     from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
