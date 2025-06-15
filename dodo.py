@@ -434,14 +434,14 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/merge_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "Red_Data.parquet",
                 DATA_DIR / data_module / "Final_data.parquet",
             ],
             "file_dep": [
-                f"./src/{data_module}/NEW_MERGE_cds_bond.py",
+                f"./src/{data_module}/merge_cds_bond.py",
             ],
             "clean": [],
         }
@@ -514,13 +514,13 @@ def task_assemble_results():
 
 
 notebook_tasks = {
-    # "summary_cds_bond_basis_ipynb": {
-    #     "path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
-    #     "file_dep": [
-    #         "./src/cds_bond_basis/NEW_MERGE_cds_bond.py",
-    #     ],
-    #     "targets": [],
-    # },
+    "summary_cds_bond_basis_ipynb": {
+        "path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
+        "file_dep": [
+            "./src/cds_bond_basis/merge_cds_bond.py",
+        ],
+        "targets": [],
+    },
     "summary_corp_bond_returns_ipynb": {
         "path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
         "file_dep": [
@@ -602,6 +602,11 @@ def task_compile_sphinx_docs():
         notebook_tasks[notebook]["path"] for notebook in notebook_tasks.keys()
     ]
 
+    # Get all file dependencies from notebook_tasks
+    notebook_deps = [
+        dep for notebook in notebook_tasks.values() for dep in notebook["file_dep"]
+    ]
+
     file_dep = [
         "./docs_src/logo.png",
         "./docs_src/conf.py",
@@ -610,6 +615,7 @@ def task_compile_sphinx_docs():
         "./docs_src/myst_markdown_demos.md",
         "./docs_src/data_glimpses.md",
         *notebook_paths,
+        *notebook_deps,
     ]
 
     def touch_file():

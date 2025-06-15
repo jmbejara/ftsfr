@@ -51,7 +51,8 @@ sys.path.insert(0, "./src")
 
 import pandas as pd
 import pull_open_source_bond
-from NEW_MERGE_cds_bond import *
+from cds_returns import pull_markit_cds
+from merge_cds_bond import *
 from process_final_product import *
 
 from settings import config
@@ -61,7 +62,6 @@ from settings import config
 
 # %%
 DATA_DIR = Path(config("DATA_DIR"))
-# DATA_DIR = "../../../FS-project_files"
 
 # %%
 """
@@ -140,14 +140,9 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 # %%
 
 
-RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
-CORPORATES_MONTHLY_FILE_NAME = "corporate_bond_returns.parquet"
-CDS_FILE_NAME = "cds_final.parquet"  # CHANGE TO PARQUET WHEN DEPEDENCY IS SORTED
-
-# corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
-corp_bonds_data = pull_open_source_bond.load_corporate_bond_returns(data_dir=DATA_DIR)
-red_data = pd.read_parquet(f"{DATA_DIR}/{RED_CODE_FILE_NAME}")
-cds_data = pd.read_parquet(f"{DATA_DIR}/{CDS_FILE_NAME}")
+corp_bonds_data = pull_open_source_bond.load_corporate_bond_returns(data_dir=DATA_DIR / "cds_bond_basis")
+red_data = pd.read_parquet(DATA_DIR / "cds_bond_basis" / "RED_and_ISIN_mapping.parquet")
+cds_data = pull_markit_cds.load_cds_data(data_dir=DATA_DIR / "cds_returns")
 
 # %%
 corp_bonds_data.info()
@@ -168,7 +163,7 @@ corp_bonds_data.describe()
 """
 # Step 1: Merge the Redcodes of firms on to the corporate bonds.
 
-The code for it is in **NEW_MERGE_cds_bond.py** in the function **merge_redcode_into_bond_treas**. The more specific inputs are within the function itself.
+The code for it is in **merge_cds_bond.py** in the function **merge_redcode_into_bond_treas**. The more specific inputs are within the function itself.
 
 Given CDS tables record issuers of the Credit Default Swaps using Redcode and the bond tables only had CUSIPs, we needed to merge a redcode-CUSIP matching table to the end product of step 1.2 for CDS merging later on.
 
@@ -210,7 +205,7 @@ The CDS data has a flaw: the **tenor** is displayed as opposed to **maturity dat
 
 For example, if the tenor is $3Y$, the number of days that we use to annualize is $3 \times 365 = 1095$. 
 
-In our processing function **NEW_MERGE_cds_bond**, we grab the **redcode, date** tuples for which we can generate a good cubic spline function, filter the bond and treasury dataframe (output of step 1). 
+In our processing function **merge_cds_bond**, we grab the **redcode, date** tuples for which we can generate a good cubic spline function, filter the bond and treasury dataframe (output of step 1). 
 
 Then, we use the days between the **maturity** and the **date** for each corporate bond as the input for the cubic spline function for par spread generation. Thus, we end up with the final dataframe with bond, treasury, and cds data all merged together.
 """

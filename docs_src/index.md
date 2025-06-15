@@ -107,9 +107,10 @@ data_glimpses
 :maxdepth: 1
 :caption: 📊 Data Cleaning Procedure Summaries
 
+_notebook_build/summary_cds_bond_basis_ipynb.ipynb
+_notebook_build/summary_cds_returns_ipynb.ipynb
 _notebook_build/summary_corp_bond_returns_ipynb.ipynb
 _notebook_build/summary_treasury_bond_returns_ipynb.ipynb
-_notebook_build/summary_cds_returns_ipynb.ipynb
 ```
 
 ```{toctree}
