@@ -143,6 +143,21 @@ def load_combined_futures_data(data_dir=DATA_DIR, format="pandas"):
     return df
 
 
+def pull_wrds_tables(data_dir=DATA_DIR):
+    """
+    Pull selected tables from WRDS.
+    """
+    db = wrds.Connection(wrds_username=WRDS_USERNAME)
+    df = db.get_table(library="tr_ds_fut", table="wrds_cseries_info")
+    df.to_csv(data_dir / "wrds_cseries_info.csv")
+    df.to_parquet(data_dir / "wrds_cseries_info.parquet")
+
+    df = db.get_table(library="tr_ds_fut", table="dsfutcalcserval")
+    df.to_csv(data_dir / "dsfutcalcserval.csv")
+    df.to_parquet(data_dir / "dsfutcalcserval.parquet")
+
+    db.close()
+
 if __name__ == "__main__":
     df = pull_all_futures_data()
     path = DATA_DIR / "wrds_futures.parquet"
