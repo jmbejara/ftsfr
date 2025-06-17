@@ -107,9 +107,10 @@ data_glimpses
 :maxdepth: 1
 :caption: 📊 Data Cleaning Procedure Summaries
 
+_notebook_build/summary_cds_bond_basis_ipynb.ipynb
+_notebook_build/summary_cds_returns_ipynb.ipynb
 _notebook_build/summary_corp_bond_returns_ipynb.ipynb
 _notebook_build/summary_treasury_bond_returns_ipynb.ipynb
-_notebook_build/summary_cds_returns_ipynb.ipynb
 ```
 
 ```{toctree}
@@ -150,8 +151,10 @@ Please see our contribution guidelines for more information.
 
 ## Acknowledgments
 
-- https://github.com/Kunj121/CIP
-- https://github.com/kyleparran/final_project_group_09
+We would like to thank the following individuals. With their permission, we have adapted and used pieces oftheir code in this repository.
+
+- Om Mehta and Kunj Shah, for their replication of the Covered Interest Rate Parity (CIP) arbitrage spreads that appear in _Siriwardane, Sunderam, and Wallen. "Segmented arbitrage", 2022._ and _Rime, Schrimpf, and Syrstad. "Segmented money markets and covered interest parity arbitrage", 2017_, available at https://github.com/Kunj121/CIP
+- Kyle Parran and Duncan Park, for their replication of the construction of the commodity futures returns that appear in and _He, Kelly, and Manela. "Intermediary asset pricing: New evidence from many asset classes." Journal of Financial Economics, 2017_ and _Yang, Fan. “Investment shocks and the commodity basis spread.” (2013)_, available at https://github.com/kyleparran/final_project_group_09
 
 
 ---

@@ -99,8 +99,11 @@ def process_task_dict(task_dict, base_name, task_files):
         task_files[task_name] = sorted(files)
 
 
-def get_dataset_report(filepath, include_stats=True):
+def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=None, total_files=None):
     """Return a dict with file metadata, shape, columns, sample values, numeric stats, and glimpse."""
+    if verbose and file_num is not None and total_files is not None:
+        print(f"Processing {Path(filepath).name} ({file_num}/{total_files})...")
+    
     report = {}
     try:
         # File info
@@ -250,7 +253,7 @@ def filename_to_anchor(filename):
     return anchor
 
 
-def create_txt_report(existing_files, include_samples=True, include_stats=True):
+def create_txt_report(existing_files, include_samples=True, include_stats=True, verbose=False):
     """Create a human-readable TXT format Data Glimpses Report."""
     output_lines = []
 
@@ -313,9 +316,11 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True):
     output_lines.append("---")
 
     # Process each file
+    total_files = len(existing_files)
     for i, f in enumerate(sorted(existing_files), 1):
         filename = Path(f).name
-        report = get_dataset_report(f, include_stats=include_stats)
+        report = get_dataset_report(f, include_stats=include_stats, verbose=verbose, 
+                                    file_num=i, total_files=total_files)
 
         output_lines.append("")
         output_lines.append(f"## {filename}")
@@ -374,7 +379,7 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True):
     return "\n".join(output_lines)
 
 
-def create_xml_report(existing_files, include_stats=True):
+def create_xml_report(existing_files, include_stats=True, verbose=False):
     """Create a machine-readable XML format Data Glimpses Report."""
     output_lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -392,9 +397,11 @@ def create_xml_report(existing_files, include_stats=True):
     output_lines.append("  <datasets>")
 
     # Add each dataset
-    for f in sorted(existing_files):
+    total_files = len(existing_files)
+    for i, f in enumerate(sorted(existing_files), 1):
         filename = Path(f).name
-        report = get_dataset_report(f, include_stats=include_stats)
+        report = get_dataset_report(f, include_stats=include_stats, verbose=verbose,
+                                    file_num=i, total_files=total_files)
         output_lines.append(
             f'    <dataset filename="{saxutils.escape(filename)}" path="{saxutils.escape(str(f))}">'
         )
@@ -469,6 +476,11 @@ def main():
         action="store_true",
         help="Exclude numeric column statistics sections from the report",
     )
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Show progress information while processing files",
+    )
     args = parser.parse_args()
 
     print("Parsing dodo.py for tasks and data files...")
@@ -492,14 +504,19 @@ def main():
     print("\nGenerating TXT report...")
     include_samples = not args.no_samples
     include_stats = not args.no_stats
+    verbose = args.verbose
 
     if args.no_samples:
         print("  - Excluding sample values sections")
     if args.no_stats:
         print("  - Excluding numeric statistics sections")
+    
+    if verbose:
+        print(f"\nPreparing to create glimpses for {len(existing_files)} data files...")
 
     txt_content = create_txt_report(
-        existing_files, include_samples=include_samples, include_stats=include_stats
+        existing_files, include_samples=include_samples, include_stats=include_stats,
+        verbose=verbose
     )
     # txt_output_file = OUTPUT_DIR / "data_glimpses.txt"
     txt_output_file = BASE_DIR / "docs_src" / "data_glimpses.md"

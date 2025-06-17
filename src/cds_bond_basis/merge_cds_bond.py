@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import warnings
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -144,6 +145,7 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
 
     # Dictionary to store cubic splines for each (redcode, date) pair
     cubic_splines = {}
+    WARN = False
 
     # Group by (redcode, date) and create splines
     for (redcode, date), group in filtered_cds_df.groupby(["redcode", "date"]):
@@ -157,8 +159,12 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
         try:
             cubic_splines[(redcode, date)] = CubicSpline(x_sorted, y_sorted)
         except:
-            print(x_sorted)
-            print(y_sorted)
+            WARN = True
+            # print(x_sorted)
+            # print(y_sorted)
+
+    if WARN:
+        warnings.warn("Failed to fit cubic spline for (redcode, date)")
 
     # START filtering the bond dataframe to make the merge easier
     red_set = set(filtered_cds_df["redcode"].unique())

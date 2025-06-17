@@ -76,13 +76,38 @@ def task_config():
 
 data_sources = config_toml["data_sources"].copy()
 
+# Check if we're being called by create_data_glimpses.py
+is_data_glimpses = any("create_data_glimpses" in arg for arg in sys.argv)
+
+# Skip Bloomberg Terminal prompt when being imported by create_data_glimpses.py
+if data_sources["bloomberg_terminal"] and not is_data_glimpses:
+    # Interactive check for Bloomberg Terminal
+    while True:
+        response = input("Is the Bloomberg Terminal open in the background? (YES/no/skip): ").strip().lower()
+        if response in ["yes", ""]:  # Fixed: should be 'in' not '=='
+            print("Proceeding with Bloomberg Terminal enabled...")
+            break
+        elif response == "no":
+            print("Aborting. Please open the Bloomberg Terminal and keep it running in the background.")
+            sys.exit(1)
+        elif response == "skip":
+            print("Skipping Bloomberg Terminal data sources...")
+            data_sources["bloomberg_terminal"] = False
+            break
+        else:
+            print("Please enter 'yes', 'no', or 'skip'.")
+elif data_sources["bloomberg_terminal"] and is_data_glimpses:
+    # When called by create_data_glimpses.py, automatically skip Bloomberg Terminal sources
+    data_sources["bloomberg_terminal"] = False
+
 # fmt: off
 module_requirements = {}
 module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
 module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
 module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
 module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
-module_requirements["foreign_exchange"] = data_sources["wrds_crsp_compustat"] and data_sources["wrds_fx"]
+module_requirements["foreign_exchange"] = data_sources["bloomberg_terminal"] and data_sources["wrds_fx"]
+module_requirements["futures_returns"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
 module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
 module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
 module_requirements["nyu_call_report"] = data_sources["nyu_call_report"]
@@ -169,6 +194,18 @@ def task_pull():
         }
     # fmt: on
 
+    data_module = "futures_returns"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_wrds_futures.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [DATA_DIR / data_module / "wrds_futures.parquet"],
+            "file_dep": [f"./src/{data_module}/pull_wrds_futures.py"],
+            "clean": [],
+        }
+
     data_module = "fed_yield_curve"
     if module_requirements[data_module] and not use_cache:
         yield {
@@ -237,13 +274,10 @@ def task_pull():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_treasury_auction_stats.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/calculate_ontherun.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/pull_CRSP_treasury.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_auction_stats.parquet",
-                DATA_DIR / data_module / "issue_dates.csv",
-                DATA_DIR / data_module / "ontherun.csv",
                 DATA_DIR / data_module / "CRSP_TFZ_DAILY.parquet",
                 DATA_DIR / data_module / "CRSP_TFZ_INFO.parquet",
                 DATA_DIR / data_module / "CRSP_TFZ_CONSOLIDATED.parquet",
@@ -251,7 +285,6 @@ def task_pull():
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_treasury_auction_stats.py",
-                f"./src/{data_module}/calculate_ontherun.py",
                 f"./src/{data_module}/pull_CRSP_treasury.py",
             ],
             "clean": [],
@@ -300,6 +333,51 @@ def task_pull():
 def task_format():
     """Pull selected data_sources based on config.toml configuration"""
 
+    data_module = "cds_bond_basis"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/merge_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "Red_Data.parquet",
+                DATA_DIR / data_module / "Final_data.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/merge_cds_bond.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "cds_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": "calc_cds_returns",
+            "actions": [
+                f"python ./src/{data_module}/calc_cds_returns.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "markit_cds_returns.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_cds_returns.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "corp_bond_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet"],
+            "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
+            "clean": [],
+        }
+
     data_module = "fed_yield_curve"
     if module_requirements[data_module]:
         yield {
@@ -313,6 +391,21 @@ def task_format():
             "file_dep": [
                 f"./src/{data_module}/pull_fed_yield_curve.py",
                 f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "futures_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_futures_returns.py --DATA_DIR={DATA_DIR / data_module}",
+                # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [DATA_DIR / data_module / "futures_returns.parquet"],
+            "file_dep": [
+                f"./src/{data_module}/calc_futures_returns.py",
             ],
             "clean": [],
         }
@@ -358,6 +451,23 @@ def task_format():
             "clean": [],
         }
 
+    data_module = "us_treasury_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_treasury_run_status.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "issue_dates.parquet",
+                DATA_DIR / data_module / "treasuries_with_run_status.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_treasury_run_status.py",
+            ],
+            "clean": [],
+        }
+
     # if data_sources["wrds_bank_premium"]:
     #     data_module = "wrds_bank_premium"
     #     yield {
@@ -394,54 +504,6 @@ def task_format():
                 f"./src/{data_module}/create_ftsfr_datasets.py",
                 f"./src/{data_module}/pull_CRSP_Compustat.py",
                 f"./src/{data_module}/calc_Fama_French_1993.py",
-            ],
-            "clean": [],
-        }
-
-        # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
-        # The code right now only pulls them separately.
-
-    data_module = "corp_bond_returns"
-    if module_requirements[data_module]:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
-            ],
-            "targets": [DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet"],
-            "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
-            "clean": [],
-        }
-
-    data_module = "cds_returns"
-    if module_requirements[data_module]:
-        yield {
-            "name": "calc_cds_returns",
-            "actions": [
-                f"python ./src/{data_module}/calc_cds_returns.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "markit_cds_returns.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/calc_cds_returns.py",
-            ],
-            "clean": [],
-        }
-
-    data_module = "cds_bond_basis"
-    if module_requirements[data_module]:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/NEW_MERGE_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "Red_Data.parquet",
-                DATA_DIR / data_module / "Final_data.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/NEW_MERGE_cds_bond.py",
             ],
             "clean": [],
         }
@@ -514,13 +576,13 @@ def task_assemble_results():
 
 
 notebook_tasks = {
-    # "summary_cds_bond_basis_ipynb": {
-    #     "path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
-    #     "file_dep": [
-    #         "./src/cds_bond_basis/NEW_MERGE_cds_bond.py",
-    #     ],
-    #     "targets": [],
-    # },
+    "summary_cds_bond_basis_ipynb": {
+        "path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
+        "file_dep": [
+            "./src/cds_bond_basis/merge_cds_bond.py",
+        ],
+        "targets": [],
+    },
     "summary_corp_bond_returns_ipynb": {
         "path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
         "file_dep": [
@@ -581,6 +643,11 @@ def task_run_notebooks():
 
 def task_create_data_glimpses():
     """Create data glimpses"""
+    # Get all files in the src directory recursively
+    src_files = list(Path("./src").rglob("*"))
+    # Filter to only include actual files (not directories)
+    src_files = [str(f) for f in src_files if f.is_file()]
+
     return {
         "actions": [
             # "python ./src/create_data_glimpses.py",
@@ -590,7 +657,7 @@ def task_create_data_glimpses():
         "targets": [
             "./docs_src/data_glimpses.md",
         ],
-        "file_dep": ["./src/create_data_glimpses.py"],
+        "file_dep": src_files,
     }
 
 
@@ -602,6 +669,11 @@ def task_compile_sphinx_docs():
         notebook_tasks[notebook]["path"] for notebook in notebook_tasks.keys()
     ]
 
+    # Get all file dependencies from notebook_tasks
+    notebook_deps = [
+        dep for notebook in notebook_tasks.values() for dep in notebook["file_dep"]
+    ]
+
     file_dep = [
         "./docs_src/logo.png",
         "./docs_src/conf.py",
@@ -610,6 +682,7 @@ def task_compile_sphinx_docs():
         "./docs_src/myst_markdown_demos.md",
         "./docs_src/data_glimpses.md",
         *notebook_paths,
+        *notebook_deps,
     ]
 
     def touch_file():

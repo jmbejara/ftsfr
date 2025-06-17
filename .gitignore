@@ -255,3 +255,5 @@ src/z_scratch_project_template.ipynb
 src/z_scratch_pipeline_template.ipynb
 
 reports/draft_ftsfr.pdf
+
+models/ffnn/lightning_logs/

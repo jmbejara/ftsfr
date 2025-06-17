@@ -366,7 +366,7 @@ def load_CRSP_treasury_daily(data_dir=DATA_DIR):
         DataFrame containing daily CRSP Treasury data. See pull_CRSP_treasury_daily
         docstring for details on the columns.
     """
-    path = data_dir / "TFZ_DAILY.parquet"
+    path = data_dir / "CRSP_TFZ_DAILY.parquet"
     df = pd.read_parquet(path)
     return df
 
@@ -385,7 +385,7 @@ def load_CRSP_treasury_info(data_dir=DATA_DIR):
         DataFrame containing Treasury issue information. See pull_CRSP_treasury_info
         docstring for details on the columns.
     """
-    path = data_dir / "TFZ_INFO.parquet"
+    path = data_dir / "CRSP_TFZ_INFO.parquet"
     df = pd.read_parquet(path)
     return df
 
@@ -409,19 +409,20 @@ def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
         column indicating the runness measure for each security.
     """
     if with_runness:
-        path = data_dir / "TFZ_with_runness.parquet"
+        path = data_dir / "CRSP_TFZ_with_runness.parquet"
     else:
-        path = data_dir / "TFZ_consolidated.parquet"
+        path = data_dir / "CRSP_TFZ_consolidated.parquet"
     df = pd.read_parquet(path)
     return df
 
 
 def _demo():
-    df = pull_CRSP_treasury_daily(data_dir=DATA_DIR)
+    DATA_DIR = Path(config("DATA_DIR")) / "us_treasury_returns"
+    df = load_CRSP_treasury_daily(data_dir=DATA_DIR)
     df.info()
-    df = pull_CRSP_treasury_info(data_dir=DATA_DIR)
+    df = load_CRSP_treasury_info(data_dir=DATA_DIR)
     df.info()
-    df = pull_CRSP_treasury_consolidated(data_dir=DATA_DIR)
+    df = load_CRSP_treasury_consolidated(data_dir=DATA_DIR)
     df.info()
     df = calc_runness(df)
     df.info()
