@@ -3,6 +3,8 @@ Fetches and loads raw foreign exchange data from Bloomberg or Excel.
 
 This module handles only data retrieval and storage. All calculations
 (CIP spreads, reciprocal conversions, etc.) are handled in calc_cip.py.
+
+This code is adapted with permission from https://github.com/Kunj121/CIP
 """
 
 import sys
@@ -10,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import pandas as pd
-from xbbg import blp
+import polars as pl
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
@@ -36,6 +38,8 @@ def pull_fx_data(start_date="1950-01-01", end_date=END_DATE):
         - 'forward_rates': 3M forward rates
         - 'interest_rates': Interest rates (OIS)
     """
+    # import here to enchance compatibility with devices that don't support xbbg
+    from xbbg import blp
 
     # Tickers for interest rates (OIS)
     interest_rate_tickers = [
@@ -117,25 +121,76 @@ def pull_fx_data(start_date="1950-01-01", end_date=END_DATE):
         "interest_rates": interest_rates_df,
     }
 
+
 def load_fx_spot_rates(data_dir=DATA_DIR):
-    """Load spot exchange rates from parquet file."""
+    """Load spot exchange rates from parquet file.
+    df = load_fx_spot_rates(data_dir=DATA_DIR)
+    df = pl.from_pandas(df)
+    df.glimpse(max_items_per_column=1)
+    Rows: 14207
+    Columns: 9
+    $ index                   <date> 1971-01-04
+    $ AUD CMPN Curncy_PX_LAST  <f64> 1.1127
+    $ CAD CMPN Curncy_PX_LAST  <f64> 1.0109
+    $ CHF CMPN Curncy_PX_LAST  <f64> 4.318
+    $ EUR CMPN Curncy_PX_LAST  <f64> None
+    $ GBP CMPN Curncy_PX_LAST  <f64> 2.3938
+    $ JPY CMPN Curncy_PX_LAST  <f64> 357.73
+    $ NZD CMPN Curncy_PX_LAST  <f64> 1.1138
+    $ SEK CMPN Curncy_PX_LAST  <f64> 5.1643
+    """
     path = data_dir / "fx_spot_rates.parquet"
     return pd.read_parquet(path)
 
 
 def load_fx_forward_points(data_dir=DATA_DIR):
-    """Load 3M forward points from parquet file."""
+    """Load 3M forward points from parquet file.
+
+    df = load_fx_forward_points(data_dir=DATA_DIR)
+    df = pl.from_pandas(df)
+    df.glimpse(max_items_per_column=1)
+    Rows: 10376
+    Columns: 9
+    $ index                     <date> 1983-12-13
+    $ AUD3M CMPN Curncy_PX_LAST  <f64> 21.4
+    $ CAD3M CMPN Curncy_PX_LAST  <f64> None
+    $ CHF3M CMPN Curncy_PX_LAST  <f64> None
+    $ EUR3M CMPN Curncy_PX_LAST  <f64> None
+    $ GBP3M CMPN Curncy_PX_LAST  <f64> None
+    $ JPY3M CMPN Curncy_PX_LAST  <f64> None
+    $ NZD3M CMPN Curncy_PX_LAST  <f64> None
+    $ SEK3M CMPN Curncy_PX_LAST  <f64> None
+    """
     path = data_dir / "fx_forward_points.parquet"
     return pd.read_parquet(path)
 
 
 def load_fx_interest_rates(data_dir=DATA_DIR):
-    """Load interest rates (OIS) from parquet file."""
+    """Load interest rates (OIS) from parquet file.
+
+    df = load_fx_interest_rates(data_dir=DATA_DIR)
+    df = pl.from_pandas(df)
+    df.glimpse(max_items_per_column=1)
+    Rows: 6867
+    Columns: 10
+    $ index                      <date> 1999-02-08
+    $ ADSOC CMPN Curncy_PX_LAST   <f64> None
+    $ CDSOC CMPN Curncy_PX_LAST   <f64> None
+    $ SFSNTC CMPN Curncy_PX_LAST  <f64> None
+    $ EUSWEC CMPN Curncy_PX_LAST  <f64> 3.102
+    $ BPSWSC CMPN Curncy_PX_LAST  <f64> None
+    $ JYSOC CMPN Curncy_PX_LAST   <f64> None
+    $ NDSOC CMPN Curncy_PX_LAST   <f64> None
+    $ SKSWTNC BGN Curncy_PX_LAST  <f64> None
+    $ USSOC CMPN Curncy_PX_LAST   <f64> None
+
+    """
     path = data_dir / "fx_interest_rates.parquet"
     return pd.read_parquet(path)
 
 
 if __name__ == "__main__":
+    # DATA_DIR = DATA_DIR / "foreign_exchange"
     # Pull data from source
     fx_data = pull_fx_data()
 

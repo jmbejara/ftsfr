@@ -299,6 +299,8 @@ def load_cip_spreads(data_dir=DATA_DIR):
 
 
 if __name__ == "__main__":
+    # DATA_DIR = DATA_DIR / "foreign_exchange"
+    df = pull_bbg_foreign_exchange.load_fx_spot_rates(data_dir=DATA_DIR)
     # Calculate CIP spreads
     cip_spreads = calculate_cip(end_date='2025-03-01', plot=True)
     

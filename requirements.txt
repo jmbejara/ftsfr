@@ -1,6 +1,5 @@
 # mistralai
 arch==7.1.0
-blpapi --index-url https://blpapi.bloomberg.com/repository/releases/python/simple/
 datetime==3.0.3
 doit
 ipynb-py-convert
