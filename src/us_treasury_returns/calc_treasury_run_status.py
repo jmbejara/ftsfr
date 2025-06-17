@@ -1,3 +1,37 @@
+"""
+calc_treasury_run_status.py
+
+Identifies on-the-run U.S. Treasury securities for each date and term.
+
+This module processes treasury auction data to determine which Treasury notes and bonds
+are "on-the-run" (the most recently issued securities) versus "off-the-run" (older issues)
+for each trading date. On-the-run securities are important benchmarks in fixed income
+markets as they typically have the highest liquidity and are used for pricing other securities.
+
+Inputs:
+    - treasury_auction_stats.parquet: Contains U.S. Treasury auction data with columns:
+        - cusip: Security identifier
+        - issueDate: Date the security was issued
+        - maturityDate: Date the security matures
+        - type: Security type (Note, Bond, etc.)
+        - term: Security term/maturity length
+        - totalTendered: Total amount tendered in the auction
+        - totalAccepted: Total amount accepted in the auction
+
+Outputs:
+    - issue_dates.parquet: Aggregated total tendered and accepted amounts by issue date
+    - treasuries_with_run_status.parquet: Daily snapshot of on-the-run securities with columns:
+        - date: Trading date
+        - run: 0 for on-the-run, incrementing for older issues
+        - term: Security term
+        - type: Security type (Note or Bond)
+        - cusip: Security identifier
+
+The module filters for Note and Bond types only, excluding Bills and other security types.
+For each date, it identifies the most recently issued security that hasn't matured yet
+for each term/type combination.
+"""
+
 import sys
 from pathlib import Path
 
@@ -19,7 +53,7 @@ def process_issue_date(df):
     returns a DataFrame with totalTendered and totalAccepted for each issueDate.
 
     Args:
-        df (DataFrame): treasury_auction_stats.csv
+        df (DataFrame): treasury_auction_stats.parquet
     """
 
     return df.groupby("issueDate").sum(numeric_only=True)[
@@ -95,16 +129,17 @@ def process_ontherun(df, start_date="1800-01-01"):
 
 
 if __name__ == "__main__":
+    # DATA_DIR = DATA_DIR / "us_treasury_returns"
     data_dir = DATA_DIR
     data_dir.mkdir(parents=True, exist_ok=True)
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=pd.errors.DtypeWarning)
-        # dat = pd.read_csv(
-        #     data_dir / "treasury_auction_stats.csv",
-        #     parse_dates=["issueDate", "maturityDate"],
-        # )
-        dat = pd.read_parquet(data_dir / "treasury_auction_stats.parquet")
+    # with warnings.catch_warnings():
+    #     warnings.filterwarnings("ignore", category=pd.errors.DtypeWarning)
+    #     dat = pd.read_csv(
+    #         data_dir / "treasury_auction_stats.csv",
+    #         parse_dates=["issueDate", "maturityDate"],
+    #     )
+    dat = pd.read_parquet(data_dir / "treasury_auction_stats.parquet")
 
     sub_cols = [
         "cusip",
@@ -120,7 +155,7 @@ if __name__ == "__main__":
     # dat = dat[sub_cols]
 
     issue_dates = process_issue_date(dat)
-    issue_dates.to_csv(data_dir / "issue_dates.csv")
+    issue_dates.to_parquet(data_dir / "issue_dates.parquet")
 
     preload = process_ontherun(dat)
-    preload.to_csv(data_dir / "ontherun.csv", index=False)
+    preload.to_parquet(data_dir / "treasuries_with_run_status.parquet", index=False)

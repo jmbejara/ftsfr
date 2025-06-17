@@ -250,13 +250,10 @@ def task_pull():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_treasury_auction_stats.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/calculate_ontherun.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/pull_CRSP_treasury.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_auction_stats.parquet",
-                DATA_DIR / data_module / "issue_dates.csv",
-                DATA_DIR / data_module / "ontherun.csv",
                 DATA_DIR / data_module / "CRSP_TFZ_DAILY.parquet",
                 DATA_DIR / data_module / "CRSP_TFZ_INFO.parquet",
                 DATA_DIR / data_module / "CRSP_TFZ_CONSOLIDATED.parquet",
@@ -264,7 +261,6 @@ def task_pull():
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_treasury_auction_stats.py",
-                f"./src/{data_module}/calculate_ontherun.py",
                 f"./src/{data_module}/pull_CRSP_treasury.py",
             ],
             "clean": [],
@@ -313,6 +309,51 @@ def task_pull():
 def task_format():
     """Pull selected data_sources based on config.toml configuration"""
 
+    data_module = "cds_bond_basis"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/merge_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "Red_Data.parquet",
+                DATA_DIR / data_module / "Final_data.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/merge_cds_bond.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "cds_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": "calc_cds_returns",
+            "actions": [
+                f"python ./src/{data_module}/calc_cds_returns.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "markit_cds_returns.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_cds_returns.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "corp_bond_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet"],
+            "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
+            "clean": [],
+        }
+
     data_module = "fed_yield_curve"
     if module_requirements[data_module]:
         yield {
@@ -338,15 +379,12 @@ def task_format():
                 f"python ./src/{data_module}/calc_futures_returns.py --DATA_DIR={DATA_DIR / data_module}",
                 # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
-            "targets": [
-                DATA_DIR / data_module / "futures_returns.parquet"
-            ],
+            "targets": [DATA_DIR / data_module / "futures_returns.parquet"],
             "file_dep": [
                 f"./src/{data_module}/calc_futures_returns.py",
             ],
             "clean": [],
         }
-
 
     # if data_sources["ken_french_data_library"]:
     #     from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
@@ -389,6 +427,23 @@ def task_format():
             "clean": [],
         }
 
+    data_module = "us_treasury_returns"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_treasury_run_status.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "issue_dates.parquet",
+                DATA_DIR / data_module / "treasuries_with_run_status.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_treasury_run_status.py",
+            ],
+            "clean": [],
+        }
+
     # if data_sources["wrds_bank_premium"]:
     #     data_module = "wrds_bank_premium"
     #     yield {
@@ -425,54 +480,6 @@ def task_format():
                 f"./src/{data_module}/create_ftsfr_datasets.py",
                 f"./src/{data_module}/pull_CRSP_Compustat.py",
                 f"./src/{data_module}/calc_Fama_French_1993.py",
-            ],
-            "clean": [],
-        }
-
-        # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
-        # The code right now only pulls them separately.
-
-    data_module = "corp_bond_returns"
-    if module_requirements[data_module]:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
-            ],
-            "targets": [DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet"],
-            "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
-            "clean": [],
-        }
-
-    data_module = "cds_returns"
-    if module_requirements[data_module]:
-        yield {
-            "name": "calc_cds_returns",
-            "actions": [
-                f"python ./src/{data_module}/calc_cds_returns.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "markit_cds_returns.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/calc_cds_returns.py",
-            ],
-            "clean": [],
-        }
-
-    data_module = "cds_bond_basis"
-    if module_requirements[data_module]:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/merge_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "Red_Data.parquet",
-                DATA_DIR / data_module / "Final_data.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/merge_cds_bond.py",
             ],
             "clean": [],
         }
@@ -616,7 +623,7 @@ def task_create_data_glimpses():
     src_files = list(Path("./src").rglob("*"))
     # Filter to only include actual files (not directories)
     src_files = [str(f) for f in src_files if f.is_file()]
-    
+
     return {
         "actions": [
             # "python ./src/create_data_glimpses.py",
