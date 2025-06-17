@@ -1,6 +1,6 @@
 # Data Glimpses Report
-Generated: 2025-06-17 09:23:17
-Total files: 57
+Generated: 2025-06-17 17:23:11
+Total files: 55
 
 ## Summary of Datasets by Task
 
@@ -25,8 +25,6 @@ Total files: 57
 - [`corp_bond_portfolio_returns.parquet`](#corp-bond-portfolio-returns-parquet)
 #### Format: Fed Yield Curve
 - [`ftsfr_treas_yield_curve_zero_coupon.parquet`](#ftsfr-treas-yield-curve-zero-coupon-parquet)
-#### Format: Futures Returns
-- [`futures_returns.parquet`](#futures-returns-parquet)
 #### Format: Nyu Call Report
 - [`ftsfr_nyu_call_report_cash_liquidity.parquet`](#ftsfr-nyu-call-report-cash-liquidity-parquet)
 - [`ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`](#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet)
@@ -56,8 +54,6 @@ Total files: 57
 - [`treasury_bond_returns.parquet`](#treasury-bond-returns-parquet)
 #### Pull: Fed Yield Curve
 - [`fed_yield_curve.parquet`](#fed-yield-curve-parquet)
-#### Pull: Futures Returns
-- [`wrds_futures.parquet`](#wrds-futures-parquet)
 #### Pull: He Kelly Manela
 - [`He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv`](#he-kelly-manela-factors-and-test-assets-monthly-csv)
 - [`He_Kelly_Manela_Factors_daily.csv`](#he-kelly-manela-factors-daily-csv)
@@ -878,50 +874,6 @@ value                                    Float64         (25.7% null)
 ### Numeric Column Statistics
 ```
 value: min=0.0554, max=16.462, mean=5.61, median=5.3232729844415
-```
-
----
-
-## futures_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/futures_returns/futures_returns.parquet`
-**Size:** 18.2 MB | **Type:** Parquet | **Shape:** 4,921,751 rows × 5 columns
-
-### Columns
-```
-futcode                                  Float64        
-date                                     Datetime(time_unit='ns', time_zone=None)
-settlement                               Float64         (0.1% null)
-contrdate                                String         
-product_code                             Int64          
-```
-
-### Numeric Column Statistics
-```
-futcode: min=37.0, max=487137.0, mean=204053.20, median=180720.0
-settlement: min=-37.630005, max=24480.0, mean=591.56, median=59.699997
-product_code: min=289, max=3847, mean=2121.62, median=2060.0
-```
-
----
-
-## wrds_futures.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/futures_returns/wrds_futures.parquet`
-**Size:** 18.2 MB | **Type:** Parquet | **Shape:** 4,921,751 rows × 5 columns
-
-### Columns
-```
-futcode                                  Float64        
-date                                     Datetime(time_unit='ns', time_zone=None)
-settlement                               Float64         (0.1% null)
-contrdate                                String         
-product_code                             Int64          
-```
-
-### Numeric Column Statistics
-```
-futcode: min=37.0, max=487137.0, mean=204053.20, median=180720.0
-settlement: min=-37.630005, max=24480.0, mean=591.56, median=59.699997
-product_code: min=289, max=3847, mean=2121.62, median=2060.0
 ```
 
 ---
