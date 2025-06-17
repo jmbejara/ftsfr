@@ -1,26 +1,18 @@
-"""
-Feed forward neural network(FFNN) using GluonTS.
-
-Performs both local and global forecasting using FFNN. Reports both mean and
-median MASE for local forecasts and a single global MASE.
-"""
 from pathlib import Path
 from warnings import filterwarnings
 
-filterwarnings("ignore")
-
 import toml
-from tqdm import tqdm
-import numpy as np
 from decouple import config
 
-from gluonts.torch import SimpleFeedForwardEstimator
+from gluonts.torch.model.simple_feedforward import SimpleFeedForwardEstimator
 from gluonts.dataset.common import ListDataset
 from gluonts.dataset.field_names import FieldName
 from gluonts.evaluation.backtest import make_evaluation_predictions
 from gluonts.evaluation import Evaluator
 
 import pandas as pd
+
+filterwarnings("ignore")
 
 # The name of the column containing time series values
 VALUE_COL_NAME = "value"
@@ -37,24 +29,27 @@ SEASONALITY_MAP_ADAPT = {
    "1B": 5,
    "1W": 365.25/7,
    "1M": 12,
-   "1ME": 12,
    "1Q": 4,
    "1Y": 1
 }
 
-def get_ffnn_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, external_forecast_horizon = None):
+def get_deep_nn_forecasts(lag, proc_df, external_forecast_horizon = None):
     """
-    Takes processed DataFrame, runs the training for a FFNN model, and returns MASE
+    Takes PKL file and writes the results into respective files
 
-    :param lag: the number of past lags that should be used when predicting the 
-    future value of time series
-    :param df: the processed DataFrame for training and evaluating
-    :param frequency: the frequency of the time series
-    :param external_forecast_horizon: the required forecast horizon
-
-    :returns MASE
+    :param dataset_name: the name of the dataset
+    :param lag: the number of past lags that should be used when predicting the next future value of time series
+    :param input_file_name: name of the .tsf file corresponding with the dataset
+    :param method: name of the forecasting method that you want to evaluate
+    :param external_forecast_horizon: the required forecast horizon, if it is not available in the .tsf file
+    :param integer_conversion: whether the forecasts should be rounded or not
     
     """
+
+    # raw_df = pd.read_parquet(input_file_name)
+    # df = raw_df.groupby(TIME_COL_NAME).agg(lambda x: pd.array(x)).reset_index()
+
+    df = proc_df
 
     train_series_list = []
     test_series_list = []
@@ -62,15 +57,12 @@ def get_ffnn_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, exter
     test_series_full_list = []
 
     # Automatic frequency inference
-    if not frequency:
-        _offset = pd.infer_freq(df[TIME_COL_NAME])
-        if _offset == "min":
-            freq = '10' + "min"
-        # 1M makes FRED work
-        else:
-            freq = '1' + _offset if _offset else "1ME"
+    _offset = pd.infer_freq(df[TIME_COL_NAME])
+    if _offset == "min":
+        freq = '10' + "min"
+    # 1M makes FRED work
     else:
-        freq = frequency
+        freq = '1' + _offset if _offset else "1M"
 
     seasonality = SEASONALITY_MAP_ADAPT[freq]
 
@@ -87,9 +79,8 @@ def get_ffnn_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, exter
         series_data = row[VALUE_COL_NAME]
 
         # Creating training and test series. Test series will be only used during evaluation
-        train_index = int(test_ratio * len(series_data))
-        train_series_data = series_data[:train_index]
-        test_series_data = series_data[train_index:]
+        train_series_data = series_data[:len(series_data) - forecast_horizon]
+        test_series_data = series_data[(len(series_data) - forecast_horizon) : len(series_data)]
 
         train_series_list.append(train_series_data)
         test_series_list.append(test_series_data)
@@ -127,102 +118,41 @@ def get_ffnn_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, exter
 
     return agg_metrics["MASE"]
 
-def get_ffnn_forecasts_local(lag, df, frequency, external_forecast_horizon = None):
-    """
-    Takes processed DataFrame containing multiple or single time series, runs 
-    the training for a separate FFNN model on each series, and returns MASE
 
-    :param lag: the number of past lags that should be used when predicting the 
-    next future value of time series
-    :param df: the processed DataFrame for training and evaluating
-    :param frequency: frequency of the series which needs to be the same for all 
-    the series in df
-    :param external_forecast_horizon: the required forecast horizon
-    
-    """
+DATA_DIR = config(
+    "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
+)
+OUTPUT_DIR = config(
+    "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
+)
+datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
 
-    # Process each entity separately
-    entities = df["entity"].unique()
-    mase_values = []
+file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
+raw_df = pd.read_parquet(file_path)
 
-    print(f"Running FFNN forecasting for {len(entities)} entities...")
+proc_df = raw_df.groupby('entity').agg(lambda x: pd.array(x)).reset_index()
+proc_df['date'] = proc_df['date'].iloc[0][0]
 
-    for entity in tqdm(entities):
-        # Filter data for the current entity
-        entity_data = df[df["entity"] == entity]
+# Define forecasting parameters
+test_ratio = 0.2  # Use last 20% of the data for testing
+forecast_horizon = 20  # 20 business days, 4 weeks, about a month
+seasonality = 5  # 5 for weekly patterns (business days)
 
-        # Generate forecasts using ARIMA
-        entity_mase = get_ffnn_forecasts_global(lag=lag,
-                                                df=entity_data,
-                                                test_ratio=test_ratio,
-                                                frequency=frequency,
-                                                external_forecast_horizon=external_forecast_horizon)
+mean_mase = get_deep_nn_forecasts(100, proc_df, 1)
 
-        if not np.isnan(entity_mase):
-            mase_values.append(entity_mase)
-    
-    return mase_values
+print("FFNN Forecasting Results:")
+print(f"Mean MASE: {mean_mase:.4f}")
 
 
-if __name__ == "__main__":
-
-    DATA_DIR = config(
-        "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
-    )
-    OUTPUT_DIR = config(
-        "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
-    )
-    datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
-
-    file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
-    raw_df = pd.read_parquet(file_path)
-
-    proc_df = raw_df.groupby('entity').agg(lambda x: pd.array(x)).reset_index()
-    proc_df['date'] = proc_df['date'].iloc[0][0]
-    proc_df['value'] = proc_df['value'].apply(lambda x: x.to_numpy())
-
-    # Define forecasting parameters
-    test_ratio = 0.2            # Use last 20% of the data for testing
-    forecast_horizon = 20       # 20 business days, 4 weeks, about a month
-    seasonality = 5             # 5 for weekly patterns (business days)
-
-    # Process each entity separately
-    entities = proc_df["entity"].unique()
-    mase_values = get_ffnn_forecasts_local(lag = 50, 
-                                           df = proc_df,
-                                           frequency = "1B",
-                                           external_forecast_horizon = forecast_horizon)
-    
-    # Calculate mean MASE across all entities
-    mean_mase = np.mean(mase_values)
-    median_mase = np.median(mase_values)
-
-    # Global Forecasting
-
-    global_mase = get_ffnn_forecasts_global(lag = 50,
-                                            df = proc_df,
-                                            test_ratio = 0.2,
-                                            frequency = "1B",
-                                            external_forecast_horizon = forecast_horizon)
-
-    # Printing and saving results
-
-    print("\nFFNN Forecasting Results:")
-    print(f"Number of entities successfully forecasted: {len(mase_values)}")
-    print(f"Mean MASE: {mean_mase:.4f}")
-    print(f"Median MASE: {median_mase:.4f}")
-    print(f"Global MASE: {global_mase:.4f}")
+results_df = pd.DataFrame(
+    {
+        "model": ["FFNN"],
+        "seasonality": [seasonality],
+        "mean_mase": [mean_mase],
+        # "median_mase": [median_mase],
+        # "entity_count": [len(mase_values)],
+    }
+)
 
 
-    results_df = pd.DataFrame(
-        {
-            "model": ["FFNN"],
-            "seasonality": [seasonality],
-            "mean_mase": [mean_mase],
-            "median_mase": [median_mase],
-            "entity_count": [len(mase_values)],
-            "global_mase": [global_mase],
-        }
-    )
-
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "ffnn_results.csv", index=False)
+results_df.to_csv(OUTPUT_DIR / "raw_results" / "ffnn_results.csv", index=False)
