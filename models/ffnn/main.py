@@ -4,7 +4,7 @@ from warnings import filterwarnings
 import toml
 from decouple import config
 
-from gluonts.mx.model.simple_feedforward import SimpleFeedForwardEstimator
+from gluonts.torch.model.simple_feedforward import SimpleFeedForwardEstimator
 from gluonts.dataset.common import ListDataset
 from gluonts.dataset.field_names import FieldName
 from gluonts.evaluation.backtest import make_evaluation_predictions
@@ -140,7 +140,7 @@ seasonality = 5  # 5 for weekly patterns (business days)
 
 mean_mase = get_deep_nn_forecasts(100, proc_df, 1)
 
-print("\FFNN Forecasting Results:")
+print("FFNN Forecasting Results:")
 print(f"Mean MASE: {mean_mase:.4f}")
 
 
