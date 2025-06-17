@@ -76,14 +76,38 @@ def task_config():
 
 data_sources = config_toml["data_sources"].copy()
 
+# Check if we're being called by create_data_glimpses.py
+is_data_glimpses = any("create_data_glimpses" in arg for arg in sys.argv)
+
+# Skip Bloomberg Terminal prompt when being imported by create_data_glimpses.py
+if data_sources["bloomberg_terminal"] and not is_data_glimpses:
+    # Interactive check for Bloomberg Terminal
+    while True:
+        response = input("Is the Bloomberg Terminal open in the background? (YES/no/skip): ").strip().lower()
+        if response in ["yes", ""]:  # Fixed: should be 'in' not '=='
+            print("Proceeding with Bloomberg Terminal enabled...")
+            break
+        elif response == "no":
+            print("Aborting. Please open the Bloomberg Terminal and keep it running in the background.")
+            sys.exit(1)
+        elif response == "skip":
+            print("Skipping Bloomberg Terminal data sources...")
+            data_sources["bloomberg_terminal"] = False
+            break
+        else:
+            print("Please enter 'yes', 'no', or 'skip'.")
+elif data_sources["bloomberg_terminal"] and is_data_glimpses:
+    # When called by create_data_glimpses.py, automatically skip Bloomberg Terminal sources
+    data_sources["bloomberg_terminal"] = False
+
 # fmt: off
 module_requirements = {}
 module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
 module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
 module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
 module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
-module_requirements["foreign_exchange"] = data_sources["wrds_crsp_compustat"] and data_sources["wrds_fx"]
-module_requirements["futures_returns"] = data_sources["wrds_datastream"]
+module_requirements["foreign_exchange"] = data_sources["bloomberg_terminal"] and data_sources["wrds_fx"]
+module_requirements["futures_returns"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
 module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
 module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
 module_requirements["nyu_call_report"] = data_sources["nyu_call_report"]
