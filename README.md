@@ -4,24 +4,31 @@ You can view the current version of the website here: https://jeremybejarano.com
 
 ## Agenda
 
+All
+ - Timeline (finish by end of July)
+ - GitHub Contributions
+ - Interactive work, using DATA_DIR
+ - How to incorporate Bloomberg: Done https://github.com/jmbejara/ftsfr/issues/14
+
 Alex and Vincent
- - https://github.com/jmbejara/ftsfr/issues/13
- - Still relevant? https://github.com/jmbejara/ftsfr/issues/6
+ - Daignose discrepancy: https://github.com/jmbejara/ftsfr/issues/20
+ - Bloomberg data now available in foreign_exchange/pull_bbg_foreign_exchange.py https://github.com/jmbejara/ftsfr/issues/18
  - https://github.com/Kunj121/CIP FX and then CIP? (I received permission). Blocked by Jeremy, needs to do Bloomberg stuff.
+ - Can close? https://github.com/jmbejara/ftsfr/issues/13
+ - Status? https://github.com/jmbejara/ftsfr/issues/3
 
 
 Kausthub
- - https://github.com/jmbejara/ftsfr/issues/11
- - https://github.com/jmbejara/ftsfr/issues/17
+ - Status? https://github.com/jmbejara/ftsfr/issues/11
+ - Status? https://github.com/jmbejara/ftsfr/issues/9
  - Treasuries and Corporate Bonds done? Sovereign Bonds next?
 
 Yangge
- - https://github.com/jmbejara/ftsfr/issues/8
- - https://github.com/jmbejara/ftsfr/issues/5
+ - Present issues raised in https://github.com/jmbejara/ftsfr/issues/21
  - Commodity returns? https://github.com/kyleparran/final_project_group_09 (I received permission)
 
 Jeremy
- - Do Bloomberg stuff for Alex and Vincent.
+ - Check this again? https://github.com/jmbejara/ftsfr/issues/2
 
 
 This repository contains a collection of financial time-series forecasting models. It produces esting a benchmark for prac
@@ -66,6 +73,10 @@ Install packages:
 
 ```bash
 pip install -r requirements.txt
+```
+If you have a Bloomberg Terminal, you can install the Bloomberg API using the following command:
+```bash
+blpapi --index-url https://blpapi.bloomberg.com/repository/releases/python/simple/
 ```
 
 Then, follow the pattern in the `.env.example` file to set your environment variables in a `.env` file.
