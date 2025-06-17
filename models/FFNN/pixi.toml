@@ -1,0 +1,18 @@
+[workspace]
+channels = ["conda-forge"]
+name = "arima-forecasting"
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[tasks]
+main = "python main.py"
+
+[dependencies]
+python = "3.13.*"
+python-decouple = "*"
+toml = "*"
+pandas = "*"
+numpy = "*"
+pyarrow = "*"
+gfortran = "*"
+gluonts = "*"
+mxnet = "*"
