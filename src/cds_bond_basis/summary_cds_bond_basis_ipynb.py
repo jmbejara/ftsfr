@@ -60,8 +60,8 @@ from settings import config
 # %autoreload 2
 
 # %%
-DATA_DIR = Path(config("DATA_DIR"))
-# DATA_DIR = "../../../FS-project_files"
+#DATA_DIR = Path(config("DATA_DIR"))
+DATA_DIR = "../../../FS-project_files"
 
 # %%
 """
