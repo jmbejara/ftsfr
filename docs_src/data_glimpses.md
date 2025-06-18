@@ -1,6 +1,6 @@
 # Data Glimpses Report
-Generated: 2025-06-17 17:23:11
-Total files: 55
+Generated: 2025-06-17 22:03:28
+Total files: 57
 
 ## Summary of Datasets by Task
 
@@ -54,6 +54,9 @@ Total files: 55
 - [`treasury_bond_returns.parquet`](#treasury-bond-returns-parquet)
 #### Pull: Fed Yield Curve
 - [`fed_yield_curve.parquet`](#fed-yield-curve-parquet)
+#### Pull: Foreign Exchange
+- [`fx_daily_data.parquet`](#fx-daily-data-parquet)
+- [`fx_monthly_data.parquet`](#fx-monthly-data-parquet)
 #### Pull: He Kelly Manela
 - [`He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv`](#he-kelly-manela-factors-and-test-assets-monthly-csv)
 - [`He_Kelly_Manela_Factors_daily.csv`](#he-kelly-manela-factors-daily-csv)
@@ -92,30 +95,30 @@ Total files: 55
 
 ## Final_data.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Final_data.parquet`
-**Size:** 1038295 bytes | **Type:** Parquet | **Shape:** 28,667 rows × 9 columns
+**Size:** 18.7 MB | **Type:** Parquet | **Shape:** 653,228 rows × 9 columns
 
 ### Columns
 ```
 cusip                                    String         
 date                                     Datetime(time_unit='ns', time_zone=None)
-mat_days                                 Float64         (6.9% null)
-BOND_YIELD                               Float64         (11.6% null)
-CS                                       Float64         (11.6% null)
-size_ig                                  Float64         (6.9% null)
-size_jk                                  Float64         (6.9% null)
-par_spread                               Float64         (6.9% null)
+mat_days                                 Float64         (5.4% null)
+BOND_YIELD                               Float64         (9.7% null)
+CS                                       Float64         (9.7% null)
+size_ig                                  Float64         (5.4% null)
+size_jk                                  Float64         (5.4% null)
+par_spread                               Float64         (5.4% null)
 __index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-mat_days: min=363.0, max=36516.0, mean=3856.70, median=2513.0
-BOND_YIELD: min=-0.2148487372494935, max=0.9514264593127048, mean=0.05, median=0.0464350605010986
-CS: min=-0.2350270544393278, max=0.9440691614682412, mean=0.02, median=0.01965415518558645
-size_ig: min=0.0, max=1.0, mean=0.76, median=1.0
+mat_days: min=360.99999999999994, max=36525.0, mean=3796.94, median=2462.0
+BOND_YIELD: min=-0.79189766622368, max=11.679347680642085, mean=0.05, median=0.0419370446205139
+CS: min=-0.8427172227775009, max=11.666247680642083, mean=0.02, median=0.0160909154748749
+size_ig: min=0.0, max=1.0, mean=0.82, median=1.0
 size_jk: min=0.0, max=1.0, mean=0.98, median=1.0
-par_spread: min=-13.051245732738076, max=45.110770582488456, mean=0.11, median=0.010004951771566519
-__index_level_0__: min=10402, max=1391541, mean=689134.38, median=699949.0
+par_spread: min=-277.079498250281, max=1307.7831991672729, mean=0.06, median=0.0075589020693470985
+__index_level_0__: min=39, max=1392383, mean=692416.28, median=696029.0
 ```
 
 ---
@@ -137,7 +140,7 @@ tier                                     String
 
 ## Red_Data.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Red_Data.parquet`
-**Size:** 20.2 MB | **Type:** Parquet | **Shape:** 1,392,507 rows × 9 columns
+**Size:** 20.2 MB | **Type:** Parquet | **Shape:** 1,392,870 rows × 9 columns
 
 ### Columns
 ```
@@ -154,11 +157,11 @@ redcode                                  String
 
 ### Numeric Column Statistics
 ```
-BOND_YIELD: min=-0.79189766622368, max=24.42611933726512, mean=0.05, median=0.04342172670364375
-CS: min=-0.8427172227775009, max=24.41471933726512, mean=0.03, median=0.01700886045541
+BOND_YIELD: min=-0.79189766622368, max=24.42611933726512, mean=0.05, median=0.0434166188240051
+CS: min=-0.8427172227775009, max=24.41471933726512, mean=0.03, median=0.0170097161030346
 size_ig: min=0.0, max=1.0, mean=0.82, median=1.0
 size_jk: min=0.0, max=1.0, mean=0.98, median=1.0
-mat_days: min=360.99999999999994, max=36525.0, mean=3766.73, median=2480.0
+mat_days: min=360.99999999999994, max=36525.0, mean=3766.07, median=2480.0
 ```
 
 ---
@@ -273,7 +276,7 @@ bondpar_mil: min=0.001, max=15000.0, mean=555.96, median=400.0
 
 ## markit_cds.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_cds.parquet`
-**Size:** 1.4 GB | **Type:** Parquet | **Shape:** 36,673,117 rows × 15 columns
+**Size:** 539.7 MB | **Type:** Parquet | **Shape:** 46,851,870 rows × 7 columns
 
 ### Columns
 ```
@@ -281,55 +284,31 @@ date                                     Datetime(time_unit='ns', time_zone=None
 ticker                                   String         
 redcode                                  String          (0.0% null)
 parspread                                Float64         (0.3% null)
-convspreard                              Float64         (20.7% null)
 tenor                                    String         
 country                                  String         
-creditdv01                               Float64         (32.8% null)
-riskypv01                                Float64         (32.8% null)
-irdv01                                   Float64         (32.8% null)
-rec01                                    Float64         (32.8% null)
-dp                                       Float64         (32.8% null)
-jtd                                      Float64         (32.8% null)
-dtz                                      Float64         (32.8% null)
 year                                     Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-parspread: min=6.57e-06, max=28.73255034, mean=0.02, median=0.00859374
-convspreard: min=6.51e-06, max=33.29895315, mean=0.02, median=0.00901274
-creditdv01: min=-129980.22, max=1450128.28, mean=4836.26, median=4708.61
-riskypv01: min=0.03, max=10.02, mean=4.54, median=4.67
-irdv01: min=-260294.91, max=1449338.67, mean=181.02, median=36.01
-rec01: min=-838629.15, max=2833213.38, mean=12284.17, median=7825.39
-dp: min=1.170670425e-05, max=1.0, mean=0.14, median=0.07792383818339
-jtd: min=4114.93, max=12774322.14, mean=6670226.42, median=6337462.6
-dtz: min=104114.93, max=14849492.24, mean=10524286.74, median=10252921.47
-year: min=2001, max=2023, mean=2013.61, median=2014.0
+parspread: min=6.57e-06, max=491.84276269, mean=0.02, median=0.00783918991183272
+year: min=2001, max=2023, mean=2011.46, median=2010.0
 ```
 
 ---
 
 ## markit_cds_subsetted_to_crsp.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_cds_subsetted_to_crsp.parquet`
-**Size:** 1.0 GB | **Type:** Parquet | **Shape:** 25,702,715 rows × 20 columns
+**Size:** 488.7 MB | **Type:** Parquet | **Shape:** 36,382,787 rows × 12 columns
 
 ### Columns
 ```
 date                                     Datetime(time_unit='ns', time_zone=None) (0.0% null)
 ticker                                   String          (0.0% null)
 redcode                                  String         
-parspread                                Float64         (0.3% null)
-convspreard                              Float64         (20.1% null)
+parspread                                Float64         (0.2% null)
 tenor                                    String          (0.0% null)
 country                                  String          (0.0% null)
-creditdv01                               Float64         (30.1% null)
-riskypv01                                Float64         (30.1% null)
-irdv01                                   Float64         (30.1% null)
-rec01                                    Float64         (30.1% null)
-dp                                       Float64         (30.1% null)
-jtd                                      Float64         (30.1% null)
-dtz                                      Float64         (30.1% null)
 year                                     Float64         (0.0% null)
 permno                                   Float64        
 permco                                   Float64        
@@ -340,20 +319,12 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-parspread: min=3.783e-05, max=21.67464603, mean=0.02, median=0.00833205
-convspreard: min=3.783e-05, max=33.29895315, mean=0.02, median=0.008820969455760259
-creditdv01: min=-18805.66, max=606741.84, mean=4841.59, median=4709.6
-riskypv01: min=0.03, max=9.99, mean=4.55, median=4.68
-irdv01: min=-145788.92, max=1146447.42, mean=179.98, median=36.35
-rec01: min=-838629.15, max=2833213.38, mean=12257.06, median=7776.27
-dp: min=6.422e-05, max=1.0, mean=0.14, median=0.07746979916892
-jtd: min=4114.93, max=12770072.21, mean=6683042.09, median=6333271.31
-dtz: min=104114.93, max=14809631.09, mean=10526845.93, median=10251015.37
-year: min=2001.0, max=2023.0, mean=2013.26, median=2013.0
-permno: min=10025.0, max=93423.0, mean=55611.95, median=61938.0
-permco: min=7.0, max=60114.0, mean=22285.94, median=21201.0
-nameRatio: min=50, max=100, mean=88.20, median=90.0
-__index_level_0__: min=0, max=26699665, mean=12953195.31, median=12877479.0
+parspread: min=2.001e-05, max=491.84276269, mean=0.02, median=0.007758560333489305
+year: min=2001.0, max=2023.0, mean=2010.78, median=2009.0
+permno: min=10025.0, max=93423.0, mean=53210.76, median=57665.0
+permco: min=7.0, max=60114.0, mean=21824.50, median=21161.0
+nameRatio: min=50, max=100, mean=88.24, median=90.0
+__index_level_0__: min=0, max=37725750, mean=18328620.07, median=18225244.0
 ```
 
 ---
@@ -874,6 +845,226 @@ value                                    Float64         (25.7% null)
 ### Numeric Column Statistics
 ```
 value: min=0.0554, max=16.462, mean=5.61, median=5.3232729844415
+```
+
+---
+
+## fx_daily_data.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/foreign_exchange/fx_daily_data.parquet`
+**Size:** 2.1 MB | **Type:** Parquet | **Shape:** 14,115 rows × 49 columns
+
+### Columns
+```
+date                                     Datetime(time_unit='ns', time_zone=None)
+dexusal                                  Float64         (3.9% null)
+dexalus                                  Float64         (3.9% null)
+dexbzus                                  Float64         (46.5% null)
+dexcaus                                  Float64         (3.8% null)
+dexchus                                  Float64         (22.0% null)
+dexdnus                                  Float64         (3.9% null)
+dexhkus                                  Float64         (21.6% null)
+dexinus                                  Float64         (7.5% null)
+dexjpus                                  Float64         (3.9% null)
+dexkous                                  Float64         (22.4% null)
+dexmaus                                  Float64         (4.0% null)
+dexmxus                                  Float64         (44.5% null)
+dexusnz                                  Float64         (4.0% null)
+dexnzus                                  Float64         (4.0% null)
+dexnous                                  Float64         (3.9% null)
+dexsius                                  Float64         (21.6% null)
+dexsfus                                  Float64         (19.9% null)
+dexslus                                  Float64         (10.0% null)
+dexsdus                                  Float64         (3.9% null)
+dexszus                                  Float64         (3.9% null)
+dextaus                                  Float64         (28.6% null)
+dexthus                                  Float64         (22.2% null)
+dexusuk                                  Float64         (3.9% null)
+dexukus                                  Float64         (3.9% null)
+dexvzus                                  Float64         (46.6% null)
+exauus                                   Float64         (50.3% null)
+exbeus                                   Float64         (50.3% null)
+exfnus                                   Float64         (50.5% null)
+exfrus                                   Float64         (50.3% null)
+exgeus                                   Float64         (50.3% null)
+exgrus                                   Float64         (64.9% null)
+exusir                                   Float64         (50.3% null)
+exirus                                   Float64         (50.3% null)
+exitus                                   Float64         (50.3% null)
+exneus                                   Float64         (50.3% null)
+expous                                   Float64         (53.8% null)
+exspus                                   Float64         (53.8% null)
+exusec                                   Float64         (65.3% null)
+execus                                   Float64         (65.3% null)
+dexuseu                                  Float64         (53.6% null)
+dexeuus                                  Float64         (53.6% null)
+dtwexb                                   Float64         (55.2% null)
+dtwexbgs                                 Float64         (66.1% null)
+dtwexm                                   Float64         (16.2% null)
+dtwexafegs                               Float64         (66.1% null)
+dtwexo                                   Float64         (55.2% null)
+dtwexemegs                               Float64         (66.1% null)
+indexgx                                  Float64         (50.3% null)
+```
+
+### Numeric Column Statistics
+```
+dexusal: min=0.4828, max=1.4885, mean=0.85, median=0.77185
+dexalus: min=0.6718172657037286, max=2.071251035625518, mean=1.24, median=1.2955885265224771
+dexbzus: min=0.832, max=6.2021, mean=2.78, median=2.3308999999999997
+dexcaus: min=0.9168, max=1.6128, mean=1.23, median=1.2371
+dexchus: min=1.5264, max=8.7409, mean=6.27, median=6.7534
+dexdnus: min=4.6605, max=12.3725, mean=6.63, median=6.4084
+dexhkus: min=5.127, max=8.7, mean=7.68, median=7.772
+dexinus: min=7.19, max=87.57, mean=37.43, median=40.33
+dexjpus: min=75.72, max=358.44, mean=156.34, median=123.02
+dexkous: min=667.2, max=1960.0, mean=1021.24, median=1073.9
+dexmaus: min=2.1048, max=4.7975, mean=3.16, median=3.049
+dexmxus: min=3.1022, max=25.132, mean=13.07, median=12.1824
+dexusnz: min=0.392, max=1.49, mean=0.73, median=0.6745
+dexnzus: min=0.6711409395973155, max=2.5510204081632653, mean=1.47, median=1.4825796886582654
+dexnous: min=4.6585, max=11.6842, mean=7.02, median=6.743
+dexsius: min=1.2007, max=2.3085, mean=1.62, median=1.5754
+dexsfus: min=0.7371, max=19.7787, mean=7.33, median=6.6785499999999995
+dexslus: min=6.006, max=365.43, mean=89.46, median=71.9
+dexsdus: min=3.867, max=11.345, mean=7.13, median=7.1831499999999995
+dexszus: min=0.7296, max=4.318, mean=1.58, median=1.4095
+dextaus: min=24.507, max=40.6, mean=31.04, median=30.86
+dexthus: min=20.36, max=56.1, mean=31.60, median=31.55
+dexusuk: min=1.052, max=2.644, mean=1.68, median=1.613
+dexukus: min=0.37821482602118, max=0.9505703422053231, mean=0.62, median=0.6199628022318661
+dexvzus: min=0.1697, max=4171327.382, mean=83251.17, median=2.145
+exauus: min=9.538, max=26.075, mean=15.22, median=13.95
+exbeus: min=27.12, max=69.6, mean=38.61, median=36.73
+exfnus: min=3.4554, max=7.115, mean=4.53, median=4.28275
+exfrus: min=3.8462, max=10.56, mean=5.67, median=5.5137
+exgeus: min=1.3565, max=3.645, mean=2.14, median=1.9458
+exgrus: min=52.9, max=410.3, mean=190.00, median=171.0
+exusir: min=0.9015, max=2.644, mean=1.71, median=1.596
+exirus: min=0.3782, max=1.1093, mean=0.62, median=0.6266
+exitus: min=553.1, max=2159.0, mean=1213.29, median=1267.0
+exneus: min=1.5192, max=3.9145, mean=2.34, median=2.15
+expous: min=21.98, max=190.4, mean=110.26, median=138.775
+exspus: min=55.54, max=191.57, mean=108.67, median=113.0
+exusec: min=0.6476, max=1.4557, mean=1.14, median=1.158
+execus: min=0.687, max=1.5442, mean=0.90, median=0.8636
+dexuseu: min=0.827, max=1.601, mean=1.18, median=1.1740499999999998
+dexeuus: min=0.6246096189881324, max=1.2091898428053205, mean=0.86, median=0.8517524822739285
+dtwexb: min=89.0259, max=131.8808, mean=111.13, median=111.19715
+dtwexbgs: min=85.4692, max=130.2142, mean=105.27, median=107.1343
+dtwexm: min=68.0137, max=148.1244, mean=94.09, median=92.58865
+dtwexafegs: min=81.3834, max=124.9301, mean=101.21, median=103.1372
+dtwexo: min=89.0787, max=175.0065, mean=133.45, median=132.75965000000002
+dtwexemegs: min=89.1519, max=139.7151, mean=110.67, median=108.3955
+indexgx: min=78.4524, max=164.7242, mean=101.64, median=97.59845
+```
+
+---
+
+## fx_monthly_data.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/foreign_exchange/fx_monthly_data.parquet`
+**Size:** 210726 bytes | **Type:** Parquet | **Shape:** 649 rows × 48 columns
+
+### Columns
+```
+date                                     Datetime(time_unit='ns', time_zone=None)
+exusal                                   Float64        
+exalus                                   Float64        
+exbzus                                   Float64         (44.4% null)
+excaus                                   Float64        
+exchus                                   Float64         (18.5% null)
+exdnus                                   Float64        
+exhkus                                   Float64         (18.5% null)
+exinus                                   Float64         (3.7% null)
+exjpus                                   Float64        
+exkous                                   Float64         (19.0% null)
+exmaus                                   Float64        
+exmxus                                   Float64         (42.2% null)
+exusnz                                   Float64        
+exnzus                                   Float64        
+exnous                                   Float64        
+exsius                                   Float64         (18.5% null)
+exsfus                                   Float64        
+exslus                                   Float64         (3.7% null)
+exsdus                                   Float64        
+exszus                                   Float64        
+extaus                                   Float64         (23.6% null)
+exthus                                   Float64         (18.5% null)
+exusuk                                   Float64        
+exukus                                   Float64        
+exvzus                                   Float64         (44.4% null)
+exauus                                   Float64         (48.2% null)
+exbeus                                   Float64         (48.2% null)
+exfnus                                   Float64         (48.2% null)
+exfrus                                   Float64         (48.2% null)
+exgeus                                   Float64         (48.2% null)
+exgrus                                   Float64         (63.5% null)
+exusir                                   Float64         (48.2% null)
+exirus                                   Float64         (48.2% null)
+exitus                                   Float64         (48.2% null)
+exneus                                   Float64         (48.2% null)
+expous                                   Float64         (51.9% null)
+exspus                                   Float64         (51.9% null)
+exusec                                   Float64         (62.9% null)
+execus                                   Float64         (62.9% null)
+exuseu                                   Float64         (51.8% null)
+exeuus                                   Float64         (51.8% null)
+twexbmth                                 Float64         (13.1% null)
+twexbgsmth                               Float64         (64.7% null)
+twexmmth                                 Float64         (13.1% null)
+twexafegsmth                             Float64         (64.7% null)
+twexomth                                 Float64         (13.1% null)
+twexemegsmth                             Float64         (64.7% null)
+```
+
+### Numeric Column Statistics
+```
+exusal: min=0.5016, max=1.4855, mean=0.85, median=0.7717
+exalus: min=0.6731740154830024, max=1.993620414673046, mean=1.24, median=1.2958403524685758
+exbzus: min=0.8412, max=6.101, mean=2.78, median=2.3251
+excaus: min=0.9553, max=1.5997, mean=1.23, median=1.2353
+exchus: min=1.5518, max=8.7251, mean=6.27, median=6.7352
+exdnus: min=4.7335, max=11.8071, mean=6.63, median=6.4083
+exhkus: min=5.1825, max=8.0948, mean=7.68, median=7.7734
+exinus: min=7.2719, max=86.2652, mean=37.41, median=40.2738
+exjpus: min=76.643, max=358.02, mean=156.57, median=122.6886
+exkous: min=669.2476, max=1707.3, mean=1020.10, median=1072.59665
+exmaus: min=2.122, max=4.7655, mean=3.16, median=3.048
+exmxus: min=3.1078, max=24.1798, mean=13.07, median=12.2366
+exusnz: min=0.399, max=1.4864, mean=0.73, median=0.6745
+exnzus: min=0.6727664155005383, max=2.506265664160401, mean=1.47, median=1.4825796886582654
+exnous: min=4.8167, max=11.3335, mean=7.02, median=6.7496
+exsius: min=1.2089, max=2.2582, mean=1.62, median=1.5755
+exsfus: min=0.6679, max=19.0322, mean=6.24, median=4.9337
+exslus: min=6.0467, max=363.945, mean=88.15, median=68.6295
+exsdus: min=3.9166, max=11.1111, mean=7.13, median=7.189
+exszus: min=0.78, max=4.3053, mean=1.58, median=1.4111
+extaus: min=24.7695, max=40.5006, mean=31.04, median=30.8355
+exthus: min=20.5491, max=52.9825, mean=31.55, median=31.506
+exusuk: min=1.0931, max=2.6181, mean=1.68, median=1.6145
+exukus: min=0.3819563805813376, max=0.9148293843198244, mean=0.62, median=0.6193868070610096
+exvzus: min=0.17, max=4191337.2125, mean=100363.82, median=3.6137
+exauus: min=9.72, max=25.873, mean=15.24, median=13.922
+exbeus: min=27.96, max=66.31, mean=38.63, median=36.805
+exfnus: min=3.4926, max=6.8616, mean=4.53, median=4.28285
+exfrus: min=4.0048, max=10.0933, mean=5.67, median=5.50065
+exgeus: min=1.3812, max=3.637, mean=2.15, median=1.94815
+exgrus: min=53.18, max=398.29, mean=189.65, median=170.42
+exusir: min=0.9423, max=2.6181, mean=1.71, median=1.5941
+exirus: min=0.382, max=1.0612, mean=0.62, median=0.6273
+exitus: min=565.26, max=2078.5, mean=1212.33, median=1263.19
+exneus: min=1.5474, max=3.7387, mean=2.34, median=2.1525
+expous: min=22.41, max=187.03, mean=110.07, median=138.87
+exspus: min=55.8, max=183.13, mean=108.62, median=112.66499999999999
+exusec: min=0.6752, max=1.4435, mean=1.14, median=1.1575
+execus: min=0.6928, max=1.481, mean=0.91, median=0.8639
+exuseu: min=0.8525, max=1.5759, mean=1.18, median=1.1743
+exeuus: min=0.6345580303318739, max=1.1730205278592374, mean=0.86, median=0.8515711487694798
+twexbmth: min=30.638, max=130.7506, mean=84.46, median=95.53444999999999
+twexbgsmth: min=86.3178, max=129.0413, mean=105.31, median=107.65
+twexmmth: min=69.0608, max=143.9059, mean=94.12, median=92.5692
+twexafegsmth: min=82.6783, max=123.1599, mean=101.24, median=103.1943
+twexomth: min=1.9979, max=172.8066, mean=80.26, median=98.3551
+twexemegsmth: min=89.8244, max=138.5574, mean=110.73, median=108.8631
 ```
 
 ---
