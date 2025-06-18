@@ -1,6 +1,6 @@
 """
 This scripts pulls the Markit CDS data from WRDS.
-Code by Kausthub Kesheva
+Code by Kausthub Kesheva, Alex Wang, and Vincent Xu
 """
 
 # Add src directory to Python path
@@ -42,34 +42,14 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
             ticker, -- The Markit ticker for the organization.
             RedCode, -- The RED Code for identification of the entity. 
             parspread, -- The par spread associated to the contributed CDS curve.
-            convspreard, -- The conversion spread associated to the contributed CDS curve.
             tenor,
-            country,
-            creditdv01, -- If the submission is in par spread, the values will match
-            -- those in ContributedLevel(X).
-            riskypv01, -- The risky annuity of a trade of the maturity of the CDS
-            -- instrument calculated from the CDS Composite curve.
-            irdv01, -- The change in the mark to market from a basis point change
-            -- in the interest rate
-            rec01, -- The change in the mark to market from a change in the
-            -- recovery rate by 1 percent
-            dp, -- The implied default probability of the reference entity,
-            jtd, -- The jump to default of the reference entity. The change in 
-            -- mark to market assuming an instantaneous credit event
-            dtz -- The jump to zero. The change in the mark to market
-            -- assuming an instantaneous credit event and a recovery rate of 0
+            country
         FROM
             {table_name}
         WHERE
-            -- country = 'United States'
+            country = 'United States' AND
             currency = 'USD' AND
-            docclause LIKE 'XR%%' AND 
-                -- The documentation clause. Values are: MM (Modified
-                -- Modified Restructuring), MR (Modified Restructuring), CR
-                -- (Old Restructuring), XR (No Restructuring).
-                -- Among all the data, these are the unique values for docclause:
-                --  CR, CR14, MM, MM14, MR, MR14, XR, XR14
-            CompositeDepth5Y >= 3 AND
+            tier = 'SNRFOR' AND -- Senior Unsecured Debt 
             tenor IN ('1Y', '3Y', '5Y', '7Y', '10Y')
         """
         cds_data[year] = db.raw_sql(query, date_cols=["date"])
