@@ -291,7 +291,6 @@ def calculate_cip(end_date='2025-03-01', plot=False):
     
     return spreads
 
-
 def load_cip_spreads(data_dir=DATA_DIR):
     """Load calculated CIP spreads from parquet file."""
     path = data_dir / "cip_spreads.parquet"

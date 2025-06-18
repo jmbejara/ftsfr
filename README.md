@@ -11,9 +11,11 @@ All
  - How to incorporate Bloomberg: Done https://github.com/jmbejara/ftsfr/issues/14
 
 Alex and Vincent
- - Daignose discrepancy: https://github.com/jmbejara/ftsfr/issues/20
+ - Diagnose discrepancy: https://github.com/jmbejara/ftsfr/issues/20
  - Bloomberg data now available in foreign_exchange/pull_bbg_foreign_exchange.py https://github.com/jmbejara/ftsfr/issues/18
  - https://github.com/Kunj121/CIP FX and then CIP? (I received permission). Blocked by Jeremy, needs to do Bloomberg stuff.
+ - Foreign Exchange returns (returns on individual currencies, not the portfolios of He, Kelly, Manela) 
+ - CIP deviations as seen in Kunj's code. https://github.com/Kunj121/CIP and in foreign_exchange/pull_bbg_foreign_exchange.py
  - Can close? https://github.com/jmbejara/ftsfr/issues/13
  - Status? https://github.com/jmbejara/ftsfr/issues/3
 

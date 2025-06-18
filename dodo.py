@@ -79,20 +79,28 @@ data_sources = config_toml["data_sources"].copy()
 # Check if we're being called by create_data_glimpses.py
 is_data_glimpses = any("create_data_glimpses" in arg for arg in sys.argv)
 
+bbg_skip = False
 # Skip Bloomberg Terminal prompt when being imported by create_data_glimpses.py
 if data_sources["bloomberg_terminal"] and not is_data_glimpses:
     # Interactive check for Bloomberg Terminal
     while True:
-        response = input("Is the Bloomberg Terminal open in the background? (YES/no/skip): ").strip().lower()
-        if response in ["yes", ""]:  # Fixed: should be 'in' not '=='
+        response = (
+            input("Is the Bloomberg Terminal open in the background? (yes/no/SKIP): ")
+            .strip()
+            .lower()
+        )
+        if response in ["yes"]:  # Fixed: should be 'in' not '=='
             print("Proceeding with Bloomberg Terminal enabled...")
             break
         elif response == "no":
-            print("Aborting. Please open the Bloomberg Terminal and keep it running in the background.")
+            print(
+                "Aborting. Please open the Bloomberg Terminal and keep it running in the background."
+            )
             sys.exit(1)
-        elif response == "skip":
+        elif response in ["skip", ""]:
             print("Skipping Bloomberg Terminal data sources...")
             data_sources["bloomberg_terminal"] = False
+            bbg_skip = True
             break
         else:
             print("Please enter 'yes', 'no', or 'skip'.")
@@ -102,11 +110,12 @@ elif data_sources["bloomberg_terminal"] and is_data_glimpses:
 
 # fmt: off
 module_requirements = {}
+module_requirements["cip"] = data_sources["bloomberg_terminal"]
 module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
 module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
 module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
 module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
-module_requirements["foreign_exchange"] = data_sources["bloomberg_terminal"] and data_sources["wrds_fx"]
+module_requirements["foreign_exchange"] = data_sources["wrds_fx"]
 module_requirements["futures_returns"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
 module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
 module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
@@ -118,7 +127,6 @@ module_requirements["wrds_crsp_compustat"] = (
     and data_sources["wrds_crsp"]
     and data_sources["wrds_crsp_compustat"]
 )
-module_requirements["wrds_fx"] = data_sources["wrds_fx"]
 # fmt: on
 
 use_cache = config_toml["cache"]["use_cache"]
@@ -174,6 +182,24 @@ def task_pull():
             "clean": [],
         }
 
+    data_module = "cip"
+    if module_requirements[data_module] and not use_cache and not bbg_skip:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_bbg_foreign_exchange.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "fx_spot_rates.parquet",
+                DATA_DIR / data_module / "fx_forward_points.parquet",
+                DATA_DIR / data_module / "fx_interest_rates.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/pull_bbg_foreign_exchange.py",
+            ],
+            "clean": [],
+        }
+
     # fmt: off
     data_module = "corp_bond_returns"
     if module_requirements[data_module] and not use_cache:
@@ -193,6 +219,19 @@ def task_pull():
             "clean": [],
         }
     # fmt: on
+
+    data_module = "foreign_exchange"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_wrds_fx.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "fx_daily_data.parquet",
+                DATA_DIR / data_module / "fx_monthly_data.parquet",
+            ],
+        }
 
     data_module = "futures_returns"
     if module_requirements[data_module] and not use_cache:
@@ -366,6 +405,22 @@ def task_format():
             "clean": [],
         }
 
+    data_module = "cip"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_cip.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "cip_spreads.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_cip.py",
+            ],
+            "clean": [],
+        }
+
     data_module = "corp_bond_returns"
     if module_requirements[data_module]:
         yield {
@@ -377,6 +432,19 @@ def task_format():
             "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
             "clean": [],
         }
+
+    # data_module = "foreign_exchange"
+    # if module_requirements[data_module]:
+    #     yield {
+    #         "name": data_module,
+    #         "actions": [
+    #             f"python ./src/{data_module}/pull_wrds_fx.py --DATA_DIR={DATA_DIR / data_module}"
+    #         ],
+    #         "targets": [
+    #             DATA_DIR / data_module / "fx_daily_data.parquet",
+    #             DATA_DIR / data_module / "fx_monthly_data.parquet",
+    #         ],
+    #     }
 
     data_module = "fed_yield_curve"
     if module_requirements[data_module]:
