@@ -9,17 +9,24 @@ import requests
 from io import BytesIO
 import sys
 import os
+import toml
+from pathlib import Path
 
 # Ensure the root directory (CIP/) is in sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+BASE_DIR = Path.cwd().parents[0]
 
 try:
     import src.settings as settings  # Try to import normally
 except ModuleNotFoundError:
     import settings as settings # Fallback if src.settings isn't found
 
+with open(f"{BASE_DIR}/config.toml", "r") as f:
+    config_toml = toml.load(f)
+data_sources = config_toml["data_sources"].copy()
 
-BLOOMBERG = settings.BLOOMBERG
+BLOOMBERG = data_sources["bloomberg_terminal"]
 
 def download():
     target_file = "./data_manual/CIP_2025.xlsx"
