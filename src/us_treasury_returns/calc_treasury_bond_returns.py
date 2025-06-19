@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from corp_bond_returns import pull_open_source_bond
+import pull_CRSP_treasury
 from settings import config
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -51,12 +51,13 @@ def group_portfolios(bond_returns=None):
 
 
 def calc_treasury_bond_returns(data_dir=DATA_DIR):
-    bond_returns = pull_open_source_bond.load_treasury_returns(data_dir=data_dir)
+    bond_returns = pull_CRSP_treasury.load_CRSP_treasury_consolidated(data_dir=data_dir)
     portfolio_returns = group_portfolios(bond_returns)
     return portfolio_returns
 
 
 if __name__ == "__main__":
-    bond_returns = pull_open_source_bond.load_treasury_returns(data_dir=DATA_DIR)
-    portfolio_returns = group_portfolios(bond_returns)
-    portfolio_returns.to_parquet(DATA_DIR / "treasury_bond_portfolio_returns.parquet")
+    # DATA_DIR = DATA_DIR / "us_treasury_returns"
+    bond_returns = pull_CRSP_treasury.load_CRSP_treasury_consolidated(data_dir=DATA_DIR)
+    # portfolio_returns = group_portfolios(bond_returns)
+    # portfolio_returns.to_parquet(DATA_DIR / "treasury_bond_portfolio_returns.parquet")
