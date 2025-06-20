@@ -165,9 +165,9 @@ corp_bonds_data.describe()
 
 The code for it is in **merge_cds_bond.py** in the function **merge_redcode_into_bond_treas**. The more specific inputs are within the function itself.
 
-Given CDS tables record issuers of the Credit Default Swaps using Redcode and the bond tables only had CUSIPs, we needed to merge a redcode-CUSIP matching table to the end product of step 1.2 for CDS merging later on.
+Given CDS tables record issuers of the Credit Default Swaps using Redcode and the bond tables only had CUSIPs, we needed to conduct a merge using a redcode-CUSIP matching table to the end product of step 1.2 for CDS processing later on.
 
-We will pull the results without processing for CDS implied arbitrage returns.
+We will pull the results without processing for CDS implied arbitrage returns. 
 """
 
 # %%
@@ -185,7 +185,9 @@ corp_red_data.describe()
 
 ## Step 2.1: CDS data pull
 
-The CDS data pull will be filtered using the redcodes from the above **bond_redcode_merged_data** dataframe, ensuring that only the firms that have corporate bond data are pulled from the CDS table. This data from Markit is daily.
+The CDS data pull will be filtered using the redcodes from the above **bond_redcode_merged_data** dataframe, ensuring that only the firms that have corporate bond data are pulled from the CDS table. Daily CDS data is being pulled initially, 
+
+resulting in a mismatch in amount compared to corporate bonds. The data will be reduced during the merge process as the corporate bonds are indicated by monthly data.
 
 ## Step 2.2: CDS data processing
 
@@ -205,9 +207,11 @@ The CDS data has a flaw: the **tenor** is displayed as opposed to **maturity dat
 
 For example, if the tenor is $3Y$, the number of days that we use to annualize is $3 \times 365 = 1095$. 
 
-In our processing function **merge_cds_bond**, we grab the **redcode, date** tuples for which we can generate a good cubic spline function, filter the bond and treasury dataframe (output of step 1). 
+In our processing function **merge_cds_bond**, we grab the **redcode, date** tuples for which we can generate a viable cubic spline function, filter the bond and treasury dataframe (output of step 1). 
 
-Then, we use the days between the **maturity** and the **date** for each corporate bond as the input for the cubic spline function for par spread generation. Thus, we end up with the final dataframe with bond, treasury, and cds data all merged together.
+Then, we use the days between the **maturity** and the **date** for each corporate bond as the input for the cubic spline function for par spread generation. Thus, our final product contains corporate bonds, duration matched treasury rates, and implied 
+
+CDS par spreads as specified by the Segmented Arbitrage paper.
 """
 
 # %%
@@ -239,6 +243,8 @@ $$
 where:
 - $y_{t, \tau}$ = duration matched treasury yield at time $t$
     - this is constructed via the "BOND_YIELD" - "CS" in the original corporate bond table
+
+### Key Note: Filtering
 
 We threw out some unreasonable data for the absolute rf values exceeding 1 (risk free annual return of 100%). 
 """
