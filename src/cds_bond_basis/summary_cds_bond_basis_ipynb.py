@@ -39,6 +39,15 @@ where:
 
 The risk free rate then can be seen as the treasury yield in addition to the basis recieved when executing the CDS basis trade (investor benefits from negative basis).
 
+## Key Filters when selecting viable data as specified in Segmented Arbitrage
+
+1. Include only Senior Unsecured Debt issued in USD by US firms with valid ISIN
+2. Include only fixed rate bonds with maturity between 1 and 10 years
+3. Include only bonds with outstanding principle of at least 100,000 USD
+4. Exclude putable and convertible bonds
+5. Exclude bonds trading at less than half of face value
+6. Include only assets on a certain date if a cubic spline of the CDS set is possible
+- There must be 2 or more CDS products corresponding to a corporate bond on a certain day for parspread cubic spline to be possible
 
 """
 
@@ -129,6 +138,9 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 2. Duration-matching the Treasury benchmark neutralises curve-shape effects, so $\Delta y$ isolates the average extra yield attributable to credit/liquidity risk.  
 3. Empirically, $\Delta y$ tracks $Z$ closely for plain-vanilla, option-free bonds, making it a “good-enough” proxy when full spot-curve data or iterative Z-spread calculations are impractical.
 
+**Note**
+
+Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
 
 """
 
@@ -244,7 +256,7 @@ where:
 - $y_{t, \tau}$ = duration matched treasury yield at time $t$
     - this is constructed via the "BOND_YIELD" - "CS" in the original corporate bond table
 
-### Key Note: Filtering
+**Note: Filtering**
 
 We threw out some unreasonable data for the absolute rf values exceeding 1 (risk free annual return of 100%). 
 """
