@@ -58,9 +58,11 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
             # Extract currency code from Bloomberg ticker format
             if "_PX_LAST" in col:
                 currency = col.split()[0][:3]
+                print(currency)
                 new_cols.append(currency)
             else:
                 new_cols.append(col)
+
         df.columns = new_cols
         
         # Keep only our standard currencies
@@ -77,7 +79,7 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
     spot_rates = clean_columns(spot_rates)
     forward_points = clean_columns(forward_points)
     interest_rates = clean_columns(interest_rates)
-    
+
     # Also include USD in interest rates if available
     if "USD" in interest_rates.columns:
         cols_ir = cols + ["USD"]
@@ -264,25 +266,25 @@ def calculate_cip(end_date='2025-03-01', plot=False):
     spot_rates = pull_bbg_foreign_exchange.load_fx_spot_rates(data_dir=DATA_DIR)
     forward_points = pull_bbg_foreign_exchange.load_fx_forward_points(data_dir=DATA_DIR)
     interest_rates = pull_bbg_foreign_exchange.load_fx_interest_rates(data_dir=DATA_DIR)
-    
+
     # Prepare data
     df_merged = prepare_fx_data(spot_rates, forward_points, interest_rates)
-    
+    return df_merged
     # Filter by end date
     if end_date:
         df_merged = df_merged.loc[:end_date]
-    
+
     # Compute CIP spreads
     df_merged = compute_cip_spreads(df_merged)
-    
+    return df_merged
     # Clean outliers
     df_merged = clean_outliers(df_merged)
-    
+
     # Extract just the CIP columns
     currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
     cip_cols = [f"CIP_{c}_ln" for c in currencies if f"CIP_{c}_ln" in df_merged.columns]
     spreads = df_merged[cip_cols].copy()
-    
+  
     # Shorten column names for display
     spreads.columns = [c[4:7] for c in spreads.columns]  # e.g., CIP_AUD_ln -> AUD
     

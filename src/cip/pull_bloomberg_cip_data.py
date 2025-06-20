@@ -13,16 +13,17 @@ import toml
 from pathlib import Path
 
 # Ensure the root directory (CIP/) is in sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-BASE_DIR = Path.cwd().parents[0]
+project_root = Path().resolve().parent.parent
+sys.path.insert(0, str(project_root))
+
 
 try:
     import src.settings as settings  # Try to import normally
 except ModuleNotFoundError:
     import settings as settings # Fallback if src.settings isn't found
 
-with open(f"{BASE_DIR}/config.toml", "r") as f:
+with open(f"{project_root}/config.toml", "r") as f:
     config_toml = toml.load(f)
 data_sources = config_toml["data_sources"].copy()
 
