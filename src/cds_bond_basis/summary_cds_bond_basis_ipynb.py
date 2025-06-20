@@ -51,7 +51,7 @@ sys.path.insert(0, "./src")
 
 import pandas as pd
 import pull_open_source_bond
-from cds_returns import pull_markit_cds
+import pull_wrds_markit
 from merge_cds_bond import *
 from process_final_product import *
 
@@ -61,12 +61,7 @@ from settings import config
 # %autoreload 2
 
 # %%
-<<<<<<< HEAD
-#DATA_DIR = Path(config("DATA_DIR"))
-DATA_DIR = "../../../FS-project_files"
-=======
 DATA_DIR = Path(config("DATA_DIR"))
->>>>>>> 2d4a1c7f056e1c587e8cc2578c680f78dcdb3b2d
 
 # %%
 """
@@ -147,7 +142,7 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 
 corp_bonds_data = pull_open_source_bond.load_corporate_bond_returns(data_dir=DATA_DIR / "cds_bond_basis")
 red_data = pd.read_parquet(DATA_DIR / "cds_bond_basis" / "RED_and_ISIN_mapping.parquet")
-cds_data = pull_markit_cds.load_cds_data(data_dir=DATA_DIR / "cds_returns")
+cds_data = pull_wrds_markit.load_cds_data(data_dir=DATA_DIR / "cds_bond_basis")
 
 # %%
 corp_bonds_data.info()

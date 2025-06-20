@@ -231,6 +231,7 @@ def task_pull():
                 DATA_DIR / data_module / "fx_daily_data.parquet",
                 DATA_DIR / data_module / "fx_monthly_data.parquet",
             ],
+            "file_dep": [f"./src/{data_module}/pull_wrds_fx.py"],
         }
 
     data_module = "futures_returns"
