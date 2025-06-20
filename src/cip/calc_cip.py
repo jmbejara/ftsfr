@@ -49,16 +49,16 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
     interest_rates = interest_rates.set_index("Date") if "Date" in interest_rates.columns else interest_rates
     
     # Standard column names for currencies
-    cols = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
+    cols = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK", "USD"]
+    int_cols = ['ADS', 'CDS', 'SFS', 'EUS', 'BPS', 'JYS', 'NDS', 'SKS', 'USS']
     
     # Clean up column names - extract currency codes from Bloomberg tickers if needed
-    def clean_columns(df, suffix=""):
+    def clean_columns(df, suffix="", interest_rate=False):
         new_cols = []
         for col in df.columns:
             # Extract currency code from Bloomberg ticker format
             if "_PX_LAST" in col:
                 currency = col.split()[0][:3]
-                print(currency)
                 new_cols.append(currency)
             else:
                 new_cols.append(col)
@@ -66,8 +66,12 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
         df.columns = new_cols
         
         # Keep only our standard currencies
-        available_cols = [c for c in cols if c in df.columns]
-        df = df[available_cols]
+        if interest_rate == True:
+            available_cols = [c for c in int_cols if c in df.columns]
+            df = df[available_cols]
+        else:
+            available_cols = [c for c in cols if c in df.columns]
+            df = df[available_cols]
         
         # Add suffix if provided
         if suffix:
@@ -78,8 +82,11 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
     # Clean and rename columns
     spot_rates = clean_columns(spot_rates)
     forward_points = clean_columns(forward_points)
-    interest_rates = clean_columns(interest_rates)
+    interest_rates = clean_columns(interest_rates, interest_rate=True)
 
+    # Map interest rate columns from int_cols to cols
+    ir_mapping = dict(zip(int_cols, cols))
+    interest_rates = interest_rates.rename(columns=ir_mapping)
     # Also include USD in interest rates if available
     if "USD" in interest_rates.columns:
         cols_ir = cols + ["USD"]
@@ -269,14 +276,12 @@ def calculate_cip(end_date='2025-03-01', plot=False):
 
     # Prepare data
     df_merged = prepare_fx_data(spot_rates, forward_points, interest_rates)
-    return df_merged
     # Filter by end date
     if end_date:
         df_merged = df_merged.loc[:end_date]
 
     # Compute CIP spreads
     df_merged = compute_cip_spreads(df_merged)
-    return df_merged
     # Clean outliers
     df_merged = clean_outliers(df_merged)
 
