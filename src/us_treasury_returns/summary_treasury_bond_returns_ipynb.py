@@ -90,7 +90,7 @@ treas_hkm.isnull().sum()
 
 # %%
 treas_bond_returns = calc_treasury_bond_returns.calc_returns(
-    data_dir=DATA_DIR
+    data_dir=DATA_DIR / "us_treasury_returns"
 )
 
 # %%

@@ -1,6 +1,6 @@
 # Data Glimpses Report
-Generated: 2025-06-17 22:03:28
-Total files: 57
+Generated: 2025-06-23 10:34:13
+Total files: 58
 
 ## Summary of Datasets by Task
 
@@ -8,6 +8,9 @@ Total files: 57
 - [`arima_results.csv`](#arima-results-csv)
 - [`simple_exponential_smoothing_results.csv`](#simple-exponential-smoothing-results-csv)
 - [`results_all.csv`](#results-all-csv)
+
+### Create Data Glimpses
+- [`filtered_info.csv`](#filtered-info-csv)
 
 ### Forecast
 #### Forecast: Arima
@@ -537,7 +540,7 @@ year: min=2001, max=2023, mean=2013.61, median=2014.0
 
 ## markit_cds_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/markit_cds_returns.parquet`
-**Size:** 50518 bytes | **Type:** Parquet | **Shape:** 276 rows × 21 columns
+**Size:** 50612 bytes | **Type:** Parquet | **Shape:** 276 rows × 21 columns
 
 ### Columns
 ```
@@ -566,26 +569,26 @@ Month                                    Datetime(time_unit='ns', time_zone=None
 
 ### Numeric Column Statistics
 ```
-3Y_Q1: min=5.3958644951911966e-05, max=0.0012987205524163, mean=0.00, median=0.00017868829906930175
-3Y_Q2: min=9.783843575229478e-05, max=0.0017596335519786373, mean=0.00, median=0.00030057140974341494
-3Y_Q3: min=0.00016909896722303746, max=0.002811914277463509, mean=0.00, median=0.00048586455942161214
-3Y_Q4: min=0.00035232945274106834, max=0.008639970833990243, mean=0.00, median=0.0008259757158827875
-3Y_Q5: min=0.0010259969300780679, max=0.017049535429726093, mean=0.00, median=0.00334627126553167
-5Y_Q1: min=8.275439968574716e-05, max=0.0013420012384308677, mean=0.00, median=0.00027986112749711634
-5Y_Q2: min=0.00016532929009160924, max=0.0015301593893626286, mean=0.00, median=0.0005003189685341969
-5Y_Q3: min=0.0002442534777740146, max=0.002962401425919081, mean=0.00, median=0.0007583209877857211
-5Y_Q4: min=0.0006687052947333961, max=0.008650813007283544, mean=0.00, median=0.0013636452904135512
-5Y_Q5: min=0.00181917402378029, max=0.01831490376557743, mean=0.01, median=0.004601687343009031
-7Y_Q1: min=0.00010968542509637644, max=0.001395133499127233, mean=0.00, median=0.0003612628188670359
-7Y_Q2: min=8.181345440668227e-05, max=0.0015315599360318712, mean=0.00, median=0.0006679377240399248
-7Y_Q3: min=0.000123485576992402, max=0.0030530014152692587, mean=0.00, median=0.0009976871950255236
-7Y_Q4: min=0.0010940670201989998, max=0.00720356187527146, mean=0.00, median=0.0020664761757250042
-7Y_Q5: min=0.0024331562135319574, max=0.019006975057498855, mean=0.01, median=0.005458032114091614
-10Y_Q1: min=0.00013492999060040592, max=0.0009062697483794201, mean=0.00, median=0.00048201940246563643
-10Y_Q2: min=7.052284975489338e-05, max=0.0015002429227769431, mean=0.00, median=0.0007555602991690161
-10Y_Q3: min=0.00014060482786995663, max=0.0031227019655337856, mean=0.00, median=0.0011668890038968615
-10Y_Q4: min=0.0013657789079570349, max=0.007458225785710698, mean=0.00, median=0.0023169418813168514
-10Y_Q5: min=0.003034542853974191, max=0.01933939526551625, mean=0.01, median=0.006146681601609476
+3Y_Q1: min=5.389689731366252e-05, max=0.0012972343600382446, mean=0.00, median=0.00017837457365309987
+3Y_Q2: min=9.771449867174918e-05, max=0.001757310815728772, mean=0.00, median=0.0003011161215830114
+3Y_Q3: min=0.00016913607602179957, max=0.0028324389890417175, mean=0.00, median=0.000485779349839776
+3Y_Q4: min=0.00035288472820092955, max=0.008641248005009428, mean=0.00, median=0.0008268060284415124
+3Y_Q5: min=0.0010272207148105958, max=0.017051761117074984, mean=0.00, median=0.003333183248464348
+5Y_Q1: min=8.275439968574716e-05, max=0.0013420012384308677, mean=0.00, median=0.0002781480228990496
+5Y_Q2: min=0.00016537177377839998, max=0.001530159389362629, mean=0.00, median=0.000501261859826796
+5Y_Q3: min=0.0002442534777740146, max=0.0029820907585587086, mean=0.00, median=0.0007583209877857211
+5Y_Q4: min=0.0006704490162541266, max=0.008650813007283542, mean=0.00, median=0.0013628831500126504
+5Y_Q5: min=0.0018230444667404195, max=0.018314903765577425, mean=0.01, median=0.004595504716873754
+7Y_Q1: min=0.00010966962933265006, max=0.0013949325863888305, mean=0.00, median=0.0003618103806222818
+7Y_Q2: min=8.184532729079774e-05, max=0.001531432278264998, mean=0.00, median=0.0006683869286375066
+7Y_Q3: min=0.0001235477998526692, max=0.003074855495910384, mean=0.00, median=0.000995591729802539
+7Y_Q4: min=0.0010978498635662321, max=0.007197178253333162, mean=0.00, median=0.0020605433190841304
+7Y_Q5: min=0.0024328731886759884, max=0.01900305868243827, mean=0.01, median=0.005422328703091937
+10Y_Q1: min=0.0001350211969086215, max=0.0009063400972020281, mean=0.00, median=0.0004824748535625107
+10Y_Q2: min=7.05582757313702e-05, max=0.0015004388490293034, mean=0.00, median=0.0007531659859585654
+10Y_Q3: min=0.0001407362718215997, max=0.003145879011273593, mean=0.00, median=0.0011662997146133626
+10Y_Q4: min=0.001358972284302623, max=0.007451035992175151, mean=0.00, median=0.0023143766609362904
+10Y_Q5: min=0.003034199956717164, max=0.019339084808444634, mean=0.01, median=0.006114826402134227
 ```
 
 ---
@@ -3852,4 +3855,36 @@ seasonality: min=5, max=5, mean=5.00, median=5.0
 mean_mase: min=9.80730049361067, max=9.83930260256351, mean=9.82, median=9.823301548087091
 median_mase: min=9.47550110922832, max=9.485053711101472, mean=9.48, median=9.480277410164895
 entity_count: min=30, max=30, mean=30.00, median=30.0
+```
+
+---
+
+## filtered_info.csv
+**Path:** `src/futures_returns/filtered_info.csv`
+**Size:** 458045 bytes | **Type:** Csv | **Shape:** 3,427 rows × 13 columns
+
+### Columns
+```
+                                         Int64          
+calcseriescode                           Int64          
+clscode                                  Int64          
+dsmnem                                   String         
+calcseriesname                           String         
+isocurrcode                              String         
+isocurrdesc                              String         
+rollmethodcode                           Int64          
+rollmethoddesc                           String         
+positionfwdcode                          Int64          
+positionfwddesc                          String         
+calcmthcode                              String         
+trdmonths                                String          (98.3% null)
+```
+
+### Numeric Column Statistics
+```
+: min=7, max=29578, mean=16597.36, median=17813.0
+calcseriescode: min=8, max=29995, mean=16660.16, median=17836.0
+clscode: min=2, max=4812, mean=2358.46, median=2403.0
+rollmethodcode: min=0, max=1, mean=0.51, median=1.0
+positionfwdcode: min=0, max=9, mean=0.91, median=0.0
 ```
