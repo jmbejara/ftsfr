@@ -111,6 +111,7 @@ elif data_sources["bloomberg_terminal"] and is_data_glimpses:
 # fmt: off
 module_requirements = {}
 module_requirements["cip"] = data_sources["bloomberg_terminal"]
+module_requirements["commodities"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
 module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
 module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
 module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
@@ -180,6 +181,21 @@ def task_pull():
                 f"./src/{data_module}/pull_fred.py",
             ],
             "clean": [],
+        }
+
+    data_module = "commodities"
+    if module_requirements[data_module] and not use_cache and not bbg_skip:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_bbg_commodities.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "commodity_futures.parquet",
+                DATA_DIR / data_module / "lme_metals.parquet",
+                DATA_DIR / data_module / "gsci_indices.parquet",
+            ],
+            "file_dep": [f"./src/{data_module}/pull_bbg_commodities.py"],
         }
 
     data_module = "cip"
@@ -420,6 +436,19 @@ def task_format():
                 f"./src/{data_module}/calc_cip.py",
             ],
             "clean": [],
+        }
+
+    data_module = "commodities"
+    if module_requirements[data_module] and not use_cache and not bbg_skip:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_commodities_returns.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "commodities_returns.parquet",
+            ],
+            "file_dep": [f"./src/{data_module}/calc_commodities_returns.py"],
         }
 
     data_module = "corp_bond_returns"
