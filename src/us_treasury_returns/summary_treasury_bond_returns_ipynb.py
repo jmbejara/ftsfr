@@ -89,8 +89,8 @@ treas_hkm.describe()
 treas_hkm.isnull().sum()
 
 # %%
-treas_bond_returns = calc_treasury_bond_returns.calc_treasury_bond_returns(
-    data_dir=DATA_DIR / "corp_bond_returns"
+treas_bond_returns = calc_treasury_bond_returns.calc_returns(
+    data_dir=DATA_DIR
 )
 
 # %%
@@ -102,58 +102,74 @@ treas_bond_returns.describe()
 """
 
 # %%
+# Print initial data info
+print("Treasury Bond Returns Info:")
+print(treas_bond_returns.info())
+print("\nTreasury Bond Returns Head:")
+print(treas_bond_returns.head())
+print("\nTreasury Bond Returns Date Range:")
+print(treas_bond_returns["DATE"].min(), "to", treas_bond_returns["DATE"].max())
 
+print("\nHKM Treasury Bonds Info:")
+print(treas_hkm.info())
+print("\nHKM Treasury Bonds Head:")
+print(treas_hkm.head())
+
+# Convert treas_hkm dates to datetime
 treas_hkm["date"] = pd.to_datetime(
     treas_hkm["yyyymm"].astype(int).astype(str), format="%Y%m"
 ) + pd.offsets.MonthEnd(0)
-treas_hkm["date"] = treas_hkm["date"].dt.strftime("%Y%m%d").astype(int)
+
+print("\nAfter date conversion - HKM Treasury Bonds Head:")
+print(treas_hkm.head())
+print("\nHKM Treasury Bonds Date Range:")
+print(treas_hkm["date"].min(), "to", treas_hkm["date"].max())
+
+# Convert treas_bond_returns DATE to datetime if it's not already
+treas_bond_returns["DATE"] = pd.to_datetime(treas_bond_returns["DATE"])
+
+print("\nAfter date conversion - Treasury Bond Returns Head:")
+print(treas_bond_returns.head())
+print("\nTreasury Bond Returns Date Range:")
+print(treas_bond_returns["DATE"].min(), "to", treas_bond_returns["DATE"].max())
+
+# Try the merge
 merged_df = pd.merge(
     treas_bond_returns, treas_hkm, left_on="DATE", right_on="date", how="inner"
 )
 
-# Now both DataFrames have datetime index with last day of month
-print("HKM Treasury Bonds shape:", treas_hkm.shape)
-print("Treasury Bond Returns shape:", treas_bond_returns.shape)
-
-# Display the date ranges to verify alignment
-print(
-    "\nHKM Treasury Bonds date range:",
-    treas_hkm.index.min(),
-    "to",
-    treas_hkm.index.max(),
-)
-print(
-    "Treasury Bond Returns date range:",
-    treas_bond_returns.index.min(),
-    "to",
-    treas_bond_returns.index.max(),
-)
+print("\nMerged DataFrame Shape:", merged_df.shape)
+print("\nMerged DataFrame Head:")
+print(merged_df.head())
 
 # Create subplots for each pair of columns
 import matplotlib.pyplot as plt
 
-fig, axes = plt.subplots(5, 2, figsize=(15, 20))
-axes = axes.flatten()
+if not merged_df.empty:
+    fig, axes = plt.subplots(5, 2, figsize=(15, 20))
+    axes = axes.flatten()
 
-for i in range(10):
-    col1 = str(i + 1)  # Column from treas_bond_returns
-    if i == 9:
-        col2 = "US_bonds_10"  # Column from treas_hkm
-    else:
-        col2 = f"US_bonds_0{i + 1}"  # Column from treas_hkm
+    for i in range(10):
+        col1 = str(i + 1)  # Column from treas_bond_returns
+        if i == 9:
+            col2 = "US_bonds_10"  # Column from treas_hkm
+        else:
+            col2 = f"US_bonds_0{i + 1}"  # Column from treas_hkm
 
-    ax = axes[i]
-    ax.plot(merged_df.index, merged_df[col1], label=f"Portfolio {i + 1}", color="blue")
-    ax.plot(merged_df.index, merged_df[col2], label=f"HKM {i + 1}", color="red")
-    ax.set_title(f"Comparison: Portfolio {i + 1} vs HKM {i + 1}")
-    ax.legend()
-    ax.grid(True)
+        ax = axes[i]
+        ax.plot(merged_df["DATE"], merged_df[col1], label=f"Portfolio {i + 1}", color="blue")
+        ax.plot(merged_df["DATE"], merged_df[col2], label=f"HKM {i + 1}", color="red", linestyle="--")
+        ax.set_title(f"Comparison: Portfolio {i + 1} vs HKM {i + 1}")
+        ax.legend()
+        ax.grid(True)
 
-    # Rotate x-axis labels for better readability
-    plt.setp(ax.get_xticklabels(), rotation=45)
+        # Rotate x-axis labels for better readability
+        plt.setp(ax.get_xticklabels(), rotation=45)
 
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
+else:
+    print("\nNo data to plot - merged DataFrame is empty")
 
 # Print correlation between corresponding columns
 print("\nCorrelations between corresponding columns:")
@@ -197,8 +213,8 @@ The figure above compares the time-series returns of **Treasury bond portfolios*
 * During periods of heightened volatility—such as the **2008 financial crisis** —portfolios with longer time to maturity generally exhibit greater return sensitivity, seen consistently in both series.
 * Small return differences may result from:
 
-  * Different data source used,
-  * Differences in portfolio formation details or rebalance timing.
+  * Rounding errors due to different data sources and small values.
+  * Missing values in the HKM data.
 
 ---
 
