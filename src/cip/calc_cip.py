@@ -44,10 +44,12 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
         Merged DataFrame with all prepared data
     """
     # Set Date as index
-    spot_rates = spot_rates.set_index("Date") if "Date" in spot_rates.columns else spot_rates
-    forward_points = forward_points.set_index("Date") if "Date" in forward_points.columns else forward_points
-    interest_rates = interest_rates.set_index("Date") if "Date" in interest_rates.columns else interest_rates
-    
+
+    spot_rates = spot_rates.set_index("index") if "index" in spot_rates.columns else spot_rates
+    forward_points = forward_points.set_index("index") if "index" in forward_points.columns else forward_points
+    interest_rates = interest_rates.set_index("index") if "index" in interest_rates.columns else interest_rates
+
+
     # Standard column names for currencies
     cols = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK", "USD"]
     int_cols = ['ADS', 'CDS', 'SFS', 'EUS', 'BPS', 'JYS', 'NDS', 'SKS', 'USS']
@@ -66,17 +68,19 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
         df.columns = new_cols
         
         # Keep only our standard currencies
-        if interest_rate == True:
-            available_cols = [c for c in int_cols if c in df.columns]
-            df = df[available_cols]
-        else:
-            available_cols = [c for c in cols if c in df.columns]
-            df = df[available_cols]
+        # if interest_rate == True:
+        #     available_cols = [c for c in int_cols if c in df.columns]
+        #     df = df[available_cols]
+        # else:
+        #     available_cols = [c for c in cols if c in df.columns]
+        #     df = df[available_cols]
         
-        # Add suffix if provided
-        if suffix:
-            df.columns = [f"{c}{suffix}" for c in df.columns]
-        
+        # # Add suffix if provided
+        # if suffix:
+        #     df.columns = [f"{c}{suffix}" for c in df.columns]
+
+        ## I've commented this out because it was dropping the index of all
+        ## three dataframes --- Alex
         return df
     
     # Clean and rename columns
@@ -114,7 +118,7 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
     df_merged = spot_rates.merge(
         forward_rates, left_index=True, right_index=True, how="inner"
     ).merge(interest_rates, left_index=True, right_index=True, how="inner")
-    
+
     # Convert to reciprocal for these currencies (quoted as foreign/USD instead of USD/foreign)
     reciprocal_currencies = ["EUR", "GBP", "AUD", "NZD"]
     for ccy in reciprocal_currencies:
@@ -278,7 +282,8 @@ def calculate_cip(end_date='2025-03-01', plot=False):
     df_merged = prepare_fx_data(spot_rates, forward_points, interest_rates)
     # Filter by end date
     if end_date:
-        df_merged = df_merged.loc[:end_date]
+        date = pd.Timestamp(end_date).date()
+        df_merged = df_merged.loc[:date]
 
     # Compute CIP spreads
     df_merged = compute_cip_spreads(df_merged)
