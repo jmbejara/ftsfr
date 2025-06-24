@@ -44,15 +44,18 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
         Merged DataFrame with all prepared data
     """
     # Set Date as index
-    spot_rates = spot_rates.set_index("Date") if "Date" in spot_rates.columns else spot_rates
-    forward_points = forward_points.set_index("Date") if "Date" in forward_points.columns else forward_points
-    interest_rates = interest_rates.set_index("Date") if "Date" in interest_rates.columns else interest_rates
-    
+
+    spot_rates = spot_rates.set_index("index") if "index" in spot_rates.columns else spot_rates
+    forward_points = forward_points.set_index("index") if "index" in forward_points.columns else forward_points
+    interest_rates = interest_rates.set_index("index") if "index" in interest_rates.columns else interest_rates
+
+
     # Standard column names for currencies
-    cols = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
+    cols = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK", "USD"]
+    int_cols = ['ADS', 'CDS', 'SFS', 'EUS', 'BPS', 'JYS', 'NDS', 'SKS', 'USS']
     
     # Clean up column names - extract currency codes from Bloomberg tickers if needed
-    def clean_columns(df, suffix=""):
+    def clean_columns(df, suffix="", interest_rate=False):
         new_cols = []
         for col in df.columns:
             # Extract currency code from Bloomberg ticker format
@@ -61,23 +64,33 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
                 new_cols.append(currency)
             else:
                 new_cols.append(col)
+
         df.columns = new_cols
         
         # Keep only our standard currencies
-        available_cols = [c for c in cols if c in df.columns]
-        df = df[available_cols]
+        # if interest_rate == True:
+        #     available_cols = [c for c in int_cols if c in df.columns]
+        #     df = df[available_cols]
+        # else:
+        #     available_cols = [c for c in cols if c in df.columns]
+        #     df = df[available_cols]
         
-        # Add suffix if provided
-        if suffix:
-            df.columns = [f"{c}{suffix}" for c in df.columns]
-        
+        # # Add suffix if provided
+        # if suffix:
+        #     df.columns = [f"{c}{suffix}" for c in df.columns]
+
+        ## I've commented this out because it was dropping the index of all
+        ## three dataframes --- Alex
         return df
     
     # Clean and rename columns
     spot_rates = clean_columns(spot_rates)
     forward_points = clean_columns(forward_points)
-    interest_rates = clean_columns(interest_rates)
-    
+    interest_rates = clean_columns(interest_rates, interest_rate=True)
+
+    # Map interest rate columns from int_cols to cols
+    ir_mapping = dict(zip(int_cols, cols))
+    interest_rates = interest_rates.rename(columns=ir_mapping)
     # Also include USD in interest rates if available
     if "USD" in interest_rates.columns:
         cols_ir = cols + ["USD"]
@@ -105,7 +118,7 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
     df_merged = spot_rates.merge(
         forward_rates, left_index=True, right_index=True, how="inner"
     ).merge(interest_rates, left_index=True, right_index=True, how="inner")
-    
+
     # Convert to reciprocal for these currencies (quoted as foreign/USD instead of USD/foreign)
     reciprocal_currencies = ["EUR", "GBP", "AUD", "NZD"]
     for ccy in reciprocal_currencies:
@@ -264,25 +277,24 @@ def calculate_cip(end_date='2025-03-01', plot=False):
     spot_rates = pull_bbg_foreign_exchange.load_fx_spot_rates(data_dir=DATA_DIR)
     forward_points = pull_bbg_foreign_exchange.load_fx_forward_points(data_dir=DATA_DIR)
     interest_rates = pull_bbg_foreign_exchange.load_fx_interest_rates(data_dir=DATA_DIR)
-    
+
     # Prepare data
     df_merged = prepare_fx_data(spot_rates, forward_points, interest_rates)
-    
     # Filter by end date
     if end_date:
-        df_merged = df_merged.loc[:end_date]
-    
+        date = pd.Timestamp(end_date).date()
+        df_merged = df_merged.loc[:date]
+
     # Compute CIP spreads
     df_merged = compute_cip_spreads(df_merged)
-    
     # Clean outliers
     df_merged = clean_outliers(df_merged)
-    
+
     # Extract just the CIP columns
     currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
     cip_cols = [f"CIP_{c}_ln" for c in currencies if f"CIP_{c}_ln" in df_merged.columns]
     spreads = df_merged[cip_cols].copy()
-    
+  
     # Shorten column names for display
     spreads.columns = [c[4:7] for c in spreads.columns]  # e.g., CIP_AUD_ln -> AUD
     
