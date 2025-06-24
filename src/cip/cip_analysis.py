@@ -11,9 +11,9 @@ import numpy as np
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 try:
-    from src.pull_bloomberg_cip_data import *
+    from src.calc_cip import *
 except ModuleNotFoundError:
-    from pull_bloomberg_cip_data import *
+    from calc_cip import *
 
 
 
@@ -37,7 +37,12 @@ def compute_cip_statistics(cip_data):
 
     stats_dict["overall_statistics"] = cip_df.describe()
     stats_dict["correlation_matrix"] = cip_df.corr()
-    cip_data.index = pd.to_datetime(cip_data.index)
+    
+    # Ensure index is datetime for resampling
+    if not isinstance(cip_data.index, pd.DatetimeIndex):
+        cip_data.index = pd.to_datetime(cip_data.index)
+        cip_df.index = cip_data.index
+    
     stats_dict["annual_statistics"] = cip_df.resample('YE').agg(['mean', 'std', 'min', 'max'])
 
     return stats_dict

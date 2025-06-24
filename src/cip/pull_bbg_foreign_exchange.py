@@ -139,7 +139,7 @@ def load_fx_spot_rates(data_dir=DATA_DIR):
     $ NZD CMPN Curncy_PX_LAST  <f64> 1.1138
     $ SEK CMPN Curncy_PX_LAST  <f64> 5.1643
     """
-    path = data_dir / "cip/fx_spot_rates.parquet"
+    path = data_dir / "fx_spot_rates.parquet"
     return pd.read_parquet(path)
 
 
@@ -161,7 +161,7 @@ def load_fx_forward_points(data_dir=DATA_DIR):
     $ NZD3M CMPN Curncy_PX_LAST  <f64> None
     $ SEK3M CMPN Curncy_PX_LAST  <f64> None
     """
-    path = data_dir / "cip/fx_forward_points.parquet"
+    path = data_dir / "fx_forward_points.parquet"
     return pd.read_parquet(path)
 
 
@@ -185,7 +185,7 @@ def load_fx_interest_rates(data_dir=DATA_DIR):
     $ USSOC CMPN Curncy_PX_LAST   <f64> None
 
     """
-    path = data_dir / "cip/fx_interest_rates.parquet"
+    path = data_dir / "fx_interest_rates.parquet"
     return pd.read_parquet(path)
 
 

@@ -99,14 +99,11 @@ if data_sources["bloomberg_terminal"] and not is_data_glimpses:
             sys.exit(1)
         elif response in ["skip", ""]:
             print("Skipping Bloomberg Terminal data sources...")
-            data_sources["bloomberg_terminal"] = False
             bbg_skip = True
             break
         else:
             print("Please enter 'yes', 'no', or 'skip'.")
-elif data_sources["bloomberg_terminal"] and is_data_glimpses:
-    # When called by create_data_glimpses.py, automatically skip Bloomberg Terminal sources
-    data_sources["bloomberg_terminal"] = False
+
 
 # fmt: off
 module_requirements = {}
@@ -428,12 +425,14 @@ def task_format():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/calc_cip.py --DATA_DIR={DATA_DIR / data_module}",
+                # f"python ./src/{data_module}/cip_analysis.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "cip_spreads.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_cip.py",
+                # f"./src/{data_module}/cip_analysis.py",
             ],
             "clean": [],
         }
@@ -681,17 +680,24 @@ notebook_tasks = {
         ],
         "targets": [],
     },
-    "summary_corp_bond_returns_ipynb": {
-        "path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
-        "file_dep": [
-            "./src/corp_bond_returns/calc_corp_bond_returns.py",
-        ],
-        "targets": [],
-    },
     "summary_cds_returns_ipynb": {
         "path": "./src/cds_returns/summary_cds_returns_ipynb.py",
         "file_dep": [
             "./src/cds_returns/calc_cds_returns.py",
+        ],
+        "targets": [],
+    },
+    "summary_cip_ipynb": {
+        "path": "./src/cip/summary_cip_ipynb.py",
+        "file_dep": [
+            "./src/cip/calc_cip.py",
+        ],
+        "targets": [],
+    },
+    "summary_corp_bond_returns_ipynb": {
+        "path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
+        "file_dep": [
+            "./src/corp_bond_returns/calc_corp_bond_returns.py",
         ],
         "targets": [],
     },
@@ -743,8 +749,8 @@ def task_create_data_glimpses():
     """Create data glimpses"""
     # Get all files in the src directory recursively
     src_files = list(Path("./src").rglob("*"))
-    # Filter to only include actual files (not directories)
-    src_files = [str(f) for f in src_files if f.is_file()]
+    # Filter to only include actual files (not directories) and exclude .ipynb files
+    src_files = [str(f) for f in src_files if f.is_file() and f.suffix != ".ipynb"]
 
     return {
         "actions": [

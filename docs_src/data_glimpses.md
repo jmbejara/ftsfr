@@ -1,6 +1,6 @@
 # Data Glimpses Report
-Generated: 2025-06-23 10:34:13
-Total files: 58
+Generated: 2025-06-24 10:38:06
+Total files: 67
 
 ## Summary of Datasets by Task
 
@@ -24,10 +24,14 @@ Total files: 58
 #### Format: Cds Bond Basis
 - [`Final_data.parquet`](#final-data-parquet)
 - [`Red_Data.parquet`](#red-data-parquet)
+#### Format: Cip
+- [`cip_spreads.parquet`](#cip-spreads-parquet)
 #### Format: Corp Bond Returns
 - [`corp_bond_portfolio_returns.parquet`](#corp-bond-portfolio-returns-parquet)
 #### Format: Fed Yield Curve
 - [`ftsfr_treas_yield_curve_zero_coupon.parquet`](#ftsfr-treas-yield-curve-zero-coupon-parquet)
+#### Format: Futures Returns
+- [`futures_returns.parquet`](#futures-returns-parquet)
 #### Format: Nyu Call Report
 - [`ftsfr_nyu_call_report_cash_liquidity.parquet`](#ftsfr-nyu-call-report-cash-liquidity-parquet)
 - [`ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`](#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet)
@@ -52,6 +56,14 @@ Total files: 58
 - [`fed_yield_curve.parquet`](#fed-yield-curve-parquet)
 - [`fred.parquet`](#fred-parquet)
 - [`markit_cds.parquet`](#markit-cds-parquet)
+#### Pull: Cip
+- [`fx_forward_points.parquet`](#fx-forward-points-parquet)
+- [`fx_interest_rates.parquet`](#fx-interest-rates-parquet)
+- [`fx_spot_rates.parquet`](#fx-spot-rates-parquet)
+#### Pull: Commodities
+- [`commodity_futures.parquet`](#commodity-futures-parquet)
+- [`gsci_indices.parquet`](#gsci-indices-parquet)
+- [`lme_metals.parquet`](#lme-metals-parquet)
 #### Pull: Corp Bond Returns
 - [`corporate_bond_returns.parquet`](#corporate-bond-returns-parquet)
 - [`treasury_bond_returns.parquet`](#treasury-bond-returns-parquet)
@@ -60,6 +72,8 @@ Total files: 58
 #### Pull: Foreign Exchange
 - [`fx_daily_data.parquet`](#fx-daily-data-parquet)
 - [`fx_monthly_data.parquet`](#fx-monthly-data-parquet)
+#### Pull: Futures Returns
+- [`wrds_futures.parquet`](#wrds-futures-parquet)
 #### Pull: He Kelly Manela
 - [`He_Kelly_Manela_Factors_And_Test_Assets_monthly.csv`](#he-kelly-manela-factors-and-test-assets-monthly-csv)
 - [`He_Kelly_Manela_Factors_daily.csv`](#he-kelly-manela-factors-daily-csv)
@@ -593,6 +607,253 @@ Month                                    Datetime(time_unit='ns', time_zone=None
 
 ---
 
+## cip_spreads.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cip/cip_spreads.parquet`
+**Size:** 463478 bytes | **Type:** Parquet | **Shape:** 6,790 rows × 9 columns
+
+### Columns
+```
+AUD                                      Float64         (11.5% null)
+CAD                                      Float64         (16.0% null)
+CHF                                      Float64         (41.1% null)
+EUR                                      Float64         (23.2% null)
+GBP                                      Float64         (11.2% null)
+JPY                                      Float64         (15.1% null)
+NZD                                      Float64         (14.5% null)
+SEK                                      Float64         (26.8% null)
+index                                    Date           
+```
+
+### Numeric Column Statistics
+```
+AUD: min=-58.53520492586132, max=339.68876731391674, mean=1.89, median=1.1534613513037661
+CAD: min=-11.13750568037226, max=313.1892275693841, mean=15.41, median=10.361567750541223
+CHF: min=-9.265949135860806, max=181.36353541348308, mean=34.16, median=29.999955867636082
+EUR: min=-22.949139790071722, max=370.9439992219156, mean=26.25, median=21.257006012834353
+GBP: min=-11.71473649302368, max=287.634939349282, mean=14.36, median=8.552763054047798
+JPY: min=-31.23245606446813, max=439.59367390435733, mean=37.54, median=31.855508763267146
+NZD: min=-65.25243119248204, max=257.4711793363026, mean=0.09, median=-5.4573860355283665
+SEK: min=-75.02010739148606, max=374.5435302007317, mean=29.33, median=21.911787065051698
+```
+
+---
+
+## fx_forward_points.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cip/fx_forward_points.parquet`
+**Size:** 381386 bytes | **Type:** Parquet | **Shape:** 10,376 rows × 9 columns
+
+### Columns
+```
+index                                    Date           
+AUD3M CMPN Curncy_PX_LAST                Float64         (4.3% null)
+CAD3M CMPN Curncy_PX_LAST                Float64         (8.9% null)
+CHF3M CMPN Curncy_PX_LAST                Float64         (8.7% null)
+EUR3M CMPN Curncy_PX_LAST                Float64         (33.4% null)
+GBP3M CMPN Curncy_PX_LAST                Float64         (4.0% null)
+JPY3M CMPN Curncy_PX_LAST                Float64         (8.8% null)
+NZD3M CMPN Curncy_PX_LAST                Float64         (8.9% null)
+SEK3M CMPN Curncy_PX_LAST                Float64         (8.8% null)
+```
+
+### Numeric Column Statistics
+```
+AUD3M CMPN Curncy_PX_LAST: min=-228.11, max=72.0, mean=-39.84, median=-30.56
+CAD3M CMPN Curncy_PX_LAST: min=-90.5, max=190.0, mean=9.10, median=0.75
+CHF3M CMPN Curncy_PX_LAST: min=-327.01, max=211.0, mean=-47.42, median=-40.03
+EUR3M CMPN Curncy_PX_LAST: min=-79.05, max=101.47, mean=23.41, median=23.59
+GBP3M CMPN Curncy_PX_LAST: min=-348.54, max=66.64, mean=-46.40, median=-12.11
+JPY3M CMPN Curncy_PX_LAST: min=-234.14, max=74.32, mean=-71.75, median=-55.28
+NZD3M CMPN Curncy_PX_LAST: min=-159.0, max=82.0, mean=-35.63, median=-39.0
+SEK3M CMPN Curncy_PX_LAST: min=-847.0, max=6500.01, mean=27.57, median=-59.55
+```
+
+---
+
+## fx_interest_rates.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cip/fx_interest_rates.parquet`
+**Size:** 256050 bytes | **Type:** Parquet | **Shape:** 6,867 rows × 10 columns
+
+### Columns
+```
+index                                    Date           
+ADSOC CMPN Curncy_PX_LAST                Float64         (11.0% null)
+CDSOC CMPN Curncy_PX_LAST                Float64         (15.5% null)
+SFSNTC CMPN Curncy_PX_LAST               Float64         (40.4% null)
+EUSWEC CMPN Curncy_PX_LAST               Float64         (13.4% null)
+BPSWSC CMPN Curncy_PX_LAST               Float64         (7.2% null)
+JYSOC CMPN Curncy_PX_LAST                Float64         (14.6% null)
+NDSOC CMPN Curncy_PX_LAST                Float64         (14.0% null)
+SKSWTNC BGN Curncy_PX_LAST               Float64         (26.3% null)
+USSOC CMPN Curncy_PX_LAST                Float64         (10.8% null)
+```
+
+### Numeric Column Statistics
+```
+ADSOC CMPN Curncy_PX_LAST: min=0.01875, max=7.3985, mean=3.40, median=3.6325
+CDSOC CMPN Curncy_PX_LAST: min=0.1675, max=5.165, mean=1.88, median=1.11
+SFSNTC CMPN Curncy_PX_LAST: min=-1.025, max=1.8825, mean=-0.21, median=-0.2175
+EUSWEC CMPN Curncy_PX_LAST: min=-0.5943, max=5.095, mean=1.37, median=0.6065
+BPSWSC CMPN Curncy_PX_LAST: min=0.023, max=5.985, mean=2.27, median=0.70105
+JYSOC CMPN Curncy_PX_LAST: min=-0.15125, max=0.699, mean=0.08, median=0.039
+NDSOC CMPN Curncy_PX_LAST: min=0.1941, max=8.37125, mean=3.71, median=2.8752500000000003
+SKSWTNC BGN Curncy_PX_LAST: min=-0.618, max=5.04, mean=1.21, median=0.95
+USSOC CMPN Curncy_PX_LAST: min=0.04302, max=5.4432, mean=1.74, median=1.1179999999999999
+```
+
+---
+
+## fx_spot_rates.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cip/fx_spot_rates.parquet`
+**Size:** 546726 bytes | **Type:** Parquet | **Shape:** 14,207 rows × 9 columns
+
+### Columns
+```
+index                                    Date           
+AUD CMPN Curncy_PX_LAST                  Float64         (1.0% null)
+CAD CMPN Curncy_PX_LAST                  Float64        
+CHF CMPN Curncy_PX_LAST                  Float64        
+EUR CMPN Curncy_PX_LAST                  Float64         (51.4% null)
+GBP CMPN Curncy_PX_LAST                  Float64        
+JPY CMPN Curncy_PX_LAST                  Float64        
+NZD CMPN Curncy_PX_LAST                  Float64         (1.2% null)
+SEK CMPN Curncy_PX_LAST                  Float64        
+```
+
+### Numeric Column Statistics
+```
+AUD CMPN Curncy_PX_LAST: min=0.479, max=1.4885, mean=0.85, median=0.7698
+CAD CMPN Curncy_PX_LAST: min=0.9204, max=1.6135, mean=1.23, median=1.2382
+CHF CMPN Curncy_PX_LAST: min=0.7208, max=4.318, mean=1.58, median=1.404
+EUR CMPN Curncy_PX_LAST: min=0.8272, max=1.5992, mean=1.18, median=1.1712
+GBP CMPN Curncy_PX_LAST: min=1.052, max=2.644, mean=1.68, median=1.612
+JPY CMPN Curncy_PX_LAST: min=75.83, max=358.44, mean=156.48, median=123.36
+NZD CMPN Curncy_PX_LAST: min=0.3915, max=1.49, mean=0.73, median=0.6724
+SEK CMPN Curncy_PX_LAST: min=3.867, max=11.3655, mean=7.15, median=7.1965
+```
+
+---
+
+## commodity_futures.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/commodities/commodity_futures.parquet`
+**Size:** 246666 bytes | **Type:** Parquet | **Shape:** 13,982 rows × 5 columns
+
+### Columns
+```
+index                                    Date           
+KW1 Comdty_PX_LAST                       Float64         (0.1% null)
+KW2 Comdty_PX_LAST                       Float64         (0.1% null)
+KW3 Comdty_PX_LAST                       Float64         (0.1% null)
+SI3 Comdty_PX_LAST                       Float64         (9.2% null)
+```
+
+### Numeric Column Statistics
+```
+KW1 Comdty_PX_LAST: min=128.0, max=1367.75, mean=440.32, median=397.5
+KW2 Comdty_PX_LAST: min=130.125, max=1369.25, mean=443.96, median=396.75
+KW3 Comdty_PX_LAST: min=131.75, max=1370.0, mean=446.81, median=395.0
+SI3 Comdty_PX_LAST: min=3.573, max=48.609, mean=12.13, median=7.802
+```
+
+---
+
+## gsci_indices.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/commodities/gsci_indices.parquet`
+**Size:** 2.0 MB | **Type:** Parquet | **Shape:** 15,272 rows × 25 columns
+
+### Columns
+```
+index                                    Date           
+SPGCBRP Index_PX_LAST                    Float64         (56.4% null)
+SPGCGOP Index_PX_LAST                    Float64         (56.4% null)
+SPGCCLP Index_PX_LAST                    Float64         (36.5% null)
+SPGCHUP Index_PX_LAST                    Float64         (38.2% null)
+SPGCHOP Index_PX_LAST                    Float64         (29.9% null)
+SPGCNGP Index_PX_LAST                    Float64         (48.1% null)
+SPGCCTP Index_PX_LAST                    Float64         (20.0% null)
+SPGCKCP Index_PX_LAST                    Float64         (26.6% null)
+SPGCCCP Index_PX_LAST                    Float64         (31.5% null)
+SPGCSBP Index_PX_LAST                    Float64         (13.4% null)
+SPGCSOP Index_PX_LAST                    Float64         (8.4% null)
+SPGCKWP Index_PX_LAST                    Float64         (56.4% null)
+SPGCCNP Index_PX_LAST                    Float64         (8.4% null)
+SPGCWHP Index_PX_LAST                    Float64         (8.4% null)
+SPGCLHP Index_PX_LAST                    Float64         (18.3% null)
+SPGCFCP Index_PX_LAST                    Float64         (61.3% null)
+SPGCLCP Index_PX_LAST                    Float64         (8.4% null)
+SPGCGCP Index_PX_LAST                    Float64         (21.6% null)
+SPGCSIP Index_PX_LAST                    Float64         (13.4% null)
+SPGCIAP Index_PX_LAST                    Float64         (43.1% null)
+SPGCIKP Index_PX_LAST                    Float64         (46.5% null)
+SPGCILP Index_PX_LAST                    Float64         (49.8% null)
+SPGCIZP Index_PX_LAST                    Float64         (43.1% null)
+SPGCICP Index_PX_LAST                    Float64         (20.0% null)
+```
+
+### Numeric Column Statistics
+```
+SPGCBRP Index_PX_LAST: min=85.0295, max=1574.401, mean=535.02, median=514.5391500000001
+SPGCGOP Index_PX_LAST: min=83.9114, max=1394.014, mean=475.62, median=459.79895
+SPGCCLP Index_PX_LAST: min=26.951, max=1818.372, mean=373.76, median=239.3859
+SPGCHUP Index_PX_LAST: min=92.861, max=2548.616, mean=905.51, median=861.777
+SPGCHOP Index_PX_LAST: min=64.8596, max=785.5128, mean=241.62, median=204.8156
+SPGCNGP Index_PX_LAST: min=1.38733, max=12860.73, mean=1654.48, median=140.5376
+SPGCCTP Index_PX_LAST: min=20.0144, max=337.9354, mean=97.02, median=74.5711
+SPGCKCP Index_PX_LAST: min=5.81163, max=371.3201, mean=65.97, median=33.93933
+SPGCCCP Index_PX_LAST: min=4.05504, max=108.1477, mean=21.54, median=11.501085
+SPGCSBP Index_PX_LAST: min=6.30204, max=1328.392, mean=57.00, median=18.565269999999998
+SPGCSOP Index_PX_LAST: min=99.7519, max=714.491, mean=309.81, median=281.5665
+SPGCKWP Index_PX_LAST: min=10.86842, max=140.7057, mean=42.85, median=46.5597
+SPGCCNP Index_PX_LAST: min=4.560629, max=331.9445, mean=71.85, median=53.25036
+SPGCWHP Index_PX_LAST: min=4.09038, max=645.9026, mean=111.92, median=103.99674999999999
+SPGCLHP Index_PX_LAST: min=6.12682, max=425.417, mean=133.16, median=117.48205
+SPGCFCP Index_PX_LAST: min=80.03, max=158.5639, mean=110.96, median=108.9892
+SPGCLCP Index_PX_LAST: min=95.9177, max=686.5271, mean=360.99, median=348.52795000000003
+SPGCGCP Index_PX_LAST: min=28.9087, max=398.9086, mean=93.53, median=91.2284
+SPGCSIP Index_PX_LAST: min=21.98021, max=1154.509, mean=96.84, median=69.09691
+SPGCIAP Index_PX_LAST: min=18.71784, max=100.0, mean=45.39, median=42.8971
+SPGCIKP Index_PX_LAST: min=42.8746, max=844.8805, mean=195.91, median=177.1975
+SPGCILP Index_PX_LAST: min=39.7621, max=461.1942, mean=156.97, median=172.1947
+SPGCIZP Index_PX_LAST: min=29.4915, max=151.1885, mean=62.96, median=60.65394
+SPGCICP Index_PX_LAST: min=33.3476, max=918.4696, mean=325.40, median=174.1641
+```
+
+---
+
+## lme_metals.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/commodities/lme_metals.parquet`
+**Size:** 457058 bytes | **Type:** Parquet | **Shape:** 9,919 rows × 11 columns
+
+### Columns
+```
+index                                    Date           
+LMAHDY Comdty_PX_LAST                    Float64         (3.8% null)
+LMAHDS03 Comdty_PX_LAST                  Float64         (3.1% null)
+LMNIDY Comdty_PX_LAST                    Float64         (2.2% null)
+LMNIDS03 Comdty_PX_LAST                  Float64         (2.1% null)
+LMPBDY Comdty_PX_LAST                    Float64         (2.1% null)
+LMPBDS03 Comdty_PX_LAST                  Float64         (2.1% null)
+LMZSDY Comdty_PX_LAST                    Float64         (7.1% null)
+LMZSDS03 Comdty_PX_LAST                  Float64         (7.1% null)
+LMCADY Comdty_PX_LAST                    Float64         (0.2% null)
+LMCADS03 Comdty_PX_LAST                  Float64         (0.2% null)
+```
+
+### Numeric Column Statistics
+```
+LMAHDY Comdty_PX_LAST: min=1019.0, max=4290.0, mean=1869.95, median=1784.875
+LMAHDS03 Comdty_PX_LAST: min=1040.5, max=3849.0, mean=1878.77, median=1796.0
+LMNIDY Comdty_PX_LAST: min=2282.0, max=54050.0, mean=13297.36, median=12072.25
+LMNIDS03 Comdty_PX_LAST: min=2331.0, max=51600.0, mean=13224.95, median=11950.0
+LMPBDY Comdty_PX_LAST: min=356.0, max=3989.0, mean=1342.98, median=1105.0
+LMPBDS03 Comdty_PX_LAST: min=369.0, max=3890.0, mean=1345.08, median=1093.5
+LMZSDY Comdty_PX_LAST: min=722.75, max=4603.0, mean=1846.36, median=1780.0
+LMZSDS03 Comdty_PX_LAST: min=743.0, max=4515.0, mean=1850.37, median=1772.0
+LMCADY Comdty_PX_LAST: min=1287.18, max=11299.5, mean=4684.37, median=3687.5
+LMCADS03 Comdty_PX_LAST: min=1301.7, max=10889.0, mean=4665.68, median=3567.0
+```
+
+---
+
 ## corp_bond_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/corp_bond_portfolio_returns.parquet`
 **Size:** 30784 bytes | **Type:** Parquet | **Shape:** 242 rows × 11 columns
@@ -1068,6 +1329,50 @@ twexmmth: min=69.0608, max=143.9059, mean=94.12, median=92.5692
 twexafegsmth: min=82.6783, max=123.1599, mean=101.24, median=103.1943
 twexomth: min=1.9979, max=172.8066, mean=80.26, median=98.3551
 twexemegsmth: min=89.8244, max=138.5574, mean=110.73, median=108.8631
+```
+
+---
+
+## futures_returns.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/futures_returns/futures_returns.parquet`
+**Size:** 18.2 MB | **Type:** Parquet | **Shape:** 4,921,751 rows × 5 columns
+
+### Columns
+```
+futcode                                  Float64        
+date                                     Datetime(time_unit='ns', time_zone=None)
+settlement                               Float64         (0.1% null)
+contrdate                                String         
+product_code                             Int64          
+```
+
+### Numeric Column Statistics
+```
+futcode: min=37.0, max=487137.0, mean=204053.20, median=180720.0
+settlement: min=-37.630005, max=24480.0, mean=591.56, median=59.699997
+product_code: min=289, max=3847, mean=2121.62, median=2060.0
+```
+
+---
+
+## wrds_futures.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/futures_returns/wrds_futures.parquet`
+**Size:** 18.2 MB | **Type:** Parquet | **Shape:** 4,921,751 rows × 5 columns
+
+### Columns
+```
+futcode                                  Float64        
+date                                     Datetime(time_unit='ns', time_zone=None)
+settlement                               Float64         (0.1% null)
+contrdate                                String         
+product_code                             Int64          
+```
+
+### Numeric Column Statistics
+```
+futcode: min=37.0, max=487137.0, mean=204053.20, median=180720.0
+settlement: min=-37.630005, max=24480.0, mean=591.56, median=59.699997
+product_code: min=289, max=3847, mean=2121.62, median=2060.0
 ```
 
 ---
