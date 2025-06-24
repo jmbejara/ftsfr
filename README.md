@@ -12,23 +12,21 @@ All
 
 Alex and Vincent
  - Bloomberg data now available in foreign_exchange/pull_bbg_foreign_exchange.py https://github.com/jmbejara/ftsfr/issues/18
- - https://github.com/Kunj121/CIP FX and then CIP? (I received permission). Blocked by Jeremy, needs to do Bloomberg stuff.
  - Foreign Exchange returns (returns on individual currencies, not the portfolios of He, Kelly, Manela) 
- - CIP deviations as seen in Kunj's code. https://github.com/Kunj121/CIP and in foreign_exchange/pull_bbg_foreign_exchange.py
- - Can close? https://github.com/jmbejara/ftsfr/issues/13
 
 
 Kausthub
- - Status? https://github.com/jmbejara/ftsfr/issues/11
- - Status? https://github.com/jmbejara/ftsfr/issues/9
+ - Sovereign bond data: https://github.com/jmbejara/ftsfr/issues/26
  - Treasuries and Corporate Bonds done? Sovereign Bonds next?
 
 Yangge
  - Present issues raised in https://github.com/jmbejara/ftsfr/issues/21
  - Commodity returns? https://github.com/kyleparran/final_project_group_09 (I received permission)
+ - Compare against: https://github.com/Raafayuqaily/DS-Commodities-Final-Project
 
 Jeremy
  - Check this again? https://github.com/jmbejara/ftsfr/issues/2
+ - Bloomberg sovereign bond data: https://github.com/jmbejara/ftsfr/issues/26
 
 
 This repository contains a collection of financial time-series forecasting models. It produces esting a benchmark for prac
