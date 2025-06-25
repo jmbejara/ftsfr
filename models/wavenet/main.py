@@ -1,7 +1,7 @@
 """
-Feed forward neural network(FFNN) using GluonTS.
+WaveNet using GluonTS.
 
-Performs both local and global forecasting using FFNN. Reports both mean and
+Performs both local and global forecasting using WaveNet. Reports both mean and
 median MASE for local forecasts and a single global MASE.
 """
 from pathlib import Path
@@ -14,7 +14,12 @@ from tqdm import tqdm
 import numpy as np
 from decouple import config
 
-from gluonts.torch import SimpleFeedForwardEstimator
+import os
+# This option is important if running on an mps(e.g. MacBook) device to enable 
+# CPU fallback for PyTorch
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"]="1"
+
+from gluonts.torch import WaveNetEstimator
 from gluonts.dataset.common import ListDataset
 from gluonts.dataset.field_names import FieldName
 from gluonts.evaluation.backtest import make_evaluation_predictions
@@ -42,9 +47,9 @@ SEASONALITY_MAP_ADAPT = {
    "1Y": 1
 }
 
-def get_ffnn_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, external_forecast_horizon = None):
+def get_wavenet_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, external_forecast_horizon = None):
     """
-    Takes processed DataFrame, runs the training for a FFNN model, and returns MASE
+    Takes processed DataFrame, runs the training for a WaveNet model, and returns MASE
 
     :param lag: the number of past lags that should be used when predicting the 
     future value of time series
@@ -110,8 +115,9 @@ def get_ffnn_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, exter
     train_ds = ListDataset(train_series_full_list, freq=freq)
     test_ds = ListDataset(test_series_full_list, freq=freq)
 
-    estimator = SimpleFeedForwardEstimator(context_length=lag,
-                                               prediction_length=forecast_horizon)
+    estimator = WaveNetEstimator(freq = freq,
+                                 context_length=lag,
+                                 prediction_length=forecast_horizon)
 
     predictor = estimator.train(training_data=train_ds)
 
@@ -127,10 +133,10 @@ def get_ffnn_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, exter
 
     return agg_metrics["MASE"]
 
-def get_ffnn_forecasts_local(lag, df, frequency, external_forecast_horizon = None):
+def get_wavenet_forecasts_local(lag, df, frequency, external_forecast_horizon = None):
     """
     Takes processed DataFrame containing multiple or single time series, runs 
-    the training for a separate FFNN model on each series, and returns MASE
+    the training for a separate WaveNet model on each series, and returns MASE
 
     :param lag: the number of past lags that should be used when predicting the 
     next future value of time series
@@ -145,14 +151,14 @@ def get_ffnn_forecasts_local(lag, df, frequency, external_forecast_horizon = Non
     entities = df["entity"].unique()
     mase_values = []
 
-    print(f"Running FFNN forecasting for {len(entities)} entities...")
+    print(f"Running WaveNet forecasting for {len(entities)} entities...")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
         entity_data = df[df["entity"] == entity]
 
         # Generate forecasts using ARIMA
-        entity_mase = get_ffnn_forecasts_global(lag=lag,
+        entity_mase = get_wavenet_forecasts_global(lag=lag,
                                                 df=entity_data,
                                                 test_ratio=test_ratio,
                                                 frequency=frequency,
@@ -188,7 +194,7 @@ if __name__ == "__main__":
 
     # Process each entity separately
     entities = proc_df["entity"].unique()
-    mase_values = get_ffnn_forecasts_local(lag = 50, 
+    mase_values = get_wavenet_forecasts_local(lag = 50, 
                                            df = proc_df,
                                            frequency = "1B",
                                            external_forecast_horizon = forecast_horizon)
@@ -199,7 +205,7 @@ if __name__ == "__main__":
 
     # Global Forecasting
 
-    global_mase = get_ffnn_forecasts_global(lag = 50,
+    global_mase = get_wavenet_forecasts_global(lag = 50,
                                             df = proc_df,
                                             test_ratio = 0.2,
                                             frequency = "1B",
@@ -207,7 +213,7 @@ if __name__ == "__main__":
 
     # Printing and saving results
 
-    print("\nFFNN Forecasting Results:")
+    print("\nWaveNet Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
@@ -216,7 +222,7 @@ if __name__ == "__main__":
 
     results_df = pd.DataFrame(
         {
-            "model": ["FFNN"],
+            "model": ["WaveNet"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
@@ -225,4 +231,4 @@ if __name__ == "__main__":
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "ffnn_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "wavenet_results.csv", index=False)

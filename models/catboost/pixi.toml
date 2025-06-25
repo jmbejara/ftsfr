@@ -1,6 +1,6 @@
 [workspace]
 channels = ["conda-forge"]
-name = "ffnn"
+name = "arima-forecasting"
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tasks]
@@ -8,14 +8,11 @@ main = "python main.py"
 
 [dependencies]
 python = "3.13.*"
-pip = "*"
 python-decouple = "*"
 toml = "*"
 pandas = "*"
 numpy = "*"
+statsmodels = "*"
+tqdm = "*"
 pyarrow = "*"
 gfortran = "*"
-gluonts = "*"
-pytorch = "*"
-lightning = "*"
-scipy = "*"
