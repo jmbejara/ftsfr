@@ -1,8 +1,8 @@
 """
-ARIMA using darts
+TimesFM using sktime
 
-Performs both local forecasting using ARIMA. Reports both mean and
-median MASE for local forecasts.
+Performs both local and global forecasting using TimesFM. Reports both mean and
+median MASE for local forecasts and a single global MASE.
 """
 from pathlib import Path
 from warnings import filterwarnings
@@ -15,15 +15,12 @@ import toml
 from decouple import config
 from tqdm import tqdm
 
-from darts.models import ARIMA
-from darts import TimeSeries
-
-from darts.metrics import mase
+from sktime.forecasting.timesfm_forecaster import TimesFMForecaster
 
 
-def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
+def forecast_timesfm(train_data, test_data, seasonality):
     """
-    Fit ARIMA model and return MASE
+    Fit TimesFM model and return MASE
 
     Parameters:
     -----------
@@ -35,6 +32,7 @@ def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
         Testing data
     seasonality : int
         Seasonality of the series
+    
     Returns:
     --------
     int
@@ -42,17 +40,14 @@ def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
     """
     try:
         test_length = len(test_data)
-        p, d, q = order
-        series = TimeSeries.from_dataframe(train_data, time_col = "date")
-        test_series = TimeSeries.from_dataframe(test_data, time_col = "date")
-        estimator = ARIMA(p = p, d = d, q = q)
+        estimator = TimesFMForecaster(context_len = seasonality * 10, 
+                                      horizon_len = test_length)
         estimator.fit(series)
-        pred_series = estimator.predict(test_length)
-
+        pred_series = estimator.predict()
         return mase(test_series, pred_series, series, seasonality)
     except Exception as e:
         # In case of errors, return NaN
-        print(f"Error in ARIMA forecasting: {e}")
+        print(f"Error in TimesFM forecasting: {e}")
         return np.nan
 
 if __name__ == "__main__":
@@ -74,8 +69,8 @@ if __name__ == "__main__":
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis = 1, inplace=True)
-    # This step below is mportant for arima since it can't handle nans
-    # A large outlier value helps arima treat it as a nan
+    # This step below is mportant for timesfm since it can't handle nans
+    # A large outlier value helps timesfm treat it as a nan
     proc_df.fillna(-999, inplace=True)
 
     # Define forecasting parameters
@@ -89,7 +84,7 @@ if __name__ == "__main__":
 
     # Local forecasting
 
-    print(f"Running ARIMA forecasting for {len(entities)} entities...")
+    print(f"Running TimesFM forecasting for {len(entities)} entities...")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
@@ -106,8 +101,8 @@ if __name__ == "__main__":
         train_data = entity_data.iloc[:train_size]
         test_data = entity_data.iloc[train_size:]
 
-        # Get MASE using ARIMA
-        entity_mase = forecast_arima(train_data, test_data, seasonality)
+        # Get MASE using TimesFM
+        entity_mase = forecast_timesfm(train_data, test_data, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -116,9 +111,17 @@ if __name__ == "__main__":
     mean_mase = np.mean(mase_values)
     median_mase = np.median(mase_values)
 
+    # Global Forecasting
+
+    train_index = int((1 - test_ratio) * len(proc_df))
+    global_mase = forecast_timesfm(proc_df.iloc[:train_index],
+                                    proc_df.iloc[train_index:],
+                                    seasonality,
+                                    True)
+
     # Printing and saving results
 
-    print("\nARIMA Forecasting Results:")
+    print("\nTimesFM Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
@@ -126,12 +129,13 @@ if __name__ == "__main__":
 
     results_df = pd.DataFrame(
         {
-            "model": ["ARIMA"],
+            "model": ["TimesFM"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
             "entity_count": [len(mase_values)],
+            "global_mase": [global_mase],
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "arima_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "timesfm_results.csv", index=False)

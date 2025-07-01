@@ -1,172 +1,78 @@
 """
-Transformer using GluonTS.
+Transformer using darts
 
-Performs both local and global forecasting using Transformer. Reports both mean 
-and median MASE for local forecasts and a single global MASE.
+Performs both local and global forecasting using a Transformer. Reports both mean and
+median MASE for local forecasts and a single global MASE.
 """
 from pathlib import Path
 from warnings import filterwarnings
-
+# Ignoring warnings
 filterwarnings("ignore")
 
-import toml
-from tqdm import tqdm
 import numpy as np
-from decouple import config
-
-from gluonts.torch import TransformerEstimator
-from gluonts.dataset.common import ListDataset
-from gluonts.dataset.field_names import FieldName
-from gluonts.evaluation.backtest import make_evaluation_predictions
-from gluonts.evaluation import Evaluator
-
 import pandas as pd
+import toml
+from decouple import config
+from tqdm import tqdm
 
-# The name of the column containing time series values
-VALUE_COL_NAME = "value"
+from darts.models import TransformerModel
+from darts import TimeSeries
+from darts.dataprocessing.transformers import Scaler
+from darts.utils.missing_values import fill_missing_values
+from darts.utils.model_selection import train_test_split
 
-# The name of the column containing timestamps
-TIME_COL_NAME = "date"
+from darts.metrics import mase
 
-SEASONALITY_MAP_ADAPT = {
-   "1min": [1440, 10080, 525960],
-   "10min": [144, 1008, 52596],
-   "30min": [48, 336, 17532],
-   "1H": [24, 168, 8766],
-   "1D": 7,
-   "1B": 5,
-   "1W": 365.25/7,
-   "1M": 12,
-   "1ME": 12,
-   "1Q": 4,
-   "1Y": 1
-}
 
-def get_transformer_forecasts_global(lag, df, test_ratio = 0.2, frequency = None, external_forecast_horizon = None):
+def forecast_transformer(df, test_split, seasonality):
     """
-    Takes processed DataFrame, runs the training for a transformer model, and 
-    returns MASE
+    Fit Transformer model and return mase
 
-    :param lag: the number of past lags that should be used when predicting the 
-    future value of time series
-    :param df: the processed DataFrame for training and evaluating
-    :param frequency: the frequency of the time series
-    :param external_forecast_horizon: the required forecast horizon
-
-    :returns MASE
+    Parameters:
+    -----------
+    df : array-like
+        entire series
+    test_split : int
+        fraction of total data which is used for testing
+    seasonality : int
+        Seasonality of the series
     
+    Returns:
+    --------
+    int
+        MASE value
     """
+    try:
+        # Data Processing
 
-    train_series_list = []
-    test_series_list = []
-    train_series_full_list = []
-    test_series_full_list = []
+        test_length = int(test_split * len(df))
+        # TimeSeries object is important for darts
+        raw_series = TimeSeries.from_dataframe(df, time_col = "date").astype(np.float32)
+        # Replace NaNs
+        raw_series = fill_missing_values(raw_series)
+        # Autoscaling the data
+        transformer = Scaler()
+        transformed_series = transformer.fit_transform(raw_series)
+        # Splitting into train and test
+        series, test_series = train_test_split(transformed_series, 
+                                               test_size = test_split)
 
-    # Automatic frequency inference
-    if not frequency:
-        _offset = pd.infer_freq(df[TIME_COL_NAME])
-        if _offset == "min":
-            freq = '10' + "min"
-        # 1M makes FRED work
-        else:
-            freq = '1' + _offset if _offset else "1ME"
-    else:
-        freq = frequency
+        # Training the model and getting MASE
 
-    seasonality = SEASONALITY_MAP_ADAPT[freq]
-
-    if isinstance(seasonality, list):
-        seasonality = min(seasonality) # Use to calculate MASE
-
-    if external_forecast_horizon is None:
-        raise Exception("Please provide the required forecast horizon")
-    else:
-        forecast_horizon = external_forecast_horizon
-
-    for index, row in df.iterrows():
-        train_start_time = row[TIME_COL_NAME]
-        series_data = row[VALUE_COL_NAME]
-
-        # Creating training and test series. Test series will be only used during evaluation
-        train_index = int(test_ratio * len(series_data))
-        train_series_data = series_data[:train_index]
-        test_series_data = series_data[train_index:]
-
-        train_series_list.append(train_series_data)
-        test_series_list.append(test_series_data)
-
-        # We use full length training series to train the model as we do not tune hyperparameters
-        # FieldName.START: pd.Timestamp(train_start_time, freq=freq)
-
-        train_series_full_list.append({
-            FieldName.TARGET: train_series_data,
-            FieldName.START: pd.Timestamp(train_start_time)
-        })
-
-        test_series_full_list.append({
-            FieldName.TARGET: series_data,
-            FieldName.START: pd.Timestamp(train_start_time)
-        })
-
-    train_ds = ListDataset(train_series_full_list, freq=freq)
-    test_ds = ListDataset(test_series_full_list, freq=freq)
-
-    estimator = TransformerEstimator(freq = freq,
-                                     context_length=lag,
-                                     prediction_length=forecast_horizon)
-
-    predictor = estimator.train(training_data=train_ds)
-
-    forecast_it, ts_it = make_evaluation_predictions(dataset=test_ds, predictor=predictor, num_samples=100)
-
-    # Time series predictions
-    forecasts = list(forecast_it)
-
-    tss = list(ts_it)
-
-    evaluator = Evaluator(quantiles=[0.1, 0.5, 0.9])
-    agg_metrics, item_metrics = evaluator(tss, forecasts)
-
-    return agg_metrics["MASE"]
-
-def get_transformer_forecasts_local(lag, df, frequency, external_forecast_horizon = None):
-    """
-    Takes processed DataFrame containing multiple or single time series, runs 
-    the training for a separate transformer model on each series, and returns MASE
-
-    :param lag: the number of past lags that should be used when predicting the 
-    next future value of time series
-    :param df: the processed DataFrame for training and evaluating
-    :param frequency: frequency of the series which needs to be the same for all 
-    the series in df
-    :param external_forecast_horizon: the required forecast horizon
-    
-    """
-
-    # Process each entity separately
-    entities = df["entity"].unique()
-    mase_values = []
-
-    print(f"Running transformer forecasting for {len(entities)} entities...")
-
-    for entity in tqdm(entities):
-        # Filter data for the current entity
-        entity_data = df[df["entity"] == entity]
-
-        # Generate forecasts using ARIMA
-        entity_mase = get_transformer_forecasts_global(lag=lag,
-                                                df=entity_data,
-                                                test_ratio=test_ratio,
-                                                frequency=frequency,
-                                                external_forecast_horizon=external_forecast_horizon)
-
-        if not np.isnan(entity_mase):
-            mase_values.append(entity_mase)
-    
-    return mase_values
-
+        estimator = TransformerModel(input_chunk_length = seasonality * 10,
+                                      output_chunk_length = test_length,
+                                      n_epochs = 100)
+        estimator.fit(series)
+        pred_series = estimator.predict(test_length)
+        return mase(test_series, pred_series, series, seasonality)
+    except Exception as e:
+        # In case of errors, return NaN
+        print(f"Error in Transformer forecasting: {e}")
+        return np.nan
 
 if __name__ == "__main__":
+
+    # Data loading and processing
 
     DATA_DIR = config(
         "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
@@ -177,11 +83,12 @@ if __name__ == "__main__":
     datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
-    raw_df = pd.read_parquet(file_path)
+    df = pd.read_parquet(file_path)
 
-    proc_df = raw_df.groupby('entity').agg(lambda x: pd.array(x)).reset_index()
-    proc_df['date'] = proc_df['date'].iloc[0][0]
-    proc_df['value'] = proc_df['value'].apply(lambda x: x.to_numpy())
+    # This pivot adds all values for an entity as a TS in each column
+    proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
+    # Basic cleaning
+    proc_df.rename_axis(None, axis = 1, inplace=True)
 
     # Define forecasting parameters
     test_ratio = 0.2            # Use last 20% of the data for testing
@@ -189,36 +96,47 @@ if __name__ == "__main__":
     seasonality = 5             # 5 for weekly patterns (business days)
 
     # Process each entity separately
-    entities = proc_df["entity"].unique()
-    mase_values = get_transformer_forecasts_local(lag = 50, 
-                                           df = proc_df,
-                                           frequency = "1B",
-                                           external_forecast_horizon = forecast_horizon)
-    
+    entities = df["entity"].unique()
+    mase_values = []
+
+    # Local forecasting
+
+    print(f"Running Transformer forecasting for {len(entities)} entities...")
+
+    for entity in tqdm(entities):
+        # Filter data for the current entity
+        entity_data = proc_df[["date", entity]]
+
+        if len(entity_data) <= 10:  # Skip entities with too few observations
+            continue
+
+        # Get MASE using Transformer
+        entity_mase = forecast_transformer(entity_data, test_ratio, seasonality)
+
+        if not np.isnan(entity_mase):
+            mase_values.append(entity_mase)
+
     # Calculate mean MASE across all entities
     mean_mase = np.mean(mase_values)
     median_mase = np.median(mase_values)
 
     # Global Forecasting
 
-    global_mase = get_transformer_forecasts_global(lag = 50,
-                                            df = proc_df,
-                                            test_ratio = 0.2,
-                                            frequency = "1B",
-                                            external_forecast_horizon = forecast_horizon)
+    global_mase = forecast_transformer(proc_df,
+                                       test_ratio,
+                                       seasonality)
 
     # Printing and saving results
 
-    print("\ntransformer Forecasting Results:")
+    print("\nTransformer Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
-    print(f"Global MASE: {global_mase:.4f}")
 
 
     results_df = pd.DataFrame(
         {
-            "model": ["transformer"],
+            "model": ["Transformer"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],

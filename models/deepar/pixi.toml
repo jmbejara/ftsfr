@@ -1,6 +1,6 @@
 [workspace]
 channels = ["conda-forge"]
-name = "ffnn"
+name = "deepar"
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tasks]

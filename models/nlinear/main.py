@@ -1,8 +1,8 @@
 """
-ARIMA using darts
+N-Linear using darts
 
-Performs both local forecasting using ARIMA. Reports both mean and
-median MASE for local forecasts.
+Performs both local and global forecasting using a N-Linear. Reports both mean and
+median MASE for local forecasts and a single global MASE.
 """
 from pathlib import Path
 from warnings import filterwarnings
@@ -15,44 +15,59 @@ import toml
 from decouple import config
 from tqdm import tqdm
 
-from darts.models import ARIMA
+from darts.models import NLinearModel
 from darts import TimeSeries
+from darts.dataprocessing.transformers import Scaler
+from darts.utils.missing_values import fill_missing_values
+from darts.utils.model_selection import train_test_split
 
 from darts.metrics import mase
 
 
-def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
+def forecast_nlinear(df, test_split, seasonality):
     """
-    Fit ARIMA model and return MASE
+    Fit N-Linear model and return mase
 
     Parameters:
     -----------
-    train_data : array-like
-        Training data
-    test_length : int
-        Number of periods to forecast
-    test_data : array_like
-        Testing data
+    df : array-like
+        entire series
+    test_split : int
+        fraction of total data which is used for testing
     seasonality : int
         Seasonality of the series
+    
     Returns:
     --------
     int
         MASE value
     """
     try:
-        test_length = len(test_data)
-        p, d, q = order
-        series = TimeSeries.from_dataframe(train_data, time_col = "date")
-        test_series = TimeSeries.from_dataframe(test_data, time_col = "date")
-        estimator = ARIMA(p = p, d = d, q = q)
+        # Data Processing
+
+        test_length = int(test_split * len(df))
+        # TimeSeries object is important for darts
+        raw_series = TimeSeries.from_dataframe(df, time_col = "date").astype(np.float32)
+        # Replace NaNs
+        raw_series = fill_missing_values(raw_series)
+        # Autoscaling the data
+        transformer = Scaler()
+        transformed_series = transformer.fit_transform(raw_series)
+        # Splitting into train and test
+        series, test_series = train_test_split(transformed_series, 
+                                               test_size = test_split)
+
+        # Training the model and getting MASE
+
+        estimator = NLinearModel(input_chunk_length = seasonality * 10,
+                                      output_chunk_length = test_length,
+                                      n_epochs = 100)
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
-
         return mase(test_series, pred_series, series, seasonality)
     except Exception as e:
         # In case of errors, return NaN
-        print(f"Error in ARIMA forecasting: {e}")
+        print(f"Error in N-Linear forecasting: {e}")
         return np.nan
 
 if __name__ == "__main__":
@@ -74,9 +89,6 @@ if __name__ == "__main__":
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis = 1, inplace=True)
-    # This step below is mportant for arima since it can't handle nans
-    # A large outlier value helps arima treat it as a nan
-    proc_df.fillna(-999, inplace=True)
 
     # Define forecasting parameters
     test_ratio = 0.2            # Use last 20% of the data for testing
@@ -89,7 +101,7 @@ if __name__ == "__main__":
 
     # Local forecasting
 
-    print(f"Running ARIMA forecasting for {len(entities)} entities...")
+    print(f"Running N-Linear forecasting for {len(entities)} entities...")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
@@ -98,16 +110,8 @@ if __name__ == "__main__":
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
 
-        # Determine train/test split
-        n = len(entity_data[entity])
-        test_size = max(1, int(n * test_ratio))
-        train_size = n - test_size
-
-        train_data = entity_data.iloc[:train_size]
-        test_data = entity_data.iloc[train_size:]
-
-        # Get MASE using ARIMA
-        entity_mase = forecast_arima(train_data, test_data, seasonality)
+        # Get MASE using N-Linear
+        entity_mase = forecast_nlinear(entity_data, test_ratio, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -116,9 +120,15 @@ if __name__ == "__main__":
     mean_mase = np.mean(mase_values)
     median_mase = np.median(mase_values)
 
+    # Global Forecasting
+
+    global_mase = forecast_nlinear(proc_df,
+                                       test_ratio,
+                                       seasonality)
+
     # Printing and saving results
 
-    print("\nARIMA Forecasting Results:")
+    print("\nN-Linear Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
@@ -126,12 +136,13 @@ if __name__ == "__main__":
 
     results_df = pd.DataFrame(
         {
-            "model": ["ARIMA"],
+            "model": ["N-Linear"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
             "entity_count": [len(mase_values)],
+            "global_mase": [global_mase],
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "arima_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "nlinear_results.csv", index=False)

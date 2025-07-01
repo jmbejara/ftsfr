@@ -25,9 +25,9 @@ from darts import TimeSeries
 from darts.metrics import mase
 
 
-def forecast_catboost(train_data, test_length, test_data, seasonality, multi = False):
+def forecast_catboost(train_data, test_data, seasonality, multi = False):
     """
-    Fit Catboost model and return mase
+    Fit Catboost model and return MASE
 
     Parameters:
     -----------
@@ -41,21 +41,23 @@ def forecast_catboost(train_data, test_length, test_data, seasonality, multi = F
         Seasonality of the series
     multi : bool
         indicates global forecasting if True
+    
     Returns:
     --------
     int
         MASE value
     """
     try:
-        series = TimeSeries.from_dataframe(train_data, time_col="date")
+        test_length = len(test_data)
+        series = TimeSeries.from_dataframe(train_data, time_col = "date")
         test_series = TimeSeries.from_dataframe(test_data, time_col = "date")
         if multi:
             estimator = CatBoostModel(lags = seasonality * 10,
-                                      output_chunk_length = seasonality * 2,
+                                      output_chunk_length = test_length,
                                       loss_function = "MultiRMSE")
         else:
             estimator = CatBoostModel(lags = seasonality * 10, 
-                                      output_chunk_length = seasonality * 2)
+                                      output_chunk_length = test_length)
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
@@ -93,7 +95,7 @@ if __name__ == "__main__":
     seasonality = 5             # 5 for weekly patterns (business days)
 
     # Process each entity separately
-    entities = proc_df["entity"].unique()
+    entities = df["entity"].unique()
     mase_values = []
 
     # Local forecasting
@@ -102,27 +104,21 @@ if __name__ == "__main__":
 
     for entity in tqdm(entities):
         # Filter data for the current entity
-        entity_data = proc_df[proc_df["entity"] == entity].sort_values("date")
-        entity_data = entity_data.dropna()
+        entity_data = proc_df[["date", entity]]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
 
-        # Extract values
-        values = entity_data["value"].values
-
         # Determine train/test split
-        n = len(values)
+        n = len(entity_data[entity])
         test_size = max(1, int(n * test_ratio))
         train_size = n - test_size
 
-        train_data = values[:train_size]
-        test_data = values[train_size:]
-
-        forecast_horizon = len(test_data)
+        train_data = entity_data.iloc[:train_size]
+        test_data = entity_data.iloc[train_size:]
 
         # Get MASE using Catboost
-        entity_mase = forecast_catboost(train_data, forecast_horizon, test_data, seasonality)
+        entity_mase = forecast_catboost(train_data, test_data, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -134,15 +130,14 @@ if __name__ == "__main__":
     # Global Forecasting
 
     train_index = int((1 - test_ratio) * len(proc_df))
-    global_mase = forecast_catboost(proc_df.iloc[:train_index], 
-                                    forecast_horizon,
+    global_mase = forecast_catboost(proc_df.iloc[:train_index],
                                     proc_df.iloc[train_index:],
                                     seasonality,
                                     True)
 
     # Printing and saving results
 
-    print("\Catboost Forecasting Results:")
+    print("\nCatboost Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
