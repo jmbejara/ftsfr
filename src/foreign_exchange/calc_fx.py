@@ -147,7 +147,7 @@ def implied_daily_fx_returns(fx_data, currency_list):
         
         
         if curr_name == "USD":
-            fx_df["USD_return"] = fx_df[int_col] / (365 * 100) # change to daily absolute returns 
+            fx_df["USD_return"] = fx_df[int_col] # change to daily annualized returns in % space
 
             continue
         
@@ -155,12 +155,30 @@ def implied_daily_fx_returns(fx_data, currency_list):
         fx_df[f"{spot_col}_ratio"] = fx_df[spot_col] / fx_df[spot_col].shift(1) # change in spot price ratio
         curr_ret_col = f"{curr_name}_return"
 
+        # keep interest conversion consistent with US
         fx_df[curr_ret_col] = (fx_df[f"{spot_col}_ratio"] * fx_df[int_col]) # combine spot change and interest
         ret_cols.append(curr_ret_col)
 
     # filter just for returns
     fx_df = fx_df[ret_cols]
     return fx_df
+
+def graph_fx_returns(fx_df, currency_list, region_name):
+    '''
+    graphing the fx_returns for a certain currency set
+        efficient for regional splits
+
+    Parameters:
+    fx_df: Foreign currency implied daily return time series 
+        absolute returns are used here (not annualized, not log scaled)
+        CUR_return is the daily return of CUR on the day (not in % space)
+    currency_list: list of currencies to graph
+    region_name: name of region/category we are graphing
+    '''
+    ret_list = [f"{curr}_return" for curr in currency_list]
+    fx_df[ret_list].plot(title=f"Annualized Daily Returns of {region_name}")
+    return
+
         
 
         
