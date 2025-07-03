@@ -113,15 +113,15 @@ def prepare_fx_data(spot_rates, interest_rates):
     # Convert to reciprocal for these currencies (quoted as foreign/USD instead of USD/foreign)
     reciprocal_currencies = ["EUR", "GBP", "AUD", "NZD"]
     for ccy in reciprocal_currencies:
-        if f"{ccy}_CURNCY" in df_merged.columns:
-            df_merged[f"{ccy}_CURNCY"] = 1.0 / df_merged[f"{ccy}_CURNCY"]
-        if f"{ccy}_CURNCY3M" in df_merged.columns:
-            df_merged[f"{ccy}_CURNCY3M"] = 1.0 / df_merged[f"{ccy}_CURNCY3M"]
+        if f"{ccy}_spot" in df_merged.columns:
+            df_merged[f"{ccy}_spot"] = 1.0 / df_merged[f"{ccy}_spot"]
 
     return df_merged
 
 def implied_daily_fx_returns(fx_data, currency_list):
     '''
+    New function written by Vincent
+
     This function returns implied daily return time series on foreign currencies
 
     Parameters:
