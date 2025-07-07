@@ -632,7 +632,7 @@ def task_forecast():
                 OUTPUT_DIR / "raw_results" / "simple_exponential_smoothing_results.csv"
             ],
             "file_dep": [
-                "./models/simple_exponential_smoothing/main.R",
+                "./models/simple_exponential_smoothing/main.py",
                 "./models/simple_exponential_smoothing/pixi.toml",
             ],
             "clean": [],

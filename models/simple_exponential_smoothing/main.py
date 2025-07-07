@@ -1,7 +1,7 @@
 """
-ARIMA using darts
+Simple Exponential Smoothing(SES) using darts
 
-Performs both local forecasting using ARIMA. Reports both mean and
+Performs both local forecasting using SES. Reports both mean and
 median MASE for local forecasts.
 """
 from pathlib import Path
@@ -15,15 +15,17 @@ import toml
 from decouple import config
 from tqdm import tqdm
 
-from darts.models import ARIMA
+from darts.models import ExponentialSmoothing
+
+from darts.utils.utils import ModelMode, SeasonalityMode
 from darts import TimeSeries
 
 from darts.metrics import mase
 
 
-def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
+def forecast_ses(train_data, test_data, seasonality):
     """
-    Fit ARIMA model and return MASE
+    Fit SES model and return MASE
 
     Parameters:
     -----------
@@ -42,17 +44,17 @@ def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
     """
     try:
         test_length = len(test_data)
-        p, d, q = order
         series = TimeSeries.from_dataframe(train_data, time_col = "date")
         test_series = TimeSeries.from_dataframe(test_data, time_col = "date")
-        estimator = ARIMA(p = p, d = d, q = q)
+        # Without any args it is simple exponential smoothing
+        estimator = ExponentialSmoothing()
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
 
         return mase(test_series, pred_series, series, seasonality)
     except Exception as e:
         # In case of errors, return NaN
-        print(f"Error in ARIMA forecasting: {e}")
+        print(f"Error in SES forecasting: {e}")
         return np.nan
 
 if __name__ == "__main__":
@@ -74,8 +76,8 @@ if __name__ == "__main__":
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis = 1, inplace=True)
-    # This step below is mportant for arima since it can't handle nans
-    # A large outlier value helps arima treat it as a nan
+    # This step below is mportant for ses since it can't handle nans
+    # A large outlier value helps ses treat it as a nan
     proc_df.fillna(-999, inplace=True)
 
     # Define forecasting parameters
@@ -89,7 +91,7 @@ if __name__ == "__main__":
 
     # Local forecasting
 
-    print(f"Running ARIMA forecasting for {len(entities)} entities...")
+    print(f"Running SES forecasting for {len(entities)} entities...")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
@@ -106,8 +108,8 @@ if __name__ == "__main__":
         train_data = entity_data.iloc[:train_size]
         test_data = entity_data.iloc[train_size:]
 
-        # Get MASE using ARIMA
-        entity_mase = forecast_arima(train_data, test_data, seasonality)
+        # Get MASE using SES
+        entity_mase = forecast_ses(train_data, test_data, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -118,7 +120,7 @@ if __name__ == "__main__":
 
     # Printing and saving results
 
-    print("\nARIMA Forecasting Results:")
+    print("\nSES Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
@@ -126,7 +128,7 @@ if __name__ == "__main__":
 
     results_df = pd.DataFrame(
         {
-            "model": ["ARIMA"],
+            "model": ["SES"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
@@ -134,4 +136,4 @@ if __name__ == "__main__":
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "arima_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "ses_results.csv", index=False)

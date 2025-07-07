@@ -1,10 +1,10 @@
 [workspace]
 channels = ["conda-forge"]
-name = "simple_exponential_smoothing"
+name = "prophet"
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tasks]
-post-install = "pip install darts"
+post-install = "pip install darts prophet"
 main = { cmd= "python main.py", depends-on = ["post-install"]}
 
 [dependencies]

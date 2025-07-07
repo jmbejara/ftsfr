@@ -12,6 +12,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{natbib}  % Required for JPE bibliography style
 
 \title{Your Paper}
 \author{You}
@@ -20,7 +21,31 @@
 \maketitle
 
 \begin{abstract}
-Your abstract.
+This paper presents a macro-finance data repository for benchmarking the
+performance of global time series forecasting methods. A standardized benchmark
+is crucial for comparing the performance of different forecasting methods, so as
+to allow apples-to-apples comparisons across different forecasting methods and
+to discourage cherry-picking of results. Despite the ubiquity of time series
+forecasting methods in macroeconomics and finance, a standardized repository of
+data for benchmarking in these domains does not exist. One reason for this is
+that many of these datasets are available only through paid subscriptions and
+are thus not freely distributable. To address this issue, we instead provide a
+set of scripts that automate the download, data cleaning, and assembly of data
+sets from the Wharton Research Data Services (WRDS) platform and the Bloomberg
+Terminal. Since many academic institutions have access to WRDS or a Bloomberg
+Terminal, contingent on having access to the appropriate WRDS or Bloomberg
+subscriptions, each researcher will be able to exactly reproduce each of the
+datasets provided in this repository. Furthermore, the datasets that we provide
+are cleaned and formatted in a way that is common within the corresponding
+academic literature. Our aim is to facilitate the process of benchmarking global
+times series forecasting methods on data from these domains. In this light, we
+demonstrate the utility of our repository by showcasing the performance of
+several baseline forecasting methods using a variety of error metrics, providing
+baseline performance metrics which researchers can use to compare forecasting
+approaches. We hope that this repository will enhance research
+that increases the precision of financial and economic forecasts and contribute
+to research related to promoting financial stability and supporting a
+well-functioning economy.
 \end{abstract}
 
 \section{Introduction}
@@ -121,7 +146,7 @@ If you have an \href{https://www.overleaf.com/user/subscription/plans}{upgraded 
 
 We hope you find Overleaf useful, and do take a look at our \href{https://www.overleaf.com/learn}{help library} for more tutorials and user guides! Please also let us know if you have any feedback using the Contact Us link at the bottom of the Overleaf menu --- or use the contact form at \url{https://www.overleaf.com/contact}.
 
-\bibliographystyle{alpha}
+\bibliographystyle{jpe}
 \bibliography{bibliography}
 
 \end{document}

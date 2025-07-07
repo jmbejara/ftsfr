@@ -1,8 +1,12 @@
 """
-ARIMA using darts
+Catboost using darts
 
-Performs both local forecasting using ARIMA. Reports both mean and
-median MASE for local forecasts.
+Performs both local and global forecasting using Catboost. Reports both mean and
+median MASE for local forecasts and a single global MASE.
+
+NOTE: training this model, especially on data which is considered large either 
+due to the number of series, the number of values in a single series, or both 
+requires large amounts of computation power.
 """
 from pathlib import Path
 from warnings import filterwarnings
@@ -15,15 +19,15 @@ import toml
 from decouple import config
 from tqdm import tqdm
 
-from darts.models import ARIMA
+from darts.models import CatBoostModel
 from darts import TimeSeries
 
 from darts.metrics import mase
 
 
-def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
+def forecast_catboost(train_data, test_data, seasonality, multi = False):
     """
-    Fit ARIMA model and return MASE
+    Fit Catboost model and return MASE
 
     Parameters:
     -----------
@@ -35,6 +39,9 @@ def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
         Testing data
     seasonality : int
         Seasonality of the series
+    multi : bool
+        indicates global forecasting if True
+    
     Returns:
     --------
     int
@@ -42,17 +49,21 @@ def forecast_arima(train_data, test_data, seasonality, order = (1, 1, 1)):
     """
     try:
         test_length = len(test_data)
-        p, d, q = order
         series = TimeSeries.from_dataframe(train_data, time_col = "date")
         test_series = TimeSeries.from_dataframe(test_data, time_col = "date")
-        estimator = ARIMA(p = p, d = d, q = q)
+        if multi:
+            estimator = CatBoostModel(lags = seasonality * 10,
+                                      output_chunk_length = test_length,
+                                      loss_function = "MultiRMSE")
+        else:
+            estimator = CatBoostModel(lags = seasonality * 10, 
+                                      output_chunk_length = test_length)
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
-
         return mase(test_series, pred_series, series, seasonality)
     except Exception as e:
         # In case of errors, return NaN
-        print(f"Error in ARIMA forecasting: {e}")
+        print(f"Error in Catboost forecasting: {e}")
         return np.nan
 
 if __name__ == "__main__":
@@ -74,8 +85,8 @@ if __name__ == "__main__":
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis = 1, inplace=True)
-    # This step below is mportant for arima since it can't handle nans
-    # A large outlier value helps arima treat it as a nan
+    # This step below is mportant for catboost since it can't handle nans
+    # A large outlier value helps catboost treat it as a nan
     proc_df.fillna(-999, inplace=True)
 
     # Define forecasting parameters
@@ -89,7 +100,7 @@ if __name__ == "__main__":
 
     # Local forecasting
 
-    print(f"Running ARIMA forecasting for {len(entities)} entities...")
+    print(f"Running Catboost forecasting for {len(entities)} entities...")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
@@ -106,8 +117,8 @@ if __name__ == "__main__":
         train_data = entity_data.iloc[:train_size]
         test_data = entity_data.iloc[train_size:]
 
-        # Get MASE using ARIMA
-        entity_mase = forecast_arima(train_data, test_data, seasonality)
+        # Get MASE using Catboost
+        entity_mase = forecast_catboost(train_data, test_data, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -116,9 +127,17 @@ if __name__ == "__main__":
     mean_mase = np.mean(mase_values)
     median_mase = np.median(mase_values)
 
+    # Global Forecasting
+
+    train_index = int((1 - test_ratio) * len(proc_df))
+    global_mase = forecast_catboost(proc_df.iloc[:train_index],
+                                    proc_df.iloc[train_index:],
+                                    seasonality,
+                                    True)
+
     # Printing and saving results
 
-    print("\nARIMA Forecasting Results:")
+    print("\nCatboost Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
@@ -126,12 +145,13 @@ if __name__ == "__main__":
 
     results_df = pd.DataFrame(
         {
-            "model": ["ARIMA"],
+            "model": ["Catboost"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
             "entity_count": [len(mase_values)],
+            "global_mase": [global_mase],
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "arima_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "catboost_results.csv", index=False)
