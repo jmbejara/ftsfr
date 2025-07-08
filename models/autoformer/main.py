@@ -1,10 +1,8 @@
 """
-TimesFM using the official timesfm package.
+Autoformer using Nixtla's neuralforecast
 
-Performs both local and global forecasting using a TimesFM. Reports both mean and
+Performs both local and global forecasting using a Autoformer. Reports both mean and
 median MASE for local forecasts and a single global MASE.
-
-NOTE: Loading the TimesFM 500m checkpoint needs about 2GB of space.
 """
 from pathlib import Path
 from warnings import filterwarnings
@@ -22,13 +20,13 @@ import subprocess
 from darts import TimeSeries
 from darts.metrics import mase
 
-import timesfm
+from neuralforecast import NeuralForecast
+from neuralforecast.models import Autoformer
 
 
-
-def forecast_timesfm(df, test_split, freq, seasonality):
+def forecast_autoformer(df, test_split, freq, seasonality, forecast_horizon):
     """
-    Fit TimesFM model and return MASE
+    Fit Autoformer model and return MASE
 
     Parameters:
     -----------
@@ -41,6 +39,8 @@ def forecast_timesfm(df, test_split, freq, seasonality):
         pandas or polars frequency of the data
     seasonality : int
         Seasonality of the series.
+    forecast_horizon: int
+        Forecast horizon
     Returns:
     --------
     float
@@ -53,6 +53,9 @@ def forecast_timesfm(df, test_split, freq, seasonality):
         # Filling NaN values with interpolated values
         df = df.interpolate()
 
+        # Following Monash style testing
+        forecast_horizon = test_length
+
         test_data = df[df.ds>=np.unique(df['ds'].values)[-test_length]]
         train_data = df[df.ds<np.unique(df['ds'].values)[-test_length]]
 
@@ -63,54 +66,31 @@ def forecast_timesfm(df, test_split, freq, seasonality):
         except Exception:
             device = "cpu"
 
-        # Code below acquired from https://pypi.org/project/timesfm/
+        # Having this horizon as the forecast_horizon means that predict will
+        # return only these amount of values
+        estimator = Autoformer(h = forecast_horizon, input_size = seasonality * 10, accelerator = device)
 
-        # Loading the timesfm-2.0 checkpoint:
-
-        # For Torch
-        tfm = timesfm.TimesFm(
-            hparams=timesfm.TimesFmHparams(
-                backend = device,
-                per_core_batch_size = 32,
-                horizon_len = 128,
-                num_layers = 50,
-                use_positional_embedding = False,
-                context_len = 2048,
-            ),
-            checkpoint=timesfm.TimesFmCheckpoint(
-                huggingface_repo_id="google/timesfm-2.0-500m-pytorch"),
+        nf = NeuralForecast(
+            models=[estimator],
+            freq=freq
         )
-
-        # Don't need to fit the model
-        len_forecast = 0
-        temp_train_data = train_data
-        pred_series = pd.DataFrame(columns = ["unique_id", "ds", "timesfm"])
-        # We directly run inference on the saved checkpoint
-        # Keep forecasting till the length of the forecasts exceeds or is equal to 
-        # test_length
-        while len_forecast < test_length:
-            forecast_df = tfm.forecast_on_df(inputs=temp_train_data,
-                                            freq=freq,  # monthly
-                                            value_name="y",
-                                            num_jobs=-1,
-                                            )
-            # Removing the quantiles from forecast_df
-            pred_series = pd.concat([pred_series, forecast_df[["unique_id", "ds", "timesfm"]]])
-            temp_train_data = pred_series
-            len_forecast += len(temp_train_data)
+        # fit model
+        nf.fit(df = train_data)
+        # get predictions
+        pred_series = nf.predict()
 
         # Converting into TimeSeries objects to calculate darts mase
         # There is a possibility that the timestamps for pred_series wouldn't
         # line up with test_data.
+        # Sort their values first on id then on timestamps
+        pred_series = pred_series.sort_values(["unique_id", "ds"]).reset_index(drop = True)
+        test_data = test_data.sort_values(["unique_id", "ds"]).reset_index(drop = True)
+        # make the ds columns same
+        pred_series["ds"] = test_data["ds"]
 
         test_series = test_data.pivot(index="ds", columns="unique_id", values="y").reset_index().rename_axis(None, axis = 1).rename(columns = {"ds":"date"})
         series = train_data.pivot(index="ds", columns="unique_id", values="y").reset_index().rename_axis(None, axis = 1).rename(columns = {"ds":"date"})
-        pred_series = pred_series.pivot(index="ds", columns="unique_id", values="timesfm").reset_index().rename_axis(None, axis = 1).rename(columns = {"ds":"date"})
-
-        # truncating pred_series to test_length
-        pred_series = pred_series.iloc[:test_length]
-        # Lining up their date columns
-        pred_series["date"] = test_series["date"]
+        pred_series = pred_series.pivot(index="ds", columns="unique_id", values="Autoformer").reset_index().rename_axis(None, axis = 1).rename(columns = {"ds":"date"})
 
         test_series = TimeSeries.from_dataframe(test_series, time_col = "date" )
         series = TimeSeries.from_dataframe(series, time_col = "date" )
@@ -119,7 +99,7 @@ def forecast_timesfm(df, test_split, freq, seasonality):
         return mase(test_series, pred_series, series, seasonality)
     except Exception as e:
         # In case of errors, return NaN
-        print(f"Error in TimesFM forecasting: {e}")
+        print(f"Error in Autoformer forecasting: {e}")
         return np.nan
 
 if __name__ == "__main__":
@@ -151,7 +131,7 @@ if __name__ == "__main__":
 
     # Local forecasting
 
-    print(f"Running TimesFM forecasting for {len(entities)} entities...")
+    print(f"Running Autoformer forecasting for {len(entities)} entities...")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
@@ -166,8 +146,8 @@ if __name__ == "__main__":
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
 
-        # Get MASE using TimesFM
-        entity_mase = forecast_timesfm(entity_data, 
+        # Get MASE using Autoformer
+        entity_mase = forecast_autoformer(entity_data, 
                                         test_ratio, 
                                         freq, 
                                         seasonality, 
@@ -182,7 +162,7 @@ if __name__ == "__main__":
 
     # Global Forecasting
 
-    global_mase = forecast_timesfm(proc_df,
+    global_mase = forecast_autoformer(proc_df,
                                     test_ratio,
                                     freq,
                                     seasonality,
@@ -190,7 +170,7 @@ if __name__ == "__main__":
 
     # Printing and saving results
 
-    print("\nTimesFM Forecasting Results:")
+    print("\nAutoformer Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
@@ -198,7 +178,7 @@ if __name__ == "__main__":
 
     results_df = pd.DataFrame(
         {
-            "model": ["TimesFM"],
+            "model": ["Autoformer"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
@@ -207,4 +187,4 @@ if __name__ == "__main__":
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "timesfm_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "autoformer_results.csv", index=False)

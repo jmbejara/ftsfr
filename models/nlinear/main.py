@@ -14,6 +14,7 @@ import pandas as pd
 import toml
 from decouple import config
 from tqdm import tqdm
+import subprocess
 
 from darts.models import NLinearModel
 from darts import TimeSeries
@@ -26,20 +27,20 @@ from darts.metrics import mase
 
 def forecast_nlinear(df, test_split, seasonality):
     """
-    Fit N-Linear model and return mase
+    Fit N-Linear model and return MASE
 
     Parameters:
     -----------
     df : array-like
-        entire series
-    test_split : int
-        fraction of total data which is used for testing
+        array-like object(e.g. pd.DataFrame), with a single or multiple series, 
+        which is split into testing and training data.
+    test_ratio : int
+        fraction of df used for testing.
     seasonality : int
-        Seasonality of the series
-    
+        Seasonality of the series.
     Returns:
     --------
-    int
+    float
         MASE value
     """
     try:
@@ -57,11 +58,18 @@ def forecast_nlinear(df, test_split, seasonality):
         series, test_series = train_test_split(transformed_series, 
                                                test_size = test_split)
 
+        # Check for an NVIDIA GPU
+        try:
+            subprocess.check_output('nvidia-smi')
+            device = "gpu"
+        except Exception:
+            device = "cpu"
+
         # Training the model and getting MASE
 
         estimator = NLinearModel(input_chunk_length = seasonality * 10,
-                                      output_chunk_length = test_length,
-                                      n_epochs = 100)
+                                 output_chunk_length = 1,
+                                 pl_trainer_kwargs = {"accelerator": device})
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
@@ -84,6 +92,7 @@ if __name__ == "__main__":
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
     df = pd.read_parquet(file_path)
+    df["date"] = df["date"].dt.to_timestamp()
 
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
@@ -106,6 +115,10 @@ if __name__ == "__main__":
     for entity in tqdm(entities):
         # Filter data for the current entity
         entity_data = proc_df[["date", entity]]
+
+        # Removing leading NaNs which show up due to different start times
+        # of different series
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
@@ -132,7 +145,7 @@ if __name__ == "__main__":
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
-
+    print(f"Global MASE: {global_mase:.4f}")
 
     results_df = pd.DataFrame(
         {

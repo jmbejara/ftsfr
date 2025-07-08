@@ -1,8 +1,9 @@
 """
-Pooled Regression(PR) using darts
+Pooled Regression(PR) using darts and scikit-learn. It is a generic gaussian 
+linear model.
 
 Performs both local and global forecasting using PR. Reports both mean and
-median MASE for local forecasts and a single global MASE.
+median MASE for local forecasts.
 """
 from pathlib import Path
 from warnings import filterwarnings
@@ -15,38 +16,49 @@ import toml
 from decouple import config
 from tqdm import tqdm
 
-from darts.models import LinearRegressionModel
+from darts.models import SKLearnModel
+from sklearn.linear_model import TweedieRegressor
 from darts import TimeSeries
+from darts.utils.missing_values import fill_missing_values
+from darts.utils.model_selection import train_test_split
 
 from darts.metrics import mase
 
-
-def forecast_pr(train_data, test_data, seasonality):
+def forecast_pr(df, test_ratio, seasonality):
     """
     Fit PR model and return MASE
 
     Parameters:
     -----------
-    train_data : array-like
-        Training data
-    test_length : int
-        Number of periods to forecast
-    test_data : array_like
-        Testing data
+    df : array-like
+        array-like object(e.g. pd.DataFrame) with a single series which is split
+        into testing and training data.
+    test_ratio : int
+        fraction of df used for testing.
     seasonality : int
-        Seasonality of the series
-    
+        Seasonality of the series.
     Returns:
     --------
-    int
+    float
         MASE value
     """
     try:
-        test_length = len(test_data)
-        series = TimeSeries.from_dataframe(train_data, time_col = "date")
-        test_series = TimeSeries.from_dataframe(test_data, time_col = "date")
-        estimator = LinearRegressionModel(lags = seasonality * 10,
-                                          output_chunk_length = test_length)
+        # Data Processing
+        test_length = int(test_ratio * len(df))
+        # TimeSeries object is important for darts
+        raw_series = TimeSeries.from_dataframe(df, time_col = "date").astype(np.float32)
+        # Replace NaNs automatically
+        raw_series = fill_missing_values(raw_series)
+        # Splitting into train and test
+        series, test_series = train_test_split(raw_series,
+                                               test_size = test_ratio)
+        # Training the model and getting MASE
+        estimator = SKLearnModel(
+            model = TweedieRegressor(power = 0),
+            lags = seasonality * 10,
+            output_chunk_length = 1,
+            multi_models = False
+        )
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
@@ -58,7 +70,6 @@ def forecast_pr(train_data, test_data, seasonality):
 if __name__ == "__main__":
 
     # Data loading and processing
-
     DATA_DIR = config(
         "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
     )
@@ -69,14 +80,12 @@ if __name__ == "__main__":
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
     df = pd.read_parquet(file_path)
+    df["date"] = df["date"].dt.to_timestamp()
 
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis = 1, inplace=True)
-    # This step below is mportant for pr since it can't handle nans
-    # A large outlier value helps pr treat it as a nan
-    proc_df.fillna(-999, inplace=True)
 
     # Define forecasting parameters
     test_ratio = 0.2            # Use last 20% of the data for testing
@@ -95,19 +104,15 @@ if __name__ == "__main__":
         # Filter data for the current entity
         entity_data = proc_df[["date", entity]]
 
+        # Removing leading NaNs which show up due to different start times
+        # of different series
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
+
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
 
-        # Determine train/test split
-        n = len(entity_data[entity])
-        test_size = max(1, int(n * test_ratio))
-        train_size = n - test_size
-
-        train_data = entity_data.iloc[:train_size]
-        test_data = entity_data.iloc[train_size:]
-
         # Get MASE using PR
-        entity_mase = forecast_pr(train_data, test_data, seasonality)
+        entity_mase = forecast_pr(entity_data, test_ratio, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -118,18 +123,15 @@ if __name__ == "__main__":
 
     # Global Forecasting
 
-    train_index = int((1 - test_ratio) * len(proc_df))
-    global_mase = forecast_pr(proc_df.iloc[:train_index],
-                                    proc_df.iloc[train_index:],
-                                    seasonality)
+    global_mase = forecast_pr(proc_df, test_ratio, seasonality)
 
     # Printing and saving results
 
-    print("\nPR Forecasting Results:")
+    print("\PR Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
-
+    print(f"Global MASE: {global_mase:.4f}")
 
     results_df = pd.DataFrame(
         {
