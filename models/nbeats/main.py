@@ -1,7 +1,7 @@
 """
-D-Linear using darts
+N-BEATS using darts
 
-Performs both local and global forecasting using a D-Linear. Reports both mean and
+Performs both local and global forecasting using a N-BEATS. Reports both mean and
 median MASE for local forecasts and a single global MASE.
 """
 from pathlib import Path
@@ -14,8 +14,9 @@ import pandas as pd
 import toml
 from decouple import config
 from tqdm import tqdm
+import subprocess
 
-from darts.models import DLinearModel
+from darts.models import NBEATSModel
 from darts import TimeSeries
 from darts.dataprocessing.transformers import Scaler
 from darts.utils.missing_values import fill_missing_values
@@ -24,22 +25,22 @@ from darts.utils.model_selection import train_test_split
 from darts.metrics import mase
 
 
-def forecast_dlinear(df, test_split, seasonality):
+def forecast_nbeats(df, test_split, seasonality):
     """
-    Fit D-Linear model and return mase
+    Fit N-BEATS model and return MASE
 
     Parameters:
     -----------
     df : array-like
-        entire series
-    test_split : int
-        fraction of total data which is used for testing
+        array-like object(e.g. pd.DataFrame), with a single or multiple series, 
+        which is split into testing and training data.
+    test_ratio : int
+        fraction of df used for testing.
     seasonality : int
-        Seasonality of the series
-    
+        Seasonality of the series.
     Returns:
     --------
-    int
+    float
         MASE value
     """
     try:
@@ -57,17 +58,24 @@ def forecast_dlinear(df, test_split, seasonality):
         series, test_series = train_test_split(transformed_series, 
                                                test_size = test_split)
 
+        # Check for an NVIDIA GPU
+        try:
+            subprocess.check_output('nvidia-smi')
+            device = "gpu"
+        except Exception:
+            device = "cpu"
+
         # Training the model and getting MASE
 
-        estimator = DLinearModel(input_chunk_length = seasonality * 10,
-                                      output_chunk_length = test_length,
-                                      n_epochs = 100)
+        estimator = NBEATSModel(input_chunk_length = seasonality * 10,
+                                 output_chunk_length = 1,
+                                 pl_trainer_kwargs = {"accelerator": device})
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
     except Exception as e:
         # In case of errors, return NaN
-        print(f"Error in D-Linear forecasting: {e}")
+        print(f"Error in N-BEATS forecasting: {e}")
         return np.nan
 
 if __name__ == "__main__":
@@ -84,6 +92,7 @@ if __name__ == "__main__":
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
     df = pd.read_parquet(file_path)
+    df["date"] = df["date"].dt.to_timestamp()
 
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
@@ -101,17 +110,21 @@ if __name__ == "__main__":
 
     # Local forecasting
 
-    print(f"Running D-Linear forecasting for {len(entities)} entities...")
+    print(f"Running N-BEATS forecasting for {len(entities)} entities...")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
         entity_data = proc_df[["date", entity]]
 
+        # Removing leading NaNs which show up due to different start times
+        # of different series
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
+
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
 
-        # Get MASE using D-Linear
-        entity_mase = forecast_dlinear(entity_data, test_ratio, seasonality)
+        # Get MASE using N-BEATS
+        entity_mase = forecast_nbeats(entity_data, test_ratio, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -122,21 +135,21 @@ if __name__ == "__main__":
 
     # Global Forecasting
 
-    global_mase = forecast_dlinear(proc_df,
+    global_mase = forecast_nbeats(proc_df,
                                        test_ratio,
                                        seasonality)
 
     # Printing and saving results
 
-    print("\nD-Linear Forecasting Results:")
+    print("\nN-BEATS Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
-
+    print(f"Global MASE: {global_mase:.4f}")
 
     results_df = pd.DataFrame(
         {
-            "model": ["D-Linear"],
+            "model": ["N-BEATS"],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
@@ -145,4 +158,4 @@ if __name__ == "__main__":
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "dlinear_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "nbeats_results.csv", index=False)

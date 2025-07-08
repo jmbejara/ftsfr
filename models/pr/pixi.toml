@@ -4,7 +4,7 @@ name = "pr"
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tasks]
-post-install = "pip install darts"
+post-install = "pip install darts scikit-learn"
 main = { cmd= "python main.py", depends-on = ["post-install"]}
 
 [dependencies]
@@ -19,3 +19,4 @@ tqdm = "*"
 pyarrow = "*"
 gfortran = "*"
 darts = "*"
+sklearn = "*"

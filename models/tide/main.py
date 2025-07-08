@@ -15,6 +15,8 @@ import toml
 from decouple import config
 from tqdm import tqdm
 
+import subprocess
+
 from darts.models import TiDEModel
 from darts import TimeSeries
 from darts.dataprocessing.transformers import Scaler
@@ -57,11 +59,16 @@ def forecast_tide(df, test_split, seasonality):
         series, test_series = train_test_split(transformed_series, 
                                                test_size = test_split)
 
-        # Training the model and getting MASE
+        try:
+            subprocess.check_output('nvidia-smi')
+            device = "gpu"
+        except Exception: 
+            device = "cpu"
 
+        # Training the model and getting MASE
         estimator = TiDEModel(input_chunk_length = seasonality * 10,
-                              output_chunk_length = test_length,
-                              n_epochs = 100)
+                              output_chunk_length = 1,
+                              n_epochs = 100, pl_trainer_kwargs = {"accelerator": device})
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
@@ -84,6 +91,7 @@ if __name__ == "__main__":
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
     df = pd.read_parquet(file_path)
+    df["date"] = df["date"].dt.to_timestamp()
 
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
@@ -106,6 +114,10 @@ if __name__ == "__main__":
     for entity in tqdm(entities):
         # Filter data for the current entity
         entity_data = proc_df[["date", entity]]
+
+        # Removing leading NaNs which show up due to different start times
+        # of different series
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue

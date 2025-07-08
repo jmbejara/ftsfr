@@ -2,7 +2,7 @@
 WaveNet using GluonTS.
 
 Performs both local and global forecasting using WaveNet. Reports both mean and
-median MASE for local forecasts and a single global MASE.
+median MASE for local forecasts and a single global MASE. Adapted from Monash.
 """
 from pathlib import Path
 from warnings import filterwarnings
