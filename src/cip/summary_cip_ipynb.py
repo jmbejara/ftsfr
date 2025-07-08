@@ -87,7 +87,7 @@ print(f"Max CIP Deviation: {cip_table.max().idxmax()}")
 
 # %%
 cip_table_replicate = calc_cip.calculate_cip(end_date="2020-01-01", data_dir=DATA_DIR)
-display(cip_table_replicate)
+cip_table_replicate.tail()
 
 # %%
 print(f"Max CIP Deviation: {cip_table_replicate.max().idxmax()}")
@@ -125,7 +125,7 @@ We extend our analysis to include more recent data through 2025 to examine conte
 
 # %%
 cip_table_2025 = calc_cip.calculate_cip(end_date="2025-01-01", data_dir=DATA_DIR)
-display(cip_table_2025)
+cip_table_2025.tail()
 
 # %%
 calc_cip.plot_cip_from_data(cip_table_2025, end_date="2025-01-01", output_suffix="2025")

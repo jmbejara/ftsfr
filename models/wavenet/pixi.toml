@@ -1,0 +1,21 @@
+[workspace]
+channels = ["conda-forge"]
+name = "wavenet"
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[tasks]
+main = "python main.py"
+
+[dependencies]
+python = "3.13.*"
+pip = "*"
+python-decouple = "*"
+toml = "*"
+pandas = "*"
+numpy = "*"
+pyarrow = "*"
+gfortran = "*"
+gluonts = "*"
+pytorch = "*"
+lightning = "*"
+scipy = "*"

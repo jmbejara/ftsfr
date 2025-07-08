@@ -1,6 +1,6 @@
 [cache]
 # If use_cache is True, then the pull step for all data sources will be skipped in dodo.py
-use_cache = false
+use_cache = true
 
 [data_sources]
 
@@ -27,28 +27,42 @@ wrds_mergent = true
 wrds_optionmetrics = false
 
 [models]
-# Naive Models
-simple_exponential_smoothing = true  # Simple Exponential Smoothing
+# Statistical Models (LocalForecastingModel)
+arima = true  # ARIMA - Autoregressive Integrated Moving Average model
+ets = true  # ETS - Exponential Smoothing (Error, Trend, Seasonal) state space model
+simple_exponential_smoothing = true  # Simple Exponential Smoothing - basic smoothing for level-only data
+tbats = true  # TBATS - Exponential smoothing with Box-Cox transformation, ARMA errors, Trend and Seasonal
+theta = true  # Theta Method - simple decomposition method that performs well on M3 competition
+prophet = true  # Prophet - Facebook's additive model for time series with strong seasonal effects
 
-# Traditional Time Series Models
-arima = true  # Vector Autoregression
-vecm = false  # Vector Error Correction Model
+# Regression Models (GlobalForecastingModel)
+pr = true  # Polynomial Regression - fits polynomial functions to capture non-linear trends
+catboost = true  # CatBoost - gradient boosting optimized for categorical features and ordered data
 
-# Deep Learning Models
-lstm = false  # Long Short-Term Memory
-transformer = false  # Transformer Architecture
-temporal_fusion = false  # Temporal Fusion Transformer
-neural_prophet = false  # Neural Prophet
+# PyTorch (Lightning)-based Models (GlobalForecastingModel)
+# Basic Neural Networks
+ffnn = true  # Feed-Forward Neural Network - simple fully connected network for time series
+deepar = true  # DeepAR - Amazon's probabilistic RNN for forecasting with uncertainty estimates
+wavenet = true  # WaveNet - dilated causal convolutions originally for audio generation
 
-# Hybrid Models
-deep_ar = false  # Deep AutoRegressive
-deep_state = false  # Deep State Space
-deep_factors = false  # Deep Factor Model
+# Linear Models (LTSF-Linear family)
+dlinear = true  # D-Linear - decomposition-based linear model for long-term forecasting
+nlinear = true  # N-Linear - normalization-based linear model handling distribution shifts
 
-# Ensemble Methods
-random_forest_ts = false  # Random Forest for Time Series
-xgboost_ts = false  # XGBoost for Time Series
-lightgbm_ts = false  # LightGBM for Time Series
+# N-BEATS/N-HiTS family
+nbeats = true  # N-BEATS - Neural Basis Expansion Analysis for interpretable forecasting
+nhits = true  # N-HiTS - Neural Hierarchical Interpolation for long-horizon forecasting
+
+# Transformer Models
+transformer = true  # Transformer - vanilla transformer architecture adapted for time series
+autoformer = true  # Autoformer - Auto-Correlation decomposition transformer
+informer = true  # Informer - ProbSparse self-attention for efficient long sequence forecasting
+patchtst = true  # PatchTST - channel-independent patching for multivariate time series
+temporal_fusion_transformer = true  # TFT - Temporal Fusion Transformer with interpretable insights
+
+# Other Advanced Models
+tide = true  # TiDE - Time Series Dense Encoder using residual blocks without attention
+timesfm = true  # TimesFM - Google's foundation model pre-trained on 100B timepoints
 
 [reports]
 is_latex_installed = true

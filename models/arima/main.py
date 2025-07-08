@@ -1,166 +1,138 @@
+"""
+ARIMA using darts
+
+Performs local forecasting using ARIMA. Reports both mean and
+median MASE for local forecasts.
+"""
 from pathlib import Path
 from warnings import filterwarnings
+# Ignoring warnings
+filterwarnings("ignore")
 
 import numpy as np
 import pandas as pd
 import toml
 from decouple import config
-from statsmodels.tsa.arima.model import ARIMA
 from tqdm import tqdm
 
-# Ignore convergence warnings from ARIMA
-filterwarnings("ignore")
+from darts.models import ARIMA
+from darts import TimeSeries
+from darts.utils.missing_values import fill_missing_values
+from darts.utils.model_selection import train_test_split
 
+from darts.metrics import mase
 
-def calculate_mase(y_true, y_pred, training_set, seasonality=1):
+def forecast_arima(df, test_ratio, seasonality, order = (1, 1, 1)):
     """
-    Calculate MASE (Mean Absolute Scaled Error) as defined in the Monash Forecasting Archive.
+    Fit ARIMA model and return MASE
 
     Parameters:
     -----------
-    y_true : array-like
-        Actual test values
-    y_pred : array-like
-        Predicted values from the model
-    training_set : array-like
-        Training set used to fit the model
-    seasonality : int, default=1
-        Seasonality of the time series (S parameter in the MASE formula)
-
+    df : array-like
+        array-like object(e.g. pd.DataFrame) with a single series which is split
+        into testing and training data.
+    test_ratio : int
+        fraction of df used for testing.
+    seasonality : int
+        Seasonality of the series.
+    order: tuple
+        ARIMA order(p, q, d). Defaults to (1, 1, 1).
     Returns:
     --------
     float
         MASE value
     """
-    n_train = len(training_set)
-    h = len(y_true)
-
-    # Calculate the numerator: sum of absolute errors
-    numerator = np.sum(np.abs(y_true - y_pred))
-
-    # Calculate the denominator: scaled in-sample naive forecast error
-    if seasonality >= n_train:
-        # Handle case where seasonality is larger than the training set
-        denominator = np.sum(np.abs(np.diff(training_set)))
-    else:
-        # Use seasonal naive forecast for denominator
-        denominator = np.sum(
-            np.abs(training_set[seasonality:] - training_set[:-seasonality])
-        )
-
-    # Adjust denominator as per the formula
-    denominator = denominator * (h / (n_train - seasonality))
-
-    # Handle edge cases
-    if denominator == 0:
+    try:
+        # Data Processing
+        test_length = int(test_ratio * len(df))
+        # TimeSeries object is important for darts
+        raw_series = TimeSeries.from_dataframe(df, time_col = "date")
+        # Replace NaNs automatically
+        raw_series = fill_missing_values(raw_series)
+        # Splitting into train and test
+        series, test_series = train_test_split(raw_series,
+                                               test_size = test_ratio)
+        p, q, d = order
+        # Training the model and getting MASE
+        estimator = ARIMA(p = p, d = d, q = q)
+        estimator.fit(series)
+        pred_series = estimator.predict(test_length)
+        return mase(test_series, pred_series, series, seasonality)
+    except Exception as e:
+        # In case of errors, return NaN
+        print(f"Error in ARIMA forecasting: {e}")
         return np.nan
 
-    return numerator / denominator
+if __name__ == "__main__":
+
+    # Data loading and processing
+
+    DATA_DIR = config(
+        "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
+    )
+    OUTPUT_DIR = config(
+        "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
+    )
+    datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
+
+    file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
+    df = pd.read_parquet(file_path)
+    
+    # This pivot adds all values for an entity as a TS in each column
+    proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
+    # Basic cleaning
+    proc_df.rename_axis(None, axis = 1, inplace=True)
+
+    # Define forecasting parameters
+    test_ratio = 0.2            # Use last 20% of the data for testing
+    forecast_horizon = 20       # 20 business days, 4 weeks, about a month
+    seasonality = 5             # 5 for weekly patterns (business days)
+
+    # Process each entity separately
+    entities = df["entity"].unique()
+    mase_values = []
+
+    # Local forecasting
+
+    print(f"Running ARIMA forecasting for {len(entities)} entities...")
+
+    for entity in tqdm(entities):
+        # Filter data for the current entity
+        entity_data = proc_df[["date", entity]]
+
+        # Removing leading NaNs which show up due to different start times
+        # of different series
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
+
+        if len(entity_data) <= 10:  # Skip entities with too few observations
+            continue
+
+        # Get MASE using ARIMA
+        entity_mase = forecast_arima(entity_data, test_ratio, seasonality)
+
+        if not np.isnan(entity_mase):
+            mase_values.append(entity_mase)
+
+    # Calculate mean MASE across all entities
+    mean_mase = np.mean(mase_values)
+    median_mase = np.median(mase_values)
+
+    # Printing and saving results
+
+    print("\nARIMA Forecasting Results:")
+    print(f"Number of entities successfully forecasted: {len(mase_values)}")
+    print(f"Mean MASE: {mean_mase:.4f}")
+    print(f"Median MASE: {median_mase:.4f}")
 
 
-def forecast_arima(train_data, test_length, order=(1, 1, 1)):
-    """
-    Fit ARIMA model and generate forecasts
+    results_df = pd.DataFrame(
+        {
+            "model": ["ARIMA"],
+            "seasonality": [seasonality],
+            "mean_mase": [mean_mase],
+            "median_mase": [median_mase],
+            "entity_count": [len(mase_values)],
+        }
+    )
 
-    Parameters:
-    -----------
-    train_data : array-like
-        Training data
-    test_length : int
-        Number of periods to forecast
-    order : tuple, default=(1,1,1)
-        ARIMA order (p,d,q)
-
-    Returns:
-    --------
-    array-like
-        Forecasted values
-    """
-    try:
-        model = ARIMA(train_data, order=order)
-        model_fit = model.fit()
-        forecast = model_fit.forecast(steps=test_length)
-        return forecast
-    except Exception as e:
-        # In case of errors (e.g., non-convergence), return NaN array
-        print(f"Error in ARIMA forecasting: {e}")
-        return np.full(test_length, np.nan)
-
-
-DATA_DIR = config(
-    "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
-)
-OUTPUT_DIR = config(
-    "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
-)
-datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
-
-file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
-df = pd.read_parquet(file_path)
-
-
-# Define forecasting parameters
-test_ratio = 0.2  # Use last 20% of the data for testing
-forecast_horizon = 20  # 20 business days, 4 weeks, about a month
-seasonality = 5  # 5 for weekly patterns (business days)
-arima_order = (1, 1, 1)  # Default ARIMA order, can be tuned
-
-# Process each entity separately
-entities = df["entity"].unique()
-mase_values = []
-
-print(f"Running ARIMA forecasting for {len(entities)} entities...")
-
-for entity in tqdm(entities):
-    # Filter data for the current entity
-    entity_data = df[df["entity"] == entity].sort_values("date")
-    entity_data = entity_data.dropna()
-
-    if len(entity_data) <= 10:  # Skip entities with too few observations
-        continue
-
-    # Extract values
-    values = entity_data["value"].values
-
-    # Determine train/test split
-    n = len(values)
-    test_size = max(1, int(n * test_ratio))
-    train_size = n - test_size
-
-    train_data = values[:train_size]
-    test_data = values[train_size:]
-
-    forecast_horizon = len(test_data)
-
-    # Generate forecasts using ARIMA
-    forecasts = forecast_arima(train_data, forecast_horizon, arima_order)
-
-    # Calculate MASE for this entity
-    entity_mase = calculate_mase(test_data, forecasts, train_data, seasonality)
-
-    if not np.isnan(entity_mase):
-        mase_values.append(entity_mase)
-
-# Calculate mean MASE across all entities
-mean_mase = np.mean(mase_values)
-median_mase = np.median(mase_values)
-
-
-print("\nARIMA Forecasting Results:")
-print(f"Number of entities successfully forecasted: {len(mase_values)}")
-print(f"Mean MASE: {mean_mase:.4f}")
-print(f"Median MASE: {median_mase:.4f}")
-
-
-results_df = pd.DataFrame(
-    {
-        "model": ["ARIMA(1,1,1)"],
-        "seasonality": [seasonality],
-        "mean_mase": [mean_mase],
-        "median_mase": [median_mase],
-        "entity_count": [len(mase_values)],
-    }
-)
-
-
-results_df.to_csv(OUTPUT_DIR / "raw_results" / "arima_results.csv", index=False)
+    results_df.to_csv(OUTPUT_DIR / "raw_results" / "arima_results.csv", index=False)

@@ -76,18 +76,18 @@ def pull_commodity_futures(start_date="1950-01-01", end_date=END_DATE):
         "SB1 Comdty",
         "SB2 Comdty",
         "SB3 Comdty",  # Sugar
-        "S1 Comdty",
-        "S2 Comdty",
-        "S3 Comdty",  # Soybeans
+        "S 1 Comdty",
+        "S 2 Comdty",
+        "S 3 Comdty",  # Soybeans
         "KW1 Comdty",
         "KW2 Comdty",
         "KW3 Comdty",  # Kansas Wheat
-        "C1 Comdty",
-        "C2 Comdty",
-        "C3 Comdty",  # Corn
-        "W1 Comdty",
-        "W2 Comdty",
-        "W3 Comdty",  # Wheat
+        "C 1 Comdty",
+        "C 2 Comdty",
+        "C 3 Comdty",  # Corn
+        "W 1 Comdty",
+        "W 2 Comdty",
+        "W 3 Comdty",  # Wheat
         # Livestock
         "LH1 Comdty",
         "LH2 Comdty",
@@ -252,17 +252,70 @@ def load_commodity_futures(data_dir=DATA_DIR):
     df = load_commodity_futures(data_dir=DATA_DIR)
     df.info()
     <class 'pandas.core.frame.DataFrame'>
-    RangeIndex: 13982 entries, 0 to 13981
-    Data columns (total 5 columns):
+    RangeIndex: 16858 entries, 0 to 16857
+    Data columns (total 58 columns):
     #   Column              Non-Null Count  Dtype  
     ---  ------              --------------  -----  
-    0   index               13982 non-null  object 
-    1   KW1 Comdty_PX_LAST  13966 non-null  float64
-    2   KW2 Comdty_PX_LAST  13972 non-null  float64
-    3   KW3 Comdty_PX_LAST  13972 non-null  float64
-    4   SI3 Comdty_PX_LAST  12689 non-null  float64
-    dtypes: float64(4), object(1)
-    memory usage: 546.3+ KB
+    0   index               16858 non-null  object 
+    1   CO1 Comdty_PX_LAST  9465 non-null   float64
+    2   CO2 Comdty_PX_LAST  9466 non-null   float64
+    3   CO3 Comdty_PX_LAST  9346 non-null   float64
+    4   QS1 Comdty_PX_LAST  9206 non-null   float64
+    5   QS2 Comdty_PX_LAST  9205 non-null   float64
+    6   QS3 Comdty_PX_LAST  9205 non-null   float64
+    7   CL1 Comdty_PX_LAST  10598 non-null  float64
+    8   CL2 Comdty_PX_LAST  10622 non-null  float64
+    9   CL3 Comdty_PX_LAST  10621 non-null  float64
+    10  XB1 Comdty_PX_LAST  4974 non-null   float64
+    11  XB2 Comdty_PX_LAST  4974 non-null   float64
+    12  XB3 Comdty_PX_LAST  4974 non-null   float64
+    13  HO1 Comdty_PX_LAST  9804 non-null   float64
+    14  HO2 Comdty_PX_LAST  9805 non-null   float64
+    15  HO3 Comdty_PX_LAST  9805 non-null   float64
+    16  NG1 Comdty_PX_LAST  8856 non-null   float64
+    17  NG2 Comdty_PX_LAST  8860 non-null   float64
+    18  NG3 Comdty_PX_LAST  8861 non-null   float64
+    19  CT1 Comdty_PX_LAST  16564 non-null  float64
+    20  CT2 Comdty_PX_LAST  16584 non-null  float64
+    21  CT3 Comdty_PX_LAST  16521 non-null  float64
+    22  KC1 Comdty_PX_LAST  13109 non-null  float64
+    23  KC2 Comdty_PX_LAST  13246 non-null  float64
+    24  KC3 Comdty_PX_LAST  13229 non-null  float64
+    25  CC1 Comdty_PX_LAST  16361 non-null  float64
+    26  CC2 Comdty_PX_LAST  16470 non-null  float64
+    27  CC3 Comdty_PX_LAST  16462 non-null  float64
+    28  SB1 Comdty_PX_LAST  16128 non-null  float64
+    29  SB2 Comdty_PX_LAST  16127 non-null  float64
+    30  SB3 Comdty_PX_LAST  16077 non-null  float64
+    31  S 1 Comdty_PX_LAST  16630 non-null  float64
+    32  S 2 Comdty_PX_LAST  16629 non-null  float64
+    33  S 3 Comdty_PX_LAST  16630 non-null  float64
+    34  KW1 Comdty_PX_LAST  13974 non-null  float64
+    35  KW2 Comdty_PX_LAST  13980 non-null  float64
+    36  KW3 Comdty_PX_LAST  13980 non-null  float64
+    37  C 1 Comdty_PX_LAST  16629 non-null  float64
+    38  C 2 Comdty_PX_LAST  16632 non-null  float64
+    39  C 3 Comdty_PX_LAST  16632 non-null  float64
+    40  W 1 Comdty_PX_LAST  16629 non-null  float64
+    41  W 2 Comdty_PX_LAST  16633 non-null  float64
+    42  W 3 Comdty_PX_LAST  16632 non-null  float64
+    43  LH1 Comdty_PX_LAST  9899 non-null   float64
+    44  LH2 Comdty_PX_LAST  9879 non-null   float64
+    45  LH3 Comdty_PX_LAST  9860 non-null   float64
+    46  FC1 Comdty_PX_LAST  13461 non-null  float64
+    47  FC2 Comdty_PX_LAST  13508 non-null  float64
+    48  FC3 Comdty_PX_LAST  13474 non-null  float64
+    49  LC1 Comdty_PX_LAST  15272 non-null  float64
+    50  LC2 Comdty_PX_LAST  15273 non-null  float64
+    51  LC3 Comdty_PX_LAST  15270 non-null  float64
+    52  GC1 Comdty_PX_LAST  12635 non-null  float64
+    53  GC2 Comdty_PX_LAST  12696 non-null  float64
+    54  GC3 Comdty_PX_LAST  12696 non-null  float64
+    55  SI1 Comdty_PX_LAST  12654 non-null  float64
+    56  SI2 Comdty_PX_LAST  12698 non-null  float64
+    57  SI3 Comdty_PX_LAST  12697 non-null  float64
+    dtypes: float64(57), object(1)
+    memory usage: 7.5+ MB
     """
     path = data_dir / "commodity_futures.parquet"
     return pd.read_parquet(path)
