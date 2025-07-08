@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
     df = pd.read_parquet(file_path)
-    df["date"] = df["date"].dt.to_timestamp()
+    
     # neuralforecast naming conventions
     proc_df = df.rename(columns = {"entity": "unique_id", "date":"ds", "value":"y"})
 

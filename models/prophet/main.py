@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
     df = pd.read_parquet(file_path)
-    df["date"] = df["date"].dt.to_timestamp()
+    
 
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
