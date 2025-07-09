@@ -1,0 +1,61 @@
+[cds_bond_basis]
+required_data_sources = ["open_source_bond", "wrds_markit"]
+
+
+[cds_returns]
+required_data_sources = ["fed_yield_curve", "wrds_markit"]
+
+
+[cip]
+required_data_sources = ["bloomberg_terminal"]
+
+
+[commodities]
+required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
+
+
+[corp_bond_returns]
+required_data_sources = ["open_source_bond"]
+
+
+[crb_commodity]
+required_data_sources = ["bloomberg_terminal"]
+
+
+[fed_yield_curve]
+required_data_sources = ["fed_yield_curve"]
+
+
+[foreign_exchange]
+required_data_sources = ["wrds_fx"]
+
+
+[futures_returns]
+required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
+
+
+[he_kelly_manela]
+required_data_sources = ["he_kelly_manela"]
+
+
+[ken_french_data_library]
+required_data_sources = ["ken_french_data_library"]
+
+
+[nyu_call_report]
+required_data_sources = ["nyu_call_report"]
+
+
+[sovereign_bonds]
+required_data_sources = ["wrds_crsp"]
+
+
+[us_treasury_returns]
+required_data_sources = ["wrds_crsp"]
+
+
+[wrds_bank_premium]
+required_data_sources = ["wrds_bank_premium"]
+
+
+[wrds_crsp_compustat]

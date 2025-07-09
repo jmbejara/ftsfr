@@ -107,11 +107,11 @@ if data_sources["bloomberg_terminal"] and not is_data_glimpses:
 
 # fmt: off
 module_requirements = {}
+module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
+module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
 module_requirements["cip"] = data_sources["bloomberg_terminal"]
 module_requirements["commodities"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
 module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
-module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
-module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
 module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
 module_requirements["foreign_exchange"] = data_sources["wrds_fx"]
 module_requirements["futures_returns"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
