@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Generated: 2025-07-10 16:42:26
+Generated: 2025-07-10 17:20:23
 Total files: 19
 
 ## Summary of Datasets by Task
@@ -74,6 +74,11 @@ par_spread: min=-277.079498250281, max=1307.7831991672729, mean=0.06, median=0.0
 __index_level_0__: min=39, max=1392383, mean=692416.28, median=696029.0
 ```
 
+### Date/Datetime Column Statistics
+```
+date: min=2002-09-30 00:00:00, max=2022-09-30 00:00:00
+```
+
 ---
 
 ## Red_Data.parquet
@@ -100,6 +105,11 @@ CS: min=-0.8427172227775009, max=24.41471933726512, mean=0.03, median=0.01700971
 size_ig: min=0.0, max=1.0, mean=0.82, median=1.0
 size_jk: min=0.0, max=1.0, mean=0.98, median=1.0
 mat_days: min=360.99999999999994, max=36525.0, mean=3766.07, median=2480.0
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 ```
 
 ---
@@ -157,6 +167,11 @@ Month                                    Datetime(time_unit='ns', time_zone=None
 10Y_Q5: min=0.003034199956717164, max=0.019339084808444634, mean=0.01, median=0.006114826402134227
 ```
 
+### Date/Datetime Column Statistics
+```
+Month: min=2001-01-01 00:00:00, max=2023-12-01 00:00:00
+```
+
 ---
 
 ## cip_spreads.parquet
@@ -186,6 +201,11 @@ GBP: min=-11.71473649302368, max=287.634939349282, mean=14.36, median=8.55276305
 JPY: min=-31.23245606446813, max=439.59367390435733, mean=37.54, median=31.855508763267146
 NZD: min=-65.25243119248204, max=257.4711793363026, mean=0.09, median=-5.4573860355283665
 SEK: min=-75.02010739148606, max=374.5435302007317, mean=29.33, median=21.911787065051698
+```
+
+### Date/Datetime Column Statistics
+```
+index: min=1999-02-08, max=2025-02-28
 ```
 
 ---
@@ -223,6 +243,11 @@ date                                     Datetime(time_unit='ns', time_zone=None
 10.0: min=-0.2357410309055786, max=0.21497478314108745, mean=0.01, median=0.007058037007308077
 ```
 
+### Date/Datetime Column Statistics
+```
+date: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
+```
+
 ---
 
 ## ftsfr_treas_yield_curve_zero_coupon.parquet
@@ -239,6 +264,11 @@ value                                    Float64         (25.7% null)
 ### Numeric Column Statistics
 ```
 value: min=0.0554, max=16.462, mean=5.61, median=5.3232729844415
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=1961-06-14 00:00:00, max=2025-05-30 00:00:00
 ```
 
 ---
@@ -263,6 +293,11 @@ settlement: min=-37.630005, max=24480.0, mean=591.56, median=59.699997
 product_code: min=289, max=3847, mean=2121.62, median=2060.0
 ```
 
+### Date/Datetime Column Statistics
+```
+date: min=1973-01-02 00:00:00, max=2025-06-11 00:00:00
+```
+
 ---
 
 ## ftsfr_nyu_call_report_cash_liquidity.parquet
@@ -279,6 +314,11 @@ value                                    Float64         (0.6% null)
 ### Numeric Column Statistics
 ```
 value: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 ```
 
 ---
@@ -299,6 +339,11 @@ value                                    Float64         (0.0% null)
 value: min=-0.0024056979902961173, max=0.9987931814753357, mean=0.07, median=0.051772243080015184
 ```
 
+### Date/Datetime Column Statistics
+```
+date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
+```
+
 ---
 
 ## ftsfr_nyu_call_report_holding_company_leverage.parquet
@@ -315,6 +360,11 @@ value                                    Float64         (0.0% null)
 ### Numeric Column Statistics
 ```
 value: min=-61371.42307692308, max=inf, mean=inf, median=10.979716024340771
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 ```
 
 ---
@@ -335,6 +385,11 @@ value                                    Float64         (3.3% null)
 value: min=-61371.42307692308, max=inf, mean=inf, median=11.125577574699662
 ```
 
+### Date/Datetime Column Statistics
+```
+date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
+```
+
 ---
 
 ## issue_dates.parquet
@@ -352,6 +407,11 @@ issueDate                                Datetime(time_unit='ns', time_zone=None
 ```
 totalTendered: min=0.0, max=566665759500.0, mean=137880865017.41, median=78532939000.0
 totalAccepted: min=0.0, max=255492688300.0, mean=56243429773.29, median=34536730000.0
+```
+
+### Date/Datetime Column Statistics
+```
+issueDate: min=1979-11-15 00:00:00, max=2025-06-30 00:00:00
 ```
 
 ---
@@ -374,6 +434,11 @@ cusip                                    String
 run: min=0, max=84, mean=21.38, median=17.0
 ```
 
+### Date/Datetime Column Statistics
+```
+date: min=1979-11-15 00:00:00, max=2025-06-16 00:00:00
+```
+
 ---
 
 ## ftsfr_CRSP_monthly_stock_ret.parquet
@@ -393,6 +458,11 @@ entity: min=10000, max=93436, mean=49674.72, median=48215.0
 value: min=-1.0, max=26.583827, mean=0.01, median=0.0
 ```
 
+### Date/Datetime Column Statistics
+```
+date: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
+```
+
 ---
 
 ## ftsfr_CRSP_monthly_stock_retx.parquet
@@ -410,6 +480,11 @@ value                                    Float64         (0.4% null)
 ```
 entity: min=10000, max=93436, mean=49674.72, median=48215.0
 value: min=-1.0, max=26.583827, mean=0.01, median=0.0
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
 ```
 
 ---

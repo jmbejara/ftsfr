@@ -210,6 +210,58 @@ def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=Non
                 )
         report["numeric_stats"] = numeric_stats
         
+        # Date/Datetime stats (only if requested)
+        # Check for date/datetime columns
+        date_cols = []
+        for c in columns_to_process:
+            dtype = schema[c]
+            # Check if it's a Date or Datetime type
+            if dtype == pl.Date or (hasattr(dtype, 'base_type') and dtype.base_type() == pl.Datetime):
+                date_cols.append(c)
+        
+        date_stats = []
+        if include_stats and date_cols:
+            date_stats_exprs = []
+            for c in date_cols:
+                date_stats_exprs.extend([
+                    pl.col(c).min().alias(f"{c}_min"),
+                    pl.col(c).max().alias(f"{c}_max"),
+                ])
+            
+            date_stats_df = lf.select(date_stats_exprs).collect()
+            date_stats_dict = date_stats_df.to_dicts()[0]
+            
+            for col in date_cols:
+                min_val = date_stats_dict.get(f"{col}_min")
+                max_val = date_stats_dict.get(f"{col}_max")
+                
+                # Format dates appropriately
+                if min_val is not None:
+                    if isinstance(min_val, datetime):
+                        min_str = min_val.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        min_str = str(min_val)
+                else:
+                    min_str = None
+                    
+                if max_val is not None:
+                    if isinstance(max_val, datetime):
+                        max_str = max_val.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        max_str = str(max_val)
+                else:
+                    max_str = None
+                
+                date_stats.append({
+                    "name": col,
+                    "min": min_str,
+                    "max": max_str,
+                    "min_raw": min_val,
+                    "max_raw": max_val
+                })
+        
+        report["date_stats"] = date_stats
+        
         # Glimpse - need a larger sample for better representation
         if max_columns and len(all_columns) > max_columns:
             glimpse_df = lf.select(columns_to_process).head(100).collect()
@@ -397,6 +449,19 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True, 
             output_lines.append("```")
             output_lines.append("")
 
+        # Date/Datetime statistics section (conditional)
+        if include_stats and report["date_stats"]:
+            output_lines.append("### Date/Datetime Column Statistics")
+            output_lines.append("```")
+            for stat in report["date_stats"]:
+                min_val = stat["min"] if stat["min"] is not None else "N/A"
+                max_val = stat["max"] if stat["max"] is not None else "N/A"
+                output_lines.append(
+                    f"{stat['name']}: min={min_val}, max={max_val}"
+                )
+            output_lines.append("```")
+            output_lines.append("")
+
         # Add separator between datasets
         output_lines.append("---")
 
@@ -484,6 +549,17 @@ def create_xml_report(existing_files, include_stats=True, verbose=False, max_col
                     f'        <column name="{saxutils.escape(stat["name"])}" min="{min_val}" max="{max_val}" mean="{mean_val}" median="{median_val}"/>'
                 )
             output_lines.append("      </numeric_stats>")
+
+        # Date/Datetime stats
+        if report["date_stats"]:
+            output_lines.append("      <date_stats>")
+            for stat in report["date_stats"]:
+                min_val = str(stat["min"]) if stat["min"] is not None else ""
+                max_val = str(stat["max"]) if stat["max"] is not None else ""
+                output_lines.append(
+                    f'        <column name="{saxutils.escape(stat["name"])}" min="{min_val}" max="{max_val}"/>'
+                )
+            output_lines.append("      </date_stats>")
 
         # Glimpse
         output_lines.append("      <glimpse><![CDATA[")
