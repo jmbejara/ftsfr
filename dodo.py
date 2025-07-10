@@ -754,9 +754,9 @@ def task_create_data_glimpses():
 
     return {
         "actions": [
-            # "python ./src/create_data_glimpses.py",
-            "python ./src/create_data_glimpses.py --no-samples",
-            # "python ./src/create_data_glimpses.py --no-samples --no-stats",
+            # "python ./src/create_data_glimpses.py --max-columns=20",
+            "python ./src/create_data_glimpses.py --no-samples" # --max-columns=20",
+            # "python ./src/create_data_glimpses.py --no-samples --no-stats --max-columns=20",
         ],
         "targets": [
             "./docs_src/data_glimpses.md",
