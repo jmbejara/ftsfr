@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Generated: 2025-07-09 10:33:09
+Generated: 2025-07-10 16:42:26
 Total files: 19
 
 ## Summary of Datasets by Task
@@ -285,25 +285,7 @@ value: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
 
 ## ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`
-**Size:** 15.4 MB | **Type:** Parquet | **Shape:** 1,919,810 rows × 3 columns
-
-### Columns
-```
-entity                                   String          (0.0% null)
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (0.6% null)
-```
-
-### Numeric Column Statistics
-```
-value: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
-```
-
----
-
-## ftsfr_nyu_call_report_holding_company_leverage.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet`
-**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 833,187 rows × 3 columns
+**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 833,010 rows × 3 columns
 
 ### Columns
 ```
@@ -314,7 +296,25 @@ value                                    Float64         (0.0% null)
 
 ### Numeric Column Statistics
 ```
-value: min=-61371.42307692308, max=inf, mean=inf, median=10.980478367317396
+value: min=-0.0024056979902961173, max=0.9987931814753357, mean=0.07, median=0.051772243080015184
+```
+
+---
+
+## ftsfr_nyu_call_report_holding_company_leverage.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet`
+**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 833,010 rows × 3 columns
+
+### Columns
+```
+entity                                   String         
+date                                     Datetime(time_unit='ns', time_zone=None)
+value                                    Float64         (0.0% null)
+```
+
+### Numeric Column Statistics
+```
+value: min=-61371.42307692308, max=inf, mean=inf, median=10.979716024340771
 ```
 
 ---
@@ -378,42 +378,38 @@ run: min=0, max=84, mean=21.38, median=17.0
 
 ## ftsfr_CRSP_monthly_stock_ret.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_ret.parquet`
-**Size:** 37.3 MB | **Type:** Parquet | **Shape:** 3,826,457 rows × 4 columns
+**Size:** 21.6 MB | **Type:** Parquet | **Shape:** 3,826,457 rows × 3 columns
 
 ### Columns
 ```
 entity                                   Int64          
 date                                     Datetime(time_unit='ns', time_zone=None)
 value                                    Float64         (0.4% null)
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
 entity: min=10000, max=93436, mean=49674.72, median=48215.0
 value: min=-1.0, max=26.583827, mean=0.01, median=0.0
-__index_level_0__: min=0, max=499999, mean=246934.99, median=247938.0
 ```
 
 ---
 
 ## ftsfr_CRSP_monthly_stock_retx.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_retx.parquet`
-**Size:** 33.9 MB | **Type:** Parquet | **Shape:** 3,826,457 rows × 4 columns
+**Size:** 18.3 MB | **Type:** Parquet | **Shape:** 3,826,457 rows × 3 columns
 
 ### Columns
 ```
 entity                                   Int64          
 date                                     Datetime(time_unit='ns', time_zone=None)
 value                                    Float64         (0.4% null)
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
 entity: min=10000, max=93436, mean=49674.72, median=48215.0
 value: min=-1.0, max=26.583827, mean=0.01, median=0.0
-__index_level_0__: min=0, max=499999, mean=246934.99, median=247938.0
 ```
 
 ---

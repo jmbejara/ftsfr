@@ -15,6 +15,7 @@ import pull_CRSP_Compustat
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "wrds_crsp_compustat"
 
 
 ## CRSP_monthly_stock_ret
@@ -25,6 +26,7 @@ df_all = df_all.sort_values(by=["permno", "mthcaldt"])
 df = df_all[["permno", "mthcaldt", "mthret"]]
 # df_all.info()
 df = df.rename(columns={"permno": "entity", "mthcaldt": "date", "mthret": "value"})
+df = df.reset_index(drop=True)
 df.to_parquet(DATA_DIR / "ftsfr_CRSP_monthly_stock_ret.parquet")
 
 
@@ -32,4 +34,5 @@ df.to_parquet(DATA_DIR / "ftsfr_CRSP_monthly_stock_ret.parquet")
 df = df_all[["permno", "mthcaldt", "mthretx"]]
 # df_all.info()
 df = df.rename(columns={"permno": "entity", "mthcaldt": "date", "mthretx": "value"})
+df = df.reset_index(drop=True)
 df.to_parquet(DATA_DIR / "ftsfr_CRSP_monthly_stock_retx.parquet")

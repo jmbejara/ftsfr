@@ -13,7 +13,7 @@ import pull_fed_yield_curve
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-
+# DATA_DIR = DATA_DIR / "fed_yield_curve"
 
 ## treas_yield_curve_zero_coupon
 df_all = pull_fed_yield_curve.load_fed_yield_curve(data_dir=DATA_DIR)
