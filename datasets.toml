@@ -130,6 +130,7 @@ required_data_sources = ["wrds_bank_premium"]
 
 ################################################################################
 [wrds_crsp_compustat]
+required_data_sources = ["wrds_compustat", "wrds_crsp", "wrds_crsp_compustat"]
 
 [wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_ret]
 description = """CRSP monthly stock returns, 1926-present"""

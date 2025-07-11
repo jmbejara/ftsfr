@@ -2,6 +2,34 @@
 
 You can view the current version of the website here: https://jeremybejarano.com/ftsfr/
 
+## Overview
+
+This repository contains a collection of financial time-series forecasting models. It produces testing benchmarks for practitioners. One key feature is that users can specify which data sources (i.e., subscriptions) they have access to in `config.toml`, and the system will automatically determine which modules can be run based on the user's available data sources.
+
+### Architecture: Data Sources, Data Modules, and Datasets
+
+This repository is organized around three key concepts:
+
+1. **Data Sources**: External data providers that may require subscriptions or API access. Examples include:
+   - Bloomberg Terminal
+   - WRDS (Wharton Research Data Services) subscriptions (Markit, CRSP, Compustat, etc.)
+   - Public data sources (Federal Reserve, Ken French Data Library, etc.)
+   
+   Users specify which data sources (subscriptions) they have access to in `config.toml`.
+
+2. **Data Modules**: Self-contained units of code organized in subdirectories under `src/`. Each data module:
+   - Contains all related code for a specific financial data domain
+   - May depend on one or more _data sources_
+   - Produces one or more related _datasets_
+   - Examples: `cds_returns`, `corp_bond_returns`, `us_treasury_returns`
+
+3. **Datasets**: The actual data files produced by data modules, saved as parquet files. These follow a consistent format:
+   - Named as `ftsfr_<dataset_name>.parquet`
+   - Contain standardized columns: `id` (entity), `ds` (date/timestamp), `y` (value)
+   - Metadata (frequency, balance status, etc.) is stored in `datasets.toml`
+
+The dependency relationships between data modules and data sources are defined in `datasets.toml` and tracked by `dependency_tracker.py`. This allows the system to automatically determine which modules can be run based on the user's available data sources.
+
 ## Agenda
 
 All
@@ -28,8 +56,6 @@ Jeremy
  - Check this again? https://github.com/jmbejara/ftsfr/issues/2
  - Bloomberg sovereign bond data: https://github.com/jmbejara/ftsfr/issues/26
 
-
-This repository contains a collection of financial time-series forecasting models. It produces esting a benchmark for prac
 
 ## Quickstart
 
