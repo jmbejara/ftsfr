@@ -152,7 +152,9 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
 # %%
 
 
-corp_bonds_data = pull_open_source_bond.load_corporate_bond_returns(data_dir=DATA_DIR / "cds_bond_basis")
+corp_bonds_data = pull_open_source_bond.load_corporate_bond_returns(
+    data_dir=DATA_DIR / "cds_bond_basis"
+)
 red_data = pd.read_parquet(DATA_DIR / "cds_bond_basis" / "RED_and_ISIN_mapping.parquet")
 cds_data = pull_wrds_markit.load_cds_data(data_dir=DATA_DIR / "cds_bond_basis")
 

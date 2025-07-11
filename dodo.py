@@ -8,7 +8,11 @@ from doit.action import CmdAction
 sys.path.insert(1, "./src/")
 
 from settings import config
-from dependency_tracker import load_module_requirements, get_available_datasets, get_format_task_name
+from dependency_tracker import (
+    load_module_requirements,
+    get_available_datasets,
+    get_format_task_name,
+)
 
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
@@ -611,9 +615,9 @@ models_activated = [model for model in models if models[model]]
 
 def task_forecast():
     """Generate forecast tasks for each combination of model and dataset."""
-    
+
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
-    
+
     for model in models_activated:
         for dataset_name, dataset_info in available_datasets.items():
             # For debugging purposes, print the full command line action here:
@@ -622,7 +626,7 @@ def task_forecast():
                 "name": f"{model}:{dataset_name}",
                 "actions": [
                     CmdAction(
-                        f"{PIXI_EXECUTABLE} run main", 
+                        f"{PIXI_EXECUTABLE} run main",
                         cwd=f"./models/{model}",
                         env={
                             "FTSFR_DATASET_PATH": str(dataset_info["path"]),
@@ -630,7 +634,7 @@ def task_forecast():
                             "FTSFR_FREQUENCY": dataset_info["frequency"],
                             "DATA_DIR": str(DATA_DIR),
                             "OUTPUT_DIR": str(OUTPUT_DIR),
-                        }
+                        },
                     )
                 ],
                 "targets": [
@@ -650,9 +654,9 @@ def task_forecast():
 
 def task_assemble_results():
     """Assemble results from all model-dataset combinations."""
-    
+
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
-    
+
     return {
         "actions": [
             "python ./src/assemble_results.py",
@@ -665,8 +669,8 @@ def task_assemble_results():
             "./src/assemble_results.py",
         ],
         "task_dep": [
-            f"forecast:{model}:{dataset_name}" 
-            for model in models_activated 
+            f"forecast:{model}:{dataset_name}"
+            for model in models_activated
             for dataset_name in available_datasets
         ],
         "clean": [],
@@ -756,7 +760,7 @@ def task_create_data_glimpses():
     return {
         "actions": [
             # "python ./src/create_data_glimpses.py --max-columns=20",
-            "python ./src/create_data_glimpses.py --no-samples" # --max-columns=20",
+            "python ./src/create_data_glimpses.py --no-samples"  # --max-columns=20",
             # "python ./src/create_data_glimpses.py --no-samples --no-stats --max-columns=20",
         ],
         "targets": [

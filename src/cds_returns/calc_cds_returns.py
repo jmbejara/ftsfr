@@ -144,35 +144,31 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
         end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
     if isinstance(cds_spreads, pd.DataFrame):
         cds_spreads = pl.from_pandas(cds_spreads)
-    
+
     # Work with LazyFrame for memory efficiency
     if isinstance(cds_spreads, pl.DataFrame):
         cds_spreads = cds_spreads.lazy()
-    
+
     # Build the query lazily - filter and clean data
     cds_spread_clean = (
-        cds_spreads
-        .filter(
-            (pl.col("date") >= start_date) & 
-            (pl.col("date") <= end_date) &
-            (pl.col("country") == "United States") &
-            (pl.col("parspread").is_not_null()) &
-            (pl.col("parspread") <= 0.5)  # Remove spreads greater than 50%
+        cds_spreads.filter(
+            (pl.col("date") >= start_date)
+            & (pl.col("date") <= end_date)
+            & (pl.col("country") == "United States")
+            & (pl.col("parspread").is_not_null())
+            & (pl.col("parspread") <= 0.5)  # Remove spreads greater than 50%
         )
         .drop(["convspreard", "year", "redcode"])
         .unique()
-        .with_columns(
-            pl.col("date").dt.strftime("%Y-%m").alias("year_month")
-        )
+        .with_columns(pl.col("date").dt.strftime("%Y-%m").alias("year_month"))
     )
 
     # Compute Credit Quantiles - need to collect here for quantile calculations
     spread_5y = cds_spread_clean.filter(pl.col("tenor") == "5Y")
-    
+
     # Get first available spread for each ticker in each month
     first_spread_5y = (
-        spread_5y
-        .sort("date")
+        spread_5y.sort("date")
         .group_by(["ticker", "year_month"])
         .first()
         .select(["ticker", "year_month", "parspread"])
@@ -206,27 +202,22 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
     ).select(["ticker", "year_month", "credit_quantile"])
 
     # Continue with lazy operations - join back the quantiles
-    cds_spreads_final = (
-        cds_spread_clean
-        .join(first_spread_5y.lazy(), on=["ticker", "year_month"], how="left")
-        .sort("date")
-    )
+    cds_spreads_final = cds_spread_clean.join(
+        first_spread_5y.lazy(), on=["ticker", "year_month"], how="left"
+    ).sort("date")
 
     # Compute Representative Parspread lazily
     relevant_tenors = ["3Y", "5Y", "7Y", "10Y"]
     relevant_quantiles = [1, 2, 3, 4, 5]
 
     rep_parspread_df = (
-        cds_spreads_final
-        .filter(
-            (pl.col("tenor").is_in(relevant_tenors)) &
-            (pl.col("credit_quantile").is_in(relevant_quantiles))
+        cds_spreads_final.filter(
+            (pl.col("tenor").is_in(relevant_tenors))
+            & (pl.col("credit_quantile").is_in(relevant_quantiles))
         )
         .group_by(["date", "tenor", "credit_quantile"])
         .agg(pl.col("parspread").mean().alias("rep_parspread"))
-        .with_columns(
-            pl.col("date").dt.truncate("1mo").alias("month")
-        )
+        .with_columns(pl.col("date").dt.truncate("1mo").alias("month"))
     )
 
     portfolio_dict = {}
@@ -238,10 +229,8 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
 
             # Filter and collect only this specific portfolio
             portfolio_df = (
-                rep_parspread_df
-                .filter(
-                    (pl.col("tenor") == tenor) & 
-                    (pl.col("credit_quantile") == quantile)
+                rep_parspread_df.filter(
+                    (pl.col("tenor") == tenor) & (pl.col("credit_quantile") == quantile)
                 )
                 .sort("date")
                 .collect()  # Only collect the small subset we need
@@ -534,14 +523,20 @@ def load_portfolio(data_dir=DATA_DIR):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Calculate CDS returns with memory optimization")
-    parser.add_argument("--DATA_DIR", type=str, default=None, 
-                       help="Data directory path (overrides config)")
+    parser = argparse.ArgumentParser(
+        description="Calculate CDS returns with memory optimization"
+    )
+    parser.add_argument(
+        "--DATA_DIR",
+        type=str,
+        default=None,
+        help="Data directory path (overrides config)",
+    )
     args = parser.parse_args()
-    
+
     # Use command line argument if provided, otherwise use config
     data_dir = Path(args.DATA_DIR) if args.DATA_DIR else DATA_DIR
-    
+
     raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=data_dir)
     # Load CDS data as LazyFrame for memory efficiency
     cds_spreads = pl.scan_parquet(data_dir / "markit_cds.parquet")

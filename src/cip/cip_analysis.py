@@ -16,8 +16,6 @@ except ModuleNotFoundError:
     from calc_cip import *
 
 
-
-
 from settings import config
 
 OUTPUT_DIR = config("OUTPUT_DIR")
@@ -26,10 +24,16 @@ OUTPUT_DIR = config("OUTPUT_DIR")
 def compute_cip_statistics(cip_data):
     """Compute CIP statistics from CIP data."""
     if cip_data is None or cip_data.empty:
-        raise ValueError("Error: cip_data is empty or None. Check if compute_cip() is working correctly.")
+        raise ValueError(
+            "Error: cip_data is empty or None. Check if compute_cip() is working correctly."
+        )
 
     stats_dict = {}
-    cip_columns = [col for col in cip_data.columns if col.startswith('CIP_') and col.endswith('_ln')]
+    cip_columns = [
+        col
+        for col in cip_data.columns
+        if col.startswith("CIP_") and col.endswith("_ln")
+    ]
     cip_df = cip_data[cip_columns]
 
     if cip_df.empty:
@@ -37,16 +41,17 @@ def compute_cip_statistics(cip_data):
 
     stats_dict["overall_statistics"] = cip_df.describe()
     stats_dict["correlation_matrix"] = cip_df.corr()
-    
+
     # Ensure index is datetime for resampling
     if not isinstance(cip_data.index, pd.DatetimeIndex):
         cip_data.index = pd.to_datetime(cip_data.index)
         cip_df.index = cip_data.index
-    
-    stats_dict["annual_statistics"] = cip_df.resample('YE').agg(['mean', 'std', 'min', 'max'])
+
+    stats_dict["annual_statistics"] = cip_df.resample("YE").agg(
+        ["mean", "std", "min", "max"]
+    )
 
     return stats_dict
-
 
 
 def display_cip_summary(stats_dict):
@@ -77,12 +82,18 @@ def display_cip_max_min(stats_dict):
     if "overall_statistics" not in stats_dict:
         raise KeyError("Key 'overall_statistics' not found in stats dictionary.")
 
-    mean_values = stats_dict["overall_statistics"].loc["mean"]  # Fix: Use lowercase "mean"
+    mean_values = stats_dict["overall_statistics"].loc[
+        "mean"
+    ]  # Fix: Use lowercase "mean"
     most_positive = mean_values.idxmax()
     most_negative = mean_values.idxmin()
 
     print("\n" + "=" * 80)
     print("EXTREME CIP DEVIATIONS")
     print("=" * 80)
-    print(f"Most Positive CIP Deviation: {most_positive} ({mean_values[most_positive]:.2f} bps)")
-    print(f"Most Negative CIP Deviation: {most_negative} ({mean_values[most_negative]:.2f} bps)")
+    print(
+        f"Most Positive CIP Deviation: {most_positive} ({mean_values[most_positive]:.2f} bps)"
+    )
+    print(
+        f"Most Negative CIP Deviation: {most_negative} ({mean_values[most_negative]:.2f} bps)"
+    )

@@ -93,7 +93,9 @@ cip_table_replicate.tail()
 print(f"Max CIP Deviation: {cip_table_replicate.max().idxmax()}")
 
 # %%
-calc_cip.plot_cip_from_data(cip_table_replicate, end_date="2020-01-01", output_suffix="replicate")
+calc_cip.plot_cip_from_data(
+    cip_table_replicate, end_date="2020-01-01", output_suffix="replicate"
+)
 
 # %%
 """
@@ -144,7 +146,9 @@ cip_table_2025.describe()
 # %%
 # Create a version with the column names that cip_analysis expects
 cip_table_2025_for_analysis = cip_table_2025.copy()
-cip_table_2025_for_analysis.columns = [f"CIP_{col}_ln" for col in cip_table_2025_for_analysis.columns]
+cip_table_2025_for_analysis.columns = [
+    f"CIP_{col}_ln" for col in cip_table_2025_for_analysis.columns
+]
 stats = cip_analysis.compute_cip_statistics(cip_table_2025_for_analysis)
 
 # %%

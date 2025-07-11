@@ -21,19 +21,20 @@ VALUE_COL_NAME = "value"
 TIME_COL_NAME = "date"
 
 SEASONALITY_MAP_ADAPT = {
-   "1min": [1440, 10080, 525960],
-   "10min": [144, 1008, 52596],
-   "30min": [48, 336, 17532],
-   "1H": [24, 168, 8766],
-   "1D": 7,
-   "1B": 5,
-   "1W": 365.25/7,
-   "1M": 12,
-   "1Q": 4,
-   "1Y": 1
+    "1min": [1440, 10080, 525960],
+    "10min": [144, 1008, 52596],
+    "30min": [48, 336, 17532],
+    "1H": [24, 168, 8766],
+    "1D": 7,
+    "1B": 5,
+    "1W": 365.25 / 7,
+    "1M": 12,
+    "1Q": 4,
+    "1Y": 1,
 }
 
-def get_deep_nn_forecasts(lag, proc_df, external_forecast_horizon = None):
+
+def get_deep_nn_forecasts(lag, proc_df, external_forecast_horizon=None):
     """
     Takes PKL file and writes the results into respective files
 
@@ -43,7 +44,7 @@ def get_deep_nn_forecasts(lag, proc_df, external_forecast_horizon = None):
     :param method: name of the forecasting method that you want to evaluate
     :param external_forecast_horizon: the required forecast horizon, if it is not available in the .tsf file
     :param integer_conversion: whether the forecasts should be rounded or not
-    
+
     """
 
     # raw_df = pd.read_parquet(input_file_name)
@@ -59,15 +60,15 @@ def get_deep_nn_forecasts(lag, proc_df, external_forecast_horizon = None):
     # Automatic frequency inference
     _offset = pd.infer_freq(df[TIME_COL_NAME])
     if _offset == "min":
-        freq = '10' + "min"
+        freq = "10" + "min"
     # 1M makes FRED work
     else:
-        freq = '1' + _offset if _offset else "1M"
+        freq = "1" + _offset if _offset else "1M"
 
     seasonality = SEASONALITY_MAP_ADAPT[freq]
 
     if isinstance(seasonality, list):
-        seasonality = min(seasonality) # Use to calculate MASE
+        seasonality = min(seasonality)  # Use to calculate MASE
 
     if external_forecast_horizon is None:
         raise Exception("Please provide the required forecast horizon")
@@ -79,8 +80,10 @@ def get_deep_nn_forecasts(lag, proc_df, external_forecast_horizon = None):
         series_data = row[VALUE_COL_NAME]
 
         # Creating training and test series. Test series will be only used during evaluation
-        train_series_data = series_data[:len(series_data) - forecast_horizon]
-        test_series_data = series_data[(len(series_data) - forecast_horizon) : len(series_data)]
+        train_series_data = series_data[: len(series_data) - forecast_horizon]
+        test_series_data = series_data[
+            (len(series_data) - forecast_horizon) : len(series_data)
+        ]
 
         train_series_list.append(train_series_data)
         test_series_list.append(test_series_data)
@@ -88,25 +91,32 @@ def get_deep_nn_forecasts(lag, proc_df, external_forecast_horizon = None):
         # We use full length training series to train the model as we do not tune hyperparameters
         # FieldName.START: pd.Timestamp(train_start_time, freq=freq)
 
-        train_series_full_list.append({
-            FieldName.TARGET: train_series_data,
-            FieldName.START: pd.Timestamp(train_start_time)
-        })
+        train_series_full_list.append(
+            {
+                FieldName.TARGET: train_series_data,
+                FieldName.START: pd.Timestamp(train_start_time),
+            }
+        )
 
-        test_series_full_list.append({
-            FieldName.TARGET: series_data,
-            FieldName.START: pd.Timestamp(train_start_time)
-        })
+        test_series_full_list.append(
+            {
+                FieldName.TARGET: series_data,
+                FieldName.START: pd.Timestamp(train_start_time),
+            }
+        )
 
     train_ds = ListDataset(train_series_full_list, freq=freq)
     test_ds = ListDataset(test_series_full_list, freq=freq)
 
-    estimator = SimpleFeedForwardEstimator(context_length=lag,
-                                               prediction_length=forecast_horizon)
+    estimator = SimpleFeedForwardEstimator(
+        context_length=lag, prediction_length=forecast_horizon
+    )
 
     predictor = estimator.train(training_data=train_ds)
 
-    forecast_it, ts_it = make_evaluation_predictions(dataset=test_ds, predictor=predictor, num_samples=100)
+    forecast_it, ts_it = make_evaluation_predictions(
+        dataset=test_ds, predictor=predictor, num_samples=100
+    )
 
     # Time series predictions
     forecasts = list(forecast_it)
@@ -130,8 +140,8 @@ datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
 file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
 raw_df = pd.read_parquet(file_path)
 
-proc_df = raw_df.groupby('entity').agg(lambda x: pd.array(x)).reset_index()
-proc_df['date'] = proc_df['date'].iloc[0][0]
+proc_df = raw_df.groupby("entity").agg(lambda x: pd.array(x)).reset_index()
+proc_df["date"] = proc_df["date"].iloc[0][0]
 
 # Define forecasting parameters
 test_ratio = 0.2  # Use last 20% of the data for testing

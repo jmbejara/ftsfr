@@ -4,8 +4,10 @@ TiDE using darts
 Performs both local and global forecasting using a TiDE. Reports both mean and
 median MASE for local forecasts and a single global MASE.
 """
+
 from pathlib import Path
 from warnings import filterwarnings
+
 # Ignoring warnings
 filterwarnings("ignore")
 
@@ -38,7 +40,7 @@ def forecast_tide(df, test_split, seasonality):
         fraction of total data which is used for testing
     seasonality : int
         Seasonality of the series
-    
+
     Returns:
     --------
     int
@@ -49,26 +51,28 @@ def forecast_tide(df, test_split, seasonality):
 
         test_length = int(test_split * len(df))
         # TimeSeries object is important for darts
-        raw_series = TimeSeries.from_dataframe(df, time_col = "date").astype(np.float32)
+        raw_series = TimeSeries.from_dataframe(df, time_col="date").astype(np.float32)
         # Replace NaNs
         raw_series = fill_missing_values(raw_series)
         # Autoscaling the data
         transformer = Scaler()
         transformed_series = transformer.fit_transform(raw_series)
         # Splitting into train and test
-        series, test_series = train_test_split(transformed_series, 
-                                               test_size = test_split)
+        series, test_series = train_test_split(transformed_series, test_size=test_split)
 
         try:
-            subprocess.check_output('nvidia-smi')
+            subprocess.check_output("nvidia-smi")
             device = "gpu"
-        except Exception: 
+        except Exception:
             device = "cpu"
 
         # Training the model and getting MASE
-        estimator = TiDEModel(input_chunk_length = seasonality * 10,
-                              output_chunk_length = 1,
-                              n_epochs = 100, pl_trainer_kwargs = {"accelerator": device})
+        estimator = TiDEModel(
+            input_chunk_length=seasonality * 10,
+            output_chunk_length=1,
+            n_epochs=100,
+            pl_trainer_kwargs={"accelerator": device},
+        )
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
@@ -77,8 +81,8 @@ def forecast_tide(df, test_split, seasonality):
         print(f"Error in TiDE forecasting: {e}")
         return np.nan
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # Data loading and processing
 
     DATA_DIR = config(
@@ -91,17 +95,16 @@ if __name__ == "__main__":
 
     file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
     df = pd.read_parquet(file_path)
-    
 
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
     # Basic cleaning
-    proc_df.rename_axis(None, axis = 1, inplace=True)
+    proc_df.rename_axis(None, axis=1, inplace=True)
 
     # Define forecasting parameters
-    test_ratio = 0.2            # Use last 20% of the data for testing
-    forecast_horizon = 20       # 20 business days, 4 weeks, about a month
-    seasonality = 5             # 5 for weekly patterns (business days)
+    test_ratio = 0.2  # Use last 20% of the data for testing
+    forecast_horizon = 20  # 20 business days, 4 weeks, about a month
+    seasonality = 5  # 5 for weekly patterns (business days)
 
     # Process each entity separately
     entities = df["entity"].unique()
@@ -117,7 +120,7 @@ if __name__ == "__main__":
 
         # Removing leading NaNs which show up due to different start times
         # of different series
-        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index() :]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
@@ -134,9 +137,7 @@ if __name__ == "__main__":
 
     # Global Forecasting
 
-    global_mase = forecast_tide(proc_df,
-                                       test_ratio,
-                                       seasonality)
+    global_mase = forecast_tide(proc_df, test_ratio, seasonality)
 
     # Printing and saving results
 
@@ -144,7 +145,6 @@ if __name__ == "__main__":
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
-
 
     results_df = pd.DataFrame(
         {

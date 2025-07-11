@@ -158,6 +158,7 @@ def pull_wrds_tables(data_dir=DATA_DIR):
 
     db.close()
 
+
 if __name__ == "__main__":
     df = pull_all_futures_data()
     path = DATA_DIR / "wrds_futures.parquet"

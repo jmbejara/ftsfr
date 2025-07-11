@@ -7,7 +7,6 @@ import pytest
 from merge_bond_treasury_redcode import *
 
 
-
 def test_merge_treasury_data():
     issue_df = pd.DataFrame(
         {

@@ -7,7 +7,11 @@ import pandas as pd
 import toml
 
 from settings import config
-from dependency_tracker import load_module_requirements, check_module_availability, get_available_datasets
+from dependency_tracker import (
+    load_module_requirements,
+    check_module_availability,
+    get_available_datasets,
+)
 
 BASE_DIR = config("BASE_DIR")
 DATA_DIR = config("DATA_DIR")

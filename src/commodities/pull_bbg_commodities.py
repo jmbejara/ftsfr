@@ -254,9 +254,9 @@ def load_commodity_futures(data_dir=DATA_DIR):
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 16858 entries, 0 to 16857
     Data columns (total 58 columns):
-    #   Column              Non-Null Count  Dtype  
-    ---  ------              --------------  -----  
-    0   index               16858 non-null  object 
+    #   Column              Non-Null Count  Dtype
+    ---  ------              --------------  -----
+    0   index               16858 non-null  object
     1   CO1 Comdty_PX_LAST  9465 non-null   float64
     2   CO2 Comdty_PX_LAST  9466 non-null   float64
     3   CO3 Comdty_PX_LAST  9346 non-null   float64
@@ -334,9 +334,9 @@ def load_lme_metals(data_dir=DATA_DIR):
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 9919 entries, 0 to 9918
     Data columns (total 11 columns):
-    #   Column                   Non-Null Count  Dtype  
-    ---  ------                   --------------  -----  
-    0   index                    9919 non-null   object 
+    #   Column                   Non-Null Count  Dtype
+    ---  ------                   --------------  -----
+    0   index                    9919 non-null   object
     1   LMAHDY Comdty_PX_LAST    9538 non-null   float64
     2   LMAHDS03 Comdty_PX_LAST  9615 non-null   float64
     3   LMNIDY Comdty_PX_LAST    9704 non-null   float64
@@ -367,9 +367,9 @@ def load_gsci_indices(data_dir=DATA_DIR):
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 15272 entries, 0 to 15271
     Data columns (total 25 columns):
-    #   Column                 Non-Null Count  Dtype  
-    ---  ------                 --------------  -----  
-    0   index                  15272 non-null  object 
+    #   Column                 Non-Null Count  Dtype
+    ---  ------                 --------------  -----
+    0   index                  15272 non-null  object
     1   SPGCBRP Index_PX_LAST  6660 non-null   float64
     2   SPGCGOP Index_PX_LAST  6660 non-null   float64
     3   SPGCCLP Index_PX_LAST  9695 non-null   float64

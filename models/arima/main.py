@@ -4,6 +4,7 @@ ARIMA using darts
 Performs local forecasting using ARIMA. Reports both mean and
 median MASE for local forecasts.
 """
+
 from pathlib import Path
 from warnings import filterwarnings
 import os
@@ -22,7 +23,8 @@ from darts.metrics import mase
 
 filterwarnings("ignore")
 
-def forecast_arima(df, test_ratio, seasonality, order = (1, 1, 1)):
+
+def forecast_arima(df, test_ratio, seasonality, order=(1, 1, 1)):
     """
     Fit ARIMA model and return MASE
 
@@ -46,15 +48,14 @@ def forecast_arima(df, test_ratio, seasonality, order = (1, 1, 1)):
         # Data Processing
         test_length = int(test_ratio * len(df))
         # TimeSeries object is important for darts
-        raw_series = TimeSeries.from_dataframe(df, time_col = "ds")
+        raw_series = TimeSeries.from_dataframe(df, time_col="ds")
         # Replace NaNs automatically
         raw_series = fill_missing_values(raw_series)
         # Splitting into train and test
-        series, test_series = train_test_split(raw_series,
-                                               test_size = test_ratio)
+        series, test_series = train_test_split(raw_series, test_size=test_ratio)
         p, q, d = order
         # Training the model and getting MASE
-        estimator = ARIMA(p = p, d = d, q = q)
+        estimator = ARIMA(p=p, d=d, q=q)
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
@@ -63,40 +64,46 @@ def forecast_arima(df, test_ratio, seasonality, order = (1, 1, 1)):
         print(f"Error in ARIMA forecasting: {e}")
         return np.nan
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # Read environment variables
     dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
     is_balanced = os.environ["FTSFR_IS_BALANCED"] == "True"
     frequency = os.environ["FTSFR_FREQUENCY"]
-    DATA_DIR = Path(os.environ.get("DATA_DIR", Path(__file__).parent.parent.parent / "_data"))
-    OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", Path(__file__).parent.parent.parent / "_output"))
-    
+    DATA_DIR = Path(
+        os.environ.get("DATA_DIR", Path(__file__).parent.parent.parent / "_data")
+    )
+    OUTPUT_DIR = Path(
+        os.environ.get("OUTPUT_DIR", Path(__file__).parent.parent.parent / "_output")
+    )
+
     # Extract dataset name from path for results filename
     dataset_name = dataset_path.stem.replace("ftsfr_", "")
-    
+
     # Load data
     df = pd.read_parquet(dataset_path)
-    
+
     # Check if data follows the expected format (id, ds, y)
     expected_columns = {"id", "ds", "y"}
     if not expected_columns.issubset(df.columns):
-        raise ValueError(f"Dataset must contain columns: {expected_columns}. Found: {df.columns}")
-    
+        raise ValueError(
+            f"Dataset must contain columns: {expected_columns}. Found: {df.columns}"
+        )
+
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="ds", columns="id", values="y").reset_index()
     # Basic cleaning
-    proc_df.rename_axis(None, axis = 1, inplace=True)
+    proc_df.rename_axis(None, axis=1, inplace=True)
 
     # Define forecasting parameters based on frequency
-    test_ratio = 0.2            # Use last 20% of the data for testing
-    
+    test_ratio = 0.2  # Use last 20% of the data for testing
+
     # Map frequency to seasonality
     seasonality_map = {
-        "D": 5,     # Daily -> weekly pattern (5 business days)
-        "ME": 12,   # Monthly -> yearly pattern
-        "QE": 4,    # Quarterly -> yearly pattern
-        "YE": 1,    # Yearly -> no seasonality
+        "D": 5,  # Daily -> weekly pattern (5 business days)
+        "ME": 12,  # Monthly -> yearly pattern
+        "QE": 4,  # Quarterly -> yearly pattern
+        "YE": 1,  # Yearly -> no seasonality
     }
     seasonality = seasonality_map.get(frequency, 1)
 
@@ -115,7 +122,7 @@ if __name__ == "__main__":
 
         # Removing leading NaNs which show up due to different start times
         # of different series
-        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index() :]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue

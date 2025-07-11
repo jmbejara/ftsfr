@@ -99,33 +99,40 @@ def process_task_dict(task_dict, base_name, task_files):
         task_files[task_name] = sorted(files)
 
 
-def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=None, total_files=None, max_columns=None):
+def get_dataset_report(
+    filepath,
+    include_stats=True,
+    verbose=False,
+    file_num=None,
+    total_files=None,
+    max_columns=None,
+):
     """Return a dict with file metadata, shape, columns, sample values, numeric stats, and glimpse."""
     if verbose and file_num is not None and total_files is not None:
         print(f"Processing {Path(filepath).name} ({file_num}/{total_files})...")
-    
+
     report = {}
     try:
         # File info
         report["file_size_bytes"] = os.path.getsize(filepath)
         report["file_size_mb"] = report["file_size_bytes"] / (1024 * 1024)
         report["file_type"] = Path(filepath).suffix.replace(".", "").upper()
-        
+
         # Load data lazily
         if filepath.endswith(".csv"):
             lf = pl.scan_csv(filepath)
         else:
             lf = pl.scan_parquet(filepath)
-        
+
         # Get schema without loading data
         schema = lf.collect_schema()
         report["n_cols"] = len(schema)
         report["n_cols_total"] = len(schema)  # Keep track of total columns
-        
+
         # Get row count efficiently
         row_count_df = lf.select(pl.len().alias("count")).collect()
         report["n_rows"] = row_count_df["count"][0]
-        
+
         # Determine which columns to process
         all_columns = list(schema.keys())
         if max_columns and len(all_columns) > max_columns:
@@ -136,11 +143,13 @@ def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=Non
             columns_to_process = all_columns
             report["columns_truncated"] = False
             report["n_cols_shown"] = len(all_columns)
-        
+
         # Get null counts efficiently (only for columns we're showing)
-        null_count_exprs = [pl.col(col).null_count().alias(col) for col in columns_to_process]
+        null_count_exprs = [
+            pl.col(col).null_count().alias(col) for col in columns_to_process
+        ]
         null_counts = lf.select(null_count_exprs).collect().to_dicts()[0]
-        
+
         # Columns info
         columns = []
         for col in columns_to_process:
@@ -153,7 +162,7 @@ def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=Non
                 {"name": col, "dtype": dtype, "pct_null": pct_null, "n_null": n_null}
             )
         report["columns"] = columns
-        
+
         # Sample values - only collect first 5 rows
         if max_columns and len(all_columns) > max_columns:
             sample_df = lf.select(columns_to_process).head(5).collect()
@@ -161,13 +170,13 @@ def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=Non
             sample_df = lf.head(5).collect()
         sample = sample_df.to_dicts()
         report["sample_values"] = sample
-        
+
         # Capture polars text representation of first 5 rows
         output = StringIO()
         with redirect_stdout(output):
             sample_df.glimpse()
         report["sample_text"] = output.getvalue()
-        
+
         # Numeric stats (only if requested)
         numeric_types = {
             pl.Int8,
@@ -184,20 +193,22 @@ def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=Non
         # Only consider numeric columns that are being shown
         numeric_cols = [c for c in columns_to_process if schema[c] in numeric_types]
         numeric_stats = []
-        
+
         if include_stats and numeric_cols:
             stats_exprs = []
             for c in numeric_cols:
-                stats_exprs.extend([
-                    pl.col(c).min().alias(f"{c}_min"),
-                    pl.col(c).max().alias(f"{c}_max"),
-                    pl.col(c).mean().alias(f"{c}_mean"),
-                    pl.col(c).median().alias(f"{c}_median"),
-                ])
-            
+                stats_exprs.extend(
+                    [
+                        pl.col(c).min().alias(f"{c}_min"),
+                        pl.col(c).max().alias(f"{c}_max"),
+                        pl.col(c).mean().alias(f"{c}_mean"),
+                        pl.col(c).median().alias(f"{c}_median"),
+                    ]
+                )
+
             stats_df = lf.select(stats_exprs).collect()
             stats_dict = stats_df.to_dicts()[0]
-            
+
             for col in numeric_cols:
                 numeric_stats.append(
                     {
@@ -209,59 +220,65 @@ def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=Non
                     }
                 )
         report["numeric_stats"] = numeric_stats
-        
+
         # Date/Datetime stats (only if requested)
         # Check for date/datetime columns
         date_cols = []
         for c in columns_to_process:
             dtype = schema[c]
             # Check if it's a Date or Datetime type
-            if dtype == pl.Date or (hasattr(dtype, 'base_type') and dtype.base_type() == pl.Datetime):
+            if dtype == pl.Date or (
+                hasattr(dtype, "base_type") and dtype.base_type() == pl.Datetime
+            ):
                 date_cols.append(c)
-        
+
         date_stats = []
         if include_stats and date_cols:
             date_stats_exprs = []
             for c in date_cols:
-                date_stats_exprs.extend([
-                    pl.col(c).min().alias(f"{c}_min"),
-                    pl.col(c).max().alias(f"{c}_max"),
-                ])
-            
+                date_stats_exprs.extend(
+                    [
+                        pl.col(c).min().alias(f"{c}_min"),
+                        pl.col(c).max().alias(f"{c}_max"),
+                    ]
+                )
+
             date_stats_df = lf.select(date_stats_exprs).collect()
             date_stats_dict = date_stats_df.to_dicts()[0]
-            
+
             for col in date_cols:
                 min_val = date_stats_dict.get(f"{col}_min")
                 max_val = date_stats_dict.get(f"{col}_max")
-                
+
                 # Format dates appropriately
                 if min_val is not None:
                     if isinstance(min_val, datetime):
-                        min_str = min_val.strftime('%Y-%m-%d %H:%M:%S')
+                        min_str = min_val.strftime("%Y-%m-%d %H:%M:%S")
                     else:
                         min_str = str(min_val)
                 else:
                     min_str = None
-                    
+
                 if max_val is not None:
                     if isinstance(max_val, datetime):
-                        max_str = max_val.strftime('%Y-%m-%d %H:%M:%S')
+                        max_str = max_val.strftime("%Y-%m-%d %H:%M:%S")
                     else:
                         max_str = str(max_val)
                 else:
                     max_str = None
-                
-                date_stats.append({
-                    "name": col,
-                    "min": min_str,
-                    "max": max_str,
-                    "min_raw": min_val,
-                    "max_raw": max_val
-                })
-        
+
+                date_stats.append(
+                    {
+                        "name": col,
+                        "min": min_str,
+                        "max": max_str,
+                        "min_raw": min_val,
+                        "max_raw": max_val,
+                    }
+                )
+
         report["date_stats"] = date_stats
-        
+
         # Glimpse - need a larger sample for better representation
         if max_columns and len(all_columns) > max_columns:
             glimpse_df = lf.select(columns_to_process).head(100).collect()
@@ -271,7 +288,7 @@ def get_dataset_report(filepath, include_stats=True, verbose=False, file_num=Non
         with redirect_stdout(output):
             glimpse_df.glimpse(max_items_per_column=0)
         report["glimpse"] = output.getvalue()
-        
+
     except Exception as e:
         report["error"] = f"ERROR: Could not read file - {str(e)}"
     return report
@@ -324,7 +341,13 @@ def filename_to_anchor(filename):
     return anchor
 
 
-def create_txt_report(existing_files, include_samples=True, include_stats=True, verbose=False, max_columns=None):
+def create_txt_report(
+    existing_files,
+    include_samples=True,
+    include_stats=True,
+    verbose=False,
+    max_columns=None,
+):
     """Create a human-readable TXT format Data Glimpses Report."""
     output_lines = []
 
@@ -390,8 +413,14 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True, 
     total_files = len(existing_files)
     for i, f in enumerate(sorted(existing_files), 1):
         filename = Path(f).name
-        report = get_dataset_report(f, include_stats=include_stats, verbose=verbose, 
-                                    file_num=i, total_files=total_files, max_columns=max_columns)
+        report = get_dataset_report(
+            f,
+            include_stats=include_stats,
+            verbose=verbose,
+            file_num=i,
+            total_files=total_files,
+            max_columns=max_columns,
+        )
 
         output_lines.append("")
         output_lines.append(f"## {filename}")
@@ -405,7 +434,9 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True, 
         # File metadata
         cols_info = f"{report['n_cols']} columns"
         if report.get("columns_truncated", False):
-            cols_info = f"{report['n_cols']} columns (showing first {report['n_cols_shown']})"
+            cols_info = (
+                f"{report['n_cols']} columns (showing first {report['n_cols_shown']})"
+            )
         output_lines.append(
             f"**Size:** {format_file_size(report['file_size_bytes'])} | **Type:** {report['file_type'].capitalize()} | **Shape:** {report['n_rows']:,} rows × {cols_info}"
         )
@@ -414,7 +445,9 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True, 
         # Columns section
         output_lines.append("### Columns")
         if report.get("columns_truncated", False):
-            output_lines.append(f"*Note: Showing first {report['n_cols_shown']} of {report['n_cols']} columns*")
+            output_lines.append(
+                f"*Note: Showing first {report['n_cols_shown']} of {report['n_cols']} columns*"
+            )
             output_lines.append("")
         output_lines.append("```")
         for col in report["columns"]:
@@ -437,11 +470,13 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True, 
             output_lines.append("```")
             for stat in report["numeric_stats"]:
                 # Format values, handling None values
-                min_val = f"{stat['min']}" if stat['min'] is not None else "N/A"
-                max_val = f"{stat['max']}" if stat['max'] is not None else "N/A"
-                mean_val = f"{stat['mean']:.2f}" if stat['mean'] is not None else "N/A"
-                median_val = f"{stat['median']}" if stat['median'] is not None else "N/A"
-                
+                min_val = f"{stat['min']}" if stat["min"] is not None else "N/A"
+                max_val = f"{stat['max']}" if stat["max"] is not None else "N/A"
+                mean_val = f"{stat['mean']:.2f}" if stat["mean"] is not None else "N/A"
+                median_val = (
+                    f"{stat['median']}" if stat["median"] is not None else "N/A"
+                )
+
                 output_lines.append(
                     f"{stat['name']}: min={min_val}, max={max_val}, "
                     f"mean={mean_val}, median={median_val}"
@@ -456,9 +491,7 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True, 
             for stat in report["date_stats"]:
                 min_val = stat["min"] if stat["min"] is not None else "N/A"
                 max_val = stat["max"] if stat["max"] is not None else "N/A"
-                output_lines.append(
-                    f"{stat['name']}: min={min_val}, max={max_val}"
-                )
+                output_lines.append(f"{stat['name']}: min={min_val}, max={max_val}")
             output_lines.append("```")
             output_lines.append("")
 
@@ -475,7 +508,9 @@ def create_txt_report(existing_files, include_samples=True, include_stats=True, 
     return "\n".join(output_lines)
 
 
-def create_xml_report(existing_files, include_stats=True, verbose=False, max_columns=None):
+def create_xml_report(
+    existing_files, include_stats=True, verbose=False, max_columns=None
+):
     """Create a machine-readable XML format Data Glimpses Report."""
     output_lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -496,8 +531,14 @@ def create_xml_report(existing_files, include_stats=True, verbose=False, max_col
     total_files = len(existing_files)
     for i, f in enumerate(sorted(existing_files), 1):
         filename = Path(f).name
-        report = get_dataset_report(f, include_stats=include_stats, verbose=verbose,
-                                    file_num=i, total_files=total_files, max_columns=max_columns)
+        report = get_dataset_report(
+            f,
+            include_stats=include_stats,
+            verbose=verbose,
+            file_num=i,
+            total_files=total_files,
+            max_columns=max_columns,
+        )
         output_lines.append(
             f'    <dataset filename="{saxutils.escape(filename)}" path="{saxutils.escape(str(f))}">'
         )
@@ -544,7 +585,7 @@ def create_xml_report(existing_files, include_stats=True, verbose=False, max_col
                 max_val = str(stat["max"]) if stat["max"] is not None else ""
                 mean_val = str(stat["mean"]) if stat["mean"] is not None else ""
                 median_val = str(stat["median"]) if stat["median"] is not None else ""
-                
+
                 output_lines.append(
                     f'        <column name="{saxutils.escape(stat["name"])}" min="{min_val}" max="{max_val}" mean="{mean_val}" median="{median_val}"/>'
                 )
@@ -590,7 +631,8 @@ def main():
         help="Exclude numeric column statistics sections from the report",
     )
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Show progress information while processing files",
     )
@@ -629,13 +671,16 @@ def main():
         print("  - Excluding sample values sections")
     if args.no_stats:
         print("  - Excluding numeric statistics sections")
-    
+
     if verbose:
         print(f"\nPreparing to create glimpses for {len(existing_files)} data files...")
 
     txt_content = create_txt_report(
-        existing_files, include_samples=include_samples, include_stats=include_stats,
-        verbose=verbose, max_columns=args.max_columns
+        existing_files,
+        include_samples=include_samples,
+        include_stats=include_stats,
+        verbose=verbose,
+        max_columns=args.max_columns,
     )
     # txt_output_file = OUTPUT_DIR / "data_glimpses.txt"
     txt_output_file = BASE_DIR / "docs_src" / "data_glimpses.md"

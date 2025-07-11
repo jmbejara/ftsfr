@@ -4,12 +4,14 @@ Catboost using darts
 Performs both local and global forecasting using Catboost. Reports both mean and
 median MASE for local forecasts and a single global MASE.
 
-NOTE: training this model, especially on data which is considered large either 
-due to the number of series, the number of values in a single series, or both 
+NOTE: training this model, especially on data which is considered large either
+due to the number of series, the number of values in a single series, or both
 requires large amounts of computation power.
 """
+
 from pathlib import Path
 from warnings import filterwarnings
+
 # Ignoring warnings
 filterwarnings("ignore")
 
@@ -28,6 +30,7 @@ from darts.metrics import mase
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
 
+
 def forecast_catboost(df, test_ratio, seasonality):
     """
     Fit CatBoost model and return MASE
@@ -35,7 +38,7 @@ def forecast_catboost(df, test_ratio, seasonality):
     Parameters:
     -----------
     df : array-like
-        array-like object(e.g. pd.DataFrame), with a single or multiple series, 
+        array-like object(e.g. pd.DataFrame), with a single or multiple series,
         which is split into testing and training data.
     test_ratio : int
         fraction of df used for testing.
@@ -50,23 +53,24 @@ def forecast_catboost(df, test_ratio, seasonality):
         # Data Processing
         test_length = int(test_ratio * len(df))
         # TimeSeries object is important for darts
-        raw_series = TimeSeries.from_dataframe(df, time_col = "date")
+        raw_series = TimeSeries.from_dataframe(df, time_col="date")
         # Replace NaNs automatically
         raw_series = fill_missing_values(raw_series)
         # Splitting into train and test
-        series, test_series = train_test_split(raw_series,
-                                               test_size = test_ratio)
+        series, test_series = train_test_split(raw_series, test_size=test_ratio)
         # Check for an NVIDIA GPU
         try:
-            subprocess.check_output('nvidia-smi')
+            subprocess.check_output("nvidia-smi")
             task_type = "GPU"
         except Exception:
             task_type = "CPU"
-        estimator = CatBoostModel(lags = seasonality * 10,
-                                  output_chunk_length = test_length, 
-                        # Training a single global model for global forecasting
-                                  multi_models = False,
-                                  task_type = task_type)
+        estimator = CatBoostModel(
+            lags=seasonality * 10,
+            output_chunk_length=test_length,
+            # Training a single global model for global forecasting
+            multi_models=False,
+            task_type=task_type,
+        )
         # Can add verbose = True below to monitor progress while training
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
@@ -76,9 +80,9 @@ def forecast_catboost(df, test_ratio, seasonality):
         print(f"Error in Catboost forecasting: {e}")
         return np.nan
 
-if __name__ == "__main__":
 
-     # Data loading and processing
+if __name__ == "__main__":
+    # Data loading and processing
 
     DATA_DIR = config(
         "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
@@ -93,12 +97,12 @@ if __name__ == "__main__":
     # This pivot adds all values for an entity as a TS in each column
     proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
     # Basic cleaning
-    proc_df.rename_axis(None, axis = 1, inplace=True)
+    proc_df.rename_axis(None, axis=1, inplace=True)
 
     # Define forecasting parameters
-    test_ratio = 0.2            # Use last 20% of the data for testing
-    forecast_horizon = 20       # 20 business days, 4 weeks, about a month
-    seasonality = 5             # 5 for weekly patterns (business days)
+    test_ratio = 0.2  # Use last 20% of the data for testing
+    forecast_horizon = 20  # 20 business days, 4 weeks, about a month
+    seasonality = 5  # 5 for weekly patterns (business days)
 
     # Process each entity separately
     entities = df["entity"].unique()
@@ -114,7 +118,7 @@ if __name__ == "__main__":
 
         # Removing leading NaNs which show up due to different start times
         # of different series
-        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():]
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index() :]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
@@ -132,9 +136,7 @@ if __name__ == "__main__":
     # Global Forecasting
 
     train_index = int((1 - test_ratio) * len(proc_df))
-    global_mase = forecast_catboost(proc_df,
-                                    test_ratio,
-                                    seasonality)
+    global_mase = forecast_catboost(proc_df, test_ratio, seasonality)
 
     # Printing and saving results
 
@@ -142,7 +144,6 @@ if __name__ == "__main__":
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
-
 
     results_df = pd.DataFrame(
         {

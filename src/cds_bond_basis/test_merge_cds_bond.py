@@ -4,7 +4,6 @@ import pandas as pd
 from merge_cds_bond import *
 
 
-
 def test_merge_cds_into_bonds():
     """
     Unit test for merge_cds_into_bonds() function.

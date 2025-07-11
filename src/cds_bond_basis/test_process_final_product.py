@@ -5,7 +5,6 @@ from merge_cds_bond import *
 from process_final_product import *
 
 
-
 def test_process_cb_spread():
     """
     Unit test for calc_cb_spread() function.

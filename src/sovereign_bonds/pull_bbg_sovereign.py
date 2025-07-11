@@ -213,7 +213,7 @@ def load_embi_composite_indices(data_dir=DATA_DIR):
 
     Returns DataFrame with major EMBI index levels and returns including:
     - EMBI Global
-    - EMBI Global Diversified  
+    - EMBI Global Diversified
     - EMBI+ Composite
     - EMBI Global Core
     - ESG EMBI Global Diversified
@@ -225,19 +225,19 @@ def load_embi_composite_indices(data_dir=DATA_DIR):
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 7826 entries, 0 to 7825
     Data columns (total 11 columns):
-     #   Column                                         Non-Null Count  Dtype         
-    ---  ------                                         --------------  -----         
+     #   Column                                         Non-Null Count  Dtype
+    ---  ------                                         --------------  -----
      0   index                                          7826 non-null   datetime64[ns]
-     1   JPEIGLBL Index_PX_LAST                        7826 non-null   float64       
-     2   JPEIGLBL Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  7826 non-null   float64       
-     3   JPEIDIVR Index_PX_LAST                        7826 non-null   float64       
-     4   JPEIDIVR Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  7826 non-null   float64       
-     5   JPEMCOMP Index_PX_LAST                        6566 non-null   float64       
-     6   JPEMCOMP Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  6566 non-null   float64       
-     7   JPEICORE Index_PX_LAST                        6826 non-null   float64       
-     8   JPEICORE Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  6826 non-null   float64       
-     9   JPEIESGE Index_PX_LAST                        3044 non-null   float64       
-     10  JPEIESGE Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  3044 non-null   float64       
+     1   JPEIGLBL Index_PX_LAST                        7826 non-null   float64
+     2   JPEIGLBL Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  7826 non-null   float64
+     3   JPEIDIVR Index_PX_LAST                        7826 non-null   float64
+     4   JPEIDIVR Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  7826 non-null   float64
+     5   JPEMCOMP Index_PX_LAST                        6566 non-null   float64
+     6   JPEMCOMP Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  6566 non-null   float64
+     7   JPEICORE Index_PX_LAST                        6826 non-null   float64
+     8   JPEICORE Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  6826 non-null   float64
+     9   JPEIESGE Index_PX_LAST                        3044 non-null   float64
+     10  JPEIESGE Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  3044 non-null   float64
     dtypes: datetime64[ns](1), float64(10)
     memory usage: 672.4 KB
     """
@@ -259,8 +259,8 @@ def load_embi_country_indices(data_dir=DATA_DIR):
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 6566 entries, 0 to 6565
     Data columns (total 3 columns):
-     #   Column                                          Non-Null Count  Dtype  
-    ---  ------                                          --------------  -----  
+     #   Column                                          Non-Null Count  Dtype
+    ---  ------                                          --------------  -----
      0   JPEMBRAZ Index_PX_LAST                         6566 non-null   float64
      1   JPEMBRAZ Index_DAY_TO_DAY_TOT_RETURN_GROSS_DVDS  6566 non-null   float64
      2   JPEMBRAZ Index_YLD_YTM_MID                     6566 non-null   float64
@@ -284,12 +284,12 @@ def load_embi_spreads(data_dir=DATA_DIR):
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 7826 entries, 0 to 7825
     Data columns (total 4 columns):
-     #   Column                  Non-Null Count  Dtype         
-    ---  ------                  --------------  -----         
+     #   Column                  Non-Null Count  Dtype
+    ---  ------                  --------------  -----
      0   index                   7826 non-null   datetime64[ns]
-     1   JPEMSOSD Index_PX_LAST  7826 non-null   float64       
-     2   JPEMDOSD Index_PX_LAST  7826 non-null   float64       
-     3   JPEMPOSD Index_PX_LAST  6566 non-null   float64       
+     1   JPEMSOSD Index_PX_LAST  7826 non-null   float64
+     2   JPEMDOSD Index_PX_LAST  7826 non-null   float64
+     3   JPEMPOSD Index_PX_LAST  6566 non-null   float64
     dtypes: datetime64[ns](1), float64(3)
     memory usage: 244.7 KB
     """
