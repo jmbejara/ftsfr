@@ -48,12 +48,26 @@ for file in results_files:
     df = pd.read_csv(file)
     # Extract model and dataset name from filename
     filename = file.stem  # removes .csv
-    parts = filename.rsplit("_results", 1)[0].split("_", 1)
-    if len(parts) == 2:
-        model_name, dataset_name = parts
+    # Remove the _results suffix
+    name_without_results = filename.rsplit("_results", 1)[0]
+    
+    # Find which model this file belongs to by checking which model name is a prefix
+    model_name = None
+    dataset_name = None
+    for model in models_activated:
+        if name_without_results.startswith(model + "_"):
+            model_name = model
+            # The dataset name is everything after the model name and underscore
+            dataset_name = name_without_results[len(model) + 1:]
+            break
+    
+    if model_name and dataset_name:
         df["model"] = model_name
         df["dataset"] = dataset_name
-    results_list.append(df)
+        results_list.append(df)
+    else:
+        print(f"Warning: Could not parse model and dataset from filename: {filename}")
+        continue
 
 results = pd.concat(results_list)
 
