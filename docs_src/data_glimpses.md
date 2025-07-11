@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Generated: 2025-07-10 17:20:23
+Generated: 2025-07-11 10:44:30
 Total files: 19
 
 ## Summary of Datasets by Task
@@ -256,19 +256,19 @@ date: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ### Columns
 ```
-entity                                   String         
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (25.7% null)
+id                                       String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64         (25.7% null)
 ```
 
 ### Numeric Column Statistics
 ```
-value: min=0.0554, max=16.462, mean=5.61, median=5.3232729844415
+y: min=0.0554, max=16.462, mean=5.61, median=5.3232729844415
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=1961-06-14 00:00:00, max=2025-05-30 00:00:00
+ds: min=1961-06-14 00:00:00, max=2025-05-30 00:00:00
 ```
 
 ---
@@ -306,19 +306,19 @@ date: min=1973-01-02 00:00:00, max=2025-06-11 00:00:00
 
 ### Columns
 ```
-entity                                   String         
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (0.6% null)
+id                                       String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64         (0.6% null)
 ```
 
 ### Numeric Column Statistics
 ```
-value: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
+y: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
+ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 ```
 
 ---
@@ -329,19 +329,19 @@ date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ### Columns
 ```
-entity                                   String         
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (0.0% null)
+id                                       String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64         (0.0% null)
 ```
 
 ### Numeric Column Statistics
 ```
-value: min=-0.0024056979902961173, max=0.9987931814753357, mean=0.07, median=0.051772243080015184
+y: min=-0.0024056979902961173, max=0.9987931814753357, mean=0.07, median=0.051772243080015184
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
+ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 ```
 
 ---
@@ -352,19 +352,19 @@ date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ### Columns
 ```
-entity                                   String         
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (0.0% null)
+id                                       String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64         (0.0% null)
 ```
 
 ### Numeric Column Statistics
 ```
-value: min=-61371.42307692308, max=inf, mean=inf, median=10.979716024340771
+y: min=-61371.42307692308, max=inf, mean=inf, median=10.979716024340771
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
+ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 ```
 
 ---
@@ -375,19 +375,19 @@ date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ### Columns
 ```
-entity                                   String         
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (3.3% null)
+id                                       String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64         (3.3% null)
 ```
 
 ### Numeric Column Statistics
 ```
-value: min=-61371.42307692308, max=inf, mean=inf, median=11.125577574699662
+y: min=-61371.42307692308, max=inf, mean=inf, median=11.125577574699662
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
+ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 ```
 
 ---
@@ -447,20 +447,20 @@ date: min=1979-11-15 00:00:00, max=2025-06-16 00:00:00
 
 ### Columns
 ```
-entity                                   Int64          
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (0.4% null)
+id                                       Int64          
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64         (0.4% null)
 ```
 
 ### Numeric Column Statistics
 ```
-entity: min=10000, max=93436, mean=49674.72, median=48215.0
-value: min=-1.0, max=26.583827, mean=0.01, median=0.0
+id: min=10000, max=93436, mean=49674.72, median=48215.0
+y: min=-1.0, max=26.583827, mean=0.01, median=0.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
+ds: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
 ```
 
 ---
@@ -471,20 +471,20 @@ date: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
 
 ### Columns
 ```
-entity                                   Int64          
-date                                     Datetime(time_unit='ns', time_zone=None)
-value                                    Float64         (0.4% null)
+id                                       Int64          
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64         (0.4% null)
 ```
 
 ### Numeric Column Statistics
 ```
-entity: min=10000, max=93436, mean=49674.72, median=48215.0
-value: min=-1.0, max=26.583827, mean=0.01, median=0.0
+id: min=10000, max=93436, mean=49674.72, median=48215.0
+y: min=-1.0, max=26.583827, mean=0.01, median=0.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
+ds: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
 ```
 
 ---

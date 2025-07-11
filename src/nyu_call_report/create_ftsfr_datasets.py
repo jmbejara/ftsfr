@@ -31,7 +31,7 @@ df = (
 # reshape to wide
 # df_wide = df.pivot(index="date", columns="rssdid", values="leverage")
 # df_wide.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_leverage.parquet")
-df = df.rename(columns={"rssdid": "entity", "date": "date", "leverage": "value"})
+df = df.rename(columns={"rssdid": "id", "date": "ds", "leverage": "y"})
 df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_leverage.parquet")
 
 ## nyu_call_report_holding_company_leverage
@@ -44,10 +44,10 @@ df_bhc = (
 df_bhc = df_bhc.reset_index()
 df_bhc["leverage"] = df_bhc["assets"] / df_bhc["equity"]
 
-df_bhc = df_bhc.rename(columns={"bhcid": "entity", "date": "date", "leverage": "value"})
+df_bhc = df_bhc.rename(columns={"bhcid": "id", "date": "ds", "leverage": "y"})
 # drop values where entity is 0
-df_bhc = df_bhc[df_bhc["entity"] != "0"]
-df_bhc = df_bhc[["entity", "date", "value"]].reset_index(drop=True)
+df_bhc = df_bhc[df_bhc["id"] != "0"]
+df_bhc = df_bhc[["id", "ds", "y"]].reset_index(drop=True)
 df_bhc.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_leverage.parquet")
 # df_wide = df_bhc.pivot(index="date", columns="bhcid", values="leverage")
 # df_wide = df_wide.drop(columns=["0"])
@@ -60,7 +60,7 @@ df = (
     .sort_values(by=["rssdid", "date"])
     .reset_index(drop=True)
 )
-df = df.rename(columns={"rssdid": "entity", "date": "date", "cash_liquidity": "value"})
+df = df.rename(columns={"rssdid": "id", "date": "ds", "cash_liquidity": "y"})
 df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
 # df_wide = df.pivot(index="date", columns="rssdid", values="cash_liquidity")
 # df_wide.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
@@ -74,9 +74,9 @@ df_bhc = (
     .reset_index()
 )
 df_bhc["cash_liquidity"] = df_bhc["cash"] / df_bhc["assets"]
-df = df_bhc.rename(columns={"bhcid": "entity", "date": "date", "cash_liquidity": "value"})
-df = df[df["entity"] != "0"]
-df = df[["entity", "date", "value"]].reset_index(drop=True)
+df = df_bhc.rename(columns={"bhcid": "id", "date": "ds", "cash_liquidity": "y"})
+df = df[df["id"] != "0"]
+df = df[["id", "ds", "y"]].reset_index(drop=True)
 df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet")
 
 # df_wide = df_bhc.pivot(index="date", columns="bhcid", values="cash_liquidity")

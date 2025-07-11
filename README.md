@@ -87,6 +87,18 @@ Finally, download the data using the following command:
 doit
 ```
 
+
+## Data Format
+Final, cleaned and formatted datasets have the following format: `ftsfr_<dataset_name>.parquet`
+and have the following columns:
+- `id`: the entity id
+- `ds`: the date/timestamp column
+- `y`: the value
+
+This follows the convention used by `nixtla` and other time series libraries (see, e.g., https://www.nixtla.io/docs/getting-started-data_requirements).
+
+The list of available datasets is given in `datasets.toml`, along with metadata such as the frequency of the time series, whether the panel is balanced, etc.
+
 ## Tips
 
 For local development on forecasting scripts, you can activate a pixi environment and open a new shell with that environment activated using the following command:
