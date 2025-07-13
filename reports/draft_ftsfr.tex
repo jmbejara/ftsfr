@@ -196,7 +196,7 @@ using data from 1999 onwards sourced through Bloomberg Terminal.
     \item OIS rates serve as our risk-free benchmark to align with other arbitrage spread studies
 \end{itemize}
 
-We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2022),
+We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2023),
 as seen in this side by side comparison of our calculated currency respective
 arbitrage spreads versus those reported in their paper.
 
@@ -206,7 +206,7 @@ arbitrage spreads versus those reported in their paper.
     \centering
     \includegraphics[width=\linewidth]{logo.png}
     \\[1ex] % small vertical gap
-    {\small (a) Findings in Siriwardane et al. (2022)}
+    {\small (a) Findings in Siriwardane et al. (2023)}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.48\textwidth}
@@ -220,8 +220,8 @@ arbitrage spreads versus those reported in their paper.
 \end{figure}
 
 During the overlapping periods of both datasets, the CIP spreads are nearly identical.
-Our findings confirm the presence of CIP deviations, particularly during periods of 
-market stress, consistent with the conclusions drawn by Siriwardane et al. (2022).
+Our findings confirm the presence of CIP deviations, particularly during periods of
+market stress, consistent with the conclusions drawn by Siriwardane et al. (2023).
 
 
 \subsection{Box Spread Arbitrage}
@@ -241,6 +241,68 @@ market stress, consistent with the conclusions drawn by Siriwardane et al. (2022
 
 \subsection{CDS-Bond Basis}
 % Credit default swap vs cash bond arbitrage
+
+Credit Default Swap-bond arbitrage stems from the assumption that the credit risk of a company should 
+be reflected in both its corporate bond spread and its CDS spread. 
+Theoretically, these two measures should be equal, leading to a basisof zero. 
+However, in reality, the basis often deviates from zero due to market inefficiencies, 
+liquidity frictions, and various risks. When this happens, an arbitrage opportunity arises.
+
+
+The authors define the CDS basis (CB) as
+
+\begin{equation}
+  CB_{i,t,\tau} \;=\; CDS_{i,t,\tau} \;-\; FR_{i,t,\tau},
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $FR_{i,t,\tau}$ = time $t$ floating‐rate spread implied by a fixed‐rate corporate bond issued by firm $i$ at tenor $\tau$,
+  \item $CDS_{i,t,\tau}$ = time $t$ Credit Default Swap (CDS) par spread for firm $i$ with tenor $\tau$.
+\end{itemize}
+
+A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
+
+The value of $FR$ is substituted by the paper with Z‐spread which we also modify in our construction. We will go into the substitution in detail later.
+
+The value of $CDS$ is interpolated by the authors using a cubic spline function.
+
+Given the CDS spread from above, traditional construction of a risk‐free rate for implied arbitrage implies the following return:
+
+\begin{equation}
+  rfr^{CDS}_{i,t,\tau} \;=\; y_{t,\tau} \;-\; CB_{i,t,\tau},
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $y_{t,\tau}$ = maturity‐matched Treasury yield at time $t$.
+\end{itemize}
+
+The risk‐free rate then can be seen as the Treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
+
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex] % small vertical gap
+    {\small (a) Findings in Siriwardane et al. (2023)}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex]
+    {\small (b) Our findings}
+  \end{minipage}
+  \caption{IMAGES ARE PLACE HOLDERS}
+  \label{fig:comparison-minipage}
+\end{figure}
+
+
+
 
 [Arbitrage spread content to be filled in...]
 
