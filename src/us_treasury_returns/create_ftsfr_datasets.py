@@ -4,7 +4,7 @@ It is used to load the datasets into memory.
 
 List of datasets:
 
-- corp_bond_portfolio_returns: corporate bond portfolio returns
+- treasury_bond_portfolio_returns: treasury bond portfolio returns
 """
 
 import calc_us_treasury_returns
