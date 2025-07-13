@@ -172,21 +172,31 @@ def implied_daily_fx_returns(fx_data, currency_list):
     return fx_df
 
 
+
+
 def graph_fx_returns(fx_df, currency_list, region_name):
     """
-    graphing the fx_returns for a certain currency set
-        efficient for regional splits
+    Graphs the FX returns for a set of currencies in a given region.
+    Legend is placed to the side for clarity.
 
     Parameters:
-    fx_df: Foreign currency implied daily return time series
-        absolute returns are used here (not annualized, not log scaled)
-        CUR_return is the daily return of CUR on the day (not in % space)
-    currency_list: list of currencies to graph
-    region_name: name of region/category we are graphing
+    fx_df: DataFrame containing foreign currency implied daily return time series.
+           CUR_return is the daily return of CUR (not in %).
+    currency_list: List of currency codes to graph.
+    region_name: Name of the region or category.
     """
     ret_list = [f"{curr}_return" for curr in currency_list]
-    fx_df[ret_list].plot(title=f"Annualized Daily Returns of {region_name}")
-    return
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(10, 5))
+    fx_df[ret_list].plot(ax=ax, title=f"Annualized Daily Returns of {region_name}")
+
+    # Move legend to the right side
+    ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    
+    plt.tight_layout()
+    plt.show()
+
 
 
 if __name__ == "__main__":
