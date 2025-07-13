@@ -128,10 +128,111 @@ Following \cite{He2017}, we include comprehensive datasets across multiple asset
 \subsection{US Treasuries}
 \label{sec:treasuries}
 % CRSP maturity-sorted portfolios Treasuries
+The US Treasury bond returns data comes from the \textbf{CRSP Treasury Database} accessed through WRDS, following the methodology of Gurkaynak, Sack, and Wright (2007). The raw CRSP Treasury data is obtained from WRDS and then subjected to the filtering criteria and return calculation methodology specified in Gurkaynak, Sack, and Wright (2007), which provides a comprehensive framework for constructing Treasury yield curves and return series. The data includes daily time series containing bid/ask prices, accrued interest, yields, and returns for Treasury securities, along with issue information containing security characteristics like CUSIP, maturity dates, coupon rates, and issue types. The coverage spans noncallable bonds and notes from 1970-2023, with key fields including Treasury record identifiers, CRSP IDs, CUSIPs, prices, yields, returns, and outstanding amounts.
+
+The data standardization process involves several key steps following the established methodology. First, daily quotes are merged with issue information to create a comprehensive dataset with security characteristics and trading data. Return processing utilizes unadjusted returns representing simple price changes plus accrued interest, with daily returns converted to monthly returns using compound return calculation. For maturity grouping, days to maturity are converted to years, and ten maturity groups are created using 0.5-year intervals from 0 to 5 years, with each bond assigned to a maturity group based on remaining time to maturity. Portfolio construction groups bonds by date and maturity group, calculates mean returns for each maturity group, and creates a time series of portfolio returns for each maturity group. Data quality measures include removing observations with missing returns or maturity information, filtering for bonds and notes only while excluding bills and other security types, and employing month-end dates for portfolio aggregation. The final output is a dataset with monthly Treasury bond portfolio returns across different maturity groups, suitable for fixed income analysis and comparison with other bond market data. The constructed Treasury bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for Treasury bond returns across different maturity groups, demonstrating strong alignment in the time series patterns and return magnitudes across maturity groups.
+% The US Treasury bond returns data comes from the \textbf{CRSP Treasury Database} accessed through WRDS, following the methodology of Gurkaynak, Sack, and Wright (2007). The data includes:
+
+% \begin{itemize}
+%     \item \textbf{Daily time series}: Contains daily bid/ask prices, accrued interest, yields, and returns for Treasury securities
+%     \item \textbf{Issue information}: Contains security characteristics like CUSIP, maturity dates, coupon rates, and issue types  
+%     \item \textbf{Coverage}: Noncallable bonds and notes from 1970-2023
+%     \item \textbf{Key fields}: Treasury record identifiers, CRSP IDs, CUSIPs, prices, yields, returns, and outstanding amounts
+% \end{itemize}
+
+% \paragraph{Data Standardization:}
+
+% The raw CRSP Treasury data is obtained from WRDS and then subjected to the filtering criteria and return calculation methodology specified in Gurkaynak, Sack, and Wright (2007), which provides a comprehensive framework for constructing Treasury yield curves and return series.
+
+% \begin{enumerate}
+%     \item \textbf{Data Consolidation}: Daily quotes are merged with issue information to create a comprehensive dataset with security characteristics and trading data
+
+%     \item \textbf{Return Processing}: 
+%     \begin{itemize}
+%         \item Unadjusted returns represent simple price changes plus accrued interest
+%         \item Daily returns are converted to monthly returns using compound return calculation
+%     \end{itemize}
+
+%     \item \textbf{Maturity Grouping}:
+%     \begin{itemize}
+%         \item Days to maturity are converted to years
+%         \item Ten maturity groups are created using 0.5-year intervals from 0 to 5 years
+%         \item Each bond is assigned to a maturity group based on remaining time to maturity
+%     \end{itemize}
+
+%     \item \textbf{Portfolio Construction}:
+%     \begin{itemize}
+%         \item Bonds are grouped by date and maturity group
+%         \item Mean returns are calculated for each maturity group
+%         \item A time series of portfolio returns is created for each maturity group
+%     \end{itemize}
+
+%     \item \textbf{Data Quality}:
+%     \begin{itemize}
+%         \item Observations with missing returns or maturity information are removed
+%         \item The sample is filtered for bonds and notes only (bills and other security types are excluded)
+%         \item Month-end dates are employed for portfolio aggregation
+%     \end{itemize}
+% \end{enumerate}
+
+% The final output is a dataset with monthly Treasury bond portfolio returns across different maturity groups, suitable for fixed income analysis and comparison with other bond market data.
+% The constructed Treasury bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for Treasury bond returns across different maturity groups. Figure \textbf{PLACEHOLDER} shows the correlation between the two datasets, demonstrating strong alignment in the time series patterns and return magnitudes across maturity groups.
 
 \subsection{Corporate Bonds}
 \label{sec:corporate_bonds}
 % Nozawa (2017) yield-spread sorted portfolios
+The corporate bond returns data comes from the \textbf{TRACE (Trade Reporting and Compliance Engine)} dataset available at openbondassetpricing.com, following the methodology of Nozawa (2017). The data includes:
+
+\begin{itemize}
+    \item \textbf{Market microstructure adjustments}: Corrections for market microstructure noise (MMN) to enhance bond price and return reliability
+    \item \textbf{Data filters}: Stringent quality filters including U.S.-domiciled firms only, exclusion of private placements and convertible bonds
+    \item \textbf{Coverage}: Corporate bonds with sufficient outstanding amounts and complete information
+    \item \textbf{Key fields}: MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads
+\end{itemize}
+
+\paragraph{Data Standardization:}
+
+The cleaning procedure follows the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM).
+
+\begin{enumerate}
+    \item \textbf{Bond Selection Criteria}:
+    \begin{itemize}
+        \item Bonds with floating rate coupons are excluded
+        \item Non-callable option features (puts, convertibles) are excluded, while callable bonds are retained
+        \item Observations where corporate bond price exceeds matched Treasury price are removed
+        \item Bonds with price less than \$0.01 per \$1 face value are dropped
+    \end{itemize}
+
+    \item \textbf{Return Processing}:
+    \begin{itemize}
+        \item Return reversals are eliminated if the product of adjacent returns is less than -0.04
+        \item Monthly returns are computed to avoid reinvestment assumptions
+    \end{itemize}
+
+    \item \textbf{Synthetic Treasury Construction}:
+    \begin{itemize}
+        \item Synthetic Treasury bonds with identical cash flow structure are constructed for each corporate bond
+        \item Treasury prices are based on Federal Reserve constant-maturity yield data
+        \item Excess returns and credit spreads are computed in price terms rather than yield spreads
+    \end{itemize}
+
+    \item \textbf{Portfolio Construction}:
+    \begin{itemize}
+        \item Bonds are sorted into deciles based on credit spread (CS) within each date
+        \item Value-weighted portfolio returns are calculated using bond values as weights
+        \item Bond value is computed as the product of MMN-adjusted clean price and amount outstanding
+    \end{itemize}
+
+    \item \textbf{Data Quality}:
+    \begin{itemize}
+        \item Defaults are verified using Moody's Default Risk Service
+        \item CRSP and Compustat data supplement equity and accounting information
+        \item Callable bonds are accounted for using fixed effects in regression models
+    \end{itemize}
+\end{enumerate}
+
+The final output is a dataset with monthly corporate bond portfolio returns across credit spread deciles, suitable for credit risk analysis and comparison with other bond market data.
+The constructed corporate bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for corporate bond returns across different credit spread deciles. Figure \textbf{PLACEHOLDER} shows the time series comparison between the two datasets, demonstrating strong alignment in return patterns across deciles, particularly during volatile periods such as the 2008 financial crisis.
 
 \subsection{Sovereign Bonds}
 \label{sec:sovereign}
