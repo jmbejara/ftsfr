@@ -222,7 +222,9 @@ def clean_outliers(df_merged, window_size=45, threshold=10):
     return df_merged
 
 
-def plot_cip_spreads(spreads, output_filename="cip_spreads", output_dir=OUTPUT_DIR, save=False):
+def plot_cip_spreads(
+    spreads, output_filename="cip_spreads", output_dir=OUTPUT_DIR, save=False
+):
     """
     Plot CIP spreads in basis points.
 

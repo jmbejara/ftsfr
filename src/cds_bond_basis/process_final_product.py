@@ -1,5 +1,3 @@
-
-
 # from settings import config
 import pandas as pd
 from matplotlib import pyplot as plt

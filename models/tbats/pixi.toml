@@ -1,0 +1,21 @@
+[workspace]
+channels = ["conda-forge"]
+name = "tbats"
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[tasks]
+post-install = "pip install darts"
+main = { cmd= "python main.py", depends-on = ["post-install"]}
+
+[dependencies]
+python = "3.13.*"
+pip = "*"
+python-decouple = "*"
+toml = "*"
+pandas = "*"
+numpy = "*"
+statsmodels = "*"
+tqdm = "*"
+pyarrow = "*"
+gfortran = "*"
+darts = "*"

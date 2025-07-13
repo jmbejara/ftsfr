@@ -1,0 +1,143 @@
+# Frequency Key:
+# https://stackoverflow.com/questions/35339139/what-values-are-valid-in-pandas-freq-tags
+# Alias    Description
+# -----    ---------
+# B       business day frequency
+# C       custom business day frequency
+# D       calendar day frequency
+# W       weekly frequency
+# ME      month end frequency
+# SME     semi-month end frequency (15th and end of month)
+# BME     business month end frequency
+# CBME    custom business month end frequency
+# MS      month start frequency
+# SMS     semi-month start frequency (1st and 15th)
+# BMS     business month start frequency
+# CBMS    custom business month start frequency
+# QE      quarter end frequency
+# BQE     business quarter end frequency
+# QS      quarter start frequency
+# BQS     business quarter start frequency
+# YE      year end frequency
+# BYE     business year end frequency
+# YS      year start frequency
+# BYS     business year start frequency
+# h       hourly frequency
+# bh      business hour frequency
+# cbh     custom business hour frequency
+# min     minutely frequency
+# s       secondly frequency
+# ms      milliseconds
+# us      microseconds
+# ns      nanoseconds
+
+################################################################################
+[cds_bond_basis]
+data_module_name = "CDS Bond Basis"
+data_module_description = """
+Contains code that replicated the CDS bond basis calculations from
+"""
+required_data_sources = ["open_source_bond", "wrds_markit"]
+
+################################################################################
+[cds_returns]
+required_data_sources = ["fed_yield_curve", "wrds_markit"]
+
+################################################################################
+[cip]
+required_data_sources = ["bloomberg_terminal"]
+
+################################################################################
+[commodities]
+required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
+
+################################################################################
+[corp_bond_returns]
+required_data_sources = ["open_source_bond"]
+
+################################################################################
+[crb_commodity]
+required_data_sources = ["bloomberg_terminal"]
+
+
+################################################################################
+[fed_yield_curve]
+data_module_name = "Fed Yield Curve"
+data_module_description = """
+This data module contains the Fed Yield Curve estimation results from Gurkaynak, 
+Sack, and Wright (2011). The data will take the form, for example, of a panel of 
+zero-coupon yields for various points on the yield curve. 
+"""
+required_data_sources = ["fed_yield_curve"]
+
+[fed_yield_curve.ftsfr_treas_yield_curve_zero_coupon]
+description = """Nelson-Seigel-Svensson zero-coupon yield curve, 
+tenors 1-30 years, 1961-present"""
+frequency = "D"
+is_balanced = true
+
+################################################################################
+[foreign_exchange]
+required_data_sources = ["wrds_fx"]
+
+################################################################################
+[futures_returns]
+required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
+
+################################################################################
+[he_kelly_manela]
+required_data_sources = ["he_kelly_manela"]
+
+################################################################################
+[ken_french_data_library]
+required_data_sources = ["ken_french_data_library"]
+
+################################################################################
+[nyu_call_report]
+required_data_sources = ["nyu_call_report"]
+
+[nyu_call_report.ftsfr_nyu_call_report_leverage]
+description = """From call report data, leverage for each rssdid, 1976-2020"""
+frequency = "QE"
+is_balanced = false
+
+[nyu_call_report.ftsfr_nyu_call_report_holding_company_leverage]
+description = """From call report data, leverage for each bhcid, 1976-2020"""
+frequency = "QE"
+is_balanced = false
+
+[nyu_call_report.ftsfr_nyu_call_report_cash_liquidity]
+description = """From call report data, cash liquidity for each rssdid, 1976-2020"""
+frequency = "QE"
+is_balanced = false
+
+[nyu_call_report.ftsfr_nyu_call_report_holding_company_cash_liquidity]
+description = """From call report data, cash liquidity for each bhcid, 1976-2020"""
+frequency = "QE"
+is_balanced = false
+
+################################################################################
+[sovereign_bonds]
+required_data_sources = ["wrds_crsp"]
+
+################################################################################
+[us_treasury_returns]
+required_data_sources = ["wrds_crsp"]
+
+################################################################################
+[wrds_bank_premium]
+required_data_sources = ["wrds_bank_premium"]
+
+################################################################################
+[wrds_crsp_compustat]
+required_data_sources = ["wrds_compustat", "wrds_crsp", "wrds_crsp_compustat"]
+
+[wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_ret]
+description = """CRSP monthly stock returns, 1926-present"""
+frequency = "ME"
+is_balanced = false
+
+[wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_retx]
+description = """CRSP monthly stock returns (without dividends), 1926-present"""
+frequency = "ME"
+is_balanced = false

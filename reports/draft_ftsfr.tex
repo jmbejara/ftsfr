@@ -12,116 +12,439 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{natbib}  % Required for JPE bibliography style
+\usepackage{booktabs} % For better tables
+\usepackage{multirow} % For tables with merged cells
+\usepackage{subfigure} % For subfigures
+\usepackage{hyperref} % For links
 
-\title{Your Paper}
-\author{You}
+\title{A Open-Source Macro-Finance Time Series Forecasting Benchmark}
+\author{Jeremy Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
+\date{\today}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Your abstract.
+This paper presents a macro-finance data repository for benchmarking the
+performance of global time series forecasting methods. A standardized benchmark
+is crucial for comparing the performance of different forecasting methods, so as
+to allow apples-to-apples comparisons across different forecasting methods and
+to discourage cherry-picking of results. Despite the ubiquity of time series
+forecasting methods in macroeconomics and finance, a standardized repository of
+data for benchmarking in these domains does not exist. One reason for this is
+that many of these datasets are available only through paid subscriptions and
+are thus not freely distributable. To address this issue, we instead provide a
+set of scripts that automate the download, data cleaning, and assembly of data
+sets from the Wharton Research Data Services (WRDS) platform and the Bloomberg
+Terminal. Since many academic institutions have access to WRDS or a Bloomberg
+Terminal, contingent on having access to the appropriate WRDS or Bloomberg
+subscriptions, each researcher will be able to exactly reproduce each of the
+datasets provided in this repository. Furthermore, the datasets that we provide
+are cleaned and formatted in a way that is common within the corresponding
+academic literature. Our aim is to facilitate the process of benchmarking global
+times series forecasting methods on data from these domains. In this light, we
+demonstrate the utility of our repository by showcasing the performance of
+several baseline forecasting methods using a variety of error metrics, providing
+baseline performance metrics which researchers can use to compare forecasting
+approaches. We hope that this repository will enhance research
+that increases the precision of financial and economic forecasts and contribute
+to research related to promoting financial stability and supporting a
+well-functioning economy.
 \end{abstract}
 
 \section{Introduction}
+\label{sec:introduction}
 
-Your introduction goes here! Simply start writing your document and use the Recompile button to view the updated PDF preview. Examples of commonly used commands and features are listed below, to help you get started.
+% TODO: Write introduction emphasizing the critical need for standardized benchmarks in macro-finance
+% - Establish that time series forecasting is ubiquitous and prevalent in macroeconomics and finance domains
+% - Highlight the current gap: no existing standardized benchmarks for evaluating forecasting algorithms in macro-finance
+% - Explain why apples-to-apples comparisons are impossible without standardized datasets
+% - Stress that researchers currently evaluate their own models on arbitrarily chosen datasets, making comparisons meaningless
+% - Position this work as filling a critical gap in quantitative finance research
+% - Emphasize that this complements (not substitutes) the Monash benchmark
+% - Make clear that the lack of standardization is particularly problematic in finance where data often requires subscriptions
 
-Once you're familiar with the editor, you can find various project setting in the Overleaf menu, accessed via the button in the very top left of the editor. To view tutorials, user guides, and further documentation, please visit our \href{https://www.overleaf.com/learn}{help library}, or head to our plans page to \href{https://www.overleaf.com/user/subscription/plans}{choose your plan}.
+[Introduction content to be filled in...]
 
-\section{Some examples to get started}
+\section{Literature Review and Related Work}
+\label{sec:literature}
 
-\subsection{How to create Sections and Subsections}
+% TODO: Position the paper relative to existing benchmarks and establish the canonical nature of chosen cleaning methods
+% - Review the Monash Time Series Forecasting Archive and explain how FTSFR follows their established template
+% - Introduce He, Kelly, Manela (2017) as the anchor paper for asset class selection and cleaning methods
+% - Introduce Siriwardane, Sunderam, & Wallen (2022) "Segmented Arbitrage" as the anchor for arbitrage spread construction
+% - Emphasize that the choice to follow these papers is deliberate - not doing anything novel is a FEATURE, not a bug
+% - Acknowledge that some dataset choices are somewhat ad hoc but are anchored by these survey-style papers
 
-Simply use the section and subsection commands, as in this example document! With Overleaf, all the formatting and numbering is handled automatically according to the template you've chosen. If you're using Rich Text mode, you can also create new section and subsections via the buttons in the editor toolbar.
+\subsection{Time Series Forecasting Benchmarks}
+% Review of existing benchmarking archives
 
-\subsection{How to include Figures}
+\subsection{Asset Pricing Literature}
+% He, Kelly, Manela (2017) and their approach to asset class selection
 
-First you have to upload the image file from your computer using the upload link in the file-tree menu. Then use the includegraphics command to include it in your document. Use the figure environment and the caption command to add a number and a caption to your figure. See the code for Figure 
-% \ref{fig:myplot} 
-in this section for an example.
+\subsection{Market Segmentation and Arbitrage}
+% Siriwardane et al. (2022) and arbitrage spread construction
 
-Note that your figure will automatically be placed in the most appropriate place for it, given the surrounding text and taking into account other figures or tables that may be close by. You can find out more about adding images to your documents in this help article on \href{https://www.overleaf.com/learn/how-to/Including_images_on_Overleaf}{including images on Overleaf}.
+[Literature review content to be filled in...]
 
-% \begin{figure}
-% \centering
-% \includegraphics[width=0.75\textwidth]{../_output/example_plot.png}
-% \caption{\label{fig:myplot}This image was uploaded via the file-tree menu.}
-% \end{figure}
+\section{Data Repository Overview}
+\label{sec:repository_overview}
 
-\subsection{How to add Tables}
+% TODO: Provide high-level description of the repository structure and contents
+% - Describe the automated data pulling framework
+% - List the major categories of data
+% - Explain the dual purpose: both for forecasting benchmarks AND for replicating important finance papers
+% - Note that replication code for many of these papers was not previously publicly available
 
-Use the table and tabular environments for basic tables --- see Table~\ref{tab:widgets}, for example. For more information, please see this help article on \href{https://www.overleaf.com/learn/latex/tables}{tables}. 
-The following website is helpful for generating tables manually: 
-\url{https://www.tablesgenerator.com/}. You can also automatically generate tables from Pandas DataFrames with this method: 
-\url{https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_latex.html}
+\subsection{Repository Architecture}
+% Technical structure and automation framework
 
-\begin{table}
-\centering
-\begin{tabular}{l|r}
-Item & Quantity \\\hline
-Widgets & 42 \\
-Gadgets & 13
-\end{tabular}
-\caption{\label{tab:widgets}An example table.}
-\end{table}
+\subsection{Data Categories}
+% Major categories of financial and economic data
 
-\subsection{How to add Comments and Track Changes}
+\subsection{Data Sources and Access Requirements}
+% WRDS, Bloomberg, and other data sources
 
-Comments can be added to your project by highlighting some text and clicking ``Add comment'' in the top right of the editor pane. To view existing comments, click on the Review menu in the toolbar above. To reply to a comment, click on the Reply button in the lower right corner of the comment. You can close the Review pane by clicking its name on the toolbar when you're done reviewing for the time being.
+[Repository overview content to be filled in...]
 
-Track changes are available on all our \href{https://www.overleaf.com/user/subscription/plans}{premium plans}, and can be toggled on or off using the option at the top of the Review pane. Track changes allow you to keep track of every change made to the document, along with the person making the change. 
+\section{Asset Class Datasets}
+\label{sec:asset_classes}
 
-\subsection{How to add Lists}
+% TODO: Document each asset class dataset with its canonical cleaning method
+% For EACH asset class, create a subsection that includes:
+% - Which specific paper's cleaning method is being replicated
+% - Why this dataset/asset class is important for macro-finance
+% - Key cleaning decisions and their justifications
+% - Summary statistics that match the original paper (proving correct replication)
 
-You can make lists with automatic numbering \dots
+Following \cite{He2017}, we include comprehensive datasets across multiple asset classes, each cleaned according to canonical methods from the academic literature.
 
-\begin{enumerate}
-\item Like this,
-\item and like this.
-\end{enumerate}
-\dots or bullet points \dots
+\subsection{Equity Markets}
+\label{sec:equity}
+% Fama-French 25 portfolios and CRSP universe
+% Explain exclusion of small stocks, ADRs, etc. following Fama-French (1993)
+
+\subsection{US Treasuries}
+\label{sec:treasuries}
+% CRSP maturity-sorted portfolios Treasuries
+
+\subsection{Corporate Bonds}
+\label{sec:corporate_bonds}
+% Nozawa (2017) yield-spread sorted portfolios
+
+\subsection{Sovereign Bonds}
+\label{sec:sovereign}
+% Borri and Verdelhan (2012) portfolios
+
+\subsection{Options}
+\label{sec:options}
+% Constantinides, Jackwerth and Savov (2013) S&P 500 portfolios
+
+\subsection{Foreign Exchange}
+\label{sec:fx}
+% Lettau et al. (2014) and Menkhoff et al. (2012)
+
+\subsection{Commodities}
+\label{sec:commodities}
+% Yang (2013) methodology
+
+\subsection{Credit Default Swaps}
+\label{sec:cds}
+% Markit data following Palhares (2013)
+
+[Asset class content to be filled in...]
+
+\section{Arbitrage Spread Datasets}
+\label{sec:arbitrage}
+
+% TODO: Document each arbitrage spread construction
+% For EACH arbitrage spread:
+% - Explain the economic intuition behind the trade
+% - Detail the exact construction methodology
+% - Show replication of statistics from Siriwardane et al.
+% - Discuss what violations of these spreads tell us about market segmentation
+
+Following \cite{Siriwardane2021}, we construct various arbitrage spreads that measure market segmentation.
+
+\subsection{Covered Interest Parity (CIP)}
+% Construction using spot, forward FX and interest rates
+
+\subsection{Box Spread Arbitrage}
+% Options-based arbitrage using put-call parity
+
+\subsection{Equity Spot-Futures Basis}
+% Cash vs futures arbitrage
+
+\subsection{Treasury Spot-Futures Basis}
+% Government bond basis trades
+
+\subsection{Treasury-Swap Spread}
+% Treasury vs interest rate swap arbitrage
+
+\subsection{TIPS-Treasury Spread}
+% Inflation-linked vs nominal bond spreads
+
+\subsection{CDS-Bond Basis}
+% Credit default swap vs cash bond arbitrage
+
+[Arbitrage spread content to be filled in...]
+
+\section{Additional Macro-Finance Datasets}
+\label{sec:additional_datasets}
+
+% TODO: Document datasets for macroeconomic forecasting and financial stability monitoring
+
+\subsection{Bank Call Report Data}
+% NYU archive (Schnabl)
+
+\subsection{Treasury Yield Curve}
+% Fed data following Gürkaynak et al.
+
+\subsection{Macroeconomic Indicators}
+% FRED-MD and other macro series
+
+\subsection{Bank-Specific Metrics}
+% Using WRDS Bank Premium
+
+[Additional datasets content to be filled in...]
+
+\section{Replication Results and Validation}
+\label{sec:replication}
+
+% TODO: Demonstrate successful replication of all source papers
+% - Create comprehensive replication tables
+% - Include specific sections for key papers
+% - Document any data quality issues discovered
+% - Explain any necessary deviations from original methodologies
+
+\subsection{He, Kelly, Manela (2017) Replication}
+% Factor loadings and test portfolio returns
+
+\subsection{Siriwardane et al. (2022) Replication}
+% Arbitrage spread statistics
+
+\subsection{Individual Dataset Replications}
+% Nozawa, Borri & Verdelhan, etc.
+
+[Replication results to be filled in...]
+
+\section{Baseline Forecasting Methodology}
+\label{sec:methodology}
+
+% TODO: Define forecasting approach following Monash template
+% - Justify choice of error metrics
+% - Select baseline forecasting models
+% - Define evaluation methodology
+
+\subsection{Error Metrics}
+% MASE, sMAPE, RMSE, etc.
+
+\subsection{Baseline Models}
+% Traditional, ML, and Deep Learning models
+TODO: Arsh: Add bullet points provide a short 2-3 sentence description of each model. What is the basic idea behind each model? Who developed it? What package are we using to implement it? 
+
 \begin{itemize}
-\item Like this,
-\item and like this.
+    \item ARIMA: Standard Autoregressive Integrated Moving Average model based on the statsmodel implementation.\cite{Box2013}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.arima.html}{darts}}
+    \end{itemize}
+    \item ETS: We use the Holt-Winter's exponential smoothing model\cite{Winters1960}. % Please add this citation from the URL: https://www.sciencedirect.com/science/article/abs/pii/S0169207003001134
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
+    \end{itemize}
+    \item Simple Exponential Smoothing: simple exponential moving average on a time-series\cite{Brown2004}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
+    \end{itemize}
+    \item TBATS: Uses Box-Cox transformations, ARMA error corrections and Fourier representations\cite{DeLivera2011}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sf_tbats.html}{darts}}
+    \end{itemize}
+    \item Theta: Splits a time-series into multiple Theta lines which are extrpolated separately and their combination is taken as the forecast\cite{Assimakopoulos2000}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.theta.html\#darts.models.forecasting.theta.Theta}{darts}}
+    \end{itemize}
+    \item Prophet: decomposable time-series model similar to Generalized Additive Model(GAM) developed by Facebook\cite{Taylor2018}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.prophet_model.html}{darts}}
+    \end{itemize}
+    \item PR (Pooled Regression): Generic gaussian linear model\cite{Trapero2015}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sklearn_model.html\#darts.models.forecasting.sklearn_model.SKLearnModel}{darts}} and \texttt{\href{https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TweedieRegressor.html\#sklearn.linear_model.TweedieRegressor}{scikit-learn}}
+    \end{itemize}
+    \item CatBoost: Gradient boosting algorithm for dealing with categorical data and a leaf value calculation trick which reduces overfitting\cite{Prokhorenkova}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.catboost_model.html}{darts}}
+    \end{itemize}
+    \item FFNN (Feed-Forward Neural Network): Simple neural network which is a collection of weight tensors with activation functions in between\cite{Goodfellow2016}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.simple_feedforward.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item Transformer: A deep network architecture utilising attention mechanisms for deducing dependencies in the input and the output\cite{Vaswani2017}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.transformer_model.html}{darts}}
+    \end{itemize}
+    \item DeepAR: An Autoregressive Recurrent Neural Network(RNN) with Long Short-Term Memory(LSTM).\cite{Salinas2020}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.deepar.module.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item WaveNet: Dilated deep neural network employing convolution layers. Originally made to generate sound waveforms\cite{Oord2016} but adapted to use in forecasting. % PLEASE ADD CITATION FROM URL: https://arxiv.org/abs/1703.04691
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.wavenet.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item D-Linear: Transformer-based deep model which is a combination of a decomposition scheme with linear layers\cite{Zeng2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.dlinear.html}{darts}}
+    \end{itemize}
+    \item N-Linear: Transformer-based deep model which addresses distribution shifts in the dataset by using a normalization trick\cite{Zeng2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nlinear.html}{darts}}
+    \end{itemize}
+    \item N-BEATS: Deep neural network with fully-connected layers along with residual links\cite{Oreshkin2020}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nbeats.html}{darts}}
+    \end{itemize}
+    \item N-HiTS: Enhances N-BEATS by using multi-rate data sampling and multi-scale interpolation\cite{Challu2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nhits.html\#darts.models.forecasting.nhits.NHiTSModel}{darts}}
+    \end{itemize}
+    \item Autoformer: Transformer-based deep network employing decomposition and Auto-Correlation\cite{Wu2021}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.autoformer.html}{neuralforecast}}
+    \end{itemize}
+    \item Informer: Transformer-based architecture using a ProbSparse self-attention mechanism and a generative-style decoder among other techniques\cite{Zhou2020}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.informer.html}{neuralforecast}}
+    \end{itemize}
+    \item PatchTST: Transformer-based model breaking a time series into a collection of patches used as tokens and utilises channel independence\cite{Nie2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.patch_tst.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item Temporal Fusion Transformer: Transformer-based model employing recurrent layers and self-attention layers with a focus on interpretablility\cite{Lim2021}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.tft.module.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item Time-series Dense Encoder(TiDE): Multi-layer perceptron based architecture utilising encoder and decoder blocks\cite{Das2023a}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.tide_model.html}{darts}}
+    \end{itemize}
+    \item TimesFM: Pre-trained transformer-based decoder-only deep model utilising patches similar to PatchTST\cite{Das2023}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://github.com/google-research/timesfm}{timesfm}} python package
+    \end{itemize}
 \end{itemize}
 
-\subsection{How to write Mathematics}
+\subsection{Evaluation Framework}
+% Train/test splits, structural breaks, etc.
 
-\LaTeX{} is great at typesetting mathematics. Let $X_1, X_2, \ldots, X_n$ be a sequence of independent and identically distributed random variables with $\text{E}[X_i] = \mu$ and $\text{Var}[X_i] = \sigma^2 < \infty$, and let
-\[S_n = \frac{X_1 + X_2 + \cdots + X_n}{n}
-      = \frac{1}{n}\sum_{i}^{n} X_i\]
-denote their mean. Then as $n$ approaches infinity, the random variables $\sqrt{n}(S_n - \mu)$ converge in distribution to a normal $\mathcal{N}(0, \sigma^2)$.
+[Methodology content to be filled in...]
 
+\section{Baseline Results and Analysis}
+\label{sec:results}
 
-\subsection{How to change the margins and paper size}
+% TODO: Present comprehensive forecasting results across all datasets
+% - Create results tables in exact same format as Monash paper
+% - Analyze patterns in results
+% - Compare with Monash findings where applicable
+% - Discuss implications for practitioners
 
-Usually the template you're using will have the page margins and paper size set correctly for that use-case. For example, if you're using a journal article template provided by the journal publisher, that template will be formatted according to their requirements. In these cases, it's best not to alter the margins directly.
+\subsection{Overall Performance}
+% Summary tables across all datasets
 
-If however you're using a more general template, such as this one, and would like to alter the margins, a common way to do so is via the geometry package. You can find the geometry package loaded in the preamble at the top of this example file, and if you'd like to learn more about how to adjust the settings, please visit this help article on \href{https://www.overleaf.com/learn/latex/page_size_and_margins}{page size and margins}.
+\subsection{Results by Asset Class}
+% Detailed analysis for each asset class
 
-\subsection{How to change the document language and spell check settings}
+\subsection{Results by Model Type}
+% Comparison of traditional vs ML vs DL approaches
 
-Overleaf supports many different languages, including multiple different languages within one document. 
+\subsection{Comparison with Monash Benchmarks}
+% How financial data differs from general time series
 
-To configure the document language, simply edit the option provided to the babel package in the preamble at the top of this example project. To learn more about the different options, please visit this help article on \href{https://www.overleaf.com/learn/latex/International_language_support}{international language support}.
+[Results content to be filled in...]
 
-To change the spell check language, simply open the Overleaf menu at the top left of the editor window, scroll down to the spell check setting, and adjust accordingly.
+\section{Implementation and Usage}
+\label{sec:implementation}
 
-\subsection{How to add Citations and a References List}
+% TODO: Explain technical architecture and usage
+% - Document the automation framework
+% - Provide clear usage instructions
+% - Explain design decisions
+% - Include code examples
 
-You can simply upload a \verb|.bib| file containing your BibTeX entries, created with a tool such as JabRef. 
-You can then cite entries from it, like this: 
-\cite{fama1992cross} or \cite{sharpe1964capital}. 
-Just remember to specify a bibliography style, as well as the filename of the \verb|.bib|. You can find a \href{https://www.overleaf.com/help/97-how-to-include-a-bibliography-using-bibtex}{video tutorial here} to learn more about BibTeX.
+\subsection{Installation and Setup}
+% Requirements and installation process
 
-If you have an \href{https://www.overleaf.com/user/subscription/plans}{upgraded account}, you can also import your Mendeley or Zotero library directly as a \verb|.bib| file, via the upload menu in the file-tree.
+\subsection{Data Pipeline Architecture}
+% dodo.py and automation framework
 
-\subsection{Good luck!}
+\subsection{Adding New Datasets}
+% Extensibility and contribution guidelines
 
-We hope you find Overleaf useful, and do take a look at our \href{https://www.overleaf.com/learn}{help library} for more tutorials and user guides! Please also let us know if you have any feedback using the Contact Us link at the bottom of the Overleaf menu --- or use the contact form at \url{https://www.overleaf.com/contact}.
+[Implementation content to be filled in...]
 
-\bibliographystyle{alpha}
+\section{Reproducibility}
+\label{sec:reproducibility}
+
+% TODO: Ensure full reproducibility of all results
+% - Document exact data vintage used
+% - Provide checksums for all processed datasets
+% - Include random seeds
+% - Detail computational environment
+
+[Reproducibility content to be filled in...]
+
+\section{Conclusions and Future Work}
+\label{sec:conclusion}
+
+% TODO: Summarize contributions and outline future extensions
+% - Recap main contributions
+% - Discuss potential additional datasets
+% - Propose enhanced forecasting methods
+% - Suggest infrastructure improvements
+% - Note community contribution guidelines
+
+[Conclusion content to be filled in...]
+
+\section*{Acknowledgments}
+
+We would like to thank the following individuals. With their permission, we have adapted and used pieces of their code in this repository: Om Mehta and Kunj Shah for their replication of the Covered Interest Rate Parity (CIP) arbitrage spreads; Kyle Parran and Duncan Park for their replication of commodity futures returns.
+
+% TODO: Add additional acknowledgments
+
+\appendix
+
+\section{Data Descriptions}
+\label{app:data_descriptions}
+% Detailed descriptions of each dataset
+
+\section{Additional Results}
+\label{app:additional_results}
+% Extended results tables and robustness checks
+
+\bibliographystyle{jpe}
 \bibliography{bibliography}
 
 \end{document}

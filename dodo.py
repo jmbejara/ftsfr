@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import shutil
 
 import toml
 from doit.action import CmdAction
@@ -7,10 +8,24 @@ from doit.action import CmdAction
 sys.path.insert(1, "./src/")
 
 from settings import config
+from dependency_tracker import (
+    load_module_requirements,
+    get_available_datasets,
+    get_format_task_name,
+)
 
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 OS_TYPE = config("OS_TYPE")
+
+# Get pixi executable path
+PIXI_EXECUTABLE = shutil.which("pixi")
+if not PIXI_EXECUTABLE:
+    # Fallback to common installation paths
+    if Path.home().joinpath(".pixi/bin/pixi").exists():
+        PIXI_EXECUTABLE = str(Path.home() / ".pixi/bin/pixi")
+    else:
+        PIXI_EXECUTABLE = "pixi"  # Hope it's in PATH at runtime
 
 
 ## Helpers for handling Jupyter Notebook tasks
@@ -105,27 +120,15 @@ if data_sources["bloomberg_terminal"] and not is_data_glimpses:
             print("Please enter 'yes', 'no', or 'skip'.")
 
 
-# fmt: off
+# Load module requirements from datasets.toml
+module_requirements_dict = load_module_requirements()
+
+# Check which modules are available based on data sources
 module_requirements = {}
-module_requirements["cip"] = data_sources["bloomberg_terminal"]
-module_requirements["commodities"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
-module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
-module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
-module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
-module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
-module_requirements["foreign_exchange"] = data_sources["wrds_fx"]
-module_requirements["futures_returns"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
-module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
-module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
-module_requirements["nyu_call_report"] = data_sources["nyu_call_report"]
-module_requirements["us_treasury_returns"] = data_sources["wrds_crsp"]
-module_requirements["wrds_bank_premium"] = data_sources["wrds_bank_premium"]
-module_requirements["wrds_crsp_compustat"] = (
-    data_sources["wrds_compustat"]
-    and data_sources["wrds_crsp"]
-    and data_sources["wrds_crsp_compustat"]
-)
-# fmt: on
+for module_name, required_sources in module_requirements_dict.items():
+    module_requirements[module_name] = all(
+        data_sources.get(source, False) for source in required_sources
+    )
 
 use_cache = config_toml["cache"]["use_cache"]
 
@@ -606,56 +609,54 @@ def task_format():
         }
 
 
-def task_collect_ftsfr_datasets_info():
-    return {
-        "actions": [
-            "python ./src/load_ftsfr_datasets.py",
-        ],
-        "file_dep": ["./src/load_ftsfr_datasets.py"],
-        "targets": [DATA_DIR / "ftsfr_datasets_paths.toml"],
-        "clean": [],
-    }
-
-
 models = config_toml["models"]
 models_activated = [model for model in models if models[model]]
 
 
 def task_forecast():
-    if models["simple_exponential_smoothing"]:
-        yield {
-            "name": "simple_exponential_smoothing",
-            "actions": [
-                CmdAction("pixi run main", cwd="./models/simple_exponential_smoothing")
-            ],
-            "targets": [
-                OUTPUT_DIR / "raw_results" / "simple_exponential_smoothing_results.csv"
-            ],
-            "file_dep": [
-                "./models/simple_exponential_smoothing/main.R",
-                "./models/simple_exponential_smoothing/pixi.toml",
-            ],
-            "clean": [],
-        }
+    """Generate forecast tasks for each combination of model and dataset."""
 
-    if models["arima"]:
-        yield {
-            "name": "arima",
-            "actions": [CmdAction("pixi run main", cwd="./models/arima")],
-            "targets": [OUTPUT_DIR / "raw_results" / "arima_results.csv"],
-            "file_dep": [
-                "./models/arima/main.py",
-                "./models/arima/pixi.toml",
-            ],
-            "clean": [],
-        }
+    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
+
+    for model in models_activated:
+        for dataset_name, dataset_info in available_datasets.items():
+            # For debugging purposes, print the full command line action here:
+            # print(f"FTSFR_DATASET_PATH={dataset_info['path']} FTSFR_IS_BALANCED={dataset_info['is_balanced']} FTSFR_FREQUENCY={dataset_info['frequency']} DATA_DIR={DATA_DIR} OUTPUT_DIR={OUTPUT_DIR} pixi run main")
+            yield {
+                "name": f"{model}:{dataset_name}",
+                "actions": [
+                    CmdAction(
+                        f"{PIXI_EXECUTABLE} run main",
+                        cwd=f"./models/{model}",
+                        env={
+                            "FTSFR_DATASET_PATH": str(dataset_info["path"]),
+                            "FTSFR_IS_BALANCED": str(dataset_info["is_balanced"]),
+                            "FTSFR_FREQUENCY": dataset_info["frequency"],
+                            "DATA_DIR": str(DATA_DIR),
+                            "OUTPUT_DIR": str(OUTPUT_DIR),
+                        },
+                    )
+                ],
+                "targets": [
+                    OUTPUT_DIR / "raw_results" / f"{model}_{dataset_name}_results.csv"
+                ],
+                "file_dep": [
+                    f"./models/{model}/main.py",
+                    f"./models/{model}/pixi.toml",
+                ],
+                "task_dep": [
+                    f"format:{get_format_task_name(dataset_info['module'])}",
+                ],
+                "clean": [],
+                "verbosity": 2,
+            }
 
 
 def task_assemble_results():
-    results_files = [
-        OUTPUT_DIR / "raw_results" / f"{model}_results.csv"
-        for model in models_activated
-    ]
+    """Assemble results from all model-dataset combinations."""
+
+    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
+
     return {
         "actions": [
             "python ./src/assemble_results.py",
@@ -665,8 +666,12 @@ def task_assemble_results():
             OUTPUT_DIR / "results_all.tex",
         ],
         "file_dep": [
-            *results_files,
             "./src/assemble_results.py",
+        ],
+        "task_dep": [
+            f"forecast:{model}:{dataset_name}"
+            for model in models_activated
+            for dataset_name in available_datasets
         ],
         "clean": [],
     }
@@ -754,9 +759,9 @@ def task_create_data_glimpses():
 
     return {
         "actions": [
-            # "python ./src/create_data_glimpses.py",
-            "python ./src/create_data_glimpses.py --no-samples",
-            # "python ./src/create_data_glimpses.py --no-samples --no-stats",
+            # "python ./src/create_data_glimpses.py --max-columns=20",
+            "python ./src/create_data_glimpses.py --no-samples"  # --max-columns=20",
+            # "python ./src/create_data_glimpses.py --no-samples --no-stats --max-columns=20",
         ],
         "targets": [
             "./docs_src/data_glimpses.md",
