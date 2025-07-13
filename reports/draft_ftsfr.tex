@@ -169,6 +169,60 @@ Following \cite{Siriwardane2021}, we construct various arbitrage spreads that me
 
 \subsection{Covered Interest Parity (CIP)}
 % Construction using spot, forward FX and interest rates
+     
+
+During periods of market stress, such as the 2008 financial crisis and the 2020 COVID-19
+pandemic, covered interest parity (CIP) may no longer hold as the forward–spot differential 
+no longer exactly offsets interest‐rate differentials. Factors contributing to this phenomenon include:
+Heightened Counterparty‐Credit Risk, Liquidity Constraints, or Regulatory Pressures.
+
+In other periods, deviations from CIP typically stem from market inefficiencies and are 
+small in magnitude and are short-lived in timeframe due to arbitrage activities.
+
+Our analysis examines CIP deviations across eight G10 currencies against the USD, 
+using data from 1999 onwards sourced through Bloomberg Terminal.
+
+\paragraph{The dataset includes:}
+\begin{itemize}
+    \item Spot exchange rates for each currency pair
+    \item 3-month forward points for each currency pair
+    \item 3-month Overnight Index Swap (OIS) rates for each currency
+\end{itemize}
+
+\paragraph{Data Standardization:}
+\begin{itemize}
+    \item Forward points are scaled appropriately (per 10,000 for most currencies, per 100 for JPY)
+    \item Currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) are converted to reciprocal rates for consistency
+    \item OIS rates serve as our risk-free benchmark to align with other arbitrage spread studies
+\end{itemize}
+
+We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2022),
+as seen in this side by side comparison of our calculated currency respective
+arbitrage spreads versus those reported in their paper.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex] % small vertical gap
+    {\small (a) Findings in Siriwardane et al. (2022)}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex]
+    {\small (b) Our findings}
+  \end{minipage}
+  \caption{IMAGES ARE PLACE HOLDERS}
+  \label{fig:comparison-minipage}
+\end{figure}
+
+During the overlapping periods of both datasets, the CIP spreads are nearly identical.
+Our findings confirm the presence of CIP deviations, particularly during periods of 
+market stress, consistent with the conclusions drawn by Siriwardane et al. (2022).
+
 
 \subsection{Box Spread Arbitrage}
 % Options-based arbitrage using put-call parity
