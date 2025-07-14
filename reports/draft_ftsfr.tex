@@ -343,12 +343,27 @@ market stress, consistent with the conclusions drawn by Siriwardane et al. (2023
 \subsection{CDS-Bond Basis}
 % Credit default swap vs cash bond arbitrage
 
-Credit Default Swap-bond arbitrage stems from the assumption that the credit risk of a company should 
-be reflected in both its corporate bond spread and its CDS spread. 
-Theoretically, these two measures should be equal, leading to a basisof zero. 
-However, in reality, the basis often deviates from zero due to market inefficiencies, 
-liquidity frictions, and various risks. When this happens, an arbitrage opportunity arises.
+% TODO: Document each arbitrage spread construction
+% For EACH arbitrage spread:
+% - Explain the economic intuition behind the trade
+% - Detail the exact construction methodology
+% - Show replication of statistics from Siriwardane et al.
+% - Discuss what violations of these spreads tell us about market segmentation
 
+Credit Default Swaps (CDS) are "insurance contracts" against the default of underlying
+corporate debt. The buyer of CDS protection pays a the CDS spread as a 
+fixed annuity premium to the seller for a horizon $\tau$. If there is a default
+before the time horizon $\tau$, the buyer receives the difference between
+the bond's par value and its market value from the seller. 
+
+Duffie (1999) (THIS IS ANOTHER PAPER WE MAY NEED TO CITE) shows that cash froms from purchasing CDS protection on 
+firm $i$'s bonds are the same as being long the risk-free floating rate note
+and short the floating rate debt of firm $i$. Thus, the CDS spread should be equal to the 
+floating rate spread for firm $i$. The floating rate spread of firm $i$ is defined as the spread of par floating rate debt
+subtracting the riskless floating rate. Intuitively, an investor that buys both the corporate bond
+and CDS protection faces no credit risk because the default will be paid off. 
+As a result, the payoff of this portfolio should not deviate from the risk free bond. The resulting difference
+between CDS spread and floating rate spread is defined by the authors as the CDS-basis.
 
 The authors define the CDS basis (CB) as
 
@@ -362,11 +377,13 @@ where:
   \item $CDS_{i,t,\tau}$ = time $t$ Credit Default Swap (CDS) par spread for firm $i$ with tenor $\tau$.
 \end{itemize}
 
-A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
+A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. 
+The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
 
-The value of $FR$ is substituted by the paper with Z‐spread which we also modify in our construction. We will go into the substitution in detail later.
+The value of $FR$ is substituted by the paper with Z‐spread which we also modify in our construction. We address the substitution in detail later.
 
-The value of $CDS$ is interpolated by the authors using a cubic spline function.
+The value of CDS par spread is interpolated by the authors using a cubic spline function as
+not all necessary tenors are present.
 
 Given the CDS spread from above, traditional construction of a risk‐free rate for implied arbitrage implies the following return:
 
@@ -379,7 +396,7 @@ where:
   \item $y_{t,\tau}$ = maturity‐matched Treasury yield at time $t$.
 \end{itemize}
 
-The risk‐free rate then can be seen as the Treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
+The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
 
 
 
@@ -403,9 +420,11 @@ The risk‐free rate then can be seen as the Treasury yield in addition to the b
 \end{figure}
 
 
-
-
 [Arbitrage spread content to be filled in...]
+
+\subsubsection{Z-spread construction}
+
+
 
 \section{Additional Macro-Finance Datasets}
 \label{sec:additional_datasets}
