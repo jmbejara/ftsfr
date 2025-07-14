@@ -26,35 +26,38 @@
 \maketitle
 
 \begin{abstract}
-This paper presents a macro-finance data repository for benchmarking the
-performance of global time series forecasting methods. A standardized benchmark
-is crucial for comparing the performance of different forecasting methods, so as
-to allow apples-to-apples comparisons across different forecasting methods and
-to discourage cherry-picking of results. Despite the ubiquity of time series
-forecasting methods in macroeconomics and finance, a standardized repository of
-data for benchmarking in these domains does not exist. One reason for this is
-that many of these datasets are available only through paid subscriptions and
-are thus not freely distributable. To address this issue, we instead provide a
-set of scripts that automate the download, data cleaning, and assembly of data
-sets from the Wharton Research Data Services (WRDS) platform and the Bloomberg
-Terminal. Since many academic institutions have access to WRDS or a Bloomberg
-Terminal, contingent on having access to the appropriate WRDS or Bloomberg
-subscriptions, each researcher will be able to exactly reproduce each of the
-datasets provided in this repository. Furthermore, the datasets that we provide
-are cleaned and formatted in a way that is common within the corresponding
-academic literature. Our aim is to facilitate the process of benchmarking global
-times series forecasting methods on data from these domains. In this light, we
-demonstrate the utility of our repository by showcasing the performance of
-several baseline forecasting methods using a variety of error metrics, providing
-baseline performance metrics which researchers can use to compare forecasting
-approaches. We hope that this repository will enhance research
-that increases the precision of financial and economic forecasts and contribute
-to research related to promoting financial stability and supporting a
-well-functioning economy.
+This paper presents an open-source macro-finance data repository for
+benchmarking the performance of global time series forecasting methods and
+compares the performance of many of the most popular modern methods. A
+standardized benchmark is crucial for comparing the performance of different
+forecasting methods, so as to allow apples-to-apples comparisons across
+different forecasting methods and to discourage cherry-picking of results.
+Despite the ubiquity of time series forecasting methods in macroeconomics and
+finance, a standardized repository of data for benchmarking in these domains
+does not exist. One reason for this is that many of these datasets are available
+only through paid subscriptions and are thus not freely distributable. To
+address this issue, we instead provide a set of scripts that automate the
+download, data cleaning, and assembly of data sets from the Wharton Research
+Data Services (WRDS) platform and the Bloomberg Terminal. Since many academic
+institutions have access to WRDS or a Bloomberg Terminal, contingent on having
+access to the appropriate WRDS or Bloomberg subscriptions, each researcher will
+be able to exactly reproduce each of the datasets provided in this repository.
+Furthermore, the datasets that we provide are cleaned and formatted in a way
+that matches best practices established within the corresponding academic
+literature. Our aim is to facilitate the process of benchmarking global times
+series forecasting methods on data from these domains. In this light, we
+demonstrate the utility of our repository by benchmarking the performance of a
+suite of classical and modern forecasting methods. We hope that this repository
+will enhance research that increases the precision of financial and economic
+forecasts and contribute to research related to promoting financial stability
+and supporting a well-functioning economy.
 \end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
+
+\subsection{The need for standardized benchmarks}
+\label{sec:need_for_standardized_benchmarks}
 
 % TODO: Write introduction emphasizing the critical need for standardized benchmarks in macro-finance
 % - Establish that time series forecasting is ubiquitous and prevalent in macroeconomics and finance domains
@@ -65,7 +68,100 @@ well-functioning economy.
 % - Emphasize that this complements (not substitutes) the Monash benchmark
 % - Make clear that the lack of standardization is particularly problematic in finance where data often requires subscriptions
 
-[Introduction content to be filled in...]
+The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in "poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
+The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it may not leverage CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR \citep{Dau2019} and UEA \citep{Bagnall2018} and Extrinsic Regression Repository \citep{Tan2020} do not include coverage of the financial domain.
+The Monash repository \citep{Godahewa2021} and recent efforts like TFB \citep{Qiu2024} have made strides toward broader coverage, yet comprehensive representation of financial asset classes, from corporate bonds to credit derivatives, remains absent. (See Table \ref{tab:benchmarks} for a summary of existing benchmarks.) This gap is particularly problematic given that, according to the ``No Free Lunch" Theorem \citep{Wolpert1997}
+there is no single forecasting method that performs best for all time series and, as such, to improve forecasting in the financial domain, we need to evaluate forecasting methods on a suite of datasets from the financial domain. Furthermore, it's also important that these datasets reflect the datasets as they
+commonly appear in the relevant finance literature. That is, they should use the same data sources and the same
+domain-specific cleaning and normalization procedures established in the literature. 
+
+
+Our proposed benchmark addresses this limitation by creating a standardized, literature-compliant repository for the macro-finance domain. By providing open-source scripts that automate the download and cleaning of data from sources like WRDS and Bloomberg, we assemble datasets spanning equities, bonds, FX, commodities, banking, and more. Each dataset is processed according to canonical methods from seminal academic papers, and crucially, while these foundational studies often lack publicly available replication code, our implementations reproduce their key results. This approach not only validates our data processing but also establishes a reusable framework that complements general time series benchmarks (like Monash, Libra, and TFB) by focusing specifically on financial data. The result is a resource that enables the kind of apples-to-apples model comparisons advocated by recent surveys, filling a critical hole in quantitative finance research.
+
+Our repository provide a variety of aggregated and disaggregated datasets from a variety of financial asset classes. For example, data for options and credit default swaps (CDS) are provided on a contract-specific basis, while banking data from Call Reports are disaggregated at the bank-specific level.
+This granularity enables nuanced research into micro-level market dynamics. Moreover, we present datasets from multiple analytical angles to capture their diverse economic roles. For example, in addition to provided datasets that measure the financial returns across various assets across a variety of asset classes, we also calculate the spreads associated with basis trades that uses these assets. 
+The CDS data, for instance, is not only formulated as a return series on the CDS contracts but is also merged with bond data to construct the CDS-bond basis, a key arbitrage spread, at the contract level. 
+
+This multi-faceted approach empowers researchers to investigate a richer set of phenomena, from price forecasting to the analysis of complex inter-market relationships.
+
+
+\begin{table}[htbp]
+\centering
+\footnotesize  % or \small
+\caption{Existing Time Series Forecasting Benchmark Data Repositories}
+\label{tab:benchmarks}
+\begin{tabular}{llll}
+\toprule
+Source & Name & Coverage of Finance Domain & Website \\ 
+\midrule
+\cite{McCracken2016} & FRED-MD & US Macroeconomic Series & \href{https://www.stlouisfed.org/research/economists/mccracken/fred-databases}{Link}\\
+\cite{Hu2018} & FinTSB & Equities Returns only & \href{https://github.com/TongjiFinLab/FinTSB}{Link}\\
+\cite {Dau2019} & \begin{tabular}[t]{@{}l@{}}UCR Time Series\\Classification Archive\end{tabular}  & None & \href{https://www.cs.ucr.edu/%7Eeamonn/time_series_data_2018/}{Link}\\
+\cite{Bagnall2018} & \begin{tabular}[t]{@{}l@{}}UEA Multivariate Time Series\\Classification Archive\end{tabular}  & None & \href{https://www.timeseriesclassification.com/}{Link}\\
+\cite{Tan2020} & \begin{tabular}[t]{@{}l@{}}Monash, UEA \& UCR Time Series\\ Extrinsic Regression Repository\end{tabular} & None & \href{http://tseregression.org/}{Link}\\
+\cite{Godahewa2021} & \begin{tabular}[t]{@{}l@{}}Monash Time Series\\Forecasting Repository\end{tabular} & Fred-MD is one component & \href{https://forecastingdata.org/}{Link}\\
+\cite{Bauer2021} & Libra & Anonymous data, unclear & \href{https://github.com/DescartesResearch/ForecastBenchmark}{Link}\\
+\cite{Qiu2024} & TFB & \begin{tabular}[t]{@{}l@{}}NN5 Bank Cash Withdrawals, \\Equity (NYSE/NASDAQ), \\ Foreign Exchange Rates \end{tabular} & \href{https://github.com/decisionintelligence/TFB}{Link}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Consequences of Poor Data Quality in Analysis}
+\label{sec:consequences_of_poor_data_quality}
+An important feature of this paper, and the accompanying data repository, is that we provide a set of data that is cleaned and formatted in a way that matches best practices established within the corresponding academic literature. 
+Analyses based on incomplete, biased, or inconsistent datasets can lead to spurious results. For example, researchers in finance have documented several specific mechanisms by which poor data quality can mislead conclusions.
+
+\paragraph{Survivorship Bias}
+Perhaps the most cited data issue in performance studies, survivorship bias occurs when only surviving or successful entities in a dataset are observed, while failed or defunct entities are absent. This selective sampling can dramatically skew results.
+See \cite{Brown1992} or \cite{Brown1995} for seminal studies demonstrating that the apparent persistence or predictability in mutual fund returns was largely an artifact of survivorship bias.
+
+\paragraph{Selection and Instant History Bias}
+Related to survivorship bias are selection biases arising from how and when data are reported. In the context of hedge funds and other lightly regulated investments, researchers have noted that managers often have discretion over reporting, which can lead to instant history (backfill) bias. Instant history bias means that a fund might report its track record only after a streak of strong returns, effectively "backfilling" the database with only the good outcomes. This practice hides the early losses or failed ventures from view. See for example, \cite{Fung2000}, who found that accounting for backfill bias reduced average hedge fund returns by several percentage points per year.
+
+\paragraph{Measurement Errors}
+Even when all relevant cases are included, errors in the data itself (inaccurate measurements, typos, misclassifications, etc.) can bias results. In econometrics, it is well-established that classical measurement error in an independent variable will attenuate regression coefficients towards zero, masking true relationships. For instance, if a researcher uses an imperfect proxy or noisy measure of a firm's earnings, any estimated effect of earnings on stock returns will be biased downward (toward zero) due to the noise. Pioneering econometric analyses (e.g. \cite{Griliches1986} and \cite{Bound2001}) showed that measurement error can be a major source of bias, sometimes even more severe than omitted variable bias in certain cases.
+
+The mechanism is that the error in the explanatory variable gets absorbed into the regression's disturbance term, violating assumptions and leading to inconsistent estimates
+econ.lse.ac.uk
+. The consequence is that real economic signals may be drowned out by data noise. High-profile examples of measurement error causing spurious findings are sobering. A notable case involved Reinhart and Rogoff's influential study on public debt and growth \cite{Reinhart2010}, which concluded that countries with debt-to-GDP above 90% experience dramatically lower growth. When Herndon, Ash, and Pollin \cite{Herndon2014} attempted to replicate the result, they discovered coding errors and selective data exclusions in the original spreadsheet
+retractionwatch.com
+. These data issues, once corrected, entirely changed the conclusion: the sharp growth cliff at 90% debt largely disappeared
+retractionwatch.com
+. The Reinhart-Rogoff episode, documented in a subsequent published critique, revealed that a spreadsheet transcription error and omission of several countries' data had led to a false econometric result with far-reaching policy implications
+retractionwatch.com
+. This case underscores that even renowned studies can suffer from "garbage in" when data are mishandled --- and that replicating analysis with cleaned, corrected data is essential to validate findings.
+
+\paragraph{Non-Standard Definitions and Inconsistent Data}
+A more subtle problem arises when data are not standardized across sources or over time. If different companies or countries define metrics differently, any comparative analysis becomes apples-to-oranges. For example, in macroeconomics, price indices and GDP figures must be standardized (using purchasing power parity adjustments, consistent base years, etc.) to be meaningfully compared across countries. Summers and Heston \cite{Summers1991} demonstrated this by constructing the Penn World Table, a comprehensive set of national accounts data expressed in common terms
+econdata.com
+. Prior to their work, cross-country income comparisons were fraught with inconsistencies --- each nation's statistics were based on its own definitions and currencies. Summers and Heston's standardized data enabled economists to obtain unbiased comparisons of GDP and growth rates across ---
+econdata.com
+. The result was a wave of robust findings in growth economics that would have been impossible with non-standardized national data. Likewise, in finance, using current stock index membership to backtest historical performance (instead of using the actual historical index constituents at each point in time) introduces survivorship bias and inconsistency
+en.wikipedia.org
+en.wikipedia.org
+. An analysis that erroneously treats the present S\&P 500 members as if they existed in 1990 will ignore all the companies that were in the index then but failed later, thereby overstating historical returns
+en.wikipedia.org
+en.wikipedia.org
+. This highlights the importance of using data that are aligned to a common standard or definition appropriate to the analysis --- whether that means consistent accounting standards, index definitions, or economic variable calculations. Without such standardization, researchers may draw incorrect inferences simply because data series are not comparable.
+
+\paragraph{Spurious Correlations from Non-Stationarity}
+In time-series analysis, a classic data pitfall is using non-stationary (e.g. trending) data in regression without proper detrending or differencing. Granger and Newbold \cite{GrangerNewbold1974} famously warned that regressing one growing time series on another can yield an apparently excellent fit (high R², significant t-statistics) that is actually spurious
+jumbong.github.io
+. They documented examples of nonsense correlations where two unrelated economic series, each with strong time trends, produced R² values near 0.99 and yet no meaningful relationship existed
+jumbong.github.io
+. In one case, they found a published regression with an astounding R² = 0.999 alongside a Durbin-Watson statistic of 0.09, indicating highly autocorrelated residuals --- a red flag for spurious regression
+jumbong.github.io
+. The lesson is that failing to transform or preprocess time-series data to stationarity can create illusory relationships driven by common trends rather than true causation. This problem is another form of "garbage in": if one feeds trending data into a linear model without precautions, the output will dutifully report a relationship (almost any two increasing series will correlate over time) --- an obvious garbage result. Modern econometric practice therefore emphasizes data preprocessing steps (taking logarithms, differences, removing trends or seasonality) to avoid such pitfalls. The need for these standardizing transformations is well supported by research. It has been shown that once data are rendered stationary and free of trend, spurious significance levels fall to normal rates
+jumbong.github.io
+. In sum, appropriate preprocessing of time-series (a form of standardization across time) is critical to obtaining reliable inference and not mistaking noise for signal.
+
+\paragraph{Data Snooping and Overfitting}
+A related concern in the realm of quantitative finance is data-snooping bias --- the false discoveries that occur when one mines a dataset for many possible patterns without proper adjustment. While this is more of a methodological issue than a data quality issue per se, it is worth noting as a cautionary tale that if one dredges "garbage data" hard enough, one will always find something. Sullivan, Timmermann, and White \cite{Sullivan1999} applied rigorous statistical checks to a large number of technical trading rules that had seemingly been profitable in past U.S. stock data. Publishing in the Journal of Finance, they showed that once one accounts for the fact that dozens of rules were tried (via White's Reality Check bootstrap), the vast majority of supposed "winning" trading strategies had no genuine predictive ---
+researchgate.net
+. Many earlier studies that lacked such corrections had overfit the data, effectively reporting noise as if it were a tradable signal
+researchgate.net
+. This reinforces the broader point: analyses conducted on poorly vetted or overly mined data can always produce some pattern of interest, but without out-of-sample validation or standardized methodologies, these are likely to be mirages. Ensuring data are partitioned properly (training vs. test sets, avoiding look-ahead bias where future information leaks into past data) is a form of maintaining data integrity in predictive modeling. The academic finance literature now contains countless factors and strategies discovered in historical data; however, as Harvey, Liu, and Zhu \cite{Harvey2016} argue in the Review of Financial Studies, many of these fail to hold up out-of-sample, suggesting that data-snooping and noise-fitting were at play. The community's response has been to demand higher standards of evidence (e.g. out-of-sample tests, multiple-comparison adjustments) --- essentially, more robust data handling --- before accepting new "discoveries." This again highlights how disciplined data practices filter out spurious results.---
+In all the above cases, the central theme is that poor data quality --- whether through biased sampling, inconsistent definitions, measurement error, or inadequate preprocessing --- can create false findings. These findings might look convincing (they may even be statistically significant or published in respected outlets), but they do not generalize or hold up under scrutiny because they are artifacts of faulty data. For researchers, analysts, and decision-makers, the implications are clear: one must critically assess data quality at the outset, or risk being led astray by garbage-in effects.
 
 \section{Literature Review and Related Work}
 \label{sec:literature}
@@ -273,7 +369,7 @@ Following \cite{Siriwardane2021}, we construct various arbitrage spreads that me
      
 
 During periods of market stress, such as the 2008 financial crisis and the 2020 COVID-19
-pandemic, covered interest parity (CIP) may no longer hold as the forward–spot differential 
+pandemic, covered interest parity (CIP) may no longer hold as the forward---spot differential 
 no longer exactly offsets interest‐rate differentials. Factors contributing to this phenomenon include:
 Heightened Counterparty‐Credit Risk, Liquidity Constraints, or Regulatory Pressures.
 
@@ -478,7 +574,7 @@ The implied risk-free arbitrage is then defined as the treasury yield in additio
 
 \subsection{Baseline Models}
 % Traditional, ML, and Deep Learning models
-TODO: Arsh: Add bullet points provide a short 2-3 sentence description of each model. What is the basic idea behind each model? Who developed it? What package are we using to implement it? 
+% TODO: Arsh: Add bullet points provide a short 2-3 sentence description of each model. What is the basic idea behind each model? Who developed it? What package are we using to implement it? 
 
 \begin{itemize}
     \item ARIMA: Standard Autoregressive Integrated Moving Average model based on the statsmodel implementation.\cite{Box2013}
