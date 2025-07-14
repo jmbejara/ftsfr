@@ -260,3 +260,7 @@ reports/draft_ftsfr.pdf
 models/ffnn/lightning_logs/
 
 models/ffnn/mytemp/lightning_logs/
+
+references/
+
+_references/
