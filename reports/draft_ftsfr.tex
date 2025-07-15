@@ -511,6 +511,74 @@ where:
 
 The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
 
+\subsubsection{Z-Spread (Zero-Volatility Spread)}
+
+**Mathematical definition**
+
+For a bond with cash-flows $CF_t$ at times $t=1,\dots,N$ and Treasury spot rates $s_t$,
+
+$$
+P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
+$$
+
+The constant $Z$ that solves this equation is the **Z-spread**.
+
+**Intuition**
+
+$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond’s dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
+
+
+### Link to Yield-to-Maturity
+
+Setting the Z-spread pricing equation equal to the standard YTM equation gives
+
+$$
+
+\sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
+=\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
+\tag{A1}
+$$
+
+where $y$ is the bond’s yield-to-maturity.  Except for the trivial flat-curve case ($s_t=s$), (A1) has no algebraic solution—$y$ or $Z$ must be found numerically.
+
+
+### Continuous-Compounding Identity
+
+Rewrite discounts as $e^{-r t}$.  With PV-weights
+
+$$
+w_t=\frac{CF_t\,e^{-(s_t+Z)t}}{P},\qquad\sum_{t}w_t=1,
+$$
+
+equation (A1) yields the convenient mean-value relationship
+
+$$
+y \;=\; \sum_{t=1}^{N} w_t\,(s_t+Z)\tag{A2}
+$$
+
+Thus YTM is the PV-weighted average of the spot rates plus the Z-spread.
+
+
+### Practical Proxy: YTM Credit Spread
+
+Analysts often approximate $Z$ with the **credit spread**
+
+$$
+\Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
+$$
+
+where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond’s (modified) duration.
+
+**Why it works**
+
+1. A small parallel shift $Z$ applied to all discount rates changes price by $-D_{\text{mod}}\;Z$.  For modest spreads, this produces nearly the same price change as replacing the spot curve with a single rate shift $\Delta y$.  
+2. Duration-matching the Treasury benchmark neutralises curve-shape effects, so $\Delta y$ isolates the average extra yield attributable to credit/liquidity risk.  
+3. Empirically, $\Delta y$ tracks $Z$ closely for plain-vanilla, option-free bonds, making it a “good-enough” proxy when full spot-curve data or iterative Z-spread calculations are impractical.
+
+**Note**
+
+Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
+
 
 
 \begin{figure}[htbp]
@@ -531,11 +599,6 @@ The implied risk-free arbitrage is then defined as the treasury yield in additio
   \caption{IMAGES ARE PLACE HOLDERS}
   \label{fig:comparison-minipage}
 \end{figure}
-
-
-[Arbitrage spread content to be filled in...]
-
-\subsubsection{Z-spread construction}
 
 
 
