@@ -18,7 +18,7 @@
 \usepackage{subfigure} % For subfigures
 \usepackage{hyperref} % For links
 
-\title{An Open-Source Macro-Finance Time Series Forecasting Benchmark}
+\title{An Open-Source Financial Time Series Forecasting Benchmark}
 \author{Jeremiah Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
 \date{\today}
 
@@ -26,7 +26,7 @@
 \maketitle
 
 \begin{abstract}
-This paper presents an open-source macro-finance data repository for
+This paper presents an open-source finance data repository for
 benchmarking the performance of global time series forecasting methods and
 compares the performance of many of the most popular modern methods. A
 standardized benchmark is crucial for comparing the performance of different
@@ -56,10 +56,7 @@ and supporting a well-functioning economy.
 \section{Introduction}
 \label{sec:introduction}
 
-\subsection{The need for standardized benchmarks}
-\label{sec:need_for_standardized_benchmarks}
-
-% TODO: Write introduction emphasizing the critical need for standardized benchmarks in macro-finance
+% TODO: Write introduction emphasizing the critical need for standardized benchmarks in finance
 % - Establish that time series forecasting is ubiquitous and prevalent in macroeconomics and finance domains
 % - Highlight the current gap: no existing standardized benchmarks for evaluating forecasting algorithms in macro-finance
 % - Explain why apples-to-apples comparisons are impossible without standardized datasets
@@ -68,26 +65,46 @@ and supporting a well-functioning economy.
 % - Emphasize that this complements (not substitutes) the Monash benchmark
 % - Make clear that the lack of standardization is particularly problematic in finance where data often requires subscriptions
 
-The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in "poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
-The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it may not leverage CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR \citep{Dau2019} and UEA \citep{Bagnall2018} and Extrinsic Regression Repository \citep{Tan2020} do not include coverage of the financial domain.
-The Monash repository \citep{Godahewa2021} and recent efforts like TFB \citep{Qiu2024} have made strides toward broader coverage, yet comprehensive representation of financial asset classes, from corporate bonds to credit derivatives, remains absent. (See Table \ref{tab:benchmarks} for a summary of existing benchmarks.) This gap is particularly problematic given that, according to the ``No Free Lunch" Theorem \citep{Wolpert1997}
-there is no single forecasting method that performs best for all time series and, as such, to improve forecasting in the financial domain, we need to evaluate forecasting methods on a suite of datasets from the financial domain. Furthermore, it's also important that these datasets reflect the datasets as they
-commonly appear in the relevant finance literature. That is, they should use the same data sources and the same
-domain-specific cleaning and normalization procedures established in the literature. 
+The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in ``poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
+The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it may not leverage CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR Time Series Classification Archive \citep{Dau2019} and UEA Multivariate Time Series Classification Archive \citep{Bagnall2018} and MUU Extrinsic Regression Repository \citep{Tan2020} do not include coverage of the financial domain.
+The Monash repository \citep{Godahewa2021} and recent efforts like TFB \citep{Qiu2024} have made strides toward broader coverage, yet comprehensive representation of financial asset classes, from corporate bonds to credit derivatives, remains absent. (See Table \ref{tab:benchmarks} for a summary of existing benchmarks.) This gap is particularly problematic given that, according to the ``No Free Lunch" Theorem \citep{Wolpert1997},
+there is no single forecasting method that performs best for all time series. As such, to improve forecasting in the financial domain, we need to evaluate forecasting methods on a suite of datasets from the financial domain and, importantly,
+these datasets need to reflect the form of the data as they commonly appear in the relevant finance literature. That is, they should use the same data sources and the same domain-specific cleaning and normalization procedures established in the literature. 
 
 
-Our proposed benchmark addresses this limitation by creating a standardized, literature-compliant repository for the macro-finance domain. By providing open-source scripts that automate the download and cleaning of data from sources like WRDS and Bloomberg, we assemble datasets spanning equities, bonds, FX, commodities, banking, and more. Each dataset is processed according to canonical methods from seminal academic papers, and crucially, while these foundational studies often lack publicly available replication code, our implementations reproduce their key results. This approach not only validates our data processing but also establishes a reusable framework that complements general time series benchmarks (like Monash, Libra, and TFB) by focusing specifically on financial data. The result is a resource that enables the kind of apples-to-apples model comparisons advocated by recent surveys, filling a critical hole in quantitative finance research.
+Our proposed benchmark addresses this limitation by creating a standardized, literature-compliant repository specifically designed for the finance domain. By providing open-source scripts that automate the download and cleaning of data from institutional sources like WRDS and Bloomberg, we enable researchers to reproduce exact datasets used in canonical finance papers. Our aim is to fill a critical gap in quantitative finance research by providing the first comprehensive forecasting benchmark tailored to financial markets. In particular, our paper has the following main contributions:
 
-Our repository provide a variety of aggregated and disaggregated datasets from a variety of financial asset classes. For example, data for options and credit default swaps (CDS) are provided on a contract-specific basis, while banking data from Call Reports are disaggregated at the bank-specific level.
-This granularity enables nuanced research into micro-level market dynamics. Moreover, we present datasets from multiple analytical angles to capture their diverse economic roles. For example, in addition to provided datasets that measure the financial returns across various assets across a variety of asset classes, we also calculate the spreads associated with basis trades that uses these assets. 
-The CDS data, for instance, is not only formulated as a return series on the CDS contracts but is also merged with bond data to construct the CDS-bond basis, a key arbitrage spread, at the contract level. 
+\begin{itemize}
+    \item We introduce the first comprehensive time series forecasting archive focused specifically on financial markets, available at \url{https://jeremybejarano.com/ftsfr/}. This archive provides standardized datasets across multiple asset classes and market segments:
+    \begin{itemize}
+        \item Asset return series spanning equities (Fama-French portfolios), corporate bonds, U.S. Treasuries, sovereign bonds, foreign exchange rates, commodity futures, credit default swaps (CDS), and options
+        \item Arbitrage basis spreads including covered interest parity (CIP) deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury spreads, equity spot-futures basis, Treasury spot-futures basis, and box spread arbitrage
+        \item Specialized datasets critical for financial stability monitoring, including bank Call Report data, Treasury auction statistics, and yield curve dynamics
+    \end{itemize}
+    
+    \item We provide validated implementations of canonical data cleaning procedures from seminal finance papers, each following the exact methodology of the original studies. Crucially, while these foundational papers often lack publicly available replication code, our implementations successfully reproduce their key results, establishing both the correctness of our data processing and creating a reusable framework for future research.
+    
+    \item We emphasize domain-specific data curation, recognizing that financial data requires specialized treatment reflecting market microstructure, regulatory requirements, and established academic conventions. Each dataset is processed using the precise subsample definitions, filters, and transformations specified in the corresponding literature, ensuring that forecasting evaluations reflect the actual data as used by domain experts rather than generic time series.
+    
+    \item We present comprehensive baseline forecasting results across all datasets using a suite of 24 methods ranging from classical statistical models (ARIMA, ETS, Theta) to modern machine learning approaches (CatBoost, neural networks) and state-of-the-art deep learning architectures (Transformer variants, N-BEATS, TimesFM). These baseline results enable standardized performance comparisons and establish benchmarks for future research.
+    
+    \item We provide novel insights into market-specific predictability by systematically evaluating forecasting performance across different asset classes and market segments. This analysis contributes to our understanding of where predictability exists in financial markets and can inform both academic research and policy decisions related to financial stability monitoring.
+    
+    \item All implementations are fully open source with best practices for reproducibility, including:
+    \begin{itemize}
+        \item Automated data pipeline using \texttt{dodo.py} for systematic data pulling and processing
+        \item Virtual environments ensuring perfect reproducibility across different computing environments  
+        \item Comprehensive documentation of data sources, cleaning procedures, and validation steps
+        \item Public availability of all code at \url{https://github.com/jmbejara/ftsfr} and processed datasets for researchers with appropriate data access
+    \end{itemize}
+\end{itemize}
 
-This multi-faceted approach empowers researchers to investigate a richer set of phenomena, from price forecasting to the analysis of complex inter-market relationships.
-
+By providing this resource, we enable the kind of standardized, apples-to-apples comparisons that have been lacking in financial forecasting research, while also contributing replication code for key papers and insights into predictability across financial markets.
 
 \begin{table}[htbp]
 \centering
-\footnotesize  % or \small
+% \footnotesize  % or 
+\small
 \caption{Existing Time Series Forecasting Benchmark Data Repositories}
 \label{tab:benchmarks}
 \begin{tabular}{llll}
@@ -522,7 +539,7 @@ The implied risk-free arbitrage is then defined as the treasury yield in additio
 
 
 
-\section{Additional Macro-Finance Datasets}
+\section{Additional Financial Datasets}
 \label{sec:additional_datasets}
 
 % TODO: Document datasets for macroeconomic forecasting and financial stability monitoring
