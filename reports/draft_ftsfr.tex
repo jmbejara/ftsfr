@@ -18,6 +18,7 @@
 \usepackage{subfigure} % For subfigures
 \usepackage{hyperref} % For links
 \usepackage{setspace}
+\usepackage[page]{appendix}
 
 \title{An Open-Source Financial Time Series Forecasting Benchmark}
 \author{Jeremiah Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
@@ -234,65 +235,8 @@ For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018},
 Following the equity basis recipe of \citet{Hazelkorn2023}, we construct implied forward rates from nearby and first-deferred S\&P 500, Dow Jones, and Nasdaq 100 futures to avoid measurement error from asynchronous spot and futures market closes. We proxy for expected dividends using realized dividends from Bloomberg. The final arbitrage spread is the difference between this futures-implied rate and the 3-month OIS rate, which serves as a clean risk-free benchmark.
 
 \paragraph{Box Arbitrage in Equity Options}
-For box spread arbitrage, we follow the methodology of \citet{vanBinsbergen2019} to extract a risk-free rate implied by S\&P 500 (SPX) index options. Their approach uses a cross-sectional regression of put-call price differences on strike prices, which cleverly avoids the need to explicitly estimate dividends. We use their publicly available daily median implied rates and extend the series using their exact methodology on recent minute-level CBOE data. The final arbitrage spread is the difference between this options-implied rate and a maturity-matched OIS rate.
+For box spread arbitrage, we follow the methodology of \citet{VanBinsbergen2022} to extract a risk-free rate implied by S\&P 500 (SPX) index options. Their approach uses a cross-sectional regression of put-call price differences on strike prices, which cleverly avoids the need to explicitly estimate dividends. We use their publicly available daily median implied rates and extend the series using their exact methodology on recent minute-level CBOE data. The final arbitrage spread is the difference between this options-implied rate and a maturity-matched OIS rate.
 
-
-\subsection{The Consequences of Poor Data Quality in Analysis}
-\label{sec:consequences_of_poor_data_quality}
-An important feature of this paper, and the accompanying data repository, is that we provide a set of data that is cleaned and formatted in a way that matches best practices established within the corresponding academic literature. 
-Analyses based on incomplete, biased, or inconsistent datasets can lead to spurious results. For example, researchers in finance have documented several specific mechanisms by which poor data quality can mislead conclusions.
-
-\paragraph{Survivorship Bias}
-Perhaps the most cited data issue in performance studies, survivorship bias occurs when only surviving or successful entities in a dataset are observed, while failed or defunct entities are absent. This selective sampling can dramatically skew results.
-See \cite{Brown1992} or \cite{Brown1995} for seminal studies demonstrating that the apparent persistence or predictability in mutual fund returns was largely an artifact of survivorship bias.
-
-\paragraph{Selection and Instant History Bias}
-Related to survivorship bias are selection biases arising from how and when data are reported. In the context of hedge funds and other lightly regulated investments, researchers have noted that managers often have discretion over reporting, which can lead to instant history (backfill) bias. Instant history bias means that a fund might report its track record only after a streak of strong returns, effectively "backfilling" the database with only the good outcomes. This practice hides the early losses or failed ventures from view. See for example, \cite{Fung2000}, who found that accounting for backfill bias reduced average hedge fund returns by several percentage points per year.
-
-\paragraph{Measurement Errors}
-Even when all relevant cases are included, errors in the data itself (inaccurate measurements, typos, misclassifications, etc.) can bias results. In econometrics, it is well-established that classical measurement error in an independent variable will attenuate regression coefficients towards zero, masking true relationships. For instance, if a researcher uses an imperfect proxy or noisy measure of a firm's earnings, any estimated effect of earnings on stock returns will be biased downward (toward zero) due to the noise. Pioneering econometric analyses (e.g. \cite{Griliches1986} and \cite{Bound2001}) showed that measurement error can be a major source of bias, sometimes even more severe than omitted variable bias in certain cases.
-
-The mechanism is that the error in the explanatory variable gets absorbed into the regression's disturbance term, violating assumptions and leading to inconsistent estimates
-econ.lse.ac.uk
-. The consequence is that real economic signals may be drowned out by data noise. High-profile examples of measurement error causing spurious findings are sobering. A notable case involved Reinhart and Rogoff's influential study on public debt and growth \cite{Reinhart2010}, which concluded that countries with debt-to-GDP above 90% experience dramatically lower growth. When Herndon, Ash, and Pollin \cite{Herndon2014} attempted to replicate the result, they discovered coding errors and selective data exclusions in the original spreadsheet
-retractionwatch.com
-. These data issues, once corrected, entirely changed the conclusion: the sharp growth cliff at 90% debt largely disappeared
-retractionwatch.com
-. The Reinhart-Rogoff episode, documented in a subsequent published critique, revealed that a spreadsheet transcription error and omission of several countries' data had led to a false econometric result with far-reaching policy implications
-retractionwatch.com
-. This case underscores that even renowned studies can suffer from "garbage in" when data are mishandled --- and that replicating analysis with cleaned, corrected data is essential to validate findings.
-
-\paragraph{Non-Standard Definitions and Inconsistent Data}
-A more subtle problem arises when data are not standardized across sources or over time. If different companies or countries define metrics differently, any comparative analysis becomes apples-to-oranges. For example, in macroeconomics, price indices and GDP figures must be standardized (using purchasing power parity adjustments, consistent base years, etc.) to be meaningfully compared across countries. Summers and Heston \cite{Summers1991} demonstrated this by constructing the Penn World Table, a comprehensive set of national accounts data expressed in common terms
-econdata.com
-. Prior to their work, cross-country income comparisons were fraught with inconsistencies --- each nation's statistics were based on its own definitions and currencies. Summers and Heston's standardized data enabled economists to obtain unbiased comparisons of GDP and growth rates across ---
-econdata.com
-. The result was a wave of robust findings in growth economics that would have been impossible with non-standardized national data. Likewise, in finance, using current stock index membership to backtest historical performance (instead of using the actual historical index constituents at each point in time) introduces survivorship bias and inconsistency
-en.wikipedia.org
-en.wikipedia.org
-. An analysis that erroneously treats the present S\&P 500 members as if they existed in 1990 will ignore all the companies that were in the index then but failed later, thereby overstating historical returns
-en.wikipedia.org
-en.wikipedia.org
-. This highlights the importance of using data that are aligned to a common standard or definition appropriate to the analysis --- whether that means consistent accounting standards, index definitions, or economic variable calculations. Without such standardization, researchers may draw incorrect inferences simply because data series are not comparable.
-
-\paragraph{Spurious Correlations from Non-Stationarity}
-In time-series analysis, a classic data pitfall is using non-stationary (e.g. trending) data in regression without proper detrending or differencing. Granger and Newbold famously warned that regressing one growing time series on another can yield an apparently excellent fit (high R², significant t-statistics) that is actually spurious
-jumbong.github.io
-. They documented examples of nonsense correlations where two unrelated economic series, each with strong time trends, produced R² values near 0.99 and yet no meaningful relationship existed
-jumbong.github.io
-. In one case, they found a published regression with an astounding R² = 0.999 alongside a Durbin-Watson statistic of 0.09, indicating highly autocorrelated residuals --- a red flag for spurious regression
-jumbong.github.io
-. The lesson is that failing to transform or preprocess time-series data to stationarity can create illusory relationships driven by common trends rather than true causation. This problem is another form of "garbage in": if one feeds trending data into a linear model without precautions, the output will dutifully report a relationship (almost any two increasing series will correlate over time) --- an obvious garbage result. Modern econometric practice therefore emphasizes data preprocessing steps (taking logarithms, differences, removing trends or seasonality) to avoid such pitfalls. The need for these standardizing transformations is well supported by research. It has been shown that once data are rendered stationary and free of trend, spurious significance levels fall to normal rates
-jumbong.github.io
-. In sum, appropriate preprocessing of time-series (a form of standardization across time) is critical to obtaining reliable inference and not mistaking noise for signal.
-
-\paragraph{Data Snooping and Overfitting}
-A related concern in the realm of quantitative finance is data-snooping bias --- the false discoveries that occur when one mines a dataset for many possible patterns without proper adjustment. While this is more of a methodological issue than a data quality issue per se, it is worth noting as a cautionary tale that if one dredges "garbage data" hard enough, one will always find something. Sullivan, Timmermann, and White \cite{Sullivan1999} applied rigorous statistical checks to a large number of technical trading rules that had seemingly been profitable in past U.S. stock data. Publishing in the Journal of Finance, they showed that once one accounts for the fact that dozens of rules were tried (via White's Reality Check bootstrap), the vast majority of supposed "winning" trading strategies had no genuine predictive ---
-researchgate.net
-. Many earlier studies that lacked such corrections had overfit the data, effectively reporting noise as if it were a tradable signal
-researchgate.net
-. This reinforces the broader point: analyses conducted on poorly vetted or overly mined data can always produce some pattern of interest, but without out-of-sample validation or standardized methodologies, these are likely to be mirages. Ensuring data are partitioned properly (training vs. test sets, avoiding look-ahead bias where future information leaks into past data) is a form of maintaining data integrity in predictive modeling. The academic finance literature now contains countless factors and strategies discovered in historical data; however, as Harvey, Liu, and Zhu \cite{Harvey2016} argue in the Review of Financial Studies, many of these fail to hold up out-of-sample, suggesting that data-snooping and noise-fitting were at play. The community's response has been to demand higher standards of evidence (e.g. out-of-sample tests, multiple-comparison adjustments) --- essentially, more robust data handling --- before accepting new "discoveries." This again highlights how disciplined data practices filter out spurious results.---
-In all the above cases, the central theme is that poor data quality --- whether through biased sampling, inconsistent definitions, measurement error, or inadequate preprocessing --- can create false findings. These findings might look convincing (they may even be statistically significant or published in respected outlets), but they do not generalize or hold up under scrutiny because they are artifacts of faulty data. For researchers, analysts, and decision-makers, the implications are clear: one must critically assess data quality at the outset, or risk being led astray by garbage-in effects.
 
 \section{Literature Review and Related Work}
 \label{sec:literature}
@@ -334,327 +278,6 @@ In all the above cases, the central theme is that poor data quality --- whether 
 % WRDS, Bloomberg, and other data sources
 
 [Repository overview content to be filled in...]
-
-\section{Asset Class Datasets}
-\label{sec:asset_classes}
-
-% TODO: Document each asset class dataset with its canonical cleaning method
-% For EACH asset class, create a subsection that includes:
-% - Which specific paper's cleaning method is being replicated
-% - Why this dataset/asset class is important for macro-finance
-% - Key cleaning decisions and their justifications
-% - Summary statistics that match the original paper (proving correct replication)
-
-Following \cite{He2017}, we include comprehensive datasets across multiple asset classes, each cleaned according to canonical methods from the academic literature.
-
-\subsection{Equity Markets}
-\label{sec:equity}
-% Fama-French 25 portfolios and CRSP universe
-% Explain exclusion of small stocks, ADRs, etc. following Fama-French (1993)
-
-The equity dataset follows \cite{Fama1993}, whose cleaning methodology has become the canonical approach in asset pricing research, establishing the foundation for thousands of subsequent studies. The essential data transformations in Fama-French are critical for avoiding common pitfalls in equity research. First, their precise definition of book equity carefully accounts for balance sheet complexities: book value of stockholders' equity plus deferred taxes and investment tax credits minus the book value of preferred stock, with a hierarchical approach to valuing preferred stock (redemption, liquidation, or par value). This standardization is crucial because inconsistent book equity definitions can dramatically alter value factor exposures and lead to spurious results. Second, their exclusion criteria eliminate securities that would contaminate standard equity analysis: ADRs (which reflect foreign market dynamics), REITs and units of beneficial interest (which have fundamentally different cash flow structures), and firms with negative book equity (which represent financial distress and behave differently from normal equity securities). Third, their timing conventions—forming portfolios in June using market equity from June and book equity from fiscal year $t-1$—ensure that accounting information would have been publicly available to investors, avoiding look-ahead bias that has plagued many studies. Fourth, they require firms to appear on COMPUSTAT for two years before inclusion, directly addressing the survivorship bias documented by \cite{Banz1986} where COMPUSTAT retroactively adds successful firms' histories. Finally, using NYSE breakpoints for size and book-to-market sorting prevents the results from being dominated by the numerous small NASDAQ and AMEX stocks that entered the sample after 1972. These seemingly technical choices have profound impacts: studies that deviate from these conventions often find dramatically different results, and the stability of the size and value effects across decades of out-of-sample testing validates these careful data handling procedures. By open-sourcing code that implements these exact transformations, we enable researchers to avoid the numerous subtle errors that can arise when attempting to reconstruct this canonical dataset from raw CRSP and COMPUSTAT data.
-
-\subsection{US Treasuries}
-\label{sec:treasuries}
-% CRSP maturity-sorted portfolios Treasuries
-
-The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns, forming the foundation for the Federal Reserve's own yield curve estimates and numerous fixed income studies. The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes (excluding bills and other security types) is fundamental because callable bonds embed optionality that contaminates pure interest rate risk measurement—a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns that would distort any analysis of term structure dynamics. Second, the focus on bonds with remaining maturity between 0 and 5 years reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, while the 0-5 year segment represents the most actively traded Treasury securities where price discovery is most efficient. Third, the careful handling of accrued interest in return calculations is essential because, unlike equities, bond prices quote clean (without accrued interest) while returns must include coupon payments—failure to properly account for this leads to dramatic miscalculation of returns around coupon dates. Fourth, the requirement for complete price and maturity information eliminates bonds with sporadic trading or ambiguous terms that could introduce noise into yield curve estimation. Fifth, the use of month-end observations for portfolio aggregation avoids the substantial day-of-month effects in Treasury markets driven by auction cycles, month-end portfolio rebalancing, and futures contract rolls. These seemingly technical choices have profound implications: studies that use all available Treasury data without these filters often find spurious term premia and unstable factor loadings, while the Gürkaynak, Sack, and Wright approach produces stable estimates that closely match dealer quotes and futures-implied yields. By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
-
-\subsection{Corporate Bonds}
-\label{sec:corporate_bonds}
-% Nozawa (2017) yield-spread sorted portfolios
-The corporate bond returns data comes from the \textbf{TRACE (Trade Reporting and Compliance Engine)} dataset available at openbondassetpricing.com, following the methodology of Nozawa (2017). The data includes:
-
-\begin{itemize}
-    \item \textbf{Market microstructure adjustments}: Corrections for market microstructure noise (MMN) to enhance bond price and return reliability
-    \item \textbf{Data filters}: Stringent quality filters including U.S.-domiciled firms only, exclusion of private placements and convertible bonds
-    \item \textbf{Coverage}: Corporate bonds with sufficient outstanding amounts and complete information
-    \item \textbf{Key fields}: MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads
-\end{itemize}
-
-\paragraph{Data Standardization:}
-
-The cleaning procedure follows the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM).
-
-\begin{enumerate}
-    \item \textbf{Bond Selection Criteria}:
-    \begin{itemize}
-        \item Bonds with floating rate coupons are excluded
-        \item Non-callable option features (puts, convertibles) are excluded, while callable bonds are retained
-        \item Observations where corporate bond price exceeds matched Treasury price are removed
-        \item Bonds with price less than \$0.01 per \$1 face value are dropped
-    \end{itemize}
-
-    \item \textbf{Return Processing}:
-    \begin{itemize}
-        \item Return reversals are eliminated if the product of adjacent returns is less than -0.04
-        \item Monthly returns are computed to avoid reinvestment assumptions
-    \end{itemize}
-
-    \item \textbf{Synthetic Treasury Construction}:
-    \begin{itemize}
-        \item Synthetic Treasury bonds with identical cash flow structure are constructed for each corporate bond
-        \item Treasury prices are based on Federal Reserve constant-maturity yield data
-        \item Excess returns and credit spreads are computed in price terms rather than yield spreads
-    \end{itemize}
-
-    \item \textbf{Portfolio Construction}:
-    \begin{itemize}
-        \item Bonds are sorted into deciles based on credit spread (CS) within each date
-        \item Value-weighted portfolio returns are calculated using bond values as weights
-        \item Bond value is computed as the product of MMN-adjusted clean price and amount outstanding
-    \end{itemize}
-
-    \item \textbf{Data Quality}:
-    \begin{itemize}
-        \item Defaults are verified using Moody's Default Risk Service
-        \item CRSP and Compustat data supplement equity and accounting information
-        \item Callable bonds are accounted for using fixed effects in regression models
-    \end{itemize}
-\end{enumerate}
-
-The final output is a dataset with monthly corporate bond portfolio returns across credit spread deciles, suitable for credit risk analysis and comparison with other bond market data.
-The constructed corporate bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for corporate bond returns across different credit spread deciles. Figure \textbf{PLACEHOLDER} shows the time series comparison between the two datasets, demonstrating strong alignment in return patterns across deciles, particularly during volatile periods such as the 2008 financial crisis.
-
-\subsection{Sovereign Bonds}
-\label{sec:sovereign}
-% Borri and Verdelhan (2012) portfolios
-
-\subsection{Options}
-\label{sec:options}
-% Constantinides, Jackwerth and Savov (2013) S&P 500 portfolios
-
-\subsection{Foreign Exchange}
-\label{sec:fx}
-% Lettau et al. (2014) and Menkhoff et al. (2012)
-
-\subsection{Commodities}
-\label{sec:commodities}
-% Yang (2013) methodology
-
-\subsection{Credit Default Swaps}
-\label{sec:cds}
-% Markit data following Palhares (2013)
-
-[Asset class content to be filled in...]
-
-\section{Arbitrage Spread Datasets}
-\label{sec:arbitrage}
-
-% TODO: Document each arbitrage spread construction
-% For EACH arbitrage spread:
-% - Explain the economic intuition behind the trade
-% - Detail the exact construction methodology
-% - Show replication of statistics from Siriwardane et al.
-% - Discuss what violations of these spreads tell us about market segmentation
-
-Following \cite{Siriwardane2021}, we construct various arbitrage spreads that measure market segmentation.
-
-\subsection{Covered Interest Parity (CIP)}
-% Construction using spot, forward FX and interest rates
-     
-
-During periods of market stress, such as the 2008 financial crisis and the 2020 COVID-19
-pandemic, covered interest parity (CIP) may no longer hold as the forward---spot differential 
-no longer exactly offsets interest‐rate differentials. Factors contributing to this phenomenon include:
-Heightened Counterparty‐Credit Risk, Liquidity Constraints, or Regulatory Pressures.
-
-In other periods, deviations from CIP typically stem from market inefficiencies and are 
-small in magnitude and are short-lived in timeframe due to arbitrage activities.
-
-Our analysis examines CIP deviations across eight G10 currencies against the USD, 
-using data from 1999 onwards sourced through Bloomberg Terminal.
-
-\paragraph{The dataset includes:}
-\begin{itemize}
-    \item Spot exchange rates for each currency pair
-    \item 3-month forward points for each currency pair
-    \item 3-month Overnight Index Swap (OIS) rates for each currency
-\end{itemize}
-
-\paragraph{Data Standardization:}
-\begin{itemize}
-    \item Forward points are scaled appropriately (per 10,000 for most currencies, per 100 for JPY)
-    \item Currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) are converted to reciprocal rates for consistency
-    \item OIS rates serve as our risk-free benchmark to align with other arbitrage spread studies
-\end{itemize}
-
-We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2023),
-as seen in this side by side comparison of our calculated currency respective
-arbitrage spreads versus those reported in their paper.
-
-\begin{figure}[htbp]
-  \centering
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{logo.png}
-    \\[1ex] % small vertical gap
-    {\small (a) Findings in Siriwardane et al. (2023)}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{logo.png}
-    \\[1ex]
-    {\small (b) Our findings}
-  \end{minipage}
-  \caption{IMAGES ARE PLACE HOLDERS}
-  \label{fig:comparison-minipage}
-\end{figure}
-
-During the overlapping periods of both datasets, the CIP spreads are nearly identical.
-Our findings confirm the presence of CIP deviations, particularly during periods of
-market stress, consistent with the conclusions drawn by Siriwardane et al. (2023).
-
-
-\subsection{Box Spread Arbitrage}
-% Options-based arbitrage using put-call parity
-
-\subsection{Equity Spot-Futures Basis}
-% Cash vs futures arbitrage
-
-\subsection{Treasury Spot-Futures Basis}
-% Government bond basis trades
-
-\subsection{Treasury-Swap Spread}
-% Treasury vs interest rate swap arbitrage
-
-\subsection{TIPS-Treasury Spread}
-% Inflation-linked vs nominal bond spreads
-
-\subsection{CDS-Bond Basis}
-% Credit default swap vs cash bond arbitrage
-
-Credit Default Swaps (CDS) are "insurance contracts" against the default of underlying
-corporate debt. The buyer of CDS protection pays a the CDS spread as a 
-fixed annuity premium to the seller for a horizon $\tau$. If there is a default
-before the time horizon $\tau$, the buyer receives the difference between
-the bond's par value and its market value from the seller. 
-As a result, the payoff of this portfolio should not deviate from the risk free bond. The resulting difference
-between CDS spread and floating rate spread is defined by the authors as the CDS-basis.
-
-The authors define the CDS basis (CB) as
-
-\begin{equation}
-  CB_{i,t,\tau} \;=\; CDS_{i,t,\tau} \;-\; FR_{i,t,\tau},
-\end{equation}
-
-where:
-\begin{itemize}
-  \item $FR_{i,t,\tau}$ = time $t$ floating‐rate spread implied by a fixed‐rate corporate bond issued by firm $i$ at tenor $\tau$,
-  \item $CDS_{i,t,\tau}$ = time $t$ Credit Default Swap (CDS) par spread for firm $i$ with tenor $\tau$.
-\end{itemize}
-
-A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. 
-The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
-
-The value of $FR$ is substituted by the paper with Z‐spread which we also modify in our construction. We address the substitution in detail later.
-
-The value of CDS par spread is interpolated by the authors using a cubic spline function as
-not all necessary tenors are present.
-
-Given the CDS spread from above, traditional construction of a risk‐free rate for implied arbitrage implies the following return:
-
-\begin{equation}
-  rfr^{CDS}_{i,t,\tau} \;=\; y_{t,\tau} \;-\; CB_{i,t,\tau},
-\end{equation}
-
-where:
-\begin{itemize}
-  \item $y_{t,\tau}$ = maturity‐matched Treasury yield at time $t$.
-\end{itemize}
-
-The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
-
-\subsubsection{Z-Spread (Zero-Volatility Spread)}
-
-\paragraph*{Mathematical definition}
-For a bond with cash-flows $CF_t$ at times $t=1,\dots,N$ and Treasury spot rates $s_t$,
-\begin{equation*}
-P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
-\end{equation*}
-The constant $Z$ that solves this equation is the \textbf{Z-spread}.
-
-\paragraph*{Intuition}
-$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond’s dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
-
-\paragraph*{Link to Yield-to-Maturity}
-Setting the Z-spread pricing equation equal to the standard YTM equation gives
-\begin{equation}
-\label{eq:ytm_z_spread}
-\sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
-=\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
-\end{equation}
-where $y$ is the bond’s yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
-
-\paragraph*{Continuous-Compounding Identity}
-Rewrite discounts as $e^{-r t}$. With PV-weights
-\begin{equation*}
-w_t=\frac{CF_t\,e^{-(s_t+Z)t}}{P},\qquad\sum_{t}w_t=1,
-\end{equation*}
-equation (\ref{eq:ytm_z_spread}) yields the convenient mean-value relationship
-\begin{equation}
-y \;=\; \sum_{t=1}^{N} w_t\,(s_t+Z)\tag{A2}
-\end{equation}
-Thus YTM is the PV-weighted average of the spot rates plus the Z-spread.
-
-\paragraph*{Practical Proxy: YTM Credit Spread}
-Analysts often approximate $Z$ with the \textbf{credit spread}
-\begin{equation*}
-\Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
-\end{equation*}
-where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond’s (modified) duration.
-
-\paragraph*{Why it works}
-\begin{enumerate}
-    \item A small parallel shift $Z$ applied to all discount rates changes price by $-D_{\text{mod}}\;Z$. For modest spreads, this produces nearly the same price change as replacing the spot curve with a single rate shift $\Delta y$.
-    \item Duration-matching the Treasury benchmark neutralises curve-shape effects, so $\Delta y$ isolates the average extra yield attributable to credit/liquidity risk.
-    \item Empirically, $\Delta y$ tracks $Z$ closely for plain-vanilla, option-free bonds, making it a ``good-enough'' proxy when full spot-curve data or iterative Z-spread calculations are impractical.
-\end{enumerate}
-
-\paragraph*{Note}
-Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
-
-
-\begin{figure}[htbp]
-  \centering
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{logo.png}
-    \\[1ex] % small vertical gap
-    {\small (a) Findings in Siriwardane et al. (2023)}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{logo.png}
-    \\[1ex]
-    {\small (b) Our findings}
-  \end{minipage}
-  \caption{IMAGES ARE PLACE HOLDERS}
-  \label{fig:comparison-minipage}
-\end{figure}
-
-
-
-\section{Additional Financial Datasets}
-\label{sec:additional_datasets}
-
-% TODO: Document datasets for macroeconomic forecasting and financial stability monitoring
-
-\subsection{Bank Call Report Data}
-% NYU archive (Schnabl)
-
-\subsection{Treasury Yield Curve}
-% Fed data following Gürkaynak et al.
-
-\subsection{Macroeconomic Indicators}
-% FRED-MD and other macro series
-
-\subsection{Bank-Specific Metrics}
-% Using WRDS Bank Premium
-
-[Additional datasets content to be filled in...]
 
 \section{Replication Results and Validation}
 \label{sec:replication}
@@ -879,23 +502,407 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
 
 We would like to thank the following individuals. With their permission, we have adapted and used pieces of their code in this repository: Om Mehta and Kunj Shah for their replication of the Covered Interest Rate Parity (CIP) arbitrage spreads; Kyle Parran and Duncan Park for their replication of commodity futures returns.
 
+
+\bibliographystyle{jpe}
+\bibliography{bibliography}
+
 % TODO: Add additional acknowledgments
 
-\appendix
+\begin{appendices}
 
-\section{Data Descriptions}
-\label{app:data_descriptions}
+\section{Data Cleaning Procedures and Replications}
+\label{app:data_cleaning_and_replications}
 % Detailed descriptions of each dataset
 
-\section{Additional Results}
+\subsection{Asset Class Datasets}
+\label{sec:asset_classes}
+
+% TODO: Document each asset class dataset with its canonical cleaning method
+% For EACH asset class, create a subsection that includes:
+% - Which specific paper's cleaning method is being replicated
+% - Why this dataset/asset class is important for macro-finance
+% - Key cleaning decisions and their justifications
+% - Summary statistics that match the original paper (proving correct replication)
+
+Following \cite{He2017}, we include comprehensive datasets across multiple asset classes, each cleaned according to canonical methods from the academic literature.
+
+\subsubsection{Equity Markets}
+\label{sec:equity}
+% Fama-French 25 portfolios and CRSP universe
+% Explain exclusion of small stocks, ADRs, etc. following Fama-French (1993)
+
+The equity dataset follows \cite{Fama1993}, whose cleaning methodology has become the canonical approach in asset pricing research, establishing the foundation for thousands of subsequent studies. The essential data transformations in Fama-French are critical for avoiding common pitfalls in equity research. First, their precise definition of book equity carefully accounts for balance sheet complexities: book value of stockholders' equity plus deferred taxes and investment tax credits minus the book value of preferred stock, with a hierarchical approach to valuing preferred stock (redemption, liquidation, or par value). This standardization is crucial because inconsistent book equity definitions can dramatically alter value factor exposures and lead to spurious results. Second, their exclusion criteria eliminate securities that would contaminate standard equity analysis: ADRs (which reflect foreign market dynamics), REITs and units of beneficial interest (which have fundamentally different cash flow structures), and firms with negative book equity (which represent financial distress and behave differently from normal equity securities). Third, their timing conventions—forming portfolios in June using market equity from June and book equity from fiscal year $t-1$—ensure that accounting information would have been publicly available to investors, avoiding look-ahead bias that has plagued many studies. Fourth, they require firms to appear on COMPUSTAT for two years before inclusion, directly addressing the survivorship bias documented by \cite{Banz1986} where COMPUSTAT retroactively adds successful firms' histories. Finally, using NYSE breakpoints for size and book-to-market sorting prevents the results from being dominated by the numerous small NASDAQ and AMEX stocks that entered the sample after 1972. These seemingly technical choices have profound impacts: studies that deviate from these conventions often find dramatically different results, and the stability of the size and value effects across decades of out-of-sample testing validates these careful data handling procedures. By open-sourcing code that implements these exact transformations, we enable researchers to avoid the numerous subtle errors that can arise when attempting to reconstruct this canonical dataset from raw CRSP and COMPUSTAT data.
+
+\subsubsection{US Treasuries}
+\label{sec:treasuries}
+% CRSP maturity-sorted portfolios Treasuries
+
+The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns, forming the foundation for the Federal Reserve's own yield curve estimates and numerous fixed income studies. The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes (excluding bills and other security types) is fundamental because callable bonds embed optionality that contaminates pure interest rate risk measurement—a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns that would distort any analysis of term structure dynamics. Second, the focus on bonds with remaining maturity between 0 and 5 years reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, while the 0-5 year segment represents the most actively traded Treasury securities where price discovery is most efficient. Third, the careful handling of accrued interest in return calculations is essential because, unlike equities, bond prices quote clean (without accrued interest) while returns must include coupon payments—failure to properly account for this leads to dramatic miscalculation of returns around coupon dates. Fourth, the requirement for complete price and maturity information eliminates bonds with sporadic trading or ambiguous terms that could introduce noise into yield curve estimation. Fifth, the use of month-end observations for portfolio aggregation avoids the substantial day-of-month effects in Treasury markets driven by auction cycles, month-end portfolio rebalancing, and futures contract rolls. These seemingly technical choices have profound implications: studies that use all available Treasury data without these filters often find spurious term premia and unstable factor loadings, while the Gürkaynak, Sack, and Wright approach produces stable estimates that closely match dealer quotes and futures-implied yields. By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
+
+\subsubsection{Corporate Bonds}
+\label{sec:corporate_bonds}
+% Nozawa (2017) yield-spread sorted portfolios
+The corporate bond returns data comes from the \textbf{TRACE (Trade Reporting and Compliance Engine)} dataset available at openbondassetpricing.com, following the methodology of Nozawa (2017). The data includes:
+
+\begin{itemize}
+    \item \textbf{Market microstructure adjustments}: Corrections for market microstructure noise (MMN) to enhance bond price and return reliability
+    \item \textbf{Data filters}: Stringent quality filters including U.S.-domiciled firms only, exclusion of private placements and convertible bonds
+    \item \textbf{Coverage}: Corporate bonds with sufficient outstanding amounts and complete information
+    \item \textbf{Key fields}: MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads
+\end{itemize}
+
+\paragraph{Data Standardization:}
+
+The cleaning procedure follows the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM).
+
+\begin{enumerate}
+    \item \textbf{Bond Selection Criteria}:
+    \begin{itemize}
+        \item Bonds with floating rate coupons are excluded
+        \item Non-callable option features (puts, convertibles) are excluded, while callable bonds are retained
+        \item Observations where corporate bond price exceeds matched Treasury price are removed
+        \item Bonds with price less than \$0.01 per \$1 face value are dropped
+    \end{itemize}
+
+    \item \textbf{Return Processing}:
+    \begin{itemize}
+        \item Return reversals are eliminated if the product of adjacent returns is less than -0.04
+        \item Monthly returns are computed to avoid reinvestment assumptions
+    \end{itemize}
+
+    \item \textbf{Synthetic Treasury Construction}:
+    \begin{itemize}
+        \item Synthetic Treasury bonds with identical cash flow structure are constructed for each corporate bond
+        \item Treasury prices are based on Federal Reserve constant-maturity yield data
+        \item Excess returns and credit spreads are computed in price terms rather than yield spreads
+    \end{itemize}
+
+    \item \textbf{Portfolio Construction}:
+    \begin{itemize}
+        \item Bonds are sorted into deciles based on credit spread (CS) within each date
+        \item Value-weighted portfolio returns are calculated using bond values as weights
+        \item Bond value is computed as the product of MMN-adjusted clean price and amount outstanding
+    \end{itemize}
+
+    \item \textbf{Data Quality}:
+    \begin{itemize}
+        \item Defaults are verified using Moody's Default Risk Service
+        \item CRSP and Compustat data supplement equity and accounting information
+        \item Callable bonds are accounted for using fixed effects in regression models
+    \end{itemize}
+\end{enumerate}
+
+The final output is a dataset with monthly corporate bond portfolio returns across credit spread deciles, suitable for credit risk analysis and comparison with other bond market data.
+The constructed corporate bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for corporate bond returns across different credit spread deciles. Figure \textbf{PLACEHOLDER} shows the time series comparison between the two datasets, demonstrating strong alignment in return patterns across deciles, particularly during volatile periods such as the 2008 financial crisis.
+
+\subsubsection{Sovereign Bonds}
+\label{sec:sovereign}
+% Borri and Verdelhan (2012) portfolios
+
+\subsubsection{Options}
+\label{sec:options}
+% Constantinides, Jackwerth and Savov (2013) S&P 500 portfolios
+
+\subsubsection{Foreign Exchange}
+\label{sec:fx}
+% Lettau et al. (2014) and Menkhoff et al. (2012)
+
+\subsubsection{Commodities}
+\label{sec:commodities}
+% Yang (2013) methodology
+
+\subsubsection{Credit Default Swaps}
+\label{sec:cds}
+% Markit data following Palhares (2013)
+
+[Asset class content to be filled in...]
+
+\subsection{Arbitrage Spread Datasets}
+\label{sec:arbitrage}
+
+% TODO: Document each arbitrage spread construction
+% For EACH arbitrage spread:
+% - Explain the economic intuition behind the trade
+% - Detail the exact construction methodology
+% - Show replication of statistics from Siriwardane et al.
+% - Discuss what violations of these spreads tell us about market segmentation
+
+Following \cite{Siriwardane2021}, we construct various arbitrage spreads that measure market segmentation.
+
+\subsubsection{Covered Interest Parity (CIP)}
+% Construction using spot, forward FX and interest rates
+     
+
+During periods of market stress, such as the 2008 financial crisis and the 2020 COVID-19
+pandemic, covered interest parity (CIP) may no longer hold as the forward---spot differential 
+no longer exactly offsets interest‐rate differentials. Factors contributing to this phenomenon include:
+Heightened Counterparty‐Credit Risk, Liquidity Constraints, or Regulatory Pressures.
+
+In other periods, deviations from CIP typically stem from market inefficiencies and are 
+small in magnitude and are short-lived in timeframe due to arbitrage activities.
+
+Our analysis examines CIP deviations across eight G10 currencies against the USD, 
+using data from 1999 onwards sourced through Bloomberg Terminal.
+
+\paragraph{The dataset includes:}
+\begin{itemize}
+    \item Spot exchange rates for each currency pair
+    \item 3-month forward points for each currency pair
+    \item 3-month Overnight Index Swap (OIS) rates for each currency
+\end{itemize}
+
+\paragraph{Data Standardization:}
+\begin{itemize}
+    \item Forward points are scaled appropriately (per 10,000 for most currencies, per 100 for JPY)
+    \item Currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) are converted to reciprocal rates for consistency
+    \item OIS rates serve as our risk-free benchmark to align with other arbitrage spread studies
+\end{itemize}
+
+We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2023),
+as seen in this side by side comparison of our calculated currency respective
+arbitrage spreads versus those reported in their paper.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex] % small vertical gap
+    {\small (a) Findings in Siriwardane et al. (2023)}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex]
+    {\small (b) Our findings}
+  \end{minipage}
+  \caption{IMAGES ARE PLACE HOLDERS}
+  \label{fig:comparison-minipage}
+\end{figure}
+
+During the overlapping periods of both datasets, the CIP spreads are nearly identical.
+Our findings confirm the presence of CIP deviations, particularly during periods of
+market stress, consistent with the conclusions drawn by Siriwardane et al. (2023).
+
+
+\subsubsection{Box Spread Arbitrage}
+% Options-based arbitrage using put-call parity
+
+\subsubsection{Equity Spot-Futures Basis}
+% Cash vs futures arbitrage
+
+\subsubsection{Treasury Spot-Futures Basis}
+% Government bond basis trades
+
+\subsubsection{Treasury-Swap Spread}
+% Treasury vs interest rate swap arbitrage
+
+\subsubsection{TIPS-Treasury Spread}
+% Inflation-linked vs nominal bond spreads
+
+\subsubsection{CDS-Bond Basis}
+% Credit default swap vs cash bond arbitrage
+
+Credit Default Swaps (CDS) are "insurance contracts" against the default of underlying
+corporate debt. The buyer of CDS protection pays a the CDS spread as a 
+fixed annuity premium to the seller for a horizon $\tau$. If there is a default
+before the time horizon $\tau$, the buyer receives the difference between
+the bond's par value and its market value from the seller. 
+As a result, the payoff of this portfolio should not deviate from the risk free bond. The resulting difference
+between CDS spread and floating rate spread is defined by the authors as the CDS-basis.
+
+The authors define the CDS basis (CB) as
+
+\begin{equation}
+  CB_{i,t,\tau} \;=\; CDS_{i,t,\tau} \;-\; FR_{i,t,\tau},
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $FR_{i,t,\tau}$ = time $t$ floating‐rate spread implied by a fixed‐rate corporate bond issued by firm $i$ at tenor $\tau$,
+  \item $CDS_{i,t,\tau}$ = time $t$ Credit Default Swap (CDS) par spread for firm $i$ with tenor $\tau$.
+\end{itemize}
+
+A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. 
+The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
+
+The value of $FR$ is substituted by the paper with Z‐spread which we also modify in our construction. We address the substitution in detail later.
+
+The value of CDS par spread is interpolated by the authors using a cubic spline function as
+not all necessary tenors are present.
+
+Given the CDS spread from above, traditional construction of a risk‐free rate for implied arbitrage implies the following return:
+
+\begin{equation}
+  rfr^{CDS}_{i,t,\tau} \;=\; y_{t,\tau} \;-\; CB_{i,t,\tau},
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $y_{t,\tau}$ = maturity‐matched Treasury yield at time $t$.
+\end{itemize}
+
+The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
+
+\subsubsection{Z-Spread (Zero-Volatility Spread)}
+
+\paragraph*{Mathematical definition}
+For a bond with cash-flows $CF_t$ at times $t=1,\dots,N$ and Treasury spot rates $s_t$,
+\begin{equation*}
+P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
+\end{equation*}
+The constant $Z$ that solves this equation is the \textbf{Z-spread}.
+
+\paragraph*{Intuition}
+$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond’s dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
+
+\paragraph*{Link to Yield-to-Maturity}
+Setting the Z-spread pricing equation equal to the standard YTM equation gives
+\begin{equation}
+\label{eq:ytm_z_spread}
+\sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
+=\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
+\end{equation}
+where $y$ is the bond’s yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
+
+\paragraph*{Continuous-Compounding Identity}
+Rewrite discounts as $e^{-r t}$. With PV-weights
+\begin{equation*}
+w_t=\frac{CF_t\,e^{-(s_t+Z)t}}{P},\qquad\sum_{t}w_t=1,
+\end{equation*}
+equation (\ref{eq:ytm_z_spread}) yields the convenient mean-value relationship
+\begin{equation}
+y \;=\; \sum_{t=1}^{N} w_t\,(s_t+Z)\tag{A2}
+\end{equation}
+Thus YTM is the PV-weighted average of the spot rates plus the Z-spread.
+
+\paragraph*{Practical Proxy: YTM Credit Spread}
+Analysts often approximate $Z$ with the \textbf{credit spread}
+\begin{equation*}
+\Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
+\end{equation*}
+where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond’s (modified) duration.
+
+\paragraph*{Why it works}
+\begin{enumerate}
+    \item A small parallel shift $Z$ applied to all discount rates changes price by $-D_{\text{mod}}\;Z$. For modest spreads, this produces nearly the same price change as replacing the spot curve with a single rate shift $\Delta y$.
+    \item Duration-matching the Treasury benchmark neutralises curve-shape effects, so $\Delta y$ isolates the average extra yield attributable to credit/liquidity risk.
+    \item Empirically, $\Delta y$ tracks $Z$ closely for plain-vanilla, option-free bonds, making it a ``good-enough'' proxy when full spot-curve data or iterative Z-spread calculations are impractical.
+\end{enumerate}
+
+\paragraph*{Note}
+Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex] % small vertical gap
+    {\small (a) Findings in Siriwardane et al. (2023)}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{logo.png}
+    \\[1ex]
+    {\small (b) Our findings}
+  \end{minipage}
+  \caption{IMAGES ARE PLACE HOLDERS}
+  \label{fig:comparison-minipage}
+\end{figure}
+
+
+
+\subsection{Additional Financial Datasets}
+\label{sec:additional_datasets}
+
+% TODO: Document datasets for macroeconomic forecasting and financial stability monitoring
+
+\subsubsection{Bank Call Report Data}
+% NYU archive (Schnabl)
+
+\subsubsection{Treasury Yield Curve}
+% Fed data following Gürkaynak et al.
+
+\subsubsection{Macroeconomic Indicators}
+% FRED-MD and other macro series
+
+\subsubsection{Bank-Specific Metrics}
+% Using WRDS Bank Premium
+
+[Additional datasets content to be filled in...]
+
+
+\subsection{Additional Results}
 \label{app:additional_results}
 % Extended results tables and robustness checks
 
-\bibliographystyle{jpe}
-\bibliography{bibliography}
+\subsection{Recyling Bin}
+% Temporary holding area for text that might not make it into the main text
 
-\end{document}
-\bibliographystyle{jpe}
-\bibliography{bibliography}
+
+\subsection{The Consequences of Poor Data Quality in Analysis}
+\label{sec:consequences_of_poor_data_quality}
+An important feature of this paper, and the accompanying data repository, is that we provide a set of data that is cleaned and formatted in a way that matches best practices established within the corresponding academic literature. 
+Analyses based on incomplete, biased, or inconsistent datasets can lead to spurious results. For example, researchers in finance have documented several specific mechanisms by which poor data quality can mislead conclusions.
+
+\paragraph{Survivorship Bias}
+Perhaps the most cited data issue in performance studies, survivorship bias occurs when only surviving or successful entities in a dataset are observed, while failed or defunct entities are absent. This selective sampling can dramatically skew results.
+See \cite{Brown1992} or \cite{Brown1995} for seminal studies demonstrating that the apparent persistence or predictability in mutual fund returns was largely an artifact of survivorship bias.
+
+\paragraph{Selection and Instant History Bias}
+Related to survivorship bias are selection biases arising from how and when data are reported. In the context of hedge funds and other lightly regulated investments, researchers have noted that managers often have discretion over reporting, which can lead to instant history (backfill) bias. Instant history bias means that a fund might report its track record only after a streak of strong returns, effectively "backfilling" the database with only the good outcomes. This practice hides the early losses or failed ventures from view. See for example, \cite{Fung2000}, who found that accounting for backfill bias reduced average hedge fund returns by several percentage points per year.
+
+\paragraph{Measurement Errors}
+Even when all relevant cases are included, errors in the data itself (inaccurate measurements, typos, misclassifications, etc.) can bias results. In econometrics, it is well-established that classical measurement error in an independent variable will attenuate regression coefficients towards zero, masking true relationships. For instance, if a researcher uses an imperfect proxy or noisy measure of a firm's earnings, any estimated effect of earnings on stock returns will be biased downward (toward zero) due to the noise. Pioneering econometric analyses (e.g. \cite{Griliches1986} and \cite{Bound2001}) showed that measurement error can be a major source of bias, sometimes even more severe than omitted variable bias in certain cases.
+
+The mechanism is that the error in the explanatory variable gets absorbed into the regression's disturbance term, violating assumptions and leading to inconsistent estimates
+econ.lse.ac.uk
+. The consequence is that real economic signals may be drowned out by data noise. High-profile examples of measurement error causing spurious findings are sobering. A notable case involved Reinhart and Rogoff's influential study on public debt and growth \cite{Reinhart2010}, which concluded that countries with debt-to-GDP above 90% experience dramatically lower growth. When Herndon, Ash, and Pollin \cite{Herndon2014} attempted to replicate the result, they discovered coding errors and selective data exclusions in the original spreadsheet
+retractionwatch.com
+. These data issues, once corrected, entirely changed the conclusion: the sharp growth cliff at 90% debt largely disappeared
+retractionwatch.com
+. The Reinhart-Rogoff episode, documented in a subsequent published critique, revealed that a spreadsheet transcription error and omission of several countries' data had led to a false econometric result with far-reaching policy implications
+retractionwatch.com
+. This case underscores that even renowned studies can suffer from "garbage in" when data are mishandled --- and that replicating analysis with cleaned, corrected data is essential to validate findings.
+
+\paragraph{Non-Standard Definitions and Inconsistent Data}
+A more subtle problem arises when data are not standardized across sources or over time. If different companies or countries define metrics differently, any comparative analysis becomes apples-to-oranges. For example, in macroeconomics, price indices and GDP figures must be standardized (using purchasing power parity adjustments, consistent base years, etc.) to be meaningfully compared across countries. Summers and Heston \cite{Summers1991} demonstrated this by constructing the Penn World Table, a comprehensive set of national accounts data expressed in common terms
+econdata.com
+. Prior to their work, cross-country income comparisons were fraught with inconsistencies --- each nation's statistics were based on its own definitions and currencies. Summers and Heston's standardized data enabled economists to obtain unbiased comparisons of GDP and growth rates across ---
+econdata.com
+. The result was a wave of robust findings in growth economics that would have been impossible with non-standardized national data. Likewise, in finance, using current stock index membership to backtest historical performance (instead of using the actual historical index constituents at each point in time) introduces survivorship bias and inconsistency
+en.wikipedia.org
+en.wikipedia.org
+. An analysis that erroneously treats the present S\&P 500 members as if they existed in 1990 will ignore all the companies that were in the index then but failed later, thereby overstating historical returns
+en.wikipedia.org
+en.wikipedia.org
+. This highlights the importance of using data that are aligned to a common standard or definition appropriate to the analysis --- whether that means consistent accounting standards, index definitions, or economic variable calculations. Without such standardization, researchers may draw incorrect inferences simply because data series are not comparable.
+
+\paragraph{Spurious Correlations from Non-Stationarity}
+In time-series analysis, a classic data pitfall is using non-stationary (e.g. trending) data in regression without proper detrending or differencing. Granger and Newbold famously warned that regressing one growing time series on another can yield an apparently excellent fit (high R², significant t-statistics) that is actually spurious
+jumbong.github.io
+. They documented examples of nonsense correlations where two unrelated economic series, each with strong time trends, produced R² values near 0.99 and yet no meaningful relationship existed
+jumbong.github.io
+. In one case, they found a published regression with an astounding R² = 0.999 alongside a Durbin-Watson statistic of 0.09, indicating highly autocorrelated residuals --- a red flag for spurious regression
+jumbong.github.io
+. The lesson is that failing to transform or preprocess time-series data to stationarity can create illusory relationships driven by common trends rather than true causation. This problem is another form of "garbage in": if one feeds trending data into a linear model without precautions, the output will dutifully report a relationship (almost any two increasing series will correlate over time) --- an obvious garbage result. Modern econometric practice therefore emphasizes data preprocessing steps (taking logarithms, differences, removing trends or seasonality) to avoid such pitfalls. The need for these standardizing transformations is well supported by research. It has been shown that once data are rendered stationary and free of trend, spurious significance levels fall to normal rates
+jumbong.github.io
+. In sum, appropriate preprocessing of time-series (a form of standardization across time) is critical to obtaining reliable inference and not mistaking noise for signal.
+
+\paragraph{Data Snooping and Overfitting}
+A related concern in the realm of quantitative finance is data-snooping bias --- the false discoveries that occur when one mines a dataset for many possible patterns without proper adjustment. While this is more of a methodological issue than a data quality issue per se, it is worth noting as a cautionary tale that if one dredges "garbage data" hard enough, one will always find something. Sullivan, Timmermann, and White \cite{Sullivan1999} applied rigorous statistical checks to a large number of technical trading rules that had seemingly been profitable in past U.S. stock data. Publishing in the Journal of Finance, they showed that once one accounts for the fact that dozens of rules were tried (via White's Reality Check bootstrap), the vast majority of supposed "winning" trading strategies had no genuine predictive ---
+researchgate.net
+. Many earlier studies that lacked such corrections had overfit the data, effectively reporting noise as if it were a tradable signal
+researchgate.net
+. This reinforces the broader point: analyses conducted on poorly vetted or overly mined data can always produce some pattern of interest, but without out-of-sample validation or standardized methodologies, these are likely to be mirages. Ensuring data are partitioned properly (training vs. test sets, avoiding look-ahead bias where future information leaks into past data) is a form of maintaining data integrity in predictive modeling. The academic finance literature now contains countless factors and strategies discovered in historical data; however, as Harvey, Liu, and Zhu \cite{Harvey2016} argue in the Review of Financial Studies, many of these fail to hold up out-of-sample, suggesting that data-snooping and noise-fitting were at play. The community's response has been to demand higher standards of evidence (e.g. out-of-sample tests, multiple-comparison adjustments) --- essentially, more robust data handling --- before accepting new "discoveries." This again highlights how disciplined data practices filter out spurious results.---
+In all the above cases, the central theme is that poor data quality --- whether through biased sampling, inconsistent definitions, measurement error, or inadequate preprocessing --- can create false findings. These findings might look convincing (they may even be statistically significant or published in respected outlets), but they do not generalize or hold up under scrutiny because they are artifacts of faulty data. For researchers, analysts, and decision-makers, the implications are clear: one must critically assess data quality at the outset, or risk being led astray by garbage-in effects.
+
+
+\end{appendices}
+
 
 \end{document}
