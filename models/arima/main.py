@@ -8,17 +8,14 @@ median MASE for local forecasts.
 from pathlib import Path
 from warnings import filterwarnings
 import os
-# Ignoring warnings
-
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-
+# Darts-based imports
 from darts.models import ARIMA
 from darts import TimeSeries
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
-
 from darts.metrics import mase
 
 filterwarnings("ignore")
@@ -71,11 +68,14 @@ if __name__ == "__main__":
     is_balanced = os.environ["FTSFR_IS_BALANCED"] == "True"
     frequency = os.environ["FTSFR_FREQUENCY"]
     DATA_DIR = Path(
-        os.environ.get("DATA_DIR", Path(__file__).parent.parent.parent / "_data")
+        os.environ.get("DATA_DIR", 
+                       Path(__file__).parent.parent.parent / "_data")
     )
     OUTPUT_DIR = Path(
-        os.environ.get("OUTPUT_DIR", Path(__file__).parent.parent.parent / "_output")
+        os.environ.get("OUTPUT_DIR", 
+                       Path(__file__).parent.parent.parent / "_output")
     )
+    seasonality = int(os.environ["SEASONALITY"])
 
     # Extract dataset name from path for results filename
     dataset_name = dataset_path.stem.replace("ftsfr_", "")
@@ -98,15 +98,6 @@ if __name__ == "__main__":
     # Define forecasting parameters based on frequency
     test_ratio = 0.2  # Use last 20% of the data for testing
 
-    # Map frequency to seasonality
-    seasonality_map = {
-        "D": 5,  # Daily -> weekly pattern (5 business days)
-        "ME": 12,  # Monthly -> yearly pattern
-        "QE": 4,  # Quarterly -> yearly pattern
-        "YE": 1,  # Yearly -> no seasonality
-    }
-    seasonality = seasonality_map.get(frequency, 1)
-
     # Process each entity separately
     entities = df["id"].unique()
     mase_values = []
@@ -120,9 +111,12 @@ if __name__ == "__main__":
         # Filter data for the current entity
         entity_data = proc_df[["ds", entity]]
 
-        # Removing leading NaNs which show up due to different start times
-        # of different series
-        entity_data = entity_data.iloc[entity_data[entity].first_valid_index() :]
+        # Removing leading/trailing NaNs which show up due to different start 
+        # times of different series
+        if entity_data[entity].first_valid_index() is None:
+            continue
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():
+                                       entity_data[entity].last_valid_index()+1]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue

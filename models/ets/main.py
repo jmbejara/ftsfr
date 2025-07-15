@@ -7,24 +7,20 @@ median MASE for local forecasts.
 
 from pathlib import Path
 from warnings import filterwarnings
-
-# Ignoring warnings
-filterwarnings("ignore")
-
+import os
 import numpy as np
 import pandas as pd
-import toml
-from decouple import config
 from tqdm import tqdm
-
+# Darts-based imports
 from darts.models import ExponentialSmoothing
 from darts import TimeSeries
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
 from darts.utils.utils import ModelMode, SeasonalityMode
-
 from darts.metrics import mase
 
+# Ignoring warnings
+filterwarnings("ignore")
 
 def forecast_ets(df, test_ratio, seasonality):
     """
@@ -48,7 +44,7 @@ def forecast_ets(df, test_ratio, seasonality):
         # Data Processing
         test_length = int(test_ratio * len(df))
         # TimeSeries object is important for darts
-        raw_series = TimeSeries.from_dataframe(df, time_col="date")
+        raw_series = TimeSeries.from_dataframe(df, time_col="ds")
         # Replace NaNs automatically
         raw_series = fill_missing_values(raw_series)
         # Splitting into train and test
@@ -67,43 +63,56 @@ def forecast_ets(df, test_ratio, seasonality):
 
 
 if __name__ == "__main__":
-    # Data loading and processing
-    DATA_DIR = config(
-        "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
+    # Read environment variables
+    dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
+    is_balanced = os.environ["FTSFR_IS_BALANCED"] == "True"
+    frequency = os.environ["FTSFR_FREQUENCY"]
+    OUTPUT_DIR = Path(
+        os.environ.get("OUTPUT_DIR", 
+                       Path(__file__).parent.parent.parent / "_output")
     )
-    OUTPUT_DIR = config(
-        "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
-    )
-    datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
+    seasonality = int(os.environ["SEASONALITY"])
 
-    file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
-    df = pd.read_parquet(file_path)
+    # Extract dataset name from path for results filename
+    dataset_name = dataset_path.stem.replace("ftsfr_", "")
+
+    # Load data
+    df = pd.read_parquet(dataset_path)
+
+    # Check if data follows the expected format (id, ds, y)
+    expected_columns = {"id", "ds", "y"}
+    if not expected_columns.issubset(df.columns):
+        raise ValueError(
+            f"Dataset must contain columns: {expected_columns}. Found: {df.columns}"
+        )
 
     # This pivot adds all values for an entity as a TS in each column
-    proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
+    proc_df = df.pivot(index="ds", columns="id", values="y").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis=1, inplace=True)
 
-    # Define forecasting parameters
+    # Define forecasting parameters based on frequency
     test_ratio = 0.2  # Use last 20% of the data for testing
-    forecast_horizon = 20  # 20 business days, 4 weeks, about a month
-    seasonality = 5  # 5 for weekly patterns (business days)
 
     # Process each entity separately
-    entities = df["entity"].unique()
+    entities = df["id"].unique()
     mase_values = []
 
     # Local forecasting
-
     print(f"Running ETS forecasting for {len(entities)} entities...")
+    print(f"Dataset: {dataset_name}")
+    print(f"Frequency: {frequency}, Seasonality: {seasonality}")
 
     for entity in tqdm(entities):
         # Filter data for the current entity
-        entity_data = proc_df[["date", entity]]
+        entity_data = proc_df[["ds", entity]]
 
-        # Removing leading NaNs which show up due to different start times
-        # of different series
-        entity_data = entity_data.iloc[entity_data[entity].first_valid_index() :]
+        # Removing leading/trailing NaNs which show up due to different start 
+        # times of different series
+        if entity_data[entity].first_valid_index() is None:
+            continue
+        entity_data = entity_data.iloc[entity_data[entity].first_valid_index():
+                                       entity_data[entity].last_valid_index()+1]
 
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
@@ -115,11 +124,10 @@ if __name__ == "__main__":
             mase_values.append(entity_mase)
 
     # Calculate mean MASE across all entities
-    mean_mase = np.mean(mase_values)
-    median_mase = np.median(mase_values)
+    mean_mase = np.mean(mase_values) if mase_values else np.nan
+    median_mase = np.median(mase_values) if mase_values else np.nan
 
     # Printing and saving results
-
     print("\nETS Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
@@ -127,7 +135,9 @@ if __name__ == "__main__":
 
     results_df = pd.DataFrame(
         {
-            "model": ["ETS"],
+            "model": ["ets"],
+            "dataset": [dataset_name],
+            "frequency": [frequency],
             "seasonality": [seasonality],
             "mean_mase": [mean_mase],
             "median_mase": [median_mase],
@@ -135,4 +145,7 @@ if __name__ == "__main__":
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "ets_results.csv", index=False)
+    # Save with the expected filename pattern
+    results_file = OUTPUT_DIR / "raw_results" / f"ets_{dataset_name}_results.csv"
+    results_file.parent.mkdir(parents=True, exist_ok=True)
+    results_df.to_csv(results_file, index=False)
