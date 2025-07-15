@@ -75,12 +75,7 @@ def forecast_prophet(df, test_ratio, seasonality):
 if __name__ == "__main__":
     # Read environment variables
     dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
-    is_balanced = os.environ["FTSFR_IS_BALANCED"] == "True"
     frequency = os.environ["FTSFR_FREQUENCY"]
-    DATA_DIR = Path(
-        os.environ.get("DATA_DIR", 
-                       Path(__file__).parent.parent.parent / "_data")
-    )
     OUTPUT_DIR = Path(
         os.environ.get("OUTPUT_DIR", 
                        Path(__file__).parent.parent.parent / "_output")

@@ -65,7 +65,6 @@ def forecast_ets(df, test_ratio, seasonality):
 if __name__ == "__main__":
     # Read environment variables
     dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
-    is_balanced = os.environ["FTSFR_IS_BALANCED"] == "True"
     frequency = os.environ["FTSFR_FREQUENCY"]
     OUTPUT_DIR = Path(
         os.environ.get("OUTPUT_DIR", 
