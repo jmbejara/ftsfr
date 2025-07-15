@@ -630,9 +630,8 @@ def task_forecast():
                         cwd=f"./models/{model}",
                         env={
                             "FTSFR_DATASET_PATH": str(dataset_info["path"]),
-                            "FTSFR_IS_BALANCED": str(dataset_info["is_balanced"]),
                             "FTSFR_FREQUENCY": dataset_info["frequency"],
-                            "DATA_DIR": str(DATA_DIR),
+                            "SEASONALITY": dataset_info["seasonality"],
                             "OUTPUT_DIR": str(OUTPUT_DIR),
                         },
                     )

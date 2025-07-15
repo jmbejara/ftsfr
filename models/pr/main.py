@@ -8,23 +8,21 @@ median MASE for local forecasts.
 
 from pathlib import Path
 from warnings import filterwarnings
-
-# Ignoring warnings
-filterwarnings("ignore")
-
 import numpy as np
 import pandas as pd
 import toml
 from decouple import config
 from tqdm import tqdm
-
-from darts.models import SKLearnModel
 from sklearn.linear_model import TweedieRegressor
+# Darts-based imports
+from darts.models import SKLearnModel
 from darts import TimeSeries
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
-
 from darts.metrics import mase
+
+# Ignore warnings
+filterwarnings("ignore")
 
 
 def forecast_pr(df, test_ratio, seasonality):
