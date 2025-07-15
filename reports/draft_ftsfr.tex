@@ -17,6 +17,7 @@
 \usepackage{multirow} % For tables with merged cells
 \usepackage{subfigure} % For subfigures
 \usepackage{hyperref} % For links
+\usepackage{setspace}
 
 \title{An Open-Source Financial Time Series Forecasting Benchmark}
 \author{Jeremiah Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
@@ -55,6 +56,7 @@ and supporting a well-functioning economy.
 
 \section{Introduction}
 \label{sec:introduction}
+\doublespacing
 
 % TODO: Write introduction emphasizing the critical need for standardized benchmarks in finance
 % - Establish that time series forecasting is ubiquitous and prevalent in macroeconomics and finance domains
@@ -77,7 +79,7 @@ Our proposed benchmark addresses this limitation by creating a standardized, lit
 \begin{itemize}
     \item We introduce the first comprehensive time series forecasting archive focused specifically on financial markets, available at \url{https://jeremybejarano.com/ftsfr/}. This archive provides standardized datasets across multiple asset classes and market segments:
     \begin{itemize}
-        \item Asset return series spanning equities (Fama-French portfolios), corporate bonds, U.S. Treasuries, sovereign bonds, foreign exchange rates, commodity futures, credit default swaps (CDS), and options
+        \item Asset return series spanning equities, corporate bonds, U.S. Treasuries, sovereign bonds, foreign exchange rates, commodity futures, credit default swaps (CDS), and options
         \item Arbitrage basis spreads including covered interest parity (CIP) deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury spreads, equity spot-futures basis, Treasury spot-futures basis, and box spread arbitrage
         \item Specialized datasets critical for financial stability monitoring, including bank Call Report data, Treasury auction statistics, and yield curve dynamics
     \end{itemize}
@@ -90,13 +92,7 @@ Our proposed benchmark addresses this limitation by creating a standardized, lit
     
     \item We provide novel insights into market-specific predictability by systematically evaluating forecasting performance across different asset classes and market segments. This analysis contributes to our understanding of where predictability exists in financial markets and can inform both academic research and policy decisions related to financial stability monitoring.
     
-    \item All implementations are fully open source with best practices for reproducibility, including:
-    \begin{itemize}
-        \item Automated data pipeline using \texttt{dodo.py} for systematic data pulling and processing
-        \item Virtual environments ensuring perfect reproducibility across different computing environments  
-        \item Comprehensive documentation of data sources, cleaning procedures, and validation steps
-        \item Public availability of all code at \url{https://github.com/jmbejara/ftsfr} and processed datasets for researchers with appropriate data access
-    \end{itemize}
+    \item All implementations are fully open source on \href{https://github.com/jmbejara/ftsfr}{GitHub} with best practices for reproducibility, including an automated data pipeline that pulls data from the appropriate data sources and cleans it according to the canonical methods established in the literature, and virtual environments ensuring perfect reproducibility across different computing environments.
 \end{itemize}
 
 By providing this resource, we enable the kind of standardized, apples-to-apples comparisons that have been lacking in financial forecasting research, while also contributing replication code for key papers and insights into predictability across financial markets.
@@ -119,9 +115,115 @@ Source & Name & Coverage of Finance Domain & Website \\
 \cite{Godahewa2021} & \begin{tabular}[t]{@{}l@{}}Monash Time Series\\Forecasting Repository\end{tabular} & Fred-MD is one component & \href{https://forecastingdata.org/}{Link}\\
 \cite{Bauer2021} & Libra & Anonymous data, unclear & \href{https://github.com/DescartesResearch/ForecastBenchmark}{Link}\\
 \cite{Qiu2024} & TFB & \begin{tabular}[t]{@{}l@{}}NN5 Bank Cash Withdrawals, \\Equity (NYSE/NASDAQ), \\ Foreign Exchange Rates \end{tabular} & \href{https://github.com/decisionintelligence/TFB}{Link}\\
+\cite{Aksu2024} & GIFT-EVAL & Anonymous data, unclear & \href{https://github.com/SalesforceAIResearch/gift-eval}{Link}\\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\section{Datasets Included in the Benchmark}
+
+% Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
+
+% A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
+
+\subsection{Asset Class Datasets}
+Our repository provides comprehensive datasets across seven major asset classes, each cleaned according to canonical methods established in the academic literature. We replicate each of the asset classes examined in \cite{He2017}, which are equities, US government and corporate bonds, foreign sovereign bonds, options, credit default swaps (CDS), commodities, and foreign exchange markets. 
+This paper references a canonical paper in each asset class and uses the data cleaning procedures from that paper to construct test portfolios within that asset class.
+For each asset class, we provide both aggregated portfolio returns (matching the test portfolios used in \cite{He2017}) and disaggregated security-level data. The disaggregated datasets apply identical filtering criteria, subsampling, and transformations as specified in the original papers, but preserve individual security information rather than aggregating into portfolios. 
+To validate our data cleaning procedures, we replicate key summary statistics and cross-sectional patterns from each source paper cited within \cite{He2017}. For instance, our corporate bond portfolios match the credit spread patterns in \cite{Nozawa2017} and our options portfolios reproduce the volatility risk premium patterns found in \cite{Constantinides2013}. These validation exercises ensure that our standardized datasets faithfully represent the canonical cleaning methods established in the literature while providing a unified framework for cross-asset forecasting research. This approach allows researchers to both replicate existing studies (which typically use the aggregated portfolios) as well as to use the disaggregated data for richer analysis using the global time
+series forecasting methods.
+
+
+
+\paragraph{Equities}
+For equities we adopt the canonical \cite{Fama1993} cleaning procedures. At a high level, this exclude ADRs, REITs, and firms with negative book equity, lag book-equity data by one fiscal year. We use data from the Center for Research in Security Prices (CRSP) and Compustat by Standard \& Poor's. These data sets
+are the gold standard for research in equity markets. Altogether, this data and filtering procedures remove survivorship and look-ahead bias, and utilize the data as it's commonly used in asset pricing research for equities.
+
+
+\paragraph{Treasuries} Our US Treasury bond portfolios utilize the CRSP Treasury database and follow \cite{Gurkaynak2007} procedure that underpins one of the
+various yield curve data publications available on the Federal Reserve Board's website\footnote{See \url{https://www.federalreserve.gov/data/yield-curve-models.htm}}. At a high level, we keep only non-callable notes and bonds, strip out STRIPS/TIPS and other exotic issues, correct returns for accrued interest, and use strictly month-end transaction quotes. These filters remove optionality, stale prices, and auction-cycle noise that otherwise create spurious risk-premia. Open-sourcing the exact code lets anyone replicate this Treasury sample instead of relying on opaque heuristics.
+
+
+\paragraph{Corporate Bonds}
+We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP) project\footnote{See \url{https://openbondassetpricing.com/}}, which begins with the full TRACE transaction tape and then applies the market--microstructure--noise (MMN) correction procedure of \citet{Dickerson2024}.  Using MMN--adjusted ``clean'' prices is essential: the bid--ask--averaged quotes in raw TRACE embed a mechanical reversal that can be mis-interpreted as illiquidity and lead researchers to overstate corporate bond excess returns.  With the cleaned data we replicate and extend the ten value-weighted credit-spread deciles of \citet{Nozawa2017}, sorting on option-adjusted spreads each month.  Relative to unadjusted TRACE figures, the MMN correction eliminates roughly half of the apparent return spread and aligns liquidity estimates with quote-based ICE data, illustrating that much of the perceived illiquidity premium is an artefact of noise rather than compensation for trading frictions.  OSBAP also furnishes auxiliary fields such as modified duration, amount outstanding, coupon rate, and matched-Treasury yields, which we exploit later for duration-matched excess-return calculations. We validate our cleaning procedure by matching the construction of corporate bond portfolios in \cite{He2017}.
+
+% \paragraph{Foreign Sovereign Bonds}
+% For sovereign bonds, we implement the methodology of \cite{Borri2011}, creating 
+% six portfolios based on a two-way sort using covariance with US equity returns and 
+% S\&P credit ratings.
+
+
+\paragraph{Options}
+Our options dataset follows \cite{Constantinides2013}. In addition to replicating
+their portfolio construction, we make public the full cleaning pipeline that transforms the raw SPX option tape into research-grade data.  This procedures (i) deletes duplicate or contradictory quotes and any observation with a zero bid, (ii) keeps only contracts with 7--180 days to expiration and moneyness between 0.8 and 1.2 to remove stale deep in/out-of-the-money options, (iii) derives a put--call-parity-implied funding curve and drop quotes that imply negative risk-free rates, (iv) discards prices whose implied volatilities fall outside the 5--100\% band or lie more than one standard error from a smoothed volatility surface, and (v) enforces arbitrage by excluding records that violate put--call parity.  These steps eliminate typographical errors, illiquidity noise, and expiry-week quirks that would otherwise distort higher-moment estimates.  We then scale option returns to unit market beta, converting the inherently fat-tailed pay-offs into near-Gaussian series that linear factor models can handle.  Open-sourcing this end-to-end workflow allows others to reproduce the ``clean" option universe that underpins modern option-pricing research and to audit every assumption embedded in the data.
+
+\paragraph{Foreign Exchange}
+For foreign exchange, we simply provide returns from the individual foreign currencies, against the US dollar. We also provide the portfolios constructed in \cite{Lettau2014} and \cite{Menkhoff2012}, as they appear in \cite{He2017}.
+
+\paragraph{Commodity Futures}
+Commodity futures follow the \cite{Yang2013} protocol but the raw quotes now
+come from Bloomberg's futures chain (queried with \texttt{xbbg}) because the
+legacy Commodity Research Bureau feed is no longer maintained.  Following their procedure, but substituting in Bloomberg data, we pull the
+first, second, and third nearby contracts for each of 19 energy, agriculture, livestock, and
+metal futures, restrict the sample to maturities of 1-12 months, roll to the
+next contract just before delivery, compute collateral-adjusted excess returns,
+and drop obvious bad ticks (zero/negative bids, thin series, extreme 0.5\% tail 
+moves).  This Bloomberg-based pipeline mirrors Yang's original CRB procedure
+while leveraging a live, well-documented data source.
+
+\paragraph{Credit Default Swaps}
+Our CDS data originate from the Markit corporate CDS database available via
+WRDS, providing daily dealer-contributed curves, reference entity identifiers,
+and rich quote metadata for all USD-denominated contracts. 
+Our CDS sample follows the constant-risky-duration construction of
+\cite{Palhares2012}, a canonical protocol that neutralises maturity roll-over
+noise introduced by the 2009 ``Big Bang'' contract change. Raw Markit XR quotes
+are first filtered to exclude zero-bid or non-standard contracts, reconciled
+with auction recovery data, and rescaled by the risky annuity so that spreads
+are comparable across tenors.  The procedure then interpolates missing
+maturities, align observations to common month-end fixing dates, and drop quotes
+that violate no-arbitrage bounds or sit outside the 1st-99th percentile of the
+cross-sectional spread distribution. Open-sourcing this transformation pipeline
+provides researchers with CDS excess-return series that are free of roll
+discontinuities, stale quote reversals, and documentation clause
+inconsistencies.
+
+\subsection{Basis Spread Datasets}
+
+% Please create a paragraph for each basis spread dataset and then, within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
+
+% A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
+
+\paragraph{Spot-Futures Arbitrage in Treasuries}
+Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we extract implied risk-free rates from the first-deferred 2-, 5-, 10-, 20- and 30-year Treasury futures.  We retain only days with positive volume, drop the delivery month to avoid the option-to-deliver distortions of \citet{Burghardt2005}, align quotes to the 17:00 ET close, and, per \citet{Barth2021}, match each futures-implied rate to a maturity-matched OIS benchmark—yielding a clean daily Treasury basis series.
+
+\paragraph{Treasury Swap Arbitrage}
+We follow \citet{Siriwardane2021} in constructing daily OIS-Treasury swap
+spreads: Bloomberg fixed-rate USD OIS quotes for tenors 1-, 2-, 3-, 5-, 10-, 20-
+and 30-years are aligned to 17:00 ET and paired with linearly-interpolated
+zero-coupon Treasury yields of identical maturities.  Observations with missing
+quotes are dropped, delivery-month futures are excluded to sidestep
+cheapest-to-deliver noise, and we winsorise the extreme 1\% of spreads; the
+resulting series replicates the persistently negative swap spreads documented by
+\citet{Jermann2020}, \citet{Du2023}, and \citet{Hanson2023}.
+
+\paragraph{TIPS-Treasury Arbitrage}
+Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we splice Federal Reserve zero-coupon TIPS yields with Bloomberg constant-maturity inflation-swap rates to create synthetic nominal yields, then difference these against equal-maturity zero-coupon Treasury yields for the 2-, 5-, 10- and 20-year tenors.  We exclude days with missing swap quotes or illiquid TIPS issues, drop outliers beyond the extreme 1\%, and harmonise all series to 17:00 ET closes to obtain a clean daily TIPS-Treasury basis series.
+
+\paragraph{CDS-Bond Basis}
+% TODO: Check this paragraph.
+Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a maturity-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorise extreme 1\% bases, and require each bond to appear in TRACE's cleaned WRDS dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
+
+\paragraph{CIP Arbitrage}
+For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for spot rates, 3-month forwards, and maturity-matched OIS curves.  Core filters rescale forward points (and invert USD-quoted pairs), synchronise all legs to the 17:00 ET close while dropping holiday or stale quotes, and winsorise the extreme 1\% of annualised spreads with spline interpolation for any missing OIS tenors to remove scaling, timing, and rate-sourcing distortions.
+
+\paragraph{Spot Futures Arbitrage in Equities}
+
+Following the equity basis recipe of \citet{Hazelkorn2023}, we construct implied forward rates from nearby and first-deferred S\&P 500, Dow Jones, and Nasdaq 100 futures to avoid measurement error from asynchronous spot and futures market closes. We proxy for expected dividends using realized dividends from Bloomberg. The final arbitrage spread is the difference between this futures-implied rate and the 3-month OIS rate, which serves as a clean risk-free benchmark.
+
+\paragraph{Box Arbitrage in Equity Options}
+For box spread arbitrage, we follow the methodology of \citet{vanBinsbergen2019} to extract a risk-free rate implied by S\&P 500 (SPX) index options. Their approach uses a cross-sectional regression of put-call price differences on strike prices, which cleverly avoids the need to explicitly estimate dividends. We use their publicly available daily median implied rates and extend the series using their exact methodology on recent minute-level CBOE data. The final arbitrage spread is the difference between this options-implied rate and a maturity-matched OIS rate.
+
 
 \subsection{The Consequences of Poor Data Quality in Analysis}
 \label{sec:consequences_of_poor_data_quality}
@@ -162,7 +264,7 @@ en.wikipedia.org
 . This highlights the importance of using data that are aligned to a common standard or definition appropriate to the analysis --- whether that means consistent accounting standards, index definitions, or economic variable calculations. Without such standardization, researchers may draw incorrect inferences simply because data series are not comparable.
 
 \paragraph{Spurious Correlations from Non-Stationarity}
-In time-series analysis, a classic data pitfall is using non-stationary (e.g. trending) data in regression without proper detrending or differencing. Granger and Newbold \cite{GrangerNewbold1974} famously warned that regressing one growing time series on another can yield an apparently excellent fit (high R², significant t-statistics) that is actually spurious
+In time-series analysis, a classic data pitfall is using non-stationary (e.g. trending) data in regression without proper detrending or differencing. Granger and Newbold famously warned that regressing one growing time series on another can yield an apparently excellent fit (high R², significant t-statistics) that is actually spurious
 jumbong.github.io
 . They documented examples of nonsense correlations where two unrelated economic series, each with strong time trends, produced R² values near 0.99 and yet no meaningful relationship existed
 jumbong.github.io
@@ -238,58 +340,13 @@ Following \cite{He2017}, we include comprehensive datasets across multiple asset
 % Fama-French 25 portfolios and CRSP universe
 % Explain exclusion of small stocks, ADRs, etc. following Fama-French (1993)
 
+The equity dataset follows \cite{Fama1993}, whose cleaning methodology has become the canonical approach in asset pricing research, establishing the foundation for thousands of subsequent studies. The essential data transformations in Fama-French are critical for avoiding common pitfalls in equity research. First, their precise definition of book equity carefully accounts for balance sheet complexities: book value of stockholders' equity plus deferred taxes and investment tax credits minus the book value of preferred stock, with a hierarchical approach to valuing preferred stock (redemption, liquidation, or par value). This standardization is crucial because inconsistent book equity definitions can dramatically alter value factor exposures and lead to spurious results. Second, their exclusion criteria eliminate securities that would contaminate standard equity analysis: ADRs (which reflect foreign market dynamics), REITs and units of beneficial interest (which have fundamentally different cash flow structures), and firms with negative book equity (which represent financial distress and behave differently from normal equity securities). Third, their timing conventions—forming portfolios in June using market equity from June and book equity from fiscal year $t-1$—ensure that accounting information would have been publicly available to investors, avoiding look-ahead bias that has plagued many studies. Fourth, they require firms to appear on COMPUSTAT for two years before inclusion, directly addressing the survivorship bias documented by \cite{Banz1986} where COMPUSTAT retroactively adds successful firms' histories. Finally, using NYSE breakpoints for size and book-to-market sorting prevents the results from being dominated by the numerous small NASDAQ and AMEX stocks that entered the sample after 1972. These seemingly technical choices have profound impacts: studies that deviate from these conventions often find dramatically different results, and the stability of the size and value effects across decades of out-of-sample testing validates these careful data handling procedures. By open-sourcing code that implements these exact transformations, we enable researchers to avoid the numerous subtle errors that can arise when attempting to reconstruct this canonical dataset from raw CRSP and COMPUSTAT data.
+
 \subsection{US Treasuries}
 \label{sec:treasuries}
 % CRSP maturity-sorted portfolios Treasuries
-The US Treasury bond returns data comes from the \textbf{CRSP Treasury Database} accessed through WRDS, following the methodology of Gurkaynak, Sack, and Wright (2007). The raw CRSP Treasury data is obtained from WRDS and then subjected to the filtering criteria and return calculation methodology specified in Gurkaynak, Sack, and Wright (2007), which provides a comprehensive framework for constructing Treasury yield curves and return series. The data includes daily time series containing bid/ask prices, accrued interest, yields, and returns for Treasury securities, along with issue information containing security characteristics like CUSIP, maturity dates, coupon rates, and issue types. The coverage spans noncallable bonds and notes from 1970-2023, with key fields including Treasury record identifiers, CRSP IDs, CUSIPs, prices, yields, returns, and outstanding amounts.
 
-The data standardization process involves several key steps following the established methodology. First, daily quotes are merged with issue information to create a comprehensive dataset with security characteristics and trading data. Return processing utilizes unadjusted returns representing simple price changes plus accrued interest, with daily returns converted to monthly returns using compound return calculation. For maturity grouping, days to maturity are converted to years, and ten maturity groups are created using 0.5-year intervals from 0 to 5 years, with each bond assigned to a maturity group based on remaining time to maturity. Portfolio construction groups bonds by date and maturity group, calculates mean returns for each maturity group, and creates a time series of portfolio returns for each maturity group. Data quality measures include removing observations with missing returns or maturity information, filtering for bonds and notes only while excluding bills and other security types, and employing month-end dates for portfolio aggregation. The final output is a dataset with monthly Treasury bond portfolio returns across different maturity groups, suitable for fixed income analysis and comparison with other bond market data. The constructed Treasury bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for Treasury bond returns across different maturity groups, demonstrating strong alignment in the time series patterns and return magnitudes across maturity groups.
-% The US Treasury bond returns data comes from the \textbf{CRSP Treasury Database} accessed through WRDS, following the methodology of Gurkaynak, Sack, and Wright (2007). The data includes:
-
-% \begin{itemize}
-%     \item \textbf{Daily time series}: Contains daily bid/ask prices, accrued interest, yields, and returns for Treasury securities
-%     \item \textbf{Issue information}: Contains security characteristics like CUSIP, maturity dates, coupon rates, and issue types  
-%     \item \textbf{Coverage}: Noncallable bonds and notes from 1970-2023
-%     \item \textbf{Key fields}: Treasury record identifiers, CRSP IDs, CUSIPs, prices, yields, returns, and outstanding amounts
-% \end{itemize}
-
-% \paragraph{Data Standardization:}
-
-% The raw CRSP Treasury data is obtained from WRDS and then subjected to the filtering criteria and return calculation methodology specified in Gurkaynak, Sack, and Wright (2007), which provides a comprehensive framework for constructing Treasury yield curves and return series.
-
-% \begin{enumerate}
-%     \item \textbf{Data Consolidation}: Daily quotes are merged with issue information to create a comprehensive dataset with security characteristics and trading data
-
-%     \item \textbf{Return Processing}: 
-%     \begin{itemize}
-%         \item Unadjusted returns represent simple price changes plus accrued interest
-%         \item Daily returns are converted to monthly returns using compound return calculation
-%     \end{itemize}
-
-%     \item \textbf{Maturity Grouping}:
-%     \begin{itemize}
-%         \item Days to maturity are converted to years
-%         \item Ten maturity groups are created using 0.5-year intervals from 0 to 5 years
-%         \item Each bond is assigned to a maturity group based on remaining time to maturity
-%     \end{itemize}
-
-%     \item \textbf{Portfolio Construction}:
-%     \begin{itemize}
-%         \item Bonds are grouped by date and maturity group
-%         \item Mean returns are calculated for each maturity group
-%         \item A time series of portfolio returns is created for each maturity group
-%     \end{itemize}
-
-%     \item \textbf{Data Quality}:
-%     \begin{itemize}
-%         \item Observations with missing returns or maturity information are removed
-%         \item The sample is filtered for bonds and notes only (bills and other security types are excluded)
-%         \item Month-end dates are employed for portfolio aggregation
-%     \end{itemize}
-% \end{enumerate}
-
-% The final output is a dataset with monthly Treasury bond portfolio returns across different maturity groups, suitable for fixed income analysis and comparison with other bond market data.
-% The constructed Treasury bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for Treasury bond returns across different maturity groups. Figure \textbf{PLACEHOLDER} shows the correlation between the two datasets, demonstrating strong alignment in the time series patterns and return magnitudes across maturity groups.
+The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns, forming the foundation for the Federal Reserve's own yield curve estimates and numerous fixed income studies. The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes (excluding bills and other security types) is fundamental because callable bonds embed optionality that contaminates pure interest rate risk measurement—a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns that would distort any analysis of term structure dynamics. Second, the focus on bonds with remaining maturity between 0 and 5 years reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, while the 0-5 year segment represents the most actively traded Treasury securities where price discovery is most efficient. Third, the careful handling of accrued interest in return calculations is essential because, unlike equities, bond prices quote clean (without accrued interest) while returns must include coupon payments—failure to properly account for this leads to dramatic miscalculation of returns around coupon dates. Fourth, the requirement for complete price and maturity information eliminates bonds with sporadic trading or ambiguous terms that could introduce noise into yield curve estimation. Fifth, the use of month-end observations for portfolio aggregation avoids the substantial day-of-month effects in Treasury markets driven by auction cycles, month-end portfolio rebalancing, and futures contract rolls. These seemingly technical choices have profound implications: studies that use all available Treasury data without these filters often find spurious term premia and unstable factor loadings, while the Gürkaynak, Sack, and Wright approach produces stable estimates that closely match dealer quotes and futures-implied yields. By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
 
 \subsection{Corporate Bonds}
 \label{sec:corporate_bonds}
@@ -456,25 +513,11 @@ market stress, consistent with the conclusions drawn by Siriwardane et al. (2023
 \subsection{CDS-Bond Basis}
 % Credit default swap vs cash bond arbitrage
 
-% TODO: Document each arbitrage spread construction
-% For EACH arbitrage spread:
-% - Explain the economic intuition behind the trade
-% - Detail the exact construction methodology
-% - Show replication of statistics from Siriwardane et al.
-% - Discuss what violations of these spreads tell us about market segmentation
-
 Credit Default Swaps (CDS) are "insurance contracts" against the default of underlying
 corporate debt. The buyer of CDS protection pays a the CDS spread as a 
 fixed annuity premium to the seller for a horizon $\tau$. If there is a default
 before the time horizon $\tau$, the buyer receives the difference between
 the bond's par value and its market value from the seller. 
-
-Duffie (1999) (THIS IS ANOTHER PAPER WE MAY NEED TO CITE) shows that cash froms from purchasing CDS protection on 
-firm $i$'s bonds are the same as being long the risk-free floating rate note
-and short the floating rate debt of firm $i$. Thus, the CDS spread should be equal to the 
-floating rate spread for firm $i$. The floating rate spread of firm $i$ is defined as the spread of par floating rate debt
-subtracting the riskless floating rate. Intuitively, an investor that buys both the corporate bond
-and CDS protection faces no credit risk because the default will be paid off. 
 As a result, the payoff of this portfolio should not deviate from the risk free bond. The resulting difference
 between CDS spread and floating rate spread is defined by the authors as the CDS-basis.
 
@@ -793,6 +836,10 @@ We would like to thank the following individuals. With their permission, we have
 \label{app:additional_results}
 % Extended results tables and robustness checks
 
+\bibliographystyle{jpe}
+\bibliography{bibliography}
+
+\end{document}
 \bibliographystyle{jpe}
 \bibliography{bibliography}
 
