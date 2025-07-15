@@ -198,6 +198,55 @@ def graph_fx_returns(fx_df, currency_list, region_name):
     plt.show()
 
 
+def calculate_cip(end_date="2025-03-01", data_dir=DATA_DIR):
+    """
+    Calculate CIP spreads from foreign exchange data.
+
+    Parameters
+    ----------
+    end_date : str
+        End date for the data
+    plot : bool
+        Whether to generate plots
+    data_dir : Path, optional
+        Directory containing the FX data files. If None, uses DATA_DIR from settings.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with CIP spreads
+    """
+    data_dir = Path(data_dir)
+    # Load data
+    spot_rates = pull_bbg_foreign_exchange.load_fx_spot_rates(data_dir=data_dir)
+    forward_points = pull_bbg_foreign_exchange.load_fx_forward_points(data_dir=data_dir)
+    interest_rates = pull_bbg_foreign_exchange.load_fx_interest_rates(data_dir=data_dir)
+
+    # Prepare data
+    df_merged = prepare_fx_data(spot_rates, forward_points, interest_rates)
+    # Filter by end date
+    if end_date:
+        date = pd.Timestamp(end_date).date()
+        df_merged = df_merged.loc[:date]
+
+    # Compute CIP spreads
+    df_merged = compute_cip_spreads(df_merged)
+    # Clean outliers
+    df_merged = clean_outliers(df_merged)
+
+    # Extract just the CIP columns
+    currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
+    cip_cols = [f"CIP_{c}_ln" for c in currencies if f"CIP_{c}_ln" in df_merged.columns]
+    spreads = df_merged[cip_cols].copy()
+
+    # Shorten column names for display
+    spreads.columns = [c[4:7] for c in spreads.columns]  # e.g., CIP_AUD_ln -> AUD
+
+    return spreads
+
+
+
+
 
 if __name__ == "__main__":
     # Calculate CIP spreads
