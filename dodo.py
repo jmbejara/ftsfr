@@ -621,7 +621,7 @@ def task_forecast():
     for model in models_activated:
         for dataset_name, dataset_info in available_datasets.items():
             # For debugging purposes, print the full command line action here:
-            # print(f"FTSFR_DATASET_PATH={dataset_info['path']} FTSFR_IS_BALANCED={dataset_info['is_balanced']} FTSFR_FREQUENCY={dataset_info['frequency']} DATA_DIR={DATA_DIR} OUTPUT_DIR={OUTPUT_DIR} pixi run main")
+            # print(f"DATASET_PATH={dataset_info['path']} FTSFR_IS_BALANCED={dataset_info['is_balanced']} FREQUENCY={dataset_info['frequency']} DATA_DIR={DATA_DIR} OUTPUT_DIR={OUTPUT_DIR} pixi run main")
             yield {
                 "name": f"{model}:{dataset_name}",
                 "actions": [
@@ -629,9 +629,9 @@ def task_forecast():
                         f"{PIXI_EXECUTABLE} run main",
                         cwd=f"./models/{model}",
                         env={
-                            "FTSFR_DATASET_PATH": str(dataset_info["path"]),
-                            "FTSFR_FREQUENCY": dataset_info["frequency"],
-                            "SEASONALITY": dataset_info["seasonality"],
+                            "DATASET_PATH": str(dataset_info["path"]),
+                            "FREQUENCY": dataset_info["frequency"],
+                            "SEASONALITY": str(dataset_info["seasonality"]),
                             "OUTPUT_DIR": str(OUTPUT_DIR),
                         },
                     )

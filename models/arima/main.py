@@ -64,8 +64,8 @@ def forecast_arima(df, test_ratio, seasonality, order=(1, 1, 1)):
 
 if __name__ == "__main__":
     # Read environment variables
-    dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
-    frequency = os.environ["FTSFR_FREQUENCY"]
+    dataset_path = Path(os.environ["DATASET_PATH"])
+    frequency = os.environ["FREQUENCY"]
     OUTPUT_DIR = Path(
         os.environ.get("OUTPUT_DIR", 
                        Path(__file__).parent.parent.parent / "_output")

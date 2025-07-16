@@ -88,6 +88,7 @@ def get_available_datasets(
         - path: Path to the parquet file
         - module: Module name that produces this dataset
         - frequency: Dataset frequency (e.g., 'D', 'ME', 'QE')
+        - seasonality: Dataset seasonality (e.g., 365 for daily, 12 for monthly, 4 for quarterly)
         - is_balanced: Whether the dataset is balanced
         - description: Dataset description
     """
@@ -121,6 +122,7 @@ def get_available_datasets(
                         "path": Path(data_dir) / module_name / f"{key}.parquet",
                         "module": module_name,
                         "frequency": value.get("frequency", "D"),
+                        "seasonality": value.get("seasonality"),
                         "is_balanced": value.get("is_balanced", False),
                         "description": value.get("description", ""),
                     }
