@@ -19,6 +19,8 @@ import pull_bbg_foreign_exchange
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
 
+CURRENCIES = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK", "USD"]
+
 
 def prepare_fx_data(spot_rates, interest_rates):
     """
@@ -198,7 +200,7 @@ def graph_fx_returns(fx_df, currency_list, region_name):
     plt.show()
 
 
-def calculate_cip(end_date="2025-03-01", data_dir=DATA_DIR):
+def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
     """
     Calculate CIP spreads from foreign exchange data.
 
@@ -230,27 +232,20 @@ def calculate_cip(end_date="2025-03-01", data_dir=DATA_DIR):
         df_merged = df_merged.loc[:date]
 
     # Compute CIP spreads
-    df_merged = compute_cip_spreads(df_merged)
-    # Clean outliers
-    df_merged = clean_outliers(df_merged)
-
-    # Extract just the CIP columns
-    currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
-    cip_cols = [f"CIP_{c}_ln" for c in currencies if f"CIP_{c}_ln" in df_merged.columns]
-    spreads = df_merged[cip_cols].copy()
+    df_merged = implied_daily_fx_returns(df_merged, CURRENCIES)
 
     # Shorten column names for display
-    spreads.columns = [c[4:7] for c in spreads.columns]  # e.g., CIP_AUD_ln -> AUD
 
-    return spreads
+    return df_merged
 
 
 
 
 
 if __name__ == "__main__":
-    # Calculate CIP spreads
+    # Calculate fx returns
+    fx_returns = calculate_fx()
 
     # Save to parquet
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    cip_spreads.to_parquet(DATA_DIR / "cip_spreads.parquet")
+    fx_returns.to_parquet(DATA_DIR / "fx_returns.parquet")
