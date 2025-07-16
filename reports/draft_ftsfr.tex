@@ -121,7 +121,38 @@ Source & Name & Coverage of Finance Domain & Website \\
 \end{tabular}
 \end{table}
 
+
+\section{Literature Review and Related Work}
+\label{sec:literature}
+
+% TODO: Position the paper relative to existing benchmarks and establish the canonical nature of chosen cleaning methods
+% - Review the Monash Time Series Forecasting Archive and explain how FTSFR follows their established template
+% - Introduce He, Kelly, Manela (2017) as the anchor paper for asset class selection and cleaning methods
+% - Introduce Siriwardane, Sunderam, & Wallen (2022) "Segmented Arbitrage" as the anchor for arbitrage spread construction
+% - Emphasize that the choice to follow these papers is deliberate - not doing anything novel is a FEATURE, not a bug
+% - Acknowledge that some dataset choices are somewhat ad hoc but are anchored by these survey-style papers
+
+\subsection{The Importance Of Open Source And Replicability}
+
+Finance faces an active debate about a potential ``replication crisis.'' \cite{Jensen2023} find that predictors' average strength is only 54\% of the original strength outside the original sample, with 32\% becoming insignificant. While much of the debate centers around data snooping, some of it involves
+coding and similar such bugs. There have been several high profile retractions\footnote{See  \cite{Lee2023} at \href{https://www.bloomberg.com/news/articles/2023-12-01/a-grad-school-number-cruncher-shakes-up-the-world-of-bond-quants}{Bloomberg}, and \cite{Dickerson2024}.}.
+Despite disagreement on the crisis's extent, consensus exists at least on one way to help the situation: standardized, open source data infrastructure. \cite{Chen2022} demonstrate with their ``Open Source Cross-Sectional Asset Pricing'' project that transparent data construction, version control, and community validation can eliminate arbitrary researcher degrees of freedom. Such infrastructure prevents simple errors from invalidating years of research. For policymakers and financial regulators, standardized open source data 
+helps them more effectively monitor systemic financial risks.
+
+\subsection{Global Time Series Forecasting Methods}
+
+The M-competition series is one of the most popular time series forecasting competitions in the field \citep{Makridakis1982, Makridakis2000, Makridakis2018, Makridakis2022}. Notably, the winning approaches of recent M-competitions have consisted of global forecasting models that train a single model across all series in the dataset. As \citet{Godahewa2021} observe, this pattern extends beyond the M-competitions. Winners of other major competitions including the NN3 and NN5 Neural Network competitions and various Kaggle competitions have similarly employed global models.
+
+Global forecasting models represent a paradigm shift from traditional univariate approaches. Rather than fitting separate models to individual series, global models treat each series as a related instance within a larger dataset, extracting information from both temporal patterns within series and cross-sectional structure across the panel. This enables them to learn common patterns while accounting for series-specific variations, with particular advantages when forecasting related series—a common scenario in finance. Global methods can handle short series by borrowing strength from longer ones and provide robust parameter estimation through regularization. Recent implementations range from pooled regression to sophisticated deep learning architectures, with many demonstrating superior performance over traditional methods \citep{Godahewa2021}.
+
+This paper contributes to the global forecasting literature by providing a comprehensive benchmark specifically designed for financial markets.
+Our benchmark thus serves to improve the infrastructure for developing the next generation of forecasting methods tailored to the complexities of financial markets, potentially improving risk management, asset allocation, and financial stability monitoring.
+
+
+
 \section{Datasets Included in the Benchmark}
+
+In this section, we describe the datasets included in the benchmark. The datasets are organized into three main groups: asset class datasets, basis spread datasets, and other financial data. We provide brief description of each dataset below. Each datasets is constructed based off of a cleaning procedure from a well-known paper in the academic literature. To validate our cleaning and transformations, we replicate a key plot or table from each paper. We give brief details of this process below. Full details of the cleaning and replications are provided in the appendix.
 
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
 
@@ -237,27 +268,19 @@ Following the equity basis recipe of \citet{Hazelkorn2023}, we construct implied
 \paragraph{Box Arbitrage in Equity Options}
 For box spread arbitrage, we follow the methodology of \citet{VanBinsbergen2022} to extract a risk-free rate implied by S\&P 500 (SPX) index options. Their approach uses a cross-sectional regression of put-call price differences on strike prices, which cleverly avoids the need to explicitly estimate dividends. We use their publicly available daily median implied rates and extend the series using their exact methodology on recent minute-level CBOE data. The final arbitrage spread is the difference between this options-implied rate and a maturity-matched OIS rate.
 
+\subsection{Other Financial Data}
 
-\section{Literature Review and Related Work}
-\label{sec:literature}
+\paragraph{Yield Curve}
+TODO
 
-% TODO: Position the paper relative to existing benchmarks and establish the canonical nature of chosen cleaning methods
-% - Review the Monash Time Series Forecasting Archive and explain how FTSFR follows their established template
-% - Introduce He, Kelly, Manela (2017) as the anchor paper for asset class selection and cleaning methods
-% - Introduce Siriwardane, Sunderam, & Wallen (2022) "Segmented Arbitrage" as the anchor for arbitrage spread construction
-% - Emphasize that the choice to follow these papers is deliberate - not doing anything novel is a FEATURE, not a bug
-% - Acknowledge that some dataset choices are somewhat ad hoc but are anchored by these survey-style papers
+\paragraph{Call Report}
+TODO
 
-\subsection{Time Series Forecasting Benchmarks}
-% Review of existing benchmarking archives
+\paragraph{Compustat Panel Data}
+TODO
 
-\subsection{Asset Pricing Literature}
-% He, Kelly, Manela (2017) and their approach to asset class selection
 
-\subsection{Market Segmentation and Arbitrage}
-% Siriwardane et al. (2022) and arbitrage spread construction
 
-[Literature review content to be filled in...]
 
 \section{Data Repository Overview}
 \label{sec:repository_overview}
@@ -755,7 +778,7 @@ P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
 The constant $Z$ that solves this equation is the \textbf{Z-spread}.
 
 \paragraph*{Intuition}
-$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond’s dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
+$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond's dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
 
 \paragraph*{Link to Yield-to-Maturity}
 Setting the Z-spread pricing equation equal to the standard YTM equation gives
@@ -764,7 +787,7 @@ Setting the Z-spread pricing equation equal to the standard YTM equation gives
 \sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
 =\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
 \end{equation}
-where $y$ is the bond’s yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
+where $y$ is the bond's yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
 
 \paragraph*{Continuous-Compounding Identity}
 Rewrite discounts as $e^{-r t}$. With PV-weights
@@ -782,7 +805,7 @@ Analysts often approximate $Z$ with the \textbf{credit spread}
 \begin{equation*}
 \Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
 \end{equation*}
-where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond’s (modified) duration.
+where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond's (modified) duration.
 
 \paragraph*{Why it works}
 \begin{enumerate}
