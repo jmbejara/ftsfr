@@ -1,7 +1,7 @@
 """
-Simple Exponential Smoothing(SES) using darts.
+AutoTBATS using darts
 
-Performs local forecasting using SES. Reports both mean and
+Performs local forecasting using AutoTBATS. Reports both mean and
 median MASE for local forecasts.
 """
 
@@ -12,19 +12,18 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 # Darts-based imports
-from darts.models import ExponentialSmoothing
+from darts.models import AutoTBATS
 from darts import TimeSeries
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
-from darts.utils.utils import ModelMode, SeasonalityMode
 from darts.metrics import mase
 
 filterwarnings("ignore")
 
 
-def forecast_ses(df, test_ratio, seasonality):
+def forecast_auto_tbats(df, test_ratio, seasonality):
     """
-    Fit SES model and return MASE
+    Fit AutoTBATS model and return MASE
 
     Parameters:
     -----------
@@ -50,13 +49,13 @@ def forecast_ses(df, test_ratio, seasonality):
         # Splitting into train and test
         series, test_series = train_test_split(raw_series, test_size=test_ratio)
         # Training the model and getting MASE
-        estimator = ExponentialSmoothing(trend = ModelMode.NONE, seasonal = SeasonalityMode.NONE)
+        estimator = AutoTBATS(season_length = seasonality)
         estimator.fit(series)
         pred_series = estimator.predict(test_length)
         return mase(test_series, pred_series, series, seasonality)
     except Exception as e:
         # In case of errors, return NaN
-        print(f"Error in SES forecasting: {e}")
+        print(f"Error in AutoTBATS forecasting: {e}")
         return np.nan
 
 
@@ -76,7 +75,7 @@ if __name__ == "__main__":
     # Load data
     df = pd.read_parquet(dataset_path)
 
-    # Check if data follows the expected format (id, ds, y)
+    # Check if data follows the expected format (unique_id, ds, y)
     expected_columns = {"id", "ds", "y"}
     if not expected_columns.issubset(df.columns):
         raise ValueError(
@@ -96,7 +95,7 @@ if __name__ == "__main__":
     mase_values = []
 
     # Local forecasting
-    print(f"Running SES forecasting for {len(entities)} entities...")
+    print(f"Running AutoTBATS forecasting for {len(entities)} entities...")
     print(f"Dataset: {dataset_name}")
     print(f"Frequency: {frequency}, Seasonality: {seasonality}")
 
@@ -114,8 +113,8 @@ if __name__ == "__main__":
         if len(entity_data) <= 10:  # Skip entities with too few observations
             continue
 
-        # Get MASE using SES
-        entity_mase = forecast_ses(entity_data, test_ratio, seasonality)
+        # Get MASE using AutoTBATS
+        entity_mase = forecast_auto_tbats(entity_data, test_ratio, seasonality)
 
         if not np.isnan(entity_mase):
             mase_values.append(entity_mase)
@@ -125,14 +124,14 @@ if __name__ == "__main__":
     median_mase = np.median(mase_values) if mase_values else np.nan
 
     # Printing and saving results
-    print("\nSES Forecasting Results:")
+    print("\nAutoTBATS Forecasting Results:")
     print(f"Number of entities successfully forecasted: {len(mase_values)}")
     print(f"Mean MASE: {mean_mase:.4f}")
     print(f"Median MASE: {median_mase:.4f}")
 
     results_df = pd.DataFrame(
         {
-            "model": ["ses"],
+            "model": ["auto_tbats"],
             "dataset": [dataset_name],
             "frequency": [frequency],
             "seasonality": [seasonality],
@@ -143,6 +142,6 @@ if __name__ == "__main__":
     )
 
     # Save with the expected filename pattern
-    results_file = OUTPUT_DIR / "raw_results" / f"ses_{dataset_name}_results.csv"
+    results_file = OUTPUT_DIR / "raw_results" / f"auto_tbats_{dataset_name}_results.csv"
     results_file.parent.mkdir(parents=True, exist_ok=True)
     results_df.to_csv(results_file, index=False)

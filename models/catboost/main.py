@@ -104,54 +104,18 @@ if __name__ == "__main__":
     forecast_horizon = 20  # 20 business days, 4 weeks, about a month
     seasonality = 5  # 5 for weekly patterns (business days)
 
-    # Process each entity separately
-    entities = df["entity"].unique()
-    mase_values = []
-
-    # Local forecasting
-
-    print(f"Running CatBoost forecasting for {len(entities)} entities...")
-
-    for entity in tqdm(entities):
-        # Filter data for the current entity
-        entity_data = proc_df[["date", entity]]
-
-        # Removing leading NaNs which show up due to different start times
-        # of different series
-        entity_data = entity_data.iloc[entity_data[entity].first_valid_index() :]
-
-        if len(entity_data) <= 10:  # Skip entities with too few observations
-            continue
-
-        # Get MASE using CatBoost
-        entity_mase = forecast_catboost(entity_data, test_ratio, seasonality)
-
-        if not np.isnan(entity_mase):
-            mase_values.append(entity_mase)
-
-    # Calculate mean MASE across all entities
-    mean_mase = np.mean(mase_values)
-    median_mase = np.median(mase_values)
-
     # Global Forecasting
 
-    train_index = int((1 - test_ratio) * len(proc_df))
     global_mase = forecast_catboost(proc_df, test_ratio, seasonality)
 
     # Printing and saving results
 
     print("\nCatboost Forecasting Results:")
-    print(f"Number of entities successfully forecasted: {len(mase_values)}")
-    print(f"Mean MASE: {mean_mase:.4f}")
-    print(f"Median MASE: {median_mase:.4f}")
+    print("Global MASE: ", global_mase)
 
     results_df = pd.DataFrame(
         {
             "model": ["Catboost"],
-            "seasonality": [seasonality],
-            "mean_mase": [mean_mase],
-            "median_mase": [median_mase],
-            "entity_count": [len(mase_values)],
             "global_mase": [global_mase],
         }
     )

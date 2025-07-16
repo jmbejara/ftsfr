@@ -10,8 +10,8 @@ from warnings import filterwarnings
 import numpy as np
 import pandas as pd
 import os
-from tqdm import tqdm
-import subprocess
+import traceback
+import platform
 # Using darts for now for MASE
 from darts import TimeSeries
 from darts.metrics import mase
@@ -21,60 +21,38 @@ from neuralforecast.models import Autoformer
 # Ignoring warnings
 filterwarnings("ignore")
 
-def train_autoformer(df, test_split, freq, seasonality, path_to_save):
+def train_autoformer(train_data, test_length, freq, seasonality, path_to_save):
     """
     Fit Autoformer model and save it to specificed path
 
     Parameters:
     -----------
-    df : array-like
+    train_data : array-like
         array-like object(e.g. pd.DataFrame), with a single or multiple series,
-        which is split into testing and training data.
+        used for training the Autoformer.
     test_ratio : int
         fraction of df used for testing.
     freq: str
         pandas or polars frequency of the data
     seasonality : int
-        Seasonality of the series.
-    path_to_save : str
+        seasonality of the dataset
+    path_to_save : str | Path
         Path to save model
     Returns:
     --------
     None
     """
     try:
-        # Data Processing
-        # No data scaling required because neuralforecast does it automatically
-        test_length = int(test_split * len(df))
-        # Filling NaN values with interpolated values
-        df = df.interpolate()
-
-        # Following Monash style testing
-        forecast_horizon = test_length
-
-        train_data = df[df.ds < np.unique(df["ds"].values)[-test_length]]
-
-        # TODO: Need to test if code runs fine if model is trained on GPU
-        # but saved to cpu
-        # Check for an NVIDIA GPU
-        try:
-            subprocess.check_output("nvidia-smi")
-            device = "gpu"
-        except Exception:
-            device = "cpu"
-
-        # Having this horizon as the forecast_horizon means that predict will
-        # return only these amount of values
-        estimator = Autoformer(h = forecast_horizon,
-                               input_size = seasonality * 4,
-                               accelerator = device)
-
+        estimator = Autoformer(h = test_length,
+                                input_size = seasonality * 4)
+        
         nf = NeuralForecast(models=[estimator], freq=freq)
+
         # fit model
         nf.fit(df=train_data)
 
         # Save model
-        nf.save(path = path_to_save,
+        nf.save(path = str(path_to_save),
                 model_index = None,
                 overwrite = True,
                 save_dataset = False)
@@ -82,66 +60,35 @@ def train_autoformer(df, test_split, freq, seasonality, path_to_save):
     except Exception as e:
         # In case of errors, return NaN
         print(f"Error in Autoformer training: {e}")
+        print(traceback.format_exc())
         return np.nan
 
-def forecast_autoformer(df, test_split, freq, seasonality, path_to_load):
+def forecast_autoformer(train_data, test_data, path_to_load, path_to_save):
     """
-    Fit Autoformer model and return MASE
+    Loads Autoformer from the path specified and saves predicted series.
 
     Parameters:
     -----------
-    df : array-like
+    train_data : array-like
         array-like object(e.g. pd.DataFrame), with a single or multiple series,
-        which is split into testing and training data.
-    test_ratio : int
-        fraction of df used for testing.
-    freq: str
-        pandas or polars frequency of the data
-    seasonality : int
-        Seasonality of the series.
-    path_to_load : str
-        Path to load model
+        which was used to train the loaded Autoformer.
+    test_data : array-like
+        array-like object used to match up the time indices of the test dataset 
+        with the predictions.
+    path_to_load : str | Path
+        Path to load model.
+    path_to_save : str
+        Path to save predicted series.
     Returns:
     --------
-    float
-        MASE value
+        None
     """
     try:
-        # Data Processing
-        # No data scaling required because neuralforecast does it automatically
-        test_length = int(test_split * len(df))
-        # Filling NaN values with interpolated values
-        df = df.interpolate()
-
-        # Following Monash style testing
-        forecast_horizon = test_length
-
-        test_data = df[df.ds >= np.unique(df["ds"].values)[-test_length]]
-        train_data = df[df.ds < np.unique(df["ds"].values)[-test_length]]
-
-        # Check for an NVIDIA GPU
-        try:
-            subprocess.check_output("nvidia-smi")
-            device = "gpu"
-        except Exception:
-            device = "cpu"
-
-        # Having this horizon as the forecast_horizon means that predict will
-        # return only these amount of values
-        estimator = Autoformer(
-            h=forecast_horizon, input_size=seasonality * 4, accelerator=device
-        )
-
-        nf = NeuralForecast(models=[estimator], freq=freq)
-        # fit model
-        nf.fit(df=train_data)
-
-        nf = NeuralForecast.load(path = path_to_load)
+        nf = NeuralForecast.load(path = str(path_to_load))
 
         # get predictions
-        pred_series = nf.predict()
+        pred_series = nf.predict(train_data)
 
-        # Converting into TimeSeries objects to calculate darts mase
         # There is a possibility that the timestamps for pred_series wouldn't
         # line up with test_data.
         # Sort their values first on id then on timestamps
@@ -152,6 +99,37 @@ def forecast_autoformer(df, test_split, freq, seasonality, path_to_load):
         # make the ds columns same
         pred_series["ds"] = test_data["ds"]
 
+        pred_series.to_parquet(path_to_save, engine = "pyarrow")
+
+    except Exception as e:
+        # In case of errors, return NaN
+        print(f"Error in Autoformer forecasting: {e}")
+        return np.nan
+
+def calculate_MASE(train_data, test_data, seasonality, path_to_load_pred):
+    """
+    Loads predicted values and returns mase
+
+    Parameters:
+    -----------
+    test_data : array-like
+        array-like object(e.g. pd.DataFrame), with a single or multiple series,
+        which is split into testing and training data.
+    train_data : array-like
+        Training dataset used to train the model.
+    path_to_load : str
+        Path to load model.
+    path_to_save : str
+        Path to save predicted series.
+    Returns:
+    --------
+    float
+        MASE value
+    """
+    try:
+        # Converting into TimeSeries objects to calculate darts mase
+        pred_series = pd.read_parquet(path_to_load_pred)
+        
         test_series = (
             test_data.pivot(index="ds", columns="unique_id", values="y")
             .reset_index()
@@ -175,7 +153,9 @@ def forecast_autoformer(df, test_split, freq, seasonality, path_to_load):
         series = TimeSeries.from_dataframe(series, time_col="date")
         pred_series = TimeSeries.from_dataframe(pred_series, time_col="date")
 
-        return mase(test_series, pred_series, series, seasonality)
+        calculated_MASE = mase(test_series, pred_series, series, seasonality)
+
+        return calculated_MASE
     except Exception as e:
         # In case of errors, return NaN
         print(f"Error in Autoformer forecasting: {e}")
@@ -183,6 +163,7 @@ def forecast_autoformer(df, test_split, freq, seasonality, path_to_load):
 
 
 if __name__ == "__main__":
+
    # Read environment variables
     dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
     frequency = os.environ["FTSFR_FREQUENCY"]
@@ -195,12 +176,17 @@ if __name__ == "__main__":
     # Extract dataset name from path for results filename
     dataset_name = dataset_path.stem.replace("ftsfr_", "")
 
-    # Path to save model to
-    model_path_to_save = OUTPUT_DIR / "models" / "Autoformer" / dataset_name
-    Path(model_path_to_save).mkdir(parents = True, exist_ok = True)
+    # Path to save model
+    model_path = OUTPUT_DIR / "models" / "Autoformer" / dataset_name
+    Path(model_path).mkdir(parents = True, exist_ok = True)
+
+    # Path to save forecasts
+    forecast_path = OUTPUT_DIR / "forecasts" / "Autoformer" / dataset_name
+    Path(forecast_path).mkdir(parents = True, exist_ok = True)
+    forecast_path = forecast_path / "forecasts.parquet"
 
     # Load data
-    df = pd.read_parquet(dataset_path)
+    df = pd.read_parquet(dataset_path).rename(columns={"id" : "unique_id"})
 
     # Check if data follows the expected format (id, ds, y)
     expected_columns = {"unique_id", "ds", "y"}
@@ -209,15 +195,24 @@ if __name__ == "__main__":
             f"Dataset must contain columns: {expected_columns}. Found: {df.columns}"
         )
 
+    unique_dates = np.unique(df["ds"].values)
+
     # Define forecasting parameters
-    test_ratio = 0.2  # Use last 20% of the data for testing
-    forecast_horizon = 20  # 20 business days, 4 weeks, about a month
+    test_ratio = 15 / len(unique_dates)  # Use last 15 entries of the data for testing
+
+    # No data scaling required because neuralforecast does it automatically
+    test_length = int(test_ratio * len(unique_dates))
+    # Filling NaN values with interpolated values
+
+    df = df.interpolate()
+
+    test_data = df[df.ds >= unique_dates[-test_length]]
+    train_data = df[df.ds < unique_dates[-test_length]]
 
     # Global Forecasting
-
-    global_mase = forecast_autoformer(
-        df, test_ratio, frequency, seasonality, forecast_horizon
-    )
+    train_autoformer(train_data, test_length, frequency, seasonality, model_path)
+    forecast_autoformer(train_data, test_data, model_path, forecast_path)
+    global_mase = calculate_MASE(train_data, test_data, seasonality, forecast_path)
 
     # Printing and saving results
 
@@ -227,7 +222,6 @@ if __name__ == "__main__":
     results_df = pd.DataFrame(
         {
             "model": ["Autoformer"],
-            "seasonality": [seasonality],
             "global_mase": [global_mase],
         }
     )
