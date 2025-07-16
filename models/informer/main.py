@@ -71,7 +71,7 @@ def forecast_informer(df, test_split, freq, seasonality, forecast_horizon):
         # Having this horizon as the forecast_horizon means that predict will
         # return only these amount of values
         estimator = Informer(
-            h=forecast_horizon, input_size=seasonality * 10, accelerator=device
+            h=forecast_horizon, input_size=seasonality * 4, accelerator=device
         )
 
         nf = NeuralForecast(models=[estimator], freq=freq)

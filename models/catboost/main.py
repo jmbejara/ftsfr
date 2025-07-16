@@ -65,7 +65,7 @@ def forecast_catboost(df, test_ratio, seasonality):
         except Exception:
             task_type = "CPU"
         estimator = CatBoostModel(
-            lags=seasonality * 10,
+            lags=seasonality * 4,
             output_chunk_length=test_length,
             # Training a single global model for global forecasting
             multi_models=False,

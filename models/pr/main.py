@@ -55,7 +55,7 @@ def forecast_pr(df, test_ratio, seasonality):
         # Training the model and getting MASE
         estimator = SKLearnModel(
             model=TweedieRegressor(power=0),
-            lags=seasonality * 10,
+            lags=seasonality * 4,
             output_chunk_length=1,
             multi_models=False,
         )

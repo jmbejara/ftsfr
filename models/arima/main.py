@@ -78,7 +78,7 @@ if __name__ == "__main__":
     # Load data
     df = pd.read_parquet(dataset_path)
 
-    # Check if data follows the expected format (id, ds, y)
+    # Check if data follows the expected format (unique_id, ds, y)
     expected_columns = {"unique_id", "ds", "y"}
     if not expected_columns.issubset(df.columns):
         raise ValueError(
