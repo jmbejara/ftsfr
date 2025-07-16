@@ -20,40 +20,46 @@
 \usepackage{setspace}
 \usepackage[page]{appendix}
 
-\title{An Open-Source Financial Time Series Forecasting Benchmark}
+% \title{An Open-Source Financial Time Series Forecasting Benchmark}
+\title{Benchmarking Forecasting Methods for Financial Stability: An Open-Source Financial Time Series Forecasting Repository}
 \author{Jeremiah Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
 \date{\today}
 
 \begin{document}
 \maketitle
 
+% \begin{abstract}
+% This paper presents an open-source finance data repository for
+% benchmarking the performance of global time series forecasting methods and
+% compares the performance of many of the most popular modern methods. A
+% standardized benchmark is crucial for comparing the performance of different
+% forecasting methods, so as to allow apples-to-apples comparisons across
+% different forecasting methods and to discourage cherry-picking of results.
+% Despite the ubiquity of time series forecasting methods in macroeconomics and
+% finance, a standardized repository of data for benchmarking in these domains
+% does not exist. One reason for this is that many of these datasets are available
+% only through paid subscriptions and are thus not freely distributable. To
+% address this issue, we instead provide a set of scripts that automate the
+% download, data cleaning, and assembly of data sets from the Wharton Research
+% Data Services (WRDS) platform and the Bloomberg Terminal. Since many academic
+% institutions have access to WRDS or a Bloomberg Terminal, contingent on having
+% access to the appropriate WRDS or Bloomberg subscriptions, each researcher will
+% be able to exactly reproduce each of the datasets provided in this repository.
+% Furthermore, the datasets that we provide are cleaned and formatted in a way
+% that matches best practices established within the corresponding academic
+% literature. Our aim is to facilitate the process of benchmarking global times
+% series forecasting methods on data from these domains. In this light, we
+% demonstrate the utility of our repository by benchmarking the performance of a
+% suite of classical and modern forecasting methods. We hope that this repository
+% will enhance research that increases the precision of financial and economic
+% forecasts and contribute to research related to promoting financial stability
+% and supporting a well-functioning economy.
+% \end{abstract}
+
+
 \begin{abstract}
-This paper presents an open-source finance data repository for
-benchmarking the performance of global time series forecasting methods and
-compares the performance of many of the most popular modern methods. A
-standardized benchmark is crucial for comparing the performance of different
-forecasting methods, so as to allow apples-to-apples comparisons across
-different forecasting methods and to discourage cherry-picking of results.
-Despite the ubiquity of time series forecasting methods in macroeconomics and
-finance, a standardized repository of data for benchmarking in these domains
-does not exist. One reason for this is that many of these datasets are available
-only through paid subscriptions and are thus not freely distributable. To
-address this issue, we instead provide a set of scripts that automate the
-download, data cleaning, and assembly of data sets from the Wharton Research
-Data Services (WRDS) platform and the Bloomberg Terminal. Since many academic
-institutions have access to WRDS or a Bloomberg Terminal, contingent on having
-access to the appropriate WRDS or Bloomberg subscriptions, each researcher will
-be able to exactly reproduce each of the datasets provided in this repository.
-Furthermore, the datasets that we provide are cleaned and formatted in a way
-that matches best practices established within the corresponding academic
-literature. Our aim is to facilitate the process of benchmarking global times
-series forecasting methods on data from these domains. In this light, we
-demonstrate the utility of our repository by benchmarking the performance of a
-suite of classical and modern forecasting methods. We hope that this repository
-will enhance research that increases the precision of financial and economic
-forecasts and contribute to research related to promoting financial stability
-and supporting a well-functioning economy.
-\end{abstract}
+    Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to preemptively address systemic vulnerabilities. This paper benchmarks state-of-the-art global time series forecasting methods, which have proven superior in the time series literature, on a comprehensive suite of financial stability indicators. Benchmarks drive progress, and our systematic evaluation of 24 forecasting methods ranging from classical models to modern deep learning architectures reveals which approaches best capture early warning signals across different market segments. We evaluate these methods on critical financial stability metrics including arbitrage basis spreads that signal funding market stress, banking indicators that reveal institutional vulnerabilities, and asset returns across multiple markets. To enable reproducible research and continuous improvement in financial forecasting, we develop an open-source \emph{financial time series forecasting repository} that standardizes these datasets according to canonical academic methodologies. Our results provide financial stability authorities with evidence-based guidance on which forecasting approaches most reliably detect emerging risks in specific market segments, directly enhancing the toolkit for macroprudential surveillance and systemic risk monitoring.
+    \end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -68,7 +74,17 @@ and supporting a well-functioning economy.
 % - Emphasize that this complements (not substitutes) the Monash benchmark
 % - Make clear that the lack of standardization is particularly problematic in finance where data often requires subscriptions
 
-The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in ``poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
+% Why forecasting is important for financial stability
+Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to preemptively address systemic vulnerabilities \cite{Adrian2015}. 
+In this context, improving our ability to forecast key financial metrics is not a theoretical exercise. Rather,
+it is critical for early warning signals and timely policy responses. 
+% The Office of Financial Research (OFR) and the Financial Stability Oversight Council (FSOC) were established to identify emerging risks across financial markets. However, their effectiveness hinges on robust data and predictive analytics. 
+By developing an open-source financial time series forecasting benchmark, we directly enhance the toolkit available for financial stability monitoring. This benchmark brings together a wide range of datasets---spanning asset returns, arbitrage (basis) spreads, and banking indicators---that are crucial for assessing vulnerabilities in different corners of the financial system. Importantly, it evaluates state-of-the-art ``global" forecasting methods (which learn across many time series) and compares them to classical models, shedding light on which approaches best capture early signs of stress in these data. In sum, better forecasting of these metrics can help regulators and market participants spot trouble on the horizon, informing pre-emptive measures to safeguard the economy
+
+% Why we need a standardized benchmark
+The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. 
+Benchmarks drive progress.
+Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in ``poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
 The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it may not leverage CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR Time Series Classification Archive \citep{Dau2019} and UEA Multivariate Time Series Classification Archive \citep{Bagnall2018} and MUU Extrinsic Regression Repository \citep{Tan2020} do not include coverage of the financial domain.
 The Monash repository \citep{Godahewa2021} and recent efforts like TFB \citep{Qiu2024} have made strides toward broader coverage, yet comprehensive representation of financial asset classes, from corporate bonds to credit derivatives, remains absent. (See Table \ref{tab:benchmarks} for a summary of existing benchmarks.) This gap is particularly problematic given that, according to the ``No Free Lunch" Theorem \citep{Wolpert1997},
 there is no single forecasting method that performs best for all time series. As such, to improve forecasting in the financial domain, we need to evaluate forecasting methods on a suite of datasets from the financial domain and, importantly,
@@ -863,7 +879,7 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
 \label{app:additional_results}
 % Extended results tables and robustness checks
 
-\subsection{Recyling Bin}
+\section{Recyling Bin}
 % Temporary holding area for text that might not make it into the main text
 
 
