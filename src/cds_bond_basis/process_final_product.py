@@ -1,6 +1,7 @@
 # from settings import config
 import pandas as pd
 from matplotlib import pyplot as plt
+import merge_cds_bond
 
 # OUTPUT_DIR = config("OUTPUT_DIR")
 # DATA_DIR = config("DATA_DIR")
@@ -48,6 +49,8 @@ def process_cb_spread(df):
     df["c_rating"] = df[["size_ig", "size_jk"]].apply(tuple, axis=1).map(rating_map)
 
     return df
+
+
 
 
 def generate_graph(df, col="rfr", col2=None, two=False):
