@@ -11,7 +11,7 @@ import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-# DATA_DIR = DATA_DIR / "wrds_crsp_compustat"
+DATA_DIR = DATA_DIR / "cip"
 
 
 ## Calculate fx returns
