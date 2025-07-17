@@ -18,7 +18,7 @@ DATA_DIR = config("DATA_DIR")
 ## Corporate Bond Portfolio Returns
 df_all = calc_us_treasury_returns.calc_returns(data_dir=DATA_DIR)
 df_stacked = df_all.stack().reset_index()
-df_stacked.columns = ['ds', 'id', 'y']
+df_stacked.columns = ['ds', 'unique_id', 'y']
 
 df_stacked.to_parquet(DATA_DIR / "ftsfr_Treas_Bond_Returns.parquet")
 

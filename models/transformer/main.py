@@ -69,7 +69,7 @@ def forecast_transformer(df, test_split, seasonality):
         # Training the model and getting MASE
 
         estimator = TransformerModel(
-            input_chunk_length=seasonality * 10,
+            input_chunk_length=seasonality * 4,
             output_chunk_length=1,
             pl_trainer_kwargs={"accelerator": device},
         )

@@ -7,26 +7,84 @@ median MASE for local forecasts and a single global MASE.
 
 from pathlib import Path
 from warnings import filterwarnings
+import numpy as np
+import pandas as pd
+import os
+from tqdm import tqdm
+import subprocess
+# Using darts for now for MASE
+from darts import TimeSeries
+from darts.metrics import mase
+from neuralforecast import NeuralForecast
+from neuralforecast.models import Autoformer
 
 # Ignoring warnings
 filterwarnings("ignore")
 
-import numpy as np
-import pandas as pd
-import toml
-from decouple import config
-from tqdm import tqdm
-import subprocess
+def train_autoformer(df, test_split, freq, seasonality, path_to_save):
+    """
+    Fit Autoformer model and save it to specificed path
 
-# Using darts for now for MASE
-from darts import TimeSeries
-from darts.metrics import mase
+    Parameters:
+    -----------
+    df : array-like
+        array-like object(e.g. pd.DataFrame), with a single or multiple series,
+        which is split into testing and training data.
+    test_ratio : int
+        fraction of df used for testing.
+    freq: str
+        pandas or polars frequency of the data
+    seasonality : int
+        Seasonality of the series.
+    path_to_save : str
+        Path to save model
+    Returns:
+    --------
+    None
+    """
+    try:
+        # Data Processing
+        # No data scaling required because neuralforecast does it automatically
+        test_length = int(test_split * len(df))
+        # Filling NaN values with interpolated values
+        df = df.interpolate()
 
-from neuralforecast import NeuralForecast
-from neuralforecast.models import Autoformer
+        # Following Monash style testing
+        forecast_horizon = test_length
 
+        train_data = df[df.ds < np.unique(df["ds"].values)[-test_length]]
 
-def forecast_autoformer(df, test_split, freq, seasonality, forecast_horizon):
+        # TODO: Need to test if code runs fine if model is trained on GPU
+        # but saved to cpu
+        # Check for an NVIDIA GPU
+        try:
+            subprocess.check_output("nvidia-smi")
+            device = "gpu"
+        except Exception:
+            device = "cpu"
+
+        # Having this horizon as the forecast_horizon means that predict will
+        # return only these amount of values
+        estimator = Autoformer(h = forecast_horizon,
+                               input_size = seasonality * 4,
+                               accelerator = device)
+
+        nf = NeuralForecast(models=[estimator], freq=freq)
+        # fit model
+        nf.fit(df=train_data)
+
+        # Save model
+        nf.save(path = path_to_save,
+                model_index = None,
+                overwrite = True,
+                save_dataset = False)
+        
+    except Exception as e:
+        # In case of errors, return NaN
+        print(f"Error in Autoformer training: {e}")
+        return np.nan
+
+def forecast_autoformer(df, test_split, freq, seasonality, path_to_load):
     """
     Fit Autoformer model and return MASE
 
@@ -41,8 +99,8 @@ def forecast_autoformer(df, test_split, freq, seasonality, forecast_horizon):
         pandas or polars frequency of the data
     seasonality : int
         Seasonality of the series.
-    forecast_horizon: int
-        Forecast horizon
+    path_to_load : str
+        Path to load model
     Returns:
     --------
     float
@@ -71,12 +129,15 @@ def forecast_autoformer(df, test_split, freq, seasonality, forecast_horizon):
         # Having this horizon as the forecast_horizon means that predict will
         # return only these amount of values
         estimator = Autoformer(
-            h=forecast_horizon, input_size=seasonality * 10, accelerator=device
+            h=forecast_horizon, input_size=seasonality * 4, accelerator=device
         )
 
         nf = NeuralForecast(models=[estimator], freq=freq)
         # fit model
         nf.fit(df=train_data)
+
+        nf = NeuralForecast.load(path = path_to_load)
+
         # get predictions
         pred_series = nf.predict()
 
@@ -122,85 +183,56 @@ def forecast_autoformer(df, test_split, freq, seasonality, forecast_horizon):
 
 
 if __name__ == "__main__":
-    # Data loading and processing
-
-    DATA_DIR = config(
-        "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
+   # Read environment variables
+    dataset_path = Path(os.environ["DATASET_PATH"])
+    frequency = os.environ["FREQUENCY"]
+    OUTPUT_DIR = Path(
+        os.environ.get("OUTPUT_DIR", 
+                       Path(__file__).parent.parent.parent / "_output")
     )
-    OUTPUT_DIR = config(
-        "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
-    )
-    datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
+    seasonality = int(os.environ["SEASONALITY"])
 
-    file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
-    df = pd.read_parquet(file_path)
+    # Extract dataset name from path for results filename
+    dataset_name = dataset_path.stem.replace("ftsfr_", "")
 
-    # neuralforecast naming conventions
-    proc_df = df.rename(columns={"entity": "unique_id", "date": "ds", "value": "y"})
+    # Path to save model to
+    model_path_to_save = OUTPUT_DIR / "models" / "Autoformer" / dataset_name
+    Path(model_path_to_save).mkdir(parents = True, exist_ok = True)
+
+    # Load data
+    df = pd.read_parquet(dataset_path)
+
+    # Check if data follows the expected format (id, ds, y)
+    expected_columns = {"unique_id", "ds", "y"}
+    if not expected_columns.issubset(df.columns):
+        raise ValueError(
+            f"Dataset must contain columns: {expected_columns}. Found: {df.columns}"
+        )
 
     # Define forecasting parameters
     test_ratio = 0.2  # Use last 20% of the data for testing
     forecast_horizon = 20  # 20 business days, 4 weeks, about a month
-    seasonality = 5  # 5 for weekly patterns (business days)
-    freq = "B"
-    # Process each entity separately
-    entities = df["entity"].unique()
-    mase_values = []
-
-    # Local forecasting
-
-    print(f"Running Autoformer forecasting for {len(entities)} entities...")
-
-    for entity in tqdm(entities):
-        # Filter data for the current entity
-        entity_data = proc_df[proc_df["unique_id"] == entity]
-
-        # Sort entity_data values by ds
-        entity_data = entity_data.sort_values(["ds"]).reset_index(drop=True)
-        # Removing leading NaNs which show up due to different start times
-        # of different series
-        entity_data = entity_data.iloc[entity_data["y"].first_valid_index() :]
-
-        if len(entity_data) <= 10:  # Skip entities with too few observations
-            continue
-
-        # Get MASE using Autoformer
-        entity_mase = forecast_autoformer(
-            entity_data, test_ratio, freq, seasonality, forecast_horizon
-        )
-
-        if not np.isnan(entity_mase):
-            mase_values.append(entity_mase)
-
-    # Calculate mean MASE across all entities
-    mean_mase = np.mean(mase_values)
-    median_mase = np.median(mase_values)
 
     # Global Forecasting
 
     global_mase = forecast_autoformer(
-        proc_df, test_ratio, freq, seasonality, forecast_horizon
+        df, test_ratio, frequency, seasonality, forecast_horizon
     )
 
     # Printing and saving results
 
     print("\nAutoformer Forecasting Results:")
-    print(f"Number of entities successfully forecasted: {len(mase_values)}")
-    print(f"Mean MASE: {mean_mase:.4f}")
-    print(f"Median MASE: {median_mase:.4f}")
     print(f"Global MASE: {global_mase:.4f}")
 
     results_df = pd.DataFrame(
         {
             "model": ["Autoformer"],
             "seasonality": [seasonality],
-            "mean_mase": [mean_mase],
-            "median_mase": [median_mase],
-            "entity_count": [len(mase_values)],
             "global_mase": [global_mase],
         }
     )
 
-    results_df.to_csv(
-        OUTPUT_DIR / "raw_results" / "autoformer_results.csv", index=False
-    )
+    results_path = OUTPUT_DIR / "raw_results" / "Autoformer"
+    file_name = "autoformer_" + dataset_name + ".csv"
+    Path(results_path).mkdir(parents = True, exist_ok = True)
+    results_df.to_csv(results_path / file_name, index = False)

@@ -37,7 +37,7 @@ df_all = process_final_product.process_cb_spread(final_data)[['date', 'c_rating'
 # NOT SURE IF THE THING WE WANT TO KEEP IS THE CREDIT RATING
 
 df_stacked = df_all.stack().reset_index()
-df_stacked.columns = ['ds', 'id', 'y']
+df_stacked.columns = ['ds', 'unique_id', 'y']
 
 df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis.parquet")
 

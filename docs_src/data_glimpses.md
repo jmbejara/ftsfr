@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Generated: 2025-07-15 13:43:11
+Generated: 2025-07-16 15:12:17
 Total files: 31
 
 ## Summary of Datasets by Task
@@ -278,7 +278,7 @@ date: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ### Columns
 ```
-id                                       String         
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (25.7% null)
 ```
@@ -328,7 +328,7 @@ date: min=1973-01-02 00:00:00, max=2025-06-11 00:00:00
 
 ### Columns
 ```
-id                                       String         
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.6% null)
 ```
@@ -351,7 +351,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ### Columns
 ```
-id                                       String         
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.0% null)
 ```
@@ -374,7 +374,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ### Columns
 ```
-id                                       String         
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.0% null)
 ```
@@ -397,7 +397,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ### Columns
 ```
-id                                       String         
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (3.3% null)
 ```
@@ -469,14 +469,14 @@ date: min=1979-11-15 00:00:00, max=2025-06-16 00:00:00
 
 ### Columns
 ```
-id                                       Int64          
+unique_id                                Int64          
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.4% null)
 ```
 
 ### Numeric Column Statistics
 ```
-id: min=10000, max=93436, mean=49674.72, median=48215.0
+unique_id: min=10000, max=93436, mean=49674.72, median=48215.0
 y: min=-1.0, max=26.583827, mean=0.01, median=0.0
 ```
 
@@ -493,14 +493,14 @@ ds: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
 
 ### Columns
 ```
-id                                       Int64          
+unique_id                                Int64          
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.4% null)
 ```
 
 ### Numeric Column Statistics
 ```
-id: min=10000, max=93436, mean=49674.72, median=48215.0
+unique_id: min=10000, max=93436, mean=49674.72, median=48215.0
 y: min=-1.0, max=26.583827, mean=0.01, median=0.0
 ```
 
@@ -513,7 +513,7 @@ ds: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
 
 ## arima_CRSP_monthly_stock_ret_results.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_CRSP_monthly_stock_ret_results.csv`
-**Size:** 110 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+**Size:** 149 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
 
 ### Columns
 ```
@@ -521,22 +521,24 @@ model                                    String
 dataset                                  String         
 frequency                                String         
 seasonality                              Int64          
-mean_mase                                String          (100.0% null)
-median_mase                              String          (100.0% null)
+mean_mase                                Float64        
+median_mase                              Float64        
 entity_count                             Int64          
 ```
 
 ### Numeric Column Statistics
 ```
 seasonality: min=12, max=12, mean=12.00, median=12.0
-entity_count: min=0, max=0, mean=0.00, median=0.0
+mean_mase: min=1.0259204800382913, max=1.0259204800382913, mean=1.03, median=1.0259204800382913
+median_mase: min=0.8256989260109684, max=0.8256989260109684, mean=0.83, median=0.8256989260109684
+entity_count: min=1446, max=1446, mean=1446.00, median=1446.0
 ```
 
 ---
 
 ## arima_CRSP_monthly_stock_retx_results.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_CRSP_monthly_stock_retx_results.csv`
-**Size:** 111 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+**Size:** 150 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
 
 ### Columns
 ```
@@ -544,22 +546,24 @@ model                                    String
 dataset                                  String         
 frequency                                String         
 seasonality                              Int64          
-mean_mase                                String          (100.0% null)
-median_mase                              String          (100.0% null)
+mean_mase                                Float64        
+median_mase                              Float64        
 entity_count                             Int64          
 ```
 
 ### Numeric Column Statistics
 ```
 seasonality: min=12, max=12, mean=12.00, median=12.0
-entity_count: min=0, max=0, mean=0.00, median=0.0
+mean_mase: min=1.0249404863568379, max=1.0249404863568379, mean=1.02, median=1.0249404863568379
+median_mase: min=0.8255633245904623, max=0.8255633245904623, mean=0.83, median=0.8255633245904623
+entity_count: min=1446, max=1446, mean=1446.00, median=1446.0
 ```
 
 ---
 
 ## arima_nyu_call_report_cash_liquidity_results.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_nyu_call_report_cash_liquidity_results.csv`
-**Size:** 160 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+**Size:** 157 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
 
 ### Columns
 ```
@@ -575,16 +579,16 @@ entity_count                             Int64
 ### Numeric Column Statistics
 ```
 seasonality: min=4, max=4, mean=4.00, median=4.0
-mean_mase: min=0.6807426850857086, max=0.6807426850857086, mean=0.68, median=0.6807426850857086
-median_mase: min=5.680051796656961e-07, max=5.680051796656961e-07, mean=0.00, median=5.680051796656961e-07
-entity_count: min=23080, max=23080, mean=23080.00, median=23080.0
+mean_mase: min=1.7190468740968465, max=1.7190468740968465, mean=1.72, median=1.7190468740968465
+median_mase: min=0.9940199045038012, max=0.9940199045038012, mean=0.99, median=0.9940199045038012
+entity_count: min=17702, max=17702, mean=17702.00, median=17702.0
 ```
 
 ---
 
 ## arima_nyu_call_report_holding_company_cash_liquidity_results.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_nyu_call_report_holding_company_cash_liquidity_results.csv`
-**Size:** 177 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+**Size:** 171 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
 
 ### Columns
 ```
@@ -600,41 +604,16 @@ entity_count                             Int64
 ### Numeric Column Statistics
 ```
 seasonality: min=4, max=4, mean=4.00, median=4.0
-mean_mase: min=0.6465407384816415, max=0.6465407384816415, mean=0.65, median=0.6465407384816415
-median_mase: min=1.9842410132783244e-06, max=1.9842410132783244e-06, mean=0.00, median=1.9842410132783244e-06
-entity_count: min=13018, max=13018, mean=13018.00, median=13018.0
+mean_mase: min=1.6206199221784616, max=1.6206199221784616, mean=1.62, median=1.6206199221784616
+median_mase: min=1.098490457283921, max=1.098490457283921, mean=1.10, median=1.098490457283921
+entity_count: min=8179, max=8179, mean=8179.00, median=8179.0
 ```
 
 ---
 
 ## arima_nyu_call_report_holding_company_leverage_results.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_nyu_call_report_holding_company_leverage_results.csv`
-**Size:** 169 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
-
-### Columns
-```
-model                                    String         
-dataset                                  String         
-frequency                                String         
-seasonality                              Int64          
-mean_mase                                Float64        
-median_mase                              Float64        
-entity_count                             Int64          
-```
-
-### Numeric Column Statistics
-```
-seasonality: min=4, max=4, mean=4.00, median=4.0
-mean_mase: min=0.5052603950471181, max=0.5052603950471181, mean=0.51, median=0.5052603950471181
-median_mase: min=7.32862022786383e-05, max=7.32862022786383e-05, mean=0.00, median=7.32862022786383e-05
-entity_count: min=12998, max=12998, mean=12998.00, median=12998.0
-```
-
----
-
-## arima_nyu_call_report_leverage_results.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_nyu_call_report_leverage_results.csv`
-**Size:** 140 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+**Size:** 151 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
 
 ### Columns
 ```
@@ -651,15 +630,15 @@ entity_count                             Int64
 ```
 seasonality: min=4, max=4, mean=4.00, median=4.0
 mean_mase: min=inf, max=inf, mean=inf, median=inf
-median_mase: min=3.6358875807745753e-06, max=3.6358875807745753e-06, mean=0.00, median=3.6358875807745753e-06
-entity_count: min=22125, max=22125, mean=22125.00, median=22125.0
+median_mase: min=1.0767206871598258, max=1.0767206871598258, mean=1.08, median=1.0767206871598258
+entity_count: min=8173, max=8173, mean=8173.00, median=8173.0
 ```
 
 ---
 
-## arima_treas_yield_curve_zero_coupon_results.csv
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_treas_yield_curve_zero_coupon_results.csv`
-**Size:** 150 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+## arima_nyu_call_report_leverage_results.csv
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_nyu_call_report_leverage_results.csv`
+**Size:** 136 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
 
 ### Columns
 ```
@@ -674,9 +653,34 @@ entity_count                             Int64
 
 ### Numeric Column Statistics
 ```
-seasonality: min=5, max=5, mean=5.00, median=5.0
-mean_mase: min=10.02251905522711, max=10.02251905522711, mean=10.02, median=10.02251905522711
-median_mase: min=9.836494729603285, max=9.836494729603285, mean=9.84, median=9.836494729603285
+seasonality: min=4, max=4, mean=4.00, median=4.0
+mean_mase: min=inf, max=inf, mean=inf, median=inf
+median_mase: min=1.2410348285034498, max=1.2410348285034498, mean=1.24, median=1.2410348285034498
+entity_count: min=17083, max=17083, mean=17083.00, median=17083.0
+```
+
+---
+
+## arima_treas_yield_curve_zero_coupon_results.csv
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_treas_yield_curve_zero_coupon_results.csv`
+**Size:** 152 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+
+### Columns
+```
+model                                    String         
+dataset                                  String         
+frequency                                String         
+seasonality                              Int64          
+mean_mase                                Float64        
+median_mase                              Float64        
+entity_count                             Int64          
+```
+
+### Numeric Column Statistics
+```
+seasonality: min=365, max=365, mean=365.00, median=365.0
+mean_mase: min=1.228649731430438, max=1.228649731430438, mean=1.23, median=1.228649731430438
+median_mase: min=1.289886838160601, max=1.289886838160601, mean=1.29, median=1.289886838160601
 entity_count: min=30, max=30, mean=30.00, median=30.0
 ```
 

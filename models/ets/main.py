@@ -64,8 +64,8 @@ def forecast_ets(df, test_ratio, seasonality):
 
 if __name__ == "__main__":
     # Read environment variables
-    dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
-    frequency = os.environ["FTSFR_FREQUENCY"]
+    dataset_path = Path(os.environ["DATASET_PATH"])
+    frequency = os.environ["FREQUENCY"]
     OUTPUT_DIR = Path(
         os.environ.get("OUTPUT_DIR", 
                        Path(__file__).parent.parent.parent / "_output")
@@ -79,14 +79,14 @@ if __name__ == "__main__":
     df = pd.read_parquet(dataset_path)
 
     # Check if data follows the expected format (id, ds, y)
-    expected_columns = {"id", "ds", "y"}
+    expected_columns = {"unique_id", "ds", "y"}
     if not expected_columns.issubset(df.columns):
         raise ValueError(
             f"Dataset must contain columns: {expected_columns}. Found: {df.columns}"
         )
 
     # This pivot adds all values for an entity as a TS in each column
-    proc_df = df.pivot(index="ds", columns="id", values="y").reset_index()
+    proc_df = df.pivot(index="ds", columns="unique_id", values="y").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis=1, inplace=True)
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     test_ratio = 0.2  # Use last 20% of the data for testing
 
     # Process each entity separately
-    entities = df["id"].unique()
+    entities = df["unique_id"].unique()
     mase_values = []
 
     # Local forecasting

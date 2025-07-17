@@ -68,7 +68,7 @@ def forecast_tide(df, test_split, seasonality):
 
         # Training the model and getting MASE
         estimator = TiDEModel(
-            input_chunk_length=seasonality * 10,
+            input_chunk_length=seasonality * 4,
             output_chunk_length=1,
             n_epochs=100,
             pl_trainer_kwargs={"accelerator": device},

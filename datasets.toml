@@ -74,7 +74,7 @@ required_data_sources = ["fed_yield_curve"]
 description = """Nelson-Seigel-Svensson zero-coupon yield curve, 
 tenors 1-30 years, 1961-present"""
 frequency = "D"
-is_balanced = true
+seasonality = 365 # Calendar days per year (or 252 for business days)
 
 ################################################################################
 [foreign_exchange]
@@ -99,22 +99,22 @@ required_data_sources = ["nyu_call_report"]
 [nyu_call_report.ftsfr_nyu_call_report_leverage]
 description = """From call report data, leverage for each rssdid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4  # Quarters per year
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_leverage]
 description = """From call report data, leverage for each bhcid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4
 
 [nyu_call_report.ftsfr_nyu_call_report_cash_liquidity]
 description = """From call report data, cash liquidity for each rssdid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_cash_liquidity]
 description = """From call report data, cash liquidity for each bhcid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4
 
 ################################################################################
 [sovereign_bonds]
@@ -135,9 +135,9 @@ required_data_sources = ["wrds_compustat", "wrds_crsp", "wrds_crsp_compustat"]
 [wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_ret]
 description = """CRSP monthly stock returns, 1926-present"""
 frequency = "ME"
-is_balanced = false
+seasonality = 12  # Months per year
 
 [wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_retx]
 description = """CRSP monthly stock returns (without dividends), 1926-present"""
 frequency = "ME"
-is_balanced = false
+seasonality = 12
