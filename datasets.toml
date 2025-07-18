@@ -117,6 +117,15 @@ frequency = "QE"
 seasonality = 4
 
 ################################################################################
+[options]
+required_data_sources = ["wrds_optionmetrics"]
+
+[options.ftsfr_optionmetrics_option_returns]
+description = """From optionmetrics data, option returns, 1996-Present"""
+frequency = "D"
+seasonality = 252 # Business days per year
+
+################################################################################
 [sovereign_bonds]
 required_data_sources = ["wrds_crsp"]
 

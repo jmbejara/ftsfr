@@ -321,6 +321,15 @@ def task_pull():
             "clean": [],
         }
 
+    # TODO
+    data_module = "options"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [f"python ./src/{data_module}/pull_optionmetrics.py --DATA_DIR={DATA_DIR / data_module}"],
+            "targets": [DATA_DIR / data_module / "optionmetrics.parquet"],
+        }
+
     data_module = "us_treasury_returns"
     if module_requirements[data_module] and not use_cache:
         # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
@@ -549,6 +558,15 @@ def task_format():
                 f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
+        }
+
+    # TODO
+    data_module = "options"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"],
+            "targets": [DATA_DIR / data_module / "ftsfr_optionmetrics_option_returns.parquet"],
         }
 
     data_module = "us_treasury_returns"
