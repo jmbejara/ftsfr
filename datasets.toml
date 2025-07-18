@@ -78,7 +78,7 @@ seasonality = 365 # Calendar days per year (or 252 for business days)
 
 ################################################################################
 [foreign_exchange]
-required_data_sources = ["wrds_fx"]
+required_data_sources = ["bloomberg_terminal"]
 
 ################################################################################
 [futures_returns]
