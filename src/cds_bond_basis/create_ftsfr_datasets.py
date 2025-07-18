@@ -33,12 +33,16 @@ corp_red_data = merge_cds_bond.merge_red_code_into_bond_treas(corp_bonds_data, r
 final_data = merge_cds_bond.merge_cds_into_bonds(corp_red_data, cds_data)
 # Missing a step of "process final data" from the ipynb
 
-df_all = process_final_product.process_cb_spread(final_data)[['date', 'c_rating', 'rfr']]
-# NOT SURE IF THE THING WE WANT TO KEEP IS THE CREDIT RATING
-#SHOULD MOST LIKELY BE SMTH UNIQUE LIKE REDCODE OR CUSIP, WILL CHECK LATER --- ALEX
+df_all = process_final_product.process_cb_spread(final_data)
 
-df_stacked = df_all.stack().reset_index()
+agg_df, non_agg_df = process_final_product.output_cb_final_products(df_all)
+
+df_stacked = agg_df.stack().reset_index()
 df_stacked.columns = ['ds', 'unique_id', 'y']
 
-df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis.parquet")
+df_stacked2 = non_agg_df.stack().reset_index()
+df_stacked2.columns = ['ds', 'unique_id', 'y']
+
+df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_aggregated.parquet")
+df_stacked2.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_non_aggregated.parquet")
 
