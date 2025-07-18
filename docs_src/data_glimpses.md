@@ -1,5 +1,4 @@
 # Data Glimpses Report
-Generated: 2025-07-16 15:12:17
 Total files: 31
 
 ## Summary of Datasets by Task
