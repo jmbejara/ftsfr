@@ -18,6 +18,8 @@
 \usepackage{subfigure} % For subfigures
 \usepackage{hyperref} % For links
 \usepackage{setspace}
+\usepackage{placeins}
+\usepackage{subfig}
 \usepackage[page]{appendix}
 
 % \title{An Open-Source Financial Time Series Forecasting Benchmark}
@@ -720,6 +722,28 @@ arbitrage spreads versus those reported in their paper.
   \label{fig:comparison-minipage}
 \end{figure}
 
+\FloatBarrier
+
+\begin{figure}
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=150pt]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
+    \small (a) Findings in Siriwardane et al. (2023)
+  \end{tabular}
+
+  \vspace{\floatsep}
+
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=125pt]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
+    \small (b) Our findings
+  \end{tabular}
+
+  \caption{Comparison of CIP spreads}\label{fig:myfig}
+\end{figure}
+
+
+
+
 During the overlapping periods of both datasets, the CIP spreads are nearly identical.
 Our findings confirm the presence of CIP deviations, particularly during periods of
 market stress, consistent with the conclusions drawn by Siriwardane et al. (2023).
@@ -833,7 +857,6 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 \paragraph*{Note}
 Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
 
-
 \begin{figure}[htbp]
   \centering
   \begin{minipage}[b]{0.48\textwidth}
@@ -852,8 +875,7 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
   \caption{IMAGES ARE PLACE HOLDERS}
   \label{fig:comparison-minipage}
 \end{figure}
-
-
+\FloatBarrier
 
 \subsection{Additional Financial Datasets}
 \label{sec:additional_datasets}

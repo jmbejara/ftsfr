@@ -35,6 +35,7 @@ final_data = merge_cds_bond.merge_cds_into_bonds(corp_red_data, cds_data)
 
 df_all = process_final_product.process_cb_spread(final_data)[['date', 'c_rating', 'rfr']]
 # NOT SURE IF THE THING WE WANT TO KEEP IS THE CREDIT RATING
+#SHOULD MOST LIKELY BE SMTH UNIQUE LIKE REDCODE OR CUSIP, WILL CHECK LATER --- ALEX
 
 df_stacked = df_all.stack().reset_index()
 df_stacked.columns = ['ds', 'unique_id', 'y']
