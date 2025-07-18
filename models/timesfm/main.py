@@ -165,38 +165,6 @@ if __name__ == "__main__":
     forecast_horizon = 20  # 20 business days, 4 weeks, about a month
     seasonality = 5  # 5 for weekly patterns (business days)
     freq = "B"
-    # Process each entity separately
-    entities = df["entity"].unique()
-    mase_values = []
-
-    # Local forecasting
-
-    print(f"Running TimesFM forecasting for {len(entities)} entities...")
-
-    for entity in tqdm(entities):
-        # Filter data for the current entity
-        entity_data = proc_df[proc_df["unique_id"] == entity]
-
-        # Sort entity_data values by ds
-        entity_data = entity_data.sort_values(["ds"]).reset_index(drop=True)
-        # Removing leading NaNs which show up due to different start times
-        # of different series
-        entity_data = entity_data.iloc[entity_data["y"].first_valid_index() :]
-
-        if len(entity_data) <= 10:  # Skip entities with too few observations
-            continue
-
-        # Get MASE using TimesFM
-        entity_mase = forecast_timesfm(
-            entity_data, test_ratio, freq, seasonality, forecast_horizon
-        )
-
-        if not np.isnan(entity_mase):
-            mase_values.append(entity_mase)
-
-    # Calculate mean MASE across all entities
-    mean_mase = np.mean(mase_values)
-    median_mase = np.median(mase_values)
 
     # Global Forecasting
 

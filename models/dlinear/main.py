@@ -46,7 +46,7 @@ def forecast_dlinear(df, test_split, seasonality):
         MASE value
     """
     try:
-        # Data Processing
+        # Splitting and TimeSeries conversion
 
         test_length = int(test_split * len(df))
         # TimeSeries object is important for darts
@@ -66,7 +66,7 @@ def forecast_dlinear(df, test_split, seasonality):
         except Exception:
             device = "cpu"
 
-        # Training the model and getting MASE
+        # Training and getting MASE
 
         estimator = DLinearModel(
             input_chunk_length=seasonality * 4,

@@ -5,142 +5,39 @@ linear model.
 Performs both local and global forecasting using PR. Reports both mean and
 median MASE for local forecasts.
 """
-
 from pathlib import Path
 from warnings import filterwarnings
-import numpy as np
-import pandas as pd
-import toml
-from decouple import config
-from tqdm import tqdm
-from sklearn.linear_model import TweedieRegressor
+filterwarnings("ignore") # This should be here to suppress warnings on import
+import os
 # Darts-based imports
 from darts.models import SKLearnModel
-from darts import TimeSeries
-from darts.utils.missing_values import fill_missing_values
-from darts.utils.model_selection import train_test_split
-from darts.metrics import mase
-
-# Ignore warnings
-filterwarnings("ignore")
-
-
-def forecast_pr(df, test_ratio, seasonality):
-    """
-    Fit PR model and return MASE
-
-    Parameters:
-    -----------
-    df : array-like
-        array-like object(e.g. pd.DataFrame) with a single series which is split
-        into testing and training data.
-    test_ratio : int
-        fraction of df used for testing.
-    seasonality : int
-        Seasonality of the series.
-    Returns:
-    --------
-    float
-        MASE value
-    """
-    try:
-        # Data Processing
-        test_length = int(test_ratio * len(df))
-        # TimeSeries object is important for darts
-        raw_series = TimeSeries.from_dataframe(df, time_col="date").astype(np.float32)
-        # Replace NaNs automatically
-        raw_series = fill_missing_values(raw_series)
-        # Splitting into train and test
-        series, test_series = train_test_split(raw_series, test_size=test_ratio)
-        # Training the model and getting MASE
-        estimator = SKLearnModel(
-            model=TweedieRegressor(power=0),
-            lags=seasonality * 4,
-            output_chunk_length=1,
-            multi_models=False,
-        )
-        estimator.fit(series)
-        pred_series = estimator.predict(test_length)
-        return mase(test_series, pred_series, series, seasonality)
-    except Exception as e:
-        # In case of errors, return NaN
-        print(f"Error in PR forecasting: {e}")
-        return np.nan
-
+from sklearn.linear_model import TweedieRegressor
+import sys
+sys.path.append('../')
+from model_classes.darts_local_class import DartsLocal
 
 if __name__ == "__main__":
-    # Data loading and processing
-    DATA_DIR = config(
-        "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
-    )
-    OUTPUT_DIR = config(
-        "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
-    )
-    datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
 
-    file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
-    df = pd.read_parquet(file_path)
+    # Read env variables
+    dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
+    frequency = os.environ["FTSFR_FREQUENCY"]
+    seasonality = int(os.environ["SEASONALITY"])
+    if os.environ.get("OUTPUT_DIR", None) is not None:
+        OUTPUT_DIR = Path(os.environ["OUTPUT_DIR"])
+    else:
+        OUTPUT_DIR = Path().resolve().parent.parent / "_output"
 
-    # This pivot adds all values for an entity as a TS in each column
-    proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
-    # Basic cleaning
-    proc_df.rename_axis(None, axis=1, inplace=True)
+    dataset_name = str(os.path.basename(dataset_path)).split(".")[0].removeprefix("ftsfr_")
 
-    # Define forecasting parameters
-    test_ratio = 0.2  # Use last 20% of the data for testing
-    forecast_horizon = 20  # 20 business days, 4 weeks, about a month
-    seasonality = 5  # 5 for weekly patterns (business days)
-
-    # Process each entity separately
-    entities = df["entity"].unique()
-    mase_values = []
-
-    # Local forecasting
-
-    print(f"Running PR forecasting for {len(entities)} entities...")
-
-    for entity in tqdm(entities):
-        # Filter data for the current entity
-        entity_data = proc_df[["date", entity]]
-
-        # Removing leading NaNs which show up due to different start times
-        # of different series
-        entity_data = entity_data.iloc[entity_data[entity].first_valid_index() :]
-
-        if len(entity_data) <= 10:  # Skip entities with too few observations
-            continue
-
-        # Get MASE using PR
-        entity_mase = forecast_pr(entity_data, test_ratio, seasonality)
-
-        if not np.isnan(entity_mase):
-            mase_values.append(entity_mase)
-
-    # Calculate mean MASE across all entities
-    mean_mase = np.mean(mase_values)
-    median_mase = np.median(mase_values)
-
-    # Global Forecasting
-
-    global_mase = forecast_pr(proc_df, test_ratio, seasonality)
-
-    # Printing and saving results
-
-    print("\PR Forecasting Results:")
-    print(f"Number of entities successfully forecasted: {len(mase_values)}")
-    print(f"Mean MASE: {mean_mase:.4f}")
-    print(f"Median MASE: {median_mase:.4f}")
-    print(f"Global MASE: {global_mase:.4f}")
-
-    results_df = pd.DataFrame(
-        {
-            "model": ["PR"],
-            "seasonality": [seasonality],
-            "mean_mase": [mean_mase],
-            "median_mase": [median_mase],
-            "entity_count": [len(mase_values)],
-            "global_mase": [global_mase],
-        }
-    )
-
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "pr_results.csv", index=False)
+    pr_obj = DartsLocal(SKLearnModel(model = TweedieRegressor(power=0),
+                                        lags = seasonality * 4,
+                                        output_chunk_length = 1,
+                                        multi_models = False),
+                                "pr", 
+                                0.2, 
+                                frequency, 
+                                seasonality, 
+                                dataset_path, 
+                                OUTPUT_DIR)
+    
+    pr_obj.main_workflow()

@@ -11,59 +11,44 @@ requires large amounts of computation power.
 
 from pathlib import Path
 from warnings import filterwarnings
-
-# Ignoring warnings
-filterwarnings("ignore")
-
-import numpy as np
+filterwarnings("ignore") # This should be here to suppress warnings on import
+import os
 import pandas as pd
-import toml
-from decouple import config
-from tqdm import tqdm
+from tabulate import tabulate
+import traceback
 import subprocess
-
+# Darts-based imports
 from darts.models import CatBoostModel
-from darts import TimeSeries
 
 from darts.metrics import mase
 
-from darts.utils.missing_values import fill_missing_values
-from darts.utils.model_selection import train_test_split
 
-
-def forecast_catboost(df, test_ratio, seasonality):
+def train_catboost(train_series, seasonality, path_to_save):
     """
-    Fit CatBoost model and return MASE
+    Fit CatBoost model and return Mean Absolute Scaled Error(MASE).
 
     Parameters:
     -----------
-    df : array-like
-        array-like object(e.g. pd.DataFrame), with a single or multiple series,
-        which is split into testing and training data.
-    test_ratio : int
-        fraction of df used for testing.
+    df : pd.DataFrame or pl.DataFrame
+        DataFrame containing the training and test series in the long format.
+    test_ratio : float
+        Ratio of the number of test samples and the total number of samples.
     seasonality : int
-        Seasonality of the series.
+        Seasonality of the dataset.
+    
     Returns:
     --------
-    float
-        MASE value
+    mase : float
+        MASE value from the testing, predicted, and training series.
     """
     try:
-        # Data Processing
-        test_length = int(test_ratio * len(df))
-        # TimeSeries object is important for darts
-        raw_series = TimeSeries.from_dataframe(df, time_col="date")
-        # Replace NaNs automatically
-        raw_series = fill_missing_values(raw_series)
-        # Splitting into train and test
-        series, test_series = train_test_split(raw_series, test_size=test_ratio)
         # Check for an NVIDIA GPU
         try:
             subprocess.check_output("nvidia-smi")
             task_type = "GPU"
         except Exception:
             task_type = "CPU"
+        
         estimator = CatBoostModel(
             lags=seasonality * 4,
             output_chunk_length=test_length,
@@ -71,53 +56,168 @@ def forecast_catboost(df, test_ratio, seasonality):
             multi_models=False,
             task_type=task_type,
         )
-        # Can add verbose = True below to monitor progress while training
+
         estimator.fit(series)
+        estimator.save(path_to_save)
+        # Model predictions
         pred_series = estimator.predict(test_length)
-        return mase(test_series, pred_series, series, seasonality)
-    except Exception as e:
-        # In case of errors, return NaN
-        print(f"Error in Catboost forecasting: {e}")
-        return np.nan
+
+        calculated_MASE = mase(test_series, pred_series, series, seasonality)
+
+        return calculated_MASE
+    
+    except Exception:
+        print("---------------------------------------------------------------")
+        print(traceback.format_exc())
+        print("\nError in CatBoost forecasting. Full traceback above \u2191")
+        print("---------------------------------------------------------------")
+        return None
+
+def forecast_catboost(train_series, seasonality, model_path, pred_series_path):
+    """
+    Fit CatBoost model and return Mean Absolute Scaled Error(MASE).
+
+    Parameters:
+    -----------
+    df : pd.DataFrame or pl.DataFrame
+        DataFrame containing the training and test series in the long format.
+    test_ratio : float
+        Ratio of the number of test samples and the total number of samples.
+    seasonality : int
+        Seasonality of the dataset.
+    
+    Returns:
+    --------
+    mase : float
+        MASE value from the testing, predicted, and training series.
+    """
+    try:
+        estimator = CatBoostModel.load(model_path)
+        pred_series = estimator.predict(test_length)
+
+        pred_series = pred_series.to_dataframe(time_as_index = False)
+
+        pred_series.to_parquet(pred_series_path)
+    
+    except Exception:
+        print("---------------------------------------------------------------")
+        print(traceback.format_exc())
+        print("\nError in CatBoost forecasting. Full traceback above \u2191")
+        print("---------------------------------------------------------------")
+        return None
+
+def calculate_MASE(train_series, seasonality, model_path, pred_series_path):
+    """
+    Fit CatBoost model and return Mean Absolute Scaled Error(MASE).
+
+    Parameters:
+    -----------
+    df : pd.DataFrame or pl.DataFrame
+        DataFrame containing the training and test series in the long format.
+    test_ratio : float
+        Ratio of the number of test samples and the total number of samples.
+    seasonality : int
+        Seasonality of the dataset.
+    
+    Returns:
+    --------
+    mase : float
+        MASE value from the testing, predicted, and training series.
+    """
+    try:
+        estimator = CatBoostModel.load(model_path)
+        pred_series = estimator.predict(test_length)
+
+        pred_series = pred_series.to_dataframe(time_as_index = False)
+
+        pred_series = pd.read_parquet(pred_series_path)
+
+        pred_series = TimeSeries.from_dataframe(pred_series, time_col = "ds")
+
+        calculated_MASE = mase(test_series, pred_series, series, seasonality)
+
+        return calculated_MASE
+    
+    except Exception:
+        print("---------------------------------------------------------------")
+        print(traceback.format_exc())
+        print("\nError in CatBoost forecasting. Full traceback above \u2191")
+        print("---------------------------------------------------------------")
+        return None
+    
+
 
 
 if __name__ == "__main__":
-    # Data loading and processing
 
-    DATA_DIR = config(
-        "DATA_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_data"
-    )
-    OUTPUT_DIR = config(
-        "OUTPUT_DIR", cast=Path, default=Path(__file__).parent.parent.parent / "_output"
-    )
-    datasets_info = toml.load(DATA_DIR / "ftsfr_datasets_paths.toml")
+    # Read env variables
+    dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
+    frequency = os.environ["FTSFR_FREQUENCY"]
+    seasonality = int(os.environ["SEASONALITY"])
+    if os.environ.get("OUTPUT_DIR", None) is not None:
+        OUTPUT_DIR = Path(os.environ["OUTPUT_DIR"])
+    else:
+        OUTPUT_DIR = Path().resolve().parent.parent / "_output"
 
-    file_path = DATA_DIR / datasets_info["treas_yield_curve_zero_coupon"]
-    df = pd.read_parquet(file_path)
+    dataset_name = str(os.path.basename(dataset_path)).split(".")[0].removeprefix("ftsfr_")
+
+    # Path to save model
+    model_path = OUTPUT_DIR / "models" / "CatBoost" / dataset_name
+    Path(model_path).mkdir(parents = True, exist_ok = True)
+    model_path = model_path / "saved_model.pkl"
+
+    # Path to save forecasts
+    forecast_path = OUTPUT_DIR / "forecasts" / "CatBoost" / dataset_name
+    Path(forecast_path).mkdir(parents = True, exist_ok = True)
+    forecast_path = forecast_path / "forecasts.parquet"
+
+    # Read dataset as a DataFrame
+    df = pd.read_parquet(dataset_path).rename(columns = {"id" : 'unique_id'})
+
     # This pivot adds all values for an entity as a TS in each column
-    proc_df = df.pivot(index="date", columns="entity", values="value").reset_index()
+    proc_df = df.pivot(index="ds", columns="unique_id", values="y").reset_index()
     # Basic cleaning
     proc_df.rename_axis(None, axis=1, inplace=True)
 
-    # Define forecasting parameters
-    test_ratio = 0.2  # Use last 20% of the data for testing
-    forecast_horizon = 20  # 20 business days, 4 weeks, about a month
-    seasonality = 5  # 5 for weekly patterns (business days)
+    # Some variables
+    test_split = 0.2
+    ids = df["unique_id"].unique()
 
-    # Global Forecasting
+    # Splitting and TimeSeries conversion
+    test_length = int(test_split * len(df))
+    # TimeSeries object is important for darts
+    raw_series = TimeSeries.from_dataframe(df, time_col = "ds")
+    # Replace NaNs automatically
+    raw_series = fill_missing_values(raw_series)
+    # Splitting into train and test
+    series, test_series = train_test_split(raw_series, test_size = test_split)
 
-    global_mase = forecast_catboost(proc_df, test_ratio, seasonality)
 
-    # Printing and saving results
+    # Training on each entity and calculating MASE
 
-    print("\nCatboost Forecasting Results:")
-    print("Global MASE: ", global_mase)
+    train_catboost()
+    forecast_catboost()
+    calculate_MASE()
+    global_mase = forecast_catboost(proc_df, test_split, seasonality)
 
-    results_df = pd.DataFrame(
+    # Printing a table with the results
+    print(tabulate([["Model", "CatBoost"],
+                    ["Dataset", dataset_name],
+                    ["Entities", len(ids)],
+                    ["Global MASE", global_mase]], tablefmt="fancy_grid"))
+    
+    # Saving the results
+
+    forecast_res = pd.DataFrame(
         {
-            "model": ["Catboost"],
-            "global_mase": [global_mase],
+            "Model" : ["CatBoost"],
+            "Dataset" : [dataset_name],
+            "Entities" : [len(ids)],
+            "Global MASE" : [global_mase]
         }
     )
 
-    results_df.to_csv(OUTPUT_DIR / "raw_results" / "catboost_results.csv", index=False)
+    result_path = OUTPUT_DIR / "raw_results" / "catboost"
+    result_path.mkdir(parents = True, exist_ok = True)
+    result_path = result_path / str(dataset_name + ".csv")
+    forecast_res.to_csv(result_path)
