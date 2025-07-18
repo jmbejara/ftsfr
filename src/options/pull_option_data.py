@@ -44,10 +44,6 @@ description_opt_Met = {
 
 
 
-
-
-
-
 def sql_query(year = 1996, start = '1996-01-01', end = '2012-01-31'): 
 
 	#use PostgreSQL
@@ -114,7 +110,7 @@ def load_all_optm_data(data_dir=DATA_DIR,
 	endYearMonth = endDate[:7]
 	
 	file_name = f"data_{startYearMonth}_{endYearMonth}.parquet"
-	file_path = Path(data_dir) / "pulled" / file_name
+	file_path = Path(data_dir) / file_name
 	t0 = time.time()
 	if file_path.exists():
 		print(f'Reading from file: {file_path}')

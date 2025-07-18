@@ -321,13 +321,13 @@ def task_pull():
             "clean": [],
         }
 
-    # TODO
     data_module = "options"
     if module_requirements[data_module] and not use_cache:
         yield {
             "name": data_module,
-            "actions": [f"python ./src/{data_module}/pull_optionmetrics.py --DATA_DIR={DATA_DIR / data_module}"],
-            "targets": [DATA_DIR / data_module / "optionmetrics.parquet"],
+            "actions": [f"python ./src/{data_module}/pull_option_data.py --DATA_DIR={DATA_DIR / data_module}"],
+            "targets": [DATA_DIR / "data_1996-01_2012-01.parquet", 
+                        DATA_DIR / "data_2012-02_2019-12.parquet"],
         }
 
     data_module = "us_treasury_returns"

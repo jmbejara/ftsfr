@@ -3,7 +3,7 @@ import numpy as np
 import config
 from pathlib import Path 
 
-import load_option_data_01 
+import options.pull_option_data as pull_option_data 
 import time 
 
 import bsm_pricer as bsm 
@@ -179,7 +179,7 @@ def appendixBfilter_level1(df):
 def execute_appendixBfilter_level1(start=START_DATE_01, end=END_DATE_01): 
 	""" Function to execute the filters from Appendix B of the paper
 	"""
-	df = load_option_data_01.load_all_optm_data(data_dir=DATA_DIR,
+	df = pull_option_data.load_all_optm_data(data_dir=DATA_DIR,
 											wrds_username=WRDS_USERNAME, 
 											startDate=start,
 											endDate=end)
