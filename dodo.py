@@ -71,6 +71,48 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
     return command
 
 
+def py_notebook_subtask(task_config):
+    """
+    Generate notebook task configuration from a simplified config dict.
+
+    Parameters:
+    - task_config: dict with keys:
+        - name: str, task name
+        - notebook_path: str, path to .py file
+        - file_dep: list, additional file dependencies
+        - targets: list, additional targets
+
+    Yields task configuration for doit.
+    """
+    name = task_config["name"]
+    pyfile_path = Path(task_config["notebook_path"])
+    notebook_path = pyfile_path.with_suffix(".ipynb")
+    file_dep = task_config.get("file_dep", [])
+    targets = task_config.get("targets", [])
+
+    yield {
+        "name": name,
+        "actions": [
+            f"""python -c "import sys; from datetime import datetime; print(f'Start {name}: {{datetime.now()}}', file=sys.stderr)" """,
+            f"ipynb-py-convert {pyfile_path} {notebook_path}",
+            jupyter_execute_notebook(notebook_path),
+            jupyter_to_html(notebook_path),
+            mv(notebook_path, OUTPUT_DIR / "_notebook_build"),
+            f"""python -c "import sys; from datetime import datetime; print(f'End {name}: {{datetime.now()}}', file=sys.stderr)" """,
+        ],
+        "file_dep": [
+            str(pyfile_path),
+            *file_dep,
+        ],
+        "targets": [
+            OUTPUT_DIR / f"{name}.html",
+            OUTPUT_DIR / "_notebook_build" / f"{name}.ipynb",
+            *targets,
+        ],
+        "clean": True,
+    }
+
+
 # Load benchmarks configuration
 with open("config.toml", "r") as f:
     config_toml = toml.load(f)
@@ -325,9 +367,13 @@ def task_pull():
     if module_requirements[data_module] and not use_cache:
         yield {
             "name": data_module,
-            "actions": [f"python ./src/{data_module}/pull_option_data.py --DATA_DIR={DATA_DIR / data_module}"],
-            "targets": [DATA_DIR / "data_1996-01_2012-01.parquet", 
-                        DATA_DIR / "data_2012-02_2019-12.parquet"],
+            "actions": [
+                f"python ./src/{data_module}/pull_option_data.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / "data_1996-01_2012-01.parquet",
+                DATA_DIR / "data_2012-02_2019-12.parquet",
+            ],
         }
 
     data_module = "us_treasury_returns"
@@ -414,6 +460,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from py_notebook_subtask(
+            {
+                "name": "summary_cds_bond_basis_ipynb",
+                "notebook_path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
+                "file_dep": [
+                    "./src/cds_bond_basis/merge_cds_bond.py",
+                ],
+                "targets": [],
+            },
+        )
 
     data_module = "cds_returns"
     if module_requirements[data_module]:
@@ -430,6 +486,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from py_notebook_subtask(
+            {
+                "name": "summary_cds_returns_ipynb",
+                "notebook_path": "./src/cds_returns/summary_cds_returns_ipynb.py",
+                "file_dep": [
+                    "./src/cds_returns/calc_cds_returns.py",
+                ],
+                "targets": [],
+            }
+        )
 
     data_module = "cip"
     if module_requirements[data_module]:
@@ -448,6 +514,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from py_notebook_subtask(
+            {
+                "name": "summary_cip_ipynb",
+                "notebook_path": "./src/cip/summary_cip_ipynb.py",
+                "file_dep": [
+                    "./src/cip/calc_cip.py",
+                ],
+                "targets": [],
+            }
+        )
 
     data_module = "commodities"
     if module_requirements[data_module] and not use_cache and not bbg_skip:
@@ -473,6 +549,16 @@ def task_format():
             "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
             "clean": [],
         }
+        yield from py_notebook_subtask(
+            {
+                "name": "summary_corp_bond_returns_ipynb",
+                "notebook_path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
+                "file_dep": [
+                    "./src/corp_bond_returns/calc_corp_bond_returns.py",
+                ],
+                "targets": [],
+            }
+        )
 
     # data_module = "foreign_exchange"
     # if module_requirements[data_module]:
@@ -565,8 +651,12 @@ def task_format():
     if module_requirements[data_module]:
         yield {
             "name": data_module,
-            "actions": [f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"],
-            "targets": [DATA_DIR / data_module / "ftsfr_optionmetrics_option_returns.parquet"],
+            "actions": [
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "ftsfr_optionmetrics_option_returns.parquet"
+            ],
         }
 
     data_module = "us_treasury_returns"
@@ -585,6 +675,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from py_notebook_subtask(
+            {
+                "name": "summary_treasury_bond_returns_ipynb",
+                "notebook_path": "./src/us_treasury_returns/summary_treasury_bond_returns_ipynb.py",
+                "file_dep": [
+                    "./src/us_treasury_returns/calc_treasury_bond_returns.py",
+                ],
+                "targets": [],
+            }
+        )
 
     # if data_sources["wrds_bank_premium"]:
     #     data_module = "wrds_bank_premium"
@@ -694,79 +794,6 @@ def task_assemble_results():
     }
 
 
-notebook_tasks = {
-    "summary_cds_bond_basis_ipynb": {
-        "path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
-        "file_dep": [
-            "./src/cds_bond_basis/merge_cds_bond.py",
-        ],
-        "targets": [],
-    },
-    "summary_cds_returns_ipynb": {
-        "path": "./src/cds_returns/summary_cds_returns_ipynb.py",
-        "file_dep": [
-            "./src/cds_returns/calc_cds_returns.py",
-        ],
-        "targets": [],
-    },
-    "summary_cip_ipynb": {
-        "path": "./src/cip/summary_cip_ipynb.py",
-        "file_dep": [
-            "./src/cip/calc_cip.py",
-        ],
-        "targets": [],
-    },
-    "summary_corp_bond_returns_ipynb": {
-        "path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
-        "file_dep": [
-            "./src/corp_bond_returns/calc_corp_bond_returns.py",
-        ],
-        "targets": [],
-    },
-    "summary_treasury_bond_returns_ipynb": {
-        "path": "./src/us_treasury_returns/summary_treasury_bond_returns_ipynb.py",
-        "file_dep": [
-            "./src/us_treasury_returns/calc_treasury_bond_returns.py",
-        ],
-        "targets": [],
-    },
-}
-
-
-# fmt: off
-def task_run_notebooks():
-    """Preps the notebooks for presentation format.
-    Execute notebooks if the script version of it has been changed.
-    """
-
-    for notebook in notebook_tasks.keys():
-        pyfile_path = Path(notebook_tasks[notebook]["path"])
-        notebook_path = pyfile_path.with_suffix(".ipynb")
-        yield {
-            "name": notebook,
-            "actions": [
-                """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
-                f"ipynb-py-convert {pyfile_path} {notebook_path}",
-                jupyter_execute_notebook(notebook_path),
-                jupyter_to_html(notebook_path),
-                mv(notebook_path, OUTPUT_DIR / "_notebook_build"),
-                """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
-            ],
-            "file_dep": [
-                pyfile_path,
-                *notebook_tasks[notebook]["file_dep"],
-            ],
-            "targets": [
-                OUTPUT_DIR / f"{notebook}.html",
-                OUTPUT_DIR / "_notebook_build" / f"{notebook}.ipynb",
-                *notebook_tasks[notebook]["targets"],
-            ],
-            "clean": True,
-            # "verbosity": 1,
-        }
-# fmt: on
-
-
 def task_create_data_glimpses():
     """Create data glimpses"""
     # Get all files in the src directory recursively
@@ -790,30 +817,27 @@ def task_create_data_glimpses():
 def task_compile_sphinx_docs():
     """Compile Sphinx Docs"""
 
-    # Get all paths from the notebook_tasks dictionary
-    notebook_paths = [
-        notebook_tasks[notebook]["path"] for notebook in notebook_tasks.keys()
-    ]
-
-    # Get all file dependencies from notebook_tasks
-    notebook_deps = [
-        dep for notebook in notebook_tasks.values() for dep in notebook["file_dep"]
-    ]
-
-    file_dep = [
-        "./docs_src/logo.png",
-        "./docs_src/conf.py",
-        "./docs_src/index.md",
-        "./docs_src/data_sources_and_modules.md",
-        "./docs_src/myst_markdown_demos.md",
-        "./docs_src/data_glimpses.md",
-        *notebook_paths,
-        *notebook_deps,
-    ]
+    # Get all files in the src directory recursively
+    src_files = list(Path("./src").rglob("*"))
+    # Filter to only include actual files (not directories) and exclude .ipynb files
+    src_files = [str(f) for f in src_files if f.is_file() and f.suffix != ".ipynb"]
 
     def touch_file():
         """Touch a file"""
         Path("./docs/.nojekyll").touch()
+
+    # Task dependencies on the format tasks that now contain the notebooks
+    task_deps = []
+    if module_requirements.get("cds_bond_basis", False):
+        task_deps.append("format:summary_cds_bond_basis_ipynb")
+    if module_requirements.get("cds_returns", False):
+        task_deps.append("format:summary_cds_returns_ipynb")
+    if module_requirements.get("cip", False):
+        task_deps.append("format:summary_cip_ipynb")
+    if module_requirements.get("corp_bond_returns", False):
+        task_deps.append("format:summary_corp_bond_returns_ipynb")
+    if module_requirements.get("us_treasury_returns", False):
+        task_deps.append("format:summary_treasury_bond_returns_ipynb")
 
     return {
         "actions": [
@@ -831,8 +855,16 @@ def task_compile_sphinx_docs():
             "./docs/myst_markdown_demos.html",
             "./docs/.nojekyll",
         ],
-        "file_dep": file_dep,
-        "task_dep": ["run_notebooks"],
+        "file_dep": [
+            "./docs_src/logo.png",
+            "./docs_src/conf.py",
+            "./docs_src/index.md",
+            "./docs_src/data_sources_and_modules.md",
+            "./docs_src/myst_markdown_demos.md",
+            "./docs_src/data_glimpses.md",
+            *src_files,
+        ],
+        "task_dep": task_deps,
         "clean": True,
     }
 

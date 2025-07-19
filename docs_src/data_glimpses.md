@@ -6,6 +6,9 @@ Total files: 31
 ### Assemble Results
 - [`results_all.csv`](#results-all-csv)
 
+### Compile Sphinx Docs
+- [`filtered_info.csv`](#filtered-info-csv)
+
 ### Create Data Glimpses
 - [`filtered_info.csv`](#filtered-info-csv)
 
