@@ -124,6 +124,17 @@ def notebook_subtask(task_config):
     # Work in the source directory to preserve relative paths
     working_notebook = source_path.with_suffix(".ipynb")
     
+    # Determine whether to move or copy based on source file type
+    if source_path.suffix == ".py":
+        # For .py sources, the .ipynb is intermediate, so move it
+        notebook_transfer_cmd = mv(working_notebook, OUTPUT_DIR / "_notebook_build")
+    else:
+        # For .ipynb sources, preserve the original by copying
+        if OS_TYPE == "nix":
+            notebook_transfer_cmd = f"cp {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
+        else:
+            notebook_transfer_cmd = f"copy {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
+    
     yield {
         "name": name,
         "actions": [
@@ -136,8 +147,8 @@ def notebook_subtask(task_config):
             jupyter_execute_notebook(working_notebook),
             # Generate HTML
             jupyter_to_html(working_notebook, OUTPUT_DIR),
-            # Move executed notebook to build directory
-            mv(working_notebook, OUTPUT_DIR / "_notebook_build"),
+            # Move or copy executed notebook to build directory based on source type
+            notebook_transfer_cmd,
             f"""python -c "import sys; from datetime import datetime; print(f'End {name}: {{datetime.now()}}', file=sys.stderr)" """,
         ],
         "file_dep": [
@@ -414,6 +425,8 @@ def task_pull():
                 DATA_DIR / "data_1996-01_2012-01.parquet",
                 DATA_DIR / "data_2012-02_2019-12.parquet",
             ],
+            "file_dep": [f"./src/{data_module}/pull_option_data.py"],
+            "clean": [],
         }
 
     data_module = "us_treasury_returns"
@@ -689,13 +702,26 @@ def task_format():
     # TODO
     data_module = "options"
     if module_requirements[data_module]:
+        yield from notebook_subtask(
+            {
+                "name": "combined_filters",
+                "notebook_path": "./src/options/combined_filters.ipynb",
+                "file_dep": [
+                    "./src/options/level_1_filters.py",
+                    "./src/options/level_2_filters.py",
+                    "./src/options/level_3_filters.py",
+                ],
+                "targets": [],
+            },
+        )
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
+                # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
+                "echo 'Not implemented'"
             ],
             "targets": [
-                DATA_DIR / data_module / "ftsfr_optionmetrics_option_returns.parquet"
+                # DATA_DIR / data_module / "ftsfr_optionmetrics_option_returns.parquet"
             ],
         }
 

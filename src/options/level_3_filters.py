@@ -14,6 +14,11 @@ Functions:
 - iv_filter_outliers: Filter out outliers based on the relative distance of implied volatility and the outlier threshold.
 """
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 # standard libraries
 import warnings
 warnings.filterwarnings("ignore")
@@ -36,23 +41,24 @@ src_path = current_directory.parent / "src"
 sys.path.insert(0, str(src_path))
 
 # project files
-import config
-import options.pull_option_data as l1
+from settings import config
+import pull_option_data as l1
 import level_1_filters as f1
 import wrds
 import bsm_pricer as bsm
 
 from functools import partial
 import time
+from datetime import date
 
 # environment variables
-WRDS_USERNAME = Path(config.WRDS_USERNAME)
-DATA_DIR = Path(config.DATA_DIR)
-OUTPUT_DIR = Path(config.OUTPUT_DIR)
-START_DATE_01 =config.START_DATE_01
-END_DATE_01 = config.END_DATE_01
-START_DATE_02 =config.START_DATE_02
-END_DATE_02 = config.END_DATE_02
+WRDS_USERNAME = Path(config("WRDS_USERNAME"))
+DATA_DIR = Path(config("DATA_DIR"))
+OUTPUT_DIR = Path(config("OUTPUT_DIR"))
+START_DATE_01 = date(1996, 1, 1)
+END_DATE_01 = date(2012, 1, 31)
+START_DATE_02 = date(2012, 2, 1)
+END_DATE_02 = date(2019, 12, 31)
 
 
 # Helper functions

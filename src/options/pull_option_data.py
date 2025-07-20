@@ -1,19 +1,24 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from datetime import date
 import pandas as pd
 import numpy as np
 import wrds
-import config
-from pathlib import Path 
+from settings import config
 import time 
 
-OUTPUT_DIR = Path(config.OUTPUT_DIR)
-DATA_DIR = Path(config.DATA_DIR)
-WRDS_USERNAME = config.WRDS_USERNAME
+OUTPUT_DIR = Path(config("OUTPUT_DIR"))
+DATA_DIR = Path(config("DATA_DIR"))
+WRDS_USERNAME = config("WRDS_USERNAME")
 
-START_DATE_01 =config.START_DATE_01
-END_DATE_01 = config.END_DATE_01
+START_DATE_01 = date(1996, 1, 1)
+END_DATE_01 = date(2012, 1, 31)
 
-START_DATE_02 =config.START_DATE_02
-END_DATE_02 = config.END_DATE_02
+START_DATE_02 = date(2012, 2, 1)
+END_DATE_02 = date(2019, 12, 31)
 
 
 
@@ -129,7 +134,7 @@ def load_all_optm_data(data_dir=DATA_DIR,
 def clean_optm_data(df):
 	df['strike_price'] = df['strike_price']/1000
 	df['tb_m3'] = df['tb_m3']/100
-	df['tb_m3'].ffill(inplace=True)
+	df['tb_m3'] = df['tb_m3'].ffill()
 	df['date'] = pd.to_datetime(df['date'])
 	return df
 
@@ -154,13 +159,13 @@ if __name__ == "__main__":
 
 	data_199601_201201 = load_all_optm_data(data_dir=DATA_DIR,
 											wrds_username=WRDS_USERNAME, 
-											startDate=START_DATE_01,
-											endDate=END_DATE_01)
+											startDate=START_DATE_01.strftime("%Y-%m-%d"),
+											endDate=END_DATE_01.strftime("%Y-%m-%d"))
 
 	data_201202_202312 = load_all_optm_data(data_dir=DATA_DIR,
 										 	wrds_username=WRDS_USERNAME, 
-											startDate=START_DATE_02,
-											endDate=END_DATE_02)
+											startDate=START_DATE_02.strftime("%Y-%m-%d"),
+											endDate=END_DATE_02.strftime("%Y-%m-%d"))
 										
 
 	

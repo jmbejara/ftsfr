@@ -1,6 +1,6 @@
 [cache]
 # If use_cache is True, then the pull step for all data sources will be skipped in dodo.py
-use_cache = true
+use_cache = false
 
 [data_sources]
 
@@ -24,7 +24,7 @@ wrds_datastream = true
 wrds_fx = true
 wrds_markit = true
 wrds_mergent = true
-wrds_optionmetrics = false
+wrds_optionmetrics = true
 
 [models]
 # Statistical Models (LocalForecastingModel)

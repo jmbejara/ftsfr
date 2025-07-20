@@ -1,22 +1,26 @@
+import sys
+import time
+from pathlib import Path
+from datetime import date
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import pandas as pd
 import numpy as np
-import config
-from pathlib import Path 
 
-import options.pull_option_data as pull_option_data 
-import time 
+from settings import config
 
-import bsm_pricer as bsm 
-import datetime 
-OUTPUT_DIR = Path(config.OUTPUT_DIR)
-DATA_DIR = Path(config.DATA_DIR)
-WRDS_USERNAME = config.WRDS_USERNAME
+import pull_option_data as pull_option_data
 
-START_DATE_01 =config.START_DATE_01
-END_DATE_01 = config.END_DATE_01
 
-START_DATE_02 =config.START_DATE_02
-END_DATE_02 = config.END_DATE_02
+OUTPUT_DIR = Path(config("OUTPUT_DIR"))
+DATA_DIR = Path(config("DATA_DIR"))
+WRDS_USERNAME = config("WRDS_USERNAME")
+
+START_DATE_01 = date(1996, 1, 1)
+END_DATE_01 = date(2012, 1, 31)
+
+START_DATE_02 = date(2012, 2, 1)
+END_DATE_02 = date(2019, 12, 31)
 
 """
 This script contains the relevant functions for executing the lvl1 filters in appendix B. 

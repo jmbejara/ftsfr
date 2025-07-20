@@ -2,17 +2,23 @@
 This module contains functions to filter options data based on time to maturity, implied volatility, moneyness, and implied interest rate.
 """
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import pandas as pd
 import numpy as np
 from datetime import datetime,timedelta
 import bsm_pricer as bsm
-import options.pull_option_data as l1
+import pull_option_data as l1
 import level_1_filters as f1
 import level_3_filters as f3
 from pathlib import Path
-import config
 
-DATA_DIR = Path(config.DATA_DIR)
+from settings import config
+
+DATA_DIR = Path(config("DATA_DIR"))
 
 
 def calc_days_to_maturity(df):
@@ -114,11 +120,11 @@ def unable_to_compute_iv_filter(df):
 def apply_l2_filters(df):
     """Apply all level 2 filters to the dataframe.
     """
-    df = filter_days_to_maturity(df)
-    df = filter_iv(df)
-    df = filter_moneyness(df)
-    df = filter_implied_interest_rate(df)
-    df = filter_unable_compute_iv(df)
+    df = days_to_maturity_filter(df)
+    df = iv_range_filter(df)
+    df = moneyness_filter(df)
+    df = implied_interest_rate_filter(df)
+    df = unable_to_compute_iv_filter(df)
     return df
 
 # if __name__ == "__main__": 
