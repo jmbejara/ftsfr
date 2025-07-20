@@ -147,6 +147,13 @@ def notebook_subtask(task_config):
                 f"copy {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
             )
 
+    # For .py sources, clear outputs before moving; for .ipynb sources, after copying
+    clear_output_action = (
+        jupyter_clear_output(working_notebook) 
+        if source_path.suffix == ".ipynb" 
+        else "echo 'Skipping output clear for .py source'"
+    )
+    
     yield {
         "name": name,
         "actions": [
@@ -165,8 +172,8 @@ def notebook_subtask(task_config):
             jupyter_to_html(working_notebook, OUTPUT_DIR),
             # Move or copy executed notebook to build directory based on source type
             notebook_transfer_cmd,
-            # Clear outputs to prevent constant re-runs
-            jupyter_clear_output(working_notebook),
+            # Clear outputs to prevent constant re-runs (only for .ipynb sources)
+            clear_output_action,
             f"""python -c "import sys; from datetime import datetime; print(f'End {name}: {{datetime.now()}}', file=sys.stderr)" """,
         ],
         "file_dep": [
@@ -614,10 +621,18 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
+                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
             ],
-            "targets": [DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet"],
-            "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
+            "targets": [
+                DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_corp_bond_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_corp_bond_portfolio_returns.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_corp_bond_returns.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
             "clean": [],
         }
         yield from notebook_subtask(
@@ -626,6 +641,7 @@ def task_format():
                 "notebook_path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
                 "file_dep": [
                     "./src/corp_bond_returns/calc_corp_bond_returns.py",
+                    "./src/corp_bond_returns/create_ftsfr_datasets.py",
                 ],
                 "targets": [],
             }
@@ -768,13 +784,17 @@ def task_format():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/calc_treasury_run_status.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "issue_dates.parquet",
                 DATA_DIR / data_module / "treasuries_with_run_status.parquet",
+                DATA_DIR / data_module / "ftsfr_treas_bond_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_treas_bond_portfolio_returns.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_treasury_run_status.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
