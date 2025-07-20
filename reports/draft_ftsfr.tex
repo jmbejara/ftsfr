@@ -577,63 +577,32 @@ The equity dataset follows \cite{Fama1993}, whose cleaning methodology has becom
 \label{sec:treasuries}
 % CRSP maturity-sorted portfolios Treasuries
 
-The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns, forming the foundation for the Federal Reserve's own yield curve estimates and numerous fixed income studies. The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes (excluding bills and other security types) is fundamental because callable bonds embed optionality that contaminates pure interest rate risk measurement—a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns that would distort any analysis of term structure dynamics. Second, the focus on bonds with remaining maturity between 0 and 5 years reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, while the 0-5 year segment represents the most actively traded Treasury securities where price discovery is most efficient. Third, the careful handling of accrued interest in return calculations is essential because, unlike equities, bond prices quote clean (without accrued interest) while returns must include coupon payments—failure to properly account for this leads to dramatic miscalculation of returns around coupon dates. Fourth, the requirement for complete price and maturity information eliminates bonds with sporadic trading or ambiguous terms that could introduce noise into yield curve estimation. Fifth, the use of month-end observations for portfolio aggregation avoids the substantial day-of-month effects in Treasury markets driven by auction cycles, month-end portfolio rebalancing, and futures contract rolls. These seemingly technical choices have profound implications: studies that use all available Treasury data without these filters often find spurious term premia and unstable factor loadings, while the Gürkaynak, Sack, and Wright approach produces stable estimates that closely match dealer quotes and futures-implied yields. By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
+The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns. This framework forms the foundation for the Federal Reserve's own yield curve estimates and underpins numerous studies in fixed income research.
+
+The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes—excluding bills and other security types—is fundamental. Callable bonds embed optionality that contaminates pure interest rate risk measurement. For example, a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns, distorting any analysis of term structure dynamics.
+
+Second, the dataset focuses on bonds with remaining maturities between 0 and 5 years. This reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, whereas the 0–5 year segment represents the most actively traded Treasury securities where price discovery is most efficient.
+
+Third, the careful handling of accrued interest in return calculations is essential. Unlike equities, bond prices are quoted as clean prices (excluding accrued interest), but return calculations must incorporate coupon payments. Failing to account for this leads to dramatic miscalculations of returns, especially around coupon payment dates.
+
+Fourth, a requirement for complete price and maturity information ensures that bonds with sporadic trading activity or ambiguous terms are excluded. This prevents noise from entering the yield curve estimation and return construction process.
+
+Fifth, the use of month-end observations for portfolio aggregation avoids substantial day-of-month effects in Treasury markets. These effects arise from auction cycles, end-of-month portfolio rebalancing, and futures contract rolls, all of which can distort return measures if not properly controlled.
+
+These seemingly technical choices have profound implications. Studies that use the full set of Treasury data without these filters often report spurious term premia and unstable factor loadings. In contrast, the Gürkaynak, Sack, and Wright methodology yields stable estimates that closely match dealer quotes and futures-implied yields.
+
+By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
 
 \subsubsection{Corporate Bonds}
 \label{sec:corporate_bonds}
 % Nozawa (2017) yield-spread sorted portfolios
-The corporate bond returns data comes from the \textbf{TRACE (Trade Reporting and Compliance Engine)} dataset available at openbondassetpricing.com, following the methodology of Nozawa (2017). The data includes:
+The corporate bond returns data is sourced from the TRACE (Trade Reporting and Compliance Engine) dataset, available at openbondassetpricing.com, and follows the methodology outlined in Nozawa (2017). This dataset incorporates several key elements to ensure accuracy and relevance. First, it includes market microstructure adjustments to correct for noise and enhance the reliability of bond prices and returns. It also applies stringent data filters, such as including only U.S.-domiciled firms and excluding private placements and convertible bonds. The dataset covers corporate bonds with sufficient outstanding amounts and complete information, and includes essential fields such as MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads.
 
-\begin{itemize}
-    \item \textbf{Market microstructure adjustments}: Corrections for market microstructure noise (MMN) to enhance bond price and return reliability
-    \item \textbf{Data filters}: Stringent quality filters including U.S.-domiciled firms only, exclusion of private placements and convertible bonds
-    \item \textbf{Coverage}: Corporate bonds with sufficient outstanding amounts and complete information
-    \item \textbf{Key fields}: MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads
-\end{itemize}
+The cleaning and standardization procedure adheres to the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM). In terms of bond selection, floating rate bonds and those with put or convertible features are excluded, although callable bonds are retained. Bonds are removed if their prices exceed matched Treasury prices or fall below \$0.01 per \$1 face value. For return processing, return reversals are eliminated if the product of adjacent returns is less than -0.04, and monthly returns are computed to avoid assumptions about reinvestment. In synthetic Treasury construction, Treasury bonds with identical cash flow structures are constructed for each corporate bond using Federal Reserve constant-maturity yield data. Excess returns and credit spreads are then calculated in price terms rather than yield spreads.
 
-\paragraph{Data Standardization:}
+For portfolio construction, bonds are sorted into deciles based on credit spreads for each date. Value-weighted portfolio returns are computed using bond values—defined as the product of MMN-adjusted clean price and amount outstanding—as weights. To ensure data quality, defaults are verified using Moody's Default Risk Service, while CRSP and Compustat data supplement the equity and accounting information. Callable bonds are also incorporated into regression models using fixed effects.
 
-The cleaning procedure follows the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM).
-
-\begin{enumerate}
-    \item \textbf{Bond Selection Criteria}:
-    \begin{itemize}
-        \item Bonds with floating rate coupons are excluded
-        \item Non-callable option features (puts, convertibles) are excluded, while callable bonds are retained
-        \item Observations where corporate bond price exceeds matched Treasury price are removed
-        \item Bonds with price less than \$0.01 per \$1 face value are dropped
-    \end{itemize}
-
-    \item \textbf{Return Processing}:
-    \begin{itemize}
-        \item Return reversals are eliminated if the product of adjacent returns is less than -0.04
-        \item Monthly returns are computed to avoid reinvestment assumptions
-    \end{itemize}
-
-    \item \textbf{Synthetic Treasury Construction}:
-    \begin{itemize}
-        \item Synthetic Treasury bonds with identical cash flow structure are constructed for each corporate bond
-        \item Treasury prices are based on Federal Reserve constant-maturity yield data
-        \item Excess returns and credit spreads are computed in price terms rather than yield spreads
-    \end{itemize}
-
-    \item \textbf{Portfolio Construction}:
-    \begin{itemize}
-        \item Bonds are sorted into deciles based on credit spread (CS) within each date
-        \item Value-weighted portfolio returns are calculated using bond values as weights
-        \item Bond value is computed as the product of MMN-adjusted clean price and amount outstanding
-    \end{itemize}
-
-    \item \textbf{Data Quality}:
-    \begin{itemize}
-        \item Defaults are verified using Moody's Default Risk Service
-        \item CRSP and Compustat data supplement equity and accounting information
-        \item Callable bonds are accounted for using fixed effects in regression models
-    \end{itemize}
-\end{enumerate}
-
-The final output is a dataset with monthly corporate bond portfolio returns across credit spread deciles, suitable for credit risk analysis and comparison with other bond market data.
-The constructed corporate bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for corporate bond returns across different credit spread deciles. Figure \textbf{PLACEHOLDER} shows the time series comparison between the two datasets, demonstrating strong alignment in return patterns across deciles, particularly during volatile periods such as the 2008 financial crisis.
+The final output is a dataset containing monthly corporate bond portfolio returns sorted by credit spread deciles, making it well-suited for credit risk analysis and for benchmarking against other bond market data. The constructed returns are validated against the dataset by He, Kelly, and Manela (2017), which serves as a benchmark for credit spread deciles. As shown in Figure PLACEHOLDER, the time series comparison between the two datasets exhibits strong alignment in return patterns, especially during volatile periods such as the 2008 financial crisis.
 
 \subsubsection{Sovereign Bonds}
 \label{sec:sovereign}
