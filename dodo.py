@@ -74,44 +74,52 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
 def notebook_subtask(task_config):
     """
     Generate notebook task configuration with unified workflow for .py and .ipynb files.
-    
+
     Creates a two-stage process:
     1. Normalize: Convert source to stable .py file in OUTPUT_DIR
     2. Execute & Render: Run .py, convert to notebook, execute, generate HTML
-    
+
     Parameters:
     - task_config: dict with keys:
         - name: str, task name
         - notebook_path: str, path to .py or .ipynb file
         - file_dep: list, additional file dependencies (optional)
         - targets: list, additional targets (optional)
-    
+
     Yields task configuration(s) for doit.
     """
     name = task_config["name"]
     source_path = Path(task_config["notebook_path"])
     file_dep = task_config.get("file_dep", [])
     targets = task_config.get("targets", [])
-    
+
     # Intermediate .py file in OUTPUT_DIR
     py_filename = f"_{name}_ipynb.py"
     py_path = OUTPUT_DIR / py_filename
-    
+
     # Stage 1: Normalize to .py in OUTPUT_DIR
     # Create the normalize action based on file type
     if source_path.suffix == ".py":
         normalize_actions = [
-            f"mkdir -p {OUTPUT_DIR}" if OS_TYPE == "nix" else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
-            f"cp {source_path} {py_path}" if OS_TYPE == "nix" else f"copy {source_path} {py_path}"
+            f"mkdir -p {OUTPUT_DIR}"
+            if OS_TYPE == "nix"
+            else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
+            f"cp {source_path} {py_path}"
+            if OS_TYPE == "nix"
+            else f"copy {source_path} {py_path}",
         ]
     elif source_path.suffix == ".ipynb":
         normalize_actions = [
-            f"mkdir -p {OUTPUT_DIR}" if OS_TYPE == "nix" else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
-            f"jupyter nbconvert --to python --output {py_path} {source_path}"
+            f"mkdir -p {OUTPUT_DIR}"
+            if OS_TYPE == "nix"
+            else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
+            f"jupyter nbconvert --to python --output {py_path} {source_path}",
         ]
     else:
-        raise ValueError(f"Unsupported file type: {source_path.suffix}. Must be .py or .ipynb")
-    
+        raise ValueError(
+            f"Unsupported file type: {source_path.suffix}. Must be .py or .ipynb"
+        )
+
     yield {
         "name": f"{name}_normalize",
         "actions": normalize_actions,
@@ -119,11 +127,11 @@ def notebook_subtask(task_config):
         "targets": [str(py_path)],
         "clean": True,
     }
-    
+
     # Stage 2: Execute and render
     # Work in the source directory to preserve relative paths
     working_notebook = source_path.with_suffix(".ipynb")
-    
+
     # Determine whether to move or copy based on source file type
     if source_path.suffix == ".py":
         # For .py sources, the .ipynb is intermediate, so move it
@@ -131,18 +139,26 @@ def notebook_subtask(task_config):
     else:
         # For .ipynb sources, preserve the original by copying
         if OS_TYPE == "nix":
-            notebook_transfer_cmd = f"cp {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
+            notebook_transfer_cmd = (
+                f"cp {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
+            )
         else:
-            notebook_transfer_cmd = f"copy {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
-    
+            notebook_transfer_cmd = (
+                f"copy {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
+            )
+
     yield {
         "name": name,
         "actions": [
             f"""python -c "import sys; from datetime import datetime; print(f'Start {name}: {{datetime.now()}}', file=sys.stderr)" """,
             # Ensure output directories exist
-            f"mkdir -p {OUTPUT_DIR / '_notebook_build'}" if OS_TYPE == "nix" else f"mkdir {OUTPUT_DIR / '_notebook_build'} 2>nul || echo.",
+            f"mkdir -p {OUTPUT_DIR / '_notebook_build'}"
+            if OS_TYPE == "nix"
+            else f"mkdir {OUTPUT_DIR / '_notebook_build'} 2>nul || echo.",
             # Convert source to notebook format (in source directory)
-            f"ipynb-py-convert {source_path} {working_notebook}" if source_path.suffix == ".py" else "echo 'Using existing notebook'",
+            f"ipynb-py-convert {source_path} {working_notebook}"
+            if source_path.suffix == ".py"
+            else "echo 'Using existing notebook'",
             # Execute notebook in its original directory (preserves relative paths)
             jupyter_execute_notebook(working_notebook),
             # Generate HTML
@@ -422,8 +438,8 @@ def task_pull():
                 f"python ./src/{data_module}/pull_option_data.py --DATA_DIR={DATA_DIR / data_module}"
             ],
             "targets": [
-                DATA_DIR / "data_1996-01_2012-01.parquet",
-                DATA_DIR / "data_2012-02_2019-12.parquet",
+                DATA_DIR / data_module / "data_1996-01_2012-01.parquet",
+                DATA_DIR / data_module / "data_2012-02_2019-12.parquet",
             ],
             "file_dep": [f"./src/{data_module}/pull_option_data.py"],
             "clean": [],
@@ -714,15 +730,34 @@ def task_format():
                 "targets": [],
             },
         )
+        yield from notebook_subtask(
+            {
+                "name": "portfolios",
+                "notebook_path": "./src/options/portfolios.ipynb",
+                "file_dep": [
+                    "./src/options/level_1_filters.py",
+                    "./src/options/level_2_filters.py",
+                    "./src/options/level_3_filters.py",
+                ],
+                "targets": [
+                    DATA_DIR / data_module / "hkm_portfolio_returns_1996-01_2019-12.parquet",
+                    DATA_DIR / data_module / "cjs_portfolio_returns_1996-01_2019-12.parquet",
+                ],
+            },
+        )
         yield {
             "name": data_module,
             "actions": [
-                # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
-                "echo 'Not implemented'"
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                # DATA_DIR / data_module / "ftsfr_optionmetrics_option_returns.parquet"
+                DATA_DIR / data_module / "ftsfr_hkm_option_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_cjs_option_returns.parquet",
             ],
+            "file_dep": [
+                f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
+            "clean": [],
         }
 
     data_module = "us_treasury_returns"

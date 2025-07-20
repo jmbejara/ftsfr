@@ -120,7 +120,12 @@ seasonality = 4
 [options]
 required_data_sources = ["wrds_optionmetrics"]
 
-[options.ftsfr_optionmetrics_option_returns]
+[options.ftsfr_hkm_option_returns]
+description = """From optionmetrics data, option returns, 1996-Present"""
+frequency = "D"
+seasonality = 252 # Business days per year
+
+[options.ftsfr_cjs_option_returns]
 description = """From optionmetrics data, option returns, 1996-Present"""
 frequency = "D"
 seasonality = 252 # Business days per year

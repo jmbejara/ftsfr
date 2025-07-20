@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Total files: 79
+Total files: 87
 
 ## Summary of Datasets by Task
 
@@ -17,6 +17,10 @@ Total files: 79
 - [`arima_CRSP_monthly_stock_ret_results.csv`](#arima-crsp-monthly-stock-ret-results-csv)
 #### Forecast: Arima:Crsp Monthly Stock Retx
 - [`arima_CRSP_monthly_stock_retx_results.csv`](#arima-crsp-monthly-stock-retx-results-csv)
+#### Forecast: Arima:Cjs Option Returns
+- [`arima_cjs_option_returns_results.csv`](#arima-cjs-option-returns-results-csv)
+#### Forecast: Arima:Hkm Option Returns
+- [`arima_hkm_option_returns_results.csv`](#arima-hkm-option-returns-results-csv)
 #### Forecast: Arima:Nyu Call Report Cash Liquidity
 - [`arima_nyu_call_report_cash_liquidity_results.csv`](#arima-nyu-call-report-cash-liquidity-results-csv)
 #### Forecast: Arima:Nyu Call Report Holding Company Cash Liquidity
@@ -61,6 +65,12 @@ Total files: 79
 - [`ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`](#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet)
 - [`ftsfr_nyu_call_report_holding_company_leverage.parquet`](#ftsfr-nyu-call-report-holding-company-leverage-parquet)
 - [`ftsfr_nyu_call_report_leverage.parquet`](#ftsfr-nyu-call-report-leverage-parquet)
+#### Format: Options
+- [`ftsfr_cjs_option_returns.parquet`](#ftsfr-cjs-option-returns-parquet)
+- [`ftsfr_hkm_option_returns.parquet`](#ftsfr-hkm-option-returns-parquet)
+#### Format: Portfolios
+- [`cjs_portfolio_returns_1996-01_2019-12.parquet`](#cjs-portfolio-returns-1996-01-2019-12-parquet)
+- [`hkm_portfolio_returns_1996-01_2019-12.parquet`](#hkm-portfolio-returns-1996-01-2019-12-parquet)
 #### Format: Us Treasury Returns
 - [`issue_dates.parquet`](#issue-dates-parquet)
 - [`treasuries_with_run_status.parquet`](#treasuries-with-run-status-parquet)
@@ -111,6 +121,9 @@ Total files: 79
 - [`french_portfolios_25_monthly_size_and_op.parquet`](#french-portfolios-25-monthly-size-and-op-parquet)
 #### Pull: Nyu Call Report
 - [`nyu_call_report.parquet`](#nyu-call-report-parquet)
+#### Pull: Options
+- [`data_1996-01_2012-01.parquet`](#data-1996-01-2012-01-parquet)
+- [`data_2012-02_2019-12.parquet`](#data-2012-02-2019-12-parquet)
 #### Pull: Us Treasury Returns
 - [`CRSP_TFZ_CONSOLIDATED.parquet`](#crsp-tfz-consolidated-parquet)
 - [`CRSP_TFZ_DAILY.parquet`](#crsp-tfz-daily-parquet)
@@ -2971,6 +2984,192 @@ dateq: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ---
 
+## cjs_portfolio_returns_1996-01_2019-12.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/options/cjs_portfolio_returns_1996-01_2019-12.parquet`
+**Size:** 122079 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+
+### Columns
+```
+return                                   Float64        
+ftfsa_id                                 String         
+date                                     Datetime(time_unit='ns', time_zone=None)
+```
+
+### Numeric Column Statistics
+```
+return: min=-0.13864600229548996, max=2.791869182116687, mean=0.02, median=0.0
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
+```
+
+---
+
+## data_1996-01_2012-01.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/options/data_1996-01_2012-01.parquet`
+**Size:** 58.6 MB | **Type:** Parquet | **Shape:** 3,410,570 rows × 15 columns
+
+### Columns
+```
+secid                                    Float64        
+date                                     Datetime(time_unit='ns', time_zone=None)
+open                                     Float64        
+close                                    Float64        
+cp_flag                                  String         
+exdate                                   Datetime(time_unit='ns', time_zone=None)
+impl_volatility                          Float64         (7.1% null)
+tb_m3                                    Float64         (0.8% null)
+volume                                   Float64        
+open_interest                            Float64        
+best_bid                                 Float64        
+best_offer                               Float64        
+strike_price                             Float64        
+contract_size                            Float64        
+__index_level_0__                        Int64          
+```
+
+### Numeric Column Statistics
+```
+secid: min=108105.0, max=108105.0, mean=108105.00, median=108105.0
+open: min=598.48, max=1564.98, mean=1160.29, median=1177.68
+close: min=598.48, max=1565.15, mean=1160.47, median=1177.6
+impl_volatility: min=0.02094, max=8.977526, mean=0.31, median=0.247122
+tb_m3: min=0.0, max=6.24, mean=1.95, median=1.06
+volume: min=0.0, max=200777.0, mean=381.46, median=0.0
+open_interest: min=0.0, max=370769.0, mean=7069.23, median=564.0
+best_bid: min=0.0, max=1916.3, mean=136.26, median=53.9
+best_offer: min=0.05, max=1921.2, mean=138.52, median=56.6
+strike_price: min=50000.0, max=3000000.0, mean=1100222.13, median=1110000.0
+contract_size: min=100.0, max=100.0, mean=100.00, median=100.0
+__index_level_0__: min=0, max=499999, mean=146085.49, median=104869.0
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=1996-01-04 00:00:00, max=2012-01-31 00:00:00
+exdate: min=1996-01-20 00:00:00, max=2014-12-20 00:00:00
+```
+
+---
+
+## data_2012-02_2019-12.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/options/data_2012-02_2019-12.parquet`
+**Size:** 261.2 MB | **Type:** Parquet | **Shape:** 15,803,328 rows × 15 columns
+
+### Columns
+```
+secid                                    Float64        
+date                                     Datetime(time_unit='ns', time_zone=None)
+open                                     Float64        
+close                                    Float64        
+cp_flag                                  String         
+exdate                                   Datetime(time_unit='ns', time_zone=None)
+impl_volatility                          Float64         (11.7% null)
+tb_m3                                    Float64         (0.8% null)
+volume                                   Float64        
+open_interest                            Float64        
+best_bid                                 Float64        
+best_offer                               Float64        
+strike_price                             Float64        
+contract_size                            Float64        
+__index_level_0__                        Int64          
+```
+
+### Numeric Column Statistics
+```
+secid: min=108105.0, max=108105.0, mean=108105.00, median=108105.0
+open: min=1277.82, max=3247.23, mean=2403.07, median=2450.66
+close: min=1278.04, max=3240.02, mean=2403.43, median=2457.59
+impl_volatility: min=0.012578, max=8.992139, mean=0.27, median=0.20988
+tb_m3: min=-0.02, max=2.43, mean=1.07, median=1.02
+volume: min=0.0, max=124136.0, mean=133.64, median=0.0
+open_interest: min=0.0, max=624873.0, mean=1700.71, median=15.0
+best_bid: min=0.0, max=3115.1, mean=219.28, median=57.0
+best_offer: min=0.05, max=3134.3, mean=222.72, median=59.2
+strike_price: min=100000.0, max=4800000.0, mean=2098406.93, median=2125000.0
+contract_size: min=100.0, max=100.0, mean=100.00, median=100.0
+__index_level_0__: min=0, max=499999, mean=238963.73, median=234175.0
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=2012-02-01 00:00:00, max=2019-12-31 00:00:00
+exdate: min=2012-02-03 00:00:00, max=2022-12-16 00:00:00
+```
+
+---
+
+## ftsfr_cjs_option_returns.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/options/ftsfr_cjs_option_returns.parquet`
+**Size:** 91678 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.13864600229548996, max=2.791869182116687, mean=0.02, median=0.0
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
+```
+
+---
+
+## ftsfr_hkm_option_returns.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/options/ftsfr_hkm_option_returns.parquet`
+**Size:** 39865 bytes | **Type:** Parquet | **Shape:** 5,184 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.07194785160690693, max=0.9284949815963346, mean=0.02, median=0.004017050151524223
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
+```
+
+---
+
+## hkm_portfolio_returns_1996-01_2019-12.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/options/hkm_portfolio_returns_1996-01_2019-12.parquet`
+**Size:** 51931 bytes | **Type:** Parquet | **Shape:** 5,184 rows × 3 columns
+
+### Columns
+```
+return                                   Float64        
+ftfsa_id                                 String         
+date                                     Datetime(time_unit='ns', time_zone=None)
+```
+
+### Numeric Column Statistics
+```
+return: min=-0.07194785160690693, max=0.9284949815963346, mean=0.02, median=0.004017050151524223
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
+```
+
+---
+
 ## CRSP_TFZ_CONSOLIDATED.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_CONSOLIDATED.parquet`
 **Size:** 93.7 MB | **Type:** Parquet | **Shape:** 2,479,718 rows × 23 columns
@@ -4574,6 +4773,52 @@ seasonality: min=12, max=12, mean=12.00, median=12.0
 mean_mase: min=1.0249404863568379, max=1.0249404863568379, mean=1.02, median=1.0249404863568379
 median_mase: min=0.8255633245904623, max=0.8255633245904623, mean=0.83, median=0.8255633245904623
 entity_count: min=1446, max=1446, mean=1446.00, median=1446.0
+```
+
+---
+
+## arima_cjs_option_returns_results.csv
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_cjs_option_returns_results.csv`
+**Size:** 106 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+
+### Columns
+```
+model                                    String         
+dataset                                  String         
+frequency                                String         
+seasonality                              Int64          
+mean_mase                                String          (100.0% null)
+median_mase                              String          (100.0% null)
+entity_count                             Int64          
+```
+
+### Numeric Column Statistics
+```
+seasonality: min=252, max=252, mean=252.00, median=252.0
+entity_count: min=0, max=0, mean=0.00, median=0.0
+```
+
+---
+
+## arima_hkm_option_returns_results.csv
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/raw_results/arima_hkm_option_returns_results.csv`
+**Size:** 106 bytes | **Type:** Csv | **Shape:** 1 rows × 7 columns
+
+### Columns
+```
+model                                    String         
+dataset                                  String         
+frequency                                String         
+seasonality                              Int64          
+mean_mase                                String          (100.0% null)
+median_mase                              String          (100.0% null)
+entity_count                             Int64          
+```
+
+### Numeric Column Statistics
+```
+seasonality: min=252, max=252, mean=252.00, median=252.0
+entity_count: min=0, max=0, mean=0.00, median=0.0
 ```
 
 ---
