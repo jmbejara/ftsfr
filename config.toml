@@ -1,6 +1,6 @@
 [cache]
 # If use_cache is True, then the pull step for all data sources will be skipped in dodo.py
-use_cache = false
+use_cache = true
 
 [data_sources]
 

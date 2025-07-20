@@ -165,6 +165,8 @@ def notebook_subtask(task_config):
             jupyter_to_html(working_notebook, OUTPUT_DIR),
             # Move or copy executed notebook to build directory based on source type
             notebook_transfer_cmd,
+            # Clear outputs to prevent constant re-runs
+            jupyter_clear_output(working_notebook),
             f"""python -c "import sys; from datetime import datetime; print(f'End {name}: {{datetime.now()}}', file=sys.stderr)" """,
         ],
         "file_dep": [
@@ -866,7 +868,7 @@ def task_forecast():
                     f"format:{get_format_task_name(dataset_info['module'])}",
                 ],
                 "clean": [],
-                "verbosity": 2,
+                "verbosity": 0,
             }
 
 

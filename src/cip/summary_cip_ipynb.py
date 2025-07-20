@@ -1,6 +1,6 @@
 # %%
 """
-# Analysis Summary: Covered Interest Parity (CIP) Arbitrage Spreads
+# Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads
 
 **Source:**
 Du, W., & Schreger, J. (2023). *Covered Interest Parity Deviations: Macro Risks and Market Frictions*. Harvard Business School.
