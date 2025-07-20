@@ -71,37 +71,77 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
     return command
 
 
-def py_notebook_subtask(task_config):
+def notebook_subtask(task_config):
     """
-    Generate notebook task configuration from a simplified config dict.
-
+    Generate notebook task configuration with unified workflow for .py and .ipynb files.
+    
+    Creates a two-stage process:
+    1. Normalize: Convert source to stable .py file in OUTPUT_DIR
+    2. Execute & Render: Run .py, convert to notebook, execute, generate HTML
+    
     Parameters:
     - task_config: dict with keys:
         - name: str, task name
-        - notebook_path: str, path to .py file
-        - file_dep: list, additional file dependencies
-        - targets: list, additional targets
-
-    Yields task configuration for doit.
+        - notebook_path: str, path to .py or .ipynb file
+        - file_dep: list, additional file dependencies (optional)
+        - targets: list, additional targets (optional)
+    
+    Yields task configuration(s) for doit.
     """
     name = task_config["name"]
-    pyfile_path = Path(task_config["notebook_path"])
-    notebook_path = pyfile_path.with_suffix(".ipynb")
+    source_path = Path(task_config["notebook_path"])
     file_dep = task_config.get("file_dep", [])
     targets = task_config.get("targets", [])
-
+    
+    # Intermediate .py file in OUTPUT_DIR
+    py_filename = f"_{name}_ipynb.py"
+    py_path = OUTPUT_DIR / py_filename
+    
+    # Stage 1: Normalize to .py in OUTPUT_DIR
+    # Create the normalize action based on file type
+    if source_path.suffix == ".py":
+        normalize_actions = [
+            f"mkdir -p {OUTPUT_DIR}" if OS_TYPE == "nix" else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
+            f"cp {source_path} {py_path}" if OS_TYPE == "nix" else f"copy {source_path} {py_path}"
+        ]
+    elif source_path.suffix == ".ipynb":
+        normalize_actions = [
+            f"mkdir -p {OUTPUT_DIR}" if OS_TYPE == "nix" else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
+            f"jupyter nbconvert --to python --output {py_path} {source_path}"
+        ]
+    else:
+        raise ValueError(f"Unsupported file type: {source_path.suffix}. Must be .py or .ipynb")
+    
+    yield {
+        "name": f"{name}_normalize",
+        "actions": normalize_actions,
+        "file_dep": [str(source_path)],
+        "targets": [str(py_path)],
+        "clean": True,
+    }
+    
+    # Stage 2: Execute and render
+    # Work in the source directory to preserve relative paths
+    working_notebook = source_path.with_suffix(".ipynb")
+    
     yield {
         "name": name,
         "actions": [
             f"""python -c "import sys; from datetime import datetime; print(f'Start {name}: {{datetime.now()}}', file=sys.stderr)" """,
-            f"ipynb-py-convert {pyfile_path} {notebook_path}",
-            jupyter_execute_notebook(notebook_path),
-            jupyter_to_html(notebook_path),
-            mv(notebook_path, OUTPUT_DIR / "_notebook_build"),
+            # Ensure output directories exist
+            f"mkdir -p {OUTPUT_DIR / '_notebook_build'}" if OS_TYPE == "nix" else f"mkdir {OUTPUT_DIR / '_notebook_build'} 2>nul || echo.",
+            # Convert source to notebook format (in source directory)
+            f"ipynb-py-convert {source_path} {working_notebook}" if source_path.suffix == ".py" else "echo 'Using existing notebook'",
+            # Execute notebook in its original directory (preserves relative paths)
+            jupyter_execute_notebook(working_notebook),
+            # Generate HTML
+            jupyter_to_html(working_notebook, OUTPUT_DIR),
+            # Move executed notebook to build directory
+            mv(working_notebook, OUTPUT_DIR / "_notebook_build"),
             f"""python -c "import sys; from datetime import datetime; print(f'End {name}: {{datetime.now()}}', file=sys.stderr)" """,
         ],
         "file_dep": [
-            str(pyfile_path),
+            str(py_path),  # Depend on normalized .py for stability
             *file_dep,
         ],
         "targets": [
@@ -460,7 +500,7 @@ def task_format():
             ],
             "clean": [],
         }
-        yield from py_notebook_subtask(
+        yield from notebook_subtask(
             {
                 "name": "summary_cds_bond_basis_ipynb",
                 "notebook_path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
@@ -486,7 +526,7 @@ def task_format():
             ],
             "clean": [],
         }
-        yield from py_notebook_subtask(
+        yield from notebook_subtask(
             {
                 "name": "summary_cds_returns_ipynb",
                 "notebook_path": "./src/cds_returns/summary_cds_returns_ipynb.py",
@@ -514,7 +554,7 @@ def task_format():
             ],
             "clean": [],
         }
-        yield from py_notebook_subtask(
+        yield from notebook_subtask(
             {
                 "name": "summary_cip_ipynb",
                 "notebook_path": "./src/cip/summary_cip_ipynb.py",
@@ -549,7 +589,7 @@ def task_format():
             "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
             "clean": [],
         }
-        yield from py_notebook_subtask(
+        yield from notebook_subtask(
             {
                 "name": "summary_corp_bond_returns_ipynb",
                 "notebook_path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
@@ -675,7 +715,7 @@ def task_format():
             ],
             "clean": [],
         }
-        yield from py_notebook_subtask(
+        yield from notebook_subtask(
             {
                 "name": "summary_treasury_bond_returns_ipynb",
                 "notebook_path": "./src/us_treasury_returns/summary_treasury_bond_returns_ipynb.py",
