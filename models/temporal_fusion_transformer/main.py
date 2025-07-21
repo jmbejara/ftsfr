@@ -6,7 +6,7 @@ median MASE for local forecasts and a single global MASE.
 """
 from pathlib import Path
 from warnings import filterwarnings
-filterwarnings("ignore") # This should be here to suppress warnings on import
+filterwarnings("ignore") 
 import os
 # Darts-based imports
 from darts.models import TFTModel
@@ -16,9 +16,9 @@ from model_classes.darts_global_class import DartsGlobal
 
 if __name__ == "__main__":
 
-    # Read env variables
-    dataset_path = Path(os.environ["FTSFR_DATASET_PATH"])
-    frequency = os.environ["FTSFR_FREQUENCY"]
+    # Environment variables
+    dataset_path = Path(os.environ["DATASET_PATH"])
+    frequency = os.environ["FREQUENCY"]
     seasonality = int(os.environ["SEASONALITY"])
     if os.environ.get("OUTPUT_DIR", None) is not None:
         OUTPUT_DIR = Path(os.environ["OUTPUT_DIR"])

@@ -4,19 +4,22 @@ This contains classes to directly inherit into a model class.
 Expected behaviour is that each new object is created for a unique model
 and data pair.
 """
-from pathlib import Path
 import os
 import traceback
 from collections import defaultdict
-import pandas as pd
+from pathlib import Path
+
 import numpy as np
-from .forecasting_model import forecasting_model
-from tabulate import tabulate
+import pandas as pd
 from darts import TimeSeries
+from darts.dataprocessing.transformers import Scaler
+from darts.metrics import mase
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
-from darts.metrics import mase
-from darts.dataprocessing.transformers import Scaler
+from tabulate import tabulate
+
+from .forecasting_model import forecasting_model
+
 
 class DartsMain(forecasting_model):
     def __init__(self,
@@ -58,11 +61,17 @@ class DartsMain(forecasting_model):
             train_series, test_series = train_test_split(transformed_series, test_size = test_split)
         else:
             train_series, test_series = train_test_split(raw_series, test_size = test_split)
+        
+        # TODO: Implement a filling mechanism which adds means to the dataset
+        # if len(train_series) < 4 * seasonality:
+        #     difference = 4 * seasonality - len(train_series)
+        #     pd.date_range(end = train_series.start_time(), periods = difference + 1)
+
 
         # Path to save model
         model_path = output_path / "models" / model_name / dataset_name
         Path(model_path).mkdir(parents = True, exist_ok = True)
-        model_path = model_path / "saved_model.pkl"
+        model_path = model_path / "saved_model" # Without an extension
 
         # Path to save forecasts
         forecast_path = output_path / "forecasts" / model_name / dataset_name
@@ -73,78 +82,99 @@ class DartsMain(forecasting_model):
         result_path.mkdir(parents = True, exist_ok = True)
         result_path = result_path / str(dataset_name + ".csv")
 
-        # Data-related variables
+        # Names
 
-        self.raw_series = raw_series
-        self.dataset_path = data_path
         self.dataset_name = dataset_name
+        self.model_name = model_name
+
+        # Paths
+        self.dataset_path = data_path
         self.forecast_path = forecast_path
         self.result_path = result_path
+        self.model_path = model_path
+
+        # Series
+        self.raw_series = raw_series # Helps with predictions
         self.train_series = train_series
         self.test_series = test_series
-        self.test_length = int(test_split * len(df))
+        self.pred_series = None # None for checking if predictions have been made
+
+        # Important variables
+        # This is the ratio of test entries to total entries in the df
         self.test_split = test_split
         self.seasonality = seasonality
         self.frequency = frequency
-        self.pred_series = None
         
-        # Model related variables
         # Stores base class
         self.estimator = estimator
         # Stores the actual model
-        self.model = estimator
-        self.model_path = model_path
-        self.model_name = model_name
+        self.model = estimator # Initially same as estimator
+
         # Error metrics
         self.errors = defaultdict(float)
 
         print("Object Initialized:")
         print(tabulate([["Model", model_name],
-                        ["Dataset", dataset_name]], tablefmt="fancy_grid"))
+                        ["Dataset", dataset_name],
+                        ["Total Entities", self.raw_series.n_components]],
+                        tablefmt="fancy_grid"))
 
     def _train_test_split(self, entity_data):
-        self.test_length = int(self.test_split * len(entity_data))
-        self.train_series, self.test_series = train_test_split(entity_data, test_size = self.test_split)
+        try:
+            self.train_series, self.test_series = train_test_split(entity_data, test_size = self.test_split)
+        except Exception:
+            self.print_sep()
+            print(traceback.format_exc())
+            print(f"\nError in {self.model_name} dataset splitting. Full traceback above \u2191")
+            self.print_sep()
+            return None
 
-    def _train(self):
+    def train(self):
         try:
             self.model.fit(self.train_series)
         except Exception:
-            print("---------------------------------------------------------------")
+            self.print_sep()
             print(traceback.format_exc())
             print(f"\nError in {self.model_name} training. Full traceback above \u2191")
-            print("---------------------------------------------------------------")
+            self.print_sep()
             return None
 
     def save_model(self):
         try:
             self.model.save(self.model_path)
         except Exception:
-            print("---------------------------------------------------------------")
+            self.print_sep()
             print(traceback.format_exc())
             print(f"\nError in saving {self.model_name} model. Full traceback above \u2191")
-            print("---------------------------------------------------------------")
+            self.print_sep()
             return None
     
     def load_model(self):
         try:
             self.model = self.estimator.load(self.model_path)
         except Exception:
-            print("---------------------------------------------------------------")
+            self.print_sep()
             print(traceback.format_exc())
             print(f"\nError in {self.model_name} model loading. Full traceback above \u2191")
-            print("---------------------------------------------------------------")
+            self.print_sep()
             return None
 
     def forecast(self):
         try:
-            # Get predictions
-            self.pred_series = self.model.predict(self.test_length)
+            pred_series = self.model.predict(1, 
+                                self.raw_series.drop_after(
+                                self.test_series.get_timestamp_at_point(0)))
+            for i in range(1, len(self.test_series)):
+                curr_time_stamp = self.test_series.get_timestamp_at_point(i)
+                pred_dataset = self.raw_series.drop_after(curr_time_stamp)
+                current_pred = self.model.predict(1, pred_dataset)
+                pred_series = pred_series.concatenate(current_pred)
+            self.pred_series = pred_series
         except Exception:
-            print("---------------------------------------------------------------")
+            self.print_sep()
             print(traceback.format_exc())
             print(f"\nError in {self.model_name} forecasting. Full traceback above \u2191")
-            print("---------------------------------------------------------------")
+            self.print_sep()
             return None
 
     def save_forecast(self):
@@ -153,10 +183,10 @@ class DartsMain(forecasting_model):
             temp_df = self.pred_series.to_dataframe(time_as_index = False)
             temp_df.to_parquet(self.forecast_path)
         except Exception:
-            print("---------------------------------------------------------------")
+            self.print_sep()
             print(traceback.format_exc())
             print(f"\nError in saving {self.model_name} forecasts. Full traceback above \u2191")
-            print("---------------------------------------------------------------")
+            self.print_sep()
             return None
     
     def load_forecast(self):
@@ -164,10 +194,10 @@ class DartsMain(forecasting_model):
             temp_df = pd.read_parquet(self.forecast_path)
             self.pred_series = TimeSeries.from_dataframe(temp_df, time_col = "ds")
         except Exception:
-            print("---------------------------------------------------------------")
+            self.print_sep()
             print(traceback.format_exc())
             print(f"\nError in loading {self.model_name} forecasts. Full traceback above \u2191")
-            print("---------------------------------------------------------------")
+            self.print_sep()
             return None
     
     def calculate_error(self, metric = "MASE"):

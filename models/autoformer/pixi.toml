@@ -4,7 +4,7 @@ name = "autoformer"
 platforms = ["osx-arm64", "osx-64", "win-64", "linux-64"]
 
 [tasks]
-install = "pip install neuralforecast darts tabulate pyarrow torch"
+install = "pip install neuralforecast darts tabulate pyarrow"
 main = { cmd = "python main.py", depends-on = ["install"] }
 
 [dependencies]
@@ -15,9 +15,3 @@ numpy = "*"
 pandas = "*"
 tqdm = "*"
 packaging = "*"
-scipy = "*"
-statsmodels = "*"
-pyarrow = "*"
-fastparquet = "*"
-darts = "*"
-tabulate = "*"
