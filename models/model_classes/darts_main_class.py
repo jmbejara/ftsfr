@@ -162,12 +162,12 @@ class DartsMain(forecasting_model):
     def forecast(self):
         try:
             pred_series = self.model.predict(1, 
-                                self.raw_series.drop_after(
+                                series = self.raw_series.drop_after(
                                 self.test_series.get_timestamp_at_point(0)))
             for i in range(1, len(self.test_series)):
                 curr_time_stamp = self.test_series.get_timestamp_at_point(i)
                 pred_dataset = self.raw_series.drop_after(curr_time_stamp)
-                current_pred = self.model.predict(1, pred_dataset)
+                current_pred = self.model.predict(1, series = pred_dataset)
                 pred_series = pred_series.concatenate(current_pred)
             self.pred_series = pred_series
         except Exception:
