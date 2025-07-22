@@ -199,7 +199,7 @@ def task_config():
 
     return {
         "actions": [
-            "ipython ./src/settings.py",
+            "python ./src/settings.py",
         ],
         "targets": [DATA_DIR, OUTPUT_DIR],
         "file_dep": ["./src/settings.py", "./config.toml"],
