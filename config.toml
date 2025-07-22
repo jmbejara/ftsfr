@@ -1,6 +1,6 @@
 [cache]
 # If use_cache is True, then the pull step for all data sources will be skipped in dodo.py
-use_cache = false
+use_cache = true
 
 [data_sources]
 
@@ -24,31 +24,45 @@ wrds_datastream = true
 wrds_fx = true
 wrds_markit = true
 wrds_mergent = true
-wrds_optionmetrics = false
+wrds_optionmetrics = true
 
 [models]
-# Naive Models
-simple_exponential_smoothing = true  # Simple Exponential Smoothing
+# Statistical Models (LocalForecastingModel)
+arima = true  # ARIMA - Autoregressive Integrated Moving Average model
+ets = false  # ETS - Exponential Smoothing (Error, Trend, Seasonal) state space model
+simple_exponential_smoothing = true  # Simple Exponential Smoothing - basic smoothing for level-only data
+tbats = false  # TBATS - Exponential smoothing with Box-Cox transformation, ARMA errors, Trend and Seasonal
+theta = false  # Theta Method - simple decomposition method that performs well on M3 competition
+prophet = false  # Prophet - Facebook's additive model for time series with strong seasonal effects
 
-# Traditional Time Series Models
-arima = true  # Vector Autoregression
-vecm = false  # Vector Error Correction Model
+# Regression Models (GlobalForecastingModel)
+pr = false  # Polynomial Regression - fits polynomial functions to capture non-linear trends
+catboost = false  # CatBoost - gradient boosting optimized for categorical features and ordered data
 
-# Deep Learning Models
-lstm = false  # Long Short-Term Memory
-transformer = false  # Transformer Architecture
-temporal_fusion = false  # Temporal Fusion Transformer
-neural_prophet = false  # Neural Prophet
+# PyTorch (Lightning)-based Models (GlobalForecastingModel)
+# Basic Neural Networks
+ffnn = false  # Feed-Forward Neural Network - simple fully connected network for time series
+deepar = false  # DeepAR - Amazon's probabilistic RNN for forecasting with uncertainty estimates
+wavenet = false  # WaveNet - dilated causal convolutions originally for audio generation
 
-# Hybrid Models
-deep_ar = false  # Deep AutoRegressive
-deep_state = false  # Deep State Space
-deep_factors = false  # Deep Factor Model
+# Linear Models (LTSF-Linear family)
+dlinear = false  # D-Linear - decomposition-based linear model for long-term forecasting
+nlinear = false  # N-Linear - normalization-based linear model handling distribution shifts
 
-# Ensemble Methods
-random_forest_ts = false  # Random Forest for Time Series
-xgboost_ts = false  # XGBoost for Time Series
-lightgbm_ts = false  # LightGBM for Time Series
+# N-BEATS/N-HiTS family
+nbeats = false  # N-BEATS - Neural Basis Expansion Analysis for interpretable forecasting
+nhits = false  # N-HiTS - Neural Hierarchical Interpolation for long-horizon forecasting
+
+# Transformer Models
+transformer = false  # Transformer - vanilla transformer architecture adapted for time series
+autoformer = false  # Autoformer - Auto-Correlation decomposition transformer
+informer = false  # Informer - ProbSparse self-attention for efficient long sequence forecasting
+patchtst = false  # PatchTST - channel-independent patching for multivariate time series
+temporal_fusion_transformer = false  # TFT - Temporal Fusion Transformer with interpretable insights
+
+# Other Advanced Models
+tide = false  # TiDE - Time Series Dense Encoder using residual blocks without attention
+timesfm = false  # TimesFM - Google's foundation model pre-trained on 100B timepoints
 
 [reports]
 is_latex_installed = true

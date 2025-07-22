@@ -1,6 +1,6 @@
 # %%
 """
-# Cleaning Summary: Treasury Bond Returns 
+# Cleaning Summary: Treasury Bond Returns
 """
 
 # %%
@@ -157,8 +157,16 @@ if not merged_df.empty:
             col2 = f"US_bonds_0{i + 1}"  # Column from treas_hkm
 
         ax = axes[i]
-        ax.plot(merged_df["DATE"], merged_df[col1], label=f"Portfolio {i + 1}", color="blue")
-        ax.plot(merged_df["DATE"], merged_df[col2], label=f"HKM {i + 1}", color="red", linestyle="--")
+        ax.plot(
+            merged_df["DATE"], merged_df[col1], label=f"Portfolio {i + 1}", color="blue"
+        )
+        ax.plot(
+            merged_df["DATE"],
+            merged_df[col2],
+            label=f"HKM {i + 1}",
+            color="red",
+            linestyle="--",
+        )
         ax.set_title(f"Comparison: Portfolio {i + 1} vs HKM {i + 1}")
         ax.legend()
         ax.grid(True)

@@ -15,6 +15,7 @@ import pull_nyu_call_report
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "nyu_call_report"
 
 
 ## nyu_call_report_leverage
@@ -27,7 +28,10 @@ df = (
     .sort_values(by=["rssdid", "date"])
     .reset_index(drop=True)
 )
-df = df.rename(columns={"rssdid": "entity", "date": "date", "leverage": "value"})
+# reshape to wide
+# df_wide = df.pivot(index="date", columns="rssdid", values="leverage")
+# df_wide.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_leverage.parquet")
+df = df.rename(columns={"rssdid": "unique_id", "date": "ds", "leverage": "y"})
 df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_leverage.parquet")
 
 ## nyu_call_report_holding_company_leverage
@@ -40,13 +44,14 @@ df_bhc = (
 df_bhc = df_bhc.reset_index()
 df_bhc["leverage"] = df_bhc["assets"] / df_bhc["equity"]
 
-df = (
-    df_bhc[["bhcid", "date", "leverage"]]
-    .sort_values(by=["bhcid", "date"])
-    .reset_index(drop=True)
-)
-df = df.rename(columns={"bhcid": "entity", "date": "date", "leverage": "value"})
-df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_leverage.parquet")
+df_bhc = df_bhc.rename(columns={"bhcid": "unique_id", "date": "ds", "leverage": "y"})
+# drop values where entity is 0
+df_bhc = df_bhc[df_bhc["unique_id"] != "0"]
+df_bhc = df_bhc[["unique_id", "ds", "y"]].reset_index(drop=True)
+df_bhc.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_leverage.parquet")
+# df_wide = df_bhc.pivot(index="date", columns="bhcid", values="leverage")
+# df_wide = df_wide.drop(columns=["0"])
+# df_wide.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_leverage.parquet")
 
 ## nyu_call_report_cash_liquidity
 df_all["cash_liquidity"] = df_all["cash"] / df_all["assets"]
@@ -55,14 +60,27 @@ df = (
     .sort_values(by=["rssdid", "date"])
     .reset_index(drop=True)
 )
-df = df.rename(columns={"rssdid": "entity", "date": "date", "cash_liquidity": "value"})
+df = df.rename(columns={"rssdid": "unique_id", "date": "ds", "cash_liquidity": "y"})
 df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
+# df_wide = df.pivot(index="date", columns="rssdid", values="cash_liquidity")
+# df_wide.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
 
 ## nyu_call_report_holding_company_cash_liquidity
-df = (
-    df_all[["bhcid", "date", "cash_liquidity"]]
+df_bhc = (
+    df_all[["bhcid", "date", "cash", "assets"]]
+    .groupby(["bhcid", "date"])
+    .sum()
     .sort_values(by=["bhcid", "date"])
-    .reset_index(drop=True)
+    .reset_index()
 )
-df = df.rename(columns={"bhcid": "entity", "date": "date", "cash_liquidity": "value"})
+df_bhc["cash_liquidity"] = df_bhc["cash"] / df_bhc["assets"]
+df = df_bhc.rename(columns={"bhcid": "unique_id", "date": "ds", "cash_liquidity": "y"})
+df = df[df["unique_id"] != "0"]
+df = df[["unique_id", "ds", "y"]].reset_index(drop=True)
 df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet")
+
+# df_wide = df_bhc.pivot(index="date", columns="bhcid", values="cash_liquidity")
+# df_wide = df_wide.drop(columns=["0"])
+# df_wide.to_parquet(
+#     DATA_DIR / "ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet"
+# )

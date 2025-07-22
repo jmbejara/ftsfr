@@ -12,116 +12,905 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{natbib}  % Required for JPE bibliography style
+\usepackage{booktabs} % For better tables
+\usepackage{multirow} % For tables with merged cells
+\usepackage{hyperref} % For links
+\usepackage{setspace}
+\usepackage{placeins}
+\usepackage{subfig} % For subfigures (modern replacement for subfigure)
+\usepackage[page]{appendix}
 
-\title{Your Paper}
-\author{You}
+% \title{An Open-Source Financial Time Series Forecasting Benchmark}
+\title{Benchmarking Forecasting Methods for Financial Stability: An Open-Source Financial Time Series Forecasting Repository}
+\author{Jeremiah Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
+\date{\today}
 
 \begin{document}
 \maketitle
 
+% \begin{abstract}
+% This paper presents an open-source finance data repository for
+% benchmarking the performance of global time series forecasting methods and
+% compares the performance of many of the most popular modern methods. A
+% standardized benchmark is crucial for comparing the performance of different
+% forecasting methods, so as to allow apples-to-apples comparisons across
+% different forecasting methods and to discourage cherry-picking of results.
+% Despite the ubiquity of time series forecasting methods in macroeconomics and
+% finance, a standardized repository of data for benchmarking in these domains
+% does not exist. One reason for this is that many of these datasets are available
+% only through paid subscriptions and are thus not freely distributable. To
+% address this issue, we instead provide a set of scripts that automate the
+% download, data cleaning, and assembly of data sets from the Wharton Research
+% Data Services (WRDS) platform and the Bloomberg Terminal. Since many academic
+% institutions have access to WRDS or a Bloomberg Terminal, contingent on having
+% access to the appropriate WRDS or Bloomberg subscriptions, each researcher will
+% be able to exactly reproduce each of the datasets provided in this repository.
+% Furthermore, the datasets that we provide are cleaned and formatted in a way
+% that matches best practices established within the corresponding academic
+% literature. Our aim is to facilitate the process of benchmarking global times
+% series forecasting methods on data from these domains. In this light, we
+% demonstrate the utility of our repository by benchmarking the performance of a
+% suite of classical and modern forecasting methods. We hope that this repository
+% will enhance research that increases the precision of financial and economic
+% forecasts and contribute to research related to promoting financial stability
+% and supporting a well-functioning economy.
+% \end{abstract}
+
+
 \begin{abstract}
-Your abstract.
-\end{abstract}
+    Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to preemptively address systemic vulnerabilities. This paper benchmarks state-of-the-art global time series forecasting methods, which have proven superior in the time series literature, on a comprehensive suite of financial stability indicators. Benchmarks drive progress, and our systematic evaluation of 24 forecasting methods ranging from classical models to modern deep learning architectures reveals which approaches best capture early warning signals across different market segments. We evaluate these methods on critical financial stability metrics including arbitrage basis spreads that signal funding market stress, banking indicators that reveal institutional vulnerabilities, and asset returns across multiple markets. To enable reproducible research and continuous improvement in financial forecasting, we develop an open-source \emph{financial time series forecasting repository} that standardizes these datasets according to canonical academic methodologies. Our results provide financial stability authorities with evidence-based guidance on which forecasting approaches most reliably detect emerging risks in specific market segments, directly enhancing the toolkit for macroprudential surveillance and systemic risk monitoring.
+    \end{abstract}
 
 \section{Introduction}
+\label{sec:introduction}
+\doublespacing
 
-Your introduction goes here! Simply start writing your document and use the Recompile button to view the updated PDF preview. Examples of commonly used commands and features are listed below, to help you get started.
+% TODO: Write introduction emphasizing the critical need for standardized benchmarks in finance
+% - Establish that time series forecasting is ubiquitous and prevalent in macroeconomics and finance domains
+% - Highlight the current gap: no existing standardized benchmarks for evaluating forecasting algorithms in macro-finance
+% - Explain why apples-to-apples comparisons are impossible without standardized datasets
+% - Stress that researchers currently evaluate their own models on arbitrarily chosen datasets, making comparisons meaningless
+% - Position this work as filling a critical gap in quantitative finance research
+% - Emphasize that this complements (not substitutes) the Monash benchmark
+% - Make clear that the lack of standardization is particularly problematic in finance where data often requires subscriptions
 
-Once you're familiar with the editor, you can find various project setting in the Overleaf menu, accessed via the button in the very top left of the editor. To view tutorials, user guides, and further documentation, please visit our \href{https://www.overleaf.com/learn}{help library}, or head to our plans page to \href{https://www.overleaf.com/user/subscription/plans}{choose your plan}.
+% Why forecasting is important for financial stability
+Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to preemptively address systemic vulnerabilities \cite{Adrian2015}. 
+In this context, improving our ability to forecast key financial metrics is not a theoretical exercise. Rather,
+it is critical for early warning signals and timely policy responses. 
+% The Office of Financial Research (OFR) and the Financial Stability Oversight Council (FSOC) were established to identify emerging risks across financial markets. However, their effectiveness hinges on robust data and predictive analytics. 
+By developing an open-source financial time series forecasting benchmark, we directly enhance the toolkit available for financial stability monitoring. This benchmark brings together a wide range of datasets---spanning asset returns, arbitrage (basis) spreads, and banking indicators---that are crucial for assessing vulnerabilities in different corners of the financial system. Importantly, it evaluates state-of-the-art ``global" forecasting methods (which learn across many time series) and compares them to classical models, shedding light on which approaches best capture early signs of stress in these data. In sum, better forecasting of these metrics can help regulators and market participants spot trouble on the horizon, informing pre-emptive measures to safeguard the economy
 
-\section{Some examples to get started}
+% Why we need a standardized benchmark
+The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. 
+Benchmarks drive progress.
+Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in ``poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
+The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it may not leverage CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR Time Series Classification Archive \citep{Dau2019} and UEA Multivariate Time Series Classification Archive \citep{Bagnall2018} and MUU Extrinsic Regression Repository \citep{Tan2020} do not include coverage of the financial domain.
+The Monash repository \citep{Godahewa2021} and recent efforts like TFB \citep{Qiu2024} have made strides toward broader coverage, yet comprehensive representation of financial asset classes, from corporate bonds to credit derivatives, remains absent. (See Table \ref{tab:benchmarks} for a summary of existing benchmarks.) This gap is particularly problematic given that, according to the ``No Free Lunch" Theorem \citep{Wolpert1997},
+there is no single forecasting method that performs best for all time series. As such, to improve forecasting in the financial domain, we need to evaluate forecasting methods on a suite of datasets from the financial domain and, importantly,
+these datasets need to reflect the form of the data as they commonly appear in the relevant finance literature. That is, they should use the same data sources and the same domain-specific cleaning and normalization procedures established in the literature. 
 
-\subsection{How to create Sections and Subsections}
 
-Simply use the section and subsection commands, as in this example document! With Overleaf, all the formatting and numbering is handled automatically according to the template you've chosen. If you're using Rich Text mode, you can also create new section and subsections via the buttons in the editor toolbar.
+Our proposed benchmark addresses this limitation by creating a standardized, literature-compliant repository specifically designed for the finance domain. By providing open-source scripts that automate the download and cleaning of data from institutional sources like WRDS and Bloomberg, we enable researchers to reproduce exact datasets used in canonical finance papers. Our aim is to fill a critical gap in quantitative finance research by providing the first comprehensive forecasting benchmark tailored to financial markets. In particular, our paper has the following main contributions:
 
-\subsection{How to include Figures}
-
-First you have to upload the image file from your computer using the upload link in the file-tree menu. Then use the includegraphics command to include it in your document. Use the figure environment and the caption command to add a number and a caption to your figure. See the code for Figure 
-% \ref{fig:myplot} 
-in this section for an example.
-
-Note that your figure will automatically be placed in the most appropriate place for it, given the surrounding text and taking into account other figures or tables that may be close by. You can find out more about adding images to your documents in this help article on \href{https://www.overleaf.com/learn/how-to/Including_images_on_Overleaf}{including images on Overleaf}.
-
-% \begin{figure}
-% \centering
-% \includegraphics[width=0.75\textwidth]{../_output/example_plot.png}
-% \caption{\label{fig:myplot}This image was uploaded via the file-tree menu.}
-% \end{figure}
-
-\subsection{How to add Tables}
-
-Use the table and tabular environments for basic tables --- see Table~\ref{tab:widgets}, for example. For more information, please see this help article on \href{https://www.overleaf.com/learn/latex/tables}{tables}. 
-The following website is helpful for generating tables manually: 
-\url{https://www.tablesgenerator.com/}. You can also automatically generate tables from Pandas DataFrames with this method: 
-\url{https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_latex.html}
-
-\begin{table}
-\centering
-\begin{tabular}{l|r}
-Item & Quantity \\\hline
-Widgets & 42 \\
-Gadgets & 13
-\end{tabular}
-\caption{\label{tab:widgets}An example table.}
-\end{table}
-
-\subsection{How to add Comments and Track Changes}
-
-Comments can be added to your project by highlighting some text and clicking ``Add comment'' in the top right of the editor pane. To view existing comments, click on the Review menu in the toolbar above. To reply to a comment, click on the Reply button in the lower right corner of the comment. You can close the Review pane by clicking its name on the toolbar when you're done reviewing for the time being.
-
-Track changes are available on all our \href{https://www.overleaf.com/user/subscription/plans}{premium plans}, and can be toggled on or off using the option at the top of the Review pane. Track changes allow you to keep track of every change made to the document, along with the person making the change. 
-
-\subsection{How to add Lists}
-
-You can make lists with automatic numbering \dots
-
-\begin{enumerate}
-\item Like this,
-\item and like this.
-\end{enumerate}
-\dots or bullet points \dots
 \begin{itemize}
-\item Like this,
-\item and like this.
+    \item We introduce the first comprehensive time series forecasting archive focused specifically on financial markets, available at \url{https://jeremybejarano.com/ftsfr/}. This archive provides standardized datasets across multiple asset classes and market segments:
+    \begin{itemize}
+        \item Asset return series spanning equities, corporate bonds, U.S. Treasuries, sovereign bonds, foreign exchange rates, commodity futures, credit default swaps (CDS), and options
+        \item Arbitrage basis spreads including covered interest parity (CIP) deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury spreads, equity spot-futures basis, Treasury spot-futures basis, and box spread arbitrage
+        \item Specialized datasets critical for financial stability monitoring, including bank Call Report data, Treasury auction statistics, and yield curve dynamics
+    \end{itemize}
+    
+    \item We provide validated implementations of canonical data cleaning procedures from seminal finance papers, each following the exact methodology of the original studies. Crucially, while these foundational papers often lack publicly available replication code, our implementations successfully reproduce their key results, establishing both the correctness of our data processing and creating a reusable framework for future research.
+    
+    \item We emphasize domain-specific data curation, recognizing that financial data requires specialized treatment reflecting market microstructure, regulatory requirements, and established academic conventions. Each dataset is processed using the precise subsample definitions, filters, and transformations specified in the corresponding literature, ensuring that forecasting evaluations reflect the actual data as used by domain experts rather than generic time series.
+    
+    \item We present comprehensive baseline forecasting results across all datasets using a suite of 24 methods ranging from classical statistical models (ARIMA, ETS, Theta) to modern machine learning approaches (CatBoost, neural networks) and state-of-the-art deep learning architectures (Transformer variants, N-BEATS, TimesFM). These baseline results enable standardized performance comparisons and establish benchmarks for future research.
+    
+    \item We provide novel insights into market-specific predictability by systematically evaluating forecasting performance across different asset classes and market segments. This analysis contributes to our understanding of where predictability exists in financial markets and can inform both academic research and policy decisions related to financial stability monitoring.
+    
+    \item All implementations are fully open source on \href{https://github.com/jmbejara/ftsfr}{GitHub} with best practices for reproducibility, including an automated data pipeline that pulls data from the appropriate data sources and cleans it according to the canonical methods established in the literature, and virtual environments ensuring perfect reproducibility across different computing environments.
 \end{itemize}
 
-\subsection{How to write Mathematics}
+By providing this resource, we enable the kind of standardized, apples-to-apples comparisons that have been lacking in financial forecasting research, while also contributing replication code for key papers and insights into predictability across financial markets.
 
-\LaTeX{} is great at typesetting mathematics. Let $X_1, X_2, \ldots, X_n$ be a sequence of independent and identically distributed random variables with $\text{E}[X_i] = \mu$ and $\text{Var}[X_i] = \sigma^2 < \infty$, and let
-\[S_n = \frac{X_1 + X_2 + \cdots + X_n}{n}
-      = \frac{1}{n}\sum_{i}^{n} X_i\]
-denote their mean. Then as $n$ approaches infinity, the random variables $\sqrt{n}(S_n - \mu)$ converge in distribution to a normal $\mathcal{N}(0, \sigma^2)$.
+\begin{table}[htbp]
+\centering
+% \footnotesize  % or 
+\small
+\caption{Existing Time Series Forecasting Benchmark Data Repositories}
+\label{tab:benchmarks}
+\begin{tabular}{llll}
+\toprule
+Source & Name & Coverage of Finance Domain & Website \\ 
+\midrule
+\cite{McCracken2016} & FRED-MD & US Macroeconomic Series & \href{https://www.stlouisfed.org/research/economists/mccracken/fred-databases}{Link}\\
+\cite{Hu2018} & FinTSB & Equities Returns only & \href{https://github.com/TongjiFinLab/FinTSB}{Link}\\
+\cite {Dau2019} & \begin{tabular}[t]{@{}l@{}}UCR Time Series\\Classification Archive\end{tabular}  & None & \href{https://www.cs.ucr.edu/%7Eeamonn/time_series_data_2018/}{Link}\\
+\cite{Bagnall2018} & \begin{tabular}[t]{@{}l@{}}UEA Multivariate Time Series\\Classification Archive\end{tabular}  & None & \href{https://www.timeseriesclassification.com/}{Link}\\
+\cite{Tan2020} & \begin{tabular}[t]{@{}l@{}}Monash, UEA \& UCR Time Series\\ Extrinsic Regression Repository\end{tabular} & None & \href{http://tseregression.org/}{Link}\\
+\cite{Godahewa2021} & \begin{tabular}[t]{@{}l@{}}Monash Time Series\\Forecasting Repository\end{tabular} & Fred-MD is one component & \href{https://forecastingdata.org/}{Link}\\
+\cite{Bauer2021} & Libra & Anonymous data, unclear & \href{https://github.com/DescartesResearch/ForecastBenchmark}{Link}\\
+\cite{Qiu2024} & TFB & \begin{tabular}[t]{@{}l@{}}NN5 Bank Cash Withdrawals, \\Equity (NYSE/NASDAQ), \\ Foreign Exchange Rates \end{tabular} & \href{https://github.com/decisionintelligence/TFB}{Link}\\
+\cite{Aksu2024} & GIFT-EVAL & Anonymous data, unclear & \href{https://github.com/SalesforceAIResearch/gift-eval}{Link}\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
-\subsection{How to change the margins and paper size}
+\section{Literature Review and Related Work}
+\label{sec:literature}
 
-Usually the template you're using will have the page margins and paper size set correctly for that use-case. For example, if you're using a journal article template provided by the journal publisher, that template will be formatted according to their requirements. In these cases, it's best not to alter the margins directly.
+% TODO: Position the paper relative to existing benchmarks and establish the canonical nature of chosen cleaning methods
+% - Review the Monash Time Series Forecasting Archive and explain how FTSFR follows their established template
+% - Introduce He, Kelly, Manela (2017) as the anchor paper for asset class selection and cleaning methods
+% - Introduce Siriwardane, Sunderam, & Wallen (2022) "Segmented Arbitrage" as the anchor for arbitrage spread construction
+% - Emphasize that the choice to follow these papers is deliberate - not doing anything novel is a FEATURE, not a bug
+% - Acknowledge that some dataset choices are somewhat ad hoc but are anchored by these survey-style papers
 
-If however you're using a more general template, such as this one, and would like to alter the margins, a common way to do so is via the geometry package. You can find the geometry package loaded in the preamble at the top of this example file, and if you'd like to learn more about how to adjust the settings, please visit this help article on \href{https://www.overleaf.com/learn/latex/page_size_and_margins}{page size and margins}.
+\subsection{The Importance Of Open Source And Replicability}
 
-\subsection{How to change the document language and spell check settings}
+Finance faces an active debate about a potential ``replication crisis.'' \cite{Jensen2023} find that predictors' average strength is only 54\% of the original strength outside the original sample, with 32\% becoming insignificant. While much of the debate centers around data snooping, some of it involves
+coding and similar such bugs. There have been several high profile retractions\footnote{See  \cite{Lee2023} at \href{https://www.bloomberg.com/news/articles/2023-12-01/a-grad-school-number-cruncher-shakes-up-the-world-of-bond-quants}{Bloomberg}, and \cite{Dickerson2024}.}.
+Despite disagreement on the crisis's extent, consensus exists at least on one way to help the situation: standardized, open source data infrastructure. \cite{Chen2022} demonstrate with their ``Open Source Cross-Sectional Asset Pricing'' project that transparent data construction, version control, and community validation can eliminate arbitrary researcher degrees of freedom. Such infrastructure prevents simple errors from invalidating years of research. For policymakers and financial regulators, standardized open source data 
+helps them more effectively monitor systemic financial risks.
 
-Overleaf supports many different languages, including multiple different languages within one document. 
+\subsection{Global Time Series Forecasting Methods}
 
-To configure the document language, simply edit the option provided to the babel package in the preamble at the top of this example project. To learn more about the different options, please visit this help article on \href{https://www.overleaf.com/learn/latex/International_language_support}{international language support}.
+The M-competition series is one of the most popular time series forecasting competitions in the field \citep{Makridakis1982, Makridakis2000, Makridakis2018, Makridakis2022}. Notably, the winning approaches of recent M-competitions have consisted of global forecasting models that train a single model across all series in the dataset. As \citet{Godahewa2021} observe, this pattern extends beyond the M-competitions. Winners of other major competitions including the NN3 and NN5 Neural Network competitions and various Kaggle competitions have similarly employed global models.
 
-To change the spell check language, simply open the Overleaf menu at the top left of the editor window, scroll down to the spell check setting, and adjust accordingly.
+Global forecasting models represent a paradigm shift from traditional univariate approaches. Rather than fitting separate models to individual series, global models treat each series as a related instance within a larger dataset, extracting information from both temporal patterns within series and cross-sectional structure across the panel. This enables them to learn common patterns while accounting for series-specific variations, with particular advantages when forecasting related series—a common scenario in finance. Global methods can handle short series by borrowing strength from longer ones and provide robust parameter estimation through regularization. Recent implementations range from pooled regression to sophisticated deep learning architectures, with many demonstrating superior performance over traditional methods \citep{Godahewa2021}.
 
-\subsection{How to add Citations and a References List}
+This paper contributes to the global forecasting literature by providing a comprehensive benchmark specifically designed for financial markets.
+Our benchmark thus serves to improve the infrastructure for developing the next generation of forecasting methods tailored to the complexities of financial markets, potentially improving risk management, asset allocation, and financial stability monitoring.
 
-You can simply upload a \verb|.bib| file containing your BibTeX entries, created with a tool such as JabRef. 
-You can then cite entries from it, like this: 
-\cite{fama1992cross} or \cite{sharpe1964capital}. 
-Just remember to specify a bibliography style, as well as the filename of the \verb|.bib|. You can find a \href{https://www.overleaf.com/help/97-how-to-include-a-bibliography-using-bibtex}{video tutorial here} to learn more about BibTeX.
 
-If you have an \href{https://www.overleaf.com/user/subscription/plans}{upgraded account}, you can also import your Mendeley or Zotero library directly as a \verb|.bib| file, via the upload menu in the file-tree.
 
-\subsection{Good luck!}
+\section{Datasets Included in the Benchmark}
 
-We hope you find Overleaf useful, and do take a look at our \href{https://www.overleaf.com/learn}{help library} for more tutorials and user guides! Please also let us know if you have any feedback using the Contact Us link at the bottom of the Overleaf menu --- or use the contact form at \url{https://www.overleaf.com/contact}.
+In this section, we describe the datasets included in the benchmark. The datasets are organized into three main groups: asset class datasets, basis spread datasets, and other financial data. We provide brief description of each dataset below. Each datasets is constructed based off of a cleaning procedure from a well-known paper in the academic literature. To validate our cleaning and transformations, we replicate a key plot or table from each paper. We give brief details of this process below. Full details of the cleaning and replications are provided in the appendix.
 
-\bibliographystyle{alpha}
+% Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
+
+% A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
+
+\subsection{Asset Class Datasets}
+Our repository provides comprehensive datasets across seven major asset classes, each cleaned according to canonical methods established in the academic literature. We replicate each of the asset classes examined in \cite{He2017}, which are equities, US government and corporate bonds, foreign sovereign bonds, options, credit default swaps (CDS), commodities, and foreign exchange markets. 
+This paper references a canonical paper in each asset class and uses the data cleaning procedures from that paper to construct test portfolios within that asset class.
+For each asset class, we provide both aggregated portfolio returns (matching the test portfolios used in \cite{He2017}) and disaggregated security-level data. The disaggregated datasets apply identical filtering criteria, subsampling, and transformations as specified in the original papers, but preserve individual security information rather than aggregating into portfolios. 
+To validate our data cleaning procedures, we replicate key summary statistics and cross-sectional patterns from each source paper cited within \cite{He2017}. For instance, our corporate bond portfolios match the credit spread patterns in \cite{Nozawa2017} and our options portfolios reproduce the volatility risk premium patterns found in \cite{Constantinides2013}. These validation exercises ensure that our standardized datasets faithfully represent the canonical cleaning methods established in the literature while providing a unified framework for cross-asset forecasting research. This approach allows researchers to both replicate existing studies (which typically use the aggregated portfolios) as well as to use the disaggregated data for richer analysis using the global time
+series forecasting methods.
+
+
+
+\paragraph{Equities}
+For equities we adopt the canonical \cite{Fama1993} cleaning procedures. At a high level, this exclude ADRs, REITs, and firms with negative book equity, lag book-equity data by one fiscal year. We use data from the Center for Research in Security Prices (CRSP) and Compustat by Standard \& Poor's. These data sets
+are the gold standard for research in equity markets. Altogether, this data and filtering procedures remove survivorship and look-ahead bias, and utilize the data as it's commonly used in asset pricing research for equities.
+
+
+\paragraph{Treasuries} Our US Treasury bond portfolios utilize the CRSP Treasury database and follow \cite{Gurkaynak2007} procedure that underpins one of the
+various yield curve data publications available on the Federal Reserve Board's website\footnote{See \url{https://www.federalreserve.gov/data/yield-curve-models.htm}}. At a high level, we keep only non-callable notes and bonds, strip out STRIPS/TIPS and other exotic issues, correct returns for accrued interest, and use strictly month-end transaction quotes. These filters remove optionality, stale prices, and auction-cycle noise that otherwise create spurious risk-premia. Open-sourcing the exact code lets anyone replicate this Treasury sample instead of relying on opaque heuristics.
+
+
+\paragraph{Corporate Bonds}
+We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP) project\footnote{See \url{https://openbondassetpricing.com/}}, which begins with the full TRACE transaction tape and then applies the market--microstructure--noise (MMN) correction procedure of \citet{Dickerson2024}.  Using MMN--adjusted ``clean'' prices is essential: the bid--ask--averaged quotes in raw TRACE embed a mechanical reversal that can be mis-interpreted as illiquidity and lead researchers to overstate corporate bond excess returns.  With the cleaned data we replicate and extend the ten value-weighted credit-spread deciles of \citet{Nozawa2017}, sorting on option-adjusted spreads each month.  Relative to unadjusted TRACE figures, the MMN correction eliminates roughly half of the apparent return spread and aligns liquidity estimates with quote-based ICE data, illustrating that much of the perceived illiquidity premium is an artefact of noise rather than compensation for trading frictions.  OSBAP also furnishes auxiliary fields such as modified duration, amount outstanding, coupon rate, and matched-Treasury yields, which we exploit later for duration-matched excess-return calculations. We validate our cleaning procedure by matching the construction of corporate bond portfolios in \cite{He2017}.
+
+% \paragraph{Foreign Sovereign Bonds}
+% For sovereign bonds, we implement the methodology of \cite{Borri2011}, creating 
+% six portfolios based on a two-way sort using covariance with US equity returns and 
+% S\&P credit ratings.
+
+
+\paragraph{Options}
+Our options dataset follows \cite{Constantinides2013}. In addition to replicating
+their portfolio construction, we make public the full cleaning pipeline that transforms the raw SPX option tape into research-grade data.  This procedures (i) deletes duplicate or contradictory quotes and any observation with a zero bid, (ii) keeps only contracts with 7--180 days to expiration and moneyness between 0.8 and 1.2 to remove stale deep in/out-of-the-money options, (iii) derives a put--call-parity-implied funding curve and drop quotes that imply negative risk-free rates, (iv) discards prices whose implied volatilities fall outside the 5--100\% band or lie more than one standard error from a smoothed volatility surface, and (v) enforces arbitrage by excluding records that violate put--call parity.  These steps eliminate typographical errors, illiquidity noise, and expiry-week quirks that would otherwise distort higher-moment estimates.  We then scale option returns to unit market beta, converting the inherently fat-tailed pay-offs into near-Gaussian series that linear factor models can handle.  Open-sourcing this end-to-end workflow allows others to reproduce the ``clean" option universe that underpins modern option-pricing research and to audit every assumption embedded in the data.
+
+\paragraph{Foreign Exchange}
+For foreign exchange, we simply provide returns from the individual foreign currencies, against the US dollar. We also provide the portfolios constructed in \cite{Lettau2014} and \cite{Menkhoff2012}, as they appear in \cite{He2017}.
+
+\paragraph{Commodity Futures}
+Commodity futures follow the \cite{Yang2013} protocol but the raw quotes now
+come from Bloomberg's futures chain (queried with \texttt{xbbg}) because the
+legacy Commodity Research Bureau feed is no longer maintained.  Following their procedure, but substituting in Bloomberg data, we pull the
+first, second, and third nearby contracts for each of 19 energy, agriculture, livestock, and
+metal futures, restrict the sample to maturities of 1-12 months, roll to the
+next contract just before delivery, compute collateral-adjusted excess returns,
+and drop obvious bad ticks (zero/negative bids, thin series, extreme 0.5\% tail 
+moves).  This Bloomberg-based pipeline mirrors Yang's original CRB procedure
+while leveraging a live, well-documented data source.
+
+\paragraph{Credit Default Swaps}
+Our CDS data originate from the Markit corporate CDS database available via
+WRDS, providing daily dealer-contributed curves, reference entity identifiers,
+and rich quote metadata for all USD-denominated contracts. 
+Our CDS sample follows the constant-risky-duration construction of
+\cite{Palhares2012}, a canonical protocol that neutralises maturity roll-over
+noise introduced by the 2009 ``Big Bang'' contract change. Raw Markit XR quotes
+are first filtered to exclude zero-bid or non-standard contracts, reconciled
+with auction recovery data, and rescaled by the risky annuity so that spreads
+are comparable across tenors.  The procedure then interpolates missing
+maturities, align observations to common month-end fixing dates, and drop quotes
+that violate no-arbitrage bounds or sit outside the 1st-99th percentile of the
+cross-sectional spread distribution. Open-sourcing this transformation pipeline
+provides researchers with CDS excess-return series that are free of roll
+discontinuities, stale quote reversals, and documentation clause
+inconsistencies.
+
+\subsection{Basis Spread Datasets}
+
+In well-functioning markets, basis spreads---deviations from classical no-arbitrage conditions like covered interest parity (CIP) or put-call parity---should be essentially zero. Persistent or large basis spreads signal that arbitrageurs are unable or unwilling to close riskless profit opportunities, often due to funding frictions or balance sheet constraints. Since the Global Financial Crisis (GFC), researchers have documented several such anomalies across asset classes, and these have important implications for financial stability.
+For example, the Covered interest parity (CIP), once ``the closest thing to a physical law in international finance," has been systematically violated since 2008 \cite{Du2018}.
+During crisis episodes, these CIP deviations tend to spike sharply, revealing strains in global funding liquidity. For example, in 2008 and again in March 2020, the USD cross-currency basis for major currencies widened dramatically, indicating that foreign institutions were scrambling for dollar liquidity 
+\citep{BoardofGovernorsoftheFederalReserveSystem2020}.
+Central banks and financial regulators closely monitor and respond to these metrics.
+And the Federal Reserve's swap lines are agreements with other central banks to exchange currencies, primarily to provide U.S. dollars to foreign institutions during times of market stress.
+
+In this benchmark repository, we provide code that will allow researchers to replicate a number of basis spreads across several different asset classes. We replicate the basis spreads in \cite{Siriwardane2021}, including spot-futures arbitrage in treasuries, treasury swap arbitrage, TIPS-Treasury arbitrage, CDS-bond basis, CIP arbitrage, spot futures arbitrage in equities, and box arbitrage in equity options.
+Each of these basis spreads are, themselves, constructed following methodologies that are well-established in the literature. To validate out replication, I follow the papers recommended in \cite{Siriwardane2021} and replicate key summary statistics from each source paper.
+
+
+
+% Please create a paragraph for each basis spread dataset and then, within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
+
+% A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
+
+\paragraph{Spot-Futures Arbitrage in Treasuries}
+Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we extract implied risk-free rates from the first-deferred 2-, 5-, 10-, 20- and 30-year Treasury futures.  We retain only days with positive volume, drop the delivery month to avoid the option-to-deliver distortions of \citet{Burghardt2005}, align quotes to the 17:00 ET close, and, per \citet{Barth2021}, match each futures-implied rate to a maturity-matched OIS benchmark—yielding a clean daily Treasury basis series.
+
+\paragraph{Treasury Swap Arbitrage}
+We follow \citet{Siriwardane2021} in constructing daily OIS-Treasury swap
+spreads: Bloomberg fixed-rate USD OIS quotes for tenors 1-, 2-, 3-, 5-, 10-, 20-
+and 30-years are aligned to 17:00 ET and paired with linearly-interpolated
+zero-coupon Treasury yields of identical maturities.  Observations with missing
+quotes are dropped, delivery-month futures are excluded to sidestep
+cheapest-to-deliver noise, and we winsorise the extreme 1\% of spreads; the
+resulting series replicates the persistently negative swap spreads documented by
+\citet{Jermann2020}, \citet{Du2023}, and \citet{Hanson2023}.
+
+\paragraph{TIPS-Treasury Arbitrage}
+Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we splice Federal Reserve zero-coupon TIPS yields with Bloomberg constant-maturity inflation-swap rates to create synthetic nominal yields, then difference these against equal-maturity zero-coupon Treasury yields for the 2-, 5-, 10- and 20-year tenors.  We exclude days with missing swap quotes or illiquid TIPS issues, drop outliers beyond the extreme 1\%, and harmonise all series to 17:00 ET closes to obtain a clean daily TIPS-Treasury basis series.
+
+\paragraph{CDS-Bond Basis}
+% TODO: Check this paragraph.
+Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a maturity-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorise extreme 1\% bases, and require each bond to appear in TRACE's cleaned WRDS dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
+
+\paragraph{CIP Arbitrage}
+For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for spot rates, 3-month forwards, and maturity-matched OIS curves.  Core filters rescale forward points (and invert USD-quoted pairs), synchronise all legs to the 17:00 ET close while dropping holiday or stale quotes, and winsorise the extreme 1\% of annualised spreads with spline interpolation for any missing OIS tenors to remove scaling, timing, and rate-sourcing distortions.
+
+\paragraph{Spot Futures Arbitrage in Equities}
+
+Following the equity basis recipe of \citet{Hazelkorn2023}, we construct implied forward rates from nearby and first-deferred S\&P 500, Dow Jones, and Nasdaq 100 futures to avoid measurement error from asynchronous spot and futures market closes. We proxy for expected dividends using realized dividends from Bloomberg. The final arbitrage spread is the difference between this futures-implied rate and the 3-month OIS rate, which serves as a clean risk-free benchmark.
+
+\paragraph{Box Arbitrage in Equity Options}
+For box spread arbitrage, we follow the methodology of \citet{VanBinsbergen2022} to extract a risk-free rate implied by S\&P 500 (SPX) index options. Their approach uses a cross-sectional regression of put-call price differences on strike prices, which cleverly avoids the need to explicitly estimate dividends. We use their publicly available daily median implied rates and extend the series using their exact methodology on recent minute-level CBOE data. The final arbitrage spread is the difference between this options-implied rate and a maturity-matched OIS rate.
+
+\subsection{Other Financial Data}
+
+\paragraph{Yield Curve}
+TODO
+
+\paragraph{Call Report}
+TODO
+
+\paragraph{Compustat Panel Data}
+TODO
+
+
+
+
+\section{Data Repository Overview}
+\label{sec:repository_overview}
+
+% TODO: Provide high-level description of the repository structure and contents
+% - Describe the automated data pulling framework
+% - List the major categories of data
+% - Explain the dual purpose: both for forecasting benchmarks AND for replicating important finance papers
+% - Note that replication code for many of these papers was not previously publicly available
+
+\subsection{Repository Architecture}
+% Technical structure and automation framework
+
+\subsection{Data Categories}
+% Major categories of financial and economic data
+
+\subsection{Data Sources and Access Requirements}
+% WRDS, Bloomberg, and other data sources
+
+[Repository overview content to be filled in...]
+
+\section{Replication Results and Validation}
+\label{sec:replication}
+
+% TODO: Demonstrate successful replication of all source papers
+% - Create comprehensive replication tables
+% - Include specific sections for key papers
+% - Document any data quality issues discovered
+% - Explain any necessary deviations from original methodologies
+
+\subsection{He, Kelly, Manela (2017) Replication}
+% Factor loadings and test portfolio returns
+
+\subsection{Siriwardane et al. (2022) Replication}
+% Arbitrage spread statistics
+
+\subsection{Individual Dataset Replications}
+% Nozawa, Borri & Verdelhan, etc.
+
+[Replication results to be filled in...]
+
+\section{Baseline Forecasting Methodology}
+\label{sec:methodology}
+
+% TODO: Define forecasting approach following Monash template
+% - Justify choice of error metrics
+% - Select baseline forecasting models
+% - Define evaluation methodology
+
+\subsection{Error Metrics}
+% MASE, sMAPE, RMSE, etc.
+
+\subsection{Baseline Models}
+% Traditional, ML, and Deep Learning models
+% TODO: Arsh: Add bullet points provide a short 2-3 sentence description of each model. What is the basic idea behind each model? Who developed it? What package are we using to implement it? 
+
+\begin{itemize}
+    \item ARIMA: Standard Autoregressive Integrated Moving Average model based on the statsmodel implementation.\cite{Box2013}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.arima.html}{darts}}
+    \end{itemize}
+    \item ETS: We use the Holt-Winter's exponential smoothing model\cite{Winters1960}. % Please add this citation from the URL: https://www.sciencedirect.com/science/article/abs/pii/S0169207003001134
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
+    \end{itemize}
+    \item Simple Exponential Smoothing: simple exponential moving average on a time-series\cite{Brown2004}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
+    \end{itemize}
+    \item TBATS: Uses Box-Cox transformations, ARMA error corrections and Fourier representations\cite{DeLivera2011}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sf_tbats.html}{darts}}
+    \end{itemize}
+    \item Theta: Splits a time-series into multiple Theta lines which are extrpolated separately and their combination is taken as the forecast\cite{Assimakopoulos2000}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.theta.html\#darts.models.forecasting.theta.Theta}{darts}}
+    \end{itemize}
+    \item Prophet: decomposable time-series model similar to Generalized Additive Model(GAM) developed by Facebook\cite{Taylor2018}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Local
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.prophet_model.html}{darts}}
+    \end{itemize}
+    \item PR (Pooled Regression): Generic gaussian linear model\cite{Trapero2015}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sklearn_model.html\#darts.models.forecasting.sklearn_model.SKLearnModel}{darts}} and \texttt{\href{https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TweedieRegressor.html\#sklearn.linear_model.TweedieRegressor}{scikit-learn}}
+    \end{itemize}
+    \item CatBoost: Gradient boosting algorithm for dealing with categorical data and a leaf value calculation trick which reduces overfitting\cite{Prokhorenkova}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.catboost_model.html}{darts}}
+    \end{itemize}
+    \item FFNN (Feed-Forward Neural Network): Simple neural network which is a collection of weight tensors with activation functions in between\cite{Goodfellow2016}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.simple_feedforward.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item Transformer: A deep network architecture utilising attention mechanisms for deducing dependencies in the input and the output\cite{Vaswani2017}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.transformer_model.html}{darts}}
+    \end{itemize}
+    \item DeepAR: An Autoregressive Recurrent Neural Network(RNN) with Long Short-Term Memory(LSTM).\cite{Salinas2020}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.deepar.module.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item WaveNet: Dilated deep neural network employing convolution layers. Originally made to generate sound waveforms\cite{Oord2016} but adapted to use in forecasting. % PLEASE ADD CITATION FROM URL: https://arxiv.org/abs/1703.04691
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.wavenet.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item D-Linear: Transformer-based deep model which is a combination of a decomposition scheme with linear layers\cite{Zeng2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.dlinear.html}{darts}}
+    \end{itemize}
+    \item N-Linear: Transformer-based deep model which addresses distribution shifts in the dataset by using a normalization trick\cite{Zeng2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nlinear.html}{darts}}
+    \end{itemize}
+    \item N-BEATS: Deep neural network with fully-connected layers along with residual links\cite{Oreshkin2020}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nbeats.html}{darts}}
+    \end{itemize}
+    \item N-HiTS: Enhances N-BEATS by using multi-rate data sampling and multi-scale interpolation\cite{Challu2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nhits.html\#darts.models.forecasting.nhits.NHiTSModel}{darts}}
+    \end{itemize}
+    \item Autoformer: Transformer-based deep network employing decomposition and Auto-Correlation\cite{Wu2021}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.autoformer.html}{neuralforecast}}
+    \end{itemize}
+    \item Informer: Transformer-based architecture using a ProbSparse self-attention mechanism and a generative-style decoder among other techniques\cite{Zhou2020}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.informer.html}{neuralforecast}}
+    \end{itemize}
+    \item PatchTST: Transformer-based model breaking a time series into a collection of patches used as tokens and utilises channel independence\cite{Nie2022}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.patch_tst.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item Temporal Fusion Transformer: Transformer-based model employing recurrent layers and self-attention layers with a focus on interpretablility\cite{Lim2021}
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.tft.module.html}{gluonts}} with \texttt{torch} backend
+    \end{itemize}
+    \item Time-series Dense Encoder(TiDE): Multi-layer perceptron based architecture utilising encoder and decoder blocks\cite{Das2023a}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.tide_model.html}{darts}}
+    \end{itemize}
+    \item TimesFM: Pre-trained transformer-based decoder-only deep model utilising patches similar to PatchTST\cite{Das2023}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://github.com/google-research/timesfm}{timesfm}} python package
+    \end{itemize}
+\end{itemize}
+
+\subsection{Evaluation Framework}
+% Train/test splits, structural breaks, etc.
+
+[Methodology content to be filled in...]
+
+\section{Baseline Results and Analysis}
+\label{sec:results}
+
+% TODO: Present comprehensive forecasting results across all datasets
+% - Create results tables in exact same format as Monash paper
+% - Analyze patterns in results
+% - Compare with Monash findings where applicable
+% - Discuss implications for practitioners
+
+\subsection{Overall Performance}
+% Summary tables across all datasets
+
+\subsection{Results by Asset Class}
+% Detailed analysis for each asset class
+
+\subsection{Results by Model Type}
+% Comparison of traditional vs ML vs DL approaches
+
+\subsection{Comparison with Monash Benchmarks}
+% How financial data differs from general time series
+
+[Results content to be filled in...]
+
+\section{Implementation and Usage}
+\label{sec:implementation}
+
+% TODO: Explain technical architecture and usage
+% - Document the automation framework
+% - Provide clear usage instructions
+% - Explain design decisions
+% - Include code examples
+
+\subsection{Installation and Setup}
+% Requirements and installation process
+
+\subsection{Data Pipeline Architecture}
+% dodo.py and automation framework
+
+\subsection{Adding New Datasets}
+% Extensibility and contribution guidelines
+
+[Implementation content to be filled in...]
+
+\section{Reproducibility}
+\label{sec:reproducibility}
+
+% TODO: Ensure full reproducibility of all results
+% - Document exact data vintage used
+% - Provide checksums for all processed datasets
+% - Include random seeds
+% - Detail computational environment
+
+[Reproducibility content to be filled in...]
+
+\section{Conclusions and Future Work}
+\label{sec:conclusion}
+
+% TODO: Summarize contributions and outline future extensions
+% - Recap main contributions
+% - Discuss potential additional datasets
+% - Propose enhanced forecasting methods
+% - Suggest infrastructure improvements
+% - Note community contribution guidelines
+
+[Conclusion content to be filled in...]
+
+\section*{Acknowledgments}
+
+We would like to thank the following individuals. With their permission, we have adapted and used pieces of their code in this repository: Om Mehta and Kunj Shah for their replication of the Covered Interest Rate Parity (CIP) arbitrage spreads; Kyle Parran and Duncan Park for their replication of commodity futures returns.
+
+
+\bibliographystyle{jpe}
 \bibliography{bibliography}
+
+% TODO: Add additional acknowledgments
+
+\begin{appendices}
+
+\section{Data Cleaning Procedures and Replications}
+\label{app:data_cleaning_and_replications}
+% Detailed descriptions of each dataset
+
+\subsection{Asset Class Datasets}
+\label{sec:asset_classes}
+
+% TODO: Document each asset class dataset with its canonical cleaning method
+% For EACH asset class, create a subsection that includes:
+% - Which specific paper's cleaning method is being replicated
+% - Why this dataset/asset class is important for macro-finance
+% - Key cleaning decisions and their justifications
+% - Summary statistics that match the original paper (proving correct replication)
+
+Following \cite{He2017}, we include comprehensive datasets across multiple asset classes, each cleaned according to canonical methods from the academic literature.
+
+\subsubsection{Equity Markets}
+\label{sec:equity}
+% Fama-French 25 portfolios and CRSP universe
+% Explain exclusion of small stocks, ADRs, etc. following Fama-French (1993)
+
+The equity dataset follows \cite{Fama1993}, whose cleaning methodology has become the canonical approach in asset pricing research, establishing the foundation for thousands of subsequent studies. The essential data transformations in Fama-French are critical for avoiding common pitfalls in equity research. First, their precise definition of book equity carefully accounts for balance sheet complexities: book value of stockholders' equity plus deferred taxes and investment tax credits minus the book value of preferred stock, with a hierarchical approach to valuing preferred stock (redemption, liquidation, or par value). This standardization is crucial because inconsistent book equity definitions can dramatically alter value factor exposures and lead to spurious results. Second, their exclusion criteria eliminate securities that would contaminate standard equity analysis: ADRs (which reflect foreign market dynamics), REITs and units of beneficial interest (which have fundamentally different cash flow structures), and firms with negative book equity (which represent financial distress and behave differently from normal equity securities). Third, their timing conventions—forming portfolios in June using market equity from June and book equity from fiscal year $t-1$—ensure that accounting information would have been publicly available to investors, avoiding look-ahead bias that has plagued many studies. Fourth, they require firms to appear on COMPUSTAT for two years before inclusion, directly addressing the survivorship bias documented by \cite{Banz1986} where COMPUSTAT retroactively adds successful firms' histories. Finally, using NYSE breakpoints for size and book-to-market sorting prevents the results from being dominated by the numerous small NASDAQ and AMEX stocks that entered the sample after 1972. These seemingly technical choices have profound impacts: studies that deviate from these conventions often find dramatically different results, and the stability of the size and value effects across decades of out-of-sample testing validates these careful data handling procedures. By open-sourcing code that implements these exact transformations, we enable researchers to avoid the numerous subtle errors that can arise when attempting to reconstruct this canonical dataset from raw CRSP and COMPUSTAT data.
+
+\subsubsection{US Treasuries}
+\label{sec:treasuries}
+% CRSP maturity-sorted portfolios Treasuries
+
+The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns. This framework forms the foundation for the Federal Reserve's own yield curve estimates and underpins numerous studies in fixed income research.
+
+The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes—excluding bills and other security types—is fundamental. Callable bonds embed optionality that contaminates pure interest rate risk measurement. For example, a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns, distorting any analysis of term structure dynamics.
+
+Second, the dataset focuses on bonds with remaining maturities between 0 and 5 years. This reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, whereas the 0–5 year segment represents the most actively traded Treasury securities where price discovery is most efficient.
+
+Third, the careful handling of accrued interest in return calculations is essential. Unlike equities, bond prices are quoted as clean prices (excluding accrued interest), but return calculations must incorporate coupon payments. Failing to account for this leads to dramatic miscalculations of returns, especially around coupon payment dates.
+
+Fourth, a requirement for complete price and maturity information ensures that bonds with sporadic trading activity or ambiguous terms are excluded. This prevents noise from entering the yield curve estimation and return construction process.
+
+Fifth, the use of month-end observations for portfolio aggregation avoids substantial day-of-month effects in Treasury markets. These effects arise from auction cycles, end-of-month portfolio rebalancing, and futures contract rolls, all of which can distort return measures if not properly controlled.
+
+These seemingly technical choices have profound implications. Studies that use the full set of Treasury data without these filters often report spurious term premia and unstable factor loadings. In contrast, the Gürkaynak, Sack, and Wright methodology yields stable estimates that closely match dealer quotes and futures-implied yields.
+
+By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
+
+\subsubsection{Corporate Bonds}
+\label{sec:corporate_bonds}
+% Nozawa (2017) yield-spread sorted portfolios
+The corporate bond returns data is sourced from the TRACE (Trade Reporting and Compliance Engine) dataset, available at openbondassetpricing.com, and follows the methodology outlined in Nozawa (2017). This dataset incorporates several key elements to ensure accuracy and relevance. First, it includes market microstructure adjustments to correct for noise and enhance the reliability of bond prices and returns. It also applies stringent data filters, such as including only U.S.-domiciled firms and excluding private placements and convertible bonds. The dataset covers corporate bonds with sufficient outstanding amounts and complete information, and includes essential fields such as MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads.
+
+The cleaning and standardization procedure adheres to the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM). In terms of bond selection, floating rate bonds and those with put or convertible features are excluded, although callable bonds are retained. Bonds are removed if their prices exceed matched Treasury prices or fall below \$0.01 per \$1 face value. For return processing, return reversals are eliminated if the product of adjacent returns is less than -0.04, and monthly returns are computed to avoid assumptions about reinvestment. In synthetic Treasury construction, Treasury bonds with identical cash flow structures are constructed for each corporate bond using Federal Reserve constant-maturity yield data. Excess returns and credit spreads are then calculated in price terms rather than yield spreads.
+
+For portfolio construction, bonds are sorted into deciles based on credit spreads for each date. Value-weighted portfolio returns are computed using bond values—defined as the product of MMN-adjusted clean price and amount outstanding—as weights. To ensure data quality, defaults are verified using Moody's Default Risk Service, while CRSP and Compustat data supplement the equity and accounting information. Callable bonds are also incorporated into regression models using fixed effects.
+
+The final output is a dataset containing monthly corporate bond portfolio returns sorted by credit spread deciles, making it well-suited for credit risk analysis and for benchmarking against other bond market data. The constructed returns are validated against the dataset by He, Kelly, and Manela (2017), which serves as a benchmark for credit spread deciles. As shown in Figure PLACEHOLDER, the time series comparison between the two datasets exhibits strong alignment in return patterns, especially during volatile periods such as the 2008 financial crisis.
+
+\subsubsection{Sovereign Bonds}
+\label{sec:sovereign}
+% Borri and Verdelhan (2012) portfolios
+
+\subsubsection{Options}
+\label{sec:options}
+% Constantinides, Jackwerth and Savov (2013) S&P 500 portfolios
+% Pull in notes from notebooks 
+
+\subsubsection{Foreign Exchange}
+\label{sec:fx}
+% Lettau et al. (2014) and Menkhoff et al. (2012)
+
+\subsubsection{Commodities}
+\label{sec:commodities}
+% Yang (2013) methodology
+
+\subsubsection{Credit Default Swaps}
+\label{sec:cds}
+% Markit data following Palhares (2013)
+
+[Asset class content to be filled in...]
+
+\subsection{Arbitrage Spread Datasets}
+\label{sec:arbitrage}
+
+% TODO: Document each arbitrage spread construction
+% For EACH arbitrage spread:
+% - Explain the economic intuition behind the trade
+% - Detail the exact construction methodology
+% - Show replication of statistics from Siriwardane et al.
+% - Discuss what violations of these spreads tell us about market segmentation
+
+Following \cite{Siriwardane2021}, we construct various arbitrage spreads that measure market segmentation.
+
+\subsubsection{Covered Interest Parity (CIP)}
+% Construction using spot, forward FX and interest rates
+     
+
+During periods of market stress, such as the 2008 financial crisis and the 2020 COVID-19
+pandemic, covered interest parity (CIP) may no longer hold as the forward---spot differential 
+no longer exactly offsets interest‐rate differentials. Factors contributing to this phenomenon include:
+Heightened Counterparty‐Credit Risk, Liquidity Constraints, or Regulatory Pressures.
+
+In other periods, deviations from CIP typically stem from market inefficiencies and are 
+small in magnitude and are short-lived in timeframe due to arbitrage activities.
+
+Our analysis examines CIP deviations across eight G10 currencies against the USD, 
+using data from 1999 onwards sourced through Bloomberg Terminal.
+
+\paragraph{The dataset includes:}
+\begin{itemize}
+    \item Spot exchange rates for each currency pair
+    \item 3-month forward points for each currency pair
+    \item 3-month Overnight Index Swap (OIS) rates for each currency
+\end{itemize}
+
+\paragraph{Data Standardization:}
+\begin{itemize}
+    \item Forward points are scaled appropriately (per 10,000 for most currencies, per 100 for JPY)
+    \item Currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) are converted to reciprocal rates for consistency
+    \item OIS rates serve as our risk-free benchmark to align with other arbitrage spread studies
+\end{itemize}
+
+We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2023),
+as seen in this side by side comparison of our calculated currency respective
+arbitrage spreads versus those reported in their paper.
+
+\begin{figure}
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
+    \small (a) Findings in Siriwardane et al. (2023)
+  \end{tabular}
+
+  \vspace{\floatsep}
+
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
+    \small (b) Our findings
+  \end{tabular}
+
+  \caption{Comparison of CIP Arbitrage spreads}\label{fig:myfig}
+\end{figure}
+
+\FloatBarrier
+
+
+During the overlapping periods of both datasets, the CIP spreads are nearly identical.
+Our findings confirm the presence of CIP deviations, particularly during periods of
+market stress, consistent with the conclusions drawn by Siriwardane et al. (2023).
+
+
+\subsubsection{Box Spread Arbitrage}
+% Options-based arbitrage using put-call parity
+
+\subsubsection{Equity Spot-Futures Basis}
+% Cash vs futures arbitrage
+
+\subsubsection{Treasury Spot-Futures Basis}
+% Government bond basis trades
+
+\subsubsection{Treasury-Swap Spread}
+% Treasury vs interest rate swap arbitrage
+
+\subsubsection{TIPS-Treasury Spread}
+% Inflation-linked vs nominal bond spreads
+
+\subsubsection{CDS-Bond Basis}
+% Credit default swap vs cash bond arbitrage
+
+Credit Default Swaps (CDS) are "insurance contracts" against the default of underlying
+corporate debt. The buyer of CDS protection pays a the CDS spread as a 
+fixed annuity premium to the seller for a horizon $\tau$. If there is a default
+before the time horizon $\tau$, the buyer receives the difference between
+the bond's par value and its market value from the seller. 
+As a result, the payoff of this portfolio should not deviate from the risk free bond. The resulting difference
+between CDS spread and floating rate spread is defined by the authors as the CDS-basis.
+
+The authors define the CDS basis (CB) as
+
+\begin{equation}
+  CB_{i,t,\tau} \;=\; CDS_{i,t,\tau} \;-\; FR_{i,t,\tau},
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $FR_{i,t,\tau}$ = time $t$ floating‐rate spread implied by a fixed‐rate corporate bond issued by firm $i$ at tenor $\tau$,
+  \item $CDS_{i,t,\tau}$ = time $t$ Credit Default Swap (CDS) par spread for firm $i$ with tenor $\tau$.
+\end{itemize}
+
+A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. 
+The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
+
+The value of $FR$ is substituted by the paper with Z‐spread which we also modify in our construction. We address the substitution in detail later.
+
+The value of CDS par spread is interpolated by the authors using a cubic spline function as
+not all necessary tenors are present.
+
+Given the CDS spread from above, traditional construction of a risk‐free rate for implied arbitrage implies the following return:
+
+\begin{equation}
+  rfr^{CDS}_{i,t,\tau} \;=\; y_{t,\tau} \;-\; CB_{i,t,\tau},
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $y_{t,\tau}$ = maturity‐matched Treasury yield at time $t$.
+\end{itemize}
+
+The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
+
+\subsubsection{Z-Spread (Zero-Volatility Spread)}
+
+\paragraph*{Mathematical definition}
+For a bond with cash-flows $CF_t$ at times $t=1,\dots,N$ and Treasury spot rates $s_t$,
+\begin{equation*}
+P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
+\end{equation*}
+The constant $Z$ that solves this equation is the \textbf{Z-spread}.
+
+\paragraph*{Intuition}
+$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond's dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
+
+\paragraph*{Link to Yield-to-Maturity}
+Setting the Z-spread pricing equation equal to the standard YTM equation gives
+\begin{equation}
+\label{eq:ytm_z_spread}
+\sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
+=\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
+\end{equation}
+where $y$ is the bond's yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
+
+\paragraph*{Continuous-Compounding Identity}
+Rewrite discounts as $e^{-r t}$. With PV-weights
+\begin{equation*}
+w_t=\frac{CF_t\,e^{-(s_t+Z)t}}{P},\qquad\sum_{t}w_t=1,
+\end{equation*}
+equation (\ref{eq:ytm_z_spread}) yields the convenient mean-value relationship
+\begin{equation}
+y \;=\; \sum_{t=1}^{N} w_t\,(s_t+Z)\tag{A2}
+\end{equation}
+Thus YTM is the PV-weighted average of the spot rates plus the Z-spread.
+
+\paragraph*{Practical Proxy: YTM Credit Spread}
+Analysts often approximate $Z$ with the \textbf{credit spread}
+\begin{equation*}
+\Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
+\end{equation*}
+where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond's (modified) duration.
+
+\paragraph*{Why it works}
+\begin{enumerate}
+    \item A small parallel shift $Z$ applied to all discount rates changes price by $-D_{\text{mod}}\;Z$. For modest spreads, this produces nearly the same price change as replacing the spot curve with a single rate shift $\Delta y$.
+    \item Duration-matching the Treasury benchmark neutralises curve-shape effects, so $\Delta y$ isolates the average extra yield attributable to credit/liquidity risk.
+    \item Empirically, $\Delta y$ tracks $Z$ closely for plain-vanilla, option-free bonds, making it a ``good-enough'' proxy when full spot-curve data or iterative Z-spread calculations are impractical.
+\end{enumerate}
+
+\paragraph*{Note}
+Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
+
+\begin{figure}
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
+    \small (a) Findings in Siriwardane et al. (2023)
+  \end{tabular}
+
+  \vspace{\floatsep}
+
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
+    \small (b) Our findings
+  \end{tabular}
+
+  \caption{Comparison of CDS Arbitrage spreads}\label{fig:myfig}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Additional Financial Datasets}
+\label{sec:additional_datasets}
+
+% TODO: Document datasets for macroeconomic forecasting and financial stability monitoring
+
+\subsubsection{Bank Call Report Data}
+% NYU archive (Schnabl)
+
+\subsubsection{Treasury Yield Curve}
+% Fed data following Gürkaynak et al.
+
+\subsubsection{Macroeconomic Indicators}
+% FRED-MD and other macro series
+
+\subsubsection{Bank-Specific Metrics}
+% Using WRDS Bank Premium
+
+[Additional datasets content to be filled in...]
+
+
+\subsection{Additional Results}
+\label{app:additional_results}
+% Extended results tables and robustness checks
+
+\section{Recyling Bin}
+% Temporary holding area for text that might not make it into the main text
+
+
+\subsection{The Consequences of Poor Data Quality in Analysis}
+\label{sec:consequences_of_poor_data_quality}
+An important feature of this paper, and the accompanying data repository, is that we provide a set of data that is cleaned and formatted in a way that matches best practices established within the corresponding academic literature. 
+Analyses based on incomplete, biased, or inconsistent datasets can lead to spurious results. For example, researchers in finance have documented several specific mechanisms by which poor data quality can mislead conclusions.
+
+\paragraph{Survivorship Bias}
+Perhaps the most cited data issue in performance studies, survivorship bias occurs when only surviving or successful entities in a dataset are observed, while failed or defunct entities are absent. This selective sampling can dramatically skew results.
+See \cite{Brown1992} or \cite{Brown1995} for seminal studies demonstrating that the apparent persistence or predictability in mutual fund returns was largely an artifact of survivorship bias.
+
+\paragraph{Selection and Instant History Bias}
+Related to survivorship bias are selection biases arising from how and when data are reported. In the context of hedge funds and other lightly regulated investments, researchers have noted that managers often have discretion over reporting, which can lead to instant history (backfill) bias. Instant history bias means that a fund might report its track record only after a streak of strong returns, effectively "backfilling" the database with only the good outcomes. This practice hides the early losses or failed ventures from view. See for example, \cite{Fung2000}, who found that accounting for backfill bias reduced average hedge fund returns by several percentage points per year.
+
+\paragraph{Measurement Errors}
+Even when all relevant cases are included, errors in the data itself (inaccurate measurements, typos, misclassifications, etc.) can bias results. In econometrics, it is well-established that classical measurement error in an independent variable will attenuate regression coefficients towards zero, masking true relationships. For instance, if a researcher uses an imperfect proxy or noisy measure of a firm's earnings, any estimated effect of earnings on stock returns will be biased downward (toward zero) due to the noise. Pioneering econometric analyses (e.g. \cite{Griliches1986} and \cite{Bound2001}) showed that measurement error can be a major source of bias, sometimes even more severe than omitted variable bias in certain cases.
+
+The mechanism is that the error in the explanatory variable gets absorbed into the regression's disturbance term, violating assumptions and leading to inconsistent estimates
+econ.lse.ac.uk
+. The consequence is that real economic signals may be drowned out by data noise. High-profile examples of measurement error causing spurious findings are sobering. A notable case involved Reinhart and Rogoff's influential study on public debt and growth \cite{Reinhart2010}, which concluded that countries with debt-to-GDP above 90% experience dramatically lower growth. When Herndon, Ash, and Pollin \cite{Herndon2014} attempted to replicate the result, they discovered coding errors and selective data exclusions in the original spreadsheet
+retractionwatch.com
+. These data issues, once corrected, entirely changed the conclusion: the sharp growth cliff at 90% debt largely disappeared
+retractionwatch.com
+. The Reinhart-Rogoff episode, documented in a subsequent published critique, revealed that a spreadsheet transcription error and omission of several countries' data had led to a false econometric result with far-reaching policy implications
+retractionwatch.com
+. This case underscores that even renowned studies can suffer from "garbage in" when data are mishandled --- and that replicating analysis with cleaned, corrected data is essential to validate findings.
+
+\paragraph{Non-Standard Definitions and Inconsistent Data}
+A more subtle problem arises when data are not standardized across sources or over time. If different companies or countries define metrics differently, any comparative analysis becomes apples-to-oranges. For example, in macroeconomics, price indices and GDP figures must be standardized (using purchasing power parity adjustments, consistent base years, etc.) to be meaningfully compared across countries. Summers and Heston \cite{Summers1991} demonstrated this by constructing the Penn World Table, a comprehensive set of national accounts data expressed in common terms
+econdata.com
+. Prior to their work, cross-country income comparisons were fraught with inconsistencies --- each nation's statistics were based on its own definitions and currencies. Summers and Heston's standardized data enabled economists to obtain unbiased comparisons of GDP and growth rates across ---
+econdata.com
+. The result was a wave of robust findings in growth economics that would have been impossible with non-standardized national data. Likewise, in finance, using current stock index membership to backtest historical performance (instead of using the actual historical index constituents at each point in time) introduces survivorship bias and inconsistency
+en.wikipedia.org
+en.wikipedia.org
+. An analysis that erroneously treats the present S\&P 500 members as if they existed in 1990 will ignore all the companies that were in the index then but failed later, thereby overstating historical returns
+en.wikipedia.org
+en.wikipedia.org
+. This highlights the importance of using data that are aligned to a common standard or definition appropriate to the analysis --- whether that means consistent accounting standards, index definitions, or economic variable calculations. Without such standardization, researchers may draw incorrect inferences simply because data series are not comparable.
+
+\paragraph{Spurious Correlations from Non-Stationarity}
+In time-series analysis, a classic data pitfall is using non-stationary (e.g. trending) data in regression without proper detrending or differencing. Granger and Newbold famously warned that regressing one growing time series on another can yield an apparently excellent fit (high R², significant t-statistics) that is actually spurious
+jumbong.github.io
+. They documented examples of nonsense correlations where two unrelated economic series, each with strong time trends, produced R² values near 0.99 and yet no meaningful relationship existed
+jumbong.github.io
+. In one case, they found a published regression with an astounding R² = 0.999 alongside a Durbin-Watson statistic of 0.09, indicating highly autocorrelated residuals --- a red flag for spurious regression
+jumbong.github.io
+. The lesson is that failing to transform or preprocess time-series data to stationarity can create illusory relationships driven by common trends rather than true causation. This problem is another form of "garbage in": if one feeds trending data into a linear model without precautions, the output will dutifully report a relationship (almost any two increasing series will correlate over time) --- an obvious garbage result. Modern econometric practice therefore emphasizes data preprocessing steps (taking logarithms, differences, removing trends or seasonality) to avoid such pitfalls. The need for these standardizing transformations is well supported by research. It has been shown that once data are rendered stationary and free of trend, spurious significance levels fall to normal rates
+jumbong.github.io
+. In sum, appropriate preprocessing of time-series (a form of standardization across time) is critical to obtaining reliable inference and not mistaking noise for signal.
+
+\paragraph{Data Snooping and Overfitting}
+A related concern in the realm of quantitative finance is data-snooping bias --- the false discoveries that occur when one mines a dataset for many possible patterns without proper adjustment. While this is more of a methodological issue than a data quality issue per se, it is worth noting as a cautionary tale that if one dredges "garbage data" hard enough, one will always find something. Sullivan, Timmermann, and White \cite{Sullivan1999} applied rigorous statistical checks to a large number of technical trading rules that had seemingly been profitable in past U.S. stock data. Publishing in the Journal of Finance, they showed that once one accounts for the fact that dozens of rules were tried (via White's Reality Check bootstrap), the vast majority of supposed "winning" trading strategies had no genuine predictive ---
+researchgate.net
+. Many earlier studies that lacked such corrections had overfit the data, effectively reporting noise as if it were a tradable signal
+researchgate.net
+. This reinforces the broader point: analyses conducted on poorly vetted or overly mined data can always produce some pattern of interest, but without out-of-sample validation or standardized methodologies, these are likely to be mirages. Ensuring data are partitioned properly (training vs. test sets, avoiding look-ahead bias where future information leaks into past data) is a form of maintaining data integrity in predictive modeling. The academic finance literature now contains countless factors and strategies discovered in historical data; however, as Harvey, Liu, and Zhu \cite{Harvey2016} argue in the Review of Financial Studies, many of these fail to hold up out-of-sample, suggesting that data-snooping and noise-fitting were at play. The community's response has been to demand higher standards of evidence (e.g. out-of-sample tests, multiple-comparison adjustments) --- essentially, more robust data handling --- before accepting new "discoveries." This again highlights how disciplined data practices filter out spurious results.---
+In all the above cases, the central theme is that poor data quality --- whether through biased sampling, inconsistent definitions, measurement error, or inadequate preprocessing --- can create false findings. These findings might look convincing (they may even be statistically significant or published in respected outlets), but they do not generalize or hold up under scrutiny because they are artifacts of faulty data. For researchers, analysts, and decision-makers, the implications are clear: one must critically assess data quality at the outset, or risk being led astray by garbage-in effects.
+
+
+\end{appendices}
+
 
 \end{document}

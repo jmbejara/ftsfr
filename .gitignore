@@ -8,7 +8,7 @@
 
 # Exclude _output directory since it's should generated automatically
 /_output/*
-
+config.toml
 
 # Secrets saved in environment files
 .env*
@@ -34,6 +34,7 @@ models/results/tests/time_series_models/*
 _docs/
 report/images/*
 
+models/*/lightning_logs
 
 ##############
 #Excluded PDFs
@@ -257,3 +258,9 @@ src/z_scratch_pipeline_template.ipynb
 reports/draft_ftsfr.pdf
 
 models/ffnn/lightning_logs/
+
+models/ffnn/mytemp/lightning_logs/
+
+references/
+
+_references/

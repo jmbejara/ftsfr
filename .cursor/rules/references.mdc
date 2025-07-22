@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+When this rule is requested, I want you to read through the references in the _references directory. You can see which reference documents are in there by looking at [bibliography.bib](mdc:reports/bibliography.bib)
+
+In the _references folder, I I've already used OCR to turn the PDFs into markdown files, so it's easier for you to read them.
+
+When you are referencing any of these documents, you should be citing them. Please use [bibliography.bib](mdc:_references/bibliography.bib) to help create citations. Please try to use quotes from the documents.
+
+Also, please use [paper_summaries.md](mdc:_output/paper_summaries/paper_summaries.md) as a reference to help you to see the big picture of what is available.
+

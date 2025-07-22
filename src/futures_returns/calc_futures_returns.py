@@ -13,7 +13,9 @@ DATA_DIR = config("DATA_DIR")
 
 
 def calc_futures_returns(data_dir=DATA_DIR):
-    df = pull_wrds_futures.load_combined_futures_data(data_dir=data_dir, format="pandas")
+    df = pull_wrds_futures.load_combined_futures_data(
+        data_dir=data_dir, format="pandas"
+    )
     # TODO
     return df
 

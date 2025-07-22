@@ -1,6 +1,6 @@
 # %%
 """
-# Analysis Summary: Covered Interest Parity (CIP) Arbitrage Spreads
+# Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads
 
 **Source:**
 Du, W., & Schreger, J. (2023). *Covered Interest Parity Deviations: Macro Risks and Market Frictions*. Harvard Business School.
@@ -87,13 +87,15 @@ print(f"Max CIP Deviation: {cip_table.max().idxmax()}")
 
 # %%
 cip_table_replicate = calc_cip.calculate_cip(end_date="2020-01-01", data_dir=DATA_DIR)
-display(cip_table_replicate)
+cip_table_replicate.tail()
 
 # %%
 print(f"Max CIP Deviation: {cip_table_replicate.max().idxmax()}")
 
 # %%
-calc_cip.plot_cip_from_data(cip_table_replicate, end_date="2020-01-01", output_suffix="replicate")
+calc_cip.plot_cip_from_data(
+    cip_table_replicate, end_date="2020-01-01", output_suffix="replicate"
+)
 
 # %%
 """
@@ -125,7 +127,7 @@ We extend our analysis to include more recent data through 2025 to examine conte
 
 # %%
 cip_table_2025 = calc_cip.calculate_cip(end_date="2025-01-01", data_dir=DATA_DIR)
-display(cip_table_2025)
+cip_table_2025.tail()
 
 # %%
 calc_cip.plot_cip_from_data(cip_table_2025, end_date="2025-01-01", output_suffix="2025")
@@ -144,7 +146,9 @@ cip_table_2025.describe()
 # %%
 # Create a version with the column names that cip_analysis expects
 cip_table_2025_for_analysis = cip_table_2025.copy()
-cip_table_2025_for_analysis.columns = [f"CIP_{col}_ln" for col in cip_table_2025_for_analysis.columns]
+cip_table_2025_for_analysis.columns = [
+    f"CIP_{col}_ln" for col in cip_table_2025_for_analysis.columns
+]
 stats = cip_analysis.compute_cip_statistics(cip_table_2025_for_analysis)
 
 # %%

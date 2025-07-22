@@ -1,0 +1,130 @@
+---
+description: 
+globs: *.tex,*.md
+alwaysApply: false
+---
+The following is a guide on how to write a good introduction to an economics paper. Even though it focuses on development economics, a lot of the advice carries over to other fields. Please use this advice. 
+
+# How to Write the Introduction of Your Development Economics Paper
+
+*by David Evans | February 10, 2020*
+
+You win or lose your readers with the introduction of your economics paper. Your title and your abstract should convince people to read your introduction. Research shows that economics papers with more readable introductions get cited more. The introduction is your opportunity to lay out your research question, your empirical strategy, your findings, and why it matters. Succinctly.
+
+Various economists have provided advice on how to write an introduction. Keith Head gives "The Introduction Formula": 
+1. The hook: attract the reader's interest
+2. The question: what your paper does
+3. Antecedents: what work you build on
+4. Value-added: how you add to the work you build on
+5. Roadmap of the paper
+
+Claudia Sahm provides related advice: 
+1. Motivation
+2. Research question
+3. Main contribution
+4. Method
+5. Findings
+6. Robustness check
+7. Roadmap of the paper
+
+How does this play out practically? I identified the most recent empirical microeconomic development papers from a range of top journals, including the American Economic Review (AER), the Quarterly Journal of Economics (QJE), American Economic Journal: Applied Economics (AEJ: Applied), and others. Then I outlined the introduction of each paper: What do the authors do in paragraph one? What about paragraph two?
+
+Here's what I learned.
+
+## The outline
+
+Most introductions in top journals look something like this, which is consistent with what Head and Sahm recommend:
+
+1. **Motivate with a puzzle or a problem** (1–2 paragraphs)
+2. **Clearly state your research question** (1 paragraph)
+3. **Empirical approach** (1 paragraph)
+4. **Detailed results** (3–4 paragraphs)
+5. **Value-added relative to related literature** (1–3 paragraphs)
+6. **Optional paragraphs**: robustness checks, policy relevance, limitations
+7. **Roadmap** (1 paragraph)
+
+There is variation, certainly, but papers in the top journals largely follow the pattern. Why? That way readers come away from the introduction with a clear idea of why they should be interested, what you do, what you learn, and how you build on the work of others. Then they can decide if they want or need to dive into the rest of the paper.
+
+Papers in lower-ranked journals (and let me be clear that I think these are all respectable journals and would be happy to publish in any of them) were less likely to have a clearly stated research question (Exactly what are you testing?) or to describe their results (What? I have to read the paper?).
+
+## The motivation
+
+How do I convince readers that my topic is important? Here are some of the ways I observe:
+
+### Here's a big development problem, and then here's a specific aspect of that problem.
+
+In Muralidharan et al.'s paper on education technology in the AER, they open with a big problem: massive expansion in education without quality. "Developing countries have made impressive progress in improving school enrollment and completion in the last two decades. Yet, their productivity in converting education investments of time and money into human capital remains very low." Then, in the next paragraph, they transition to a narrower problem: When kids fall behind, they don't have any support. "Specifically, the rapid expansion of education in developing countries has led to the enrollment of millions of first-generation learners, who lack instructional support when they fall behind the curriculum."
+
+Celhay et al.'s paper on results-based financing for health in AEJ: Applied uses a similar approach. It opens with "slow adoption of improved technologies has been extensively documented." In the next paragraph, it transitions to the health sector specifically: "Slow diffusion of improved clinical practices (i.e., quality) in the health care industry is also a global issue as indicated by…"
+
+### Here's a major policy that many countries or other entities engage in.
+
+In Dell and Querubin's paper on foreign military interventions, the motivation stems from the frequency of the policy: "Military interventions in weakly institutionalized societies were a central feature of the Cold War and continue through the present." Let's test whether it works! (Not so well, in this case.) In de Ree et al.'s paper on teacher salaries in the QJE, they start with, "countries sometimes implement large increases in public-sector salaries to attract higher-quality applicants to government jobs and to better motivate existing employees." Let's test it! (In this case, again, it didn't work so well.) In Romero et al.'s paper on outsourcing education in the AER, they say, "Governments often enter into public-private partnerships as a means to raise capital or to leverage the efficiency of the private sector."
+
+Likewise, In Barrera-Osorio et al.'s paper on alternative conditional cash transfer designs in AEJ: Applied, they open with "Conditional cash transfers are one of the most prevalent and fastest-growing social assistance programs in the developing world." Similarly, Haushofer and Shapiro's paper on unconditional cash transfers in the QJE starts with "Unconditional cash transfers have recently received renewed attention as a tool for poverty alleviation in developing countries."
+
+### Here's a big debate in economics.
+
+Breza et al.'s paper on pay inequality in the QJE start with a debate: "In traditional agency models, workers care about only their own wage levels." But "a long tradition in economic thought—as well as in psychology, sociology, and organizational behavior—has advanced the notion that individuals also care about their pay relative to that of their coworkers." So that's what they test.
+
+Hjort and Poulsen's paper on the internet and employment in Africa, in the AER, opens with a debate: "Traditional trade theory predicts a decrease in inequality in developing countries during periods of integration in the global economy." But "the slow economic progress of poor workers in many parts of Africa, Asia, and Latin America during the last few decades, therefore, surprised economists." They then lay out two potential explanations.
+
+## The research question
+
+Clearly state exactly what you are researching. This is what this looks like:
+
+"I focus on a particular dimension of diversity (economic status) and seek to answer the following question: what effects do peers from poor households have on students from relatively wealthy families?" (Rao in AER)
+
+"This paper asks whether elite colleges help students outside of historically advantaged groups reach top positions in the economy." (Zimmerman in AER)
+
+"In this paper, we study the impact of a novel community health delivery program." (Björkman Nyqvist et al. in AEJ: Applied)
+
+"Given these gaps in knowledge, the overall purpose of this paper is to evaluate the impact of a typical, large-scale teacher [professional development] program from a developing country on a wide range of teacher and student outcomes." (Loyalka et al. in AEJ: Applied)
+
+"This paper investigates how working alongside friends affects employee productivity and whether this effect varies as a function of a worker's personality skills." (Park in AEJ: Applied)
+
+A few papers skip the motivation altogether and dive right into the research question.
+
+## The empirical approach
+
+This is where you explain how you're going to answer the research question. These are not all randomized controlled trials. Whatever the method, authors are stating their approach clearly.
+
+"To shed light on the issue, we combine a detailed labor survey that tracks over 21,000 households, drawn from the entire wealth distribution in 1,309 rural Bangladeshi villages, four times over a seven-year period, with the randomized evaluation of the nationwide roll-out of a program that transfers assets and skills to the poorest women in these villages." (Bandiera et al. in QJE)
+
+"My first econometric strategy exploits the plausibly exogenous staggered timing of a policy change that required elite private schools to offer free places to poor students." (Rao in AER)
+
+"We compare individuals and firms in locations in Africa that are on the terrestrial network of Internet cables to those that are not. We compare these two groups during the gradual arrival on the coast of submarine cables from Europe that greatly increase speed and capacity on the terrestrial network." (Hjort and Poulsen in AER)
+
+## The detailed results
+
+What exactly did you learn from this research? Papers in top journals dedicate a substantial portion of their introduction to their results, often 3–5 paragraphs (or between 25 and 30 percent of entire introduction). Some papers plow through a whole host of results (arguably more than half the introduction of Bandiera et al.). Others alternate, setting up an empirical strategy, summarizing the results, then another empirical strategy, then more results. But don't skimp: Readers should be able to confidently cite your paper after they read your introduction. (Of course, everyone will read the paper very carefully before citing it—wink wink—but why not make it easier on them?)
+
+## The value added
+
+The value added is what your paper contributes above and beyond the existing literature. You probably didn't invent this topic of study (good for you if you did!), so it's important to position your work relative to previous evidence. In most articles in top journals, the bulk of that discussion comes toward the end of the introduction. The point of the introduction is to introduce your work, so don't make readers wade through paragraphs of other people's work to get to it.
+
+I found that in lower-ranked journals, papers were more likely to have paragraphs dedicated to literature early on, in the second or fourth paragraph. One could argue that more original contributions get published in higher-ranked journals and don't need as much of a literature review, but even the papers in the top journals are building on existing literature; they just hold off on the detailed discussion of that literature. This doesn't mean you can't have a reference to an existing study in the opening paragraphs. Many papers have a few references in the opening paragraph as they establish an economic problem or puzzle. But the bulk of the references should come later.
+
+Don't just review the literature: Review it as it relates to your paper and so that it highlights what your paper adds. Romero et al. in the AER write, "We contribute to the broader literature on outsourcing service delivery." They then summarize that literature over the course of a paragraph and end with "In our setting, while outsourcing management improves most indices of school quality on average, the effect varies across providers. In addition, some providers' actions had negative unintended consequences and may have generated negative spillovers for the broader education system."
+
+Dizon-Ross, in the antepenultimate paragraph of the introduction to her paper on children's schooling in the AER, writes, "A large literature shows that providing information to households affects decision-making across many domains." But here's the hook: "However these interventions have primarily delivered information that one might not expect households to know, even richer or well-informed households." Then she lays out both the highlights of that "large literature" and how her paper fills the gap she's identified.
+
+## The optional paragraphs
+
+Many papers have other elements in their introduction, usually either after the results or after the value added. Muralidharan et al. discuss policy relevance: "Our results are directly relevant to policy debates on effective strategies to address the challenge of mismatch between student learning and the level of curriculum/pedagogy." So does Rao: "My findings are also of relevance to policymakers: the policy I study is being extended throughout India under the Right To Education Act, with consequences for over 300 million school-age children. This policy is controversial."
+
+A few papers discuss limitations. Breza et al. write that "Despite the magnitude of the results in our setting, one cannot draw conclusions about optimal pay structure." But the paragraph ends with a reiteration of what the paper can say: "Our findings indicate that workers' relative-pay concerns, especially in situations where pay differences are difficult to clearly justify, could affect this calculus."
+
+Some papers dedicate a paragraph or two to mechanisms (if you've got 'em, show 'em!), to robustness (show us your results aren't a house of cards!), or to theoretical antecedents (oh yeah, theory!).
+
+## The roadmap
+
+Twelve out of the 15 papers I examined in the AER, QJE, and AEJ: Applied have the roadmap. I usually include it because it's a convention, but it doesn't feel like great writing. Here's what Deirdre McCloskey has to say about it in her book Economical Writing: "Still another piece of boilerplate, and one that kills the momentum of most papers on the second page, is the table-of-contents paragraph… Too many editors and referees demand it. Don't, please … don't. Ninety-nine out of a hundred readers skip to the substance, if they can find it. The one out of a hundred who pauses on the paragraph is wasting her time."
+
+So be warned!
+
+## The takeaway
+
+Invest in your introduction. One reason that so many introductions in top journals have a similar pattern is that it's clear: you tell the reader why the issue you studied is important, you tell them what you did, you tell them what you learned, and you tell them how it builds on what we already knew. You might tell them how it relates to policy or what the limitations of your work are. Interested readers can dive into the details of the paper, but good introductions give casual readers a clear sense of what they'll get out of your paper.
+
+Your introduction is your kingdom. Rule it well.

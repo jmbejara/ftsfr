@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import shutil
 
 import toml
 from doit.action import CmdAction
@@ -7,10 +8,24 @@ from doit.action import CmdAction
 sys.path.insert(1, "./src/")
 
 from settings import config
+from dependency_tracker import (
+    load_module_requirements,
+    get_available_datasets,
+    get_format_task_name,
+)
 
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 OS_TYPE = config("OS_TYPE")
+
+# Get pixi executable path
+PIXI_EXECUTABLE = shutil.which("pixi")
+if not PIXI_EXECUTABLE:
+    # Fallback to common installation paths
+    if Path.home().joinpath(".pixi/bin/pixi").exists():
+        PIXI_EXECUTABLE = str(Path.home() / ".pixi/bin/pixi")
+    else:
+        PIXI_EXECUTABLE = "pixi"  # Hope it's in PATH at runtime
 
 
 ## Helpers for handling Jupyter Notebook tasks
@@ -54,6 +69,124 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
     else:
         command = f"xcopy /E /I {dir_path}/ {destination_folder}"
     return command
+
+
+def notebook_subtask(task_config):
+    """
+    Generate notebook task configuration with unified workflow for .py and .ipynb files.
+
+    Creates a two-stage process:
+    1. Normalize: Convert source to stable .py file in OUTPUT_DIR
+    2. Execute & Render: Run .py, convert to notebook, execute, generate HTML
+
+    Parameters:
+    - task_config: dict with keys:
+        - name: str, task name
+        - notebook_path: str, path to .py or .ipynb file
+        - file_dep: list, additional file dependencies (optional)
+        - targets: list, additional targets (optional)
+
+    Yields task configuration(s) for doit.
+    """
+    name = task_config["name"]
+    source_path = Path(task_config["notebook_path"])
+    file_dep = task_config.get("file_dep", [])
+    targets = task_config.get("targets", [])
+
+    # Intermediate .py file in OUTPUT_DIR
+    py_filename = f"_{name}_ipynb.py"
+    py_path = OUTPUT_DIR / py_filename
+
+    # Stage 1: Normalize to .py in OUTPUT_DIR
+    # Create the normalize action based on file type
+    if source_path.suffix == ".py":
+        normalize_actions = [
+            f"mkdir -p {OUTPUT_DIR}"
+            if OS_TYPE == "nix"
+            else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
+            f"cp {source_path} {py_path}"
+            if OS_TYPE == "nix"
+            else f"copy {source_path} {py_path}",
+        ]
+    elif source_path.suffix == ".ipynb":
+        normalize_actions = [
+            f"mkdir -p {OUTPUT_DIR}"
+            if OS_TYPE == "nix"
+            else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
+            f"jupyter nbconvert --to python --output {py_path} {source_path}",
+        ]
+    else:
+        raise ValueError(
+            f"Unsupported file type: {source_path.suffix}. Must be .py or .ipynb"
+        )
+
+    yield {
+        "name": f"{name}_normalize",
+        "actions": normalize_actions,
+        "file_dep": [str(source_path)],
+        "targets": [str(py_path)],
+        "clean": True,
+    }
+
+    # Stage 2: Execute and render
+    # Work in the source directory to preserve relative paths
+    working_notebook = source_path.with_suffix(".ipynb")
+
+    # Determine whether to move or copy based on source file type
+    if source_path.suffix == ".py":
+        # For .py sources, the .ipynb is intermediate, so move it
+        notebook_transfer_cmd = mv(working_notebook, OUTPUT_DIR / "_notebook_build")
+    else:
+        # For .ipynb sources, preserve the original by copying
+        if OS_TYPE == "nix":
+            notebook_transfer_cmd = (
+                f"cp {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
+            )
+        else:
+            notebook_transfer_cmd = (
+                f"copy {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
+            )
+
+    # For .py sources, clear outputs before moving; for .ipynb sources, after copying
+    clear_output_action = (
+        jupyter_clear_output(working_notebook) 
+        if source_path.suffix == ".ipynb" 
+        else "echo 'Skipping output clear for .py source'"
+    )
+    
+    yield {
+        "name": name,
+        "actions": [
+            f"""python -c "import sys; from datetime import datetime; print(f'Start {name}: {{datetime.now()}}', file=sys.stderr)" """,
+            # Ensure output directories exist
+            f"mkdir -p {OUTPUT_DIR / '_notebook_build'}"
+            if OS_TYPE == "nix"
+            else f"mkdir {OUTPUT_DIR / '_notebook_build'} 2>nul || echo.",
+            # Convert source to notebook format (in source directory)
+            f"ipynb-py-convert {source_path} {working_notebook}"
+            if source_path.suffix == ".py"
+            else "echo 'Using existing notebook'",
+            # Execute notebook in its original directory (preserves relative paths)
+            jupyter_execute_notebook(working_notebook),
+            # Generate HTML
+            jupyter_to_html(working_notebook, OUTPUT_DIR),
+            # Move or copy executed notebook to build directory based on source type
+            notebook_transfer_cmd,
+            # Clear outputs to prevent constant re-runs (only for .ipynb sources)
+            clear_output_action,
+            f"""python -c "import sys; from datetime import datetime; print(f'End {name}: {{datetime.now()}}', file=sys.stderr)" """,
+        ],
+        "file_dep": [
+            str(py_path),  # Depend on normalized .py for stability
+            *file_dep,
+        ],
+        "targets": [
+            OUTPUT_DIR / f"{name}.html",
+            OUTPUT_DIR / "_notebook_build" / f"{name}.ipynb",
+            *targets,
+        ],
+        "clean": True,
+    }
 
 
 # Load benchmarks configuration
@@ -105,27 +238,15 @@ if data_sources["bloomberg_terminal"] and not is_data_glimpses:
             print("Please enter 'yes', 'no', or 'skip'.")
 
 
-# fmt: off
+# Load module requirements from datasets.toml
+module_requirements_dict = load_module_requirements()
+
+# Check which modules are available based on data sources
 module_requirements = {}
-module_requirements["cip"] = data_sources["bloomberg_terminal"]
-module_requirements["commodities"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
-module_requirements["corp_bond_returns"] = data_sources["open_source_bond"]
-module_requirements["cds_bond_basis"] = data_sources["open_source_bond"] and data_sources["wrds_markit"]
-module_requirements["cds_returns"] = data_sources["fed_yield_curve"] and data_sources["wrds_markit"]
-module_requirements["fed_yield_curve"] = data_sources["fed_yield_curve"]
-module_requirements["foreign_exchange"] = data_sources["wrds_fx"]
-module_requirements["futures_returns"] = data_sources["bloomberg_terminal"] and data_sources["wrds_datastream"]
-module_requirements["he_kelly_manela"] = data_sources["he_kelly_manela"]
-module_requirements["ken_french_data_library"] = data_sources["ken_french_data_library"]
-module_requirements["nyu_call_report"] = data_sources["nyu_call_report"]
-module_requirements["us_treasury_returns"] = data_sources["wrds_crsp"]
-module_requirements["wrds_bank_premium"] = data_sources["wrds_bank_premium"]
-module_requirements["wrds_crsp_compustat"] = (
-    data_sources["wrds_compustat"]
-    and data_sources["wrds_crsp"]
-    and data_sources["wrds_crsp_compustat"]
-)
-# fmt: on
+for module_name, required_sources in module_requirements_dict.items():
+    module_requirements[module_name] = all(
+        data_sources.get(source, False) for source in required_sources
+    )
 
 use_cache = config_toml["cache"]["use_cache"]
 
@@ -318,6 +439,21 @@ def task_pull():
             "clean": [],
         }
 
+    data_module = "options"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_option_data.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "data_1996-01_2012-01.parquet",
+                DATA_DIR / data_module / "data_2012-02_2019-12.parquet",
+            ],
+            "file_dep": [f"./src/{data_module}/pull_option_data.py"],
+            "clean": [],
+        }
+
     data_module = "us_treasury_returns"
     if module_requirements[data_module] and not use_cache:
         # TODO: Create dataset that merges the treasury auction, runness, and treasury yield data
@@ -402,6 +538,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from notebook_subtask(
+            {
+                "name": "summary_cds_bond_basis_ipynb",
+                "notebook_path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
+                "file_dep": [
+                    "./src/cds_bond_basis/merge_cds_bond.py",
+                ],
+                "targets": [],
+            },
+        )
 
     data_module = "cds_returns"
     if module_requirements[data_module]:
@@ -418,6 +564,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from notebook_subtask(
+            {
+                "name": "summary_cds_returns_ipynb",
+                "notebook_path": "./src/cds_returns/summary_cds_returns_ipynb.py",
+                "file_dep": [
+                    "./src/cds_returns/calc_cds_returns.py",
+                ],
+                "targets": [],
+            }
+        )
 
     data_module = "cip"
     if module_requirements[data_module]:
@@ -436,6 +592,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from notebook_subtask(
+            {
+                "name": "summary_cip_ipynb",
+                "notebook_path": "./src/cip/summary_cip_ipynb.py",
+                "file_dep": [
+                    "./src/cip/calc_cip.py",
+                ],
+                "targets": [],
+            }
+        )
 
     data_module = "commodities"
     if module_requirements[data_module] and not use_cache and not bbg_skip:
@@ -455,12 +621,31 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}"
+                f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
             ],
-            "targets": [DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet"],
-            "file_dep": [f"./src/{data_module}/calc_corp_bond_returns.py"],
+            "targets": [
+                DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_corp_bond_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_corp_bond_portfolio_returns.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_corp_bond_returns.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
             "clean": [],
         }
+        yield from notebook_subtask(
+            {
+                "name": "summary_corp_bond_returns_ipynb",
+                "notebook_path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
+                "file_dep": [
+                    "./src/corp_bond_returns/calc_corp_bond_returns.py",
+                    "./src/corp_bond_returns/create_ftsfr_datasets.py",
+                ],
+                "targets": [],
+            }
+        )
 
     # data_module = "foreign_exchange"
     # if module_requirements[data_module]:
@@ -548,22 +733,81 @@ def task_format():
             "clean": [],
         }
 
+    # TODO
+    data_module = "options"
+    if module_requirements[data_module]:
+        yield from notebook_subtask(
+            {
+                "name": "combined_filters",
+                "notebook_path": "./src/options/combined_filters.ipynb",
+                "file_dep": [
+                    "./src/options/level_1_filters.py",
+                    "./src/options/level_2_filters.py",
+                    "./src/options/level_3_filters.py",
+                ],
+                "targets": [],
+            },
+        )
+        yield from notebook_subtask(
+            {
+                "name": "portfolios",
+                "notebook_path": "./src/options/portfolios.ipynb",
+                "file_dep": [
+                    "./src/options/level_1_filters.py",
+                    "./src/options/level_2_filters.py",
+                    "./src/options/level_3_filters.py",
+                ],
+                "targets": [
+                    DATA_DIR / data_module / "hkm_portfolio_returns_1996-01_2019-12.parquet",
+                    DATA_DIR / data_module / "cjs_portfolio_returns_1996-01_2019-12.parquet",
+                ],
+            },
+        )
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "ftsfr_hkm_option_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_cjs_option_returns.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
+            "clean": [],
+        }
+
     data_module = "us_treasury_returns"
     if module_requirements[data_module]:
         yield {
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/calc_treasury_run_status.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "issue_dates.parquet",
                 DATA_DIR / data_module / "treasuries_with_run_status.parquet",
+                DATA_DIR / data_module / "ftsfr_treas_bond_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_treas_bond_portfolio_returns.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_treasury_run_status.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
+        yield from notebook_subtask(
+            {
+                "name": "summary_treasury_bond_returns_ipynb",
+                "notebook_path": "./src/us_treasury_returns/summary_treasury_bond_returns_ipynb.py",
+                "file_dep": [
+                    "./src/us_treasury_returns/calc_treasury_bond_returns.py",
+                ],
+                "targets": [],
+            }
+        )
 
     # if data_sources["wrds_bank_premium"]:
     #     data_module = "wrds_bank_premium"
@@ -606,56 +850,53 @@ def task_format():
         }
 
 
-def task_collect_ftsfr_datasets_info():
-    return {
-        "actions": [
-            "python ./src/load_ftsfr_datasets.py",
-        ],
-        "file_dep": ["./src/load_ftsfr_datasets.py"],
-        "targets": [DATA_DIR / "ftsfr_datasets_paths.toml"],
-        "clean": [],
-    }
-
-
 models = config_toml["models"]
 models_activated = [model for model in models if models[model]]
 
 
 def task_forecast():
-    if models["simple_exponential_smoothing"]:
-        yield {
-            "name": "simple_exponential_smoothing",
-            "actions": [
-                CmdAction("pixi run main", cwd="./models/simple_exponential_smoothing")
-            ],
-            "targets": [
-                OUTPUT_DIR / "raw_results" / "simple_exponential_smoothing_results.csv"
-            ],
-            "file_dep": [
-                "./models/simple_exponential_smoothing/main.R",
-                "./models/simple_exponential_smoothing/pixi.toml",
-            ],
-            "clean": [],
-        }
+    """Generate forecast tasks for each combination of model and dataset."""
 
-    if models["arima"]:
-        yield {
-            "name": "arima",
-            "actions": [CmdAction("pixi run main", cwd="./models/arima")],
-            "targets": [OUTPUT_DIR / "raw_results" / "arima_results.csv"],
-            "file_dep": [
-                "./models/arima/main.py",
-                "./models/arima/pixi.toml",
-            ],
-            "clean": [],
-        }
+    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
+
+    for model in models_activated:
+        for dataset_name, dataset_info in available_datasets.items():
+            # For debugging purposes, print the full command line action here:
+            # print(f"DATASET_PATH={dataset_info['path']} FTSFR_IS_BALANCED={dataset_info['is_balanced']} FREQUENCY={dataset_info['frequency']} DATA_DIR={DATA_DIR} OUTPUT_DIR={OUTPUT_DIR} pixi run main")
+            yield {
+                "name": f"{model}:{dataset_name}",
+                "actions": [
+                    CmdAction(
+                        f"{PIXI_EXECUTABLE} run main",
+                        cwd=f"./models/{model}",
+                        env={
+                            "DATASET_PATH": str(dataset_info["path"]),
+                            "FREQUENCY": dataset_info["frequency"],
+                            "SEASONALITY": str(dataset_info["seasonality"]),
+                            "OUTPUT_DIR": str(OUTPUT_DIR),
+                        },
+                    )
+                ],
+                "targets": [
+                    OUTPUT_DIR / "raw_results" / f"{model}_{dataset_name}_results.csv"
+                ],
+                "file_dep": [
+                    f"./models/{model}/main.py",
+                    f"./models/{model}/pixi.toml",
+                ],
+                "task_dep": [
+                    f"format:{get_format_task_name(dataset_info['module'])}",
+                ],
+                "clean": [],
+                "verbosity": 0,
+            }
 
 
 def task_assemble_results():
-    results_files = [
-        OUTPUT_DIR / "raw_results" / f"{model}_results.csv"
-        for model in models_activated
-    ]
+    """Assemble results from all model-dataset combinations."""
+
+    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
+
     return {
         "actions": [
             "python ./src/assemble_results.py",
@@ -665,84 +906,15 @@ def task_assemble_results():
             OUTPUT_DIR / "results_all.tex",
         ],
         "file_dep": [
-            *results_files,
             "./src/assemble_results.py",
+        ],
+        "task_dep": [
+            f"forecast:{model}:{dataset_name}"
+            for model in models_activated
+            for dataset_name in available_datasets
         ],
         "clean": [],
     }
-
-
-notebook_tasks = {
-    "summary_cds_bond_basis_ipynb": {
-        "path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
-        "file_dep": [
-            "./src/cds_bond_basis/merge_cds_bond.py",
-        ],
-        "targets": [],
-    },
-    "summary_cds_returns_ipynb": {
-        "path": "./src/cds_returns/summary_cds_returns_ipynb.py",
-        "file_dep": [
-            "./src/cds_returns/calc_cds_returns.py",
-        ],
-        "targets": [],
-    },
-    "summary_cip_ipynb": {
-        "path": "./src/cip/summary_cip_ipynb.py",
-        "file_dep": [
-            "./src/cip/calc_cip.py",
-        ],
-        "targets": [],
-    },
-    "summary_corp_bond_returns_ipynb": {
-        "path": "./src/corp_bond_returns/summary_corp_bond_returns_ipynb.py",
-        "file_dep": [
-            "./src/corp_bond_returns/calc_corp_bond_returns.py",
-        ],
-        "targets": [],
-    },
-    "summary_treasury_bond_returns_ipynb": {
-        "path": "./src/us_treasury_returns/summary_treasury_bond_returns_ipynb.py",
-        "file_dep": [
-            "./src/us_treasury_returns/calc_treasury_bond_returns.py",
-        ],
-        "targets": [],
-    },
-}
-
-
-# fmt: off
-def task_run_notebooks():
-    """Preps the notebooks for presentation format.
-    Execute notebooks if the script version of it has been changed.
-    """
-
-    for notebook in notebook_tasks.keys():
-        pyfile_path = Path(notebook_tasks[notebook]["path"])
-        notebook_path = pyfile_path.with_suffix(".ipynb")
-        yield {
-            "name": notebook,
-            "actions": [
-                """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
-                f"ipynb-py-convert {pyfile_path} {notebook_path}",
-                jupyter_execute_notebook(notebook_path),
-                jupyter_to_html(notebook_path),
-                mv(notebook_path, OUTPUT_DIR / "_notebook_build"),
-                """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
-            ],
-            "file_dep": [
-                pyfile_path,
-                *notebook_tasks[notebook]["file_dep"],
-            ],
-            "targets": [
-                OUTPUT_DIR / f"{notebook}.html",
-                OUTPUT_DIR / "_notebook_build" / f"{notebook}.ipynb",
-                *notebook_tasks[notebook]["targets"],
-            ],
-            "clean": True,
-            # "verbosity": 1,
-        }
-# fmt: on
 
 
 def task_create_data_glimpses():
@@ -754,9 +926,9 @@ def task_create_data_glimpses():
 
     return {
         "actions": [
-            # "python ./src/create_data_glimpses.py",
-            "python ./src/create_data_glimpses.py --no-samples",
-            # "python ./src/create_data_glimpses.py --no-samples --no-stats",
+            # "python ./src/create_data_glimpses.py --max-columns=20",
+            "python ./src/create_data_glimpses.py --no-samples"  # --max-columns=20",
+            # "python ./src/create_data_glimpses.py --no-samples --no-stats --max-columns=20",
         ],
         "targets": [
             "./docs_src/data_glimpses.md",
@@ -768,30 +940,27 @@ def task_create_data_glimpses():
 def task_compile_sphinx_docs():
     """Compile Sphinx Docs"""
 
-    # Get all paths from the notebook_tasks dictionary
-    notebook_paths = [
-        notebook_tasks[notebook]["path"] for notebook in notebook_tasks.keys()
-    ]
-
-    # Get all file dependencies from notebook_tasks
-    notebook_deps = [
-        dep for notebook in notebook_tasks.values() for dep in notebook["file_dep"]
-    ]
-
-    file_dep = [
-        "./docs_src/logo.png",
-        "./docs_src/conf.py",
-        "./docs_src/index.md",
-        "./docs_src/data_sources_and_modules.md",
-        "./docs_src/myst_markdown_demos.md",
-        "./docs_src/data_glimpses.md",
-        *notebook_paths,
-        *notebook_deps,
-    ]
+    # Get all files in the src directory recursively
+    src_files = list(Path("./src").rglob("*"))
+    # Filter to only include actual files (not directories) and exclude .ipynb files
+    src_files = [str(f) for f in src_files if f.is_file() and f.suffix != ".ipynb"]
 
     def touch_file():
         """Touch a file"""
         Path("./docs/.nojekyll").touch()
+
+    # Task dependencies on the format tasks that now contain the notebooks
+    task_deps = []
+    if module_requirements.get("cds_bond_basis", False):
+        task_deps.append("format:summary_cds_bond_basis_ipynb")
+    if module_requirements.get("cds_returns", False):
+        task_deps.append("format:summary_cds_returns_ipynb")
+    if module_requirements.get("cip", False):
+        task_deps.append("format:summary_cip_ipynb")
+    if module_requirements.get("corp_bond_returns", False):
+        task_deps.append("format:summary_corp_bond_returns_ipynb")
+    if module_requirements.get("us_treasury_returns", False):
+        task_deps.append("format:summary_treasury_bond_returns_ipynb")
 
     return {
         "actions": [
@@ -809,8 +978,16 @@ def task_compile_sphinx_docs():
             "./docs/myst_markdown_demos.html",
             "./docs/.nojekyll",
         ],
-        "file_dep": file_dep,
-        "task_dep": ["run_notebooks"],
+        "file_dep": [
+            "./docs_src/logo.png",
+            "./docs_src/conf.py",
+            "./docs_src/index.md",
+            "./docs_src/data_sources_and_modules.md",
+            "./docs_src/myst_markdown_demos.md",
+            "./docs_src/data_glimpses.md",
+            *src_files,
+        ],
+        "task_dep": task_deps,
         "clean": True,
     }
 

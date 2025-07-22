@@ -19,8 +19,10 @@ import pull_bbg_foreign_exchange
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
 
+CURRENCIES = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK", "USD"]
 
-def prepare_fx_data(spot_rates, forward_points, interest_rates):
+
+def prepare_fx_data(spot_rates, interest_rates):
     """
     Prepare foreign exchange data for CIP calculations.
 
@@ -35,8 +37,6 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
     ----------
     spot_rates : pd.DataFrame
         Spot exchange rates with Date column
-    forward_points : pd.DataFrame
-        3M forward points with Date column
     interest_rates : pd.DataFrame
         Interest rates (OIS) with Date column
 
@@ -45,15 +45,11 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
     pd.DataFrame
         Merged DataFrame with all prepared data
     """
+    # NOTE: removed forward points from original function
     # Set Date as index
 
     spot_rates = (
         spot_rates.set_index("index") if "index" in spot_rates.columns else spot_rates
-    )
-    forward_points = (
-        forward_points.set_index("index")
-        if "index" in forward_points.columns
-        else forward_points
     )
     interest_rates = (
         interest_rates.set_index("index")
@@ -96,7 +92,6 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
 
     # Clean and rename columns
     spot_rates = clean_columns(spot_rates)
-    forward_points = clean_columns(forward_points)
     interest_rates = clean_columns(interest_rates, interest_rate=True)
 
     # Map interest rate columns from int_cols to cols
@@ -109,178 +104,103 @@ def prepare_fx_data(spot_rates, forward_points, interest_rates):
         cols_ir = cols
 
     # Convert forward points to forward rates
-    # Non-JPY: forward points are per 10,000; JPY: per 100
-    forward_rates = forward_points.copy()
-    non_jpy_cols = [c for c in forward_rates.columns if c != "JPY"]
-    if non_jpy_cols:
-        forward_rates[non_jpy_cols] = forward_rates[non_jpy_cols] / 10000
-    if "JPY" in forward_rates.columns:
-        forward_rates["JPY"] = forward_rates["JPY"] / 100
-
-    # Add forward points to spot rates to get forward rates
-    forward_rates = spot_rates + forward_rates
 
     # Rename columns to keep track
     spot_rates.columns = [f"{name}_spot" for name in spot_rates.columns]
-    forward_rates.columns = [f"{name}_3Mfwd" for name in forward_rates.columns]
     interest_rates.columns = [f"{name}_ir" for name in interest_rates.columns]
 
     # Merge all dataframes
     df_merged = spot_rates.merge(
-        forward_rates, left_index=True, right_index=True, how="inner"
-    ).merge(interest_rates, left_index=True, right_index=True, how="inner")
+        interest_rates, left_index=True, right_index=True, how="inner"
+    )
 
     # Convert to reciprocal for these currencies (quoted as foreign/USD instead of USD/foreign)
     reciprocal_currencies = ["EUR", "GBP", "AUD", "NZD"]
     for ccy in reciprocal_currencies:
-        if f"{ccy}_CURNCY" in df_merged.columns:
-            df_merged[f"{ccy}_CURNCY"] = 1.0 / df_merged[f"{ccy}_CURNCY"]
-        if f"{ccy}_CURNCY3M" in df_merged.columns:
-            df_merged[f"{ccy}_CURNCY3M"] = 1.0 / df_merged[f"{ccy}_CURNCY3M"]
+        if f"{ccy}_spot" in df_merged.columns:
+            df_merged[f"{ccy}_spot"] = 1.0 / df_merged[f"{ccy}_spot"]
 
     return df_merged
 
 
-def compute_cip_spreads(df_merged):
+def implied_daily_fx_returns(fx_data, currency_list):
     """
-    Compute CIP spreads in basis points for all currencies.
+    New function written by Vincent
 
-    CIP in log terms (bps) = 10000 × [domestic_i - (logF - logS)×(360/90) - foreign_i]
+    This function returns implied daily return time series on foreign currencies
 
-    Parameters
-    ----------
-    df_merged : pd.DataFrame
-        DataFrame with spot rates, forward rates, and interest rates
+    Parameters:
+    fx_data: Foreign currency data containing spot exchange rate and interest rate of currency
+        CUR_spot is the spot exchange rate of 1USD to CUR
+        CUR_ir is the annualized interest rate of CUR on that day in percent space (7.0 = 7%)
 
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with CIP spreads for each currency
+    currency_list: list of currencies we generate returns for
+
+    Output:
+    fx_df: Foreign currency implied daily return time series
+        absolute returns are used here (not annualized, not log scaled)
+        CUR_return is the daily return of CUR on the day (not in % space)
     """
-    currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
+    fx_df = fx_data.copy()
+    fx_df = fx_df.fillna(method="ffill")
 
-    # Compute the log CIP basis in basis points
-    for ccy in currencies:
-        fwd_col = f"{ccy}_CURNCY3M"
-        spot_col = f"{ccy}_CURNCY"
-        ir_col = f"{ccy}_IR"
-        usd_ir_col = "USD_IR"
+    # tracking returns columns
+    ret_cols = ["USD_return"]
 
-        if all(
-            col in df_merged.columns for col in [fwd_col, spot_col, ir_col, usd_ir_col]
-        ):
-            # CIP in log terms (bps) = 10000 × [domestic_i - (logF - logS)×(360/90) - foreign_i]
-            cip_col = f"CIP_{ccy}_ln"
-            df_merged[cip_col] = 10000 * (
-                (df_merged[ir_col] / 100.0)  # domestic interest rate
-                - (360.0 / 90.0)
-                * (np.log(df_merged[fwd_col]) - np.log(df_merged[spot_col]))
-                - (df_merged[usd_ir_col] / 100.0)  # foreign interest rate (USD)
-            )
+    for curr_name in currency_list:
+        int_col = f"{curr_name}_ir"
 
-    return df_merged
+        if curr_name == "USD":
+            fx_df["USD_return"] = fx_df[
+                int_col
+            ]  # change to daily annualized returns in % space
 
-
-def clean_outliers(df_merged, window_size=45, threshold=10):
-    """
-    Clean outliers using rolling median absolute deviation.
-
-    Parameters
-    ----------
-    df_merged : pd.DataFrame
-        DataFrame with CIP spreads
-    window_size : int
-        Window size for rolling calculations
-    threshold : float
-        Threshold for outlier detection (number of MADs)
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with outliers replaced by NaN
-    """
-    currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
-
-    for ccy in currencies:
-        cip_col = f"CIP_{ccy}_ln"
-        if cip_col not in df_merged.columns:
             continue
 
-        # Rolling median over window
-        rolling_median = df_merged[cip_col].rolling(window_size).median()
+        spot_col = f"{curr_name}_spot"
+        fx_df[f"{spot_col}_ratio"] = fx_df[spot_col] / fx_df[spot_col].shift(
+            1
+        )  # change in spot price ratio
+        curr_ret_col = f"{curr_name}_return"
 
-        # Absolute deviation from median
-        abs_dev = (df_merged[cip_col] - rolling_median).abs()
+        # keep interest conversion consistent with US
+        fx_df[curr_ret_col] = (
+            fx_df[f"{spot_col}_ratio"] * fx_df[int_col]
+        )  # combine spot change and interest
+        ret_cols.append(curr_ret_col)
 
-        # Rolling mean of abs_dev (proxy for MAD)
-        rolling_mad = abs_dev.rolling(window_size).mean()
-
-        # Mark outliers and replace with NaN
-        outlier_mask = (abs_dev / rolling_mad) >= threshold
-        df_merged.loc[outlier_mask, cip_col] = np.nan
-
-    return df_merged
+    # filter just for returns
+    fx_df = fx_df[ret_cols]
+    return fx_df
 
 
-def plot_cip_spreads(spreads, output_filename="cip_spreads", output_dir=OUTPUT_DIR, save=False):
+
+
+def graph_fx_returns(fx_df, currency_list, region_name):
     """
-    Plot CIP spreads in basis points.
+    Graphs the FX returns for a set of currencies in a given region.
+    Legend is placed to the side for clarity.
 
-    Parameters
-    ----------
-    spreads : pd.DataFrame
-        DataFrame with CIP spreads (columns should be currency codes)
-    output_filename : str
-        Base filename for output (without extension)
+    Parameters:
+    fx_df: DataFrame containing foreign currency implied daily return time series.
+           CUR_return is the daily return of CUR (not in %).
+    currency_list: List of currency codes to graph.
+    region_name: Name of the region or category.
     """
-    _, ax = plt.subplots(figsize=(13, 8), dpi=300)
+    ret_list = [f"{curr}_return" for curr in currency_list]
 
-    # Plot each column
-    for column in spreads.columns:
-        ax.plot(
-            spreads.index, spreads[column], label=column, linewidth=1, antialiased=True
-        )
+    # Plot
+    fig, ax = plt.subplots(figsize=(10, 5))
+    fx_df[ret_list].plot(ax=ax, title=f"Annualized Daily Returns of {region_name}")
 
-    ax.set_xlabel("Dates", fontsize=14)
-    ax.set_ylabel("Arbitrage Spread (bps)", fontsize=14)
-
-    # Format the x-axis for years
-    ax.xaxis.set_major_locator(mdates.YearLocator(2))
-    ax.xaxis.set_minor_locator(mdates.YearLocator(1))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-    plt.xticks(rotation=0)
-
-    # Horizontal grid lines only
-    ax.yaxis.grid(True, linestyle="--", alpha=0.5)
-    ax.xaxis.grid(False)
-
-    # Hard limit the y-axis
-    ax.set_ylim([-50, 210])
-
-    # Legend below the plot
-    ax.legend(
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.2),
-        ncol=4,
-        fontsize=12,
-        frameon=True,
-    )
-
-    # Remove top and right spines
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-
-    plt.tight_layout(rect=[0, 0.15, 1, 1])  # ensure legend fits
-
-    if save:
-        plt.savefig(
-            output_dir / f"{output_filename}.pdf", format="pdf", bbox_inches="tight"
-        )
-        plt.savefig(output_dir / f"{output_filename}.png", dpi=300, bbox_inches="tight")
-    plt.close()
+    # Move legend to the right side
+    ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    
+    plt.tight_layout()
+    plt.show()
 
 
-def calculate_cip(end_date="2025-03-01", data_dir=DATA_DIR):
+def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
     """
     Calculate CIP spreads from foreign exchange data.
 
@@ -312,280 +232,20 @@ def calculate_cip(end_date="2025-03-01", data_dir=DATA_DIR):
         df_merged = df_merged.loc[:date]
 
     # Compute CIP spreads
-    df_merged = compute_cip_spreads(df_merged)
-    # Clean outliers
-    df_merged = clean_outliers(df_merged)
-
-    # Extract just the CIP columns
-    currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
-    cip_cols = [f"CIP_{c}_ln" for c in currencies if f"CIP_{c}_ln" in df_merged.columns]
-    spreads = df_merged[cip_cols].copy()
+    df_merged = implied_daily_fx_returns(df_merged, CURRENCIES)
 
     # Shorten column names for display
-    spreads.columns = [c[4:7] for c in spreads.columns]  # e.g., CIP_AUD_ln -> AUD
 
-    return spreads
-
-
-def load_cip_spreads(data_dir=DATA_DIR):
-    """Load calculated CIP spreads from parquet file."""
-    path = data_dir / "cip_spreads.parquet"
-    return pd.read_parquet(path)
+    return df_merged
 
 
-def load_raw_data(end_date="2025-03-01"):
-    """
-    Load and prepare raw FX data from Excel files.
 
-    Parameters
-    ----------
-    end_date : str
-        End date for filtering data
-
-    Returns
-    -------
-    pd.DataFrame
-        Merged DataFrame with spot rates, forward rates, and interest rates
-    """
-    import os
-    import toml
-    from pathlib import Path
-
-    # Get project root and config
-    project_root = Path(__file__).resolve().parent.parent.parent
-    with open(f"{project_root}/config.toml", "r") as f:
-        config_toml = toml.load(f)
-
-    data_sources = config_toml["data_sources"].copy()
-    BLOOMBERG = data_sources["bloomberg_terminal"]
-
-    if not BLOOMBERG:
-        possible_paths = [
-            "./data_manual/CIP_2025.xlsx",
-            "../data_manual/CIP_2025.xlsx",
-        ]
-
-        data = None
-        for filepath in possible_paths:
-            if os.path.exists(filepath):
-                try:
-                    data = pd.read_excel(filepath, sheet_name=None)
-                    break
-                except Exception as e:
-                    print(f"Error loading {filepath}: {e}")
-
-        if data is None:
-            raise FileNotFoundError(
-                "Could not find or load the CIP_2025.xlsx file in any of the expected locations"
-            )
-
-        df_spot = data["Spot"]
-        exchange_rates = df_spot.set_index("Date")
-
-        df_forward = data["Forward"]
-        forward_rates = df_forward.set_index("Date")
-
-        df_ir = data["OIS"]
-        interest_rates = df_ir.set_index("Date")
-
-        # Standard columns
-        cols = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
-        exchange_rates.columns = cols
-        forward_rates.columns = cols
-
-        # Convert forward points to forward rates
-        # Non-JPY: forward points are per 10,000; JPY: per 100
-        forward_rates[[c for c in cols if c != "JPY"]] /= 10000
-        forward_rates["JPY"] /= 100
-        forward_rates = exchange_rates + forward_rates
-
-        # Rename to keep track
-        exchange_rates.columns = [f"{name}_CURNCY" for name in exchange_rates.columns]
-        forward_rates.columns = [f"{name}_CURNCY3M" for name in forward_rates.columns]
-        interest_rates.columns = [f"{name}_IR" for name in interest_rates.columns]
-
-        # Merge
-        df_merged = exchange_rates.merge(
-            forward_rates, left_index=True, right_index=True, how="inner"
-        ).merge(interest_rates, left_index=True, right_index=True, how="inner")
-
-        # Convert to reciprocal for these currencies
-        reciprocal_currencies = ["EUR", "GBP", "AUD", "NZD"]
-        for ccy in reciprocal_currencies:
-            df_merged[f"{ccy}_CURNCY"] = 1.0 / df_merged[f"{ccy}_CURNCY"]
-            df_merged[f"{ccy}_CURNCY3M"] = 1.0 / df_merged[f"{ccy}_CURNCY3M"]
-
-    else:
-        # Bloomberg data fetching would go here
-        raise NotImplementedError(
-            "Bloomberg data fetching not implemented in this refactored version"
-        )
-
-    return df_merged.loc[:end_date]
-
-
-def compute_cip_from_raw(df_merged, end_date="2020-01-01"):
-    """
-    Compute CIP spreads from raw merged data.
-
-    Parameters
-    ----------
-    df_merged : pd.DataFrame
-        Merged DataFrame with FX data
-    end_date : str
-        End date for filtering
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with CIP spreads
-    """
-    # Filter by end date
-    df_merged = df_merged.loc[:end_date]
-
-    # List of all the core currencies
-    currencies = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK"]
-
-    # Compute the log CIP basis in basis points
-    for ccy in currencies:
-        fwd_col = f"{ccy}_CURNCY3M"
-        spot_col = f"{ccy}_CURNCY"
-        ir_col = f"{ccy}_IR"
-        usd_ir_col = "USD_IR"  # The US interest rate column
-
-        if all(
-            col in df_merged.columns for col in [fwd_col, spot_col, ir_col, usd_ir_col]
-        ):
-            # CIP in log terms (bps) = 100*100 x [ domestic_i - (logF - logS)*(360/90) - foreign_i ]
-            cip_col = f"CIP_{ccy}_ln"
-            df_merged[cip_col] = (
-                100
-                * 100
-                * (
-                    (df_merged[ir_col] / 100.0)  # domestic interest rate
-                    - (360.0 / 90.0)
-                    * (np.log(df_merged[fwd_col]) - np.log(df_merged[spot_col]))
-                    - (df_merged[usd_ir_col] / 100.0)  # foreign interest rate (USD)
-                )
-            )
-
-    # Rolling outlier cleanup (45-day window)
-    window_size = 45
-    for ccy in currencies:
-        cip_col = f"CIP_{ccy}_ln"
-        if cip_col not in df_merged.columns:
-            continue
-
-        # Rolling median over 45 days
-        rolling_median = df_merged[cip_col].rolling(window_size).median()
-
-        # Absolute deviation from median
-        abs_dev = (df_merged[cip_col] - rolling_median).abs()
-
-        # Rolling mean of abs_dev (proxy for MAD)
-        rolling_mad = abs_dev.rolling(window_size).mean()
-
-        # Mark outliers (abs_dev / mad >= 10) and replace with NaN
-        outlier_mask = (abs_dev / rolling_mad) >= 10
-        df_merged.loc[outlier_mask, cip_col] = np.nan
-
-    # Create a separate DataFrame for the CIP columns
-    cip_cols = [f"CIP_{c}_ln" for c in currencies if f"CIP_{c}_ln" in df_merged.columns]
-    spreads = df_merged[cip_cols].copy()
-
-    # Shorten column names for plotting
-    spreads.columns = [c[4:7] for c in spreads.columns]  # e.g., CIP_AUD_ln -> AUD
-
-    return spreads
-
-
-def plot_cip_from_data(
-    spreads,
-    end_date="2025-01-01",
-    output_suffix="rep",
-    save=False,
-    output_dir=OUTPUT_DIR,
-):
-    """
-    Plot CIP spreads from a DataFrame of spreads.
-
-    Parameters
-    ----------
-    spreads : pd.DataFrame
-        DataFrame with CIP spreads (columns should be currency codes)
-    end_date : str
-        End date for filtering the plot
-    output_suffix : str
-        Suffix for output filename
-    """
-    # Filter spreads by end date if needed
-    if end_date:
-        if isinstance(end_date, str):
-            end_date = pd.Timestamp(end_date).date()
-        spreads_filtered = spreads.loc[:end_date]
-    else:
-        spreads_filtered = spreads
-
-    _, ax = plt.subplots(figsize=(13, 8), dpi=300)
-
-    # Plot each column in the DataFrame
-    for column in spreads_filtered.columns:
-        ax.plot(
-            spreads_filtered.index,
-            spreads_filtered[column],
-            label=column,
-            linewidth=1,
-            antialiased=True,
-        )
-
-    ax.set_xlabel("Dates", fontsize=14)
-    ax.set_ylabel("Arbitrage Spread (bps)", fontsize=14)
-
-    # Format the x-axis for years
-    ax.xaxis.set_major_locator(mdates.YearLocator(2))
-    ax.xaxis.set_minor_locator(mdates.YearLocator(1))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-    plt.xticks(rotation=0)
-
-    # Horizontal grid lines only
-    ax.yaxis.grid(True, linestyle="--", alpha=0.5)
-    ax.xaxis.grid(False)
-
-    # Hard limit the y-axis
-    ax.set_ylim([-50, 210])
-
-    # Legend below the plot
-    ax.legend(
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.2),
-        ncol=4,
-        fontsize=12,
-        frameon=True,
-    )
-
-    # Remove top and right spines
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-
-    plt.tight_layout(rect=[0, 0.15, 1, 1])  # ensure legend fits
-    if save:
-        plt.savefig(
-            output_dir / f"spread_plot_{output_suffix}.pdf",
-            format="pdf",
-            bbox_inches="tight",
-        )
-        plt.savefig(
-            output_dir / f"spread_plot_{output_suffix}.png",
-            dpi=300,
-            bbox_inches="tight",
-        )
-    plt.show()
 
 
 if __name__ == "__main__":
-    # Calculate CIP spreads
-    cip_spreads = calculate_cip(end_date="2025-03-01")
+    # Calculate fx returns
+    fx_returns = calculate_fx()
 
     # Save to parquet
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    cip_spreads.to_parquet(DATA_DIR / "cip_spreads.parquet")
+    fx_returns.to_parquet(DATA_DIR / "fx_returns.parquet")

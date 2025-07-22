@@ -8,7 +8,7 @@ Key Auction Terminology:
 - The difference occurs because auctions can be oversubscribed (more bids than securities available).
 
 What is SOMA?
-SOMA (System Open Market Account) is the Federal Reserve's portfolio of securities used to 
+SOMA (System Open Market Account) is the Federal Reserve's portfolio of securities used to
 implement monetary policy. When the Fed participates in Treasury auctions:
 - It typically bids non-competitively (accepts whatever rate/yield is determined)
 - Purchases inject money into the banking system (expansionary policy)
@@ -262,126 +262,126 @@ def load_treasury_auction_data(data_dir: Path = DATA_DIR):
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 10569 entries, 0 to 10568
     Data columns (total 120 columns):
-    #    Column                                                 Dtype         
-    ---   ------                                                 -----         
-    0    cusip                                                  object        
+    #    Column                                                 Dtype
+    ---   ------                                                 -----
+    0    cusip                                                  object
     1    issueDate                                              datetime64[ns]
-    2    securityType                                           object        
-    3    securityTerm                                           object        
+    2    securityType                                           object
+    3    securityTerm                                           object
     4    maturityDate                                           datetime64[ns]
-    5    interestRate                                           float64       
-    6    refCpiOnIssueDate                                      object        
-    7    refCpiOnDatedDate                                      object        
+    5    interestRate                                           float64
+    6    refCpiOnIssueDate                                      object
+    7    refCpiOnDatedDate                                      object
     8    announcementDate                                       datetime64[ns]
     9    auctionDate                                            datetime64[ns]
-    10   auctionDateYear                                        object        
+    10   auctionDateYear                                        object
     11   datedDate                                              datetime64[ns]
-    12   accruedInterestPer1000                                 float64       
-    13   accruedInterestPer100                                  float64       
-    14   adjustedAccruedInterestPer1000                         float64       
-    15   adjustedPrice                                          float64       
-    16   allocationPercentage                                   float64       
-    17   allocationPercentageDecimals                           object        
-    18   announcedCusip                                         object        
-    19   auctionFormat                                          object        
-    20   averageMedianDiscountRate                              float64       
-    21   averageMedianInvestmentRate                            float64       
-    22   averageMedianPrice                                     float64       
-    23   averageMedianDiscountMargin                            object        
-    24   averageMedianYield                                     object        
-    25   backDated                                              object        
+    12   accruedInterestPer1000                                 float64
+    13   accruedInterestPer100                                  float64
+    14   adjustedAccruedInterestPer1000                         float64
+    15   adjustedPrice                                          float64
+    16   allocationPercentage                                   float64
+    17   allocationPercentageDecimals                           object
+    18   announcedCusip                                         object
+    19   auctionFormat                                          object
+    20   averageMedianDiscountRate                              float64
+    21   averageMedianInvestmentRate                            float64
+    22   averageMedianPrice                                     float64
+    23   averageMedianDiscountMargin                            object
+    24   averageMedianYield                                     object
+    25   backDated                                              object
     26   backDatedDate                                          datetime64[ns]
-    27   bidToCoverRatio                                        float64       
+    27   bidToCoverRatio                                        float64
     28   callDate                                               datetime64[ns]
-    29   callable                                               object        
+    29   callable                                               object
     30   calledDate                                             datetime64[ns]
-    31   cashManagementBillCMB                                  object        
-    32   closingTimeCompetitive                                 object        
-    33   closingTimeNoncompetitive                              object        
-    34   competitiveAccepted                                    object        
-    35   competitiveBidDecimals                                 object        
-    36   competitiveTendered                                    object        
-    37   competitiveTendersAccepted                             object        
-    38   corpusCusip                                            object        
-    39   cpiBaseReferencePeriod                                 object        
-    40   currentlyOutstanding                                   object        
-    41   directBidderAccepted                                   object        
-    42   directBidderTendered                                   object        
-    43   estimatedAmountOfPubliclyHeldMaturingSecuritiesByType  object        
-    44   fimaIncluded                                           object        
-    45   fimaNoncompetitiveAccepted                             object        
-    46   fimaNoncompetitiveTendered                             object        
-    47   firstInterestPeriod                                    object        
+    31   cashManagementBillCMB                                  object
+    32   closingTimeCompetitive                                 object
+    33   closingTimeNoncompetitive                              object
+    34   competitiveAccepted                                    object
+    35   competitiveBidDecimals                                 object
+    36   competitiveTendered                                    object
+    37   competitiveTendersAccepted                             object
+    38   corpusCusip                                            object
+    39   cpiBaseReferencePeriod                                 object
+    40   currentlyOutstanding                                   object
+    41   directBidderAccepted                                   object
+    42   directBidderTendered                                   object
+    43   estimatedAmountOfPubliclyHeldMaturingSecuritiesByType  object
+    44   fimaIncluded                                           object
+    45   fimaNoncompetitiveAccepted                             object
+    46   fimaNoncompetitiveTendered                             object
+    47   firstInterestPeriod                                    object
     48   firstInterestPaymentDate                               datetime64[ns]
-    49   floatingRate                                           object        
-    50   frnIndexDeterminationDate                              object        
-    51   frnIndexDeterminationRate                              object        
-    52   highDiscountRate                                       object        
-    53   highInvestmentRate                                     object        
-    54   highPrice                                              object        
-    55   highDiscountMargin                                     object        
-    56   highYield                                              object        
-    57   indexRatioOnIssueDate                                  object        
-    58   indirectBidderAccepted                                 object        
-    59   indirectBidderTendered                                 object        
-    60   interestPaymentFrequency                               object        
-    61   lowDiscountRate                                        object        
-    62   lowInvestmentRate                                      object        
-    63   lowPrice                                               object        
-    64   lowDiscountMargin                                      object        
-    65   lowYield                                               object        
+    49   floatingRate                                           object
+    50   frnIndexDeterminationDate                              object
+    51   frnIndexDeterminationRate                              object
+    52   highDiscountRate                                       object
+    53   highInvestmentRate                                     object
+    54   highPrice                                              object
+    55   highDiscountMargin                                     object
+    56   highYield                                              object
+    57   indexRatioOnIssueDate                                  object
+    58   indirectBidderAccepted                                 object
+    59   indirectBidderTendered                                 object
+    60   interestPaymentFrequency                               object
+    61   lowDiscountRate                                        object
+    62   lowInvestmentRate                                      object
+    63   lowPrice                                               object
+    64   lowDiscountMargin                                      object
+    65   lowYield                                               object
     66   maturingDate                                           datetime64[ns]
-    67   maximumCompetitiveAward                                object        
-    68   maximumNoncompetitiveAward                             object        
-    69   maximumSingleBid                                       object        
-    70   minimumBidAmount                                       object        
-    71   minimumStripAmount                                     object        
-    72   minimumToIssue                                         object        
-    73   multiplesToBid                                         object        
-    74   multiplesToIssue                                       object        
-    75   nlpExclusionAmount                                     object        
-    76   nlpReportingThreshold                                  object        
-    77   noncompetitiveAccepted                                 object        
-    78   noncompetitiveTendersAccepted                          object        
-    79   offeringAmount                                         object        
-    80   originalCusip                                          object        
+    67   maximumCompetitiveAward                                object
+    68   maximumNoncompetitiveAward                             object
+    69   maximumSingleBid                                       object
+    70   minimumBidAmount                                       object
+    71   minimumStripAmount                                     object
+    72   minimumToIssue                                         object
+    73   multiplesToBid                                         object
+    74   multiplesToIssue                                       object
+    75   nlpExclusionAmount                                     object
+    76   nlpReportingThreshold                                  object
+    77   noncompetitiveAccepted                                 object
+    78   noncompetitiveTendersAccepted                          object
+    79   offeringAmount                                         object
+    80   originalCusip                                          object
     81   originalDatedDate                                      datetime64[ns]
     82   originalIssueDate                                      datetime64[ns]
-    83   originalSecurityTerm                                   object        
-    84   pdfFilenameAnnouncement                                object        
-    85   pdfFilenameCompetitiveResults                          object        
-    86   pdfFilenameNoncompetitiveResults                       object        
-    87   pdfFilenameSpecialAnnouncement                         object        
-    88   pricePer100                                            object        
-    89   primaryDealerAccepted                                  object        
-    90   primaryDealerTendered                                  object        
-    91   reopening                                              object        
-    92   securityTermDayMonth                                   object        
-    93   securityTermWeekYear                                   object        
-    94   series                                                 object        
-    95   somaAccepted                                           object        
-    96   somaHoldings                                           object        
-    97   somaIncluded                                           object        
-    98   somaTendered                                           object        
-    99   spread                                                 object        
-    100  standardInterestPaymentPer1000                         object        
-    101  strippable                                             object        
-    102  term                                                   object        
-    103  tiinConversionFactorPer1000                            object        
-    104  tips                                                   object        
-    105  totalAccepted                                          float64       
-    106  totalTendered                                          float64       
-    107  treasuryRetailAccepted                                 object        
-    108  treasuryRetailTendersAccepted                          object        
-    109  type                                                   object        
-    110  unadjustedAccruedInterestPer1000                       object        
-    111  unadjustedPrice                                        object        
-    112  updatedTimestamp                                       object        
-    113  xmlFilenameAnnouncement                                object        
-    114  xmlFilenameCompetitiveResults                          object        
-    115  xmlFilenameSpecialAnnouncement                         object        
-    116  tintCusip1                                             object        
-    117  tintCusip2                                             object        
+    83   originalSecurityTerm                                   object
+    84   pdfFilenameAnnouncement                                object
+    85   pdfFilenameCompetitiveResults                          object
+    86   pdfFilenameNoncompetitiveResults                       object
+    87   pdfFilenameSpecialAnnouncement                         object
+    88   pricePer100                                            object
+    89   primaryDealerAccepted                                  object
+    90   primaryDealerTendered                                  object
+    91   reopening                                              object
+    92   securityTermDayMonth                                   object
+    93   securityTermWeekYear                                   object
+    94   series                                                 object
+    95   somaAccepted                                           object
+    96   somaHoldings                                           object
+    97   somaIncluded                                           object
+    98   somaTendered                                           object
+    99   spread                                                 object
+    100  standardInterestPaymentPer1000                         object
+    101  strippable                                             object
+    102  term                                                   object
+    103  tiinConversionFactorPer1000                            object
+    104  tips                                                   object
+    105  totalAccepted                                          float64
+    106  totalTendered                                          float64
+    107  treasuryRetailAccepted                                 object
+    108  treasuryRetailTendersAccepted                          object
+    109  type                                                   object
+    110  unadjustedAccruedInterestPer1000                       object
+    111  unadjustedPrice                                        object
+    112  updatedTimestamp                                       object
+    113  xmlFilenameAnnouncement                                object
+    114  xmlFilenameCompetitiveResults                          object
+    115  xmlFilenameSpecialAnnouncement                         object
+    116  tintCusip1                                             object
+    117  tintCusip2                                             object
     118  tintCusip1DueDate                                      datetime64[ns]
     119  tintCusip2DueDate                                      datetime64[ns]
     dtypes: datetime64[ns](14), float64(12), object(94)
