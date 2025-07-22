@@ -1,6 +1,7 @@
 # from settings import config
 import pandas as pd
 from matplotlib import pyplot as plt
+import merge_cds_bond
 
 # OUTPUT_DIR = config("OUTPUT_DIR")
 # DATA_DIR = config("DATA_DIR")
@@ -12,6 +13,7 @@ def process_cb_spread(df):
     """
     INPUT WAS PREVIOUS FINAL PRODUCT
     df: dataframe with par spread values merged into all values where there was a possible cubic spline
+       'cusip', -- cusip of the entire bond issue, unique bond identifier
        'date', -- reporting date
        'mat_days', -- days till maturity
        BOND_YIELD, -- MMN adjusted bond yield
@@ -48,6 +50,69 @@ def process_cb_spread(df):
     df["c_rating"] = df[["size_ig", "size_jk"]].apply(tuple, axis=1).map(rating_map)
 
     return df
+
+def output_cb_final_products(df):
+    '''
+        INPUT is from previous function
+    
+        df: dataframe with par spread values merged into all values where there was a possible cubic spline
+            'cusip', -- cusip of the entire bond issue, unique bond identifier
+            'date', -- reporting date
+            'mat_days', -- days till maturity
+            BOND_YIELD, -- MMN adjusted bond yield
+            'CS', -- credit spread
+                'size_ig', -- 0 if no ig bonds in portfolio, 1 if yes
+                'size_jk', -- 0 if no junk bonds in portfolio, 1 if yes
+            'par_spread', -- parspread of CDS, backed out by Cubic Spline
+        additional columns:
+        FR: Z-spread of the bond
+            FR = CS column
+        CB: implied return on CDS-bond spread
+            CB = par_spread - FR
+        rfr: implied risk free rate
+            rfr = (BOND_YIELD - CS) - CB
+        contain_rating: if it has IG or Junk bonds
+            0 if it contains Junk
+            1 if it contains IG
+        c_rating: IG, Junk, or combo
+            0 if it only contains Junk
+            1 if it only contains IG
+            2 if it contains both
+
+        output: 
+            agg_df: aggregated dataframe where data is combined
+                date: date of the aggregated collection
+                c_rating: IG, Junk, or combo
+                    0 if it only contains Junk
+                    1 if it only contains IG
+                    2 if it contains both
+                rfr: implied risk free rate
+                    desired value from stat arbitrage
+            non_agg_df: non aggregated dataframe, keeping individual bond issue
+                date: date of bond data
+                cusip: cusip of the entire bond issue, unique bond identifier
+                c_rating: IG, Junk, or combo
+                    0 if it only contains Junk
+                    1 if it only contains IG
+                    2 if it contains both
+
+                ^ ABOVE COMLUMNS ARE COMBINED INTO 
+                'combined_id'
+                
+                rfr: implied risk free rate
+                    desired value from stat arbitrage
+
+    '''
+
+    agg_df = df[['date', 'c_rating', 'rfr']]
+    non_agg_df = df[['date', 'cusip', 'c_rating', 'rfr']]
+
+    # combine the ids consistent processing
+    non_agg_df['combined_id'] = non_agg_df[['cusip', 'c_rating']].apply(tuple, axis=1)
+    non_agg_df = non_agg_df[['date', 'combined_id', 'rfr']]
+
+    return agg_df, non_agg_df
+
 
 
 def generate_graph(df, col="rfr", col2=None, two=False):

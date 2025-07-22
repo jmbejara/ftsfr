@@ -15,10 +15,13 @@ sys.path.append('../')
 from model_classes.darts_local_class import DartsLocal
 
 if __name__ == "__main__":
-
-    # Environment variables
+    # Read environment variables
     dataset_path = Path(os.environ["DATASET_PATH"])
     frequency = os.environ["FREQUENCY"]
+    OUTPUT_DIR = Path(
+        os.environ.get("OUTPUT_DIR", 
+                       Path(__file__).parent.parent.parent / "_output")
+    )
     seasonality = int(os.environ["SEASONALITY"])
     if os.environ.get("OUTPUT_DIR", None) is not None:
         OUTPUT_DIR = Path(os.environ["OUTPUT_DIR"])

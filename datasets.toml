@@ -55,7 +55,32 @@ required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
 [corp_bond_returns]
 required_data_sources = ["open_source_bond"]
 
+[corp_bond_returns.ftsfr_corp_bond_returns]
+description = """This data module contains the returns of individual corporate bonds sourced from the TRACE database."""
+frequency = "ME"
+seasonality = 12
+
+[corp_bond_returns.ftsfr_corp_bond_portfolio_returns]
+description = """This data module contains the returns of the corporate bond portfolios formed as per the methodology of Nozawa (2017)."""
+frequency = "ME"
+seasonality = 12
+
 ################################################################################
+[us_treasury_returns]
+required_data_sources = ["wrds_crsp"]
+
+[us_treasury_returns.ftsfr_treas_bond_returns]
+description = """This data module contains the returns of individual treasury bonds sourced from the CRSP database."""
+frequency = "ME"
+seasonality = 12
+
+[us_treasury_returns.ftsfr_treas_bond_portfolio_returns]
+description = """This data module contains the returns of the treasury bond portfolios formed as per the methodology of Gurkaynak, Sack, and Wright (2011)."""
+frequency = "ME"
+seasonality = 12
+
+################################################################################
+
 [crb_commodity]
 required_data_sources = ["bloomberg_terminal"]
 
@@ -74,11 +99,11 @@ required_data_sources = ["fed_yield_curve"]
 description = """Nelson-Seigel-Svensson zero-coupon yield curve, 
 tenors 1-30 years, 1961-present"""
 frequency = "D"
-is_balanced = true
+seasonality = 365 # Calendar days per year (or 252 for business days)
 
 ################################################################################
 [foreign_exchange]
-required_data_sources = ["wrds_fx"]
+required_data_sources = ["bloomberg_terminal"]
 
 ################################################################################
 [futures_returns]
@@ -99,29 +124,39 @@ required_data_sources = ["nyu_call_report"]
 [nyu_call_report.ftsfr_nyu_call_report_leverage]
 description = """From call report data, leverage for each rssdid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4  # Quarters per year
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_leverage]
 description = """From call report data, leverage for each bhcid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4
 
 [nyu_call_report.ftsfr_nyu_call_report_cash_liquidity]
 description = """From call report data, cash liquidity for each rssdid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_cash_liquidity]
 description = """From call report data, cash liquidity for each bhcid, 1976-2020"""
 frequency = "QE"
-is_balanced = false
+seasonality = 4
+
+################################################################################
+[options]
+required_data_sources = ["wrds_optionmetrics"]
+
+[options.ftsfr_hkm_option_returns]
+description = """From optionmetrics data, option returns, 1996-Present"""
+frequency = "D"
+seasonality = 252 # Business days per year
+
+[options.ftsfr_cjs_option_returns]
+description = """From optionmetrics data, option returns, 1996-Present"""
+frequency = "D"
+seasonality = 252 # Business days per year
 
 ################################################################################
 [sovereign_bonds]
-required_data_sources = ["wrds_crsp"]
-
-################################################################################
-[us_treasury_returns]
 required_data_sources = ["wrds_crsp"]
 
 ################################################################################
@@ -135,9 +170,9 @@ required_data_sources = ["wrds_compustat", "wrds_crsp", "wrds_crsp_compustat"]
 [wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_ret]
 description = """CRSP monthly stock returns, 1926-present"""
 frequency = "ME"
-is_balanced = false
+seasonality = 12  # Months per year
 
 [wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_retx]
 description = """CRSP monthly stock returns (without dividends), 1926-present"""
 frequency = "ME"
-is_balanced = false
+seasonality = 12

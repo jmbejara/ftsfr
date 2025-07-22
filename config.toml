@@ -24,7 +24,7 @@ wrds_datastream = true
 wrds_fx = true
 wrds_markit = true
 wrds_mergent = true
-wrds_optionmetrics = false
+wrds_optionmetrics = true
 
 [models]
 # Statistical Models (LocalForecastingModel)

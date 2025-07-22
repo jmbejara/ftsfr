@@ -15,45 +15,52 @@
 \usepackage{natbib}  % Required for JPE bibliography style
 \usepackage{booktabs} % For better tables
 \usepackage{multirow} % For tables with merged cells
-\usepackage{subfigure} % For subfigures
 \usepackage{hyperref} % For links
 \usepackage{setspace}
+\usepackage{placeins}
+\usepackage{subfig} % For subfigures (modern replacement for subfigure)
 \usepackage[page]{appendix}
 
-\title{An Open-Source Financial Time Series Forecasting Benchmark}
+% \title{An Open-Source Financial Time Series Forecasting Benchmark}
+\title{Benchmarking Forecasting Methods for Financial Stability: An Open-Source Financial Time Series Forecasting Repository}
 \author{Jeremiah Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
 \date{\today}
 
 \begin{document}
 \maketitle
 
+% \begin{abstract}
+% This paper presents an open-source finance data repository for
+% benchmarking the performance of global time series forecasting methods and
+% compares the performance of many of the most popular modern methods. A
+% standardized benchmark is crucial for comparing the performance of different
+% forecasting methods, so as to allow apples-to-apples comparisons across
+% different forecasting methods and to discourage cherry-picking of results.
+% Despite the ubiquity of time series forecasting methods in macroeconomics and
+% finance, a standardized repository of data for benchmarking in these domains
+% does not exist. One reason for this is that many of these datasets are available
+% only through paid subscriptions and are thus not freely distributable. To
+% address this issue, we instead provide a set of scripts that automate the
+% download, data cleaning, and assembly of data sets from the Wharton Research
+% Data Services (WRDS) platform and the Bloomberg Terminal. Since many academic
+% institutions have access to WRDS or a Bloomberg Terminal, contingent on having
+% access to the appropriate WRDS or Bloomberg subscriptions, each researcher will
+% be able to exactly reproduce each of the datasets provided in this repository.
+% Furthermore, the datasets that we provide are cleaned and formatted in a way
+% that matches best practices established within the corresponding academic
+% literature. Our aim is to facilitate the process of benchmarking global times
+% series forecasting methods on data from these domains. In this light, we
+% demonstrate the utility of our repository by benchmarking the performance of a
+% suite of classical and modern forecasting methods. We hope that this repository
+% will enhance research that increases the precision of financial and economic
+% forecasts and contribute to research related to promoting financial stability
+% and supporting a well-functioning economy.
+% \end{abstract}
+
+
 \begin{abstract}
-This paper presents an open-source finance data repository for
-benchmarking the performance of global time series forecasting methods and
-compares the performance of many of the most popular modern methods. A
-standardized benchmark is crucial for comparing the performance of different
-forecasting methods, so as to allow apples-to-apples comparisons across
-different forecasting methods and to discourage cherry-picking of results.
-Despite the ubiquity of time series forecasting methods in macroeconomics and
-finance, a standardized repository of data for benchmarking in these domains
-does not exist. One reason for this is that many of these datasets are available
-only through paid subscriptions and are thus not freely distributable. To
-address this issue, we instead provide a set of scripts that automate the
-download, data cleaning, and assembly of data sets from the Wharton Research
-Data Services (WRDS) platform and the Bloomberg Terminal. Since many academic
-institutions have access to WRDS or a Bloomberg Terminal, contingent on having
-access to the appropriate WRDS or Bloomberg subscriptions, each researcher will
-be able to exactly reproduce each of the datasets provided in this repository.
-Furthermore, the datasets that we provide are cleaned and formatted in a way
-that matches best practices established within the corresponding academic
-literature. Our aim is to facilitate the process of benchmarking global times
-series forecasting methods on data from these domains. In this light, we
-demonstrate the utility of our repository by benchmarking the performance of a
-suite of classical and modern forecasting methods. We hope that this repository
-will enhance research that increases the precision of financial and economic
-forecasts and contribute to research related to promoting financial stability
-and supporting a well-functioning economy.
-\end{abstract}
+    Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to preemptively address systemic vulnerabilities. This paper benchmarks state-of-the-art global time series forecasting methods, which have proven superior in the time series literature, on a comprehensive suite of financial stability indicators. Benchmarks drive progress, and our systematic evaluation of 24 forecasting methods ranging from classical models to modern deep learning architectures reveals which approaches best capture early warning signals across different market segments. We evaluate these methods on critical financial stability metrics including arbitrage basis spreads that signal funding market stress, banking indicators that reveal institutional vulnerabilities, and asset returns across multiple markets. To enable reproducible research and continuous improvement in financial forecasting, we develop an open-source \emph{financial time series forecasting repository} that standardizes these datasets according to canonical academic methodologies. Our results provide financial stability authorities with evidence-based guidance on which forecasting approaches most reliably detect emerging risks in specific market segments, directly enhancing the toolkit for macroprudential surveillance and systemic risk monitoring.
+    \end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -68,7 +75,17 @@ and supporting a well-functioning economy.
 % - Emphasize that this complements (not substitutes) the Monash benchmark
 % - Make clear that the lack of standardization is particularly problematic in finance where data often requires subscriptions
 
-The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in ``poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
+% Why forecasting is important for financial stability
+Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to preemptively address systemic vulnerabilities \cite{Adrian2015}. 
+In this context, improving our ability to forecast key financial metrics is not a theoretical exercise. Rather,
+it is critical for early warning signals and timely policy responses. 
+% The Office of Financial Research (OFR) and the Financial Stability Oversight Council (FSOC) were established to identify emerging risks across financial markets. However, their effectiveness hinges on robust data and predictive analytics. 
+By developing an open-source financial time series forecasting benchmark, we directly enhance the toolkit available for financial stability monitoring. This benchmark brings together a wide range of datasets---spanning asset returns, arbitrage (basis) spreads, and banking indicators---that are crucial for assessing vulnerabilities in different corners of the financial system. Importantly, it evaluates state-of-the-art ``global" forecasting methods (which learn across many time series) and compares them to classical models, shedding light on which approaches best capture early signs of stress in these data. In sum, better forecasting of these metrics can help regulators and market participants spot trouble on the horizon, informing pre-emptive measures to safeguard the economy
+
+% Why we need a standardized benchmark
+The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. 
+Benchmarks drive progress.
+Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in ``poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
 The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it may not leverage CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR Time Series Classification Archive \citep{Dau2019} and UEA Multivariate Time Series Classification Archive \citep{Bagnall2018} and MUU Extrinsic Regression Repository \citep{Tan2020} do not include coverage of the financial domain.
 The Monash repository \citep{Godahewa2021} and recent efforts like TFB \citep{Qiu2024} have made strides toward broader coverage, yet comprehensive representation of financial asset classes, from corporate bonds to credit derivatives, remains absent. (See Table \ref{tab:benchmarks} for a summary of existing benchmarks.) This gap is particularly problematic given that, according to the ``No Free Lunch" Theorem \citep{Wolpert1997},
 there is no single forecasting method that performs best for all time series. As such, to improve forecasting in the financial domain, we need to evaluate forecasting methods on a suite of datasets from the financial domain and, importantly,
@@ -121,7 +138,38 @@ Source & Name & Coverage of Finance Domain & Website \\
 \end{tabular}
 \end{table}
 
+
+\section{Literature Review and Related Work}
+\label{sec:literature}
+
+% TODO: Position the paper relative to existing benchmarks and establish the canonical nature of chosen cleaning methods
+% - Review the Monash Time Series Forecasting Archive and explain how FTSFR follows their established template
+% - Introduce He, Kelly, Manela (2017) as the anchor paper for asset class selection and cleaning methods
+% - Introduce Siriwardane, Sunderam, & Wallen (2022) "Segmented Arbitrage" as the anchor for arbitrage spread construction
+% - Emphasize that the choice to follow these papers is deliberate - not doing anything novel is a FEATURE, not a bug
+% - Acknowledge that some dataset choices are somewhat ad hoc but are anchored by these survey-style papers
+
+\subsection{The Importance Of Open Source And Replicability}
+
+Finance faces an active debate about a potential ``replication crisis.'' \cite{Jensen2023} find that predictors' average strength is only 54\% of the original strength outside the original sample, with 32\% becoming insignificant. While much of the debate centers around data snooping, some of it involves
+coding and similar such bugs. There have been several high profile retractions\footnote{See  \cite{Lee2023} at \href{https://www.bloomberg.com/news/articles/2023-12-01/a-grad-school-number-cruncher-shakes-up-the-world-of-bond-quants}{Bloomberg}, and \cite{Dickerson2024}.}.
+Despite disagreement on the crisis's extent, consensus exists at least on one way to help the situation: standardized, open source data infrastructure. \cite{Chen2022} demonstrate with their ``Open Source Cross-Sectional Asset Pricing'' project that transparent data construction, version control, and community validation can eliminate arbitrary researcher degrees of freedom. Such infrastructure prevents simple errors from invalidating years of research. For policymakers and financial regulators, standardized open source data 
+helps them more effectively monitor systemic financial risks.
+
+\subsection{Global Time Series Forecasting Methods}
+
+The M-competition series is one of the most popular time series forecasting competitions in the field \citep{Makridakis1982, Makridakis2000, Makridakis2018, Makridakis2022}. Notably, the winning approaches of recent M-competitions have consisted of global forecasting models that train a single model across all series in the dataset. As \citet{Godahewa2021} observe, this pattern extends beyond the M-competitions. Winners of other major competitions including the NN3 and NN5 Neural Network competitions and various Kaggle competitions have similarly employed global models.
+
+Global forecasting models represent a paradigm shift from traditional univariate approaches. Rather than fitting separate models to individual series, global models treat each series as a related instance within a larger dataset, extracting information from both temporal patterns within series and cross-sectional structure across the panel. This enables them to learn common patterns while accounting for series-specific variations, with particular advantages when forecasting related series—a common scenario in finance. Global methods can handle short series by borrowing strength from longer ones and provide robust parameter estimation through regularization. Recent implementations range from pooled regression to sophisticated deep learning architectures, with many demonstrating superior performance over traditional methods \citep{Godahewa2021}.
+
+This paper contributes to the global forecasting literature by providing a comprehensive benchmark specifically designed for financial markets.
+Our benchmark thus serves to improve the infrastructure for developing the next generation of forecasting methods tailored to the complexities of financial markets, potentially improving risk management, asset allocation, and financial stability monitoring.
+
+
+
 \section{Datasets Included in the Benchmark}
+
+In this section, we describe the datasets included in the benchmark. The datasets are organized into three main groups: asset class datasets, basis spread datasets, and other financial data. We provide brief description of each dataset below. Each datasets is constructed based off of a cleaning procedure from a well-known paper in the academic literature. To validate our cleaning and transformations, we replicate a key plot or table from each paper. We give brief details of this process below. Full details of the cleaning and replications are provided in the appendix.
 
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
 
@@ -237,27 +285,19 @@ Following the equity basis recipe of \citet{Hazelkorn2023}, we construct implied
 \paragraph{Box Arbitrage in Equity Options}
 For box spread arbitrage, we follow the methodology of \citet{VanBinsbergen2022} to extract a risk-free rate implied by S\&P 500 (SPX) index options. Their approach uses a cross-sectional regression of put-call price differences on strike prices, which cleverly avoids the need to explicitly estimate dividends. We use their publicly available daily median implied rates and extend the series using their exact methodology on recent minute-level CBOE data. The final arbitrage spread is the difference between this options-implied rate and a maturity-matched OIS rate.
 
+\subsection{Other Financial Data}
 
-\section{Literature Review and Related Work}
-\label{sec:literature}
+\paragraph{Yield Curve}
+TODO
 
-% TODO: Position the paper relative to existing benchmarks and establish the canonical nature of chosen cleaning methods
-% - Review the Monash Time Series Forecasting Archive and explain how FTSFR follows their established template
-% - Introduce He, Kelly, Manela (2017) as the anchor paper for asset class selection and cleaning methods
-% - Introduce Siriwardane, Sunderam, & Wallen (2022) "Segmented Arbitrage" as the anchor for arbitrage spread construction
-% - Emphasize that the choice to follow these papers is deliberate - not doing anything novel is a FEATURE, not a bug
-% - Acknowledge that some dataset choices are somewhat ad hoc but are anchored by these survey-style papers
+\paragraph{Call Report}
+TODO
 
-\subsection{Time Series Forecasting Benchmarks}
-% Review of existing benchmarking archives
+\paragraph{Compustat Panel Data}
+TODO
 
-\subsection{Asset Pricing Literature}
-% He, Kelly, Manela (2017) and their approach to asset class selection
 
-\subsection{Market Segmentation and Arbitrage}
-% Siriwardane et al. (2022) and arbitrage spread construction
 
-[Literature review content to be filled in...]
 
 \section{Data Repository Overview}
 \label{sec:repository_overview}
@@ -537,63 +577,32 @@ The equity dataset follows \cite{Fama1993}, whose cleaning methodology has becom
 \label{sec:treasuries}
 % CRSP maturity-sorted portfolios Treasuries
 
-The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns, forming the foundation for the Federal Reserve's own yield curve estimates and numerous fixed income studies. The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes (excluding bills and other security types) is fundamental because callable bonds embed optionality that contaminates pure interest rate risk measurement—a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns that would distort any analysis of term structure dynamics. Second, the focus on bonds with remaining maturity between 0 and 5 years reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, while the 0-5 year segment represents the most actively traded Treasury securities where price discovery is most efficient. Third, the careful handling of accrued interest in return calculations is essential because, unlike equities, bond prices quote clean (without accrued interest) while returns must include coupon payments—failure to properly account for this leads to dramatic miscalculation of returns around coupon dates. Fourth, the requirement for complete price and maturity information eliminates bonds with sporadic trading or ambiguous terms that could introduce noise into yield curve estimation. Fifth, the use of month-end observations for portfolio aggregation avoids the substantial day-of-month effects in Treasury markets driven by auction cycles, month-end portfolio rebalancing, and futures contract rolls. These seemingly technical choices have profound implications: studies that use all available Treasury data without these filters often find spurious term premia and unstable factor loadings, while the Gürkaynak, Sack, and Wright approach produces stable estimates that closely match dealer quotes and futures-implied yields. By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
+The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns. This framework forms the foundation for the Federal Reserve's own yield curve estimates and underpins numerous studies in fixed income research.
+
+The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes—excluding bills and other security types—is fundamental. Callable bonds embed optionality that contaminates pure interest rate risk measurement. For example, a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns, distorting any analysis of term structure dynamics.
+
+Second, the dataset focuses on bonds with remaining maturities between 0 and 5 years. This reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, whereas the 0–5 year segment represents the most actively traded Treasury securities where price discovery is most efficient.
+
+Third, the careful handling of accrued interest in return calculations is essential. Unlike equities, bond prices are quoted as clean prices (excluding accrued interest), but return calculations must incorporate coupon payments. Failing to account for this leads to dramatic miscalculations of returns, especially around coupon payment dates.
+
+Fourth, a requirement for complete price and maturity information ensures that bonds with sporadic trading activity or ambiguous terms are excluded. This prevents noise from entering the yield curve estimation and return construction process.
+
+Fifth, the use of month-end observations for portfolio aggregation avoids substantial day-of-month effects in Treasury markets. These effects arise from auction cycles, end-of-month portfolio rebalancing, and futures contract rolls, all of which can distort return measures if not properly controlled.
+
+These seemingly technical choices have profound implications. Studies that use the full set of Treasury data without these filters often report spurious term premia and unstable factor loadings. In contrast, the Gürkaynak, Sack, and Wright methodology yields stable estimates that closely match dealer quotes and futures-implied yields.
+
+By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
 
 \subsubsection{Corporate Bonds}
 \label{sec:corporate_bonds}
 % Nozawa (2017) yield-spread sorted portfolios
-The corporate bond returns data comes from the \textbf{TRACE (Trade Reporting and Compliance Engine)} dataset available at openbondassetpricing.com, following the methodology of Nozawa (2017). The data includes:
+The corporate bond returns data is sourced from the TRACE (Trade Reporting and Compliance Engine) dataset, available at openbondassetpricing.com, and follows the methodology outlined in Nozawa (2017). This dataset incorporates several key elements to ensure accuracy and relevance. First, it includes market microstructure adjustments to correct for noise and enhance the reliability of bond prices and returns. It also applies stringent data filters, such as including only U.S.-domiciled firms and excluding private placements and convertible bonds. The dataset covers corporate bonds with sufficient outstanding amounts and complete information, and includes essential fields such as MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads.
 
-\begin{itemize}
-    \item \textbf{Market microstructure adjustments}: Corrections for market microstructure noise (MMN) to enhance bond price and return reliability
-    \item \textbf{Data filters}: Stringent quality filters including U.S.-domiciled firms only, exclusion of private placements and convertible bonds
-    \item \textbf{Coverage}: Corporate bonds with sufficient outstanding amounts and complete information
-    \item \textbf{Key fields}: MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads
-\end{itemize}
+The cleaning and standardization procedure adheres to the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM). In terms of bond selection, floating rate bonds and those with put or convertible features are excluded, although callable bonds are retained. Bonds are removed if their prices exceed matched Treasury prices or fall below \$0.01 per \$1 face value. For return processing, return reversals are eliminated if the product of adjacent returns is less than -0.04, and monthly returns are computed to avoid assumptions about reinvestment. In synthetic Treasury construction, Treasury bonds with identical cash flow structures are constructed for each corporate bond using Federal Reserve constant-maturity yield data. Excess returns and credit spreads are then calculated in price terms rather than yield spreads.
 
-\paragraph{Data Standardization:}
+For portfolio construction, bonds are sorted into deciles based on credit spreads for each date. Value-weighted portfolio returns are computed using bond values—defined as the product of MMN-adjusted clean price and amount outstanding—as weights. To ensure data quality, defaults are verified using Moody's Default Risk Service, while CRSP and Compustat data supplement the equity and accounting information. Callable bonds are also incorporated into regression models using fixed effects.
 
-The cleaning procedure follows the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM).
-
-\begin{enumerate}
-    \item \textbf{Bond Selection Criteria}:
-    \begin{itemize}
-        \item Bonds with floating rate coupons are excluded
-        \item Non-callable option features (puts, convertibles) are excluded, while callable bonds are retained
-        \item Observations where corporate bond price exceeds matched Treasury price are removed
-        \item Bonds with price less than \$0.01 per \$1 face value are dropped
-    \end{itemize}
-
-    \item \textbf{Return Processing}:
-    \begin{itemize}
-        \item Return reversals are eliminated if the product of adjacent returns is less than -0.04
-        \item Monthly returns are computed to avoid reinvestment assumptions
-    \end{itemize}
-
-    \item \textbf{Synthetic Treasury Construction}:
-    \begin{itemize}
-        \item Synthetic Treasury bonds with identical cash flow structure are constructed for each corporate bond
-        \item Treasury prices are based on Federal Reserve constant-maturity yield data
-        \item Excess returns and credit spreads are computed in price terms rather than yield spreads
-    \end{itemize}
-
-    \item \textbf{Portfolio Construction}:
-    \begin{itemize}
-        \item Bonds are sorted into deciles based on credit spread (CS) within each date
-        \item Value-weighted portfolio returns are calculated using bond values as weights
-        \item Bond value is computed as the product of MMN-adjusted clean price and amount outstanding
-    \end{itemize}
-
-    \item \textbf{Data Quality}:
-    \begin{itemize}
-        \item Defaults are verified using Moody's Default Risk Service
-        \item CRSP and Compustat data supplement equity and accounting information
-        \item Callable bonds are accounted for using fixed effects in regression models
-    \end{itemize}
-\end{enumerate}
-
-The final output is a dataset with monthly corporate bond portfolio returns across credit spread deciles, suitable for credit risk analysis and comparison with other bond market data.
-The constructed corporate bond returns are validated against the He, Kelly, and Manela (2017) dataset, which provides a benchmark for corporate bond returns across different credit spread deciles. Figure \textbf{PLACEHOLDER} shows the time series comparison between the two datasets, demonstrating strong alignment in return patterns across deciles, particularly during volatile periods such as the 2008 financial crisis.
+The final output is a dataset containing monthly corporate bond portfolio returns sorted by credit spread deciles, making it well-suited for credit risk analysis and for benchmarking against other bond market data. The constructed returns are validated against the dataset by He, Kelly, and Manela (2017), which serves as a benchmark for credit spread deciles. As shown in Figure PLACEHOLDER, the time series comparison between the two datasets exhibits strong alignment in return patterns, especially during volatile periods such as the 2008 financial crisis.
 
 \subsubsection{Sovereign Bonds}
 \label{sec:sovereign}
@@ -602,6 +611,7 @@ The constructed corporate bond returns are validated against the He, Kelly, and 
 \subsubsection{Options}
 \label{sec:options}
 % Constantinides, Jackwerth and Savov (2013) S&P 500 portfolios
+% Pull in notes from notebooks 
 
 \subsubsection{Foreign Exchange}
 \label{sec:fx}
@@ -662,24 +672,25 @@ We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2
 as seen in this side by side comparison of our calculated currency respective
 arbitrage spreads versus those reported in their paper.
 
-\begin{figure}[htbp]
+\begin{figure}
   \centering
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/SegArb_CIP_Timeseries.png}
-    \\[1ex] % small vertical gap
-    {\small (a) Findings in Siriwardane et al. (2023)}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/CIP_replicate.png}
-    \\[1ex]
-    {\small (b) Our findings}
-  \end{minipage}
-  \caption{IMAGES ARE PLACE HOLDERS}
-  \label{fig:comparison-minipage}
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
+    \small (a) Findings in Siriwardane et al. (2023)
+  \end{tabular}
+
+  \vspace{\floatsep}
+
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
+    \small (b) Our findings
+  \end{tabular}
+
+  \caption{Comparison of CIP Arbitrage spreads}\label{fig:myfig}
 \end{figure}
+
+\FloatBarrier
+
 
 During the overlapping periods of both datasets, the CIP spreads are nearly identical.
 Our findings confirm the presence of CIP deviations, particularly during periods of
@@ -755,7 +766,7 @@ P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
 The constant $Z$ that solves this equation is the \textbf{Z-spread}.
 
 \paragraph*{Intuition}
-$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond’s dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
+$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond's dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
 
 \paragraph*{Link to Yield-to-Maturity}
 Setting the Z-spread pricing equation equal to the standard YTM equation gives
@@ -764,7 +775,7 @@ Setting the Z-spread pricing equation equal to the standard YTM equation gives
 \sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
 =\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
 \end{equation}
-where $y$ is the bond’s yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
+where $y$ is the bond's yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
 
 \paragraph*{Continuous-Compounding Identity}
 Rewrite discounts as $e^{-r t}$. With PV-weights
@@ -782,7 +793,7 @@ Analysts often approximate $Z$ with the \textbf{credit spread}
 \begin{equation*}
 \Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
 \end{equation*}
-where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond’s (modified) duration.
+where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond's (modified) duration.
 
 \paragraph*{Why it works}
 \begin{enumerate}
@@ -794,27 +805,24 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 \paragraph*{Note}
 Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
 
-
-\begin{figure}[htbp]
+\begin{figure}
   \centering
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/SegArb_CDS_Timeseries.png}
-    \\[1ex] % small vertical gap
-    {\small (a) Findings in Siriwardane et al. (2023)}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/logo.png}
-    \\[1ex]
-    {\small (b) Our findings}
-  \end{minipage}
-  \caption{IMAGES ARE PLACE HOLDERS}
-  \label{fig:comparison-minipage}
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
+    \small (a) Findings in Siriwardane et al. (2023)
+  \end{tabular}
+
+  \vspace{\floatsep}
+
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
+    \small (b) Our findings
+  \end{tabular}
+
+  \caption{Comparison of CDS Arbitrage spreads}\label{fig:myfig}
 \end{figure}
 
-
+\FloatBarrier
 
 \subsection{Additional Financial Datasets}
 \label{sec:additional_datasets}
@@ -840,7 +848,7 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
 \label{app:additional_results}
 % Extended results tables and robustness checks
 
-\subsection{Recyling Bin}
+\section{Recyling Bin}
 % Temporary holding area for text that might not make it into the main text
 
 

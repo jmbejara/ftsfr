@@ -82,6 +82,7 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
     """
     bond_red_df: dataframe with the issuer cusip and red_code now added
         date, -- date when data was collected
+        cusip, -- cusip of the entire bond issue, unique bond identifier
         issuer_cusip, -- cusip of issuing firm
         BOND_YIELD, -- MMN adjusted bond yield
         CS, -- Credit Spread we replace Z-spread with
@@ -101,6 +102,7 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
         'year' -- year of date
 
     output: dataframe with par spread values merged into all values where there was a possible cubic spline
+        'cusip', -- cusip of the entire bond issue, unique bond identifier
        'date', -- reporting date
        'mat_days', -- days till maturity
        'BOND_YIELD', -- MMN adjusted bond yield
