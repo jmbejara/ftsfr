@@ -18,9 +18,9 @@ from settings import config
 DATA_DIR = config("DATA_DIR") / "futures_returns"
 
 
-def load_wrds_futures(data_dir=DATA_DIR):
-    path = data_dir / "wrds_futures.parquet"
-    return pd.read_parquet(path)
+# def load_wrds_futures(data_dir=DATA_DIR):
+#     path = data_dir / "wrds_futures.parquet"
+#     return pd.read_parquet(path)
 
 
 def load_wrds_cseries_info(data_dir=DATA_DIR):
