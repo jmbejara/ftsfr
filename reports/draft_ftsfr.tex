@@ -672,45 +672,24 @@ We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2
 as seen in this side by side comparison of our calculated currency respective
 arbitrage spreads versus those reported in their paper.
 
-\begin{figure}[htbp]
-  \centering
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/SegArb_CIP_Timeseries.png}
-    \\[1ex] % small vertical gap
-    {\small (a) Findings in Siriwardane et al. (2023)}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/CIP_replicate.png}
-    \\[1ex]
-    {\small (b) Our findings}
-  \end{minipage}
-  \caption{IMAGES ARE PLACE HOLDERS}
-  \label{fig:comparison-minipage}
-\end{figure}
-
-\FloatBarrier
-
 \begin{figure}
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=150pt]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
+    \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
     \small (a) Findings in Siriwardane et al. (2023)
   \end{tabular}
 
   \vspace{\floatsep}
 
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=125pt]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
     \small (b) Our findings
   \end{tabular}
 
-  \caption{Comparison of CIP spreads}\label{fig:myfig}
+  \caption{Comparison of CIP Arbitrage spreads}\label{fig:myfig}
 \end{figure}
 
-
+\FloatBarrier
 
 
 During the overlapping periods of both datasets, the CIP spreads are nearly identical.
@@ -826,24 +805,23 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 \paragraph*{Note}
 Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
 
-\begin{figure}[htbp]
+\begin{figure}
   \centering
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/SegArb_CDS_Timeseries.png}
-    \\[1ex] % small vertical gap
-    {\small (a) Findings in Siriwardane et al. (2023)}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{../docs_src/logo.png}
-    \\[1ex]
-    {\small (b) Our findings}
-  \end{minipage}
-  \caption{IMAGES ARE PLACE HOLDERS}
-  \label{fig:comparison-minipage}
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
+    \small (a) Findings in Siriwardane et al. (2023)
+  \end{tabular}
+
+  \vspace{\floatsep}
+
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
+    \small (b) Our findings
+  \end{tabular}
+
+  \caption{Comparison of CDS Arbitrage spreads}\label{fig:myfig}
 \end{figure}
+
 \FloatBarrier
 
 \subsection{Additional Financial Datasets}
