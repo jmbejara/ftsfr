@@ -7,13 +7,12 @@ from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
+import numpy as np
 from tabulate import tabulate
 
 # Gluonts based imports
 from gluonts.dataset.common import ListDataset
 from gluonts.dataset.field_names import FieldName
-from gluonts.evaluation import Evaluator
-from gluonts.evaluation.backtest import make_evaluation_predictions
 from gluonts.model.predictor import Predictor
 
 from .forecasting_model import forecasting_model
@@ -47,6 +46,7 @@ class GluontsMain(forecasting_model):
 
         raw_df = pd.read_parquet(data_path)
         raw_df = raw_df.rename(columns = {"id" : "unique_id"})
+
         raw_df = raw_df.sort_values(["unique_id", "ds"])
         raw_df = raw_df.reset_index(drop = True)
 
@@ -65,7 +65,14 @@ class GluontsMain(forecasting_model):
             series_data = row["y"]
 
             test_index = int(test_split * len(series_data))
+            train_elements = len(series_data) - test_index
             train_series_data = series_data[:-test_index]
+            # if train_elements < 4 * seasonality:
+            #     curr_mean = train_series_data.mean()
+            #     difference = 4 * seasonality - train_elements
+            #     for _ in range(difference):
+            #         train_series_data = np.insert(train_series_data, 0, curr_mean)
+            
             test_series_data = series_data[-test_index:]
 
             train_series_list.append(train_series_data)

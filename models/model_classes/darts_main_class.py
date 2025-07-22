@@ -43,10 +43,10 @@ class DartsMain(forecasting_model):
         # Basic cleaning
         proc_df.rename_axis(None, axis=1, inplace=True)
         # TimeSeries object is important for darts
+        raw_series = TimeSeries.from_dataframe(proc_df, time_col = "ds")
         if f32:
-            raw_series = TimeSeries.from_dataframe(proc_df, time_col = "ds").astype(np.float32)
-        else:
-            raw_series = TimeSeries.from_dataframe(proc_df, time_col = "ds")
+            raw_series = raw_series.astype(np.float32)
+
         # Replace NaNs automatically
         # TODO: Replace with better method to deal with NaNs.
         # This uses linear interpolation
@@ -56,16 +56,45 @@ class DartsMain(forecasting_model):
 
         if scaling:
             transformer = Scaler()
-            transformed_series = transformer.fit_transform(raw_series)
+            raw_series = transformer.fit_transform(raw_series)
             # Splitting into train and test
-            train_series, test_series = train_test_split(transformed_series, test_size = test_split)
+            train_series, test_series = train_test_split(raw_series, 
+                                                         test_size = test_split)
         else:
-            train_series, test_series = train_test_split(raw_series, test_size = test_split)
+            train_series, test_series = train_test_split(raw_series, 
+                                                         test_size = test_split)
         
-        # TODO: Implement a filling mechanism which adds means to the dataset
+        # This adds means as new entries to the series in the beginning
         # if len(train_series) < 4 * seasonality:
         #     difference = 4 * seasonality - len(train_series)
-        #     pd.date_range(end = train_series.start_time(), periods = difference + 1)
+        #     mean_values = []
+        #     for id in df.unique_id.unique():
+        #         mean_values.append(df[df.unique_id == id]['y'].mean())
+
+        #     dates = pd.date_range(end = train_series.start_time(), 
+        #                           periods = difference + 1)
+        #     dates = dates[:-1]
+
+        #     dict_to_df = {"unique_id": [],
+        #                 "ds" : [],
+        #                 "y" : []}
+        #     unique_ids = df.unique_id.unique()
+        #     for date in dates:
+        #         for i in range(len(unique_ids)):
+        #             dict_to_df["unique_id"].append(unique_ids[i])
+        #             dict_to_df["ds"].append(date)
+        #             dict_to_df["y"].append(mean_values[i])
+
+            # df_new = pd.DataFrame(dict_to_df)
+            # df_new = df_new.pivot(index="ds", columns="unique_id", values="y")
+            # df_new = df_new.reset_index()
+
+            # df_new_series = TimeSeries.from_dataframe(df_new, time_col = "ds")
+            # if f32:
+            #     df_new_series = df_new_series.astype(np.float32)
+            
+            # raw_series = raw_series.prepend(df_new_series)
+
 
 
         # Path to save model
