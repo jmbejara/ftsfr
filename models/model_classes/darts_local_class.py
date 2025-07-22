@@ -61,6 +61,8 @@ class DartsLocal(DartsMain):
                 if len(entity_data) <= 10:
                     continue
                 
+                self.raw_series = entity_data
+
                 # Updates internal train and test series
                 self._train_test_split(entity_data)
                 self.train()
@@ -74,7 +76,7 @@ class DartsLocal(DartsMain):
                     self.mase_list.append(id_mase)
 
             self.print_sep()
-
+            self.save_forecast()
             self.raw_series = raw_series
 
             if self.mase_list:

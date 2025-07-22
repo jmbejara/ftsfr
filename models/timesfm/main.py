@@ -69,8 +69,8 @@ class TimesFMForecasting(forecasting_model):
         # Dataframes
         self.raw_series = df
         self.pred_series = None
-        self.test_series = df[df.ds < unique_dates[-test_length]]
-        self.train_series = df[df.ds >= unique_dates[-test_length]]
+        self.train_series = df[df.ds < unique_dates[-test_length]]
+        self.test_series = df[df.ds >= unique_dates[-test_length]]
 
         # Important variables
         self.seasonality = seasonality

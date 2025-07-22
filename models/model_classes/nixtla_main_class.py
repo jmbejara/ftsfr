@@ -14,7 +14,6 @@ import pandas as pd
 from tabulate import tabulate
 import torch
 from darts import TimeSeries
-from darts.metrics import mase
 from neuralforecast import NeuralForecast
 
 from .forecasting_model import forecasting_model

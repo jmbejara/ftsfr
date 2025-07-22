@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     dataset_name = str(os.path.basename(dataset_path)).split(".")[0].removeprefix("ftsfr_")
 
-    wavenet_obj = GluontsMain(WaveNetEstimator(freq=frequency, prediction_length=1),
+    wavenet_obj = GluontsMain(WaveNetEstimator(freq = frequency, prediction_length=1),
                            "wavenet",
                            0.2,
                            frequency,
