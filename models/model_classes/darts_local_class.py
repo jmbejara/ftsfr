@@ -41,7 +41,7 @@ class DartsLocal(DartsMain):
     
     def forecast_workflow(self):
         try:
-            raw_series = self.raw_series
+            raw_series = self.raw_series.copy()
             auto_mode = False
             # The check below is important because Auto models like AutoARIMA
             # need interpolation
@@ -52,7 +52,7 @@ class DartsLocal(DartsMain):
 
             for id in tqdm(raw_series.columns):
                 # Select the date and the column for current id
-                entity_data = raw_series[[id]]
+                entity_data = raw_series[[id]].copy()
                 # Removing leading/trailing NaNs which show up due to different start 
                 # times of different series
                 entity_data = entity_data.strip()
@@ -74,6 +74,8 @@ class DartsLocal(DartsMain):
                     self.mase_list.append(id_mase)
 
             self.print_sep()
+
+            self.raw_series = raw_series
 
             if self.mase_list:
                 self.errors["MASE"] = sum(self.mase_list) / len(self.mase_list)

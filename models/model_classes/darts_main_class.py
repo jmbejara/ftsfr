@@ -91,7 +91,7 @@ class DartsMain(forecasting_model):
         self.dataset_path = data_path
         self.forecast_path = forecast_path
         self.result_path = result_path
-        self.model_path = model_path
+        self.model_path = str(model_path)
 
         # Series
         self.raw_series = raw_series # Helps with predictions
