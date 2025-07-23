@@ -55,7 +55,32 @@ required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
 [corp_bond_returns]
 required_data_sources = ["open_source_bond"]
 
+[corp_bond_returns.ftsfr_corp_bond_returns]
+description = """This data module contains the returns of individual corporate bonds sourced from the TRACE database."""
+frequency = "ME"
+seasonality = 12
+
+[corp_bond_returns.ftsfr_corp_bond_portfolio_returns]
+description = """This data module contains the returns of the corporate bond portfolios formed as per the methodology of Nozawa (2017)."""
+frequency = "ME"
+seasonality = 12
+
 ################################################################################
+[us_treasury_returns]
+required_data_sources = ["wrds_crsp"]
+
+[us_treasury_returns.ftsfr_treas_bond_returns]
+description = """This data module contains the returns of individual treasury bonds sourced from the CRSP database."""
+frequency = "ME"
+seasonality = 12
+
+[us_treasury_returns.ftsfr_treas_bond_portfolio_returns]
+description = """This data module contains the returns of the treasury bond portfolios formed as per the methodology of Gurkaynak, Sack, and Wright (2011)."""
+frequency = "ME"
+seasonality = 12
+
+################################################################################
+
 [crb_commodity]
 required_data_sources = ["bloomberg_terminal"]
 
@@ -117,11 +142,21 @@ frequency = "QE"
 seasonality = 4
 
 ################################################################################
-[sovereign_bonds]
-required_data_sources = ["wrds_crsp"]
+[options]
+required_data_sources = ["wrds_optionmetrics"]
+
+[options.ftsfr_hkm_option_returns]
+description = """From optionmetrics data, option returns, 1996-Present"""
+frequency = "D"
+seasonality = 252 # Business days per year
+
+[options.ftsfr_cjs_option_returns]
+description = """From optionmetrics data, option returns, 1996-Present"""
+frequency = "D"
+seasonality = 252 # Business days per year
 
 ################################################################################
-[us_treasury_returns]
+[sovereign_bonds]
 required_data_sources = ["wrds_crsp"]
 
 ################################################################################

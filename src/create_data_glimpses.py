@@ -365,7 +365,6 @@ def create_txt_report(
 
     # Header
     output_lines.append("# Data Glimpses Report")
-    output_lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     output_lines.append(f"Total files: {len(existing_files)}")
     output_lines.append("")
 
