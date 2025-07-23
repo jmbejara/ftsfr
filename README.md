@@ -113,6 +113,36 @@ Finally, download the data using the following command:
 doit
 ```
 
+### Tips for Running on LambdaLabs
+
+Install Miniconda, using these [instructions](https://www.anaconda.com/docs/getting-started/miniconda/install#quickstart-install-instructions):
+```
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm ~/miniconda3/miniconda.sh
+```
+After installing, close and reopen your terminal application or refresh it by running the following command:
+
+```
+source ~/miniconda3/bin/activate
+```
+
+Then, initialize conda on all available shells by running the following command:
+
+```
+conda init --all
+```
+Also, to get VS Code code server
+```
+curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' --output vscode_cli.tar.gz
+
+tar -xf vscode_cli.tar.gz
+```
+then run it with this:
+```
+code tunnel
+```
 
 ## Data Format
 Final, cleaned and formatted datasets have the following format: `ftsfr_<dataset_name>.parquet`

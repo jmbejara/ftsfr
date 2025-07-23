@@ -857,6 +857,15 @@ models_activated = [model for model in models if models[model]]
 def task_forecast():
     """Generate forecast tasks for each combination of model and dataset."""
 
+    # DUBUG:
+    # env \
+    # DATASET_PATH="/home/ubuntu/ftsfr/ftsfr/_data/fed_yield_curve/ftsfr_treas_yield_curve_zero_coupon.parquet" \
+    # FREQUENCY="B" \
+    # SEASONALITY=5 \
+    # DATA_DIR="/home/ubuntu/ftsfr/ftsfr/_data" \
+    # OUTPUT_DIR="/home/ubuntu/ftsfr/ftsfr/_output" \
+    # pixi run main
+
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
 
     for model in models_activated:
