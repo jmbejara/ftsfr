@@ -28,7 +28,7 @@ wrds_optionmetrics = true
 
 [models]
 # Statistical Models (LocalForecastingModel)
-arima = true  # ARIMA - Autoregressive Integrated Moving Average model
+arima = false  # ARIMA - Autoregressive Integrated Moving Average model
 ets = false  # ETS - Exponential Smoothing (Error, Trend, Seasonal) state space model
 simple_exponential_smoothing = true  # Simple Exponential Smoothing - basic smoothing for level-only data
 tbats = false  # TBATS - Exponential smoothing with Box-Cox transformation, ARMA errors, Trend and Seasonal
