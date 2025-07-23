@@ -38,10 +38,10 @@ df_all = process_final_product.process_cb_spread(final_data)
 agg_df, non_agg_df = process_final_product.output_cb_final_products(df_all)
 
 df_stacked = agg_df.stack().reset_index()
-df_stacked.columns = ['ds', 'unique_id', 'y']
+df_stacked.columns = ['unique_id', 'ds', 'y']
 
 df_stacked2 = non_agg_df.stack().reset_index()
-df_stacked2.columns = ['ds', 'unique_id', 'y']
+df_stacked2.columns = ['unique_id', 'ds', 'y']
 
 df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_aggregated.parquet")
 df_stacked2.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_non_aggregated.parquet")

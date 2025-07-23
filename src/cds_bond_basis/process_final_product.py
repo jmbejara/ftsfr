@@ -91,25 +91,15 @@ def output_cb_final_products(df):
             non_agg_df: non aggregated dataframe, keeping individual bond issue
                 date: date of bond data
                 cusip: cusip of the entire bond issue, unique bond identifier
-                c_rating: IG, Junk, or combo
-                    0 if it only contains Junk
-                    1 if it only contains IG
-                    2 if it contains both
-
-                ^ ABOVE COMLUMNS ARE COMBINED INTO 
-                'combined_id'
-                
                 rfr: implied risk free rate
                     desired value from stat arbitrage
 
     '''
+    # outliers were removed so aggregation should be ok
+    agg_df = df[['c_rating', 'date', 'rfr']].groupby('c_rating').mean().reset_index()
 
-    agg_df = df[['date', 'c_rating', 'rfr']]
-    non_agg_df = df[['date', 'cusip', 'c_rating', 'rfr']]
-
-    # combine the ids consistent processing
-    non_agg_df['combined_id'] = non_agg_df[['cusip', 'c_rating']].apply(tuple, axis=1)
-    non_agg_df = non_agg_df[['date', 'combined_id', 'rfr']]
+    # no grouping or aggregation here
+    non_agg_df = df[['cusip', 'date', 'rfr']]
 
     return agg_df, non_agg_df
 
