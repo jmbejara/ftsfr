@@ -19,6 +19,7 @@ import subprocess
 import timesfm
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 
 from model_classes.forecasting_model import forecasting_model
 from model_classes.helper_func import calculate_darts_MASE

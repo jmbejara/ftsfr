@@ -7,6 +7,7 @@ median MASE for local forecasts and a single global MASE.
 
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.nixtla_main_class import NixtlaMain
 from neuralforecast.models import Informer
 import os

@@ -12,6 +12,7 @@ import os
 from darts.models import DLinearModel
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.darts_global_class import DartsGlobal
 
 if __name__ == "__main__":

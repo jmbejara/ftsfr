@@ -14,6 +14,7 @@ from darts.models import SKLearnModel
 from sklearn.linear_model import TweedieRegressor
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.darts_local_class import DartsLocal
 
 if __name__ == "__main__":

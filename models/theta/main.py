@@ -13,6 +13,7 @@ from darts.models import Theta
 from darts.utils.utils import SeasonalityMode
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.darts_local_class import DartsLocal
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ from darts.models import ExponentialSmoothing
 from darts.utils.utils import ModelMode, SeasonalityMode
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.darts_local_class import DartsLocal
 from env_reader import env_reader
 

@@ -16,6 +16,7 @@ from gluonts.torch import PatchTSTEstimator
 
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.gluonts_main_class import GluontsMain
 
 if __name__ == "__main__":

@@ -18,10 +18,10 @@ from gluonts.torch import WaveNetEstimator
 
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.gluonts_main_class import GluontsMain
 
 if __name__ == "__main__":
-
     
     env_vars = env_reader(os.environ)
     

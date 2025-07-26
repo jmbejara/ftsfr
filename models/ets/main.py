@@ -13,6 +13,7 @@ from darts.models import ExponentialSmoothing
 from darts.utils.utils import ModelMode, SeasonalityMode
 import sys
 sys.path.append('../')
+from env_reader import env_reader
 from model_classes.darts_local_class import DartsLocal
 
 if __name__ == "__main__":
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     env_vars = env_reader(os.environ)
     
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
-    
+
     ets_obj = DartsLocal(ExponentialSmoothing(trend = ModelMode.ADDITIVE,
                                                    seasonal = SeasonalityMode.NONE),
                                 "ets",
