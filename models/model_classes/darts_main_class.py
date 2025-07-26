@@ -9,6 +9,9 @@ import traceback
 from collections import defaultdict
 from pathlib import Path
 
+# from warnings import filterwarnings
+# filterwarnings("ignore")
+
 import numpy as np
 import pandas as pd
 from darts import TimeSeries
@@ -54,6 +57,9 @@ class DartsMain(forecasting_model):
         if interpolation:
             raw_series = fill_missing_values(raw_series)
 
+        if test_split == "seasonal":
+            test_split = (seasonality / len(proc_df))
+
         if scaling:
             transformer = Scaler()
             raw_series = transformer.fit_transform(raw_series)
@@ -94,8 +100,6 @@ class DartsMain(forecasting_model):
             #     df_new_series = df_new_series.astype(np.float32)
             
             # raw_series = raw_series.prepend(df_new_series)
-
-
 
         # Path to save model
         model_path = output_path / "models" / model_name / dataset_name
@@ -190,14 +194,10 @@ class DartsMain(forecasting_model):
 
     def forecast(self):
         try:
-            pred_series = self.model.predict(1, 
-                                series = self.raw_series.drop_after(
-                                self.test_series.get_timestamp_at_point(0)))
-            for i in range(1, len(self.test_series)):
-                curr_time_stamp = self.test_series.get_timestamp_at_point(i)
-                pred_dataset = self.raw_series.drop_after(curr_time_stamp)
-                current_pred = self.model.predict(1, series = pred_dataset)
-                pred_series = pred_series.concatenate(current_pred)
+            start_time = self.test_series.start_time()
+            pred_series = self.model.historical_forecasts(
+                                        series = self.raw_series,
+                                        start = start_time)
             self.pred_series = pred_series
         except Exception:
             self.print_sep()

@@ -1,0 +1,41 @@
+[workspace]
+channels = ["conda-forge"]
+name = "transformer"
+# platforms = ["osx-arm64", "osx-64", "win-64", "linux-64"]
+platforms = ["win-64", "linux-64"]
+
+[tasks]
+main = { cmd = "python main.py" }
+
+[dependencies]
+
+python = "3.13.*"
+pip = "*"
+numpy = "*"
+pandas = "*"
+tqdm = "*"
+packaging = "*"
+scipy = "*"
+statsmodels = "*"
+pyarrow = "*"
+fastparquet = "*"
+
+[feature.g]
+system-requirements = {cuda = "12.8"}
+[feature.g.pypi-dependencies]
+torch = { version = ">=2.5.1", index = "https://download.pytorch.org/whl/cu128" }
+torchvision = { version = ">=0.20.1", index = "https://download.pytorch.org/whl/cu128" }
+lightning = { version = "==2.5.*" }
+tabulate = { version = "==0.9.*" }
+darts = { version = "==0.36.*" }
+
+[feature.c.pypi-dependencies]
+torch = { version = ">=2.5.1", index = "https://download.pytorch.org/whl/cpu" }
+torchvision = { version = ">=0.20.1", index = "https://download.pytorch.org/whl/cpu" }
+lightning = { version = "==2.5.*" }
+tabulate = { version = "==0.9.*" }
+darts = { version = "==0.36.*" }
+
+[environments]
+g = { features = ["g"] }
+default = { features = ["c"] }

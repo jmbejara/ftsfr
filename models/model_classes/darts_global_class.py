@@ -8,6 +8,9 @@ import traceback
 import pandas as pd
 from tabulate import tabulate
 
+# from warnings import filterwarnings
+# filterwarnings("ignore")
+
 from .darts_main_class import DartsMain
 
 class DartsGlobal(DartsMain):
@@ -33,6 +36,23 @@ class DartsGlobal(DartsMain):
                          scaling,
                          interpolation,
                          f32)
+        
+        # self.model_path += ".pt"
+    
+    def forecast(self):
+        try:
+            start_time = self.test_series.start_time()
+            pred_series = self.model.historical_forecasts(
+                                        series = self.raw_series,
+                                        start = start_time,
+                                        retrain = False)
+            self.pred_series = pred_series
+        except Exception:
+            self.print_sep()
+            print(traceback.format_exc())
+            print(f"\nError in {self.model_name} forecasting. Full traceback above \u2191")
+            self.print_sep()
+            return None
     
     def print_summary(self):
         print(tabulate([

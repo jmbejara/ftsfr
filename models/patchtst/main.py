@@ -20,13 +20,9 @@ from model_classes.gluonts_main_class import GluontsMain
 
 if __name__ == "__main__":
     
-    dataset_path = Path(os.environ["DATASET_PATH"])
-    frequency = os.environ["FREQUENCY"]
-    seasonality = int(os.environ["SEASONALITY"])
-    if os.environ.get("OUTPUT_DIR", None) is not None:
-        OUTPUT_DIR = Path(os.environ["OUTPUT_DIR"])
-    else:
-        OUTPUT_DIR = Path().resolve().parent.parent / "_output"
+    env_vars = env_reader(os.environ)
+    
+    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     forecast_horizon = 1
     patchtst_obj = GluontsMain(PatchTSTEstimator(
                                 patch_len = seasonality,

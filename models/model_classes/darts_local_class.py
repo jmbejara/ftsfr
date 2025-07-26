@@ -11,6 +11,9 @@ from darts.utils.missing_values import fill_missing_values
 from tabulate import tabulate
 from tqdm import tqdm
 
+# from warnings import filterwarnings
+# filterwarnings("ignore")
+
 from .darts_main_class import DartsMain
 
 class DartsLocal(DartsMain):
@@ -37,6 +40,7 @@ class DartsLocal(DartsMain):
 
         self.median_mase = np.nan
         self.mase_list = []
+        self.model_path += ".pkl"
     
     def forecast_workflow(self):
         try:
@@ -64,7 +68,6 @@ class DartsLocal(DartsMain):
 
                 # Updates internal train and test series
                 self._train_test_split(entity_data)
-                self.train()
                 self.forecast()
                 id_mase = self.calculate_error()
 

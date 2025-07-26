@@ -52,7 +52,11 @@ class NixtlaMain(forecasting_model):
         df = df.interpolate()
 
         unique_dates = np.unique(df["ds"].values)
-        test_length = int(test_split * len(unique_dates))
+
+        if test_split == "seasonal":
+            test_length = seasonality
+        else:
+            test_length = int(test_split * len(unique_dates))
         test_data = df[df.ds >= unique_dates[-test_length]]
         train_data = df[df.ds < unique_dates[-test_length]]
 

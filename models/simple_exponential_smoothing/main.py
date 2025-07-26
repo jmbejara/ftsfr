@@ -6,7 +6,7 @@ median MASE for local forecasts.
 """
 from pathlib import Path
 from warnings import filterwarnings
-filterwarnings("ignore") 
+filterwarnings("ignore")
 import os
 # Darts-based imports
 from darts.models import ExponentialSmoothing
@@ -14,24 +14,21 @@ from darts.utils.utils import ModelMode, SeasonalityMode
 import sys
 sys.path.append('../')
 from model_classes.darts_local_class import DartsLocal
+from env_reader import env_reader
 
 if __name__ == "__main__":
     
-    dataset_path = Path(os.environ["DATASET_PATH"])
-    frequency = os.environ["FREQUENCY"]
-    seasonality = int(os.environ["SEASONALITY"])
-    if os.environ.get("OUTPUT_DIR", None) is not None:
-        OUTPUT_DIR = Path(os.environ["OUTPUT_DIR"])
-    else:
-        OUTPUT_DIR = Path().resolve().parent.parent / "_output"
+    env_vars = env_reader(os.environ)
 
-    ses_obj = DartsLocal(ExponentialSmoothing(trend=ModelMode.NONE, 
-                                                seasonal=SeasonalityMode.NONE),
-                                "ses", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
+
+    ses_obj = DartsLocal(ExponentialSmoothing(trend=ModelMode.NONE,
+                                              seasonal=SeasonalityMode.NONE),
+                                "ses",
+                                test_split,
+                                frequency,
+                                seasonality,
+                                dataset_path,
+                                output_dir)
 
     ses_obj.main_workflow()

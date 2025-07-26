@@ -55,16 +55,21 @@ class GluontsMain(forecasting_model):
         proc_df["ds"] = proc_df["ds"].iloc[0][0]
         proc_df["y"] = proc_df["y"].apply(lambda x: x.to_numpy())
 
+        test_split_seasonal = test_split == "seasonal"
+
         train_series_list = []
         test_series_list = []
         train_series_full_list = []
         test_series_full_list = []
 
+        test_index = seasonality
+
         for index, row in proc_df.iterrows():
             train_start_time = row["ds"]
             series_data = row["y"]
 
-            test_index = int(test_split * len(series_data))
+            if not test_split_seasonal:
+                test_index = int(test_split * len(series_data))
             train_elements = len(series_data) - test_index
             train_series_data = series_data[:-test_index]
             # if train_elements < 4 * seasonality:

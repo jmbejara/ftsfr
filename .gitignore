@@ -10,6 +10,10 @@
 /_output/*
 config.toml
 
+# .pixi and pixi.lock files in models
+/models/*/.pixi
+/models/*/pixi.lock
+
 # Secrets saved in environment files
 .env*
 # Allow example environment file
