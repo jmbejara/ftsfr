@@ -15,8 +15,7 @@ sys.path.append('../')
 from model_classes.darts_global_class import DartsGlobal
 
 if __name__ == "__main__":
-
-    # Environment variables
+    
     dataset_path = Path(os.environ["DATASET_PATH"])
     frequency = os.environ["FREQUENCY"]
     seasonality = int(os.environ["SEASONALITY"])
@@ -25,20 +24,18 @@ if __name__ == "__main__":
     else:
         OUTPUT_DIR = Path().resolve().parent.parent / "_output"
 
-    dataset_name = str(os.path.basename(dataset_path)).split(".")[0].removeprefix("ftsfr_")
-
     transformer_obj = DartsGlobal(TransformerModel(
                                 input_chunk_length=seasonality * 4,
                                 output_chunk_length=1,
                             ),
-                           "transformer",
-                           0.2,
-                           frequency,
-                           seasonality,
-                           dataset_path,
-                           OUTPUT_DIR,
-                           scaling = True,
-                           interpolation=True,
-                           f32 = True)
-    
+                            "transformer",
+                            0.2,
+                            frequency,
+                            seasonality,
+                            dataset_path,
+                            OUTPUT_DIR,
+                            scaling = True,
+                            interpolation=True,
+                            f32 = True)
+
     transformer_obj.main_workflow()

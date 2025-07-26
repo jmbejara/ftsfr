@@ -13,7 +13,6 @@ from tqdm import tqdm
 
 from .darts_main_class import DartsMain
 
-
 class DartsLocal(DartsMain):
     def __init__(self,
                  estimator,
