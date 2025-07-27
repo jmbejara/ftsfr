@@ -113,9 +113,41 @@ required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
 [he_kelly_manela]
 required_data_sources = ["he_kelly_manela"]
 
+[he_kelly_manela.ftsfr_he_kelly_manela_factors_monthly]
+description = """Monthly factors from He, Kelly, and Manela (2017)"""
+frequency = "ME"
+seasonality = 12
+
+[he_kelly_manela.ftsfr_he_kelly_manela_factors_daily]
+description = """Daily factors from He, Kelly, and Manela (2017)"""
+frequency = "D"
+seasonality = 252
+
+[he_kelly_manela.ftsfr_he_kelly_manela_all]
+description = """All factors from He, Kelly, and Manela (2017)"""
+frequency = "D"
+seasonality = 252
+
+
 ################################################################################
 [ken_french_data_library]
 required_data_sources = ["ken_french_data_library"]
+
+[ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_bm]
+description = """Daily Fama-French 25 portfolios based on size and book-to-market"""
+frequency = "D"
+seasonality = 252
+
+[ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_op]
+description = """Daily Fama-French 25 portfolios based on size and operating profitability"""
+frequency = "D"
+seasonality = 252
+
+[ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_inv]
+description = """Daily Fama-French 25 portfolios based on size and investment"""
+frequency = "D"
+seasonality = 252
+
 
 ################################################################################
 [nyu_call_report]

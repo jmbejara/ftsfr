@@ -606,8 +606,18 @@ These seemingly technical choices have profound implications. Studies that use t
 
 By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
 
+A comparison of the treasury bond returns dataset with the FTSFR dataset is shown in Figure \ref{fig:us_treasury_returns_comparison}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../docs_src/us_treasury_compare.png}
+  \caption{Comparison of He, Kelly, and Manela (2017) treasury bond returns dataset with FTSFR dataset}
+  \label{fig:us_treasury_returns_comparison}
+\end{figure}
+
 \subsubsection{Corporate Bonds}
 \label{sec:corporate_bonds}
+
 % Nozawa (2017) yield-spread sorted portfolios
 The corporate bond returns data is sourced from the TRACE (Trade Reporting and Compliance Engine) dataset, available at openbondassetpricing.com, and follows the methodology outlined in Nozawa (2017). This dataset incorporates several key elements to ensure accuracy and relevance. First, it includes market microstructure adjustments to correct for noise and enhance the reliability of bond prices and returns. It also applies stringent data filters, such as including only U.S.-domiciled firms and excluding private placements and convertible bonds. The dataset covers corporate bonds with sufficient outstanding amounts and complete information, and includes essential fields such as MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads.
 
@@ -615,7 +625,14 @@ The cleaning and standardization procedure adheres to the rigorous framework est
 
 For portfolio construction, bonds are sorted into deciles based on credit spreads for each date. Value-weighted portfolio returns are computed using bond values—defined as the product of MMN-adjusted clean price and amount outstanding—as weights. To ensure data quality, defaults are verified using Moody's Default Risk Service, while CRSP and Compustat data supplement the equity and accounting information. Callable bonds are also incorporated into regression models using fixed effects.
 
-The final output is a dataset containing monthly corporate bond portfolio returns sorted by credit spread deciles, making it well-suited for credit risk analysis and for benchmarking against other bond market data. The constructed returns are validated against the dataset by He, Kelly, and Manela (2017), which serves as a benchmark for credit spread deciles. As shown in Figure PLACEHOLDER, the time series comparison between the two datasets exhibits strong alignment in return patterns, especially during volatile periods such as the 2008 financial crisis.
+The final output is a dataset containing monthly corporate bond portfolio returns sorted by credit spread deciles, making it well-suited for credit risk analysis and for benchmarking against other bond market data. The constructed returns are validated against the dataset by He, Kelly, and Manela (2017), which serves as a benchmark for credit spread deciles. As shown in Figure \ref{fig:corp_bond_returns_comparison}, the time series comparison between the two datasets exhibits strong alignment in return patterns, especially during volatile periods such as the 2008 financial crisis.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../docs_src/corporate_returns_compare.png}
+    \caption{Comparison of He, Kelly, and Manela (2017) corporate bond returns dataset with FTSFR dataset}
+    \label{fig:corp_bond_returns_comparison}
+  \end{figure}
 
 \subsubsection{Sovereign Bonds}
 \label{sec:sovereign}
