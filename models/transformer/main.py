@@ -18,21 +18,15 @@ from model_classes.darts_global_class import DartsGlobal
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
-    
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
 
     transformer_obj = DartsGlobal(TransformerModel(
                                 input_chunk_length=seasonality * 4,
                                 output_chunk_length=1,
                             ),
                             "transformer",
-                            0.2,
-                            frequency,
-                            seasonality,
-                            dataset_path,
-                            OUTPUT_DIR,
+                            *env_vars,
                             scaling = True,
                             interpolation=True,
                             f32 = True)
-
+    
     transformer_obj.inference_workflow()

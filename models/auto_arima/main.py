@@ -19,15 +19,9 @@ from model_classes.darts_local_class import DartsLocal
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
-    
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
 
     auto_arima_obj = DartsLocal(AutoARIMA(season_length = seasonality),
                                 "auto_arima", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
 
     auto_arima_obj.main_workflow()

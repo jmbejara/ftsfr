@@ -22,10 +22,6 @@ if __name__ == "__main__":
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     auto_tbats_obj = DartsLocal(AutoTBATS(season_length = seasonality),
                                 "auto_tbats", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
 
     auto_tbats_obj.main_workflow()

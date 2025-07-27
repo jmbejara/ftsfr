@@ -22,9 +22,5 @@ if __name__ == "__main__":
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     auto_mfles_obj = DartsLocal(AutoMFLES(test_size = 1, season_length = seasonality),
                                 "auto_mfles", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
     auto_mfles_obj.main_workflow()

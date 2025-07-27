@@ -16,14 +16,9 @@ from pathlib import Path
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
-    
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
         
-    informer = NixtlaMain(estimator=Informer,
-                            model_name="informer",
-                            test_split=0.2,
-                            frequency=frequency,
-                            seasonality=seasonality,
-                            data_path=dataset_path,
-                            output_path=OUTPUT_DIR)
+    informer = NixtlaMain(Informer,
+                            "informer",
+                            *env_vars)
+    
     informer.main_workflow()

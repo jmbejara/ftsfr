@@ -6,9 +6,9 @@ def env_reader(environment_dict):
     frequency = environment_dict["FREQUENCY"]
     seasonality = int(environment_dict["SEASONALITY"])
     if environment_dict.get("OUTPUT_DIR", None) is not None:
-        OUTPUT_DIR = Path(environment_dict["OUTPUT_DIR"])
+        output_dir = Path(environment_dict["OUTPUT_DIR"])
     else:
-        OUTPUT_DIR = Path().resolve().parent.parent / "_output"
+        output_dir = Path().resolve().parent.parent / "_output"
     if environment_dict.get("TEST_SPLIT", None) is not None:
         # Seasonal mode would instruct the classes to calculate test_split
         # such that the testing data is just the last season of values
@@ -20,4 +20,4 @@ def env_reader(environment_dict):
     else:
         test_split = 0.2
     
-    return (dataset_path, frequency, seasonality, OUTPUT_DIR, test_split)
+    return (test_split, frequency, seasonality, dataset_path, output_dir)

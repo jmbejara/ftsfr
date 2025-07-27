@@ -17,12 +17,8 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
-    autoformer = NixtlaMain(estimator=Autoformer,
-                            model_name="autoformer",
-                            test_split=0.2,
-                            frequency=frequency,
-                            seasonality=seasonality,
-                            data_path=dataset_path,
-                            output_path=OUTPUT_DIR)
-    autoformer.inference_workflow()
+    autoformer = NixtlaMain(Autoformer,
+                            "autoformer",
+                            *env_vars)
+    
+    autoformer.main_workflow()

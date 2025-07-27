@@ -22,9 +22,5 @@ if __name__ == "__main__":
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     auto_ces_obj = DartsLocal(AutoCES(season_length = seasonality),
                                 "auto_ces", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
     auto_ces_obj.main_workflow()

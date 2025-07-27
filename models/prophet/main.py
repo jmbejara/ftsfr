@@ -19,13 +19,8 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     prophet_obj = DartsLocal(Prophet(),
                                 "prophet", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
 
     prophet_obj.main_workflow()

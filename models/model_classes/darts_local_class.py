@@ -46,10 +46,6 @@ class DartsLocal(DartsMain):
         try:
             raw_series = self.raw_series.copy()
             auto_mode = False
-            # The check below is important because Auto models like AutoARIMA
-            # need interpolation
-            if self.model_name[:5] == "auto_":
-                auto_mode = True
             # Training on each entity and calculating MASE
             self.print_sep()
 
@@ -59,8 +55,7 @@ class DartsLocal(DartsMain):
                 # Removing leading/trailing NaNs which show up due to different start 
                 # times of different series
                 entity_data = entity_data.strip()
-                if auto_mode:
-                    entity_data = fill_missing_values(entity_data)
+                entity_data = fill_missing_values(entity_data)
                 if len(entity_data) <= 10:
                     continue
                 
@@ -68,11 +63,25 @@ class DartsLocal(DartsMain):
 
                 # Updates internal train and test series
                 self._train_test_split(entity_data)
+                # self.print_sep()
+                # print("Train Series")
+                # display(self.train_series.to_dataframe())
+                # self.print_sep()
+                # print("Test Series")
+                # display(self.test_series.to_dataframe())
+                self.train()
                 self.forecast()
+                # self.print_sep()
+                # print("Pred Series")
+                # display(self.pred_series.to_dataframe())
                 id_mase = self.calculate_error()
+                # self.print_sep()
+                # print("MASE")
+                # display(id_mase)
+                # self.print_sep()
 
                 # Resets the model
-                self.model = self.estimator
+                self.model = self.model.untrained_model()
 
                 if id_mase is not None:
                     self.mase_list.append(id_mase)

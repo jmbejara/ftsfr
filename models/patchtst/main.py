@@ -22,8 +22,7 @@ from model_classes.gluonts_main_class import GluontsMain
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
-    
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
+
     forecast_horizon = 1
     patchtst_obj = GluontsMain(PatchTSTEstimator(
                                 patch_len = seasonality,
@@ -32,9 +31,6 @@ if __name__ == "__main__":
                                 stride = 4,
                             ),
                             "patchtst",
-                            0.2,
-                            frequency,
-                            seasonality,
-                            dataset_path,
-                            OUTPUT_DIR)
+                            *env_vars)
+    
     patchtst_obj.main_workflow()

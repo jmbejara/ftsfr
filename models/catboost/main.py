@@ -24,7 +24,6 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     # Check for an NVIDIA GPU
     try:
         subprocess.check_output("nvidia-smi")
@@ -40,11 +39,7 @@ if __name__ == "__main__":
                                 task_type=task_type,
                             ),
                            "catboost",
-                           0.2,
-                           frequency,
-                           seasonality,
-                           dataset_path,
-                           OUTPUT_DIR,
+                           *env_vars,
                            scaling = False,
                            interpolation=True)
     

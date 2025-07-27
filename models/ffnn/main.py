@@ -29,10 +29,6 @@ if __name__ == "__main__":
         context_length = seasonality * 4, prediction_length=1
     ),
                            "ffnn",
-                           0.2,
-                           frequency,
-                           seasonality,
-                           dataset_path,
-                           OUTPUT_DIR)
+                           *env_vars)
     
     ffnn_obj.main_workflow()

@@ -24,15 +24,10 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     deepar_obj = GluontsMain(DeepAREstimator(
         freq=frequency, context_length = seasonality * 4, prediction_length = 1
     ),
                            "deepar",
-                           0.2,
-                           frequency,
-                           seasonality,
-                           dataset_path,
-                           OUTPUT_DIR)
+                           *env_vars)
     
     deepar_obj.main_workflow()

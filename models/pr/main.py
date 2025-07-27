@@ -21,16 +21,11 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     pr_obj = DartsLocal(SKLearnModel(model = TweedieRegressor(power=0),
                                         lags = seasonality * 4,
                                         output_chunk_length = 1,
                                         multi_models = False),
                                 "pr", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
 
     pr_obj.main_workflow()

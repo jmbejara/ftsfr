@@ -25,11 +25,7 @@ if __name__ == "__main__":
                                 output_chunk_length=1,
                             ),
                            "nhits",
-                           0.2,
-                           frequency,
-                           seasonality,
-                           dataset_path,
-                           OUTPUT_DIR,
+                           *env_vars,
                            scaling = True,
                            interpolation=True,
                            f32 = True)

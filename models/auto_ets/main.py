@@ -22,10 +22,6 @@ if __name__ == "__main__":
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     auto_ets_obj = DartsLocal(AutoETS(season_length = seasonality),
                                 "auto_ets", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
 
     auto_ets_obj.main_workflow()

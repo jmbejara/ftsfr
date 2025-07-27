@@ -22,9 +22,5 @@ if __name__ == "__main__":
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     auto_theta_obj = DartsLocal(AutoTheta(season_length = seasonality),
                                 "auto_theta", 
-                                0.2, 
-                                frequency, 
-                                seasonality, 
-                                dataset_path, 
-                                OUTPUT_DIR)
+                                *env_vars)
     auto_theta_obj.main_workflow()

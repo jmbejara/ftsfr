@@ -13,6 +13,7 @@ config.toml
 # .pixi and pixi.lock files in models
 /models/*/.pixi
 /models/*/pixi.lock
+/models/testing
 
 # Secrets saved in environment files
 .env*

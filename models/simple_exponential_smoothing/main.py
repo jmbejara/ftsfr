@@ -15,21 +15,14 @@ import sys
 sys.path.append('../')
 from env_reader import env_reader
 from model_classes.darts_local_class import DartsLocal
-from env_reader import env_reader
 
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
 
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
-
     ses_obj = DartsLocal(ExponentialSmoothing(trend=ModelMode.NONE,
                                               seasonal=SeasonalityMode.NONE),
                                 "ses",
-                                test_split,
-                                frequency,
-                                seasonality,
-                                dataset_path,
-                                output_dir)
+                                *env_vars)
 
     ses_obj.main_workflow()
