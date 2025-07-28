@@ -692,22 +692,39 @@ def task_format():
             "clean": [],
         }
 
-    # if data_sources["ken_french_data_library"]:
-    #     from ken_french_data_library.pull_fama_french_25_portfolios import DATA_INFO
+    data_module = "he_kelly_manela"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "ftsfr_he_kelly_manela_factors_monthly.parquet",
+                DATA_DIR / data_module / "ftsfr_he_kelly_manela_factors_daily.parquet",
+                DATA_DIR / data_module / "ftsfr_he_kelly_manela_all.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
+            "clean": [],
+        }
 
-    #     data_module = "ken_french_data_library"
-    #     yield {
-    #         "name": f"pull:{data_module}",
-    #         "actions": [
-    #             f"python ./src/{data_module}/pull_fama_french_25_portfolios.py --DATA_DIR={DATA_DIR / data_module}"
-    #         ],
-    #         "targets": [
-    #             DATA_DIR / "ken_french_data_library" / info["parquet"]
-    #             for info in DATA_INFO.values()
-    #         ],
-    #         "file_dep": [f"./src/{data_module}/pull_fama_french_25_portfolios.py"],
-    #         "clean": [],
-    #     }
+    data_module = "ken_french_data_library"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "ftsfr_french_portfolios_25_daily_size_and_bm.parquet",
+                DATA_DIR / data_module / "ftsfr_french_portfolios_25_daily_size_and_op.parquet",
+                DATA_DIR / data_module / "ftsfr_french_portfolios_25_daily_size_and_inv.parquet",
+            ],
+            "file_dep": [f"./src/{data_module}/create_ftsfr_datasets.py"],
+            "clean": [],
+        }
 
     data_module = "nyu_call_report"
     if module_requirements[data_module]:

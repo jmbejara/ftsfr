@@ -9,12 +9,11 @@ List of datasets:
 - ftsfr_he_kelly_manela_all: all factors from He, Kelly, and Manela (2017)
 """
 
-import pandas as pd
 import pull_he_kelly_manela
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-DATA_DIR = DATA_DIR / "he_kelly_manela"
+DATA_DIR = DATA_DIR
 
 he_kelly_manela_factors_monthly = pull_he_kelly_manela.load_he_kelly_manela_factors_monthly(data_dir=DATA_DIR)
 he_kelly_manela_factors_daily = pull_he_kelly_manela.load_he_kelly_manela_factors_daily(data_dir=DATA_DIR)

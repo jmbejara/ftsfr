@@ -9,12 +9,15 @@ List of datasets:
 - ftsfr_french_portfolios_25_daily_size_and_inv: Daily Fama-French 25 portfolios based on size and investment
 """
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import pandas as pd
-import pull_fama_french_25_portfolios
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-DATA_DIR = DATA_DIR / "ken_french_data_library"
 
 
 def convert_wide_to_long_format(df):
