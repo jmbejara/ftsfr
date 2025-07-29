@@ -19,9 +19,8 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     dlinear_obj = DartsGlobal(DLinearModel(
-                                input_chunk_length=seasonality * 4,
+                                input_chunk_length = env_vars[2] * 4,
                                 output_chunk_length=1,
                             ),
                            "dlinear",

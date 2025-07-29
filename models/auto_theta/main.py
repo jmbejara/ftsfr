@@ -19,8 +19,7 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
-    auto_theta_obj = DartsLocal(AutoTheta(season_length = seasonality),
+    auto_theta_obj = DartsLocal(AutoTheta(season_length = env_vars[2]),
                                 "auto_theta", 
                                 *env_vars)
     auto_theta_obj.main_workflow()

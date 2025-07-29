@@ -20,7 +20,7 @@ if __name__ == "__main__":
     env_vars = env_reader(os.environ)
 
     transformer_obj = DartsGlobal(TransformerModel(
-                                input_chunk_length=seasonality * 4,
+                                input_chunk_length=env_vars[2] * 4,
                                 output_chunk_length=1,
                             ),
                             "transformer",
@@ -29,4 +29,4 @@ if __name__ == "__main__":
                             interpolation=True,
                             f32 = True)
     
-    transformer_obj.inference_workflow()
+    transformer_obj.main_workflow()

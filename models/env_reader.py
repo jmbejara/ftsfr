@@ -17,6 +17,8 @@ def env_reader(environment_dict):
             test_split = "seasonal"
         else:
             test_split = float(environment_dict["TEST_SPLIT"])
+            if test_split > 1.0:
+                raise ValueError("Test split can't be greater than 1.")
     else:
         test_split = 0.2
     

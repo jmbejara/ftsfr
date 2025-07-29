@@ -25,7 +25,8 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    wavenet_obj = GluontsMain(WaveNetEstimator(freq = frequency, prediction_length=1),
+    wavenet_obj = GluontsMain(WaveNetEstimator(freq = env_vars[1], 
+                                               prediction_length=1),
                             "wavenet",
                             *env_vars)
     

@@ -19,8 +19,7 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
     
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
-    auto_tbats_obj = DartsLocal(AutoTBATS(season_length = seasonality),
+    auto_tbats_obj = DartsLocal(AutoTBATS(season_length = env_vars[2]),
                                 "auto_tbats", 
                                 *env_vars)
 

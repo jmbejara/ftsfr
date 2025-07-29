@@ -51,7 +51,7 @@ class TimesFMForecasting(forecasting_model):
         result_path = result_path / str(dataset_name + ".csv")
 
         df = pd.read_parquet(data_path).rename(columns = {"id" : 'unique_id'})
-        df = df.interpolate()
+        df = df.interpolate(limit_direction = 'both')
         df = df.sort_values(["unique_id", "ds"])
         df = df.reset_index(drop = True)
 

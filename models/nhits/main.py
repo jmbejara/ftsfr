@@ -21,7 +21,7 @@ if __name__ == "__main__":
     
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     nhits_obj = DartsGlobal(NHiTSModel(
-                                input_chunk_length=seasonality * 4,
+                                input_chunk_length=env_vars[2] * 4,
                                 output_chunk_length=1,
                             ),
                            "nhits",

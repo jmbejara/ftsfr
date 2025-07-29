@@ -45,54 +45,44 @@ class forecasting_model(ABC):
         Saves class-specific summary results.
         """
         pass
-
-    def main_workflow(self):
-        try:
-            self.train()
-            self.save_model()
-            self.forecast()
-            self.save_forecast()
-            self.calculate_error()
-            self.print_summary()
-            self.save_results()
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in main workflow. " +
-                  "Full traceback above \u2191")
-            self.print_sep()
-            return None
-    
-    def large_training_workflow(self):
-        try:
-            self.train()
-            self.save_model()
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in heavy training workflow. " +
-                  "Full traceback above \u2191")
-            self.print_sep()
-            return None
-    
-    def inference_workflow(self):
-        try:
-            self.load_model()
-            self.forecast()
-            self.save_forecast()
-            self.calculate_error()
-            self.print_summary()
-            self.save_results()
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in inference workflow. " +
-                  "Full traceback above \u2191")
-            self.print_sep()
-            return None
     
     def print_sep(self):
+        """
+        Prints a separator line.
+        """
         sep = ""
         for i in range(67):
             sep += "-"
         print(sep)
+
+    def main_workflow(self):
+        """
+        Trains the model -> Saves the model -> Get predictions -> 
+        Saves predictions -> Calculates error -> Prints summary -> Saves results
+        """
+        self.train()
+        self.save_model()
+        self.forecast()
+        self.save_forecast()
+        self.calculate_error()
+        self.print_summary()
+        self.save_results()
+    
+    def training_workflow(self):
+        """
+        Trains the model -> Saves the model
+        """
+        self.train()
+        self.save_model()
+    
+    def inference_workflow(self):
+        """
+        Loads the model -> Get predictions -> Saves predictions ->
+        Calculates error -> Prints summary -> Saves results
+        """
+        self.load_model()
+        self.forecast()
+        self.save_forecast()
+        self.calculate_error()
+        self.print_summary()
+        self.save_results()

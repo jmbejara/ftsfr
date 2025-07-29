@@ -2,6 +2,7 @@
 The GluontsMain class can help quickly create the necessary objects for 
 forecasting with Gluonts models.
 """
+
 import os
 from collections import defaultdict
 from pathlib import Path
@@ -14,9 +15,10 @@ from tabulate import tabulate
 from gluonts.dataset.common import ListDataset
 from gluonts.dataset.field_names import FieldName
 from gluonts.model.predictor import Predictor
+from gluonts.dataset.pandas import PandasDataset
 
 from .forecasting_model import forecasting_model
-from .helper_func import calculate_darts_MASE
+from .helper_func import *
 
 class GluontsMain(forecasting_model):
     def __init__(self,
@@ -47,59 +49,33 @@ class GluontsMain(forecasting_model):
         raw_df = pd.read_parquet(data_path)
         raw_df = raw_df.rename(columns = {"id" : "unique_id"})
 
+        # Fills missing dates and extends if required
+        raw_df, test_split = process_df(raw_df,
+                                        frequency,
+                                        seasonality,
+                                        test_split)
+        
+        raw_df = raw_df.interpolate(limit_direction = 'both')
         raw_df = raw_df.sort_values(["unique_id", "ds"])
         raw_df = raw_df.reset_index(drop = True)
 
-        proc_df = raw_df.groupby("unique_id").agg(lambda x: pd.array(x))
-        proc_df = proc_df.reset_index()
-        proc_df["ds"] = proc_df["ds"].iloc[0][0]
-        proc_df["y"] = proc_df["y"].apply(lambda x: x.to_numpy())
+        unique_dates = raw_df["ds"].unique()
+        test_length = int(test_split * len(unique_dates))
 
-        test_split_seasonal = test_split == "seasonal"
+        raw_df['y'] = raw_df['y'].astype(np.float32)
+        
+        train_data = raw_df[raw_df['ds'] < unique_dates[-test_length]]
 
-        train_series_list = []
-        test_series_list = []
-        train_series_full_list = []
-        test_series_full_list = []
-
-        test_index = seasonality
-
-        for index, row in proc_df.iterrows():
-            train_start_time = row["ds"]
-            series_data = row["y"]
-
-            if not test_split_seasonal:
-                test_index = int(test_split * len(series_data))
-            train_elements = len(series_data) - test_index
-            train_series_data = series_data[:-test_index]
-            # if train_elements < 4 * seasonality:
-            #     curr_mean = train_series_data.mean()
-            #     difference = 4 * seasonality - train_elements
-            #     for _ in range(difference):
-            #         train_series_data = np.insert(train_series_data, 0, curr_mean)
-            
-            test_series_data = series_data[-test_index:]
-
-            train_series_list.append(train_series_data)
-            test_series_list.append(test_series_data)
-
-            train_series_full_list.append(
-                {
-                    FieldName.TARGET: train_series_data,
-                    FieldName.START: pd.Timestamp(train_start_time),
-                }
-            )
-
-            test_series_full_list.append(
-                {
-                    FieldName.TARGET: series_data,
-                    FieldName.START: pd.Timestamp(train_start_time),
-                }
-            )
-
-        train_ds = ListDataset(train_series_full_list, freq=frequency)
-        test_ds = ListDataset(test_series_full_list, freq=frequency)
-
+        df = raw_df.set_index("ds")
+        train_data = train_data.set_index("ds")
+        test_ds = PandasDataset.from_long_dataframe(df,
+                                                    target="y",
+                                                    item_id="unique_id")
+        
+        train_ds = PandasDataset.from_long_dataframe(train_data, 
+                                                     target="y", 
+                                                     item_id="unique_id")
+        
         # Names
         self.model_name = model_name
         self.dataset_name = dataset_name
@@ -129,9 +105,16 @@ class GluontsMain(forecasting_model):
         # Error metrics
         self.errors = defaultdict(float)
 
+        print("Object Initialized:")
+        print(tabulate([["Model", model_name],
+                        ["Dataset", dataset_name],
+                        ["Total Entities", len(df["unique_id"].unique())]],
+                        tablefmt="fancy_grid"))
+
     def train(self):
         self.model = self.estimator.train(training_data=self.train_series)
     
+    @common_error_catch
     def save_model(self):
         self.model.serialize(self.model_path)
 
@@ -140,24 +123,32 @@ class GluontsMain(forecasting_model):
 
     def forecast(self):
         model = self.model
-        test_series = self.test_series
+        test_series = list(self.test_series)
+        train_series = list(self.train_series)
         result = []
-        for i in range(len(self.train_series[0]['target']), 
+        for i in range(len(train_series[0]['target']), 
                        len(test_series[0]['target'])):
             temp_dataset = []
             for m in test_series:
                 temp_dataset.append(m.copy())
                 temp_dataset[-1]['target'] = temp_dataset[-1]['target'][:i]
-            res = map(lambda x: x.to_sample_forecast(1), 
-                    list(model.predict(temp_dataset)))
-            res = list(res)
+            
+            temp_pred = list(model.predict(temp_dataset, num_samples = 1))
+
+            if temp_pred[0].__class__.__name__ != "SampleForecast":
+                res = map(lambda x: x.to_sample_forecast(1),
+                        temp_pred)
+                res = list(res)
+            else:
+                res = temp_pred
+
             temp = []
             for j in res:
                 temp.append(j.samples.item())
             result.append(temp)
         
         df = self.raw_df.copy(deep = True)
-        dates_unique = df.ds.unique()[len(self.train_series[0]['target']):]
+        dates_unique = df.ds.unique()[len(train_series[0]['target']):]
         entities = sorted(df.unique_id.unique())
         i = 0
         for date in dates_unique:
@@ -169,6 +160,7 @@ class GluontsMain(forecasting_model):
         
         self.pred_series = df
     
+    @common_error_catch
     def save_forecast(self):
         self.pred_series.to_parquet(self.forecast_path)
 

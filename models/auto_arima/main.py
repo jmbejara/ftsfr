@@ -20,7 +20,7 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
 
-    auto_arima_obj = DartsLocal(AutoARIMA(season_length = seasonality),
+    auto_arima_obj = DartsLocal(AutoARIMA(season_length = env_vars[2]),
                                 "auto_arima", 
                                 *env_vars)
 

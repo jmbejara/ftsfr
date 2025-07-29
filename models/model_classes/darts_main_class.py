@@ -22,7 +22,7 @@ from darts.utils.model_selection import train_test_split
 from tabulate import tabulate
 
 from .forecasting_model import forecasting_model
-
+from .helper_func import process_df, common_error_catch
 
 class DartsMain(forecasting_model):
     def __init__(self,
@@ -41,12 +41,20 @@ class DartsMain(forecasting_model):
 
         # Read dataset to a pd.DataFrame
         df = pd.read_parquet(data_path).rename(columns = {"id" : 'unique_id'})
+        # Fills missing dates and extends if required
+        df, test_split = process_df(df, frequency, seasonality, test_split)
+        
         # This pivot adds all values for an entity as a TS in each column
-        proc_df = df.pivot(index="ds", columns="unique_id", values="y").reset_index()
-        # Basic cleaning
+        proc_df = df.pivot(index="ds",
+                           columns="unique_id",
+                           values="y")
+        
+        # Removing column index
         proc_df.rename_axis(None, axis=1, inplace=True)
+
         # TimeSeries object is important for darts
-        raw_series = TimeSeries.from_dataframe(proc_df, time_col = "ds")
+        raw_series = TimeSeries.from_dataframe(proc_df)
+
         if f32:
             raw_series = raw_series.astype(np.float32)
 
@@ -57,49 +65,13 @@ class DartsMain(forecasting_model):
         if interpolation:
             raw_series = fill_missing_values(raw_series)
 
-        if test_split == "seasonal":
-            test_split = (seasonality / len(proc_df))
-
         if scaling:
             transformer = Scaler()
             raw_series = transformer.fit_transform(raw_series)
-            # Splitting into train and test
-            train_series, test_series = train_test_split(raw_series, 
-                                                         test_size = test_split)
-        else:
-            train_series, test_series = train_test_split(raw_series, 
-                                                         test_size = test_split)
         
-        # This adds means as new entries to the series in the beginning
-        # if len(train_series) < 4 * seasonality:
-        #     difference = 4 * seasonality - len(train_series)
-        #     mean_values = []
-        #     for id in df.unique_id.unique():
-        #         mean_values.append(df[df.unique_id == id]['y'].mean())
-
-        #     dates = pd.date_range(end = train_series.start_time(), 
-        #                           periods = difference + 1)
-        #     dates = dates[:-1]
-
-        #     dict_to_df = {"unique_id": [],
-        #                 "ds" : [],
-        #                 "y" : []}
-        #     unique_ids = df.unique_id.unique()
-        #     for date in dates:
-        #         for i in range(len(unique_ids)):
-        #             dict_to_df["unique_id"].append(unique_ids[i])
-        #             dict_to_df["ds"].append(date)
-        #             dict_to_df["y"].append(mean_values[i])
-
-            # df_new = pd.DataFrame(dict_to_df)
-            # df_new = df_new.pivot(index="ds", columns="unique_id", values="y")
-            # df_new = df_new.reset_index()
-
-            # df_new_series = TimeSeries.from_dataframe(df_new, time_col = "ds")
-            # if f32:
-            #     df_new_series = df_new_series.astype(np.float32)
-            
-            # raw_series = raw_series.prepend(df_new_series)
+        # Splitting into train and test
+        train_series, test_series = train_test_split(raw_series, 
+                                                         test_size = test_split)
 
         # Path to save model
         model_path = output_path / "models" / model_name / dataset_name
@@ -152,82 +124,41 @@ class DartsMain(forecasting_model):
                         ["Total Entities", self.raw_series.n_components]],
                         tablefmt="fancy_grid"))
 
+    @common_error_catch
     def _train_test_split(self, entity_data):
-        try:
-            self.train_series, self.test_series = train_test_split(entity_data, test_size = self.test_split)
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} dataset splitting. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        self.train_series, self.test_series = train_test_split(entity_data, test_size = self.test_split)
 
+    @common_error_catch
     def train(self):
-        try:
-            self.model.fit(self.train_series)
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} training. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        self.model.fit(self.train_series)
 
+    @common_error_catch
     def save_model(self):
-        try:
-            self.model.save(self.model_path)
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in saving {self.model_name} model. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        self.model.save(self.model_path)
     
+    # Doesn't have an error catch because errors in loading a model is a 
+    # breaking condition for downstream tasks
     def load_model(self):
-        try:
-            self.model = self.estimator.load(self.model_path)
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} model loading. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        self.model = self.estimator.load(self.model_path)
 
+    @common_error_catch
     def forecast(self):
-        try:
-            start_time = self.test_series.start_time()
-            pred_series = self.model.historical_forecasts(
-                                        series = self.raw_series,
-                                        start = start_time)
-            self.pred_series = pred_series
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} forecasting. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        start_time = self.test_series.start_time()
+        pred_series = self.model.historical_forecasts(
+                                    series = self.raw_series,
+                                    start = start_time)
+        self.pred_series = pred_series
 
+    @common_error_catch
     def save_forecast(self):
-        try:
-            # Save to parquet
-            temp_df = self.pred_series.to_dataframe(time_as_index = False)
-            temp_df.to_parquet(self.forecast_path)
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in saving {self.model_name} forecasts. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        # Save to parquet
+        temp_df = self.pred_series.to_dataframe(time_as_index = False)
+        temp_df.to_parquet(self.forecast_path)
     
+
     def load_forecast(self):
-        try:
-            temp_df = pd.read_parquet(self.forecast_path)
-            self.pred_series = TimeSeries.from_dataframe(temp_df, time_col = "ds")
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in loading {self.model_name} forecasts. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        temp_df = pd.read_parquet(self.forecast_path)
+        self.pred_series = TimeSeries.from_dataframe(temp_df, time_col = "ds")
     
     def calculate_error(self, metric = "MASE"):
         if self.pred_series is None:

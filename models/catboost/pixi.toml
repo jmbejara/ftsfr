@@ -4,7 +4,7 @@ name = "catboost"
 platforms = ["osx-arm64", "osx-64", "win-64", "linux-64"]
 
 [tasks]
-install = "pip install darts tabulate"
+install = "pip install darts tabulate catboost"
 main = { cmd = "python main.py", depends-on = ["install"] }
 
 [dependencies]

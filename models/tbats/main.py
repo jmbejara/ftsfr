@@ -22,7 +22,7 @@ if __name__ == "__main__":
     
     dataset_path, frequency, seasonality, output_dir, test_split = env_vars
     
-    tbats_obj = DartsLocal(TBATS(season_length = seasonality),
+    tbats_obj = DartsLocal(TBATS(season_length = env_vars[2]),
                                 "tbats", 
                                 *env_vars)
 

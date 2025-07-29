@@ -23,12 +23,11 @@ from model_classes.gluonts_main_class import GluontsMain
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
-    
-    dataset_path, frequency, seasonality, output_dir, test_split = env_vars
+
     ffnn_obj = GluontsMain(SimpleFeedForwardEstimator(
-        context_length = seasonality * 4, prediction_length=1
+        context_length = env_vars[2] * 4, prediction_length = 1
     ),
                            "ffnn",
                            *env_vars)
     
-    ffnn_obj.main_workflow()
+    ffnn_obj.inference_workflow()

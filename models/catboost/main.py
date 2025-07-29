@@ -32,7 +32,7 @@ if __name__ == "__main__":
         task_type = "CPU"
 
     catboost_obj = DartsGlobal(CatBoostModel(
-                                lags=seasonality * 4,
+                                lags=env_vars[2] * 4,
                                 output_chunk_length=1,
                                 # Training a single global model for global forecasting
                                 multi_models=False,

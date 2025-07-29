@@ -23,10 +23,9 @@ if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
 
-    forecast_horizon = 1
     patchtst_obj = GluontsMain(PatchTSTEstimator(
-                                patch_len = seasonality,
-                                context_length = seasonality * 4,
+                                patch_len = env_vars[2],
+                                context_length = env_vars[2] * 4,
                                 prediction_length = 1,
                                 stride = 4,
                             ),

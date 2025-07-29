@@ -1,11 +1,14 @@
 [workspace]
 channels = ["conda-forge"]
 name = "patchtst"
-platforms = ["osx-arm64", "osx-64", "win-64", "linux-64"]
+platforms = ["linux-64"]
 
 [tasks]
-install = "pip install gluonts[torch] lightning"
+install = "pip install gluonts darts"
 main = { cmd = "python main.py", depends-on = ["install"] }
+
+[system-requirements]
+cuda = "12.8"
 
 [dependencies]
 
@@ -21,3 +24,8 @@ pyarrow = "*"
 fastparquet = "*"
 gluonts = "*"
 tabulate = "*"
+
+[pypi-dependencies]
+torch = { version = ">=2.5.1", index = "https://download.pytorch.org/whl/cu128" }
+torchvision = { version = ">=0.20.1", index = "https://download.pytorch.org/whl/cu128" }
+lightning = { version = "==2.5.*" }

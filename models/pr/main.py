@@ -22,7 +22,7 @@ if __name__ == "__main__":
     env_vars = env_reader(os.environ)
     
     pr_obj = DartsLocal(SKLearnModel(model = TweedieRegressor(power=0),
-                                        lags = seasonality * 4,
+                                        lags = env_vars[2] * 4,
                                         output_chunk_length = 1,
                                         multi_models = False),
                                 "pr", 
