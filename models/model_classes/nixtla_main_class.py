@@ -32,30 +32,33 @@ class NixtlaMain(forecasting_model):
                  data_path,
                  output_path):
         
+        # This helps with organising
         dataset_name = str(os.path.basename(data_path)).split(".")[0]
         dataset_name = dataset_name.removeprefix("ftsfr_")
 
-        # Path to save model
+        # Path to save model once trained
         model_path = output_path / "models" / model_name / dataset_name
         Path(model_path).mkdir(parents = True, exist_ok = True)
 
-        # Path to save forecasts
+        # Path to save forecasts generated after training the model
         forecast_path = output_path / "forecasts" / model_name / dataset_name
         Path(forecast_path).mkdir(parents = True, exist_ok = True)
         forecast_path = forecast_path / "forecasts.parquet"
 
+        # Path to save results which include the error metric
         result_path = output_path / "raw_results" / model_name
         result_path.mkdir(parents = True, exist_ok = True)
         result_path = result_path / str(dataset_name + ".csv")
 
+        # Data pre-processing
         df = pd.read_parquet(data_path).rename(columns = {"id" : 'unique_id'})
         df, test_split = process_df(df, frequency, seasonality, test_split) 
-        df = df.interpolate(limit_direction = "both")
+        df = custom_interpolate(df)
 
+        # Unique dates defines the number of entries per entity
+        # makes calculating test_length and subsequent splits easier
         unique_dates = df['ds'].unique()
-
         test_length = int(test_split * len(unique_dates))
-
         test_data = df[df.ds >= unique_dates[-test_length]]
         train_data = df[df.ds < unique_dates[-test_length]]
 
@@ -83,19 +86,21 @@ class NixtlaMain(forecasting_model):
         # Stores base class
         # MPS is causing buffer errors
         if torch.backends.mps.is_available():
+            # For whatever reason if cuda is available
             if torch.cuda.is_available():
-                self.estimator = estimator(h = 1, 
-                                           input_size = seasonality * 4, 
+                self.estimator = estimator(h = 1,
+                                           input_size = seasonality * 4,
                                            accelerator = "gpu")
             else:
-                self.estimator = estimator(h = 1, 
-                                           input_size = seasonality * 4, 
+                self.estimator = estimator(h = 1,
+                                           input_size = seasonality * 4,
                                            accelerator = "cpu")
         else:
+            # Auto detect if not on MPS
             self.estimator = estimator(h = 1, input_size = seasonality * 4)
+        
         # Stores the nf object
         self.nf = NeuralForecast(models = [self.estimator], freq = frequency)
-
         # Error metrics
         self.errors = defaultdict(float)
 
@@ -108,6 +113,7 @@ class NixtlaMain(forecasting_model):
     def train(self):
         self.nf.fit(df = self.train_series)
     
+    @common_error_catch
     def save_model(self):
         self.nf.save(self.model_path,
                     model_index = None,
@@ -118,12 +124,17 @@ class NixtlaMain(forecasting_model):
         self.nf = NeuralForecast.load(path = str(self.model_path))
 
     def forecast(self):
+        # The loop keeps concatenating forecasts to pred_series
         pred_series = self.nf.predict(self.train_series)
         pred_series["ds"] = self.test_series["ds"].unique()[0]
         df = self.raw_series
 
+        # Sliding window forecasts
+        # Predict 1 date right after the dataset in the arguments
+        # After each prediction the next prediction uses the actual value in the
+        # test dataset instead of relying on the previous predicted value.
         for i in self.test_series["ds"].unique()[1:]:
-            # Get predictions
+            # Get predictions for the next date
             temp_pred_series = self.nf.predict(df[df.ds < i])
             # Lining up the dates
             temp_pred_series['ds'] = i
@@ -162,6 +173,7 @@ class NixtlaMain(forecasting_model):
             ["Global MASE", self.errors["MASE"]]
             ], tablefmt="fancy_grid"))
     
+    @common_error_catch
     def save_results(self):
         forecast_res = pd.DataFrame(
             {

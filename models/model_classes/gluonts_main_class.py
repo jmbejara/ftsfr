@@ -30,48 +30,57 @@ class GluontsMain(forecasting_model):
                  data_path,
                  output_path):
         
+        # This helps with organising
         dataset_name = str(os.path.basename(data_path)).split(".")[0]
         dataset_name = dataset_name.removeprefix("ftsfr_")
 
-        # Path to save model
+        # Path to save model once trained
         model_path = output_path / "models" / model_name / dataset_name
         Path(model_path).mkdir(parents = True, exist_ok = True)
 
-        # Path to save forecasts
+        # Path to save forecasts generated after training the model
         forecast_path = output_path / "forecasts" / model_name / dataset_name
         Path(forecast_path).mkdir(parents = True, exist_ok = True)
         forecast_path = forecast_path / "forecasts.parquet"
 
+        # Path to save results which include the error metric
         result_path = output_path / "raw_results" / model_name
         result_path.mkdir(parents = True, exist_ok = True)
         result_path = result_path / str(dataset_name + ".csv")
 
+        # Data pre-processing
         raw_df = pd.read_parquet(data_path)
         raw_df = raw_df.rename(columns = {"id" : "unique_id"})
-
         # Fills missing dates and extends if required
         raw_df, test_split = process_df(raw_df,
                                         frequency,
                                         seasonality,
                                         test_split)
-        
-        raw_df = raw_df.interpolate(limit_direction = 'both')
+        # Fills all the np.nans
+        raw_df = custom_interpolate(raw_df)
+        # Sorting for consistency downstream
         raw_df = raw_df.sort_values(["unique_id", "ds"])
+        # Sorting makes the indices shuffled
         raw_df = raw_df.reset_index(drop = True)
+        # Some float and double issues
+        raw_df['y'] = raw_df['y'].astype(np.float32)
 
+        # Unique dates defines the number of entries per entity
+        # makes calculating test_length and subsequent splits easier
         unique_dates = raw_df["ds"].unique()
         test_length = int(test_split * len(unique_dates))
-
-        raw_df['y'] = raw_df['y'].astype(np.float32)
         
+        # Splitting to train and test
+        # Train data for GluonTS is the entire df - test entries
         train_data = raw_df[raw_df['ds'] < unique_dates[-test_length]]
-
-        df = raw_df.set_index("ds")
+        # Test data for GluonTS is the entire dataframe with the dates as index
+        test_data = raw_df.set_index("ds")
+        # Train data for GluonTS with dates as index
         train_data = train_data.set_index("ds")
-        test_ds = PandasDataset.from_long_dataframe(df,
+        # Converts to GluonTS format
+        test_ds = PandasDataset.from_long_dataframe(test_data,
                                                     target="y",
                                                     item_id="unique_id")
-        
         train_ds = PandasDataset.from_long_dataframe(train_data, 
                                                      target="y", 
                                                      item_id="unique_id")
@@ -98,8 +107,6 @@ class GluontsMain(forecasting_model):
         self.test_split = test_split
         
         # Model related variables
-        # Stores base class
-        self.estimator = estimator
         # Stores the actual model
         self.model = estimator
         # Error metrics
@@ -108,11 +115,11 @@ class GluontsMain(forecasting_model):
         print("Object Initialized:")
         print(tabulate([["Model", model_name],
                         ["Dataset", dataset_name],
-                        ["Total Entities", len(df["unique_id"].unique())]],
+                        ["Total Entities", len(raw_df["unique_id"].unique())]],
                         tablefmt="fancy_grid"))
 
     def train(self):
-        self.model = self.estimator.train(training_data=self.train_series)
+        self.model = self.model.train(training_data=self.train_series)
     
     @common_error_catch
     def save_model(self):
@@ -154,7 +161,8 @@ class GluontsMain(forecasting_model):
         for date in dates_unique:
             j = 0
             for id in entities:
-                df.loc[(df['ds'] == date) & (df['unique_id'] == id), 'y'] = result[i][j]
+                df.loc[(df['ds'] == date) & \
+                       (df['unique_id'] == id), 'y'] = result[i][j]
                 j += 1
             i += 1
         
@@ -199,11 +207,14 @@ class GluontsMain(forecasting_model):
             ["Global MASE", self.errors["MASE"]]
             ], tablefmt="fancy_grid"))
     
+    @common_error_catch
     def save_results(self):
         forecast_res = pd.DataFrame(
             {
                 "Model" : [self.model_name],
                 "Dataset" : [self.dataset_name],
+                "Frequency" : [self.frequency],
+                "Seasonality" : [self.seasonality],
                 "Global MASE" : [self.errors["MASE"]]
             }
         )

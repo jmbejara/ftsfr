@@ -30,4 +30,4 @@ if __name__ == "__main__":
                            "deepar",
                            *env_vars)
     
-    deepar_obj.inference_workflow()
+    deepar_obj.main_workflow()

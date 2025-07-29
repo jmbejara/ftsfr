@@ -45,7 +45,7 @@ def calculate_darts_MASE(test_series, train_series, pred_series,
 
     return mase(test_series, pred_series, train_series, seasonality)
 
-def extend_df(df, train_series_len, frequency, interpolate = True):
+def extend_df(df, train_series_len, frequency, seasonality, interpolate = True):
     """
     Extends a df to fit seasonality * 4 lags. Doesn't interpolate, but
     adds np.nan as values in the extend rows.
@@ -76,18 +76,43 @@ def process_df(df, frequency, seasonality, test_split):
     len_ud = len(unique_dates)
 
     if test_split == "seasonal":
-        test_split = float(seasonality / len_ud)
+        if seasonality < len_ud:
+            test_split = float(seasonality / len_ud)
+        else:
+            raise ValueError("Series too short. " +
+                             "Please select appropriate test split.")
     
     test_length = int(test_split * len_ud)
     train_series_len = len_ud - test_length
 
     if train_series_len < 4 * seasonality:
-        df = extend_df(df, train_series_len, frequency)
+        df = extend_df(df, train_series_len, frequency, seasonality)
         
         unique_dates = df['ds'].unique()
         test_split = float(test_length / len(unique_dates))
     
     return (df, test_split)
+
+def custom_interpolate(df):
+    """
+    Entity-wise interpolation.
+    """
+    # Pivots so that each column is an entity
+    proc_df = df.pivot(index="ds",
+                           columns="unique_id",
+                           values="y")
+    
+    # Interpolates per entity
+    proc_df = proc_df.interpolate(limit_direction = 'both')
+
+    # Melts back to original shape
+    proc_df = proc_df.reset_index().melt(id_vars = ['ds'])
+
+    # Reset the name
+    proc_df = proc_df.rename(columns = {"value" : "y"})
+
+    return proc_df
+
 
 def common_error_catch(f):
     """

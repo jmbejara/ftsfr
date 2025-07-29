@@ -15,6 +15,7 @@ from tqdm import tqdm
 # filterwarnings("ignore")
 
 from .darts_main_class import DartsMain
+from .helper_func import common_error_catch
 
 class DartsLocal(DartsMain):
     def __init__(self,
@@ -42,78 +43,68 @@ class DartsLocal(DartsMain):
         self.mase_list = []
         self.model_path += ".pkl"
     
+    @common_error_catch
     def forecast_workflow(self):
-        try:
-            raw_series = self.raw_series.copy()
-            auto_mode = False
-            # Training on each entity and calculating MASE
-            self.print_sep()
+        """
+        This workflow function follows the procedure below:
 
-            for id in tqdm(raw_series.columns):
-                # Select the date and the column for current id
-                entity_data = raw_series[[id]].copy()
-                # Removing leading/trailing NaNs which show up due to different start 
-                # times of different series
-                entity_data = entity_data.strip()
-                entity_data = fill_missing_values(entity_data)
-                if len(entity_data) <= 10:
-                    continue
-                
-                self.raw_series = entity_data
+        Step 1
+        ------
+        For each entity in raw_series:
+            1. Extract and process entity data
+            2. If entity data is too small, move to next
+            3. Update internal variables and split into train and test
+            4. Train -> Forecast -> Calculate error
+            5. Update internal model to untrained version
+        
+        Step 2
+        ------
+        Calculates mean and median MASE, and updates internal variables.
+        """
+        raw_series = self.raw_series.copy()
+        auto_mode = False
+        # Training on each entity and calculating MASE
+        self.print_sep()
 
-                # Updates internal train and test series
-                self._train_test_split(entity_data)
-                # self.print_sep()
-                # print("Train Series")
-                # display(self.train_series.to_dataframe())
-                # self.print_sep()
-                # print("Test Series")
-                # display(self.test_series.to_dataframe())
-                self.train()
-                self.forecast()
-                # self.print_sep()
-                # print("Pred Series")
-                # display(self.pred_series.to_dataframe())
-                id_mase = self.calculate_error()
-                # self.print_sep()
-                # print("MASE")
-                # display(id_mase)
-                # self.print_sep()
+        for id in tqdm(raw_series.columns):
+            # Select the date and the column for current id
+            entity_data = raw_series[[id]].copy()
+            # Removing leading/trailing NaNs which show up due to different 
+            # start times of different series
+            entity_data = entity_data.strip()
+            entity_data = fill_missing_values(entity_data)
+            if len(entity_data) <= 10:
+                continue
+            
+            self.raw_series = entity_data
 
-                # Resets the model
-                self.model = self.model.untrained_model()
+            # Updates internal train and test series
+            self._train_test_split(entity_data)
+            self.train()
+            self.forecast()
+            id_mase = self.calculate_error()
 
-                if id_mase is not None:
-                    self.mase_list.append(id_mase)
+            # Resets the model
+            self.model = self.model.untrained_model()
 
-            self.print_sep()
-            self.save_forecast()
-            self.raw_series = raw_series
+            if id_mase is not None:
+                self.mase_list.append(id_mase)
 
-            if self.mase_list:
-                self.errors["MASE"] = sum(self.mase_list) / len(self.mase_list)
-                self.median_mase = statistics.median(self.mase_list)
-            else:
-                self.errors["MASE"] = np.nan
-                self.median_mase = np.nan
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} forecast workflow. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        self.print_sep()
+        self.save_forecast()
+        self.raw_series = raw_series
+
+        if self.mase_list:
+            self.errors["MASE"] = sum(self.mase_list) / len(self.mase_list)
+            self.median_mase = statistics.median(self.mase_list)
+        else:
+            self.errors["MASE"] = np.nan
+            self.median_mase = np.nan
     
     def main_workflow(self):
-        try:
-            self.forecast_workflow()
-            self.print_summary()
-            self.save_results()
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} workflow. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        self.forecast_workflow()
+        self.print_summary()
+        self.save_results()
     
     def print_summary(self):
         print(tabulate([
@@ -126,24 +117,17 @@ class DartsLocal(DartsMain):
             ["Mean MASE", self.errors["MASE"]]
             ], tablefmt="fancy_grid"))
     
+    @common_error_catch
     def save_results(self):
-        try:
-            forecast_res = pd.DataFrame(
-                {
-                    "Model" : [self.model_name],
-                    "Dataset" : [self.dataset_name],
-                    "Entities" : [len(self.mase_list)],
-                    "Seasonality" : [self.seasonality],
-                    "Median_MASE" : [self.median_mase],
-                    "Mean_MASE" : [self.errors["MASE"]]
-                }
-            )
+        forecast_res = pd.DataFrame(
+            {
+                "Model" : [self.model_name],
+                "Dataset" : [self.dataset_name],
+                "Entities" : [len(self.mase_list)],
+                "Seasonality" : [self.seasonality],
+                "Median_MASE" : [self.median_mase],
+                "Mean_MASE" : [self.errors["MASE"]]
+            }
+        )
 
-            forecast_res.to_csv(self.result_path)
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in saving {self.model_name} results. Full traceback above \u2191")
-            self.print_sep()
-            return None
-    
+        forecast_res.to_csv(self.result_path)

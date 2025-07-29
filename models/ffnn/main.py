@@ -30,4 +30,4 @@ if __name__ == "__main__":
                            "ffnn",
                            *env_vars)
     
-    ffnn_obj.inference_workflow()
+    ffnn_obj.main_workflow()

@@ -17,8 +17,8 @@ class forecasting_model(ABC):
     @abstractmethod
     def forecast(self):
         """
-        Predicts using the model, adds it to the object, and saves the 
-        predictions.
+        Predicts using the model, adds it to the object. Sliding window 
+        forecasts.
         """
         pass
     @abstractmethod
