@@ -51,7 +51,7 @@ def extend_df(df, train_series_len, frequency, interpolate = True):
     adds np.nan as values in the extend rows.
     """
     difference = 4 * seasonality - train_series_len
-    new_date = df.index.min()
+    new_date = df['ds'].min()
     date_offset = difference * to_offset(frequency)
     new_date -= date_offset
 
