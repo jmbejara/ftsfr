@@ -35,7 +35,7 @@
 [cds_bond_basis]
 data_module_name = "CDS Bond Basis"
 data_module_description = """
-Contains code that replicated the CDS bond basis calculations from
+Contains code that replicated the CDS bond basis calculations from Segmented Arbitrage
 """
 required_data_sources = ["open_source_bond", "wrds_markit"]
 
@@ -45,6 +45,10 @@ required_data_sources = ["fed_yield_curve", "wrds_markit"]
 
 ################################################################################
 [cip]
+data_module_name = "CIP"
+data_module_description = """
+Contains code that replicated the CIP arbitrage calculations from Segmented Arbitrage
+"""
 required_data_sources = ["bloomberg_terminal"]
 
 ################################################################################
