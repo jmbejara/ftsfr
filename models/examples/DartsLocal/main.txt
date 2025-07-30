@@ -1,0 +1,27 @@
+"""
+{model_name} using darts.
+
+Performs local forecasting using {model_name}. Reports both mean and
+median MASE for local forecasts.
+"""
+from pathlib import Path
+from warnings import filterwarnings
+filterwarnings("ignore")
+import os
+
+{imports}
+
+import sys
+sys.path.append('../')
+from env_reader import env_reader
+from model_classes.darts_local_class import DartsLocal
+
+if __name__ == "__main__":
+    
+    env_vars = env_reader(os.environ)
+    
+    {obj_name}_obj = DartsLocal({estimator_func},
+                                "{obj_name}", 
+                                *env_vars)
+    
+    {obj_name}_obj.main_workflow()
