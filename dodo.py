@@ -647,18 +647,17 @@ def task_format():
             }
         )
 
-    # data_module = "foreign_exchange"
-    # if module_requirements[data_module]:
-    #     yield {
-    #         "name": data_module,
-    #         "actions": [
-    #             f"python ./src/{data_module}/pull_wrds_fx.py --DATA_DIR={DATA_DIR / data_module}"
-    #         ],
-    #         "targets": [
-    #             DATA_DIR / data_module / "fx_daily_data.parquet",
-    #             DATA_DIR / data_module / "fx_monthly_data.parquet",
-    #         ],
-    #     }
+    data_module = "foreign_exchange"
+    if module_requirements[data_module]:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
+            ],
+            "targets": [
+                DATA_DIR / data_module / "ftsfr_FX_returns.parquet",
+            ],
+        }
 
     data_module = "fed_yield_curve"
     if module_requirements[data_module]:
