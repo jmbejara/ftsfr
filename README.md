@@ -143,6 +143,13 @@ then run it with this:
 ```
 ./code tunnel
 ```
+Then,
+```
+conda create -n ftsfr python=3.12.6
+conda activate ftsfr
+pip install -r requirements.txt
+curl -fsSL https://pixi.sh/install.sh | zsh
+```
 
 ## Data Format
 Final, cleaned and formatted datasets have the following format: `ftsfr_<dataset_name>.parquet`
