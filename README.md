@@ -141,7 +141,7 @@ tar -xf vscode_cli.tar.gz
 ```
 then run it with this:
 ```
-code tunnel
+./code tunnel
 ```
 
 ## Data Format
