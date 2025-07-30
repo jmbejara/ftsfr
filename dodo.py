@@ -528,13 +528,17 @@ def task_format():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/merge_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "Red_Data.parquet",
                 DATA_DIR / data_module / "Final_data.parquet",
+                DATA_DIR / data_module / "ftsfr_CDS_bond_basis_aggregated.parquet",
+                DATA_DIR / data_module / "ftsfr_CDS_bond_basis_non_aggregated.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/merge_cds_bond.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
@@ -555,12 +559,15 @@ def task_format():
             "name": "calc_cds_returns",
             "actions": [
                 f"python ./src/{data_module}/calc_cds_returns.py --DATA_DIR={DATA_DIR / data_module}",
+                # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "markit_cds_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_CDS_returns.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_cds_returns.py",
+                # f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
@@ -582,13 +589,16 @@ def task_format():
             "actions": [
                 f"python ./src/{data_module}/calc_cip.py --DATA_DIR={DATA_DIR / data_module}",
                 # f"python ./src/{data_module}/cip_analysis.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "cip_spreads.parquet",
+                DATA_DIR / data_module / "ftsfr_CIP_returns.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_cip.py",
                 # f"./src/{data_module}/cip_analysis.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
