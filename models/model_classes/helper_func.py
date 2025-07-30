@@ -6,6 +6,7 @@ import numpy as np
 from pandas.tseries.frequencies import to_offset
 from darts import TimeSeries
 from darts.metrics import mase
+import traceback
 from utilsforecast.preprocessing import fill_gaps
 
 def calculate_darts_MASE(test_series, train_series, pred_series, 
@@ -113,6 +114,11 @@ def custom_interpolate(df):
 
     return proc_df
 
+def print_sep():
+    sep = ""
+    for i in range(67):
+        sep += "-"
+    print(sep)
 
 def common_error_catch(f):
     """
@@ -122,10 +128,10 @@ def common_error_catch(f):
         try:
             return f(*args)
         except Exception:
-            self.print_sep()
+            print_sep()
             print(traceback.format_exc())
-            print(f"\nError in {f.__name__} for {self.model_name}." +
+            print(f"\nError in {f.__name__}." +
                 " Full traceback above \u2191")
-            self.print_sep()
+            print_sep()
             return None
     return error_catcher
