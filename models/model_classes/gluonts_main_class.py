@@ -1,6 +1,6 @@
 """
 The GluontsMain class can help quickly create the necessary objects for 
-forecasting with Gluonts models.
+forecasting with Gluonts models. Some code adapted from Monash.
 """
 
 import os
