@@ -58,7 +58,7 @@ class GluontsMain(forecasting_model):
                                         test_split)
         # Fills all the np.nans
         raw_df = custom_interpolate(raw_df)
-        # Sorting for consistency downstream
+        # Sorting for consistency
         raw_df = raw_df.sort_values(["unique_id", "ds"])
         # Sorting makes the indices shuffled
         raw_df = raw_df.reset_index(drop = True)
@@ -133,15 +133,21 @@ class GluontsMain(forecasting_model):
         test_series = list(self.test_series)
         train_series = list(self.train_series)
         result = []
+
         for i in range(len(train_series[0]['target']), 
                        len(test_series[0]['target'])):
+            
+            # A temp dataset to store the current window of values
             temp_dataset = []
             for m in test_series:
                 temp_dataset.append(m.copy())
                 temp_dataset[-1]['target'] = temp_dataset[-1]['target'][:i]
             
+            # Get model predictions for the next timestamp
             temp_pred = list(model.predict(temp_dataset, num_samples = 1))
 
+            # Some models(e.g. wavenet) give SampleForecasts directly 
+            # while others(e.g. ffnn) need conversion
             if temp_pred[0].__class__.__name__ != "SampleForecast":
                 res = map(lambda x: x.to_sample_forecast(1),
                         temp_pred)
@@ -149,24 +155,20 @@ class GluontsMain(forecasting_model):
             else:
                 res = temp_pred
 
+            # Each SampleForecast has three values that we're interested in.
+            # Each list in temp is a row in a dataframe.
             temp = []
             for j in res:
-                temp.append(j.samples.item())
-            result.append(temp)
+                temp.append([])
+                temp[-1].append(j.start_date.to_timestamp())
+                temp[-1].append(j.item_id)
+                temp[-1].append(j.samples.item())
+            
+            # Stores all the rows
+            result += temp
         
-        df = self.raw_df.copy(deep = True)
-        dates_unique = df.ds.unique()[len(train_series[0]['target']):]
-        entities = sorted(df.unique_id.unique())
-        i = 0
-        for date in dates_unique:
-            j = 0
-            for id in entities:
-                df.loc[(df['ds'] == date) & \
-                       (df['unique_id'] == id), 'y'] = result[i][j]
-                j += 1
-            i += 1
-        
-        self.pred_series = df
+        self.pred_series = pd.DataFrame(result, 
+                                        columns = ['ds', 'unique_id', 'y'])
     
     @common_error_catch
     def save_forecast(self):
@@ -184,14 +186,10 @@ class GluontsMain(forecasting_model):
 
             test_data = df[df.ds >= unique_dates[-test_length]]
             train_data = df[df.ds < unique_dates[-test_length]]
-
-            pred_series = self.pred_series
-            pred_series = pred_series[pred_series.ds >= 
-                                      unique_dates[-test_length]]
             
             self.errors["MASE"] = calculate_darts_MASE(test_data,
                                                        train_data,
-                                                       pred_series,
+                                                       self.pred_series,
                                                        self.seasonality)
 
             return self.errors["MASE"]
