@@ -2,22 +2,33 @@ import os
 import stat
 from pathlib import Path
 
-def build_models(model_dir, import_string, main_template, pixi_template):
+import logging
+logger = logging.getLogger("model_gen")
 
+def build_models(model_dir, import_string, main_template, pixi_template,
+                 class_name):
+    
+    logger.info("build_models called. Building " + class_name + ".")
     for model_data in model_dir:
 
         # Setting up the directory
         curr_model = model_data["obj_name"]
+
+        logger.info("Build process began for " + curr_model + ".")
+
         try:
             os.mkdir(curr_model)
+            logger.info("Created directory for " + curr_model)
         except FileExistsError:
             pass
         except Exception as e:
             raise
         
         os.chmod(curr_model, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | \
-                            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | \
-                            stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH)
+                             stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | \
+                             stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH)
+        
+        logger.info("Changed permissions for the directory.")
         
         # Setups imports
         imports = model_data['imports']
@@ -26,15 +37,35 @@ def build_models(model_dir, import_string, main_template, pixi_template):
             import_str += "\n".join(imports[1:])
         model_data['imports'] = import_str
 
+        logger.info("Created import string.")
+
         # Creating files
         with open("./" + curr_model + "/main.py", "w") as main_f:
             main_f.write(main_template.format(**model_data))
+        
+        logger.info("Created main.py")
+        
         with open("./" + curr_model + "/pixi.toml", "w") as pixi_f:
             pixi_f.write(pixi_template.format(**model_data))
-    
+        
+        logger.info("Created pixi.toml")
+
+        logger.info("Build process completed for " + curr_model + ".")
+
     return
 
 if __name__ == "__main__":
+
+    log_path = Path().resolve() / "model_logs"
+    Path(log_path).mkdir(parents = True, exist_ok = True)
+    log_path = log_path / "model_gen.log"
+    logging.basicConfig(filename = log_path,
+                        filemode = "w", # Overwrites previously existing logs
+                        format = "%(asctime)s"+\
+                        " - %(levelname)s - %(message)s",
+                        level = logging.DEBUG)
+
+    logger.info("Model generator script called.")
 
     # Import strings
     darts_import_string = "from darts.models import "
@@ -317,6 +348,11 @@ if __name__ == "__main__":
         with open(path / "pixi.txt", "r") as pixi:
             templates.append(pixi.read())
     
+    class_name = ["DartsLocal", "DartsGlobal", "Nixtla", "GluonTS"]
+
+    logger.info("Templates loaded. All variables set up.")
+    logger.info("Starting the directory and file generation.")
+
     # Building the models
     # Can customise range to select specific packages or for darts specific
     # model types
@@ -324,4 +360,5 @@ if __name__ == "__main__":
         build_models(model_dirs[i],
                      import_strings[i],
                      templates[2 * i],
-                     templates[2 * i + 1])
+                     templates[2 * i + 1],
+                     class_name[i])

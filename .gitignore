@@ -10,10 +10,11 @@
 /_output/*
 config.toml
 
-# .pixi and pixi.lock files in models
+# files and dirs in models
 /models/*/.pixi
 /models/*/pixi.lock
 /models/testing
+/models/model_logs
 
 # Secrets saved in environment files
 .env*

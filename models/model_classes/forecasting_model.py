@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 import traceback
+import logging
+
+fm_logger = logging.getLogger("forecasting_model")
 
 class forecasting_model(ABC):
     @abstractmethod
@@ -60,6 +63,7 @@ class forecasting_model(ABC):
         Trains the model -> Saves the model -> Get predictions -> 
         Saves predictions -> Calculates error -> Prints summary -> Saves results
         """
+        fm_logger.info("main_workflow called.")
         self.train()
         self.save_model()
         self.forecast()
@@ -72,6 +76,7 @@ class forecasting_model(ABC):
         """
         Trains the model -> Saves the model
         """
+        fm_logger.info("training_workflow called.")
         self.train()
         self.save_model()
     
@@ -80,6 +85,7 @@ class forecasting_model(ABC):
         Loads the model -> Get predictions -> Saves predictions ->
         Calculates error -> Prints summary -> Saves results
         """
+        fm_logger.info("inference_workflow called.")
         self.load_model()
         self.forecast()
         self.save_forecast()
