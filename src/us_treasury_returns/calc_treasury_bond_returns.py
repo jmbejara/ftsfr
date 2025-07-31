@@ -14,6 +14,7 @@ from settings import config
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 DATA_DIR = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "us_treasury_returns"
 
 
 def group_portfolios(bond_returns=None):
