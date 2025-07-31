@@ -266,6 +266,131 @@ greater than the OIS dollar risk-free rate.
 
 Do have access to the data to get this up to the present day?
 
+## He, Kelly, Manela (HKM) Test Portfolios: Options
+
+From the HKM 2017 paper on intermediary asset pricing:
+> For options, we use 54 portfolios of S&P 500 index options sorted on moneyness and maturity from Constantinides, Jackwerth and Savov (2013), 
+> split by contract type (27 call and 27 put portfolios), and starting in 1986. Portfolio returns are leverage-adjusted, meaning that each option 
+> portfolio is combined with the risk-free rate to achieve a targeted market beta of one. According to Constantinides et al. (2013),
+> *The major advantage of this construction is to lower the variance and skewness of the monthly portfolio returns and render the returns close to
+> normal (about as close to normal as the index return), thereby making applicable the standard linear factor pricing methodology*. To keep 
+> the number of portfolios used in our tests similar across asset classes, we reduce the 54 portfolios to 18 portfolios by constructing equal-weighted
+> averages of portfolios that have the same moneyness but different maturity (though our results are essentially unchanged if we use all 54 portfolios separately). 
+
+
+In order to replicate the HKM options portfolio returns, we necessarily needed to construct the 54 portfolios of S&P 500 index options sorted on 9 tiers of moneyness and 3 maturities from Constantinides, Jackwerth and Savov (2013), split by contract type (9 moneyness x 3 maturities = 27 call portfolios, and similarly, 27 put portfolios). HKM take an equal-weighted average over the 3 maturities in CJS 2013, and obtain **54 / 3 = 18 portfolios for the HKM analysis**. 
+
+The original CJS 2013 paper used data from 1986 through 2012 (26 years of data). Due to unavailability of SPX option data from 1985 to 1995, we replicated the data cleaning and portfolio construction process for the 54 portfolios in CJS using data from **January 1996 to December 2019** (23 years). Our dataset (from 1996 to 2019) comprises over 19.2 million rows of SPX options data, and, due to increasing liquidity in the SPX options market over time, our dataset contains significantly more options than the original paper. Portfolio returns are leverage-adjusted, meaning that each option portfolio is combined with the risk-free rate to achieve a targeted market beta of one, as described broadly in CJS 2013. *The spirit of this project is to replicate with the highest practical fidelity the ***process*** of data filtration and portfolio construction in the original CJS and HKM papers, without commenting on the effectiveness or appropriateness of the process and parameters. The idea here is that we provide the logic so the user can apply the same data cleaning and portfolio construction process to any date range of SPX options data.*  
+
+### Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS 2013 and HKM 2017
+
+The construction of the 27 call and 27 put portfolios in CJS is a multi-step process, with the objective of developing portfolio returns series that are stationary and only moderately skewed. Note that the discrete bucketing of moneyness and days to maturity lead to multiple candidate options for each portfolio on each trading day. These options  are given weights according to a **bivariate Gaussian weighting kernel** in moneyness and maturity (bandwidths: *0.0125 in moneyness* and *10 days to maturity*).
+
+Each portfolio's daily returns are initially calculated as simple arithmetic return, assuming the option is bought and sold at its bid-ask midpoint at each rebalancing. The one-day arithmetic return is then converted to a **leverage-adjusted return**. This procedure is achieved by calculating the one-day return of a hypothetical portfolio with $\omega_{BSM}^{-1}$ dollars invested in the option, and $(1 - \omega^{-1})$ dollars invested in the risk-free rate, where $\omega_{BSM}$ is the BSM elasticity based on the implied volatility of the option. 
+
+$$
+\omega_{\text{BSM, Call}} &= \frac{\partial C_{\text{BSM}}}{\partial S} \cdot \frac{S}{C_{\text{BSM}}} > 1 \\
+\omega_{\text{BSM, Put}}  &= \frac{\partial P_{\text{BSM}}}{\partial S} \cdot \frac{S}{P_{\text{BSM}}} < -1
+$$
+
+Each **leverage-adjusted call portfolio** comprises of a long position in a fraction of a call, and some investment in the risk-free rate. 
+
+Each **leverage-adjusted put portfolio** comprises of a short position in a fraction of a put, and >100% investment in the risk-free rate. 
+
+<font color="blue">*While the original paper did not provide this level of detail, for clarity, we present below the mathematics we utilized to implement CJS' portfolio construction process. The following applies for a single trading day $t$, for a set of candidate call or put options. Portfolios in CJS are identified by 3 characteristics: option type (call or put), moneyness (9 discrete targets), and time to maturity (3 discrete targets). On any given day, it is rare to find options that exactly match the moneyness and maturity targets. Instead, there may be multiple options that are "close to" the target moneyness / maturity (each a **"candidate option"**). Furthermore, each candidate option has its own price and price sensitivity to changes in the underlying SPX index level. In order to arrive at a "price" for an option portfolio, CJS applies a **Gaussian weighting kernel** in moneyness and maturity, as described below. This kernel-weighted price across the candidate options on a given day is used as the price of the **option component** of the portfolio (the other component being the risk-free rate). This portfolio is leverage-adjusted using the BSM elasticity, in order to standardize the sensitivity of OTM and ITM portfolios to changes in the underlying.*</font>
+
+#### 1. Gaussian Kernel Weighting
+
+Let:
+
+* $m_{i}$ = moneyness of option $i$
+* $\tau_{i}$ = days to maturity of option $i$
+* $k_{s}$ = target moneyness
+* $\tau$ = target maturity
+* $h_{m}$, $h_{\tau}$ = bandwidths for moneyness and maturity
+* $d_{i}^2 = \left( \frac{m_{i} - k_{s}}{h_{m}} \right)^2 + \left( \frac{\tau_{i} - \tau}{h_{\tau}} \right)^2$
+
+Then the unnormalized Gaussian weight for option $i$ is:
+
+$$
+w_{i}^* = \exp\left( -\frac{1}{2} d_{i}^2 \right)
+$$
+
+The normalized kernel weight:
+
+$$
+w_{i} = \frac{w_{i}^*}{\sum_j w_j^*}
+$$
+
+
+#### 2. Option Elasticity
+
+Let:
+
+* $S_{t}$ = underlying index level at time $t$
+* $P_{i}$ = price of option $i$
+* $\Delta_{i}$ = option delta
+
+Then:
+
+$$
+\varepsilon_{i} = \frac{S_t \cdot \Delta_{i}}{P_{i}}
+$$
+
+
+#### 3. Arithmetic Return of Option $i$
+
+Let:
+
+* $P_{i,t-1}$ = price of option $i$ at time $t-1$
+* $P_{i,t}$ = price of option $i$ at time $t$
+
+Then:
+
+$$
+r_{i} = \frac{P_{i,t} - P_{i,t-1}}{P_{i,t-1}}
+$$
+
+
+#### 4. Leverage-Adjusted Portfolio Construction
+
+Let:
+
+* $r_{f}$ = risk-free rate on day $t$
+
+The leverage-adjusted return of the call portfolio is:
+
+$$
+R_t^{call} = \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 - \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+$$
+
+The leverage-adjusted return of the put portfolio is:
+
+$$
+R_t^{put} = -\sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 + \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+$$
+
+On each trading day, the return of a portfolio is calculated as the <u>weighted average return of the set of candidate options that comprise a single day's option portfolio</u>. The weighting used is the Gaussian kernel weight calculated earlier. Thus the daily return from period $t$ to $t+1$ represents the return from holding a set of candidate options, weighted using the kernel weights as of $t$, from period $t$ to $t+1$. 
+
+#### 5. (to be implemented) Filling NaNs
+CJS implement an multi-step process to deal with options with missing prices (detailed in section **1.3 Portfolio Formation** of the paper). We reserve the implementation this NaN-filling process for a future version of this dataset. For the current version, we compound the daily portfolio returns into monthly returns, which is the final form of the data utilized in the paper.  
+
+#### 6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)
+
+#### 7. Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)
+
+HKM 2017 reduces the 54 portfolio return series constructed in CJS to 18 by taking an equal-weight average across the 3 maturities for the CJS portfolios with the same moneyness. Below we implement that procedure to obtain the final return series for the FTSFA. 
+<br>
+<p align="center">* * *</p>
+
+The final FTFSR data series comprise the monthly leverage-adjusted returns for call and put portfolios for **both** CJS 2013 (54 portfolios) and HKM 2017 (18 portfolios). The format for the unique id for each portfolio is as follows: <br><p align="center"><b>{Call C or Put P flag}\_{moneyness * 1000}\_{maturity in days}</b></p>
+    
+So if we want to retrieve the daily return series of the Call (<b>C</b>) portfolio with moneyness ($\frac{K}{S}$) of 0.90 (x1000 = <b>900</b>), and maturity of <b>30</b> days, the unique id would be the string <b>'C_900_30'</b>. 
+
+
+
+
+
 ## Datasets I've Already Included
 
 - CRSP Returns (with and without dividends)
@@ -283,7 +408,9 @@ The paper would reference data from a few papers. The datasets would mostly be o
     - For **corporate bonds**, we use ten portfolios sorted on yield spreads from Nozawa (2017). These portfolios are based on a comprehensive bond data set combining TRACE, the Lehman bond database, and others, starting in 1973.
 
   - For **sovereign bonds** we use six portfolios from Borri and Verdelhan (2012). These portfolios are based on a twoway sort on a bond's covariance with the US equity market return and the bond's Standard & Poor's credit rating.
-  - **Options:** For options, we use 54 portfolios of S&P 500 index options sorted on moneyness and maturity from Constantinides, Jackwerth and Savov (2013), split by contract type (27 call and 27 put portfolios), and starting in 1986\. Portfolio returns are leverage-adjusted, meaning that each option portfolio is combined with the risk-free rate to achieve a targeted market beta of one.
+  
+
+  
   - For **foreign exchange**, we combine two datasets of currency portfolios to arrive at a total of 12 portfolios. First is the set of six currency portfolios sorted on the interest rate differential from Lettau et al. (2014). Second is the set of six currency portfolios sorted on momentum from Menkhoff, Sarno, Schmeling and Schrimpf (2012).
   - For **commodities**, we use returns to commodity futures from the Commodities Research Bureau. We begin from the list of 31 commodities in Table 1 of Yang (2013). For each commodity, we form an equal-weighted portfolio of all futures contracts with maturities up to four months. These 31 commodities differ in their availability, with some samples only available for a few years. To balance the benefits of a long sample and many commodities, we include in our dataset 23 commodity portfolios with at least 25 years of returns data.
   - For **CDS**, we construct 20 portfolios sorted by spreads using individual name 5-year contracts. The data are from Markit and begin in 2001\. We focus on 5-year CDS for the well known reason that these are the most liquid contracts. Our definition of CDS returns follows Palhares (2013).
