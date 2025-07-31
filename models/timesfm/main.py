@@ -11,10 +11,12 @@ import os
 import traceback
 from collections import defaultdict
 from pathlib import Path
+import logging
 import numpy as np
 import pandas as pd
 from tabulate import tabulate
 from darts import TimeSeries
+import datetime
 import subprocess
 import timesfm
 import sys
@@ -22,10 +24,9 @@ sys.path.append('../')
 from env_reader import env_reader
 
 from model_classes.forecasting_model import forecasting_model
-from model_classes.helper_func import calculate_darts_MASE
+from model_classes.helper_func import *
 
-# TODO: Need to add logging
-# TODO: Make a decorator for error handling
+logger = logging.getLogger("main")
 
 class TimesFMForecasting(forecasting_model):
     def __init__(self,
@@ -36,6 +37,8 @@ class TimesFMForecasting(forecasting_model):
                  data_path,
                  output_path):
         
+        logger.info("TimesFM __init__ called.")
+
         dataset_name = str(os.path.basename(data_path)).split(".")[0]
         dataset_name = dataset_name.removeprefix("ftsfr_")
 
@@ -46,14 +49,23 @@ class TimesFMForecasting(forecasting_model):
         Path(forecast_path).mkdir(parents = True, exist_ok = True)
         forecast_path = forecast_path / "forecasts.parquet"
 
+        logger.info("Created forecast path and required folders if " +\
+                    "they weren't present.")
+
         result_path = output_path / "raw_results" / model_name
         result_path.mkdir(parents = True, exist_ok = True)
         result_path = result_path / str(dataset_name + ".csv")
 
+        logger.info("Created result path and required folders if they " +\
+                    "weren't present.")
+
         df = pd.read_parquet(data_path).rename(columns = {"id" : 'unique_id'})
-        df = df.interpolate(limit_direction = 'both')
+        df, test_split = process_df(df, frequency, seasonality, test_split)
+        df = custom_interpolate(df)
         df = df.sort_values(["unique_id", "ds"])
         df = df.reset_index(drop = True)
+
+        logger.info("Read and processed dataframe.")
 
         test_length = int(test_split * len(df.ds.unique()))
         unique_dates = sorted(np.unique(df["ds"].values))
@@ -73,6 +85,8 @@ class TimesFMForecasting(forecasting_model):
         self.train_series = df[df.ds < unique_dates[-test_length]]
         self.test_series = df[df.ds >= unique_dates[-test_length]]
 
+        logger.info("Generated train and test series.")
+
         # Important variables
         self.seasonality = seasonality
         self.frequency = frequency
@@ -83,37 +97,46 @@ class TimesFMForecasting(forecasting_model):
         else:
             self.model_version = "500m"
         
+        logger.info("Selected: " + self.model_version + ".")
+        
         self.tfm = None
 
         # Error metrics
         self.errors = defaultdict(float)
+
+        logger.info("Setup internal variables.")
 
         print("Object Initialized:")
         print(tabulate([["Model", model_name],
                         ["Dataset", dataset_name],
                         ["Total Entities", len(df["unique_id"].unique())]],
                         tablefmt="fancy_grid"))
+        
+        logger.info("Object fully initialized.")
 
     def train(self):
         # Might repurpose to fine-tuning later
         pass
 
+    @common_error_catch
     def load_model(self):
+        logger.info("Loading model.")
         # Check for an NVIDIA GPU
         try:
             subprocess.check_output("nvidia-smi")
             device = "gpu"
         except Exception:
             device = "cpu"
+        
+        logger.info("Selected device: " + device + ".")
         # Code below adapted from https://pypi.org/project/timesfm/
         # and https://github.com/google-research/timesfm
-        try:
-            if self.model_version == "200m":
-                repo_id = "google/timesfm-1.0-200m-pytorch"
-            else:
-                repo_id = "google/timesfm-2.0-500m-pytorch"
-            # Loading the timesfm-2.0 checkpoint:
-            self.tfm = timesfm.TimesFm(
+        if self.model_version == "200m":
+            repo_id = "google/timesfm-1.0-200m-pytorch"
+        else:
+            repo_id = "google/timesfm-2.0-500m-pytorch"
+        # Loading the timesfm-2.0 checkpoint:
+        self.tfm = timesfm.TimesFm(
             hparams=timesfm.TimesFmHparams(
                 backend=device,
                 per_core_batch_size=32,
@@ -126,84 +149,66 @@ class TimesFMForecasting(forecasting_model):
                 huggingface_repo_id = repo_id
             ),
         )
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in loading {self.model_name}. " +
-                  "Full traceback above \u2191")
-            self.print_sep()
-            return None
 
+        logger.info("Model loaded.")
+
+    @common_error_catch
     def forecast(self):
-        try:
-            df = self.raw_series
-            tfm = self.tfm
-            result = pd.DataFrame(columns = df.columns)
-            for i in range(self.test_length_by_date, 0, -1):
-                curr_date = sorted(np.unique(df["ds"].values))[-i]
-                train_data = df[df.ds < curr_date]
-                forecast_df = tfm.forecast_on_df(
-                            inputs=train_data,
-                            freq=self.frequency,
-                            value_name="y",
-                            num_jobs=-1,
-                        )
-                forecast_df = forecast_df[["unique_id", "ds", "timesfm"]]
-                forecast_df = forecast_df[forecast_df.ds == forecast_df.ds.min()]
-                forecast_df["ds"] = curr_date
-                result = pd.concat([result, forecast_df], ignore_index = True)
-            result = result.drop(["y"], axis = 1)
-            result = result.rename(columns = {"timesfm" : "y"})
-            self.pred_series = result
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} forecasting." +
-                  " Full traceback above \u2191")
-            self.print_sep()
-            return None
+        logger.info("Getting model predictions.")
+        df = self.raw_series
+        tfm = self.tfm
+        result = pd.DataFrame(columns = df.columns)
 
-    
+        logger.info("Starting loop to get sliding window forecasts.")
+
+        for i in range(self.test_length_by_date, 0, -1):
+            curr_date = sorted(np.unique(df["ds"].values))[-i]
+            logger.info("Getting predictions for date: " +\
+            pd.to_datetime(curr_date).strftime("%Y-%m-%d, %r") + ".")
+            train_data = df[df.ds < curr_date]
+            forecast_df = tfm.forecast_on_df(
+                        inputs=train_data,
+                        freq=self.frequency,
+                        value_name="y",
+                        num_jobs=-1,
+                    )
+            logger.info("Got predictions.")
+            forecast_df = forecast_df[["unique_id", "ds", "timesfm"]]
+            forecast_df = forecast_df[forecast_df.ds == forecast_df.ds.min()]
+            forecast_df["ds"] = curr_date
+            result = pd.concat([result, forecast_df], ignore_index = True)
+            logger.info("Processed DataFrame and added to result.")
+        result = result.drop(["y"], axis = 1)
+        result = result.rename(columns = {"timesfm" : "y"})
+        self.pred_series = result
+
+        logger.info("Got all predictions. Processed result "+\
+                    "and updated internal variable.")
+
+    @common_error_catch
     def save_forecast(self):
-        try:
-            self.pred_series.to_parquet(self.forecast_path, engine = "pyarrow")
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in saving {self.model_name} forecasts. " +
-                  "Full traceback above \u2191")
-            self.print_sep()
-            return None
+        self.pred_series.to_parquet(self.forecast_path, engine = "pyarrow")
+        logger.info("Predictions saved to \"" + str(self.forecast_path) + \
+                    "\".")
 
+    @common_error_catch
     def load_forecast(self):
-        try:
-            temp_df = pd.read_parquet(self.forecast_path)
-            self.pred_series = TimeSeries.from_dataframe(temp_df, 
-                                                         time_col = "ds")
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in saving {self.model_name} forecasts. " +
-                  "Full traceback above \u2191")
-            self.print_sep()
-            return None
+        temp_df = pd.read_parquet(self.forecast_path)
+        self.pred_series = TimeSeries.from_dataframe(temp_df, 
+                                                        time_col = "ds")
+        logger.info("Model forecasts loaded from " + self.forecast_path +\
+                       ". Internal variable updated.")
     
     def calculate_error(self, metric = "MASE"):
         if metric == "MASE":
-            try:
-                self.errors["MASE"] = calculate_darts_MASE(self.test_series,
-                                                           self.train_series,
-                                                           self.pred_series,
-                                                           self.seasonality)
-                return self.errors["MASE"]
-            except Exception:
-                self.print_sep()
-                print(traceback.format_exc())
-                print(f"\nError in {self.model_name} MASE calculation. " +
-                      "Full traceback above \u2191")
-                self.print_sep()
-                return None
+            self.errors["MASE"] = calculate_darts_MASE(self.test_series,
+                                                        self.train_series,
+                                                        self.pred_series,
+                                                        self.seasonality)
+            logger.info("MASE = " + str(self.errors["MASE"]) + ".")
+            return self.errors["MASE"]
         else:
+            logger.error("calculate_error called for an unsupported metric.")
             raise ValueError('Metric not supported.')
     
     def print_summary(self):
@@ -216,31 +221,43 @@ class TimesFMForecasting(forecasting_model):
             ["Global MASE", self.errors["MASE"]]
             ], tablefmt="fancy_grid"))
     
+    @common_error_catch
     def save_results(self):
-        try:
-            forecast_res = pd.DataFrame(
-                {
-                    "Model" : [self.model_name],
-                    "Dataset" : [self.dataset_name],
-                    "Entities" : [len(self.raw_series["unique_id"].unique())],
-                    "Frequency" : [self.frequency],
-                    "Seasonality" : [self.seasonality],
-                    "Global MASE" : [self.errors["MASE"]]
-                }
-            )
-            forecast_res.to_csv(self.result_path)
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in saving {self.model_name} results." +
-                  "Full traceback above \u2191")
-            self.print_sep()
-            return None
+
+        forecast_res = pd.DataFrame(
+            {
+                "Model" : [self.model_name],
+                "Dataset" : [self.dataset_name],
+                "Entities" : [len(self.raw_series["unique_id"].unique())],
+                "Frequency" : [self.frequency],
+                "Seasonality" : [self.seasonality],
+                "Global MASE" : [self.errors["MASE"]]
+            }
+        )
+
+        forecast_res.to_csv(self.result_path)
+        logger.info("Saved results to \"" + str(self.result_path) +"\".")
 
 
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
+
+    data_path = env_vars[3]
+
+    dataset_name = str(os.path.basename(data_path)).split(".")[0]
+    dataset_name = dataset_name.removeprefix("ftsfr_")
+
+    log_path = Path().resolve().parent / "model_logs" / "timesfm"
+    Path(log_path).mkdir(parents = True, exist_ok = True)
+    log_path = log_path / (dataset_name + ".log")
+    logging.basicConfig(filename = log_path,
+                        filemode = "w", # Overwrites previously existing logs
+                        format = "%(asctime)s - timesfm - %(name)-12s"+\
+                        " - %(levelname)s - %(message)s",
+                        level = logging.DEBUG)
+
+    logger.info("Running main. Environment variables read.")
     
     timesfm_obj = TimesFMForecasting("500m", *env_vars) # can use "200m"
 

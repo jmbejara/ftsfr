@@ -4,14 +4,17 @@ implemented using darts. Examples include CatBoost, Pooled Regression, and the
 Transformer.
 """
 import traceback
-
 import pandas as pd
 from tabulate import tabulate
+import logging
 
 # from warnings import filterwarnings
 # filterwarnings("ignore")
 
 from .darts_main_class import DartsMain
+from .helper_func import common_error_catch
+
+dg_logger = logging.getLogger("DartsGlobal")
 
 class DartsGlobal(DartsMain):
     def __init__(self,
@@ -26,6 +29,8 @@ class DartsGlobal(DartsMain):
                  interpolation = True,
                  f32 = False):
         
+        dg_logger.info("DartsGlobal object initialized.")
+
         super().__init__(estimator,
                          model_name,
                          test_split,
@@ -37,22 +42,22 @@ class DartsGlobal(DartsMain):
                          interpolation,
                          f32)
         
+        dg_logger.info("DartsGlobal super().__init__() complete.")
+        
         # self.model_path += ".pt"
     
+    @common_error_catch
     def forecast(self):
-        try:
-            start_time = self.test_series.start_time()
-            pred_series = self.model.historical_forecasts(
-                                        series = self.raw_series,
-                                        start = start_time,
-                                        retrain = False)
-            self.pred_series = pred_series
-        except Exception:
-            self.print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {self.model_name} forecasting. Full traceback above \u2191")
-            self.print_sep()
-            return None
+        start_time = self.test_series.start_time()
+        pred_series = self.model.historical_forecasts(
+                                    series = self.raw_series,
+                                    start = start_time,
+                                    retrain = False)
+        self.pred_series = pred_series
+
+        dg_logger.info("DartsGlobal forecast called. "+\
+                       "Predicted series acquired. "+\
+                       "Internal pred_series updated.")
     
     def print_summary(self):
         print(tabulate([
@@ -64,23 +69,17 @@ class DartsGlobal(DartsMain):
             ["Global MASE", self.errors["MASE"]]
             ], tablefmt="fancy_grid"))
     
+    @common_error_catch
     def save_results(self):
-        try:
-            forecast_res = pd.DataFrame(
-                {
-                    "Model" : [self.model_name],
-                    "Dataset" : [self.dataset_name],
-                    "Entities" : [self.train_series.n_components],
-                    "Global MASE" : [self.errors["MASE"]]
-                }
-            )
+        forecast_res = pd.DataFrame(
+            {
+                "Model" : [self.model_name],
+                "Dataset" : [self.dataset_name],
+                "Entities" : [self.train_series.n_components],
+                "Global MASE" : [self.errors["MASE"]]
+            }
+        )
 
-            forecast_res.to_csv(self.result_path)
-        except Exception:
+        forecast_res.to_csv(self.result_path)
 
-            self.print_sep()
-
-            print(traceback.format_exc())
-            print(f"\nError in saving {self.model_name} results. Full traceback above \u2191")
-
-            self.print_sep()
+        dg_logger.info("Results saved to \""+ str(self.result_path) + "\".")

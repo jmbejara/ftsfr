@@ -8,7 +8,7 @@ def env_reader(environment_dict):
     if environment_dict.get("OUTPUT_DIR", None) is not None:
         output_dir = Path(environment_dict["OUTPUT_DIR"])
     else:
-        output_dir = Path().resolve().parent.parent / "_output"
+        output_dir = Path().resolve().parent / "_output"
     if environment_dict.get("TEST_SPLIT", None) is not None:
         # Seasonal mode would instruct the classes to calculate test_split
         # such that the testing data is just the last season of values

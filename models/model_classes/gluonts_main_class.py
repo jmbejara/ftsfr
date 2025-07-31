@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from tabulate import tabulate
+import logging
 
 # Gluonts based imports
 from gluonts.dataset.common import ListDataset
@@ -19,6 +20,8 @@ from gluonts.dataset.pandas import PandasDataset
 
 from .forecasting_model import forecasting_model
 from .helper_func import *
+
+gt_logger = logging.getLogger()
 
 class GluontsMain(forecasting_model):
     def __init__(self,
@@ -30,6 +33,8 @@ class GluontsMain(forecasting_model):
                  data_path,
                  output_path):
         
+        gt_logger.info("GluontsMain __init__ called.")
+
         # This helps with organising
         dataset_name = str(os.path.basename(data_path)).split(".")[0]
         dataset_name = dataset_name.removeprefix("ftsfr_")
@@ -38,15 +43,24 @@ class GluontsMain(forecasting_model):
         model_path = output_path / "models" / model_name / dataset_name
         Path(model_path).mkdir(parents = True, exist_ok = True)
 
+        gt_logger.info("Created model path and its +" + \
+                       "folders if they were missing.")
+
         # Path to save forecasts generated after training the model
         forecast_path = output_path / "forecasts" / model_name / dataset_name
         Path(forecast_path).mkdir(parents = True, exist_ok = True)
         forecast_path = forecast_path / "forecasts.parquet"
 
+        gt_logger.info("Created forecast_path and its "+\
+                       "folders if they were missing.")
+
         # Path to save results which include the error metric
         result_path = output_path / "raw_results" / model_name
         result_path.mkdir(parents = True, exist_ok = True)
         result_path = result_path / str(dataset_name + ".csv")
+
+        gt_logger.info("Created result_path and its "+\
+                       "folders if they were missing.")
 
         # Data pre-processing
         raw_df = pd.read_parquet(data_path)
@@ -56,14 +70,20 @@ class GluontsMain(forecasting_model):
                                         frequency,
                                         seasonality,
                                         test_split)
+        
+        gt_logger.info("Data read and pre-processed.")
+
         # Fills all the np.nans
         raw_df = custom_interpolate(raw_df)
+        gt_logger.info("Data interpolated.")
         # Sorting for consistency
         raw_df = raw_df.sort_values(["unique_id", "ds"])
         # Sorting makes the indices shuffled
         raw_df = raw_df.reset_index(drop = True)
+        gt_logger.info("Sorted values along unique_id and then ds.")
         # Some float and double issues
         raw_df['y'] = raw_df['y'].astype(np.float32)
+        gt_logger.info("Converted target values to np.float32.")
 
         # Unique dates defines the number of entries per entity
         # makes calculating test_length and subsequent splits easier
@@ -77,6 +97,9 @@ class GluontsMain(forecasting_model):
         test_data = raw_df.set_index("ds")
         # Train data for GluonTS with dates as index
         train_data = train_data.set_index("ds")
+
+        gt_logger.info("Created train and test series from DataFrame.")
+
         # Converts to GluonTS format
         test_ds = PandasDataset.from_long_dataframe(test_data,
                                                     target="y",
@@ -84,6 +107,8 @@ class GluontsMain(forecasting_model):
         train_ds = PandasDataset.from_long_dataframe(train_data, 
                                                      target="y", 
                                                      item_id="unique_id")
+
+        gt_logger.info("Converted from DataFrame to PandasDataset.")
         
         # Names
         self.model_name = model_name
@@ -112,28 +137,39 @@ class GluontsMain(forecasting_model):
         # Error metrics
         self.errors = defaultdict(float)
 
+        gt_logger.info("Internal variables set.")
+
         print("Object Initialized:")
         print(tabulate([["Model", model_name],
                         ["Dataset", dataset_name],
                         ["Total Entities", len(raw_df["unique_id"].unique())]],
                         tablefmt="fancy_grid"))
+        
+        gt_logger.info("Object fully initialized.")
 
     def train(self):
+        gt_logger.info("Model training started.")
         self.model = self.model.train(training_data=self.train_series)
+        gt_logger.info("Model trained.")
     
     @common_error_catch
     def save_model(self):
         self.model.serialize(self.model_path)
+        gt_logger.info("Model saved to \"" + str(self.model_path) + "\".")
 
     def load_model(self):
         self.model = Predictor.deserialize(self.model_path)
+        gt_logger.info("Model loaded from \"" + str(self.model_path) + "\".")
 
     def forecast(self):
+        gt_logger.info("Forecasting from model.")
+        
         model = self.model
         test_series = list(self.test_series)
         train_series = list(self.train_series)
         result = []
 
+        gt_logger.info("Loop for sliding window starting.")
         for i in range(len(train_series[0]['target']), 
                        len(test_series[0]['target'])):
             
@@ -143,8 +179,12 @@ class GluontsMain(forecasting_model):
                 temp_dataset.append(m.copy())
                 temp_dataset[-1]['target'] = temp_dataset[-1]['target'][:i]
             
+            gt_logger.info("Temporary dataset created.")
+            
             # Get model predictions for the next timestamp
             temp_pred = list(model.predict(temp_dataset, num_samples = 1))
+
+            gt_logger.info("Generated model predictions.")
 
             # Some models(e.g. wavenet) give SampleForecasts directly 
             # while others(e.g. ffnn) need conversion
@@ -152,6 +192,7 @@ class GluontsMain(forecasting_model):
                 res = map(lambda x: x.to_sample_forecast(1),
                         temp_pred)
                 res = list(res)
+                gt_logger.info("Converted predictions to SampleForecast.")
             else:
                 res = temp_pred
 
@@ -164,18 +205,26 @@ class GluontsMain(forecasting_model):
                 temp[-1].append(j.item_id)
                 temp[-1].append(j.samples.item())
             
+            gt_logger.info("Created list from current predictions.")
+            
             # Stores all the rows
             result += temp
         
         self.pred_series = pd.DataFrame(result, 
                                         columns = ['ds', 'unique_id', 'y'])
+        
+        gt_logger.info("Converted list to DataFrame and updated "+\
+                       "internal variable.")
     
     @common_error_catch
     def save_forecast(self):
         self.pred_series.to_parquet(self.forecast_path)
+        gt_logger.info("Saved forecasts to \"" + str(self.forecast_path) +"\".")
 
     def load_forecast(self):
         self.pred_series = pd.read_parquet(self.forecast_path)
+        gt_logger.info("Loaded forecasts from \"" +\
+                       str(self.forecast_path) +"\".")
     
     def calculate_error(self, metric = "MASE"):
         if metric == "MASE":
@@ -192,8 +241,11 @@ class GluontsMain(forecasting_model):
                                                        self.pred_series,
                                                        self.seasonality)
 
+            gt_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
+
             return self.errors["MASE"]
         else:
+            gt_logger.error("Metric not supported.")
             raise ValueError('Metric not supported.')
     
     def print_summary(self):
@@ -218,3 +270,5 @@ class GluontsMain(forecasting_model):
         )
 
         forecast_res.to_csv(self.result_path)
+
+        gt_logger.info("Saved results to \"" + str(self.result_path) +"\".")

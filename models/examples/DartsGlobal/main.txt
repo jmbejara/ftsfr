@@ -7,6 +7,7 @@ from pathlib import Path
 from warnings import filterwarnings
 filterwarnings("ignore") 
 import os
+import logging
 
 {imports}
 
@@ -15,9 +16,28 @@ sys.path.append('../')
 from env_reader import env_reader
 from model_classes.darts_global_class import DartsGlobal
 
+logger = logging.getLogger("main")
+
 if __name__ == "__main__":
     
     env_vars = env_reader(os.environ)
+
+    data_path = env_vars[3]
+
+    dataset_name = str(os.path.basename(data_path)).split(".")[0]
+    dataset_name = dataset_name.removeprefix("ftsfr_")
+
+    # Sets up logging for this model - dataset pair
+    log_path = Path().resolve().parent / "model_logs" / "{obj_name}"
+    Path(log_path).mkdir(parents = True, exist_ok = True)
+    log_path = log_path / (dataset_name + ".log")
+    logging.basicConfig(filename = log_path,
+                        filemode = "w", # Overwrites previously existing logs
+                        format = "%(asctime)s - {obj_name} - %(name)-12s"+\
+                        " - %(levelname)s - %(message)s",
+                        level = logging.DEBUG)
+
+    logger.info("Running main. Environment variables read.")
 
     {obj_name}_obj = DartsGlobal({estimator_func},
                             "{obj_name}",
