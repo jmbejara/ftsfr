@@ -15,21 +15,26 @@ from settings import config
 DATA_DIR = config("DATA_DIR")
 DATA_DIR = DATA_DIR
 
-he_kelly_manela_factors_monthly = pull_he_kelly_manela.load_he_kelly_manela_factors_monthly(data_dir=DATA_DIR)
-he_kelly_manela_factors_daily = pull_he_kelly_manela.load_he_kelly_manela_factors_daily(data_dir=DATA_DIR)
+he_kelly_manela_factors_monthly = (
+    pull_he_kelly_manela.load_he_kelly_manela_factors_monthly(data_dir=DATA_DIR)
+)
+he_kelly_manela_factors_daily = pull_he_kelly_manela.load_he_kelly_manela_factors_daily(
+    data_dir=DATA_DIR
+)
 he_kelly_manela_all = pull_he_kelly_manela.load_he_kelly_manela_all(data_dir=DATA_DIR)
+
 
 def convert_intermediary_to_long_format(df):
     """
     Convert intermediary columns from wide to long format.
-    
+
     Parameters:
     -----------
     df : pd.DataFrame
-        DataFrame with columns: date, intermediary_capital_ratio, 
-        intermediary_capital_risk_factor, intermediary_value_weighted_investment_return, 
+        DataFrame with columns: date, intermediary_capital_ratio,
+        intermediary_capital_risk_factor, intermediary_value_weighted_investment_return,
         intermediary_leverage_ratio_squared
-    
+
     Returns:
     --------
     pd.DataFrame
@@ -38,37 +43,43 @@ def convert_intermediary_to_long_format(df):
     """
     # Define the columns to convert to long format
     value_columns = [
-        'intermediary_capital_ratio',
-        'intermediary_capital_risk_factor', 
-        'intermediary_value_weighted_investment_return',
-        'intermediary_leverage_ratio_squared'
+        "intermediary_capital_ratio",
+        "intermediary_capital_risk_factor",
+        "intermediary_value_weighted_investment_return",
+        "intermediary_leverage_ratio_squared",
     ]
-    
+
     # Use pandas melt to convert from wide to long format
     long_df = df.melt(
-        id_vars=['date'],
-        value_vars=value_columns,
-        var_name='unique_id',
-        value_name='y'
+        id_vars=["date"], value_vars=value_columns, var_name="unique_id", value_name="y"
     )
-    
+
     # Rename date column to ds to match the project convention
-    long_df = long_df.rename(columns={'date': 'ds'})
-    
+    long_df = long_df.rename(columns={"date": "ds"})
+
     # Reorder columns to match the project convention
-    long_df = long_df[['unique_id', 'ds', 'y']]
-    
+    long_df = long_df[["unique_id", "ds", "y"]]
+
     # Drop NaN values from y column
-    long_df = long_df.dropna(subset=['y'])
-    
+    long_df = long_df.dropna(subset=["y"])
+
     return long_df
 
-he_kelly_manela_factors_monthly = convert_intermediary_to_long_format(he_kelly_manela_factors_monthly)
-he_kelly_manela_factors_daily = convert_intermediary_to_long_format(he_kelly_manela_factors_daily)
+
+he_kelly_manela_factors_monthly = convert_intermediary_to_long_format(
+    he_kelly_manela_factors_monthly
+)
+he_kelly_manela_factors_daily = convert_intermediary_to_long_format(
+    he_kelly_manela_factors_daily
+)
 he_kelly_manela_all = convert_intermediary_to_long_format(he_kelly_manela_all)
 
 
 # Save the datasets
-he_kelly_manela_factors_monthly.to_parquet(DATA_DIR / "ftsfr_he_kelly_manela_factors_monthly.parquet")
-he_kelly_manela_factors_daily.to_parquet(DATA_DIR / "ftsfr_he_kelly_manela_factors_daily.parquet")
+he_kelly_manela_factors_monthly.to_parquet(
+    DATA_DIR / "ftsfr_he_kelly_manela_factors_monthly.parquet"
+)
+he_kelly_manela_factors_daily.to_parquet(
+    DATA_DIR / "ftsfr_he_kelly_manela_factors_daily.parquet"
+)
 he_kelly_manela_all.to_parquet(DATA_DIR / "ftsfr_he_kelly_manela_all.parquet")

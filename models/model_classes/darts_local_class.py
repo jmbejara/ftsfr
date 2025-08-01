@@ -1,7 +1,8 @@
 """
-The DartsLocal class is specifically designed for Global forecasting models 
+The DartsLocal class is specifically designed for Global forecasting models
 implemented using darts. Examples include ARIMA, TBATS, ETS, and Theta.
 """
+
 import statistics
 import traceback
 
@@ -20,30 +21,34 @@ from .helper_func import common_error_catch
 
 dl_logger = logging.getLogger("DartsLocal")
 
+
 class DartsLocal(DartsMain):
-    def __init__(self,
-                 estimator,
-                 model_name,
-                 test_split,
-                 frequency,
-                 seasonality,
-                 data_path,
-                 output_path,
-                 scaling = False,
-                 interpolation = False):
-        
+    def __init__(
+        self,
+        estimator,
+        model_name,
+        test_split,
+        frequency,
+        seasonality,
+        data_path,
+        output_path,
+        scaling=False,
+        interpolation=False,
+    ):
         dl_logger.info("DartsLocal object initialized.")
 
-        super().__init__(estimator,
-                         model_name,
-                         test_split,
-                         frequency,
-                         seasonality,
-                         data_path,
-                         output_path,
-                         scaling,
-                         interpolation)
-        
+        super().__init__(
+            estimator,
+            model_name,
+            test_split,
+            frequency,
+            seasonality,
+            data_path,
+            output_path,
+            scaling,
+            interpolation,
+        )
+
         dl_logger.info("DartsLocal super().__init__() complete.")
 
         self.median_mase = np.nan
@@ -51,7 +56,7 @@ class DartsLocal(DartsMain):
         self.model_path += ".pkl"
 
         dl_logger.info("DartsLocal internal variables set.")
-    
+
     @common_error_catch
     def forecast_workflow(self):
         """
@@ -65,13 +70,15 @@ class DartsLocal(DartsMain):
             3. Update internal variables and split into train and test
             4. Train -> Forecast -> Calculate error
             5. Update internal model to untrained version
-        
+
         Step 2
         ------
         Calculates mean and median MASE, and updates internal variables.
         """
-        dl_logger.info("forecast_workflow called. Predictions made for each "+\
-                       "entity separately.")
+        dl_logger.info(
+            "forecast_workflow called. Predictions made for each "
+            + "entity separately."
+        )
         raw_series = self.raw_series.copy()
         auto_mode = False
         # Training on each entity and calculating MASE
@@ -81,7 +88,7 @@ class DartsLocal(DartsMain):
             dl_logger.info("Processing id: " + id + ".")
             # Select the date and the column for current id
             entity_data = raw_series[[id]].copy()
-            # Removing leading/trailing NaNs which show up due to different 
+            # Removing leading/trailing NaNs which show up due to different
             # start times of different series
             entity_data = entity_data.strip()
             entity_data = fill_missing_values(entity_data)
@@ -91,7 +98,7 @@ class DartsLocal(DartsMain):
             if len(entity_data) <= 10:
                 dl_logger.info("Data too small, so skipped.")
                 continue
-            
+
             self.raw_series = entity_data
 
             # Updates internal train and test series
@@ -116,38 +123,44 @@ class DartsLocal(DartsMain):
         else:
             self.errors["MASE"] = np.nan
             self.median_mase = np.nan
-        
-        dl_logger.info(f"Mean MASE: {self.errors['MASE']} | "+\
-                        "Median MASE: {self.median_mase}")
-    
+
+        dl_logger.info(
+            f"Mean MASE: {self.errors['MASE']} | " + "Median MASE: {self.median_mase}"
+        )
+
     def main_workflow(self):
         dl_logger.info("main_workflow called.")
         self.forecast_workflow()
         self.print_summary()
         self.save_results()
-    
+
     def print_summary(self):
         dl_logger.info("print_summary called.")
-        print(tabulate([
-            ["Model", self.model_name],
-            ["Dataset", self.dataset_name],
-            ["Entities", len(self.mase_list)],
-            ["Frequency", self.frequency],
-            ["Seasonality", self.seasonality],
-            ["Median MASE", self.median_mase],
-            ["Mean MASE", self.errors["MASE"]]
-            ], tablefmt="fancy_grid"))
-    
+        print(
+            tabulate(
+                [
+                    ["Model", self.model_name],
+                    ["Dataset", self.dataset_name],
+                    ["Entities", len(self.mase_list)],
+                    ["Frequency", self.frequency],
+                    ["Seasonality", self.seasonality],
+                    ["Median MASE", self.median_mase],
+                    ["Mean MASE", self.errors["MASE"]],
+                ],
+                tablefmt="fancy_grid",
+            )
+        )
+
     @common_error_catch
     def save_results(self):
         forecast_res = pd.DataFrame(
             {
-                "Model" : [self.model_name],
-                "Dataset" : [self.dataset_name],
-                "Entities" : [len(self.mase_list)],
-                "Seasonality" : [self.seasonality],
-                "Median_MASE" : [self.median_mase],
-                "Mean_MASE" : [self.errors["MASE"]]
+                "Model": [self.model_name],
+                "Dataset": [self.dataset_name],
+                "Entities": [len(self.mase_list)],
+                "Seasonality": [self.seasonality],
+                "Median_MASE": [self.median_mase],
+                "Mean_MASE": [self.errors["MASE"]],
             }
         )
 

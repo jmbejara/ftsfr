@@ -5,14 +5,18 @@ This file contains all tasks related to:
 - Running forecasting models on datasets
 - Checking for required data files before running
 """
+
 import sys
 from pathlib import Path
 from doit.action import CmdAction
 
 # Import common utilities
 from dodo_common import (
-    DATA_DIR, OUTPUT_DIR, PIXI_EXECUTABLE,
-    load_config, load_all_module_requirements
+    DATA_DIR,
+    OUTPUT_DIR,
+    PIXI_EXECUTABLE,
+    load_config,
+    load_all_module_requirements,
 )
 from dependency_tracker import get_available_datasets, get_format_task_name
 
@@ -33,12 +37,12 @@ for module_name, required_sources in module_requirements_dict.items():
 def check_required_files():
     """Check if required data files exist before running forecasts"""
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
-    
+
     missing_files = []
     for dataset_name, dataset_info in available_datasets.items():
         if not dataset_info["path"].exists():
             missing_files.append(str(dataset_info["path"]))
-    
+
     if missing_files:
         print("\nWarning: The following required data files are missing:")
         for f in missing_files:
@@ -49,10 +53,10 @@ def check_required_files():
 
 def task_forecast():
     """Generate forecast tasks for each combination of model and dataset."""
-    
+
     # Check for required files at task generation time
     check_required_files()
-    
+
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
 
     for model in models_activated:
@@ -60,7 +64,7 @@ def task_forecast():
             # Skip if the dataset file doesn't exist
             if not dataset_info["path"].exists():
                 continue
-                
+
             yield {
                 "name": f"{model}:{dataset_name}",
                 "actions": [

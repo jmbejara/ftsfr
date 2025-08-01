@@ -51,58 +51,58 @@ def process_cb_spread(df):
 
     return df
 
+
 def output_cb_final_products(df):
-    '''
-        INPUT is from previous function
-    
-        df: dataframe with par spread values merged into all values where there was a possible cubic spline
-            'cusip', -- cusip of the entire bond issue, unique bond identifier
-            'date', -- reporting date
-            'mat_days', -- days till maturity
-            BOND_YIELD, -- MMN adjusted bond yield
-            'CS', -- credit spread
-                'size_ig', -- 0 if no ig bonds in portfolio, 1 if yes
-                'size_jk', -- 0 if no junk bonds in portfolio, 1 if yes
-            'par_spread', -- parspread of CDS, backed out by Cubic Spline
-        additional columns:
-        FR: Z-spread of the bond
-            FR = CS column
-        CB: implied return on CDS-bond spread
-            CB = par_spread - FR
-        rfr: implied risk free rate
-            rfr = (BOND_YIELD - CS) - CB
-        contain_rating: if it has IG or Junk bonds
-            0 if it contains Junk
-            1 if it contains IG
-        c_rating: IG, Junk, or combo
-            0 if it only contains Junk
-            1 if it only contains IG
-            2 if it contains both
+    """
+    INPUT is from previous function
 
-        output: 
-            agg_df: aggregated dataframe where data is combined
-                date: date of the aggregated collection
-                c_rating: IG, Junk, or combo
-                    0 if it only contains Junk
-                    1 if it only contains IG
-                    2 if it contains both
-                rfr: implied risk free rate
-                    desired value from stat arbitrage
-            non_agg_df: non aggregated dataframe, keeping individual bond issue
-                date: date of bond data
-                cusip: cusip of the entire bond issue, unique bond identifier
-                rfr: implied risk free rate
-                    desired value from stat arbitrage
+    df: dataframe with par spread values merged into all values where there was a possible cubic spline
+        'cusip', -- cusip of the entire bond issue, unique bond identifier
+        'date', -- reporting date
+        'mat_days', -- days till maturity
+        BOND_YIELD, -- MMN adjusted bond yield
+        'CS', -- credit spread
+            'size_ig', -- 0 if no ig bonds in portfolio, 1 if yes
+            'size_jk', -- 0 if no junk bonds in portfolio, 1 if yes
+        'par_spread', -- parspread of CDS, backed out by Cubic Spline
+    additional columns:
+    FR: Z-spread of the bond
+        FR = CS column
+    CB: implied return on CDS-bond spread
+        CB = par_spread - FR
+    rfr: implied risk free rate
+        rfr = (BOND_YIELD - CS) - CB
+    contain_rating: if it has IG or Junk bonds
+        0 if it contains Junk
+        1 if it contains IG
+    c_rating: IG, Junk, or combo
+        0 if it only contains Junk
+        1 if it only contains IG
+        2 if it contains both
 
-    '''
+    output:
+        agg_df: aggregated dataframe where data is combined
+            date: date of the aggregated collection
+            c_rating: IG, Junk, or combo
+                0 if it only contains Junk
+                1 if it only contains IG
+                2 if it contains both
+            rfr: implied risk free rate
+                desired value from stat arbitrage
+        non_agg_df: non aggregated dataframe, keeping individual bond issue
+            date: date of bond data
+            cusip: cusip of the entire bond issue, unique bond identifier
+            rfr: implied risk free rate
+                desired value from stat arbitrage
+
+    """
     # outliers were removed so aggregation should be ok
-    agg_df = df[['c_rating', 'date', 'rfr']].groupby('c_rating').mean().reset_index()
+    agg_df = df[["c_rating", "date", "rfr"]].groupby("c_rating").mean().reset_index()
 
     # no grouping or aggregation here
-    non_agg_df = df[['cusip', 'date', 'rfr']]
+    non_agg_df = df[["cusip", "date", "rfr"]]
 
     return agg_df, non_agg_df
-
 
 
 def generate_graph(df, col="rfr", col2=None, two=False):

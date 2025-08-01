@@ -50,7 +50,7 @@ for file in results_files:
     filename = file.stem  # removes .csv
     # Remove the _results suffix
     name_without_results = filename.rsplit("_results", 1)[0]
-    
+
     # Find which model this file belongs to by checking which model name is a prefix
     model_name = None
     dataset_name = None
@@ -58,9 +58,9 @@ for file in results_files:
         if name_without_results.startswith(model + "_"):
             model_name = model
             # The dataset name is everything after the model name and underscore
-            dataset_name = name_without_results[len(model) + 1:]
+            dataset_name = name_without_results[len(model) + 1 :]
             break
-    
+
     if model_name and dataset_name:
         df["model"] = model_name
         df["dataset"] = dataset_name

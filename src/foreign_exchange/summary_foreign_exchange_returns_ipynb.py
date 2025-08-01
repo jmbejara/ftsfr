@@ -1,14 +1,14 @@
 # %%
 
-'''
+"""
 
 # Foreign Exchange Daily Returns Series
 
-We are generating a Daily Returns Time Series for FX investing. 
+We are generating a Daily Returns Time Series for FX investing.
 
 ## Data Sources
 
-Bloomberg is used to pull all of the data necessary for building this returns series. We will be using FX spot rates and interest rates (get specific pull data for this later). 
+Bloomberg is used to pull all of the data necessary for building this returns series. We will be using FX spot rates and interest rates (get specific pull data for this later).
 
 ## Methodology
 
@@ -22,9 +22,9 @@ where
 - $fret$ is the return of the foreign currency when invested in their overnight repo market
 - $spot$ is the spot price of the currency (**how much 1 USD is worth in the foreign currency**)
 
-We are replicating a process where we convert our USD into the foreign currency $i$ at end of day $t - 1$, invest it in the repo market, then switch the currency back to USD on day $t$. 
+We are replicating a process where we convert our USD into the foreign currency $i$ at end of day $t - 1$, invest it in the repo market, then switch the currency back to USD on day $t$.
 
-'''
+"""
 
 # %%
 import pandas as pd
@@ -55,13 +55,13 @@ currency_list = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK", "USD"]
 
 # %%
 
-'''
+"""
 ## FX raw data
 
 The FX data we see is pulled from Bloomberg, then aggregated for consistent naming.
 - CUR_spot is the spot price of the currency (how much 1 USD is worth in the foreign currency CUR)
 - CUR_ir is the interest rate of CUR
-'''
+"""
 
 # %%
 
@@ -81,11 +81,11 @@ fx_data.info()
 
 # %%
 
-'''
+"""
 # Implied Daily Returns Time Series
 
 Through the *methodology* described above, we then calculate the implied daily returns on foreign currency invesment.
-'''
+"""
 
 # %%
 
@@ -109,11 +109,11 @@ impl_fx_ret.info()
 
 # %%
 
-'''
+"""
 ## Currency Groupings 
 
 We will graph how certain currencies compare based upon regional breakdowns and other categories.
-'''
+"""
 
 # %%
 
@@ -142,4 +142,3 @@ graph_fx_returns(impl_fx_ret, oceania_currencies, "Oceania Currencies")
 # %%
 
 graph_fx_returns(impl_fx_ret, can_currencies, "North American Currencies")
-

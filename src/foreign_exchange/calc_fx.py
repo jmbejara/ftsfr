@@ -174,8 +174,6 @@ def implied_daily_fx_returns(fx_data, currency_list):
     return fx_df
 
 
-
-
 def graph_fx_returns(fx_df, currency_list, region_name):
     """
     Graphs the FX returns for a set of currencies in a given region.
@@ -194,8 +192,8 @@ def graph_fx_returns(fx_df, currency_list, region_name):
     fx_df[ret_list].plot(ax=ax, title=f"Annualized Daily Returns of {region_name}")
 
     # Move legend to the right side
-    ax.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
-    
+    ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
+
     plt.tight_layout()
     plt.show()
 
@@ -237,9 +235,6 @@ def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
     # Shorten column names for display
 
     return df_merged
-
-
-
 
 
 if __name__ == "__main__":

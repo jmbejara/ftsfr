@@ -37,26 +37,24 @@ def load_futcal(data_dir=DATA_DIR):
     path = data_dir / "dsfutcalcserval.parquet"
     return pd.read_parquet(path)
 
-def load_gsci_data(data_dir = DATA_DIR):
+
+def load_gsci_data(data_dir=DATA_DIR):
     df = pd.read_parquet("gsci_indices.parquet")
     df["Date"] = pd.to_datetime(df["index"])
     df = df.sort_values("Date")
-    df = df.drop(columns = "index")
+    df = df.drop(columns="index")
 
-    df_monthly = df.groupby(df['Date'].dt.to_period('M')).last().reset_index(drop=True)
-    index_cols = [col for col in df_monthly.columns if col.endswith('_PX_LAST')]
+    df_monthly = df.groupby(df["Date"].dt.to_period("M")).last().reset_index(drop=True)
+    index_cols = [col for col in df_monthly.columns if col.endswith("_PX_LAST")]
 
     for col in index_cols:
-        df_monthly[col + '_Return'] = df_monthly[col].pct_change()
+        df_monthly[col + "_Return"] = df_monthly[col].pct_change()
 
-    df_monthly['yyyymm'] = df_monthly['Date'].dt.strftime('%Y%m')
-    df_return = df_monthly.drop(columns = index_cols).set_index("yyyymm")
+    df_monthly["yyyymm"] = df_monthly["Date"].dt.strftime("%Y%m")
+    df_return = df_monthly.drop(columns=index_cols).set_index("yyyymm")
 
-    return df_return 
+    return df_return
+
 
 def load_commodities_future():
     df = pd.read_parquet("commodities_f")
-
-
-
-

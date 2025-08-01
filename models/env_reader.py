@@ -1,7 +1,7 @@
 from pathlib import Path
 
-def env_reader(environment_dict):
 
+def env_reader(environment_dict):
     dataset_path = Path(environment_dict["DATASET_PATH"])
     frequency = environment_dict["FREQUENCY"]
     seasonality = int(environment_dict["SEASONALITY"])
@@ -21,5 +21,5 @@ def env_reader(environment_dict):
                 raise ValueError("Test split can't be greater than 1.")
     else:
         test_split = 0.2
-    
+
     return (test_split, frequency, seasonality, dataset_path, output_dir)

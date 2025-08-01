@@ -1,6 +1,7 @@
 """
 Common utilities and configuration shared across all dodo files.
 """
+
 import sys
 from pathlib import Path
 import shutil
@@ -34,16 +35,20 @@ if not PIXI_EXECUTABLE:
 def jupyter_execute_notebook(notebook_path):
     return f"jupyter nbconvert --execute --to notebook --ClearMetadataPreprocessor.enabled=True --inplace {notebook_path}"
 
+
 def jupyter_to_html(notebook_path, output_dir=OUTPUT_DIR):
     return f"jupyter nbconvert --to html --output-dir={output_dir} {notebook_path}"
+
 
 def jupyter_to_md(notebook_path, output_dir=OUTPUT_DIR):
     """Requires jupytext"""
     return f"jupytext --to markdown --output-dir={output_dir} {notebook_path}"
 
+
 def jupyter_to_python(notebook_path, notebook, build_dir):
     """Convert a notebook to a python script"""
     return f"jupyter nbconvert --to python {notebook_path} --output _{notebook}.py --output-dir {build_dir}"
+
 
 def jupyter_clear_output(notebook_path):
     """Clear the output of a notebook"""
@@ -152,11 +157,11 @@ def notebook_subtask(task_config):
 
     # For .py sources, clear outputs before moving; for .ipynb sources, after copying
     clear_output_action = (
-        jupyter_clear_output(working_notebook) 
-        if source_path.suffix == ".ipynb" 
+        jupyter_clear_output(working_notebook)
+        if source_path.suffix == ".ipynb"
         else "echo 'Skipping output clear for .py source'"
     )
-    
+
     yield {
         "name": name,
         "actions": [

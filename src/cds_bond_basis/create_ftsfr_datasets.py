@@ -24,7 +24,6 @@ CDS_FILE_NAME = (
 ## Calculate cds_basis
 
 
-
 corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
 red_data = pd.read_parquet(f"{DATA_DIR}/{RED_CODE_FILE_NAME}")
 cds_data = pd.read_parquet(f"{DATA_DIR}/{CDS_FILE_NAME}")
@@ -38,11 +37,10 @@ df_all = process_final_product.process_cb_spread(final_data)
 agg_df, non_agg_df = process_final_product.output_cb_final_products(df_all)
 
 df_stacked = agg_df.stack().reset_index()
-df_stacked.columns = ['unique_id', 'ds', 'y']
+df_stacked.columns = ["unique_id", "ds", "y"]
 
 df_stacked2 = non_agg_df.stack().reset_index()
-df_stacked2.columns = ['unique_id', 'ds', 'y']
+df_stacked2.columns = ["unique_id", "ds", "y"]
 
 df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_aggregated.parquet")
 df_stacked2.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_non_aggregated.parquet")
-

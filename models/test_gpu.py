@@ -7,7 +7,7 @@ Run this to verify GPU support before running models.
 Usage:
     # Test all frameworks
     python test_gpu.py
-    
+
     # Test specific framework
     python test_gpu.py --framework torch
 """
@@ -22,13 +22,13 @@ def test_nvidia_smi():
     """Test if nvidia-smi is available (basic GPU check)."""
     print("Testing nvidia-smi...")
     try:
-        result = subprocess.run(['nvidia-smi'], capture_output=True, text=True)
+        result = subprocess.run(["nvidia-smi"], capture_output=True, text=True)
         if result.returncode == 0:
             print("✓ nvidia-smi detected GPU(s)")
             # Parse output to show GPU info
-            lines = result.stdout.split('\n')
+            lines = result.stdout.split("\n")
             for line in lines:
-                if 'NVIDIA' in line and 'Driver' in line:
+                if "NVIDIA" in line and "Driver" in line:
                     print(f"  {line.strip()}")
             return True
         else:
@@ -46,11 +46,11 @@ def test_cuda():
     """Test CUDA availability."""
     print("\nTesting CUDA...")
     try:
-        result = subprocess.run(['nvcc', '--version'], capture_output=True, text=True)
+        result = subprocess.run(["nvcc", "--version"], capture_output=True, text=True)
         if result.returncode == 0:
             # Extract CUDA version
-            for line in result.stdout.split('\n'):
-                if 'release' in line:
+            for line in result.stdout.split("\n"):
+                if "release" in line:
                     print(f"✓ CUDA detected: {line.strip()}")
                     return True
         else:
@@ -69,17 +69,17 @@ def test_torch_gpu():
     print("\nTesting PyTorch GPU support...")
     try:
         import torch
-        
+
         cuda_available = torch.cuda.is_available()
         print(f"✓ PyTorch imported successfully")
         print(f"  CUDA available: {cuda_available}")
-        
+
         if cuda_available:
             print(f"  CUDA device count: {torch.cuda.device_count()}")
             for i in range(torch.cuda.device_count()):
                 print(f"  GPU {i}: {torch.cuda.get_device_name(i)}")
             print(f"  Current CUDA device: {torch.cuda.current_device()}")
-            
+
             # Test tensor creation
             try:
                 x = torch.tensor([1.0, 2.0, 3.0]).cuda()
@@ -91,7 +91,7 @@ def test_torch_gpu():
         else:
             print("  ✗ CUDA not available in PyTorch")
             return False
-            
+
     except ImportError:
         print("✗ PyTorch not installed")
         print("  Install with: pip install torch")
@@ -107,13 +107,13 @@ def test_lightning_gpu():
     try:
         from lightning.pytorch.accelerators import find_usable_cuda_devices
         from pytorch_lightning.accelerators.cuda import CUDAAccelerator
-        
+
         print("✓ PyTorch Lightning imported successfully")
-        
+
         # Check if CUDA accelerator is available
         cuda_available = CUDAAccelerator.is_available()
         print(f"  CUDA Accelerator available: {cuda_available}")
-        
+
         if cuda_available:
             # Find usable CUDA devices
             try:
@@ -126,7 +126,7 @@ def test_lightning_gpu():
         else:
             print("  ✗ CUDA Accelerator not available")
             return False
-            
+
     except ImportError:
         print("✗ PyTorch Lightning not installed")
         print("  Install with: pip install lightning")
@@ -141,21 +141,21 @@ def test_tensorflow_gpu():
     print("\nTesting TensorFlow GPU support...")
     try:
         import tensorflow as tf
-        
+
         print("✓ TensorFlow imported successfully")
         print(f"  TensorFlow version: {tf.__version__}")
-        
+
         # List physical devices
-        gpus = tf.config.list_physical_devices('GPU')
+        gpus = tf.config.list_physical_devices("GPU")
         print(f"  GPU devices found: {len(gpus)}")
-        
+
         if gpus:
             for i, gpu in enumerate(gpus):
                 print(f"  GPU {i}: {gpu}")
-            
+
             # Test tensor creation
             try:
-                with tf.device('/GPU:0'):
+                with tf.device("/GPU:0"):
                     a = tf.constant([[1.0, 2.0], [3.0, 4.0]])
                     b = tf.constant([[1.0, 1.0], [0.0, 1.0]])
                     c = tf.matmul(a, b)
@@ -167,7 +167,7 @@ def test_tensorflow_gpu():
         else:
             print("  ✗ No GPU devices found")
             return False
-            
+
     except ImportError:
         print("✗ TensorFlow not installed")
         print("  Install with: pip install tensorflow")
@@ -179,62 +179,64 @@ def test_tensorflow_gpu():
 
 def print_summary(results):
     """Print summary of GPU test results."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("GPU TEST SUMMARY")
-    print("="*60)
-    
+    print("=" * 60)
+
     all_passed = all(results.values())
-    
+
     for test, passed in results.items():
         status = "✓ PASSED" if passed else "✗ FAILED"
         print(f"{test:.<45} {status}")
-    
+
     print("\nOverall Status:", "✓ GPU READY" if all_passed else "⚠ GPU ISSUES DETECTED")
-    
+
     if not all_passed:
         print("\nRecommendations:")
-        if not results.get('nvidia-smi', False):
+        if not results.get("nvidia-smi", False):
             print("- Install NVIDIA drivers")
-        if not results.get('cuda', False):
+        if not results.get("cuda", False):
             print("- Install CUDA toolkit")
-        if not results.get('torch', False):
+        if not results.get("torch", False):
             print("- Install PyTorch with CUDA support")
             print("  Visit: https://pytorch.org/get-started/locally/")
-        if not results.get('lightning', False) and results.get('torch', False):
+        if not results.get("lightning", False) and results.get("torch", False):
             print("- Install PyTorch Lightning: pip install lightning")
-        if not results.get('tensorflow', False):
+        if not results.get("tensorflow", False):
             print("- Install TensorFlow with GPU support if using GluonTS/TimesFM")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Test GPU availability for forecasting models")
+    parser = argparse.ArgumentParser(
+        description="Test GPU availability for forecasting models"
+    )
     parser.add_argument(
         "--framework",
         choices=["all", "torch", "tensorflow", "cuda"],
         default="all",
-        help="Which framework to test (default: all)"
+        help="Which framework to test (default: all)",
     )
-    
+
     args = parser.parse_args()
-    
+
     print("GPU Availability Test for Forecasting Models")
     print("=" * 60)
-    
+
     results = {}
-    
+
     # Always test basic GPU availability
-    results['nvidia-smi'] = test_nvidia_smi()
-    results['cuda'] = test_cuda()
-    
+    results["nvidia-smi"] = test_nvidia_smi()
+    results["cuda"] = test_cuda()
+
     if args.framework in ["all", "torch"]:
-        results['torch'] = test_torch_gpu()
-        results['lightning'] = test_lightning_gpu()
-    
+        results["torch"] = test_torch_gpu()
+        results["lightning"] = test_lightning_gpu()
+
     if args.framework in ["all", "tensorflow"]:
-        results['tensorflow'] = test_tensorflow_gpu()
-    
+        results["tensorflow"] = test_tensorflow_gpu()
+
     print_summary(results)
-    
+
     # Return non-zero exit code if any test failed
     sys.exit(0 if all(results.values()) else 1)
 

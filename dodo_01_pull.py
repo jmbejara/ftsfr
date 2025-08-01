@@ -7,14 +7,19 @@ This file contains all tasks related to:
 - Creating data glimpses
 - Building documentation
 """
+
 import sys
 from pathlib import Path
 
 # Import common utilities
 from dodo_common import (
-    DATA_DIR, OUTPUT_DIR, OS_TYPE,
-    notebook_subtask, copy_dir_contents_to_folder,
-    load_config, load_all_module_requirements
+    DATA_DIR,
+    OUTPUT_DIR,
+    OS_TYPE,
+    notebook_subtask,
+    copy_dir_contents_to_folder,
+    load_config,
+    load_all_module_requirements,
 )
 
 # Load configuration
@@ -457,7 +462,7 @@ def task_format():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/calc_corp_bond_returns.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "corp_bond_portfolio_returns.parquet",
@@ -534,7 +539,9 @@ def task_format():
                 f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
             ],
             "targets": [
-                DATA_DIR / data_module / "ftsfr_he_kelly_manela_factors_monthly.parquet",
+                DATA_DIR
+                / data_module
+                / "ftsfr_he_kelly_manela_factors_monthly.parquet",
                 DATA_DIR / data_module / "ftsfr_he_kelly_manela_factors_daily.parquet",
                 DATA_DIR / data_module / "ftsfr_he_kelly_manela_all.parquet",
             ],
@@ -552,9 +559,15 @@ def task_format():
                 f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
             ],
             "targets": [
-                DATA_DIR / data_module / "ftsfr_french_portfolios_25_daily_size_and_bm.parquet",
-                DATA_DIR / data_module / "ftsfr_french_portfolios_25_daily_size_and_op.parquet",
-                DATA_DIR / data_module / "ftsfr_french_portfolios_25_daily_size_and_inv.parquet",
+                DATA_DIR
+                / data_module
+                / "ftsfr_french_portfolios_25_daily_size_and_bm.parquet",
+                DATA_DIR
+                / data_module
+                / "ftsfr_french_portfolios_25_daily_size_and_op.parquet",
+                DATA_DIR
+                / data_module
+                / "ftsfr_french_portfolios_25_daily_size_and_inv.parquet",
             ],
             "file_dep": [f"./src/{data_module}/create_ftsfr_datasets.py"],
             "clean": [],
@@ -609,8 +622,12 @@ def task_format():
                     "./src/options/level_3_filters.py",
                 ],
                 "targets": [
-                    DATA_DIR / data_module / "hkm_portfolio_returns_1996-01_2019-12.parquet",
-                    DATA_DIR / data_module / "cjs_portfolio_returns_1996-01_2019-12.parquet",
+                    DATA_DIR
+                    / data_module
+                    / "hkm_portfolio_returns_1996-01_2019-12.parquet",
+                    DATA_DIR
+                    / data_module
+                    / "cjs_portfolio_returns_1996-01_2019-12.parquet",
                 ],
             },
         )

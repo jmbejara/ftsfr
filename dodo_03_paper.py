@@ -6,14 +6,12 @@ This file contains all tasks related to:
 - Generating LaTeX documents and reports
 - Converting PDFs to markdown
 """
+
 import sys
 from pathlib import Path
 
 # Import common utilities
-from dodo_common import (
-    DATA_DIR, OUTPUT_DIR,
-    load_config, load_all_module_requirements
-)
+from dodo_common import DATA_DIR, OUTPUT_DIR, load_config, load_all_module_requirements
 from dependency_tracker import get_available_datasets
 
 # Load configuration
@@ -34,33 +32,37 @@ def check_forecast_results():
     """Check if forecast result files exist"""
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
     results_dir = OUTPUT_DIR / "raw_results"
-    
+
     if not results_dir.exists():
         print("\nWarning: No results directory found at:", results_dir)
-        print("Please run 'doit -f dodo_02_forecast.py' first to generate forecast results.")
+        print(
+            "Please run 'doit -f dodo_02_forecast.py' first to generate forecast results."
+        )
         return False
-    
+
     expected_files = []
     for model in models_activated:
         for dataset_name in available_datasets:
             expected_files.append(results_dir / f"{model}_{dataset_name}_results.csv")
-    
+
     missing_files = [f for f in expected_files if not f.exists()]
-    
+
     if missing_files:
         print(f"\nWarning: {len(missing_files)} result files are missing.")
-        print("Some expected result files not found. You may want to run forecasting first.")
+        print(
+            "Some expected result files not found. You may want to run forecasting first."
+        )
         print("Continuing with available results...\n")
-    
+
     return len(missing_files) == 0
 
 
 def task_assemble_results():
     """Assemble results from all model-dataset combinations."""
-    
+
     # Check for result files at task generation time
     check_forecast_results()
-    
+
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
 
     # Simplified file dependencies - only depend on the assemble script
@@ -106,24 +108,24 @@ def task_compile_latex_docs():
         }
 
 
-def task_convert_pdfs_to_markdown():
-    """Convert PDFs to Markdown (currently commented out in original)"""
-    
-    # This task was commented out in the original dodo.py
-    # Uncomment and modify as needed
-    
-    return {
-        "actions": [
-            "python ./src/mistral_ocr.py",
-        ],
-        "targets": [
-            "./notes/monash_time_series_forecasting_appendix.md",
-            "./notes/monash_time_series_forecasting.md",
-        ],
-        "file_dep": [
-            "./references_md/309_monash_time_series_forecasting-Supplementary_Material.pdf",
-            "./references_md/309_monash_time_series_forecasting.pdf",
-        ],
-        "clean": True,
-        "verbosity": 2,
-    }
+# def task_convert_pdfs_to_markdown():
+#     """Convert PDFs to Markdown (currently commented out in original)"""
+
+#     # This task was commented out in the original dodo.py
+#     # Uncomment and modify as needed
+
+#     return {
+#         "actions": [
+#             "python ./src/mistral_ocr.py",
+#         ],
+#         "targets": [
+#             "./notes/monash_time_series_forecasting_appendix.md",
+#             "./notes/monash_time_series_forecasting.md",
+#         ],
+#         "file_dep": [
+#             "./references_md/309_monash_time_series_forecasting-Supplementary_Material.pdf",
+#             "./references_md/309_monash_time_series_forecasting.pdf",
+#         ],
+#         "clean": True,
+#         "verbosity": 2,
+#     }
