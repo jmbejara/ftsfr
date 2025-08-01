@@ -57,6 +57,44 @@ Jeremy
  - Bloomberg sovereign bond data: https://github.com/jmbejara/ftsfr/issues/26
 
 
+## Configuration Files
+
+This repository uses two main configuration files:
+
+### config.toml
+Controls which data sources and models are enabled. Key sections:
+- `[cache]` - Whether to use cached data or pull fresh data
+- `[data_sources]` - Enable/disable various data providers (Bloomberg, WRDS, public sources)
+- `[models]` - Enable/disable different forecasting models
+- `[reports]` - Configuration for report generation
+
+### datasets.toml
+Defines metadata for all datasets produced by the pipeline:
+- Maps data modules to their required data sources
+- Specifies dataset properties (frequency, seasonality)
+- Documents dataset descriptions
+- Controls which datasets are available for forecasting
+
+## Task Organization
+
+The build pipeline is split into three separate dodo files for modularity:
+
+1. **dodo_01_pull.py** - Data acquisition and processing
+   - Pulls data from various sources
+   - Formats data into standardized datasets
+   - Creates data documentation
+   - Builds the documentation website
+
+2. **dodo_02_forecast.py** - Model forecasting
+   - Runs enabled models on available datasets
+   - Can be run on different machines (e.g., GPU servers)
+   - Checks for required data files
+
+3. **dodo_03_paper.py** - Results and reporting
+   - Assembles forecast results
+   - Compiles LaTeX documents
+   - Generates final reports
+
 ## Quickstart
 
 Please install the following:
@@ -107,11 +145,35 @@ Then, follow the pattern in the `.env.example` file to set your environment vari
 
 Then, set the values in `config.toml` to your desired values. This file is used to configure the datasets that will be downloaded, based of the subscriptions that you have, and the benchmarks that will be run.
 
-Finally, download the data using the following command:
+Finally, run the pipeline (which is broken down into three majors parts):
 
 ```bash
-doit
+# Step 1: Pull and format data
+doit -f dodo_01_pull.py
+
+# Step 2: Run forecasting models (optional, requires step 1)
+doit -f dodo_02_forecast.py
+
+# Step 3: Generate reports and papers (optional, requires step 2)
+doit -f dodo_03_paper.py
 ```
+
+Or run specific tasks:
+```bash
+# Just pull data from a specific source
+doit -f dodo_01_pull.py pull:fed_yield_curve
+
+# Just format data for a specific module
+doit -f dodo_01_pull.py format:cds_returns
+
+# Run a specific model on specific datasets
+doit -f dodo_02_forecast.py forecast:arima:ftsfr_treas_yield_curve_zero_coupon
+```
+
+Note: Each step can be run on different machines. For example:
+- Run `dodo_01_pull.py` on a machine with data access
+- Run `dodo_02_forecast.py` on a GPU server
+- Run `dodo_03_paper.py` on your local machine
 
 ### Tips for Running on LambdaLabs
 
