@@ -31,6 +31,6 @@ thefuzz
 toml
 torch==2.6.0
 tqdm
-wrds==3.2.0
+wrds==3.4.0
 xbbg
 yfinance==0.2.43

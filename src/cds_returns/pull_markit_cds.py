@@ -96,11 +96,17 @@ def combine_cds_data(cds_data: dict) -> pd.DataFrame:
     """
     dataframes = []
     for year, df in cds_data.items():
-        # Create a copy to avoid modifying the original DataFrame
-        df_with_year = df.copy()
-        df_with_year["year"] = year
-        dataframes.append(df_with_year)
+        # Skip empty DataFrames to avoid deprecation warning
+        if df is not None and not df.empty:
+            # Create a copy to avoid modifying the original DataFrame
+            df_with_year = df.copy()
+            df_with_year["year"] = year
+            dataframes.append(df_with_year)
 
+    # Handle case where all DataFrames might be empty
+    if not dataframes:
+        return pd.DataFrame()
+    
     combined_df = pd.concat(dataframes, ignore_index=True)
     return combined_df
 
