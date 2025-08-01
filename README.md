@@ -149,8 +149,8 @@ Finally, run the pipeline (which is broken down into three major parts):
 
 ```bash
 # Step 1: Pull and format data (default when you run `doit`)
-doit
-# Or explicitly: doit -f dodo_01_pull.py
+doit -f dodo_01_pull.py
+# Or, simply, just run this: doit 
 
 # Step 2: Run forecasting models (optional, requires step 1)
 doit -f dodo_02_forecast.py
@@ -180,41 +180,21 @@ Note: Each step can be run on different machines. For example:
 
 ### Tips for Running on LambdaLabs
 
-Install Miniconda, using these [instructions](https://www.anaconda.com/docs/getting-started/miniconda/install#quickstart-install-instructions):
-```
-mkdir -p ~/miniconda3
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm ~/miniconda3/miniconda.sh
-```
-After installing, close and reopen your terminal application or refresh it by running the following command:
+We provide a setup script that automates the entire LambdaLabs GPU instance setup process:
 
-```
-source ~/miniconda3/bin/activate
+```bash
+./setup_lambdalabs.sh
 ```
 
-Then, initialize conda on all available shells by running the following command:
+This script will:
+1. Install Miniconda and initialize it for all shells
+2. Download VS Code CLI for remote development
+3. Create a conda environment named "ftsfr" with Python 3.12.6
+4. Install all required Python packages from requirements.txt
+5. Install Pixi package manager
+6. Optionally start the VS Code tunnel for remote development
 
-```
-conda init --all
-```
-Also, to get VS Code code server
-```
-curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' --output vscode_cli.tar.gz
-
-tar -xf vscode_cli.tar.gz
-```
-then run it with this:
-```
-./code tunnel
-```
-Then,
-```
-conda create -n ftsfr python=3.12.6
-conda activate ftsfr
-pip install -r requirements.txt
-curl -fsSL https://pixi.sh/install.sh | zsh
-```
+**Note**: The script handles the shell restart requirement automatically. You'll need to run it twice - once for the initial setup, and once after restarting your shell (the script will guide you through this process).
 
 ## Data Format
 Final, cleaned and formatted datasets have the following format: `ftsfr_<dataset_name>.parquet`
