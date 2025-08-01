@@ -145,11 +145,12 @@ Then, follow the pattern in the `.env.example` file to set your environment vari
 
 Then, set the values in `config.toml` to your desired values. This file is used to configure the datasets that will be downloaded, based of the subscriptions that you have, and the benchmarks that will be run.
 
-Finally, run the pipeline (which is broken down into three majors parts):
+Finally, run the pipeline (which is broken down into three major parts):
 
 ```bash
-# Step 1: Pull and format data
-doit -f dodo_01_pull.py
+# Step 1: Pull and format data (default when you run `doit`)
+doit
+# Or explicitly: doit -f dodo_01_pull.py
 
 # Step 2: Run forecasting models (optional, requires step 1)
 doit -f dodo_02_forecast.py
@@ -158,15 +159,17 @@ doit -f dodo_02_forecast.py
 doit -f dodo_03_paper.py
 ```
 
+**Note:** Running `doit` without any arguments will execute the pull tasks (Step 1) by default. This is the most common use case for most users.
+
 Or run specific tasks:
 ```bash
 # Just pull data from a specific source
-doit -f dodo_01_pull.py pull:fed_yield_curve
+doit pull:fed_yield_curve
 
 # Just format data for a specific module
-doit -f dodo_01_pull.py format:cds_returns
+doit format:cds_returns
 
-# Run a specific model on specific datasets
+# Run a specific model on specific datasets (requires specifying the file)
 doit -f dodo_02_forecast.py forecast:arima:ftsfr_treas_yield_curve_zero_coupon
 ```
 
