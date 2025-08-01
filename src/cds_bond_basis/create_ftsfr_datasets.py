@@ -36,11 +36,21 @@ df_all = process_final_product.process_cb_spread(final_data)
 
 agg_df, non_agg_df = process_final_product.output_cb_final_products(df_all)
 
-df_stacked = agg_df.stack().reset_index()
-df_stacked.columns = ["unique_id", "ds", "y"]
+# Set date as index before stacking to avoid mixing date and numeric values
+agg_df_indexed = agg_df.set_index(['c_rating', 'date'])
+df_stacked = agg_df_indexed.stack().reset_index()
+df_stacked.columns = ["c_rating", "date", "variable", "value"]
+# Create a unique ID from c_rating
+df_stacked["unique_id"] = df_stacked["c_rating"].astype(str)
+df_stacked = df_stacked[["unique_id", "date", "value"]].rename(columns={"date": "ds", "value": "y"})
 
-df_stacked2 = non_agg_df.stack().reset_index()
-df_stacked2.columns = ["unique_id", "ds", "y"]
+# For non-aggregated data, set cusip and date as index
+non_agg_df_indexed = non_agg_df.set_index(['cusip', 'date'])
+df_stacked2 = non_agg_df_indexed.stack().reset_index()
+df_stacked2.columns = ["cusip", "date", "variable", "value"]
+# Use cusip as unique_id
+df_stacked2["unique_id"] = df_stacked2["cusip"]
+df_stacked2 = df_stacked2[["unique_id", "date", "value"]].rename(columns={"date": "ds", "value": "y"})
 
 df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_aggregated.parquet")
 df_stacked2.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_non_aggregated.parquet")
