@@ -210,6 +210,9 @@ We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP)
 
 
 \paragraph{Options}
+
+TODO: Viren: Please review this paragraph in depth. Perhaps just replace it with your own. Put in a description of the economic significance of the options data (maybe the increasing volume in SPX options). Only high level of detail about the cleaning procedure. Focus is on the economic significance of the options data and the economic significance of the cleaning procedure.
+
 Our options dataset follows \cite{Constantinides2013}. In addition to replicating
 their portfolio construction, we make public the full cleaning pipeline that transforms the raw SPX option tape into research-grade data.  This procedures (i) deletes duplicate or contradictory quotes and any observation with a zero bid, (ii) keeps only contracts with 7--180 days to expiration and moneyness between 0.8 and 1.2 to remove stale deep in/out-of-the-money options, (iii) derives a put--call-parity-implied funding curve and drop quotes that imply negative risk-free rates, (iv) discards prices whose implied volatilities fall outside the 5--100\% band or lie more than one standard error from a smoothed volatility surface, and (v) enforces arbitrage by excluding records that violate put--call parity.  These steps eliminate typographical errors, illiquidity noise, and expiry-week quirks that would otherwise distort higher-moment estimates.  We then scale option returns to unit market beta, converting the inherently fat-tailed pay-offs into near-Gaussian series that linear factor models can handle.  Open-sourcing this end-to-end workflow allows others to reproduce the ``clean" option universe that underpins modern option-pricing research and to audit every assumption embedded in the data.
 
@@ -642,6 +645,8 @@ The final output is a dataset containing monthly corporate bond portfolio return
 \label{sec:options}
 % Constantinides, Jackwerth and Savov (2013) S&P 500 portfolios
 % Pull in notes from notebooks 
+
+TODO: Viren
 
 \subsubsection{Foreign Exchange}
 \label{sec:fx}
