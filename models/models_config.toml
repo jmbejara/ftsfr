@@ -1,0 +1,248 @@
+# Models Configuration File
+# This file defines all available forecasting models and their parameters
+
+# Local Darts Models (univariate, per-series training)
+
+[arima]
+class = "DartsLocal"
+estimator_class = "darts.models.ARIMA"
+display_name = "ARIMA"
+estimator_params = { p = 1, d = 1, q = 1 }
+
+[auto_arima]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoARIMA"
+display_name = "AutoARIMA"
+estimator_params = { season_length = "env_vars[2]" }
+
+[auto_ces]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoCES"
+display_name = "AutoCES"
+estimator_params = { season_length = "env_vars[2]" }
+
+[auto_ets]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoETS"
+display_name = "AutoETS"
+estimator_params = { season_length = "env_vars[2]" }
+
+[auto_mfles]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoMFLES"
+display_name = "AutoMFLES"
+estimator_params = { test_size = 1, season_length = "env_vars[2]" }
+
+[auto_tbats]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoTBATS"
+display_name = "AutoTBATS"
+estimator_params = { season_length = "env_vars[2]" }
+
+[auto_theta]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoTheta"
+display_name = "AutoTheta"
+estimator_params = { season_length = "env_vars[2]" }
+
+[ets]
+class = "DartsLocal"
+estimator_class = "darts.models.ExponentialSmoothing"
+display_name = "Exponential Smoothing"
+imports = ["from darts.utils.utils import ModelMode, SeasonalityMode"]
+estimator_params = { trend = "ModelMode.ADDITIVE", seasonal = "SeasonalityMode.NONE" }
+
+[naive_drift]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveDrift"
+display_name = "NaiveDrift"
+estimator_params = {}
+
+[naive_mean]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveMean"
+display_name = "NaiveMean"
+estimator_params = {}
+
+[naive_movav]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveMovingAverage"
+display_name = "NaiveMovingAverage"
+estimator_params = { input_chunk_length = "env_vars[2] * 4" }
+
+[naive_seasonal]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveSeasonal"
+display_name = "NaiveSeasonal"
+estimator_params = { K = "env_vars[2]" }
+
+[pr]
+class = "DartsLocal"
+estimator_class = "darts.models.SKLearnModel"
+display_name = "Pooled Regression"
+imports = ["from sklearn.linear_model import TweedieRegressor"]
+estimator_params = { model = "TweedieRegressor(power=0)", lags = "env_vars[2] * 4", output_chunk_length = 1, multi_models = false }
+
+[prophet]
+class = "DartsLocal"
+estimator_class = "darts.models.Prophet"
+display_name = "Prophet"
+estimator_params = {}
+
+[ses]
+class = "DartsLocal"
+estimator_class = "darts.models.ExponentialSmoothing"
+display_name = "Simple Exponential Smoothing"
+imports = ["from darts.utils.utils import ModelMode, SeasonalityMode"]
+estimator_params = { trend = "ModelMode.NONE", seasonal = "SeasonalityMode.NONE" }
+
+[tbats]
+class = "DartsLocal"
+estimator_class = "darts.models.TBATS"
+display_name = "TBATS"
+estimator_params = { season_length = "env_vars[2]" }
+
+[theta]
+class = "DartsLocal"
+estimator_class = "darts.models.Theta"
+display_name = "Theta"
+imports = ["from darts.utils.utils import SeasonalityMode"]
+estimator_params = { season_mode = "SeasonalityMode.ADDITIVE" }
+
+# Global Darts Models (multivariate, global training)
+
+[dlinear]
+class = "DartsGlobal"
+estimator_class = "darts.models.DLinearModel"
+display_name = "DLinear"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[global_naive_agg]
+class = "DartsGlobal"
+estimator_class = "darts.models.GlobalNaiveAggregate"
+display_name = "Global Naive Aggregate"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[global_naive_dri]
+class = "DartsGlobal"
+estimator_class = "darts.models.GlobalNaiveDrift"
+display_name = "Global Naive Drift"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[global_naive_sea]
+class = "DartsGlobal"
+estimator_class = "darts.models.GlobalNaiveSeasonal"
+display_name = "Global Naive Seasonal"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[nbeats]
+class = "DartsGlobal"
+estimator_class = "darts.models.NBEATSModel"
+display_name = "N-BEATS"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[nhits]
+class = "DartsGlobal"
+estimator_class = "darts.models.NHiTSModel"
+display_name = "NHiTS"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[nlinear]
+class = "DartsGlobal"
+estimator_class = "darts.models.NLinearModel"
+display_name = "NLinear"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[tide]
+class = "DartsGlobal"
+estimator_class = "darts.models.TiDEModel"
+display_name = "TiDE"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[transformer]
+class = "DartsGlobal"
+estimator_class = "darts.models.TransformerModel"
+display_name = "Transformer"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+
+[catboost]
+class = "DartsGlobal"
+estimator_class = "darts.models.CatBoostModel"
+display_name = "CatBoost"
+scaling = false
+interpolation = true
+f32 = false
+special_handler = "catboost"  # For GPU/CPU detection
+estimator_params = { lags = "env_vars[2] * 4", output_chunk_length = 1, multi_models = false }
+
+# Nixtla Models
+
+[autoformer]
+class = "NixtlaMain"
+estimator_class = "neuralforecast.models.Autoformer"
+display_name = "Autoformer"
+
+[informer]
+class = "NixtlaMain"
+estimator_class = "neuralforecast.models.Informer"
+display_name = "Informer"
+
+# GluonTS Models
+
+[deepar]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.DeepAREstimator"
+display_name = "DeepAR"
+estimator_params = { freq = "env_vars[1]", context_length = "env_vars[2] * 4", prediction_length = 1 }
+
+[ffnn]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.SimpleFeedForwardEstimator"
+display_name = "FFNN"
+estimator_params = { context_length = "env_vars[2] * 4", prediction_length = 1 }
+
+[patchtst]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.PatchTSTEstimator"
+display_name = "PatchTST"
+estimator_params = { patch_len = "env_vars[2]", context_length = "env_vars[2] * 4", prediction_length = 1, stride = 4 }
+
+[wavenet]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.WaveNetEstimator"
+display_name = "WaveNet"
+estimator_params = { freq = "env_vars[1]", prediction_length = 1 }
+
+# Special Models
+
+[timesfm]
+class = "TimesFM"
+display_name = "TimesFM"
+model_version = "500m"  # or "200m"
