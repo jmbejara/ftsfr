@@ -43,6 +43,11 @@ required_data_sources = ["open_source_bond", "wrds_markit"]
 [cds_returns]
 required_data_sources = ["fed_yield_curve", "wrds_markit"]
 
+[cds_returns.ftsfr_cds_portfolio_returns]
+description = """This data module contains the returns of the CDS portfolio formed as per the methodology of Nozawa (2017)."""
+frequency = "ME"
+seasonality = 12
+
 ################################################################################
 [cip]
 data_module_name = "CIP"
