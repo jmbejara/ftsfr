@@ -393,11 +393,11 @@ def task_format():
             ],
             "targets": [
                 DATA_DIR / data_module / "markit_cds_returns.parquet",
-                DATA_DIR / data_module / "ftsfr_CDS_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_cds_portfolio_returns.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_cds_returns.py",
-                # f"./src/{data_module}/create_ftsfr_datasets.py",
+                 f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
