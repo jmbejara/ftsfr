@@ -497,6 +497,9 @@ def task_format():
             "actions": [
                 f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}"
             ],
+            "file_dep": [
+                f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
             "targets": [
                 DATA_DIR / data_module / "ftsfr_FX_returns.parquet",
             ],

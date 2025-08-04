@@ -1,5 +1,5 @@
 
-## He, Kelly, Manela (HKM) Test Portfolios: Options
+# He, Kelly, Manela (HKM) Test Portfolios: Options
 
 From the HKM 2017 paper on intermediary asset pricing:
 > For options, we use 54 portfolios of S&P 500 index options sorted on moneyness and maturity from Constantinides, Jackwerth and Savov (2013), 
@@ -15,7 +15,7 @@ In order to replicate the HKM options portfolio returns, we necessarily needed t
 
 The original CJS 2013 paper used data from 1986 through 2012 (26 years of data). Due to unavailability of SPX option data from 1985 to 1995, we replicated the data cleaning and portfolio construction process for the 54 portfolios in CJS using data from **January 1996 to December 2019** (23 years). Our dataset (from 1996 to 2019) comprises over 19.2 million rows of SPX options data, and, due to increasing liquidity in the SPX options market over time, our dataset contains significantly more options than the original paper. Portfolio returns are leverage-adjusted, meaning that each option portfolio is combined with the risk-free rate to achieve a targeted market beta of one, as described broadly in CJS 2013. *The spirit of this project is to replicate with the highest practical fidelity the ***process*** of data filtration and portfolio construction in the original CJS and HKM papers, without commenting on the effectiveness or appropriateness of the process and parameters. The idea here is that we provide the logic so the user can apply the same data cleaning and portfolio construction process to any date range of SPX options data.*  
 
-### Data Filtration and Cleaning
+## Data Filtration and Cleaning
 
 We replicate the Level 1, 2, and 3 data filters outlined in *CJS 2013 Appendix B* as follows: 
 
@@ -54,7 +54,7 @@ value.
 * **Put-Call Parity Filter:** The puts and calls need to be matched up based on trading date, expiry date, and option type.
 
 
-### Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS 2013 and HKM 2017
+## Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS 2013 and HKM 2017
 
 The construction of the 27 call and 27 put portfolios in CJS is a multi-step process, with the objective of developing portfolio returns series that are stationary and only moderately skewed. Note that the discrete bucketing of moneyness and days to maturity lead to multiple candidate options for each portfolio on each trading day. These options  are given weights according to a **bivariate Gaussian weighting kernel** in moneyness and maturity (bandwidths: *0.0125 in moneyness* and *10 days to maturity*).
 
@@ -73,7 +73,7 @@ Each **leverage-adjusted put portfolio** comprises of a short position in a frac
 
 <font color="blue">*While the original paper did not provide this level of detail, for clarity, we present below the mathematics we utilized to implement CJS' portfolio construction process. The following applies for a single trading day <i>t</i>, for a set of candidate call or put options. Portfolios in CJS are identified by 3 characteristics: option type (call or put), moneyness (9 discrete targets), and time to maturity (3 discrete targets). On any given day, it is rare to find options that exactly match the moneyness and maturity targets. Instead, there may be multiple options that are "close to" the target moneyness / maturity (each a **"candidate option"**). Furthermore, each candidate option has its own price and price sensitivity to changes in the underlying SPX index level. In order to arrive at a "price" for an option portfolio, CJS applies a **Gaussian weighting kernel** in moneyness and maturity, as described below. This kernel-weighted price across the candidate options on a given day is used as the price of the **option component** of the portfolio (the other component being the risk-free rate). This portfolio is leverage-adjusted using the BSM elasticity, in order to standardize the sensitivity of OTM and ITM portfolios to changes in the underlying.*</font>
 
-#### 1. Gaussian Kernel Weighting
+### 1. Gaussian Kernel Weighting
 
 Let:
 
@@ -100,7 +100,7 @@ w_{i} &= \frac{w_{i}^\ast}{\sum_{j} w_{j}^\ast} \\
 \end{aligned}
 $$
 
-#### 2. Option Elasticity
+### 2. Option Elasticity
 
 Let:
 
@@ -115,7 +115,7 @@ $$
 $$
 
 
-#### 3. Arithmetic Return of Option $i$
+### 3. Arithmetic Return of Option $i$
 
 Let:
 
@@ -129,7 +129,7 @@ r_{i} = \frac{P_{i,t} - P_{i,t-1}}{P_{i,t-1}}
 $$
 
 
-#### 4. Leverage-Adjusted Portfolio Construction
+### 4. Leverage-Adjusted Portfolio Construction
 
 Let:
 
@@ -149,18 +149,18 @@ $$
 
 On each trading day, the return of a portfolio is calculated as the <u>weighted average return of the set of candidate options that comprise a single day's option portfolio</u>. The weighting used is the Gaussian kernel weight calculated earlier. Thus the daily return from period $t$ to $t+1$ represents the return from holding a set of candidate options, weighted using the kernel weights as of $t$, from period $t$ to $t+1$. 
 
-#### 5. (to be implemented) Filling NaNs
+### 5. (to be implemented) Filling NaNs
 CJS implement an multi-step process to deal with options with missing prices (detailed in section **1.3 Portfolio Formation** of the paper). We reserve the implementation this NaN-filling process for a future version of this dataset. For the current version, we compound the daily portfolio returns into monthly returns, which is the final form of the data utilized in the paper.  
 
-#### 6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)
+### 6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)
 
-#### 7. Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)
+### 7. Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)
 
 HKM 2017 reduces the 54 portfolio return series constructed in CJS to 18 by taking an equal-weight average across the 3 maturities for the CJS portfolios with the same moneyness. We implement that procedure to obtain the final return series for the FTSFR. 
 <br>
 <p align="center">* * *</p>
 
-#### Final FTFSR Data Series
+### Final FTFSR Data Series
 
 The final FTFSR data series comprise the monthly leverage-adjusted returns for call and put portfolios for **both CJS 2013 (54 portfolios) and HKM 2017 (18 portfolios)** for the period from Jan 1996 - Dec 2019. The format for the unique id for each portfolio is as follows: <br><p align="center"><b>{Call C or Put P flag}\_{moneyness * 1000}\_{maturity in days}</b></p>
     
