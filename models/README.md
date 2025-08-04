@@ -156,3 +156,17 @@ Models are automatically saved after training and can be loaded for later use.
 ## Migration from Old System
 
 The old system generated separate directories for each model. If you have existing results from the old system, they should still be compatible as the output structure remains the same.
+
+## Syncing Data with Lambda Labs
+
+```bash
+# Push local _data to Lambda Labs
+ssh -i ~/.ssh/MYKEY.pem ubuntu@NODE_ID_ADDRESS "mkdir -p ~/washington-dc-three-fs/ftsfr/_data"
+rsync -avzh --progress --delete -e "ssh -i ~/.ssh/MYKEY.pem" ./_data/ ubuntu@NODE_ID_ADDRESS:~/washington-dc-three-fs/ftsfr/_data/
+```
+ssh ubuntu@192.222.55.71
+Example with actual values:
+```bash
+ssh -i ~/.ssh/jeremy.pem ubuntu@192.222.55.71 "mkdir -p ~/central-texas-three-fs/ftsfr/_data"
+rsync -avzh --progress --delete -e "ssh -i ~/.ssh/jeremy.pem" ./_data/ ubuntu@192.222.55.71:~/central-texas-three-fs/ftsfr/_data/
+```
