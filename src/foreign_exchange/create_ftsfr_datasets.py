@@ -4,7 +4,7 @@ It is used to load the datasets into memory.
 
 List of datasets:
 
-- corp_bond_portfolio_returns: corporate bond portfolio returns
+- fx_returns: foreign exchange returns
 """
 
 import calc_fx
@@ -16,7 +16,7 @@ DATA_DIR = config("DATA_DIR")
 
 
 ## Calculate fx returns
-df_all = calc_fx.calc_corp_bond_returns(data_dir=DATA_DIR)
+df_all = calc_fx.calculate_fx(data_dir=DATA_DIR)
 df_stacked = df_all.stack().reset_index()
 df_stacked.columns = ["unique_id", "ds", "y"]
 
