@@ -159,14 +159,27 @@ The old system generated separate directories for each model. If you have existi
 
 ## Syncing Data with Lambda Labs
 
+To copy data to Lambda Labs:
 ```bash
-# Push local _data to Lambda Labs
-ssh -i ~/.ssh/MYKEY.pem ubuntu@NODE_ID_ADDRESS "mkdir -p ~/washington-dc-three-fs/ftsfr/_data"
-rsync -avzh --progress --delete -e "ssh -i ~/.ssh/MYKEY.pem" ./_data/ ubuntu@NODE_ID_ADDRESS:~/washington-dc-three-fs/ftsfr/_data/
+
+NODE_IP="192.222.55.71"
+SSH_KEY="jeremy.pem"
+FS_FOLDER="central-texas-three-fs"
+
+# NODE_IP="104.171.202.244"
+# SSH_KEY="jeremy.pem"
+# FS_FOLDER="texas-one-fs"
+
+# NODE_IP="192.222.58.241"
+# SSH_KEY="jeremy.pem"
+# FS_FOLDER="washington-dc-three-fs"
+
+ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP} "mkdir -p ~/${FS_FOLDER}/ftsfr"
+rsync -avzh --progress --delete --exclude='_output/' -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
 ```
-ssh ubuntu@192.222.55.71
-Example with actual values:
+
+To Connect via SSH:
 ```bash
-ssh -i ~/.ssh/jeremy.pem ubuntu@192.222.55.71 "mkdir -p ~/central-texas-three-fs/ftsfr/_data"
-rsync -avzh --progress --delete -e "ssh -i ~/.ssh/jeremy.pem" ./_data/ ubuntu@192.222.55.71:~/central-texas-three-fs/ftsfr/_data/
+ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP}
 ```
+
