@@ -1,13 +1,32 @@
 """
-Calculate Covered Interest Parity (CIP) spreads from foreign exchange data.
+Calculate foreign exchange daily returns for USD invested in foreign currencies.
+
+This module implements a strategy where USD is converted to a foreign currency at the
+end of day t-1, invested in that currency's overnight repo market, and then converted
+back to USD on day t.
+
+The methodology calculates returns as:
+    ret_{t,i} = (spot_{t-1,i} / spot_{t,i}) * fret_{t,i}
+
+Where:
+    - i is the foreign currency
+    - t is the date of the implied foreign currency return
+    - ret is the return of USD invested in the foreign currency
+    - fret is the return of the foreign currency when invested in their overnight repo market
+    - spot is the spot price of the currency (how much 1 USD is worth in the foreign currency)
+
+Data Sources:
+    - Bloomberg FX spot rates
+    - Bloomberg interest rates (OIS)
+
+Note: The implementation in implied_daily_fx_returns() appears to have the spot ratio
+inverted compared to the documented formula. This should be verified and corrected if needed.
 
 Code adapted with permission from https://github.com/Kunj121/CIP
 """
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import sys
 from pathlib import Path
 
@@ -97,11 +116,6 @@ def prepare_fx_data(spot_rates, interest_rates):
     # Map interest rate columns from int_cols to cols
     ir_mapping = dict(zip(int_cols, cols))
     interest_rates = interest_rates.rename(columns=ir_mapping)
-    # Also include USD in interest rates if available
-    if "USD" in interest_rates.columns:
-        cols_ir = cols + ["USD"]
-    else:
-        cols_ir = cols
 
     # Convert forward points to forward rates
 
@@ -125,21 +139,29 @@ def prepare_fx_data(spot_rates, interest_rates):
 
 def implied_daily_fx_returns(fx_data, currency_list):
     """
-    New function written by Vincent
+    Calculate implied daily return time series for USD invested in foreign currencies.
 
-    This function returns implied daily return time series on foreign currencies
+    This function implements the investment strategy where USD is converted to a foreign
+    currency, invested in that currency's overnight market, then converted back to USD.
 
-    Parameters:
-    fx_data: Foreign currency data containing spot exchange rate and interest rate of currency
-        CUR_spot is the spot exchange rate of 1USD to CUR
-        CUR_ir is the annualized interest rate of CUR on that day in percent space (7.0 = 7%)
+    WARNING: The current implementation appears to have issues:
+    1. The spot ratio is inverted (using spot_t/spot_{t-1} instead of spot_{t-1}/spot_t)
+    2. Interest rates are used directly without converting from annual percentage to daily returns
 
-    currency_list: list of currencies we generate returns for
+    Parameters
+    ----------
+    fx_data : pd.DataFrame
+        Foreign currency data containing:
+        - CUR_spot: Spot exchange rate (how much 1 USD is worth in currency CUR)
+        - CUR_ir: Annualized interest rate of CUR in percent space (7.0 = 7%)
+    currency_list : list
+        List of currency codes to generate returns for
 
-    Output:
-    fx_df: Foreign currency implied daily return time series
-        absolute returns are used here (not annualized, not log scaled)
-        CUR_return is the daily return of CUR on the day (not in % space)
+    Returns
+    -------
+    pd.DataFrame
+        Daily return time series with columns:
+        - CUR_return: Daily return of USD invested in currency CUR (not in % space)
     """
     fx_df = fx_data.copy()
     fx_df = fx_df.fillna(method="ffill")
@@ -200,30 +222,27 @@ def graph_fx_returns(fx_df, currency_list, region_name):
 
 def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
     """
-    Calculate CIP spreads from foreign exchange data.
+    Calculate foreign exchange daily returns for USD invested in foreign currencies.
 
     Parameters
     ----------
     end_date : str
         End date for the data
-    plot : bool
-        Whether to generate plots
     data_dir : Path, optional
         Directory containing the FX data files. If None, uses DATA_DIR from settings.
 
     Returns
     -------
     pd.DataFrame
-        DataFrame with CIP spreads
+        DataFrame with FX returns for each currency
     """
     data_dir = Path(data_dir)
     # Load data
     spot_rates = pull_bbg_foreign_exchange.load_fx_spot_rates(data_dir=data_dir)
-    forward_points = pull_bbg_foreign_exchange.load_fx_forward_points(data_dir=data_dir)
     interest_rates = pull_bbg_foreign_exchange.load_fx_interest_rates(data_dir=data_dir)
 
     # Prepare data
-    df_merged = prepare_fx_data(spot_rates, forward_points, interest_rates)
+    df_merged = prepare_fx_data(spot_rates, interest_rates)
     # Filter by end date
     if end_date:
         date = pd.Timestamp(end_date).date()

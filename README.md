@@ -40,7 +40,11 @@ All
 
 Alex and Vincent
  - Bloomberg data now available in foreign_exchange/pull_bbg_foreign_exchange.py https://github.com/jmbejara/ftsfr/issues/18
- - Foreign Exchange returns (returns on individual currencies, not the portfolios of He, Kelly, Manela) 
+ - Foreign Exchange returns (returns on individual currencies, not the portfolios of He, Kelly, Manela)
+ - TODO (Vincent): Review FX return calculation issues in calc_fx.py:
+   - The spot ratio appears inverted (using spot_t/spot_{t-1} instead of spot_{t-1}/spot_t)
+   - Interest rates need conversion from percentage to decimal and from annual to daily rates
+   - USD return calculation may need adjustment 
 
 
 Kausthub
