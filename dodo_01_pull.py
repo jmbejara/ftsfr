@@ -426,7 +426,7 @@ def task_format():
             ],
             "targets": [
                 DATA_DIR / data_module / "cip_spreads.parquet",
-                DATA_DIR / data_module / "ftsfr_CIP_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_CIP_spreads.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_cip.py",
