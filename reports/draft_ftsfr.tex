@@ -291,8 +291,29 @@ Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, 
 % - Vincent
 Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a duration-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorise extreme 100\% bases, and require each bond to appear in TRACE's cleaned WRDS dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
 
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
+    \small Replicated findings of CDS arbitrage spreads
+  \end{tabular}
+  \caption{CDS Arbitrage spreads}\label{fig:myfig}
+\end{figure}
+\vspace{\floatsep}
+
 \paragraph{CIP Arbitrage}
 For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for spot rates, 3-month forwards, and maturity-matched OIS curves.  Core filters rescale forward points (and invert USD-quoted pairs), synchronise all legs to the 17:00 ET close while dropping holiday or stale quotes, and winsorise the extreme 1\% of annualised spreads with spline interpolation for any missing OIS tenors to remove scaling, timing, and rate-sourcing distortions.
+
+\begin{figure}[h!]
+  \centering
+  \vspace{\floatsep}
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
+    \small Replicated findings of CIP arbitrage spreads
+  \end{tabular}
+  \caption{CIP Arbitrage spreads}\label{fig:myfig}
+\end{figure}
+\FloatBarrier
 
 \paragraph{Spot Futures Arbitrage in Equities}
 
@@ -349,35 +370,6 @@ TODO
 
 \subsection{Siriwardane et al. (2022) Replication}
 % Arbitrage spread statistics
-\begin{figure}
-  \centering
-
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
-    \small Replicated findings of CDS arbitrage spreads
-  \end{tabular}
-
-  \caption{CDS Arbitrage spreads}\label{fig:myfig}
-\end{figure}
-
-\FloatBarrier
-
-\begin{figure}
-  \centering
-
-  \vspace{\floatsep}
-
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
-    \small Replicated findings of CIP arbitrage spreads
-  \end{tabular}
-
-  \caption{CIP Arbitrage spreads}\label{fig:myfig}
-\end{figure}
-
-\FloatBarrier
-
-
 
 \subsection{Individual Dataset Replications}
 % Nozawa, Borri & Verdelhan, etc.

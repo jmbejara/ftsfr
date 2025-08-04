@@ -112,6 +112,12 @@ seasonality = 365 # Calendar days per year (or 252 for business days)
 
 ################################################################################
 [foreign_exchange]
+
+data_module_name = "Foreign Exchange"
+data_module_description = """
+Contains code that shows returns of holding portfolios of various foreign
+currencies relative to the US dollar
+"""
 required_data_sources = ["bloomberg_terminal"]
 
 ################################################################################
