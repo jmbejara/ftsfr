@@ -164,7 +164,7 @@ def implied_daily_fx_returns(fx_data, currency_list):
         - CUR_return: Daily return of USD invested in currency CUR (not in % space)
     """
     fx_df = fx_data.copy()
-    fx_df = fx_df.fillna(method="ffill")
+    fx_df = fx_df.ffill()
 
     # tracking returns columns
     ret_cols = ["USD_return"]
