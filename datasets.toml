@@ -41,7 +41,27 @@ required_data_sources = ["open_source_bond", "wrds_markit"]
 
 ################################################################################
 [cds_returns]
+data_module_name = "CDS Returns"
+data_module_description = """
+Contains code that calculates CDS returns following the methodology of He, Kelly, and 
+Manela (2017) and Palhares (2013). Provides both contract-level and portfolio-level 
+returns for US single-name CDS contracts.
+"""
 required_data_sources = ["fed_yield_curve", "wrds_markit"]
+
+[cds_returns.ftsfr_CDS_contract_returns]
+description = """Monthly returns for individual CDS contracts. Each contract is identified 
+by ticker and tenor (3Y, 5Y, 7Y, 10Y). Returns are calculated using the He-Kelly formula 
+with risky duration adjustment."""
+frequency = "ME"
+seasonality = 12
+
+[cds_returns.ftsfr_CDS_portfolio_returns]
+description = """Monthly returns for 20 CDS portfolios formed by sorting contracts into 
+4 tenors (3Y, 5Y, 7Y, 10Y) and 5 credit quality quintiles based on 5Y spreads. 
+Portfolio IDs follow the format 'TENOR_QUINTILE' (e.g., '5Y_Q3')."""
+frequency = "ME"
+seasonality = 12
 
 ################################################################################
 [cip]

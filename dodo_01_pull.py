@@ -386,20 +386,23 @@ def task_format():
     data_module = "cds_returns"
     if module_requirements[data_module]:
         yield {
-            "name": "calc_cds_returns",
+            "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/calc_cds_returns.py --DATA_DIR={DATA_DIR / data_module}",
-                # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "markit_cds_returns.parquet",
-                DATA_DIR / data_module / "ftsfr_CDS_returns.parquet",
+                DATA_DIR / data_module / "markit_cds_contract_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_CDS_contract_returns.parquet",
+                DATA_DIR / data_module / "ftsfr_CDS_portfolio_returns.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_cds_returns.py",
-                # f"./src/{data_module}/create_ftsfr_datasets.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
+            "verbosity": 2,
         }
         yield from notebook_subtask(
             {
