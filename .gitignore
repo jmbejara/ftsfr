@@ -25,6 +25,7 @@ config.toml
 temp*.csv
 */_build/
 drafts/draft_bp.pdf
+*_ipynb.ipynb
 
 # venv virtual environment folder
 /venv/*
