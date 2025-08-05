@@ -50,10 +50,26 @@ case $SETUP_STATE in
     0)
         print_status "Starting fresh LambdaLabs setup..."
         
+        # Step 1: Check system architecture
+        ARCH=$(uname -m)
+        print_status "Detected system architecture: $ARCH"
+        
         # Step 1: Install Miniconda
         print_status "Installing Miniconda..."
         mkdir -p ~/miniconda3
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+        
+        # Download appropriate Miniconda installer based on architecture
+        if [ "$ARCH" = "x86_64" ]; then
+            MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+        elif [ "$ARCH" = "aarch64" ]; then
+            MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh"
+        else
+            print_error "Unsupported architecture: $ARCH"
+            exit 1
+        fi
+        
+        print_status "Downloading Miniconda from: $MINICONDA_URL"
+        wget "$MINICONDA_URL" -O ~/miniconda3/miniconda.sh
         bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
         rm ~/miniconda3/miniconda.sh
         
@@ -66,9 +82,21 @@ case $SETUP_STATE in
         
         # Download VS Code CLI
         print_status "Downloading VS Code CLI..."
-        curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' --output vscode_cli.tar.gz
+        cd ~
+        if [ "$ARCH" = "x86_64" ]; then
+            VSCODE_URL='https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64'
+        elif [ "$ARCH" = "aarch64" ]; then
+            VSCODE_URL='https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-arm64'
+        else
+            print_error "Unsupported architecture for VS Code CLI: $ARCH"
+            exit 1
+        fi
+        
+        print_status "Downloading VS Code CLI from: $VSCODE_URL"
+        curl -Lk "$VSCODE_URL" --output vscode_cli.tar.gz
         tar -xf vscode_cli.tar.gz
         rm vscode_cli.tar.gz
+        cd -
         
         # Update state and request restart
         update_setup_state "1"
@@ -92,6 +120,11 @@ case $SETUP_STATE in
             print_error "Conda is not available. Please ensure you've restarted your shell properly."
             exit 1
         fi
+        
+        # Accept Conda Terms of Service
+        print_status "Accepting Conda Terms of Service..."
+        conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+        conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
         
         # Step 2: Create conda environment
         print_status "Creating conda environment '$CONDA_ENV_NAME' with Python $PYTHON_VERSION..."
@@ -128,7 +161,7 @@ case $SETUP_STATE in
         echo "    conda activate $CONDA_ENV_NAME"
         echo ""
         echo "2. Start VS Code tunnel:"
-        echo "    ./code tunnel"
+        echo "    ~/code tunnel"
         echo ""
         echo "3. (Optional) Install Bloomberg API:"
         echo "    pip install blpapi --index-url https://blpapi.bloomberg.com/repository/releases/python/simple/"
@@ -142,7 +175,7 @@ case $SETUP_STATE in
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             print_status "Starting VS Code tunnel..."
-            ./code tunnel
+            ~/code tunnel
         fi
         ;;
         

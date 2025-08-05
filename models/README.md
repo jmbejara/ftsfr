@@ -214,7 +214,7 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="texas-one-fs"
 
 # Washington, USA us-east-3
-NODE_IP="192.222.50.240"
+NODE_IP="192.222.56.151"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="washington-dc-three-fs"
 
