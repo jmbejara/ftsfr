@@ -14,6 +14,7 @@ import logging
 
 from .darts_main_class import DartsMain
 from .helper_func import common_error_catch
+from .unified_one_step_ahead import perform_one_step_ahead_darts, verify_one_step_ahead
 
 dg_logger = logging.getLogger("DartsGlobal")
 
@@ -53,11 +54,27 @@ class DartsGlobal(DartsMain):
 
     @common_error_catch
     def forecast(self):
-        start_time = self.test_series.start_time()
-        pred_series = self.model.historical_forecasts(
-            series=self.raw_series, start=start_time, retrain=False
+        dg_logger.info("Starting unified one-step-ahead forecasting for global model")
+        
+        # Use the unified one-step-ahead implementation
+        self.pred_series = perform_one_step_ahead_darts(
+            model=self.model,
+            train_series=self.train_series,
+            test_series=self.test_series,
+            raw_series=self.raw_series
         )
-        self.pred_series = pred_series
+        
+        # Verify that we're doing one-step-ahead
+        is_valid = verify_one_step_ahead(
+            predictions=self.pred_series,
+            test_data=self.test_series,
+            model_type="darts"
+        )
+        
+        if is_valid:
+            dg_logger.info("✓ One-step-ahead forecasting verified")
+        else:
+            dg_logger.warning("⚠ One-step-ahead forecasting verification failed")
 
         dg_logger.info(
             "DartsGlobal forecast called. "

@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 import traceback
 import logging
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
 
 fm_logger = logging.getLogger("forecasting_model")
 
@@ -64,6 +67,33 @@ class forecasting_model(ABC):
         for i in range(67):
             sep += "-"
         print(sep)
+
+    def one_step_ahead_forecast(self):
+        """
+        Unified one-step-ahead forecasting implementation.
+        
+        This method ensures consistent evaluation across all model types:
+        1. Model is trained once on training data (80%)
+        2. For each point in test period, forecasts one step ahead using 
+           all actual historical data up to that point
+        3. No retraining occurs during the test period
+        
+        This method should be called by the forecast() method in each model class.
+        """
+        fm_logger.info("Starting unified one-step-ahead forecasting")
+        
+        # Check if we have the necessary attributes
+        if not hasattr(self, 'model') or not hasattr(self, 'train_series') or not hasattr(self, 'test_series'):
+            raise AttributeError("Model must have 'model', 'train_series', and 'test_series' attributes")
+        
+        # Model should already be trained at this point
+        if not hasattr(self.model, 'is_fitted') or not self.model.is_fitted:
+            fm_logger.warning("Model appears to not be fitted. Ensure train() was called before forecast()")
+        
+        fm_logger.info("One-step-ahead forecasting completed")
+        
+        # Subclasses should implement the actual forecasting logic
+        raise NotImplementedError("Subclasses must implement one_step_ahead_forecast")
 
     def main_workflow(self):
         """

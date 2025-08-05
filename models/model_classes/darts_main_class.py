@@ -28,6 +28,7 @@ from tabulate import tabulate
 
 from .forecasting_model import forecasting_model
 from .helper_func import process_df, common_error_catch
+from .unified_one_step_ahead import perform_one_step_ahead_darts, verify_one_step_ahead
 
 
 class DartsMain(forecasting_model):
@@ -181,11 +182,28 @@ class DartsMain(forecasting_model):
 
     @common_error_catch
     def forecast(self):
-        start_time = self.test_series.start_time()
-        pred_series = self.model.historical_forecasts(
-            series=self.raw_series, start=start_time
+        dm_logger.info("Starting unified one-step-ahead forecasting")
+        
+        # Use the unified one-step-ahead implementation
+        self.pred_series = perform_one_step_ahead_darts(
+            model=self.model,
+            train_series=self.train_series,
+            test_series=self.test_series,
+            raw_series=self.raw_series
         )
-        self.pred_series = pred_series
+        
+        # Verify that we're doing one-step-ahead
+        is_valid = verify_one_step_ahead(
+            predictions=self.pred_series,
+            test_data=self.test_series,
+            model_type="darts"
+        )
+        
+        if is_valid:
+            dm_logger.info("✓ One-step-ahead forecasting verified")
+        else:
+            dm_logger.warning("⚠ One-step-ahead forecasting verification failed")
+        
         dm_logger.info("Model inference complete. Internal variable updated.")
 
     @common_error_catch

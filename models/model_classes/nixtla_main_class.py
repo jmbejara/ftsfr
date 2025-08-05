@@ -21,6 +21,7 @@ from neuralforecast import NeuralForecast
 
 from .forecasting_model import forecasting_model
 from .helper_func import *
+from .unified_one_step_ahead import perform_one_step_ahead_nixtla, verify_one_step_ahead
 
 nx_logger = logging.getLogger("NixtlaMain")
 
@@ -152,32 +153,27 @@ class NixtlaMain(forecasting_model):
 
     @common_error_catch
     def forecast(self):
-        nx_logger.info("Forecasting from model.")
-        # The loop keeps concatenating forecasts to pred_series
-        pred_series = self.nf.predict(self.train_series)
-        first_date = self.test_series["ds"].unique()[0]
-        pred_series["ds"] = first_date
-        df = self.raw_series
-        nx_logger.info(
-            "Got predictions for date: " + first_date.strftime("%Y-%m-%d, %r") + "."
+        nx_logger.info("Starting unified one-step-ahead forecasting for Nixtla model")
+        
+        # Use the unified one-step-ahead implementation
+        self.pred_series = perform_one_step_ahead_nixtla(
+            nf_model=self.nf,
+            train_df=self.train_series,
+            test_df=self.test_series,
+            raw_df=self.raw_series
         )
-
-        # Sliding window forecasts
-        # Predict 1 date right after the dataset in the arguments
-        # After each prediction the next prediction uses the actual value in the
-        # test dataset instead of relying on the previous predicted value.
-        nx_logger.info("Starting for loop to get sliding window forecasts.")
-        for i in self.test_series["ds"].unique()[1:]:
-            # Get predictions for the next date
-            temp_pred_series = self.nf.predict(df[df.ds < i])
-            # Lining up the dates
-            temp_pred_series["ds"] = i
-            pred_series = pd.concat([pred_series, temp_pred_series], ignore_index=True)
-            nx_logger.info(
-                "Got predictions for date: " + i.strftime("%Y-%m-%d, %r") + "."
-            )
-
-        self.pred_series = pred_series
+        
+        # Verify that we're doing one-step-ahead
+        is_valid = verify_one_step_ahead(
+            predictions=self.pred_series,
+            test_data=self.test_series,
+            model_type="nixtla"
+        )
+        
+        if is_valid:
+            nx_logger.info("✓ One-step-ahead forecasting verified")
+        else:
+            nx_logger.warning("⚠ One-step-ahead forecasting verification failed")
 
         nx_logger.info("Forecasting complete. Internal variable updated.")
 

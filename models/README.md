@@ -157,6 +157,14 @@ Models are automatically saved after training and can be loaded for later use.
 
 The old system generated separate directories for each model. If you have existing results from the old system, they should still be compatible as the output structure remains the same.
 
+## One-Step-Ahead Forecasting
+
+All models now use a unified one-step-ahead forecasting implementation for consistent evaluation:
+- Models are trained once on 80% of the data
+- For the 20% test period, models forecast one step at a time using actual historical values
+- No recursive forecasting or retraining during evaluation
+- See `UNIFIED_ONE_STEP_AHEAD.md` for implementation details
+
 ## Syncing Data with Lambda Labs
 
 To copy data to Lambda Labs:
@@ -174,6 +182,10 @@ FS_FOLDER="central-texas-three-fs"
 # SSH_KEY="jeremy.pem"
 # FS_FOLDER="washington-dc-three-fs"
 
+NODE_IP="209.20.158.246"
+SSH_KEY="jeremy.pem"
+FS_FOLDER="utah-fs"
+
 ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP} "mkdir -p ~/${FS_FOLDER}/ftsfr"
 rsync -avzh --progress --delete --exclude='_output/' -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
 ```
@@ -183,3 +195,4 @@ To Connect via SSH:
 ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP}
 ```
 
+# Description of the Forecasting Approach
