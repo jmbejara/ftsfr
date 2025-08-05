@@ -180,9 +180,7 @@ def implied_daily_fx_returns(fx_data, currency_list):
             continue
 
         spot_col = f"{curr_name}_spot"
-        fx_df[f"{spot_col}_ratio"] = fx_df[spot_col] / fx_df[spot_col].shift(
-            1
-        )  # change in spot price ratio
+        fx_df[f"{spot_col}_ratio"] = fx_df[spot_col].shift(1) / fx_df[spot_col]  # change in spot price ratio
         curr_ret_col = f"{curr_name}_return"
 
         # keep interest conversion consistent with US

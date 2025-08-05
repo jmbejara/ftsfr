@@ -1,8 +1,7 @@
 """
 Fetches and loads raw foreign exchange data from Bloomberg or Excel.
 
-This module handles only data retrieval and storage. All calculations
-(CIP spreads, reciprocal conversions, etc.) are handled in calc_cip.py.
+This module handles only data retrieval and storage. All calculations are handled in calc_fx.py.
 
 This code is adapted with permission from https://github.com/Kunj121/CIP
 """
