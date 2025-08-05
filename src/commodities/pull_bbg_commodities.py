@@ -9,6 +9,38 @@ Data includes:
 - First, second, and third nearest futures contracts for 19 commodities
 - LME metals spot and 3-month forward prices
 - Goldman Sachs Commodity Index (GSCI) excess return indices
+
+
+TODO: Yangge, check to see if the commodities in this table are all pulled in the code below.
+
+Sector Commodity Symbol N Basis Freq. of bw. Excess returns Volatility Sharpe ratio (%)
+Agriculture Canola WC 97 0.12 83.02 -0.73 19.37 -3.75
+Cocoa CC 160 -0.01 25.43 4.52 30.19 14.98
+Coffee KC 149 0.08 81.88 6.45 35.96 17.95
+Corn C- 152 0.30 99.57 -1.10 24.09 -4.55
+Cotton CT 170 0.07 78.21 2.07 23.17 8.93
+Lumber LB 114 -0.01 31.50 3.71 24.88 14.90
+Oats O- 119 -0.03 44.42 0.06 29.57 0.22
+Orange juice JO 178 -0.05 23.50 1.55 30.54 5.09
+Rough rice RR 119 0.35 97.08 -1.23 25.56 -4.82
+Soybean meal SM 191 -0.19 0.43 6.81 30.71 22.18
+Soybeans S- 182 -0.01 34.62 4.53 27.42 16.51
+Wheat W- 133 0.45 98.72 1.75 24.18 7.25
+Energy Crude Oil CL 241 0.13 85.48 12.54 32.41 38.68
+Gasoline RB 251 -0.09 0.00 -11.35 40.52 -28.02
+Heating Oil HO 246 -0.02 30.37 12.33 31.85 38.72
+Natural gas NG 250 0.48 96.89 2.26 49.33 4.59
+Unleaded gas HU 198 0.01 69.64 9.94 29.24 33.98
+Livestock Feeder cattle FC 141 0.18 97.75 3.55 16.02 22.13
+Lean hogs LH 175 0.34 97.07 5.81 20.93 27.78
+Live cattle LC 136 0.08 85.47 5.52 15.81 34.93
+Metals Aluminium AL 252 0.05 100.00 -2.76 18.04 -15.28
+Copper HG 197 -0.03 31.12 8.92 24.94 35.78
+Gold GC 229 -0.03 7.84 0.28 19.10 1.44
+Palladium PA 69 0.19 77.29 6.98 30.56 22.85
+Platinum PL 78 -0.17 17.95 5.66 21.53 26.30
+Silver SI 198 0.12 99.51 1.56 30.79 5.07
+
 """
 
 import sys
