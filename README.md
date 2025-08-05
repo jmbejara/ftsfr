@@ -32,31 +32,19 @@ The dependency relationships between data modules and data sources are defined i
 
 ## Agenda
 
-All
- - Timeline (finish by end of July)
- - GitHub Contributions
- - Interactive work, using DATA_DIR
- - How to incorporate Bloomberg: Done https://github.com/jmbejara/ftsfr/issues/14
-
 Alex and Vincent
- - Bloomberg data now available in foreign_exchange/pull_bbg_foreign_exchange.py https://github.com/jmbejara/ftsfr/issues/18
- - Foreign Exchange returns (returns on individual currencies, not the portfolios of He, Kelly, Manela)
  - TODO (Vincent): Review FX return calculation issues in calc_fx.py:
    - The spot ratio appears inverted (using spot_t/spot_{t-1} instead of spot_{t-1}/spot_t)
    - Interest rates need conversion from percentage to decimal and from annual to daily rates
    - USD return calculation may need adjustment 
 
-
 Kausthub
- - Sovereign bond data: https://github.com/jmbejara/ftsfr/issues/26
- - Treasuries and Corporate Bonds done? Sovereign Bonds next?
+ - Once I give data, need to do various treasury basis trades
 
 Yangge
  - Needs to create ftsfr_futures_returns.parquet
-
-Jeremy
- - Check this again? https://github.com/jmbejara/ftsfr/issues/2
- - Bloomberg sovereign bond data: https://github.com/jmbejara/ftsfr/issues/26
+ - Needs to clean up and consolidate various notebooks in futures_returns folder
+ - Needs to consolidate futures_returns and commodities folders
 
 
 ## Configuration Files
@@ -375,36 +363,6 @@ Other options. It's probably best to stick to those above for simplicity
 - Average within-firm predictability
 
   - Match asset returns and Compustat financials within firms. That is, for a given company (e.g., via PERCMO), find the stock return, dividend payment, bond returns, associated single name CDS, options connected with that firms stocks, and various Compustat financials all associated with that company. Calculate the predictability within this firm. Then, do this for all firms. Measure the average predictability among firms.
-
-# Interesting Packages to Use
-
-## Darts
-
-Darts offers a consistent fit() and predict() interface across various forecasting models (from ARIMA to deep learning models). Easy to understand, compare and switch.
-
-<https://github.com/unit8co/darts>
-
-## Prophet
-
-Prophet is specifically designed for users with limited statistical knowledge.
-
-<https://github.com/facebook/prophet>
-
-## SKTime
-
-SKtime provides a scikit-learn-compatible framework for time series analysis. Allows for easy model tuning, validation, and deployment. You can also use embedded scikit-learn data transformers for feature generation.
-
-<https://github.com/sktime/sktime>
-
-<https://www.sktime.net/en/stable/>
-
-## GluonTS
-
-GluonTS is focused on probabilistic forecasting, allowing users to generate confidence intervals.
-
-<https://github.com/awslabs/gluonts>
-
-<https://ts.gluon.ai/stable/>
 
 # Useful Commands
 

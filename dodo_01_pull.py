@@ -535,16 +535,16 @@ def task_format():
             ],
             "clean": [],
         }
-        yield from notebook_subtask(
-            {
-                "name": "futures_replication_ipynb",
-                "notebook_path": "./src/futures_returns/futures_replication_ipynb.py",
-                "file_dep": [
-                    "./src/futures_returns/calc_futures_returns.py",
-                ],
-                "targets": [],
-            }
-        )
+        # yield from notebook_subtask(
+        #     {
+        #         "name": "futures_replication_ipynb",
+        #         "notebook_path": "./src/futures_returns/futures_replication_ipynb.py",
+        #         "file_dep": [
+        #             "./src/futures_returns/calc_futures_returns.py",
+        #         ],
+        #         "targets": [],
+        #     }
+        # )
 
     data_module = "he_kelly_manela"
     if module_requirements[data_module]:
