@@ -1,206 +1,234 @@
 # Models - Configuration-Driven Forecasting System
 
-This directory contains a flexible, configuration-driven system for running various time series forecasting models. Instead of generating separate directories for each model, all models are defined in a central configuration file and executed through a unified runner.
+Configuration-driven system for running various time series forecasting models with unified interface.
 
-## Overview
+## Quick Start
 
-The new system consists of:
-
-1. **`models_config.toml`** - Central configuration file defining all available models
-2. **`run_model.py`** - Unified runner that can execute any model based on configuration
-3. **`model_controller.py`** - Controller for orchestrating multiple model runs
-4. **`model_classes/`** - Reusable model classes (DartsLocal, DartsGlobal, NixtlaMain, GluontsMain)
-5. **`pixi.toml`** - Single environment file with all dependencies
-
-## Usage
-
-### Running a Single Model
+### Step 1: Initial Setup (Lambda Labs)
 
 ```bash
-# Activate the environment
-pixi shell
+# From the project root, run the setup script
+./setup_lambdalabs.sh
 
-# Run a specific model (full workflow)
-python run_model.py --model arima
+# This will:
+# - Install Miniconda and create 'ftsfr' environment
+# - Install all Python dependencies
+# - Install Pixi package manager
+# - Download VS Code CLI for remote development
+# - Optionally start VS Code tunnel
 
-# Run separate workflows
-python run_model.py --model transformer --workflow train      # Train and save model
-python run_model.py --model transformer --workflow inference  # Load model and predict
-python run_model.py --model transformer --workflow evaluate   # Load predictions and calculate errors
-
-# With custom config
-python run_model.py --model deepar --config custom_config.toml --workflow train
+# After setup, navigate to models directory
+cd models
 ```
 
-### Running Multiple Models
+### Step 2: Test Your Setup
+
+```bash
+# Activate the conda environment
+conda activate ftsfr
+
+# For GPU models, activate pixi GPU environment
+pixi shell -e gpu
+
+# Install required packages
+pixi run install
+
+# Test GPU availability
+python test_gpu.py
+
+# Note: On LambdaLabs nodes:
+# - For x86_64 H100/A100 nodes: Use `pixi shell -e gpu` (full CUDA support)
+# - For ARM64 GH200 nodes: Use `pixi shell` (CPU-only due to PyTorch Triton limitations)
+
+# Verify data exists (datasets are in subfolders)
+ls -la ../_data/*/ftsfr_*.parquet
+```
+
+### Step 3: Run Your First Model
+
+```bash
+# Set dataset (datasets are in module subfolders)
+export DATASET_PATH="../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet"  # US Treasury
+# export DATASET_PATH="../_data/corp_bond_returns/ftsfr_corp_bond_returns.parquet"  # Corporate bonds
+# export DATASET_PATH="../_data/cds_returns/ftsfr_CDS_contract_returns.parquet"  # CDS
+
+# Run a simple model (ARIMA)
+python run_model.py --model arima
+
+# Check results
+ls -la ../_output/raw_results/arima/
+```
+
+## Production Run
+
+### Step 4: Test Model Classes
+
+```bash
+# Local models (CPU, fast)
+python run_model.py --model arima
+python run_model.py --model auto_arima
+
+# GPU-enabled neural networks
+python run_model.py --model dlinear
+python run_model.py --model nlinear
+
+# GluonTS models
+python run_model.py --model deepar
+python run_model.py --model simple_feed_forward
+
+# Advanced models (if dependencies installed)
+python run_model.py --model timesfm
+```
+
+### Step 5: Run Multiple Models
 
 ```bash
 # List all available models
 python model_controller.py --list
 
-# Run all models sequentially (full workflow)
+# Run a subset of models
+python model_controller.py --models arima dlinear deepar
+
+# Run all models (takes time!)
 python model_controller.py --all
 
-# Run specific models with separate workflows
-python model_controller.py --models arima transformer nbeats --workflow train
-python model_controller.py --models arima transformer nbeats --workflow inference
-python model_controller.py --models arima transformer nbeats --workflow evaluate
-
-# Run all models of a specific class
-python model_controller.py --class DartsLocal --workflow train
-
-# Run models in parallel
-python model_controller.py --all --parallel --workers 4 --workflow inference
-
-# Save results to file
-python model_controller.py --all --save-results results.json
+# Run in parallel (uses more memory)
+python model_controller.py --all --parallel --workers 4
 ```
 
-## Environment Setup
-
-All models use a single unified environment:
+### Step 6: Cost-Optimized Workflow (Lambda Labs)
 
 ```bash
-# For CPU (default)
+# On GPU instance ($1.49/hr for H100) - train models
+conda activate ftsfr
+pixi shell -e gpu
+export DATASET_PATH="../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet"
+python model_controller.py --models transformer nbeats dlinear --workflow train --parallel
+
+# Switch to CPU instance ($0.20/hr) - run inference
+conda activate ftsfr
 pixi shell
-
-# For GPU support
-pixi shell -e gpu
+export DATASET_PATH="../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet"
+python model_controller.py --models transformer nbeats dlinear --workflow inference --parallel
+python model_controller.py --models transformer nbeats dlinear --workflow evaluate
 ```
 
-### Testing GPU Availability
-Before running GPU-accelerated models, test your GPU setup:
+## Monitor Your Runs
+
 ```bash
-pixi shell -e gpu
-python test_gpu.py
+# Watch GPU usage (in another terminal)
+watch -n 1 nvidia-smi
+
+# Check output structure
+tree ../_output/
+
+# View results
+cat ../_output/raw_results/arima/*.csv
+```
+
+## Troubleshooting
+
+### Common Issues
+
+```bash
+# PyTorch CUDA not detected
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# Out of memory on GPU
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+
+# Missing dependencies
+pixi install
+python -m pip install --upgrade pip
+
+# Prophet not installing on ARM64
+pip install prophet --no-binary :all:
+
+# Pixi environment issues on ARM64
+# If pixi fails with "No candidates were found for prophet"
+# Just use pip to install packages directly:
+conda activate ftsfr
+pip install -r ../requirements.txt
+pip install darts gluonts neuralforecast timesfm catboost tabulate tomli prophet tensorflow
+```
+
+### Available Model Classes
+
+- **DartsLocal**: ARIMA, AutoARIMA, ETS, Prophet (train per series)
+- **DartsGlobal**: DLinear, NLinear, Transformer, NBEATs (train globally)
+- **GluontsMain**: DeepAR, SimpleFeedForward (probabilistic forecasting)
+- **NixtlaMain**: Various neural forecasting models
+- **Special**: TimesFM (Google), Chronos (Amazon), CatBoost
+
+## Configuration
+
+### Required Environment Variable
+```bash
+# Datasets are organized in module subfolders
+export DATASET_PATH="../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet"
+```
+
+### Optional Overrides
+```bash
+export FREQUENCY="D"        # Override data frequency
+export SEASONALITY="7"      # Override seasonality
+export OUTPUT_DIR="custom"  # Custom output directory
+export TEST_SPLIT="0.3"     # 30% test split
+```
+
+### Available Datasets
+```bash
+# List all available datasets
+ls -la ../_data/*/ftsfr_*.parquet
+
+# Common datasets:
+# ../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet
+# ../_data/us_treasury_returns/ftsfr_treas_bond_portfolio_returns.parquet
+# ../_data/corp_bond_returns/ftsfr_corp_bond_returns.parquet
+# ../_data/corp_bond_returns/ftsfr_corp_bond_portfolio_returns.parquet
+# ../_data/cds_returns/ftsfr_CDS_contract_returns.parquet
+# ../_data/cds_returns/ftsfr_CDS_portfolio_returns.parquet
+# ../_data/fed_yield_curve/ftsfr_treas_yield_curve_zero_coupon.parquet
+# ../_data/he_kelly_manela/ftsfr_he_kelly_manela_factors_monthly.parquet
+# ../_data/ken_french_data_library/ftsfr_french_portfolios_25_daily_size_and_bm.parquet
+# ../_data/nyu_call_report/ftsfr_nyu_call_report_leverage.parquet
+# ../_data/options/ftsfr_hkm_option_returns.parquet
+# ../_data/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_ret.parquet
+
+# See datasets.toml in project root for full details
+```
+
+### Output Structure
+```
+_output/
+├── models/          # Trained models
+├── forecasts/       # Predictions
+├── raw_results/     # MASE scores
+└── model_logs/      # Execution logs
 ```
 
 ## Adding New Models
 
-To add a new model, simply edit `models_config.toml`:
-
+Edit `models_config.toml`:
 ```toml
-[my_new_model]
-class = "DartsLocal"  # or DartsGlobal, NixtlaMain, GluontsMain
-estimator_class = "darts.models.MyNewModel"
-display_name = "My New Model"
+[my_model]
+class = "DartsLocal"  # Model class
+estimator_class = "darts.models.MyModel"
+display_name = "My Model"
 estimator_params = { param1 = "value1" }
-
-# Optional parameters for DartsGlobal models:
-scaling = true
-interpolation = true
-f32 = false
 ```
 
-Dataset-specific parameters (seasonality, frequency) are automatically injected based on model type.
+## Remote Development (Lambda Labs)
 
-## Model Classes
-
-- **DartsLocal**: For univariate models that train separately on each time series
-- **DartsGlobal**: For models that train globally across all time series
-- **NixtlaMain**: For Nixtla's neuralforecast models
-- **GluontsMain**: For GluonTS probabilistic models
-- **TimesFM**: Special implementation for Google's TimesFM
-
-## Configuration System
-
-### Dataset Configuration
-
-Dataset-specific parameters are defined in the root `datasets.toml`:
-
-```toml
-[us_treasury_returns.ftsfr_treas_bond_returns]
-description = """This data module contains the returns of individual treasury bonds sourced from the CRSP database."""
-frequency = "ME"
-seasonality = 12
-```
-
-### Environment Variables
-
-Only one environment variable is required:
-- `DATASET_PATH`: Path to the parquet file containing the data
-
-Optional overrides (these override dataset configuration):
-- `FREQUENCY`: Time series frequency (e.g., "D", "M", "Q")
-- `SEASONALITY`: Seasonal period (e.g., 7 for daily data)
-- `OUTPUT_DIR`: Directory for saving results (default: `_output`)
-- `TEST_SPLIT`: Fraction of data to use for testing
-
-### Example Usage
-
+### VS Code Remote Development (Recommended)
 ```bash
-# Basic usage - configuration is automatic
-export DATASET_PATH="_data/ftsfr_us_treasury_returns.parquet"
-python run_model.py --model arima
+# After running setup_lambdalabs.sh, start VS Code tunnel
+~/code tunnel
 
-# Override seasonality for experimentation
-export DATASET_PATH="_data/ftsfr_us_treasury_returns.parquet"
-export SEASONALITY="10"
-python run_model.py --model arima
+# Follow the instructions to authenticate and connect from your local VS Code
 ```
 
-## Output Structure
-
-Results are saved in the following structure:
-```
-_output/
-├── models/          # Saved trained model files
-│   └── {model_name}/{dataset_name}/saved_model.*
-├── forecasts/       # Model predictions
-│   └── {model_name}/{dataset_name}/forecasts.parquet
-├── raw_results/     # Performance metrics (MASE scores)
-│   └── {model_name}/{dataset_name}.csv
-└── model_logs/      # Execution logs
-    └── {model_name}/{dataset_name}.log
-```
-
-## Model Workflows for Lambda Labs
-
-Models support separated workflows to optimize costs on cloud computing:
-
-- **`--workflow main`**: Complete pipeline (train → predict → evaluate)
-- **`--workflow train`**: Train and save model only
-- **`--workflow inference`**: Load model and generate predictions
-- **`--workflow evaluate`**: Calculate metrics from saved predictions
-
-### Lambda Labs Strategy
-
-```bash
-# 1. Train on GPU instance ($0.75/hour)
-export DATASET_PATH="_data/ftsfr_us_treasury_returns.parquet"
-pixi shell -e gpu
-python model_controller.py --models transformer nbeats --workflow train --parallel
-
-# 2. Switch to CPU instance ($0.20/hour) - models already in persistent storage
-export DATASET_PATH="_data/ftsfr_us_treasury_returns.parquet"
-pixi shell
-python model_controller.py --models transformer nbeats --workflow inference --parallel
-```
-
-The `_output/` directory is automatically saved to the persistent filesystem.
-
-**Note**: DartsLocal models (ARIMA, ETS, Prophet) save configuration only and train during inference.
-
-### Troubleshooting
-
-- **Model not found**: Run `--workflow train` before `--workflow inference`
-- **Predictions not found**: Run `--workflow inference` before `--workflow evaluate`
-- **Environment issues**: Use the same pixi environment for all workflows
-
-## One-Step-Ahead Forecasting
-
-All models use unified one-step-ahead forecasting for consistent evaluation:
-
-- **Training**: Once on 80% of data
-- **Testing**: For each test point, forecast one step using actual historical data (never predictions)
-- **No retraining** during test period
-- **Automatic verification** ensures prediction count matches test period
-
-This avoids look-ahead bias and ensures fair comparison across all model types (Darts, Nixtla, GluonTS).
-
-## Syncing Data with Lambda Labs
-
-To copy data to Lambda Labs:
+### Data Sync
 ```bash
 
 # Central Texas, USA us-south-3
@@ -209,7 +237,7 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="central-texas-three-fs"
 
 # Texas, USA us-south-1
-NODE_IP="104.171.202.68"
+NODE_IP="104.171.202.199"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="texas-one-fs"
 
@@ -230,4 +258,13 @@ rsync -avzh --progress --delete --exclude='_output/' --exclude='.pixi/' -e "ssh 
 To Connect via SSH:
 ```bash
 ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP}
+cd ~/${FS_FOLDER}/ftsfr
+./setup_lambdalabs.sh  # Run setup on first connection
 ```
+
+## Technical Details
+
+- **One-step-ahead forecasting**: Train once on 80% data, test without retraining
+- **No look-ahead bias**: Each forecast uses only historical data
+- **Unified evaluation**: All models use MASE (Mean Absolute Scaled Error)
+- **Automatic dataset detection**: Reads configuration from `datasets.toml`

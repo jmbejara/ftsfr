@@ -104,26 +104,28 @@ def test_lightning_gpu():
     """Test PyTorch Lightning GPU support."""
     print("\nTesting PyTorch Lightning GPU support...")
     try:
+        import lightning.pytorch as pl
         from lightning.pytorch.accelerators import find_usable_cuda_devices
-        from pytorch_lightning.accelerators.cuda import CUDAAccelerator
 
         print("✓ PyTorch Lightning imported successfully")
+        print(f"  Lightning version: {pl.__version__}")
 
-        # Check if CUDA accelerator is available
-        cuda_available = CUDAAccelerator.is_available()
-        print(f"  CUDA Accelerator available: {cuda_available}")
-
-        if cuda_available:
-            # Find usable CUDA devices
-            try:
-                devices = find_usable_cuda_devices(1)
+        # Check if CUDA is available through Lightning
+        try:
+            # Try to find usable CUDA devices
+            devices = find_usable_cuda_devices(1)
+            if devices:
                 print(f"  Usable CUDA devices: {devices}")
+                
+                # Test creating a simple trainer with GPU
+                trainer = pl.Trainer(accelerator="gpu", devices=1)
+                print("  ✓ Successfully created GPU trainer")
                 return True
-            except Exception as e:
-                print(f"  ✗ Error finding usable devices: {e}")
+            else:
+                print("  ✗ No usable CUDA devices found")
                 return False
-        else:
-            print("  ✗ CUDA Accelerator not available")
+        except Exception as e:
+            print(f"  ✗ Error finding/using CUDA devices: {e}")
             return False
 
     except ImportError:
