@@ -174,6 +174,9 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
 
     # vectorized function to grab the par spread
     def add_par_spread_vectorized(df):
+        # Create a copy to avoid SettingWithCopyWarning
+        df = df.copy()
+        
         mask = df.set_index(["redcode", "date"]).index.isin(cubic_splines.keys())
 
         # spline interpolation only for matching keys
@@ -217,7 +220,7 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
             return x
 
     # Apply safe conversion
-    par_df = par_df.applymap(safe_convert)
+    par_df = par_df.map(safe_convert)
     par_df = par_df.drop_duplicates()
 
     return par_df
