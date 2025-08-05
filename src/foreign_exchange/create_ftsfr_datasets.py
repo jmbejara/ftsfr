@@ -16,7 +16,6 @@ DATA_DIR = config("DATA_DIR")
 
 ## Calculate fx returns
 df_all = calc_fx.calculate_fx(data_dir=DATA_DIR)
-df_stacked = df_all.stack().reset_index()
-df_stacked.columns = ["unique_id", "ds", "y"]
+df_all.columns = ["unique_id", "ds", "y"]
 
-df_stacked.to_parquet(DATA_DIR / "ftsfr_FX_returns.parquet")
+df_all.to_parquet(DATA_DIR / "ftsfr_FX_returns.parquet")

@@ -180,9 +180,7 @@ def implied_daily_fx_returns(fx_data, currency_list):
             continue
 
         spot_col = f"{curr_name}_spot"
-        fx_df[f"{spot_col}_ratio"] = fx_df[spot_col] / fx_df[spot_col].shift(
-            1
-        )  # change in spot price ratio
+        fx_df[f"{spot_col}_ratio"] = fx_df[spot_col].shift(1) / fx_df[spot_col]  # change in spot price ratio
         curr_ret_col = f"{curr_name}_return"
 
         # keep interest conversion consistent with US
@@ -235,6 +233,7 @@ def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
     -------
     pd.DataFrame
         DataFrame with FX returns for each currency
+        the formatting will be in long format, with the currency returns in a column
     """
     data_dir = Path(data_dir)
     # Load data
@@ -248,12 +247,20 @@ def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
         date = pd.Timestamp(end_date).date()
         df_merged = df_merged.loc[:date]
 
-    # Compute CIP spreads
+    # Compute FX
     df_merged = implied_daily_fx_returns(df_merged, CURRENCIES)
 
-    # Shorten column names for display
+    # Change things up
+    df_merged = df_merged.reset_index().rename(columns={"index":"date"})
+    df_long = df_merged.melt(
+        id_vars=["date"],       # columns to keep fixed
+        var_name="currency",    # name for former column headers
+        value_name="returns"       # name for the values
+    )
+    # specified unique_id, ds, y ordering
+    df_long = df_long[['currency', 'date', 'returns']]
 
-    return df_merged
+    return df_long
 
 
 if __name__ == "__main__":
