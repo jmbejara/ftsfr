@@ -1,5 +1,6 @@
-# Models Configuration File
+# Models Configuration File V2
 # This file defines all available forecasting models and their parameters
+# Dataset-specific parameters (frequency, seasonality, test_split) are now in datasets_config.toml
 
 # Local Darts Models (univariate, per-series training)
 
@@ -13,37 +14,38 @@ estimator_params = { p = 1, d = 1, q = 1 }
 class = "DartsLocal"
 estimator_class = "darts.models.AutoARIMA"
 display_name = "AutoARIMA"
-estimator_params = { season_length = "env_vars[2]" }
+# season_length will be set from dataset config
 
 [auto_ces]
 class = "DartsLocal"
 estimator_class = "darts.models.AutoCES"
 display_name = "AutoCES"
-estimator_params = { season_length = "env_vars[2]" }
+# season_length will be set from dataset config
 
 [auto_ets]
 class = "DartsLocal"
 estimator_class = "darts.models.AutoETS"
 display_name = "AutoETS"
-estimator_params = { season_length = "env_vars[2]" }
+# season_length will be set from dataset config
 
 [auto_mfles]
 class = "DartsLocal"
 estimator_class = "darts.models.AutoMFLES"
 display_name = "AutoMFLES"
-estimator_params = { test_size = 1, season_length = "env_vars[2]" }
+estimator_params = { test_size = 1 }
+# season_length will be set from dataset config
 
 [auto_tbats]
 class = "DartsLocal"
 estimator_class = "darts.models.AutoTBATS"
 display_name = "AutoTBATS"
-estimator_params = { season_length = "env_vars[2]" }
+# season_length will be set from dataset config
 
 [auto_theta]
 class = "DartsLocal"
 estimator_class = "darts.models.AutoTheta"
 display_name = "AutoTheta"
-estimator_params = { season_length = "env_vars[2]" }
+# season_length will be set from dataset config
 
 [ets]
 class = "DartsLocal"
@@ -68,20 +70,21 @@ estimator_params = {}
 class = "DartsLocal"
 estimator_class = "darts.models.NaiveMovingAverage"
 display_name = "NaiveMovingAverage"
-estimator_params = { input_chunk_length = "env_vars[2] * 4" }
+# input_chunk_length will be set to seasonality * 4
 
 [naive_seasonal]
 class = "DartsLocal"
 estimator_class = "darts.models.NaiveSeasonal"
 display_name = "NaiveSeasonal"
-estimator_params = { K = "env_vars[2]" }
+# K will be set to seasonality
 
 [pr]
 class = "DartsLocal"
 estimator_class = "darts.models.SKLearnModel"
 display_name = "Pooled Regression"
 imports = ["from sklearn.linear_model import TweedieRegressor"]
-estimator_params = { model = "TweedieRegressor(power=0)", lags = "env_vars[2] * 4", output_chunk_length = 1, multi_models = false }
+estimator_params = { model = "TweedieRegressor(power=0)", output_chunk_length = 1, multi_models = false }
+# lags will be set to seasonality * 4
 
 [prophet]
 class = "DartsLocal"
@@ -100,7 +103,7 @@ estimator_params = { trend = "ModelMode.NONE", seasonal = "SeasonalityMode.NONE"
 class = "DartsLocal"
 estimator_class = "darts.models.TBATS"
 display_name = "TBATS"
-estimator_params = { season_length = "env_vars[2]" }
+# season_length will be set from dataset config
 
 [theta]
 class = "DartsLocal"
@@ -118,7 +121,8 @@ display_name = "DLinear"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [global_naive_agg]
 class = "DartsGlobal"
@@ -127,7 +131,8 @@ display_name = "Global Naive Aggregate"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [global_naive_dri]
 class = "DartsGlobal"
@@ -136,7 +141,8 @@ display_name = "Global Naive Drift"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [global_naive_sea]
 class = "DartsGlobal"
@@ -145,7 +151,8 @@ display_name = "Global Naive Seasonal"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [nbeats]
 class = "DartsGlobal"
@@ -154,7 +161,8 @@ display_name = "N-BEATS"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [nhits]
 class = "DartsGlobal"
@@ -163,7 +171,8 @@ display_name = "NHiTS"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [nlinear]
 class = "DartsGlobal"
@@ -172,7 +181,8 @@ display_name = "NLinear"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [tide]
 class = "DartsGlobal"
@@ -181,7 +191,8 @@ display_name = "TiDE"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [transformer]
 class = "DartsGlobal"
@@ -190,7 +201,8 @@ display_name = "Transformer"
 scaling = true
 interpolation = true
 f32 = true
-estimator_params = { input_chunk_length = "env_vars[2] * 4", output_chunk_length = 1 }
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
 
 [catboost]
 class = "DartsGlobal"
@@ -200,7 +212,8 @@ scaling = false
 interpolation = true
 f32 = false
 special_handler = "catboost"  # For GPU/CPU detection
-estimator_params = { lags = "env_vars[2] * 4", output_chunk_length = 1, multi_models = false }
+estimator_params = { output_chunk_length = 1, multi_models = false }
+# lags will be set to seasonality * 4
 
 # Nixtla Models
 
@@ -208,11 +221,15 @@ estimator_params = { lags = "env_vars[2] * 4", output_chunk_length = 1, multi_mo
 class = "NixtlaMain"
 estimator_class = "neuralforecast.models.Autoformer"
 display_name = "Autoformer"
+estimator_params = { h = 1 }
+# input_size will be set to seasonality * 4
 
 [informer]
 class = "NixtlaMain"
 estimator_class = "neuralforecast.models.Informer"
 display_name = "Informer"
+estimator_params = { h = 1 }
+# input_size will be set to seasonality * 4
 
 # GluonTS Models
 
@@ -220,25 +237,29 @@ display_name = "Informer"
 class = "GluontsMain"
 estimator_class = "gluonts.torch.DeepAREstimator"
 display_name = "DeepAR"
-estimator_params = { freq = "env_vars[1]", context_length = "env_vars[2] * 4", prediction_length = 1 }
+estimator_params = { prediction_length = 1 }
+# freq and context_length will be set from dataset config
 
 [ffnn]
 class = "GluontsMain"
 estimator_class = "gluonts.torch.SimpleFeedForwardEstimator"
 display_name = "FFNN"
-estimator_params = { context_length = "env_vars[2] * 4", prediction_length = 1 }
+estimator_params = { prediction_length = 1 }
+# context_length will be set to seasonality * 4
 
 [patchtst]
 class = "GluontsMain"
 estimator_class = "gluonts.torch.PatchTSTEstimator"
 display_name = "PatchTST"
-estimator_params = { patch_len = "env_vars[2]", context_length = "env_vars[2] * 4", prediction_length = 1, stride = 4 }
+estimator_params = { prediction_length = 1, stride = 4 }
+# patch_len and context_length will be set from dataset config
 
 [wavenet]
 class = "GluontsMain"
 estimator_class = "gluonts.torch.WaveNetEstimator"
 display_name = "WaveNet"
-estimator_params = { freq = "env_vars[1]", prediction_length = 1 }
+estimator_params = { prediction_length = 1 }
+# freq will be set from dataset config
 
 # Special Models
 

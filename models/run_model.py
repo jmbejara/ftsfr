@@ -12,7 +12,7 @@ Usage:
 import os
 import sys
 import argparse
-import tomllib
+import tomli
 import importlib
 import subprocess
 import logging
@@ -23,7 +23,7 @@ from warnings import filterwarnings
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from env_reader import env_reader
+from config_reader import get_model_config
 from model_classes.darts_local_class import DartsLocal
 from model_classes.darts_global_class import DartsGlobal
 from model_classes.nixtla_main_class import NixtlaMain
@@ -35,25 +35,7 @@ filterwarnings("ignore")
 def load_config(config_path="models_config.toml"):
     """Load the models configuration from TOML file."""
     with open(config_path, "rb") as f:
-        return tomllib.load(f)
-
-
-def evaluate_param(param_str, env_vars):
-    """
-    Evaluate parameter strings that contain env_vars references.
-
-    Args:
-        param_str: String that may contain env_vars references
-        env_vars: Tuple of environment variables (test_split, frequency, seasonality, data_path, output_dir)
-    """
-    if isinstance(param_str, str) and "env_vars" in param_str:
-        # Create a safe evaluation context
-        eval_context = {"env_vars": env_vars}
-        try:
-            return eval(param_str, {"__builtins__": {}}, eval_context)
-        except:
-            return param_str
-    return param_str
+        return tomli.load(f)
 
 
 def evaluate_special_params(param_str, imports_context):
@@ -104,7 +86,7 @@ def create_estimator(model_config, env_vars):
 
     Args:
         model_config: Dictionary containing model configuration
-        env_vars: Environment variables tuple
+        env_vars: Environment variables tuple (test_split, frequency, seasonality, data_path, output_dir)
 
     Returns:
         Instantiated estimator object
@@ -114,6 +96,9 @@ def create_estimator(model_config, env_vars):
     module = importlib.import_module(module_path)
     estimator_class = getattr(module, class_name)
 
+    # Extract dataset parameters
+    test_split, frequency, seasonality, data_path, output_dir = env_vars
+
     # Process imports if any
     imports_context = {}
     if "imports" in model_config:
@@ -122,11 +107,47 @@ def create_estimator(model_config, env_vars):
     # Process estimator parameters
     params = {}
     for key, value in model_config.get("estimator_params", {}).items():
-        # First evaluate env_vars references
-        value = evaluate_param(value, env_vars)
-        # Then evaluate special parameters (like ModelMode.ADDITIVE)
+        # Evaluate special parameters (like ModelMode.ADDITIVE)
         value = evaluate_special_params(value, imports_context)
         params[key] = value
+
+    # Inject dataset-specific parameters based on model requirements
+    model_name = model_config.get("estimator_class", "")
+    
+    # Models that need season_length
+    if any(name in model_name for name in ["AutoARIMA", "AutoCES", "AutoETS", "AutoMFLES", 
+                                           "AutoTBATS", "AutoTheta", "TBATS"]):
+        if "season_length" not in params:
+            params["season_length"] = seasonality
+    
+    # Models that need input_chunk_length (typically seasonality * 4)
+    if any(name in model_name for name in ["DLinearModel", "GlobalNaive", "NBEATSModel", 
+                                           "NHiTSModel", "NLinearModel", "TiDEModel", 
+                                           "TransformerModel", "NaiveMovingAverage"]):
+        if "input_chunk_length" not in params:
+            params["input_chunk_length"] = seasonality * 4
+    
+    # Models that need lags
+    if "CatBoostModel" in model_name or ("SKLearnModel" in model_name and "lags" not in params):
+        params["lags"] = seasonality * 4
+    
+    # Models that need K (for NaiveSeasonal)
+    if "NaiveSeasonal" in model_name and "K" not in params:
+        params["K"] = seasonality
+    
+    # GluonTS models that need frequency
+    if any(name in model_name for name in ["DeepAREstimator", "WaveNetEstimator"]):
+        if "freq" not in params:
+            params["freq"] = frequency
+    
+    # GluonTS models that need context_length
+    if any(name in model_name for name in ["DeepAREstimator", "SimpleFeedForwardEstimator", "PatchTSTEstimator"]):
+        if "context_length" not in params:
+            params["context_length"] = seasonality * 4
+    
+    # PatchTST specific
+    if "PatchTSTEstimator" in model_name and "patch_len" not in params:
+        params["patch_len"] = seasonality
 
     # Special handling for certain models
     if model_config.get("special_handler") == "catboost":
@@ -140,13 +161,14 @@ def create_estimator(model_config, env_vars):
     return estimator_class(**params)
 
 
-def run_model(model_name, config_path="models_config.toml"):
+def run_model(model_name, config_path="models_config.toml", workflow="main"):
     """
     Run a specific model based on its configuration.
 
     Args:
         model_name: Name of the model to run (e.g., 'arima', 'transformer')
         config_path: Path to the configuration file
+        workflow: Which workflow to run ('main', 'train', 'inference', 'evaluate')
     """
     # Load configuration
     config = load_config(config_path)
@@ -156,13 +178,14 @@ def run_model(model_name, config_path="models_config.toml"):
 
     model_config = config[model_name]
 
-    # Read environment variables
-    env_vars = env_reader(os.environ)
+    # Read configuration (dataset config + environment overrides)
+    dataset_config = get_model_config(os.environ)
+    # Unpack for backward compatibility
+    env_vars = dataset_config[:5]  # (test_split, frequency, seasonality, dataset_path, output_dir)
+    dataset_name = dataset_config[5]
 
     # Setup logging
     data_path = env_vars[3]
-    dataset_name = str(os.path.basename(data_path)).split(".")[0]
-    dataset_name = dataset_name.removeprefix("ftsfr_")
 
     log_path = Path().resolve().parent / "model_logs" / model_name
     Path(log_path).mkdir(parents=True, exist_ok=True)
@@ -211,6 +234,8 @@ def run_model(model_name, config_path="models_config.toml"):
     elif model_class == "NixtlaMain":
         # Nixtla needs special handling for MPS
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+        # Note: NixtlaMain expects the estimator class, not an instance
+        # It will create the instance with h=1 and input_size=seasonality*4
         model_obj = NixtlaMain(estimator.__class__, model_name, *env_vars)
 
     elif model_class == "GluontsMain":
@@ -221,8 +246,21 @@ def run_model(model_name, config_path="models_config.toml"):
     else:
         raise ValueError(f"Unknown model class: {model_class}")
 
-    # Run the model workflow
-    model_obj.main_workflow()
+    # Run the selected workflow
+    if workflow == "main":
+        model_obj.main_workflow()
+    elif workflow == "train":
+        model_obj.training_workflow()
+    elif workflow == "inference":
+        model_obj.inference_workflow()
+    elif workflow == "evaluate":
+        # For evaluate-only workflow, we need to load predictions first
+        model_obj.load_forecast()
+        model_obj.calculate_error()
+        model_obj.print_summary()
+        model_obj.save_results()
+    else:
+        raise ValueError(f"Unknown workflow: {workflow}")
 
 
 def main():
@@ -240,11 +278,17 @@ def main():
         default="models_config.toml",
         help="Path to the configuration file (default: models_config.toml)",
     )
+    parser.add_argument(
+        "--workflow",
+        choices=["main", "train", "inference", "evaluate"],
+        default="main",
+        help="Which workflow to run (default: main)",
+    )
 
     args = parser.parse_args()
 
     # Run the specified model
-    run_model(args.model, args.config)
+    run_model(args.model, args.config, args.workflow)
 
 
 if __name__ == "__main__":

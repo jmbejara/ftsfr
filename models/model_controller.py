@@ -32,7 +32,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from run_model import run_model, load_config
 
 
-def run_model_wrapper(model_name, config_path):
+def run_model_wrapper(model_name, config_path, workflow="main"):
     """
     Wrapper function for running a model that captures output and errors.
 
@@ -41,7 +41,7 @@ def run_model_wrapper(model_name, config_path):
     """
     start_time = datetime.now()
     try:
-        run_model(model_name, config_path)
+        run_model(model_name, config_path, workflow)
         duration = (datetime.now() - start_time).total_seconds()
         return model_name, True, duration, None
     except Exception as e:
@@ -49,17 +49,17 @@ def run_model_wrapper(model_name, config_path):
         return model_name, False, duration, str(e)
 
 
-def run_models_sequential(models, config_path):
+def run_models_sequential(models, config_path, workflow="main"):
     """Run models sequentially."""
     results = []
     total_models = len(models)
 
-    print(f"\nRunning {total_models} models sequentially...")
+    print(f"\nRunning {total_models} models sequentially (workflow: {workflow})...")
     print("-" * 60)
 
     for i, model_name in enumerate(models, 1):
         print(f"\n[{i}/{total_models}] Running {model_name}...")
-        result = run_model_wrapper(model_name, config_path)
+        result = run_model_wrapper(model_name, config_path, workflow)
         results.append(result)
 
         if result[1]:  # Success
@@ -70,7 +70,7 @@ def run_models_sequential(models, config_path):
     return results
 
 
-def run_models_parallel(models, config_path, max_workers=None):
+def run_models_parallel(models, config_path, workflow="main", max_workers=None):
     """Run models in parallel using ProcessPoolExecutor."""
     results = []
     total_models = len(models)
@@ -78,13 +78,13 @@ def run_models_parallel(models, config_path, max_workers=None):
     if max_workers is None:
         max_workers = min(multiprocessing.cpu_count(), total_models)
 
-    print(f"\nRunning {total_models} models in parallel (max {max_workers} workers)...")
+    print(f"\nRunning {total_models} models in parallel (max {max_workers} workers, workflow: {workflow})...")
     print("-" * 60)
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
         futures = {
-            executor.submit(run_model_wrapper, model_name, config_path): model_name
+            executor.submit(run_model_wrapper, model_name, config_path, workflow): model_name
             for model_name in models
         }
 
@@ -209,6 +209,12 @@ def main():
         "--config", default="models_config.toml", help="Path to configuration file"
     )
     parser.add_argument("--save-results", help="Save results to JSON file")
+    parser.add_argument(
+        "--workflow",
+        choices=["main", "train", "inference", "evaluate"],
+        default="main",
+        help="Which workflow to run (default: main)",
+    )
 
     args = parser.parse_args()
 
@@ -241,9 +247,9 @@ def main():
     start_time = datetime.now()
 
     if args.parallel:
-        results = run_models_parallel(models, args.config, args.workers)
+        results = run_models_parallel(models, args.config, args.workflow, args.workers)
     else:
-        results = run_models_sequential(models, args.config)
+        results = run_models_sequential(models, args.config, args.workflow)
 
     total_duration = (datetime.now() - start_time).total_seconds()
 

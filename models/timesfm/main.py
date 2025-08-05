@@ -19,8 +19,8 @@ import subprocess
 import timesfm
 import sys
 
-sys.path.append("../")
-from env_reader import env_reader
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from config_reader import get_model_config
 
 from model_classes.forecasting_model import forecasting_model
 from model_classes.helper_func import *
@@ -249,7 +249,7 @@ class TimesFMForecasting(forecasting_model):
 
 
 if __name__ == "__main__":
-    env_vars = env_reader(os.environ)
+    env_vars = get_model_config(os.environ)[:5]  # Get first 5 elements for compatibility
 
     data_path = env_vars[3]
 
