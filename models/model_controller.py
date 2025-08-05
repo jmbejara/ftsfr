@@ -78,13 +78,17 @@ def run_models_parallel(models, config_path, workflow="main", max_workers=None):
     if max_workers is None:
         max_workers = min(multiprocessing.cpu_count(), total_models)
 
-    print(f"\nRunning {total_models} models in parallel (max {max_workers} workers, workflow: {workflow})...")
+    print(
+        f"\nRunning {total_models} models in parallel (max {max_workers} workers, workflow: {workflow})..."
+    )
     print("-" * 60)
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
         futures = {
-            executor.submit(run_model_wrapper, model_name, config_path, workflow): model_name
+            executor.submit(
+                run_model_wrapper, model_name, config_path, workflow
+            ): model_name
             for model_name in models
         }
 

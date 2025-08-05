@@ -249,7 +249,9 @@ class TimesFMForecasting(forecasting_model):
 
 
 if __name__ == "__main__":
-    env_vars = get_model_config(os.environ)[:5]  # Get first 5 elements for compatibility
+    env_vars = get_model_config(os.environ)[
+        :5
+    ]  # Get first 5 elements for compatibility
 
     data_path = env_vars[3]
 

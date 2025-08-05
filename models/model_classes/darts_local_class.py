@@ -62,8 +62,10 @@ class DartsLocal(DartsMain):
 
         # Store model configuration for workflow separation
         self.model_config = {
-            'class': self.model.__class__,
-            'params': self.model._model_params if hasattr(self.model, '_model_params') else {}
+            "class": self.model.__class__,
+            "params": self.model._model_params
+            if hasattr(self.model, "_model_params")
+            else {},
         }
 
         dl_logger.info("DartsLocal internal variables set.")
@@ -180,32 +182,35 @@ class DartsLocal(DartsMain):
 
     def save_model(self):
         """Save model configuration (not trained models) for DartsLocal.
-        
-        Since DartsLocal trains separately for each time series, 
+
+        Since DartsLocal trains separately for each time series,
         we only save the configuration to recreate models during inference.
         """
-        config_path = Path(self.model_path).with_suffix('.config')
+        config_path = Path(self.model_path).with_suffix(".config")
         config_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        with open(config_path, 'wb') as f:
-            pickle.dump({
-                'model_config': self.model_config,
-                'model_name': self.model_name,
-                'seasonality': self.seasonality,
-                'frequency': self.frequency,
-            }, f)
+
+        with open(config_path, "wb") as f:
+            pickle.dump(
+                {
+                    "model_config": self.model_config,
+                    "model_name": self.model_name,
+                    "seasonality": self.seasonality,
+                    "frequency": self.frequency,
+                },
+                f,
+            )
         dl_logger.info(f'Model configuration saved to "{config_path}"')
 
     def load_model(self):
         """Load model configuration and recreate untrained model."""
-        config_path = Path(self.model_path).with_suffix('.config')
-        
-        with open(config_path, 'rb') as f:
+        config_path = Path(self.model_path).with_suffix(".config")
+
+        with open(config_path, "rb") as f:
             data = pickle.load(f)
-        
+
         # Recreate untrained model
-        model_class = data['model_config']['class']
-        model_params = data['model_config']['params']
+        model_class = data["model_config"]["class"]
+        model_params = data["model_config"]["params"]
         self.model = model_class(**model_params)
         dl_logger.info(f'Model configuration loaded from "{config_path}"')
 

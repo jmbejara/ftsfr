@@ -113,38 +113,67 @@ def create_estimator(model_config, env_vars):
 
     # Inject dataset-specific parameters based on model requirements
     model_name = model_config.get("estimator_class", "")
-    
+
     # Models that need season_length
-    if any(name in model_name for name in ["AutoARIMA", "AutoCES", "AutoETS", "AutoMFLES", 
-                                           "AutoTBATS", "AutoTheta", "TBATS"]):
+    if any(
+        name in model_name
+        for name in [
+            "AutoARIMA",
+            "AutoCES",
+            "AutoETS",
+            "AutoMFLES",
+            "AutoTBATS",
+            "AutoTheta",
+            "TBATS",
+        ]
+    ):
         if "season_length" not in params:
             params["season_length"] = seasonality
-    
+
     # Models that need input_chunk_length (typically seasonality * 4)
-    if any(name in model_name for name in ["DLinearModel", "GlobalNaive", "NBEATSModel", 
-                                           "NHiTSModel", "NLinearModel", "TiDEModel", 
-                                           "TransformerModel", "NaiveMovingAverage"]):
+    if any(
+        name in model_name
+        for name in [
+            "DLinearModel",
+            "GlobalNaive",
+            "NBEATSModel",
+            "NHiTSModel",
+            "NLinearModel",
+            "TiDEModel",
+            "TransformerModel",
+            "NaiveMovingAverage",
+        ]
+    ):
         if "input_chunk_length" not in params:
             params["input_chunk_length"] = seasonality * 4
-    
+
     # Models that need lags
-    if "CatBoostModel" in model_name or ("SKLearnModel" in model_name and "lags" not in params):
+    if "CatBoostModel" in model_name or (
+        "SKLearnModel" in model_name and "lags" not in params
+    ):
         params["lags"] = seasonality * 4
-    
+
     # Models that need K (for NaiveSeasonal)
     if "NaiveSeasonal" in model_name and "K" not in params:
         params["K"] = seasonality
-    
+
     # GluonTS models that need frequency
     if any(name in model_name for name in ["DeepAREstimator", "WaveNetEstimator"]):
         if "freq" not in params:
             params["freq"] = frequency
-    
+
     # GluonTS models that need context_length
-    if any(name in model_name for name in ["DeepAREstimator", "SimpleFeedForwardEstimator", "PatchTSTEstimator"]):
+    if any(
+        name in model_name
+        for name in [
+            "DeepAREstimator",
+            "SimpleFeedForwardEstimator",
+            "PatchTSTEstimator",
+        ]
+    ):
         if "context_length" not in params:
             params["context_length"] = seasonality * 4
-    
+
     # PatchTST specific
     if "PatchTSTEstimator" in model_name and "patch_len" not in params:
         params["patch_len"] = seasonality
@@ -181,7 +210,9 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     # Read configuration (dataset config + environment overrides)
     dataset_config = get_model_config(os.environ)
     # Unpack for backward compatibility
-    env_vars = dataset_config[:5]  # (test_split, frequency, seasonality, dataset_path, output_dir)
+    env_vars = dataset_config[
+        :5
+    ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
     dataset_name = dataset_config[5]
 
     # Setup logging

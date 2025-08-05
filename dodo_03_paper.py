@@ -7,7 +7,6 @@ This file contains all tasks related to:
 - Converting PDFs to markdown
 """
 
-
 # Import common utilities
 from dodo_common import DATA_DIR, OUTPUT_DIR, load_config, load_all_module_requirements
 from dependency_tracker import get_available_datasets
