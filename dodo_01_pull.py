@@ -15,7 +15,6 @@ from pathlib import Path
 from dodo_common import (
     DATA_DIR,
     OUTPUT_DIR,
-    OS_TYPE,
     notebook_subtask,
     copy_dir_contents_to_folder,
     load_config,
@@ -536,6 +535,16 @@ def task_format():
             ],
             "clean": [],
         }
+        yield from notebook_subtask(
+            {
+                "name": "futures_replication_ipynb",
+                "notebook_path": "./src/futures_returns/futures_replication_ipynb.py",
+                "file_dep": [
+                    "./src/futures_returns/calc_futures_returns.py",
+                ],
+                "targets": [],
+            }
+        )
 
     data_module = "he_kelly_manela"
     if module_requirements[data_module]:
