@@ -37,7 +37,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import warnings
 from pathlib import Path
 
 import numpy as np

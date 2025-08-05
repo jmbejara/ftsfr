@@ -8,10 +8,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import bsm_pricer as bsm
-import pull_option_data as l1
 import level_1_filters as f1
 import level_3_filters as f3
 from pathlib import Path

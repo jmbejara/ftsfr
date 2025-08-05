@@ -7,8 +7,6 @@ This file contains all tasks related to:
 - Converting PDFs to markdown
 """
 
-import sys
-from pathlib import Path
 
 # Import common utilities
 from dodo_common import DATA_DIR, OUTPUT_DIR, load_config, load_all_module_requirements

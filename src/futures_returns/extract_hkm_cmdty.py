@@ -8,9 +8,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
 from he_kelly_manela.pull_he_kelly_manela import load_he_kelly_manela_all
 from settings import config
 

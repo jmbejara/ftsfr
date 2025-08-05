@@ -4,7 +4,6 @@ implemented using darts. Examples include CatBoost, Pooled Regression, and the
 Transformer.
 """
 
-import traceback
 import pandas as pd
 from tabulate import tabulate
 import logging

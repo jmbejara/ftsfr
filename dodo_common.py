@@ -12,8 +12,6 @@ sys.path.insert(1, "./src/")
 from settings import config
 from dependency_tracker import (
     load_module_requirements,
-    get_available_datasets,
-    get_format_task_name,
 )
 
 # Common configuration

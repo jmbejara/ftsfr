@@ -25,7 +25,6 @@ sys.path.insert(0, "./src")
 import calc_cip
 import cip_analysis
 import pandas as pd
-from IPython.display import display
 
 from settings import config
 

@@ -10,7 +10,6 @@ List of datasets:
 
 import calc_corp_bond_returns
 import pull_open_source_bond
-import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")

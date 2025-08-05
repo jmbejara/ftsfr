@@ -30,7 +30,6 @@ pd.set_option("display.max_columns", None)
 
 import numpy as np
 import datetime
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 # system libraries
@@ -45,12 +44,7 @@ sys.path.insert(0, str(src_path))
 
 # project files
 from settings import config
-import pull_option_data as l1
-import level_1_filters as f1
-import wrds
-import bsm_pricer as bsm
 
-from functools import partial
 import time
 from datetime import date
 

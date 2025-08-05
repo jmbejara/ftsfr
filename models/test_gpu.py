@@ -15,7 +15,6 @@ Usage:
 import argparse
 import subprocess
 import sys
-from pathlib import Path
 
 
 def test_nvidia_smi():
@@ -71,7 +70,7 @@ def test_torch_gpu():
         import torch
 
         cuda_available = torch.cuda.is_available()
-        print(f"✓ PyTorch imported successfully")
+        print("✓ PyTorch imported successfully")
         print(f"  CUDA available: {cuda_available}")
 
         if cuda_available:

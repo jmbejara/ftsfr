@@ -52,9 +52,7 @@ Kausthub
  - Treasuries and Corporate Bonds done? Sovereign Bonds next?
 
 Yangge
- - Present issues raised in https://github.com/jmbejara/ftsfr/issues/21
- - Commodity returns? https://github.com/kyleparran/final_project_group_09 (I received permission)
- - Compare against: https://github.com/Raafayuqaily/DS-Commodities-Final-Project
+ - Needs to create ftsfr_futures_returns.parquet
 
 Jeremy
  - Check this again? https://github.com/jmbejara/ftsfr/issues/2
@@ -421,5 +419,5 @@ pre-commit run --all-files
 to format all files and fix linting errors:
 
 ```bash
-ruff format . && ruff check --select I --fix . && ruff check --fix .
+ruff format . && ruff check --fix --show-fixes .
 ```

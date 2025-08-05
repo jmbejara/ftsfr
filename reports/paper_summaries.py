@@ -1,11 +1,10 @@
-import os
 import re
 import tomli
 import toml
 from pathlib import Path
 import bibtexparser
 from openai import OpenAI
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 import markdown
 from decouple import config
 
@@ -279,7 +278,7 @@ def generate_markdown_from_toml(summaries: Dict, bib_entries: Dict) -> str:
         # Format lists properly with blank line before list
         empirical_facts = summary["empirical_facts"]
         if isinstance(empirical_facts, list):
-            md_content += f"**Key Empirical Facts:**\n\n"
+            md_content += "**Key Empirical Facts:**\n\n"
             for fact in empirical_facts:
                 md_content += f"- {fact}\n"
             md_content += "\n"
@@ -288,7 +287,7 @@ def generate_markdown_from_toml(summaries: Dict, bib_entries: Dict) -> str:
 
         lessons_learned = summary["lessons_learned"]
         if isinstance(lessons_learned, list):
-            md_content += f"**Key Lessons Learned:**\n\n"
+            md_content += "**Key Lessons Learned:**\n\n"
             for lesson in lessons_learned:
                 md_content += f"- {lesson}\n"
             md_content += "\n"
@@ -297,7 +296,7 @@ def generate_markdown_from_toml(summaries: Dict, bib_entries: Dict) -> str:
 
         data_sources = summary["data_sources"]
         if isinstance(data_sources, list):
-            md_content += f"**Data Sources:**\n\n"
+            md_content += "**Data Sources:**\n\n"
             for source in data_sources:
                 md_content += f"- {source}\n"
             md_content += "\n"
@@ -306,7 +305,7 @@ def generate_markdown_from_toml(summaries: Dict, bib_entries: Dict) -> str:
 
         cleaning_steps = summary["cleaning_steps"]
         if isinstance(cleaning_steps, list):
-            md_content += f"**Data Cleaning Steps:**\n\n"
+            md_content += "**Data Cleaning Steps:**\n\n"
             for step in cleaning_steps:
                 md_content += f"- {step}\n"
             md_content += "\n"
@@ -418,7 +417,7 @@ def main():
                 print(f"  ✗ Error generating summary: {e}")
                 unmatched_entries.append((bib_key, bib_entry, f"Error: {e}"))
         else:
-            print(f"  ✗ No matching file found")
+            print("  ✗ No matching file found")
             author, year = extract_author_year(bib_entry)
             unmatched_entries.append(
                 (bib_key, bib_entry, f"Could not find file for {author} ({year})")

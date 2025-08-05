@@ -8,7 +8,6 @@ NOTE: Loading the TimesFM 500m checkpoint needs about 2GB of space.
 """
 
 import os
-import traceback
 from collections import defaultdict
 from pathlib import Path
 import logging
@@ -16,7 +15,6 @@ import numpy as np
 import pandas as pd
 from tabulate import tabulate
 from darts import TimeSeries
-import datetime
 import subprocess
 import timesfm
 import sys

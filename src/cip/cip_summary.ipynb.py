@@ -15,17 +15,13 @@ Du, W., & Schreger, J. (2023). *Covered Interest Parity Deviations: Macro Risks 
 # %%
 
 import pandas as pd
-import numpy as np
-from matplotlib import pyplot as plt
 from pathlib import Path
 import sys
-import os
 import calc_cip
 
 project_root = Path().resolve().parent.parent
 sys.path.insert(0, str(project_root))
 
-from settings import config
 
 DATA_DIR = project_root / "_data"
 SRC_PATH = project_root / "src"
@@ -33,10 +29,6 @@ SRC_PATH = project_root / "src"
 
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
-import pull_bloomberg_cip_data
-import cip_analysis
-import importlib
-import settings
 
 # %%
 

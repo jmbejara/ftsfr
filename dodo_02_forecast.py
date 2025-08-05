@@ -6,8 +6,6 @@ This file contains all tasks related to:
 - Checking for required data files before running
 """
 
-import sys
-from pathlib import Path
 from doit.action import CmdAction
 
 # Import common utilities
@@ -18,7 +16,7 @@ from dodo_common import (
     load_config,
     load_all_module_requirements,
 )
-from dependency_tracker import get_available_datasets, get_format_task_name
+from dependency_tracker import get_available_datasets
 
 # Load configuration
 config_toml = load_config()

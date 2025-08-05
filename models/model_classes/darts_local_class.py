@@ -4,7 +4,6 @@ implemented using darts. Examples include ARIMA, TBATS, ETS, and Theta.
 """
 
 import statistics
-import traceback
 
 import numpy as np
 import pandas as pd

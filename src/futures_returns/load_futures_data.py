@@ -8,10 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from io import BytesIO
 
 import pandas as pd
-import requests
 
 from settings import config
 

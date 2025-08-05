@@ -8,7 +8,6 @@ List of datasets:
 """
 
 import calc_fx
-import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")

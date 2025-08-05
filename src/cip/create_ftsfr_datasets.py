@@ -7,7 +7,6 @@ List of datasets:
 """
 
 import calc_cip
-import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")

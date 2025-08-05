@@ -3,8 +3,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import pandas as pd
-import polars as pl
 
 import pull_wrds_futures
 from settings import config

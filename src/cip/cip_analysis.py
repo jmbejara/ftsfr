@@ -5,7 +5,6 @@ Performs analysis on raw fx, exchange rate, and spot data
 import sys
 import os
 import pandas as pd
-import numpy as np
 
 # Add the project root (CIP/) to sys.path if not already present
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))

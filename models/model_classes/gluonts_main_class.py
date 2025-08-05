@@ -13,8 +13,6 @@ from tabulate import tabulate
 import logging
 
 # Gluonts based imports
-from gluonts.dataset.common import ListDataset
-from gluonts.dataset.field_names import FieldName
 from gluonts.model.predictor import Predictor
 from gluonts.dataset.pandas import PandasDataset
 

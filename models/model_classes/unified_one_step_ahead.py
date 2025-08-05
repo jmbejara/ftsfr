@@ -8,10 +8,6 @@ across Darts, Nixtla, and GluonTS models.
 import numpy as np
 import pandas as pd
 from darts import TimeSeries
-from darts.models.forecasting.forecasting_model import (
-    LocalForecastingModel,
-    GlobalForecastingModel,
-)
 from tqdm import tqdm
 import logging
 

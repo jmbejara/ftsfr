@@ -28,7 +28,6 @@ We are replicating a process where we convert our USD into the foreign currency 
 
 # %%
 import pandas as pd
-import numpy as np
 
 from calc_fx import *
 

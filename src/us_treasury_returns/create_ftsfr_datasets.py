@@ -10,7 +10,6 @@ List of datasets:
 
 import calc_treasury_bond_returns
 import pull_CRSP_treasury
-import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")

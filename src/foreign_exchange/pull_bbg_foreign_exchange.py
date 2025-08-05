@@ -12,7 +12,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import pandas as pd
-import polars as pl
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
