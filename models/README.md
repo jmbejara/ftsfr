@@ -30,9 +30,6 @@ conda activate ftsfr
 # For GPU models, activate pixi GPU environment
 pixi shell -e gpu
 
-# Install required packages
-pixi run install
-
 # Test GPU availability
 python test_gpu.py
 
@@ -131,14 +128,12 @@ cat ../_output/raw_results/arima/*.csv
 ### Common Issues
 
 ```bash
-# PyTorch CUDA not detected
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-
 # Out of memory on GPU
 export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
 
 # Missing dependencies
-pixi install
+# For the GPU environment, use:
+pixi install -e gpu
 python -m pip install --upgrade pip
 
 # Prophet not installing on ARM64
@@ -149,7 +144,7 @@ pip install prophet --no-binary :all:
 # Just use pip to install packages directly:
 conda activate ftsfr
 pip install -r ../requirements.txt
-pip install darts gluonts neuralforecast timesfm catboost tabulate tomli prophet tensorflow
+pip install darts "gluonts[torch]" neuralforecast timesfm catboost tabulate tomli prophet tensorflow
 ```
 
 ### Available Model Classes
