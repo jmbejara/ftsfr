@@ -20,7 +20,10 @@ from gluonts.dataset.pandas import PandasDataset
 
 from .forecasting_model import forecasting_model
 from .helper_func import *
-from .unified_one_step_ahead import perform_one_step_ahead_gluonts, verify_one_step_ahead
+from .unified_one_step_ahead import (
+    perform_one_step_ahead_gluonts,
+    verify_one_step_ahead,
+)
 
 gt_logger = logging.getLogger()
 
@@ -168,35 +171,29 @@ class GluontsMain(forecasting_model):
 
     def forecast(self):
         gt_logger.info("Starting unified one-step-ahead forecasting for GluonTS model")
-        
+
         # Use the unified one-step-ahead implementation
         self.pred_series = perform_one_step_ahead_gluonts(
-            model=self.model,
-            train_ds=self.train_series,
-            test_ds=self.test_series
+            model=self.model, train_ds=self.train_series, test_ds=self.test_series
         )
-        
+
         # For verification, we need the test data in DataFrame format
         # Extract test portion from raw_df
-        unique_dates = self.raw_df['ds'].unique()
+        unique_dates = self.raw_df["ds"].unique()
         test_length = int(self.test_split * len(unique_dates))
-        test_df = self.raw_df[self.raw_df['ds'] >= unique_dates[-test_length]]
-        
+        test_df = self.raw_df[self.raw_df["ds"] >= unique_dates[-test_length]]
+
         # Verify that we're doing one-step-ahead
         is_valid = verify_one_step_ahead(
-            predictions=self.pred_series,
-            test_data=test_df,
-            model_type="gluonts"
+            predictions=self.pred_series, test_data=test_df, model_type="gluonts"
         )
-        
+
         if is_valid:
             gt_logger.info("✓ One-step-ahead forecasting verified")
         else:
             gt_logger.warning("⚠ One-step-ahead forecasting verification failed")
 
-        gt_logger.info(
-            "Forecasting complete. Internal variable updated."
-        )
+        gt_logger.info("Forecasting complete. Internal variable updated.")
 
     @common_error_catch
     def save_forecast(self):

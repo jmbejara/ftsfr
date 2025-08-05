@@ -154,22 +154,22 @@ class NixtlaMain(forecasting_model):
     @common_error_catch
     def forecast(self):
         nx_logger.info("Starting unified one-step-ahead forecasting for Nixtla model")
-        
+
         # Use the unified one-step-ahead implementation
         self.pred_series = perform_one_step_ahead_nixtla(
             nf_model=self.nf,
             train_df=self.train_series,
             test_df=self.test_series,
-            raw_df=self.raw_series
+            raw_df=self.raw_series,
         )
-        
+
         # Verify that we're doing one-step-ahead
         is_valid = verify_one_step_ahead(
             predictions=self.pred_series,
             test_data=self.test_series,
-            model_type="nixtla"
+            model_type="nixtla",
         )
-        
+
         if is_valid:
             nx_logger.info("✓ One-step-ahead forecasting verified")
         else:

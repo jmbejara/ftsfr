@@ -1,7 +1,7 @@
 """
 Calculate CDS returns following He, Kelly, and Manela (2017) methodology.
 
-This module replicates monthly CDS portfolio returns as constructed in He, Kelly, and Manela (2017) 
+This module replicates monthly CDS portfolio returns as constructed in He, Kelly, and Manela (2017)
 and Palhares (2013)'s paper "Cash-Flow Maturity and Risk Premia in CDS Markets."
 
 The CDS return calculation uses the He-Kelly formula:
@@ -70,9 +70,9 @@ def _format_elapsed_time(seconds):
     if seconds < 60:
         return f"{seconds:.1f} sec"
     elif seconds < 3600:
-        return f"{seconds/60:.1f} min"
+        return f"{seconds / 60:.1f} min"
     else:
-        return f"{seconds/3600:.1f} hours"
+        return f"{seconds / 3600:.1f} hours"
 
 
 def process_rates(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
@@ -113,10 +113,10 @@ def process_rates(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
 def extrapolate_rates(rates=None):
     """
     Interpolates interest rates to quarterly intervals using cubic splines.
-    
+
     Since CDS spreads are paid quarterly, we need quarterly risk-free rates
     for the risky duration calculation. This function takes annual rates
-    (plus 3M and 6M) and interpolates to get rates at 0.25, 0.5, 0.75, 1.0, 
+    (plus 3M and 6M) and interpolates to get rates at 0.25, 0.5, 0.75, 1.0,
     1.25, ... up to 30 years.
 
     Parameters:
@@ -151,7 +151,7 @@ def extrapolate_rates(rates=None):
 def calc_discount(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
     """
     Calculates discount factors from interest rates for risky duration computation.
-    
+
     Discount factors are computed as e^(-r*t/4) where r is the quarterly rate
     and t is the time in quarters. These factors are used to discount the
     expected CDS payments in the risky duration calculation.
@@ -162,7 +162,7 @@ def calc_discount(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
     - end_date (str or datetime): The end date for filtering.
 
     Returns:
-    - DataFrame: Discount factors for various maturities, with columns 
+    - DataFrame: Discount factors for various maturities, with columns
                  representing quarters (0.25, 0.5, ..., 30).
     """
     # Call the function to get rates
@@ -184,24 +184,26 @@ def calc_discount(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
     return quarterly_discount
 
 
-def _get_filtered_cds_data_with_quantiles(start_date=START_DATE, end_date=END_DATE, cds_spreads=None):
+def _get_filtered_cds_data_with_quantiles(
+    start_date=START_DATE, end_date=END_DATE, cds_spreads=None
+):
     """
     Common function to filter CDS data and assign credit quantiles.
-    
+
     This function applies the standard filters for the He-Kelly-Manela methodology:
     - Only US CDS contracts
     - Parspreads <= 50% (5000 bps) to exclude distressed names
     - Assigns credit quality quintiles based on 5Y spreads each month
-    
+
     Credit quintiles are computed monthly, with Q1 being the safest (lowest spread)
     and Q5 being the riskiest (highest spread). This allows tracking of credit
     migration and ensures balanced portfolios across the credit spectrum.
-    
+
     Parameters:
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
     - cds_spreads (pl.LazyFrame or pl.DataFrame): CDS spread data.
-    
+
     Returns:
     - pl.LazyFrame: Filtered CDS data with credit quantile assignments.
     """
@@ -279,29 +281,28 @@ def _get_filtered_cds_data_with_quantiles(start_date=START_DATE, end_date=END_DA
 def get_contract_data(start_date=START_DATE, end_date=END_DATE, cds_spreads=None):
     """
     Gets individual CDS contract data with credit quantile assignments.
-    
+
     Parameters:
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
     - cds_spreads (pl.LazyFrame or pl.DataFrame): CDS spread data.
-    
+
     Returns:
     - pl.DataFrame: DataFrame with individual contract data including credit quantiles.
     """
     # Get filtered data with quantiles
-    cds_spreads_final = _get_filtered_cds_data_with_quantiles(start_date, end_date, cds_spreads)
-    
+    cds_spreads_final = _get_filtered_cds_data_with_quantiles(
+        start_date, end_date, cds_spreads
+    )
+
     # Filter to relevant tenors and collect
     relevant_tenors = ["3Y", "5Y", "7Y", "10Y"]
-    
-    contract_data = (
-        cds_spreads_final.filter(
-            (pl.col("tenor").is_in(relevant_tenors))
-            & (pl.col("credit_quantile").is_not_null())
-        )
-        .collect()
-    )
-    
+
+    contract_data = cds_spreads_final.filter(
+        (pl.col("tenor").is_in(relevant_tenors))
+        & (pl.col("credit_quantile").is_not_null())
+    ).collect()
+
     return contract_data
 
 
@@ -318,7 +319,9 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
     - dict: Dictionary where keys are tenor-quantile pairs and values are Polars DataFrames.
     """
     # Get filtered data with quantiles using the common function
-    cds_spreads_final = _get_filtered_cds_data_with_quantiles(start_date, end_date, cds_spreads)
+    cds_spreads_final = _get_filtered_cds_data_with_quantiles(
+        start_date, end_date, cds_spreads
+    )
 
     # Compute Representative Parspread lazily
     relevant_tenors = ["3Y", "5Y", "7Y", "10Y"]
@@ -355,15 +358,17 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
     return portfolio_dict
 
 
-def _get_quarterly_discount_polars(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
+def _get_quarterly_discount_polars(
+    raw_rates=None, start_date=START_DATE, end_date=END_DATE
+):
     """
     Helper function to compute quarterly discount rates and convert to Polars format.
-    
+
     Parameters:
     - raw_rates (pd.DataFrame): Raw interest rate data.
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
-    
+
     Returns:
     - pl.DataFrame: Quarterly discount rates in Polars format.
     """
@@ -371,7 +376,7 @@ def _get_quarterly_discount_polars(raw_rates=None, start_date=START_DATE, end_da
         raw_rates, start_date, end_date
     )  # Output is Pandas
     quarterly_discount_pd = quarterly_discount_pd.iloc[:-1]  # Remove last row
-    
+
     # Convert Pandas quarterly discount to Polars for compatibility
     return pl.from_pandas(quarterly_discount_pd.reset_index())
 
@@ -381,166 +386,182 @@ def calc_cds_return_for_contracts(
 ):
     """
     Calculates CDS returns for individual contracts using the He-Kelly formula.
-    
+
     The return calculation follows:
     CDS_Return_t = CDS_{t-1}/250 + ΔCDS_t × RD_{t-1}
-    
+
     Where:
     - CDS_{t-1}/250: Daily carry from holding the protection (spread accrual)
     - ΔCDS_t: Change in CDS spread (mark-to-market component)
     - RD_{t-1}: Risky duration (sensitivity to spread changes)
-    
+
     Lambda (default intensity) is calculated from 5Y spreads for each ticker,
     or averaged by credit quantile if 5Y data is unavailable.
-    
+
     Parameters:
     - contract_data (pl.DataFrame): DataFrame with individual contract data.
     - raw_rates (pd.DataFrame): Raw interest rate data.
     - start_date (str or datetime): Start date for filtering.
     - end_date (str or datetime): End date for filtering.
-    
+
     Returns:
-    - pl.DataFrame: Daily returns with columns: ticker, tenor, date, 
+    - pl.DataFrame: Daily returns with columns: ticker, tenor, date,
                     credit_quantile, daily_return.
     """
     # Step 1: Compute discount rates
     quarterly_discount = _get_quarterly_discount_polars(raw_rates, start_date, end_date)
-    
+
     # Step 2: Calculate lambda for each contract based on 5Y spreads within same credit quantile
     # First, get 5Y spreads for lambda calculation
     fiveY_data = contract_data.filter(pl.col("tenor") == "5Y")
-    
+
     # Calculate lambda for each ticker-date combination
     loss_given_default = 0.6
     fiveY_lambdas = fiveY_data.with_columns(
-        (4 * np.log(1 + (pl.col("parspread") / (4 * loss_given_default)))).alias("lambda")
+        (4 * np.log(1 + (pl.col("parspread") / (4 * loss_given_default)))).alias(
+            "lambda"
+        )
     ).select(["ticker", "date", "credit_quantile", "lambda"])
-    
+
     # Join lambda values back to all contracts (using ticker and date)
     contract_data_with_lambda = contract_data.join(
         fiveY_lambdas, on=["ticker", "date", "credit_quantile"], how="left"
     )
-    
+
     # For contracts without 5Y data, use average lambda from same quantile
     avg_lambda_by_quantile = fiveY_lambdas.group_by(["date", "credit_quantile"]).agg(
         pl.col("lambda").mean().alias("avg_lambda")
     )
-    
+
     contract_data_with_lambda = contract_data_with_lambda.join(
         avg_lambda_by_quantile, on=["date", "credit_quantile"], how="left"
     ).with_columns(
         pl.coalesce([pl.col("lambda"), pl.col("avg_lambda")]).alias("lambda_final")
     )
-    
+
     # Step 3: Calculate risky duration and returns for each contract
     # Sort by ticker, tenor, and date to ensure proper shift operations
     contract_data_sorted = contract_data_with_lambda.sort(["ticker", "tenor", "date"])
-    
+
     # Calculate risky duration
     quarters = np.arange(0.25, 20.25, 0.25)
-    
+
     # Initialize result list
     all_contract_returns = []
-    
+
     # Process each unique ticker-tenor combination
     unique_contracts = contract_data_sorted.select(["ticker", "tenor"]).unique()
     total_contracts = len(unique_contracts)
-    
+
     print(f"\nProcessing {total_contracts} individual CDS contracts...")
     start_time = time.time()
-    
+
     for idx, row in enumerate(unique_contracts.iter_rows()):
         ticker, tenor = row
-        
+
         # Progress update every 100 contracts or at milestones
-        if idx % 100 == 0 or idx in [total_contracts // 4, total_contracts // 2, 3 * total_contracts // 4]:
+        if idx % 100 == 0 or idx in [
+            total_contracts // 4,
+            total_contracts // 2,
+            3 * total_contracts // 4,
+        ]:
             elapsed = time.time() - start_time
             progress_pct = (idx / total_contracts) * 100
-            
+
             # Estimate time remaining
             if idx > 0:
                 rate = idx / elapsed
                 remaining = (total_contracts - idx) / rate
-                print(f"  Progress: {idx}/{total_contracts} contracts ({progress_pct:.1f}%), "
-                      f"Elapsed: {_format_elapsed_time(elapsed)}, "
-                      f"Est. remaining: {_format_elapsed_time(remaining)}")
-        
+                print(
+                    f"  Progress: {idx}/{total_contracts} contracts ({progress_pct:.1f}%), "
+                    f"Elapsed: {_format_elapsed_time(elapsed)}, "
+                    f"Est. remaining: {_format_elapsed_time(remaining)}"
+                )
+
         # Get data for this specific contract
         contract = contract_data_sorted.filter(
             (pl.col("ticker") == ticker) & (pl.col("tenor") == tenor)
         ).sort("date")
-        
+
         if len(contract) < 2:
             continue  # Need at least 2 dates to calculate returns
-            
+
         # Extract dates and lambda values
         dates = contract["date"].to_numpy()
         lambda_vals = contract["lambda_final"].to_numpy()
         parspreads = contract["parspread"].to_numpy()
-        
+
         # Calculate survival probabilities for each date
         survival_probs_list = []
         for lambda_val in lambda_vals:
             survival_probs = np.exp(-quarters * lambda_val)
             survival_probs_list.append(survival_probs)
-        
+
         # Get discount factors for matching dates
         discount_dates = quarterly_discount["index"].to_numpy()
-        
+
         # Calculate risky duration for each date
         risky_durations = []
         for i, date in enumerate(dates):
             if date in discount_dates:
                 date_idx = np.where(discount_dates == date)[0][0]
                 discount_row = quarterly_discount.row(date_idx)[1:]  # Skip date column
-                
+
                 # Calculate risky duration
                 rd = 0.25 * sum(
-                    survival_probs_list[i][j] * discount_row[j] 
+                    survival_probs_list[i][j] * discount_row[j]
                     for j in range(min(len(quarters), len(discount_row)))
                 )
                 risky_durations.append(rd)
             else:
                 risky_durations.append(np.nan)
-        
+
         # Calculate daily returns
         daily_returns = []
         for i in range(1, len(parspreads)):
-            if not np.isnan(risky_durations[i-1]):
-                carry = parspreads[i-1] / 250
-                spread_change = parspreads[i] - parspreads[i-1]
-                daily_return = carry + (spread_change * risky_durations[i-1])
+            if not np.isnan(risky_durations[i - 1]):
+                carry = parspreads[i - 1] / 250
+                spread_change = parspreads[i] - parspreads[i - 1]
+                daily_return = carry + (spread_change * risky_durations[i - 1])
                 daily_returns.append(daily_return)
             else:
                 daily_returns.append(np.nan)
-        
+
         # Create result dataframe for this contract
         if daily_returns:
-            result_df = pl.DataFrame({
-                "ticker": [ticker] * len(daily_returns),
-                "tenor": [tenor] * len(daily_returns),
-                "date": dates[1:],  # Skip first date
-                "credit_quantile": contract["credit_quantile"][1:],
-                "daily_return": daily_returns
-            })
+            result_df = pl.DataFrame(
+                {
+                    "ticker": [ticker] * len(daily_returns),
+                    "tenor": [tenor] * len(daily_returns),
+                    "date": dates[1:],  # Skip first date
+                    "credit_quantile": contract["credit_quantile"][1:],
+                    "daily_return": daily_returns,
+                }
+            )
             all_contract_returns.append(result_df)
-    
+
     # Combine all contract returns
     if all_contract_returns:
-        final_returns = pl.concat(all_contract_returns).sort(["ticker", "tenor", "date"])
+        final_returns = pl.concat(all_contract_returns).sort(
+            ["ticker", "tenor", "date"]
+        )
         total_elapsed = time.time() - start_time
-        print(f"  Completed: {total_contracts}/{total_contracts} contracts (100.0%), "
-              f"Total time: {_format_elapsed_time(total_elapsed)}")
+        print(
+            f"  Completed: {total_contracts}/{total_contracts} contracts (100.0%), "
+            f"Total time: {_format_elapsed_time(total_elapsed)}"
+        )
         return final_returns
     else:
         # Return empty DataFrame with correct schema
-        return pl.DataFrame({
-            "ticker": pl.Series([], dtype=pl.Utf8),
-            "tenor": pl.Series([], dtype=pl.Utf8),
-            "date": pl.Series([], dtype=pl.Date),
-            "credit_quantile": pl.Series([], dtype=pl.Int64),
-            "daily_return": pl.Series([], dtype=pl.Float64)
-        })
+        return pl.DataFrame(
+            {
+                "ticker": pl.Series([], dtype=pl.Utf8),
+                "tenor": pl.Series([], dtype=pl.Utf8),
+                "date": pl.Series([], dtype=pl.Date),
+                "credit_quantile": pl.Series([], dtype=pl.Int64),
+                "daily_return": pl.Series([], dtype=pl.Float64),
+            }
+        )
 
 
 def calc_cds_return_for_portfolios(
@@ -590,14 +611,16 @@ def calc_cds_return_for_portfolios(
     total_portfolios = len(portfolio_dict)
     print(f"\nProcessing {total_portfolios} CDS portfolios...")
     portfolio_start_time = time.time()
-    
+
     for portfolio_idx, (key, portfolio_df) in enumerate(portfolio_dict.items()):
         # Progress update
         if portfolio_idx % 5 == 0 or portfolio_idx == total_portfolios - 1:
             elapsed = time.time() - portfolio_start_time
             progress_pct = ((portfolio_idx + 1) / total_portfolios) * 100
-            print(f"  Portfolio {portfolio_idx + 1}/{total_portfolios}: {key} ({progress_pct:.0f}%), "
-                  f"Elapsed: {_format_elapsed_time(elapsed)}")
+            print(
+                f"  Portfolio {portfolio_idx + 1}/{total_portfolios}: {key} ({progress_pct:.0f}%), "
+                f"Elapsed: {_format_elapsed_time(elapsed)}"
+            )
         # Ensure pivot_table is structured correctly in Polars
         pivot_table = portfolio_df.pivot(
             index="date", on="tenor", values="rep_parspread"
@@ -705,61 +728,63 @@ def calc_cds_return_for_portfolios(
         cds_return_dict[key] = cds_return
 
     total_elapsed = time.time() - portfolio_start_time
-    print(f"  Completed all {total_portfolios} portfolios in {_format_elapsed_time(total_elapsed)}")
+    print(
+        f"  Completed all {total_portfolios} portfolios in {_format_elapsed_time(total_elapsed)}"
+    )
     return cds_return_dict
 
 
 def calculate_monthly_contract_returns(daily_contract_returns=None):
     """
     Calculates monthly returns for individual CDS contracts.
-    
+
     Parameters:
     - daily_contract_returns (pl.DataFrame): DataFrame with daily contract returns.
-    
+
     Returns:
     - pl.DataFrame: DataFrame with monthly contract returns.
     """
     if daily_contract_returns is None or daily_contract_returns.is_empty():
-        return pl.DataFrame({
-            "ticker": pl.Series([], dtype=pl.Utf8),
-            "tenor": pl.Series([], dtype=pl.Utf8),
-            "Month": pl.Series([], dtype=pl.Date),
-            "credit_quantile": pl.Series([], dtype=pl.Int64),
-            "monthly_return": pl.Series([], dtype=pl.Float64)
-        })
-    
+        return pl.DataFrame(
+            {
+                "ticker": pl.Series([], dtype=pl.Utf8),
+                "tenor": pl.Series([], dtype=pl.Utf8),
+                "Month": pl.Series([], dtype=pl.Date),
+                "credit_quantile": pl.Series([], dtype=pl.Int64),
+                "monthly_return": pl.Series([], dtype=pl.Float64),
+            }
+        )
+
     # Add month column
     daily_with_month = daily_contract_returns.with_columns(
         pl.col("date").dt.truncate("1mo").alias("Month")
     )
-    
+
     # Calculate monthly returns for each contract
     monthly_returns = (
         daily_with_month.group_by(["ticker", "tenor", "Month", "credit_quantile"])
-        .agg(
-            ((pl.col("daily_return") + 1).product() - 1).alias("monthly_return")
-        )
+        .agg(((pl.col("daily_return") + 1).product() - 1).alias("monthly_return"))
         .sort(["ticker", "tenor", "Month"])
     )
-    
+
     return monthly_returns
 
 
 def calculate_monthly_returns(daily_returns_dict=None):
     """
     Calculates monthly returns for portfolios with volatility scaling.
-    
+
     This function:
     1. Compounds daily returns to monthly frequency
     2. Calculates volatility for each 5Y portfolio (used as benchmark)
     3. Scales returns of all portfolios to match their corresponding 5Y volatility
-    
+
     The volatility scaling ensures that portfolios with the same credit quality
     but different tenors have comparable risk levels, making it easier to
     analyze the term structure of CDS returns.
 
     Parameters:
-    - daily_returns_dict (dict): Dictionary where keys are tenor-quantile pairs 
+    - daily_returns_dict (dict): Dictionary where keys are tenor-quantile pairs
                                  (e.g., "3Y_Q1") and values are Polars DataFrames.
 
     Returns:
@@ -849,13 +874,13 @@ def run_cds_calculation(
 ):
     """
     Main entry point for CDS return calculation following He-Kelly-Manela methodology.
-    
+
     This function orchestrates the entire calculation process:
     1. Filters CDS data to US contracts with spreads <= 50%
     2. Assigns credit quality quintiles based on 5Y spreads
     3. Calculates daily returns using risky duration adjustment
     4. Aggregates to monthly frequency with volatility scaling
-    
+
     The output includes both:
     - Contract-level returns: Individual CDS contracts (ticker-tenor pairs)
     - Portfolio-level returns: 20 portfolios (4 tenors × 5 credit quintiles)
@@ -870,20 +895,20 @@ def run_cds_calculation(
     - tuple: (contract_monthly_returns, portfolio_monthly_returns)
              Both are DataFrames with monthly return data.
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Starting CDS return calculation")
     print(f"Date range: {start_date} to {end_date}")
-    print("="*60)
-    
+    print("=" * 60)
+
     overall_start = time.time()
-    
+
     # Get contract-level data
     print("\n1. Loading and filtering CDS data...")
     step_start = time.time()
     contract_data = get_contract_data(start_date, end_date, cds_spreads)
     print(f"   Loaded {len(contract_data):,} contract-date observations")
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
-    
+
     # Calculate contract-level returns
     print("\n2. Calculating daily contract-level returns...")
     step_start = time.time()
@@ -892,38 +917,42 @@ def run_cds_calculation(
     )
     print(f"   Generated {len(daily_contract_returns):,} daily returns")
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
-    
+
     print("\n3. Aggregating to monthly contract returns...")
     step_start = time.time()
-    monthly_contract_returns = calculate_monthly_contract_returns(daily_contract_returns)
+    monthly_contract_returns = calculate_monthly_contract_returns(
+        daily_contract_returns
+    )
     print(f"   Generated {len(monthly_contract_returns):,} monthly contract returns")
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
-    
+
     # Calculate portfolio-level returns
     print("\n4. Creating portfolio structure...")
     step_start = time.time()
     portfolio_dict = get_portfolio_dict(start_date, end_date, cds_spreads)
     print(f"   Created {len(portfolio_dict)} portfolios")
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
-    
+
     print("\n5. Calculating daily portfolio returns...")
     step_start = time.time()
     daily_returns_dict = calc_cds_return_for_portfolios(
         portfolio_dict, raw_rates, start_date, end_date
     )
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
-    
+
     print("\n6. Aggregating and scaling monthly portfolio returns...")
     step_start = time.time()
     monthly_portfolio_returns = calculate_monthly_returns(daily_returns_dict)
-    print(f"   Generated returns for {len(monthly_portfolio_returns.columns) - 1} portfolios")
+    print(
+        f"   Generated returns for {len(monthly_portfolio_returns.columns) - 1} portfolios"
+    )
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
-    
+
     total_elapsed = time.time() - overall_start
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print(f"Total calculation time: {_format_elapsed_time(total_elapsed)}")
-    print("="*60 + "\n")
-    
+    print("=" * 60 + "\n")
+
     return monthly_contract_returns, monthly_portfolio_returns
 
 
@@ -953,14 +982,14 @@ if __name__ == "__main__":
 
     print("\nCDS Return Calculation Script")
     print(f"Data directory: {data_dir}")
-    
+
     print("\nLoading interest rate data...")
     raw_rates = pull_fed_yield_curve.load_fed_yield_curve(data_dir=data_dir)
-    
+
     print("Loading CDS spread data...")
     # Load CDS data as LazyFrame for memory efficiency
     cds_spreads = pl.scan_parquet(data_dir / "markit_cds.parquet")
-    
+
     # Calculate both contract and portfolio returns
     contract_returns, portfolio_returns = run_cds_calculation(
         raw_rates=raw_rates,
@@ -968,15 +997,17 @@ if __name__ == "__main__":
         start_date=START_DATE,
         end_date=END_DATE,
     )
-    
+
     # Save both contract and portfolio returns
     print("\nSaving results...")
     save_start = time.time()
     contract_returns.write_parquet(data_dir / "markit_cds_contract_returns.parquet")
-    print(f"  Saved contract returns: {data_dir / 'markit_cds_contract_returns.parquet'}")
-    
+    print(
+        f"  Saved contract returns: {data_dir / 'markit_cds_contract_returns.parquet'}"
+    )
+
     portfolio_returns.write_parquet(data_dir / "markit_cds_returns.parquet")
     print(f"  Saved portfolio returns: {data_dir / 'markit_cds_returns.parquet'}")
     print(f"  Save time: {_format_elapsed_time(time.time() - save_start)}")
-    
+
     print("\nCalculation complete!")

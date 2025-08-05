@@ -106,7 +106,7 @@ def combine_cds_data(cds_data: dict) -> pd.DataFrame:
     # Handle case where all DataFrames might be empty
     if not dataframes:
         return pd.DataFrame()
-    
+
     combined_df = pd.concat(dataframes, ignore_index=True)
     return combined_df
 

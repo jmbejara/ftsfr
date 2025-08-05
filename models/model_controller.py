@@ -203,7 +203,7 @@ def main():
         help="Run specific models (space-separated list)"
     )
     group.add_argument(
-        "--class",
+        "--class-name",
         choices=["DartsLocal", "DartsGlobal", "NixtlaMain", "GluontsMain", "TimesFM"],
         help="Run all models of a specific class"
     )
@@ -257,10 +257,10 @@ def main():
             list_available_models(config)
             return
         models = args.models
-    elif args.class:
-        models = filter_models_by_class(config, args.class)
+    elif args.class_name:
+        models = filter_models_by_class(config, args.class_name)
         if not models:
-            print(f"No models found for class: {args.class}")
+            print(f"No models found for class: {args.class_name}")
             return
     
     # Run models

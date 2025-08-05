@@ -32,16 +32,16 @@ df_portfolios = calc_cds_returns.load_portfolio(data_dir=DATA_DIR)
 
 # Melt the dataframe to get unique_id (portfolio), ds (date), and y (return value)
 df_portfolio_long = df_portfolios.melt(
-    id_vars=["Month"], 
-    var_name="unique_id", 
-    value_name="y"
+    id_vars=["Month"], var_name="unique_id", value_name="y"
 )
 
 # Rename columns to match ftsfr standard
 df_portfolio_long = df_portfolio_long.rename(columns={"Month": "ds"})
 
 # Sort by portfolio and date
-df_portfolio_long = df_portfolio_long.sort_values(by=["unique_id", "ds"]).reset_index(drop=True)
+df_portfolio_long = df_portfolio_long.sort_values(by=["unique_id", "ds"]).reset_index(
+    drop=True
+)
 
 # Save as ftsfr dataset
 df_portfolio_long.to_parquet(DATA_DIR / "ftsfr_CDS_portfolio_returns.parquet")
@@ -62,7 +62,9 @@ df_contract_long = df_contracts[["unique_id", "Month", "monthly_return"]].rename
 )
 
 # Sort by contract and date
-df_contract_long = df_contract_long.sort_values(by=["unique_id", "ds"]).reset_index(drop=True)
+df_contract_long = df_contract_long.sort_values(by=["unique_id", "ds"]).reset_index(
+    drop=True
+)
 
 # Save as ftsfr dataset
 df_contract_long.to_parquet(DATA_DIR / "ftsfr_CDS_contract_returns.parquet")
