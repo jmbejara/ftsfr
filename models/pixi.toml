@@ -1,32 +1,50 @@
 [workspace]
 channels = ["conda-forge"]
 name = "ftsfr_models"
-platforms = ["osx-arm64", "osx-64", "win-64", "linux-64"]
+platforms = ["osx-arm64", "win-64", "linux-64", "linux-aarch64"]
 
 [tasks]
-install = "pip install darts gluonts neuralforecast timesfm catboost tabulate tomli"
-run = { cmd = "python run_model.py", depends-on = ["install"] }
-run-controller = { cmd = "python model_controller.py", depends-on = ["install"] }
+run = "python run_model.py"
+run-controller = "python model_controller.py"
 test-gpu = "python test_gpu.py"
 
 [feature.gpu]
-system-requirements = {cuda = "12.8"}
-platforms = ["win-64", "linux-64"]
+system-requirements = {cuda = "11.8"}
+platforms = ["linux-64"]  # ARM64 not supported due to PyTorch CUDA dependency on Triton
 
 [feature.gpu.pypi-dependencies]
-torch = { version = ">=2.5.1", index = "https://download.pytorch.org/whl/cu128" }
-torchvision = { version = ">=0.20.1", index = "https://download.pytorch.org/whl/cu128" }
-lightning = { version = "==2.5.*" }
+# Core PyTorch packages with CUDA support
+torch = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu118" }
+torchvision = { version = "==0.18.1", index = "https://download.pytorch.org/whl/cu118" }
+torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu118" }
+lightning = { version = ">=2.3.0" }
+# Forecasting libraries - let pip resolver handle compatible versions
+darts = "*"
+gluonts = { version = "*", extras = ["torch"] }
+neuralforecast = "*"
+timesfm = "*"
+catboost = "*"
+prophet = "*"
+tensorflow = "==2.15.0"
 
 [feature.cpu.pypi-dependencies]
-torch = { version = ">=2.5.1", index = "https://download.pytorch.org/whl/cpu" }
-torchvision = { version = ">=0.20.1", index = "https://download.pytorch.org/whl/cpu" }
-lightning = { version = "==2.5.*" }
+torch = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cpu" }
+torchvision = { version = "==0.18.1", index = "https://download.pytorch.org/whl/cpu" }
+torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cpu" }
+lightning = { version = ">=2.3.0" }
+# Forecasting libraries
+darts = "*"
+gluonts = { version = "*", extras = ["torch"] }
+neuralforecast = "*"
+timesfm = "*"
+catboost = "*"
+prophet = "*"
+tensorflow = "*"
 
 [dependencies]
 python = "3.11.*"  # TimesFM requires 3.11
 pip = "*"
-numpy = "*"
+numpy = ">=1.26,<2.0"
 pandas = "*"
 tqdm = "*"
 packaging = "*"
@@ -36,8 +54,8 @@ pyarrow = "*"
 fastparquet = "*"
 tabulate = "*"
 scikit-learn = "*"
-prophet = "*"
 tomli = "*"  # For TOML reading in Python < 3.11
+# Prophet will be installed via pip for all platforms
 
 [environments]
 gpu = { features = ["gpu"] }
