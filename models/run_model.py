@@ -24,10 +24,6 @@ from warnings import filterwarnings
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from config_reader import get_model_config
-from model_classes.darts_local_class import DartsLocal
-from model_classes.darts_global_class import DartsGlobal
-from model_classes.nixtla_main_class import NixtlaMain
-from model_classes.gluonts_main_class import GluontsMain
 
 filterwarnings("ignore")
 
@@ -231,28 +227,19 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     logger = logging.getLogger("main")
     logger.info(f"Running {model_name} model. Environment variables read.")
 
-    # Handle special models
-    if model_config["class"] == "TimesFM":
-        # TimesFM has its own implementation
-        from timesfm.main import TimesFMForecasting
-
-        model_obj = TimesFMForecasting(
-            model_config.get("model_version", "500m"), *env_vars
-        )
-        model_obj.inference_workflow()
-        return
-
-    # Create estimator
+    # Create estimator before instantiating the model class
     estimator = create_estimator(model_config, env_vars)
 
-    # Create appropriate model object based on class
+    # Handle special models
     model_class = model_config["class"]
     display_name = model_config.get("display_name", model_name)
 
+    # Dynamically import the required model class only when needed
     if model_class == "DartsLocal":
+        from model_classes.darts_local_class import DartsLocal
         model_obj = DartsLocal(estimator, model_name, *env_vars)
-
     elif model_class == "DartsGlobal":
+        from model_classes.darts_global_class import DartsGlobal
         model_obj = DartsGlobal(
             estimator,
             model_name,
@@ -261,19 +248,21 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
             interpolation=model_config.get("interpolation", True),
             f32=model_config.get("f32", False),
         )
-
     elif model_class == "NixtlaMain":
-        # Nixtla needs special handling for MPS
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-        # Note: NixtlaMain expects the estimator class, not an instance
-        # It will create the instance with h=1 and input_size=seasonality*4
+        from model_classes.nixtla_main_class import NixtlaMain
         model_obj = NixtlaMain(estimator.__class__, model_name, *env_vars)
-
     elif model_class == "GluontsMain":
-        # GluonTS also needs MPS fallback
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+        from model_classes.gluonts_main_class import GluontsMain
         model_obj = GluontsMain(estimator, model_name, *env_vars)
-
+    elif model_class == "TimesFM":
+        from timesfm.main import TimesFMForecasting
+        model_obj = TimesFMForecasting(
+            model_config.get("model_version", "500m"), *env_vars
+        )
+        model_obj.inference_workflow()
+        return
     else:
         raise ValueError(f"Unknown model class: {model_class}")
 

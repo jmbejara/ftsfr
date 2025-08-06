@@ -12,13 +12,9 @@ import logging
 
 import pandas as pd
 from tabulate import tabulate
-import torch
-from darts import TimeSeries
-from neuralforecast import NeuralForecast
 
 from .forecasting_model import forecasting_model
 from .helper_func import *
-from .unified_one_step_ahead import perform_one_step_ahead_nixtla, verify_one_step_ahead
 
 nx_logger = logging.getLogger("NixtlaMain")
 
@@ -34,6 +30,8 @@ class NixtlaMain(forecasting_model):
         data_path,
         output_path,
     ):
+        # Only import torch here, not neuralforecast
+        import torch
         nx_logger.info("NixtlaMain __init__ called.")
 
         # This helps with organising
@@ -112,7 +110,7 @@ class NixtlaMain(forecasting_model):
             self.estimator = estimator(h=1, input_size=seasonality * 4)
 
         # Stores the nf object
-        self.nf = NeuralForecast(models=[self.estimator], freq=frequency)
+        self.nf = None # Initialize to None, will be set in train()
         # Error metrics
         self.errors = defaultdict(float)
 
@@ -134,6 +132,8 @@ class NixtlaMain(forecasting_model):
 
     def train(self):
         nx_logger.info("Model training started.")
+        NeuralForecast = __import__('neuralforecast').neuralforecast.NeuralForecast
+        self.nf = NeuralForecast(models=[self.estimator], freq=self.frequency)
         self.nf.fit(df=self.train_series)
         nx_logger.info("Model trained.")
 
@@ -145,14 +145,17 @@ class NixtlaMain(forecasting_model):
         nx_logger.info('Model saved to "' + str(self.model_path) + '".')
 
     def load_model(self):
+        NeuralForecast = __import__('neuralforecast').neuralforecast.NeuralForecast
         self.nf = NeuralForecast.load(path=str(self.model_path))
         nx_logger.info('Model loaded from "' + str(self.model_path) + '".')
 
     @common_error_catch
     def forecast(self):
         nx_logger.info("Starting unified one-step-ahead forecasting for Nixtla model")
+        import torch
+        from darts import TimeSeries
+        from .unified_one_step_ahead import perform_one_step_ahead_nixtla, verify_one_step_ahead
 
-        # Use the unified one-step-ahead implementation
         self.pred_series = perform_one_step_ahead_nixtla(
             nf_model=self.nf,
             train_df=self.train_series,

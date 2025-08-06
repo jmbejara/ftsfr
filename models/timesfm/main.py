@@ -14,9 +14,6 @@ import logging
 import numpy as np
 import pandas as pd
 from tabulate import tabulate
-from darts import TimeSeries
-import subprocess
-import timesfm
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -32,6 +29,7 @@ class TimesFMForecasting(forecasting_model):
     def __init__(
         self, model_version, test_split, frequency, seasonality, data_path, output_path
     ):
+        # TimesFM-specific import only when needed
         logger.info("TimesFM __init__ called.")
 
         dataset_name = str(os.path.basename(data_path)).split(".")[0]
@@ -123,6 +121,8 @@ class TimesFMForecasting(forecasting_model):
 
     @common_error_catch
     def load_model(self):
+        import subprocess
+        import timesfm
         logger.info("Loading model.")
         # Check for an NVIDIA GPU
         try:

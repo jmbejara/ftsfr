@@ -44,6 +44,12 @@ class DartsMain(forecasting_model):
         interpolation=True,
         f32=False,
     ):
+        # Darts-specific imports only when needed
+        from darts import TimeSeries
+        from darts.dataprocessing.transformers import Scaler
+        from darts.utils.missing_values import fill_missing_values
+        from darts.utils.model_selection import train_test_split
+        dm_logger = logging.getLogger("DartsMain")
         dm_logger.info("DartsMain __init__() called.")
 
         # This helps with organising

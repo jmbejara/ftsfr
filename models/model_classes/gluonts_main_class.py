@@ -1,6 +1,6 @@
 """
 The GluontsMain class can help quickly create the necessary objects for
-forecasting with Gluonts models. Some code adapted from Monash.
+forecasting with GluonTS models. Some code adapted from Monash.
 """
 
 import os
@@ -12,16 +12,10 @@ import numpy as np
 from tabulate import tabulate
 import logging
 
-# Gluonts based imports
-from gluonts.model.predictor import Predictor
-from gluonts.dataset.pandas import PandasDataset
-
 from .forecasting_model import forecasting_model
 from .helper_func import *
-from .unified_one_step_ahead import (
-    perform_one_step_ahead_gluonts,
-    verify_one_step_ahead,
-)
+
+# GluonTS-specific imports are moved inside methods
 
 gt_logger = logging.getLogger()
 
@@ -37,6 +31,8 @@ class GluontsMain(forecasting_model):
         data_path,
         output_path,
     ):
+        # GluonTS-specific imports only when needed
+        from gluonts.dataset.pandas import PandasDataset
         gt_logger.info("GluontsMain __init__ called.")
 
         # This helps with organising
@@ -160,14 +156,17 @@ class GluontsMain(forecasting_model):
 
     @common_error_catch
     def save_model(self):
+        from gluonts.model.predictor import Predictor
         self.model.serialize(self.model_path)
         gt_logger.info('Model saved to "' + str(self.model_path) + '".')
 
     def load_model(self):
+        from gluonts.model.predictor import Predictor
         self.model = Predictor.deserialize(self.model_path)
         gt_logger.info('Model loaded from "' + str(self.model_path) + '".')
 
     def forecast(self):
+        from .unified_one_step_ahead import perform_one_step_ahead_gluonts, verify_one_step_ahead
         gt_logger.info("Starting unified one-step-ahead forecasting for GluonTS model")
 
         # Use the unified one-step-ahead implementation

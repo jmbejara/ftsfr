@@ -13,13 +13,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from darts.utils.missing_values import fill_missing_values
 from tabulate import tabulate
 from tqdm import tqdm
 import logging
-
-# from warnings import filterwarnings
-# filterwarnings("ignore")
 
 from .darts_main_class import DartsMain
 from .helper_func import common_error_catch
@@ -40,6 +36,8 @@ class DartsLocal(DartsMain):
         scaling=False,
         interpolation=False,
     ):
+        # Import Darts-specific utilities only when needed
+        from darts.utils.missing_values import fill_missing_values
         dl_logger.info("DartsLocal object initialized.")
 
         super().__init__(
@@ -72,22 +70,8 @@ class DartsLocal(DartsMain):
 
     @common_error_catch
     def forecast_workflow(self):
-        """
-        This workflow function follows the procedure below:
-
-        Step 1
-        ------
-        For each entity in raw_series:
-            1. Extract and process entity data
-            2. If entity data is too small, move to next
-            3. Update internal variables and split into train and test
-            4. Train -> Forecast -> Calculate error
-            5. Update internal model to untrained version
-
-        Step 2
-        ------
-        Calculates mean and median MASE, and updates internal variables.
-        """
+        # Import Darts-specific utilities only when needed
+        from darts.utils.missing_values import fill_missing_values
         dl_logger.info(
             "forecast_workflow called. Predictions made for each "
             + "entity separately."

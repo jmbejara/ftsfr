@@ -13,7 +13,8 @@ import logging
 
 from .darts_main_class import DartsMain
 from .helper_func import common_error_catch
-from .unified_one_step_ahead import perform_one_step_ahead_darts, verify_one_step_ahead
+
+# Darts-specific imports are moved inside methods
 
 dg_logger = logging.getLogger("DartsGlobal")
 
@@ -53,6 +54,8 @@ class DartsGlobal(DartsMain):
 
     @common_error_catch
     def forecast(self):
+        # Darts-specific imports only when needed
+        from .unified_one_step_ahead import perform_one_step_ahead_darts, verify_one_step_ahead
         dg_logger.info("Starting unified one-step-ahead forecasting for global model")
 
         # Use the unified one-step-ahead implementation
