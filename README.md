@@ -32,12 +32,6 @@ The dependency relationships between data modules and data sources are defined i
 
 ## Agenda
 
-Alex and Vincent
- - TODO (Vincent): Review FX return calculation issues in calc_fx.py:
-   - The spot ratio appears inverted (using spot_t/spot_{t-1} instead of spot_{t-1}/spot_t)
-   - Interest rates need conversion from percentage to decimal and from annual to daily rates
-   - USD return calculation may need adjustment 
-
 Kausthub
  - Once I give data, need to do various treasury basis trades
 
