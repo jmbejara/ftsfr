@@ -197,18 +197,6 @@ def task_pull():
             "file_dep": [f"./src/{data_module}/pull_wrds_fx.py"],
         }
 
-    data_module = "futures_returns"
-    if module_requirements[data_module] and not use_cache:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/pull_wrds_futures.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [DATA_DIR / data_module / "wrds_futures.parquet"],
-            "file_dep": [f"./src/{data_module}/pull_wrds_futures.py"],
-            "clean": [],
-        }
-
     data_module = "fed_yield_curve"
     if module_requirements[data_module] and not use_cache:
         yield {
@@ -520,31 +508,6 @@ def task_format():
             ],
             "clean": [],
         }
-
-    data_module = "futures_returns"
-    if module_requirements[data_module]:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/calc_futures_returns.py --DATA_DIR={DATA_DIR / data_module}",
-                # f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [DATA_DIR / data_module / "futures_returns.parquet"],
-            "file_dep": [
-                f"./src/{data_module}/calc_futures_returns.py",
-            ],
-            "clean": [],
-        }
-        # yield from notebook_subtask(
-        #     {
-        #         "name": "futures_replication_ipynb",
-        #         "notebook_path": "./src/futures_returns/futures_replication_ipynb.py",
-        #         "file_dep": [
-        #             "./src/futures_returns/calc_futures_returns.py",
-        #         ],
-        #         "targets": [],
-        #     }
-        # )
 
     data_module = "he_kelly_manela"
     if module_requirements[data_module]:

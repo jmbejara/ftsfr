@@ -242,7 +242,7 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="washington-dc-three-fs"
 
 # Utah, USA us-west-3
-NODE_IP="209.20.158.246"
+NODE_IP="209.20.157.38"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="utah-fs"
 
