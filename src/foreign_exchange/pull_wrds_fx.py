@@ -1,6 +1,9 @@
 """
 This scripts pulls FX rates from the fed reserve FX table on WRDS.
 Code by by Alex Wang
+
+DEPRECATED
+KEEPING IN CASE OF MIGRATION FROM BBG TO WRDS FOR DATA SOURCING
 """
 
 # Add src directory to Python path
