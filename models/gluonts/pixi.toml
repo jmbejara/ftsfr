@@ -1,0 +1,40 @@
+[workspace]
+channels = ["conda-forge"]
+name = "ftsfr_gluonts"
+platforms = ["linux-64"]
+
+[tasks]
+run = "python run_model.py --model deepar"
+test-gpu = "python test_gpu.py"
+
+[feature.gpu]
+system-requirements = { cuda = "11.8" }
+platforms = ["linux-64"]
+
+[feature.gpu.pypi-dependencies]
+mxnet = "*"
+gluonts = "*"
+torch = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu118" }
+torchvision = { version = "==0.18.1", index = "https://download.pytorch.org/whl/cu118" }
+torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu118" }
+lightning = { version = ">=2.3.0" }
+tensorflow = "==2.15.0"
+
+[dependencies]
+python = "3.11.*"
+pip = "*"
+numpy = ">=1.26,<2.0"
+pandas = "*"
+tqdm = "*"
+packaging = "*"
+scipy = "*"
+statsmodels = "*"
+pyarrow = "*"
+fastparquet = "*"
+tabulate = "*"
+scikit-learn = "*"
+tomli = "*"
+
+[environments]
+default = []
+gpu = ["gpu"]
