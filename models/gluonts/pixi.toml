@@ -12,7 +12,6 @@ system-requirements = { cuda = "11.8" }
 platforms = ["linux-64"]
 
 [feature.gpu.pypi-dependencies]
-mxnet = "*"
 gluonts = "*"
 torch = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu118" }
 torchvision = { version = "==0.18.1", index = "https://download.pytorch.org/whl/cu118" }
@@ -23,7 +22,7 @@ tensorflow = "==2.15.0"
 [dependencies]
 python = "3.11.*"
 pip = "*"
-numpy = ">=1.26,<2.0"
+numpy = ">=1.23,<1.24"
 pandas = "*"
 tqdm = "*"
 packaging = "*"

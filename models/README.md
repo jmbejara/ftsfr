@@ -91,6 +91,10 @@ python run_model.py --model nlinear
 python run_model.py --model deepar
 python run_model.py --model simple_feed_forward
 
+# Nixtla models
+python run_model.py --model autoformer
+python run_model.py --model informer
+
 # Advanced models (if dependencies installed), implemented in TimesFM
 python run_model.py --model timesfm
 ```

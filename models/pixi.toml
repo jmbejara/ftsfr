@@ -20,12 +20,11 @@ torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu
 lightning = { version = ">=2.3.0" }
 # Forecasting libraries - let pip resolver handle compatible versions
 darts = "*"
-gluonts = { version = "*", extras = ["torch"] }
+gluonts = "*"
 neuralforecast = "*"
 timesfm = "*"
 catboost = "*"
 prophet = "*"
-mxnet-cu118 = "*"
 tensorflow = "==2.15.0"
 
 [feature.cpu.pypi-dependencies]
@@ -35,18 +34,17 @@ torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cp
 lightning = { version = ">=2.3.0" }
 # Forecasting libraries
 darts = "*"
-gluonts = { version = "*", extras = ["torch"] }
+gluonts = "*"
 neuralforecast = "*"
 timesfm = "*"
 catboost = "*"
 prophet = "*"
-mxnet = "*"
 tensorflow = "*"
 
 [dependencies]
 python = "3.11.*"  # TimesFM requires 3.11
 pip = "*"
-numpy = ">=1.26,<2.0"
+numpy = ">=1.23,<1.24"
 pandas = "*"
 tqdm = "*"
 packaging = "*"
