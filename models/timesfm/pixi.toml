@@ -34,6 +34,8 @@ fastparquet = "*"
 tabulate = "*"
 scikit-learn = "*"
 tomli = "*"
+darts = "*"
+utilsforecast = "*"
 
 [environments]
 default = []

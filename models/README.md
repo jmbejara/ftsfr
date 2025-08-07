@@ -115,7 +115,40 @@ python model_controller.py --all
 python model_controller.py --all --parallel --workers 4
 ```
 
-### Step 6: Cost-Optimized Workflow (Lambda Labs)
+### Step 6: Run All Models on All Datasets (Overnight Runs)
+
+For comprehensive testing across all models and datasets:
+
+```bash
+# Run all models on all datasets (sequential)
+python run_all_models_all_datasets.py
+
+# Run with parallel processing
+python run_all_models_all_datasets.py --parallel --workers 4
+
+# Run specific models on all datasets
+python run_all_models_all_datasets.py --models arima transformer nbeats
+
+# Run all models on specific datasets
+python run_all_models_all_datasets.py --datasets cds_returns.ftsfr_CDS_contract_returns us_treasury_returns.ftsfr_treas_bond_returns
+
+# Save detailed results
+python run_all_models_all_datasets.py --save-results overnight_results.json
+
+# Simple overnight wrapper script
+./run_overnight.sh
+./run_overnight.sh --parallel --workers 4
+./run_overnight.sh --models arima transformer
+```
+
+**Overnight Run Features:**
+- **Robust error handling**: Continues even if individual model-dataset combinations fail
+- **Comprehensive logging**: Tracks progress and errors in `model_logs/batch_runs/`
+- **Progress tracking**: Shows current progress and estimated completion
+- **Results summary**: Detailed success/failure statistics at the end
+- **JSON results**: Save detailed results for later analysis
+
+### Step 7: Cost-Optimized Workflow (Lambda Labs)
 
 ```bash
 # On GPU instance ($1.49/hr for H100) - train models

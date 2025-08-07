@@ -195,12 +195,19 @@ class TimesFMForecasting(forecasting_model):
 
     @common_error_catch
     def save_forecast(self):
+        if self.pred_series is None:
+            logger.error("Cannot save forecast: pred_series is None. Forecast method may have failed.")
+            raise ValueError("pred_series is None - forecast method did not complete successfully")
         self.pred_series.to_parquet(self.forecast_path, engine="pyarrow")
         logger.info('Predictions saved to "' + str(self.forecast_path) + '".')
 
     @common_error_catch
     def load_forecast(self):
         temp_df = pd.read_parquet(self.forecast_path)
+        # Check if darts is available before using TimeSeries
+        if not DARTS_AVAILABLE:
+            logger.error("Cannot load forecast: darts is required but not available in this environment")
+            raise ImportError("darts is required for loading forecasts but not available in this environment")
         self.pred_series = TimeSeries.from_dataframe(temp_df, time_col="ds")
         logger.info(
             "Model forecasts loaded from "
@@ -209,6 +216,10 @@ class TimesFMForecasting(forecasting_model):
         )
 
     def calculate_error(self, metric="MASE"):
+        if self.pred_series is None:
+            logger.error("Cannot calculate error: pred_series is None. Forecast method may have failed.")
+            raise ValueError("pred_series is None - forecast method did not complete successfully")
+        
         if metric == "MASE":
             self.errors["MASE"] = calculate_darts_MASE(
                 self.test_series, self.train_series, self.pred_series, self.seasonality
