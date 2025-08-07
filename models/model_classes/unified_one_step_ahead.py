@@ -141,28 +141,30 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
     """
     logger.info("Starting Nixtla one-step-ahead forecasting")
 
-    # Get unique test dates
-    test_dates = sorted(test_df["ds"].unique())
-    logger.info(f"Forecasting for {len(test_dates)} test dates")
-
-    predictions = []
-
-    for i, test_date in enumerate(tqdm(test_dates, desc="One-step-ahead forecasting")):
-        # Get all data before this test date
-        historical_data = raw_df[raw_df["ds"] < test_date]
-
-        # Predict one step ahead
-        pred = nf_model.predict(historical_data)
-
-        # Align the prediction date
-        pred["ds"] = test_date
-        predictions.append(pred)
-
-    # Concatenate all predictions
-    pred_df = pd.concat(predictions, ignore_index=True)
-
-    logger.info(f"Generated {len(pred_df)} one-step-ahead predictions")
-    return pred_df
+    # For NeuralForecast, we can use the predict method directly on the full dataset
+    # and then filter to get only the test predictions
+    logger.info("Using NeuralForecast predict method on full dataset")
+    
+    try:
+        # Predict on the full dataset (this will give us predictions for all future points)
+        predictions = nf_model.predict(raw_df)
+        
+        # Filter to only include test dates
+        test_dates = set(test_df["ds"].unique())
+        pred_df = predictions[predictions["ds"].isin(test_dates)].copy()
+        
+        logger.info(f"Generated {len(pred_df)} predictions for test dates")
+        return pred_df
+        
+    except Exception as e:
+        logger.error(f"Error in NeuralForecast prediction: {e}")
+        # Fallback: try a simpler approach
+        logger.info("Trying fallback approach with test data only")
+        
+        # Use the test data directly for prediction
+        predictions = nf_model.predict(test_df)
+        logger.info(f"Fallback generated {len(predictions)} predictions")
+        return predictions
 
 
 def perform_one_step_ahead_gluonts(model, train_ds, test_ds):

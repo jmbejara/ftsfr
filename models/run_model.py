@@ -124,11 +124,14 @@ def get_nixtla_estimator_params(model_config, env_vars):
         params["input_size"] = seasonality * 4
 
     # Environment variable overrides for debugging
-    # Allow overriding n_epochs via environment variable for debugging
+    # Allow overriding max_steps via environment variable for debugging
     if "N_EPOCHS" in os.environ:
         n_epochs = int(os.environ["N_EPOCHS"])
-        params["n_epochs"] = n_epochs
-        print(f"Overriding n_epochs to {n_epochs} via environment variable")
+        # For Nixtla models, use max_steps instead of max_epochs (which is deprecated)
+        # Use a very small number of steps for debugging (e.g., 50 steps)
+        max_steps = n_epochs * 50
+        params["max_steps"] = max_steps
+        print(f"Overriding max_steps to {max_steps} via environment variable for Nixtla model")
 
     return params
 

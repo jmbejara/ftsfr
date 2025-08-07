@@ -16,9 +16,12 @@ import pandas as pd
 from tabulate import tabulate
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from config_reader import get_model_config
+# Add parent directory to path for imports
+parent_dir = os.path.join(os.path.dirname(__file__), "..")
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
+from config_reader import get_model_config
 from model_classes.forecasting_model import forecasting_model
 from model_classes.helper_func import *
 

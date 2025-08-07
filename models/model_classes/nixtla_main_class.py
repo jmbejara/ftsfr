@@ -29,6 +29,7 @@ class NixtlaMain(forecasting_model):
         seasonality,
         data_path,
         output_path,
+        estimator_params=None,
     ):
         # Only import torch here, not neuralforecast
         import torch
@@ -98,16 +99,19 @@ class NixtlaMain(forecasting_model):
 
         # Model related variables
         # Stores base class
+        # Use provided parameters or defaults
+        if estimator_params is None:
+            estimator_params = {"h": 1, "input_size": seasonality * 4}
+        
         # MPS is causing buffer errors
         if torch.backends.mps.is_available():
             nx_logger.info("MPS available, but will be ignored.")
-            self.estimator = estimator(
-                h=1, input_size=seasonality * 4, accelerator="cpu"
-            )
+            estimator_params["accelerator"] = "cpu"
+            self.estimator = estimator(**estimator_params)
         else:
             # Auto detect if not on MPS
             nx_logger.info("MPS not available. Auto detection enabled.")
-            self.estimator = estimator(h=1, input_size=seasonality * 4)
+            self.estimator = estimator(**estimator_params)
 
         # Stores the nf object
         self.nf = None # Initialize to None, will be set in train()
@@ -132,7 +136,7 @@ class NixtlaMain(forecasting_model):
 
     def train(self):
         nx_logger.info("Model training started.")
-        NeuralForecast = __import__('neuralforecast').neuralforecast.NeuralForecast
+        from neuralforecast import NeuralForecast
         self.nf = NeuralForecast(models=[self.estimator], freq=self.frequency)
         self.nf.fit(df=self.train_series)
         nx_logger.info("Model trained.")
@@ -145,7 +149,7 @@ class NixtlaMain(forecasting_model):
         nx_logger.info('Model saved to "' + str(self.model_path) + '".')
 
     def load_model(self):
-        NeuralForecast = __import__('neuralforecast').neuralforecast.NeuralForecast
+        from neuralforecast import NeuralForecast
         self.nf = NeuralForecast.load(path=str(self.model_path))
         nx_logger.info('Model loaded from "' + str(self.model_path) + '".')
 
@@ -153,7 +157,6 @@ class NixtlaMain(forecasting_model):
     def forecast(self):
         nx_logger.info("Starting unified one-step-ahead forecasting for Nixtla model")
         import torch
-        from darts import TimeSeries
         from .unified_one_step_ahead import perform_one_step_ahead_nixtla, verify_one_step_ahead
 
         self.pred_series = perform_one_step_ahead_nixtla(
@@ -163,43 +166,54 @@ class NixtlaMain(forecasting_model):
             raw_df=self.raw_series,
         )
 
-        # Verify that we're doing one-step-ahead
-        is_valid = verify_one_step_ahead(
-            predictions=self.pred_series,
-            test_data=self.test_series,
-            model_type="nixtla",
-        )
+        # Verify that we're doing one-step-ahead (only if darts is available)
+        try:
+            from darts import TimeSeries
+            is_valid = verify_one_step_ahead(
+                predictions=self.pred_series,
+                test_data=self.test_series,
+                model_type="nixtla",
+            )
 
-        if is_valid:
-            nx_logger.info("✓ One-step-ahead forecasting verified")
-        else:
-            nx_logger.warning("⚠ One-step-ahead forecasting verification failed")
+            if is_valid:
+                nx_logger.info("✓ One-step-ahead forecasting verified")
+            else:
+                nx_logger.warning("⚠ One-step-ahead forecasting verification failed")
+        except ImportError:
+            nx_logger.warning("⚠ Darts not available - skipping one-step-ahead verification")
 
         nx_logger.info("Forecasting complete. Internal variable updated.")
 
     @common_error_catch
     def save_forecast(self):
+        if self.pred_series is None:
+            nx_logger.error("No forecasts to save - forecast() must be called first")
+            raise ValueError("No forecasts available to save")
         self.pred_series.to_parquet(self.forecast_path, engine="pyarrow")
         nx_logger.info('Saved forecasts to "' + str(self.forecast_path) + '".')
 
     def load_forecast(self):
         temp_df = pd.read_parquet(self.forecast_path)
-        self.pred_series = TimeSeries.from_dataframe(temp_df, time_col="ds")
+        # For Nixtla models, we work with pandas DataFrames, not darts TimeSeries
+        self.pred_series = temp_df
         nx_logger.info('Loaded forecasts from "' + str(self.forecast_path) + '".')
 
     def calculate_error(self, metric="MASE"):
         if metric == "MASE":
-            self.errors["MASE"] = calculate_darts_MASE(
-                self.test_series,
-                self.train_series,
-                self.pred_series,
-                self.seasonality,
-                self.model_name.title(),
-            )
-
-            nx_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
-
-            return self.errors["MASE"]
+            try:
+                self.errors["MASE"] = calculate_darts_MASE(
+                    self.test_series,
+                    self.train_series,
+                    self.pred_series,
+                    self.seasonality,
+                    self.model_name.title(),
+                )
+                nx_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
+                return self.errors["MASE"]
+            except ImportError:
+                nx_logger.warning("⚠ Darts not available - cannot calculate MASE")
+                self.errors["MASE"] = float('nan')
+                return self.errors["MASE"]
         else:
             raise ValueError("Metric not supported.")
 

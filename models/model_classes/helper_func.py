@@ -51,9 +51,9 @@ def calculate_darts_MASE(
         + " darts TimeSeries compatible format."
     )
 
-    test_series = TimeSeries.from_dataframe(test_series, time_col="ds")
-    train_series = TimeSeries.from_dataframe(train_series, time_col="ds")
-    pred_series = TimeSeries.from_dataframe(pred_series, time_col="ds")
+    test_series = TimeSeries.from_dataframe(test_series, time_col="ds", fill_missing_dates=True, freq=None)
+    train_series = TimeSeries.from_dataframe(train_series, time_col="ds", fill_missing_dates=True, freq=None)
+    pred_series = TimeSeries.from_dataframe(pred_series, time_col="ds", fill_missing_dates=True, freq=None)
 
     hf_logger.info("Converted all three series into TimeSeries objects.")
 
