@@ -135,6 +135,10 @@ python run_all_models_all_datasets.py --datasets cds_returns.ftsfr_CDS_contract_
 # Save detailed results
 python run_all_models_all_datasets.py --save-results overnight_results.json
 
+# Use Pixi environment switching (recommended for production)
+python run_all_models_all_datasets.py --use-pixi-environments
+./run_overnight.sh --use-pixi-environments
+
 # Simple overnight wrapper script
 ./run_overnight.sh
 ./run_overnight.sh --parallel --workers 4
@@ -147,6 +151,7 @@ python run_all_models_all_datasets.py --save-results overnight_results.json
 - **Progress tracking**: Shows current progress and estimated completion
 - **Results summary**: Detailed success/failure statistics at the end
 - **JSON results**: Save detailed results for later analysis
+- **Pixi environment switching**: Automatically uses the correct environment for each model type
 
 ### Step 7: Cost-Optimized Workflow (Lambda Labs)
 

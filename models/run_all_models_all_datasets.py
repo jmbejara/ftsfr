@@ -12,6 +12,7 @@ Features:
 - Progress tracking with timestamps
 - Results summary at the end
 - Can be run overnight with confidence
+- Handles different Pixi environments for different model types
 
 Usage:
     python run_all_models_all_datasets.py
@@ -31,6 +32,7 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import traceback
+import subprocess
 
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -38,54 +40,108 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from run_model import run_model, load_config
 
 
-def setup_logging(log_dir: Path) -> logging.Logger:
-    """Setup comprehensive logging for the batch run."""
-    log_dir.mkdir(parents=True, exist_ok=True)
+def get_model_environment(model_name: str, config_path: str = "models_config.toml") -> str:
+    """
+    Determine which Pixi environment a model needs based on its configuration.
     
-    # Create a unique log file for this run
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = log_dir / f"batch_run_{timestamp}.log"
-    
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_file),
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
-    
-    logger = logging.getLogger(__name__)
-    logger.info(f"Starting batch run - logging to {log_file}")
-    return logger
-
-
-def get_all_datasets() -> List[str]:
-    """Get all available datasets from datasets.toml."""
-    datasets = []
-    
-    # Load datasets.toml
-    config_path = Path(__file__).parent.parent / "datasets.toml"
-    with open(config_path, "rb") as f:
-        datasets_config = tomli.load(f)
-    
-    # Extract all dataset paths
-    for section, content in datasets_config.items():
-        if isinstance(content, dict):
-            for subsection, subcontent in content.items():
-                if isinstance(subcontent, dict) and any(key in subcontent for key in ["frequency", "seasonality"]):
-                    # This is a dataset with configuration
-                    dataset_path = f"../_data/{subsection}.parquet"
-                    datasets.append(dataset_path)
-    
-    return sorted(datasets)
-
-
-def get_all_models(config_path: str = "models_config.toml") -> List[str]:
-    """Get all available models from models_config.toml."""
+    Returns:
+        str: The pixi command to run the model in the correct environment
+    """
     config = load_config(config_path)
-    return list(config.keys())
+    if model_name not in config:
+        return "pixi run run-model"  # Default fallback
+    
+    model_config = config[model_name]
+    model_class = model_config.get("class", "")
+    
+    # Map model classes to their required environments
+    if model_class == "GluontsMain":
+        return "pixi run run-model --manifest-path gluonts -e gpu"
+    elif model_class == "NixtlaMain":
+        return "pixi run run-model --manifest-path nixtla -e gpu"
+    elif model_class == "TimesFM":
+        return "pixi run run-model --manifest-path timesfm -e gpu"
+    elif model_class in ["DartsLocal", "DartsGlobal"]:
+        return "pixi run run-model --manifest-path darts -e gpu"
+    else:
+        return "pixi run run-model"  # Default fallback
+
+
+def run_single_model_dataset_with_environment(
+    model_name: str, 
+    dataset_path: str, 
+    config_path: str = "models_config.toml",
+    workflow: str = "main"
+) -> Dict:
+    """
+    Run a single model on a single dataset with the correct Pixi environment.
+    
+    Returns:
+        Dict with results including success status, timing, and error details
+    """
+    start_time = datetime.now()
+    result = {
+        "model": model_name,
+        "dataset": dataset_path,
+        "start_time": start_time.isoformat(),
+        "success": False,
+        "duration": 0.0,
+        "error": None,
+        "error_traceback": None,
+        "environment": None
+    }
+    
+    try:
+        # Determine the correct environment for this model
+        pixi_env = get_model_environment(model_name, config_path)
+        result["environment"] = pixi_env
+        
+        # Set environment variables for this run
+        os.environ["DATASET_PATH"] = dataset_path
+        
+        # Run the model with the correct Pixi environment
+        cmd = f"{pixi_env} --model {model_name} --workflow {workflow}"
+        
+        # Execute the command
+        process = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            cwd=os.path.dirname(os.path.abspath(__file__))
+        )
+        
+        # Check if successful
+        if process.returncode == 0:
+            end_time = datetime.now()
+            result.update({
+                "success": True,
+                "duration": (end_time - start_time).total_seconds(),
+                "end_time": end_time.isoformat()
+            })
+        else:
+            # Command failed
+            end_time = datetime.now()
+            result.update({
+                "success": False,
+                "duration": (end_time - start_time).total_seconds(),
+                "end_time": end_time.isoformat(),
+                "error": f"Command failed with return code {process.returncode}",
+                "error_traceback": f"STDOUT: {process.stdout}\nSTDERR: {process.stderr}"
+            })
+        
+    except Exception as e:
+        # Exception occurred
+        end_time = datetime.now()
+        result.update({
+            "success": False,
+            "duration": (end_time - start_time).total_seconds(),
+            "end_time": end_time.isoformat(),
+            "error": str(e),
+            "error_traceback": traceback.format_exc()
+        })
+    
+    return result
 
 
 def run_single_model_dataset(
@@ -96,6 +152,7 @@ def run_single_model_dataset(
 ) -> Dict:
     """
     Run a single model on a single dataset with comprehensive error handling.
+    This version uses the direct Python import approach (for backward compatibility).
     
     Returns:
         Dict with results including success status, timing, and error details
@@ -140,12 +197,64 @@ def run_single_model_dataset(
     return result
 
 
+def setup_logging(log_dir: Path) -> logging.Logger:
+    """Setup comprehensive logging for the batch run."""
+    log_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create a unique log file for this run
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = log_dir / f"batch_run_{timestamp}.log"
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    
+    logger = logging.getLogger(__name__)
+    logger.info(f"Starting batch run - logging to {log_file}")
+    return logger
+
+
+def get_all_datasets() -> List[str]:
+    """Get all available datasets from datasets.toml."""
+    datasets = []
+    
+    # Load datasets.toml
+    config_path = Path(__file__).parent.parent / "datasets.toml"
+    with open(config_path, "rb") as f:
+        datasets_config = tomli.load(f)
+    
+    # Extract all dataset paths
+    for section, content in datasets_config.items():
+        if isinstance(content, dict):
+            for subsection, subcontent in content.items():
+                if isinstance(subcontent, dict) and any(key in subcontent for key in ["frequency", "seasonality"]):
+                    # This is a dataset with configuration
+                    # Include the section (module) name in the path
+                    dataset_path = f"../_data/{section}/{subsection}.parquet"
+                    datasets.append(dataset_path)
+    
+    return sorted(datasets)
+
+
+def get_all_models(config_path: str = "models_config.toml") -> List[str]:
+    """Get all available models from models_config.toml."""
+    config = load_config(config_path)
+    return list(config.keys())
+
+
 def run_models_sequential(
     models: List[str], 
     datasets: List[str], 
     config_path: str = "models_config.toml",
     workflow: str = "main",
-    logger: Optional[logging.Logger] = None
+    logger: Optional[logging.Logger] = None,
+    use_pixi_environments: bool = False
 ) -> List[Dict]:
     """Run all model-dataset combinations sequentially."""
     results = []
@@ -154,6 +263,8 @@ def run_models_sequential(
     
     if logger:
         logger.info(f"Starting sequential run of {total_combinations} model-dataset combinations")
+        if use_pixi_environments:
+            logger.info("Using Pixi environment switching for different model types")
     
     for model_name in models:
         for dataset_path in datasets:
@@ -162,12 +273,17 @@ def run_models_sequential(
             if logger:
                 logger.info(f"[{current}/{total_combinations}] Running {model_name} on {dataset_path}")
             
-            result = run_single_model_dataset(model_name, dataset_path, config_path, workflow)
+            if use_pixi_environments:
+                result = run_single_model_dataset_with_environment(model_name, dataset_path, config_path, workflow)
+            else:
+                result = run_single_model_dataset(model_name, dataset_path, config_path, workflow)
+            
             results.append(result)
             
             if result["success"]:
                 if logger:
-                    logger.info(f"✓ {model_name} on {dataset_path} completed in {result['duration']:.2f}s")
+                    env_info = f" (env: {result.get('environment', 'default')})" if use_pixi_environments else ""
+                    logger.info(f"✓ {model_name} on {dataset_path}{env_info} completed in {result['duration']:.2f}s")
             else:
                 if logger:
                     logger.warning(f"✗ {model_name} on {dataset_path} failed: {result['error']}")
@@ -181,7 +297,8 @@ def run_models_parallel(
     config_path: str = "models_config.toml",
     workflow: str = "main",
     max_workers: Optional[int] = None,
-    logger: Optional[logging.Logger] = None
+    logger: Optional[logging.Logger] = None,
+    use_pixi_environments: bool = False
 ) -> List[Dict]:
     """Run all model-dataset combinations in parallel."""
     results = []
@@ -192,6 +309,8 @@ def run_models_parallel(
     
     if logger:
         logger.info(f"Starting parallel run of {total_combinations} combinations with {max_workers} workers")
+        if use_pixi_environments:
+            logger.warning("Parallel execution with Pixi environments may have issues - consider using sequential mode")
     
     # Create all combinations
     combinations = [(model, dataset) for model in models for dataset in datasets]
@@ -199,7 +318,10 @@ def run_models_parallel(
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
         futures = {
-            executor.submit(run_single_model_dataset, model, dataset, config_path, workflow): (model, dataset)
+            executor.submit(
+                run_single_model_dataset_with_environment if use_pixi_environments else run_single_model_dataset, 
+                model, dataset, config_path, workflow
+            ): (model, dataset)
             for model, dataset in combinations
         }
         
@@ -213,7 +335,8 @@ def run_models_parallel(
             
             if logger:
                 if result["success"]:
-                    logger.info(f"[{completed}/{total_combinations}] ✓ {model} on {dataset} completed in {result['duration']:.2f}s")
+                    env_info = f" (env: {result.get('environment', 'default')})" if use_pixi_environments else ""
+                    logger.info(f"[{completed}/{total_combinations}] ✓ {model} on {dataset}{env_info} completed in {result['duration']:.2f}s")
                 else:
                     logger.warning(f"[{completed}/{total_combinations}] ✗ {model} on {dataset} failed: {result['error']}")
     
@@ -260,7 +383,8 @@ Failed combinations:"""
         sorted_results = sorted(successful_results, key=lambda x: x["duration"], reverse=True)
         print("\nTop 5 slowest successful runs:")
         for result in sorted_results[:5]:
-            print(f"  - {result['model']} on {result['dataset']}: {result['duration']:.2f}s")
+            env_info = f" (env: {result.get('environment', 'default')})" if result.get('environment') else ""
+            print(f"  - {result['model']} on {result['dataset']}{env_info}: {result['duration']:.2f}s")
 
 
 def save_results(results: List[Dict], output_file: str, logger: Optional[logging.Logger] = None):
@@ -313,6 +437,13 @@ def main():
         "--workers", 
         type=int, 
         help="Number of parallel workers (default: CPU count)"
+    )
+    
+    # Environment options
+    parser.add_argument(
+        "--use-pixi-environments",
+        action="store_true",
+        help="Use Pixi environment switching for different model types (recommended for production)"
     )
     
     # Other options
@@ -368,16 +499,20 @@ def main():
     logger.info(f"Models: {', '.join(models)}")
     logger.info(f"Datasets: {', '.join(datasets)}")
     
+    if args.use_pixi_environments:
+        logger.info("Using Pixi environment switching - this will ensure each model runs in its correct environment")
+        logger.info("Note: This may be slower but more reliable than running all models in the same environment")
+    
     # Run the combinations
     start_time = datetime.now()
     
     if args.parallel:
         results = run_models_parallel(
-            models, datasets, args.config, args.workflow, args.workers, logger
+            models, datasets, args.config, args.workflow, args.workers, logger, args.use_pixi_environments
         )
     else:
         results = run_models_sequential(
-            models, datasets, args.config, args.workflow, logger
+            models, datasets, args.config, args.workflow, logger, args.use_pixi_environments
         )
     
     total_duration = (datetime.now() - start_time).total_seconds()

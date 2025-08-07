@@ -19,6 +19,7 @@ WORKERS=""
 MODELS=""
 DATASETS=""
 SAVE_RESULTS="overnight_results_$(date +%Y%m%d_%H%M%S).json"
+USE_PIXI_ENVIRONMENTS=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -43,9 +44,13 @@ while [[ $# -gt 0 ]]; do
             SAVE_RESULTS="$2"
             shift 2
             ;;
+        --use-pixi-environments)
+            USE_PIXI_ENVIRONMENTS=true
+            shift
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--parallel] [--workers N] [--models model1 model2] [--datasets dataset1 dataset2] [--save-results filename]"
+            echo "Usage: $0 [--parallel] [--workers N] [--models model1 model2] [--datasets dataset1 dataset2] [--save-results filename] [--use-pixi-environments]"
             exit 1
             ;;
     esac
@@ -66,6 +71,9 @@ if [ ! -z "$DATASETS" ]; then
     echo "Datasets: $DATASETS"
 fi
 echo "Results will be saved to: $SAVE_RESULTS"
+if [ "$USE_PIXI_ENVIRONMENTS" = true ]; then
+    echo "Using Pixi environment switching for different model types"
+fi
 echo "=========================================="
 
 # Change to the models directory
@@ -94,6 +102,10 @@ fi
 
 if [ ! -z "$DATASETS" ]; then
     CMD="$CMD $DATASETS"
+fi
+
+if [ "$USE_PIXI_ENVIRONMENTS" = true ]; then
+    CMD="$CMD --use-pixi-environments"
 fi
 
 echo "Executing: $CMD"

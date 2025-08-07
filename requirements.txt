@@ -29,6 +29,7 @@ sphinx-book-theme
 statsmodels==0.14.3
 thefuzz
 toml
+tomli
 torch==2.6.0
 tqdm
 wrds==3.4.0
