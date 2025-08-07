@@ -145,6 +145,38 @@ tree ../_output/
 cat ../_output/raw_results/arima/*.csv
 ```
 
+## Debugging and Development
+
+### Quick Debugging with Limited Epochs
+
+For faster iteration during development, you can limit the number of training epochs:
+
+```bash
+# Limit to 5 epochs for quick testing
+export N_EPOCHS=5 && python run_model.py --model deepar
+
+# Limit to 3 epochs for very fast testing
+export N_EPOCHS=3 && python run_model.py --model transformer
+
+# Works with all model types:
+# - GluonTS models (DeepAR, SimpleFeedForward, etc.): Uses max_epochs in trainer_kwargs
+# - Darts models (DLinear, NLinear, etc.): Uses n_epochs parameter
+# - Nixtla models (Autoformer, Informer, etc.): Uses n_epochs parameter
+```
+
+**Important**: Use `&&` to chain commands, not `&`. The `&` operator runs commands in separate processes, which don't inherit environment variables.
+
+### Environment Variable Debugging
+
+If you're unsure whether the N_EPOCHS override is working, look for these debug messages:
+
+```
+DEBUG: Checking for N_EPOCHS environment variable. Available env vars: ['N_EPOCHS']
+DEBUG: Found N_EPOCHS=5
+Overriding max_epochs to 5 via environment variable for GluonTS model
+INFO: `Trainer.fit` stopped: `max_epochs=5` reached.
+```
+
 ## Troubleshooting
 
 ### Common Issues
@@ -152,6 +184,10 @@ cat ../_output/raw_results/arima/*.csv
 ```bash
 # Out of memory on GPU
 export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+
+# Limit training epochs for debugging
+export N_EPOCHS=5 && python run_model.py --model deepar
+# Note: Use && not & to ensure environment variable is passed to the process
 
 # Missing dependencies
 # For the GPU environment, use:
@@ -188,6 +224,7 @@ export FREQUENCY="D"        # Override data frequency
 export SEASONALITY="7"      # Override seasonality
 export OUTPUT_DIR="custom"  # Custom output directory
 export TEST_SPLIT="0.3"     # 30% test split
+export N_EPOCHS="5"         # Limit training epochs (for debugging)
 ```
 
 ### Available Datasets

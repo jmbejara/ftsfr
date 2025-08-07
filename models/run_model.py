@@ -76,6 +76,63 @@ def process_imports(imports_list):
     return context
 
 
+def get_estimator_class(model_config):
+    """
+    Get the estimator class from the model configuration.
+
+    Args:
+        model_config: Dictionary containing model configuration
+
+    Returns:
+        Estimator class (not instantiated)
+    """
+    # Import the estimator class
+    module_path, class_name = model_config["estimator_class"].rsplit(".", 1)
+    module = importlib.import_module(module_path)
+    estimator_class = getattr(module, class_name)
+    return estimator_class
+
+
+def get_nixtla_estimator_params(model_config, env_vars):
+    """
+    Get estimator parameters for Nixtla models, including environment variable overrides.
+
+    Args:
+        model_config: Dictionary containing model configuration
+        env_vars: Environment variables tuple (test_split, frequency, seasonality, data_path, output_dir)
+
+    Returns:
+        Dictionary of estimator parameters
+    """
+    # Extract dataset parameters
+    test_split, frequency, seasonality, data_path, output_dir = env_vars
+
+    # Process imports if any
+    imports_context = {}
+    if "imports" in model_config:
+        imports_context = process_imports(model_config["imports"])
+
+    # Process estimator parameters
+    params = {}
+    for key, value in model_config.get("estimator_params", {}).items():
+        # Evaluate special parameters (like ModelMode.ADDITIVE)
+        value = evaluate_special_params(value, imports_context)
+        params[key] = value
+
+    # Set default input_size for Nixtla models
+    if "input_size" not in params:
+        params["input_size"] = seasonality * 4
+
+    # Environment variable overrides for debugging
+    # Allow overriding n_epochs via environment variable for debugging
+    if "N_EPOCHS" in os.environ:
+        n_epochs = int(os.environ["N_EPOCHS"])
+        params["n_epochs"] = n_epochs
+        print(f"Overriding n_epochs to {n_epochs} via environment variable")
+
+    return params
+
+
 def create_estimator(model_config, env_vars):
     """
     Create an estimator instance based on the model configuration.
@@ -88,9 +145,7 @@ def create_estimator(model_config, env_vars):
         Instantiated estimator object
     """
     # Import the estimator class
-    module_path, class_name = model_config["estimator_class"].rsplit(".", 1)
-    module = importlib.import_module(module_path)
-    estimator_class = getattr(module, class_name)
+    estimator_class = get_estimator_class(model_config)
 
     # Extract dataset parameters
     test_split, frequency, seasonality, data_path, output_dir = env_vars
@@ -150,6 +205,17 @@ def create_estimator(model_config, env_vars):
         if "input_chunk_length" not in params:
             params["input_chunk_length"] = seasonality * 4
 
+    # Nixtla models that need input_size (typically seasonality * 4)
+    if any(
+        name in model_name
+        for name in [
+            "Autoformer",
+            "Informer",
+        ]
+    ):
+        if "input_size" not in params:
+            params["input_size"] = seasonality * 4
+
     # Models that need lags
     if "CatBoostModel" in model_name or (
         "SKLearnModel" in model_name and "lags" not in params
@@ -192,10 +258,22 @@ def create_estimator(model_config, env_vars):
 
     # Environment variable overrides for debugging
     # Allow overriding n_epochs via environment variable for debugging
+    print(f"DEBUG: Checking for N_EPOCHS environment variable. Available env vars: {[k for k in os.environ.keys() if 'EPOCH' in k.upper()]}")
     if "N_EPOCHS" in os.environ:
         n_epochs = int(os.environ["N_EPOCHS"])
-        params["n_epochs"] = n_epochs
-        print(f"Overriding n_epochs to {n_epochs} via environment variable")
+        print(f"DEBUG: Found N_EPOCHS={n_epochs}")
+        
+        # Handle different parameter names for different model types
+        if any(name in model_name for name in ["DeepAREstimator", "SimpleFeedForwardEstimator", "PatchTSTEstimator", "WaveNetEstimator"]):
+            # GluonTS models use trainer_kwargs with max_epochs
+            if "trainer_kwargs" not in params:
+                params["trainer_kwargs"] = {}
+            params["trainer_kwargs"]["max_epochs"] = n_epochs
+            print(f"Overriding max_epochs to {n_epochs} via environment variable for GluonTS model")
+        else:
+            # Other models use n_epochs directly
+            params["n_epochs"] = n_epochs
+            print(f"Overriding n_epochs to {n_epochs} via environment variable")
 
     return estimator_class(**params)
 
@@ -241,9 +319,6 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     logger = logging.getLogger("main")
     logger.info(f"Running {model_name} model. Environment variables read.")
 
-    # Create estimator before instantiating the model class
-    estimator = create_estimator(model_config, env_vars)
-
     # Handle special models
     model_class = model_config["class"]
     display_name = model_config.get("display_name", model_name)
@@ -251,9 +326,11 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     # Dynamically import the required model class only when needed
     if model_class == "DartsLocal":
         from model_classes.darts_local_class import DartsLocal
+        estimator = create_estimator(model_config, env_vars)
         model_obj = DartsLocal(estimator, model_name, *env_vars)
     elif model_class == "DartsGlobal":
         from model_classes.darts_global_class import DartsGlobal
+        estimator = create_estimator(model_config, env_vars)
         model_obj = DartsGlobal(
             estimator,
             model_name,
@@ -265,13 +342,22 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     elif model_class == "NixtlaMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.nixtla_main_class import NixtlaMain
-        model_obj = NixtlaMain(estimator.__class__, model_name, *env_vars)
+        # For Nixtla models, we need the estimator class and parameters
+        estimator_class = get_estimator_class(model_config)
+        # Get estimator parameters for Nixtla models (including n_epochs override)
+        estimator_params = get_nixtla_estimator_params(model_config, env_vars)
+        model_obj = NixtlaMain(estimator_class, model_name, *env_vars, estimator_params=estimator_params)
     elif model_class == "GluontsMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.gluonts_main_class import GluontsMain
+        estimator = create_estimator(model_config, env_vars)
         model_obj = GluontsMain(estimator, model_name, *env_vars)
     elif model_class == "TimesFM":
-        from timesfm.main import TimesFMForecasting
+        # Add the timesfm directory to the path for local import
+        timesfm_path = os.path.join(os.path.dirname(__file__), "timesfm")
+        if timesfm_path not in sys.path:
+            sys.path.insert(0, timesfm_path)
+        from main import TimesFMForecasting
         model_obj = TimesFMForecasting(
             model_config.get("model_version", "500m"), *env_vars
         )
