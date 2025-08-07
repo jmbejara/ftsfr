@@ -211,6 +211,20 @@ class DartsMain(forecasting_model):
 
     @common_error_catch
     def save_forecast(self):
+        # Add debugging to understand the type of pred_series
+        dm_logger.info(f"pred_series type: {type(self.pred_series)}")
+        if hasattr(self.pred_series, 'shape'):
+            dm_logger.info(f"pred_series shape: {self.pred_series.shape}")
+        elif isinstance(self.pred_series, list):
+            dm_logger.info(f"pred_series is a list with {len(self.pred_series)} elements")
+            # If it's still a list, try to concatenate it
+            if len(self.pred_series) > 0:
+                from darts import TimeSeries
+                self.pred_series = TimeSeries.concatenate(self.pred_series, axis=0)
+                dm_logger.info("Concatenated list of TimeSeries into single TimeSeries")
+            else:
+                raise ValueError("pred_series is an empty list")
+        
         # Save to parquet
         temp_df = self.pred_series.to_dataframe(time_as_index=False)
         temp_df.to_parquet(self.forecast_path)
@@ -229,12 +243,35 @@ class DartsMain(forecasting_model):
         if self.pred_series is None:
             dm_logger.error("calculate_error called without predictions.")
             raise ValueError("Please call self.forecast() first.")
+        
+        # Add debugging information
+        dm_logger.info(f"test_series components: {self.test_series.n_components}")
+        dm_logger.info(f"pred_series components: {self.pred_series.n_components}")
+        dm_logger.info(f"test_series shape: {self.test_series.shape}")
+        dm_logger.info(f"pred_series shape: {self.pred_series.shape}")
+        
         if metric == "MASE":
-            self.errors["MASE"] = mase(
-                self.test_series, self.pred_series, self.train_series, self.seasonality
-            )
-            dm_logger.info("MASE = " + str(self.errors["MASE"]) + ".")
-            return self.errors["MASE"]
+            from darts.metrics import mase
+            try:
+                self.errors["MASE"] = mase(
+                    self.test_series, self.pred_series, self.train_series, self.seasonality
+                )
+                dm_logger.info("MASE = " + str(self.errors["MASE"]) + ".")
+                return self.errors["MASE"]
+            except ValueError as e:
+                if "cannot use MASE with periodical signals" in str(e):
+                    dm_logger.warning("MASE failed due to periodical signals, falling back to MAE")
+                    from darts.metrics import mae
+                    self.errors["MAE"] = mae(self.test_series, self.pred_series)
+                    dm_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
+                    return self.errors["MAE"]
+                else:
+                    raise e
+        elif metric == "MAE":
+            from darts.metrics import mae
+            self.errors["MAE"] = mae(self.test_series, self.pred_series)
+            dm_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
+            return self.errors["MAE"]
         else:
             dm_logger.error("calculate_error called for an unsupported metric.")
             raise ValueError("Metric not supported.")

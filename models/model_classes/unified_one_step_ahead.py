@@ -63,6 +63,22 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
             last_points_only=False,
             verbose=False,
         )
+        
+        # Handle case where historical_forecasts returns a list
+        if isinstance(predictions, list):
+            logger.info(f"historical_forecasts returned a list of {len(predictions)} TimeSeries")
+            # Concatenate all predictions into a single TimeSeries
+            if len(predictions) > 0:
+                # Concatenate one by one
+                result = predictions[0]
+                for pred in predictions[1:]:
+                    result = TimeSeries.concatenate(result, pred, axis=0)
+                predictions = result
+            else:
+                raise ValueError("No predictions returned from historical_forecasts")
+        
+        logger.info(f"Final predictions shape: {predictions.shape}")
+        
     else:
         # For local models, we need to be more careful
         logger.info("Performing manual one-step-ahead for local model")
@@ -87,12 +103,26 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
 
         # Concatenate all predictions
         # Each prediction is a TimeSeries of length 1
-        values = np.concatenate([p.values() for p in predictions_list])
-        predictions = TimeSeries.from_times_and_values(
-            times=test_dates, values=values, freq=freq
-        )
+        if len(predictions_list) > 0:
+            result = predictions_list[0]
+            for pred in predictions_list[1:]:
+                result = TimeSeries.concatenate(result, pred, axis=0)
+            predictions = result
+        else:
+            raise ValueError("No predictions generated for local model")
 
-    logger.info(f"Generated {len(predictions)} one-step-ahead predictions")
+    # Ensure predictions have the same number of components as test_series
+    if predictions.n_components != test_series.n_components:
+        logger.warning(f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}")
+        # If predictions have more components, take only the first test_series.n_components
+        if predictions.n_components > test_series.n_components:
+            predictions = predictions[:, :test_series.n_components]
+            logger.info(f"Truncated predictions to {test_series.n_components} components")
+        else:
+            # If predictions have fewer components, this is a problem
+            raise ValueError(f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})")
+
+    logger.info(f"Generated predictions with shape: {predictions.shape}")
     return predictions
 
 

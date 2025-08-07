@@ -190,6 +190,13 @@ def create_estimator(model_config, env_vars):
         except Exception:
             params["task_type"] = "CPU"
 
+    # Environment variable overrides for debugging
+    # Allow overriding n_epochs via environment variable for debugging
+    if "N_EPOCHS" in os.environ:
+        n_epochs = int(os.environ["N_EPOCHS"])
+        params["n_epochs"] = n_epochs
+        print(f"Overriding n_epochs to {n_epochs} via environment variable")
+
     return estimator_class(**params)
 
 
