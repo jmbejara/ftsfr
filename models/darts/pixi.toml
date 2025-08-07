@@ -23,7 +23,7 @@ prophet = "*"
 [dependencies]
 python = "3.11.*"
 pip = "*"
-numpy = ">=1.26,<2.0"
+numpy = ">=1.23,<2.0"
 pandas = "*"
 tqdm = "*"
 packaging = "*"
