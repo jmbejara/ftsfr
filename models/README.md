@@ -47,6 +47,8 @@ If you want to isolate GPU dependencies per library, use one of the new Pixi TOM
 - **TimesFM**:  
   `pixi shell --manifest-path timesfm -e gpu`
 
+This is important because it is impossible to create a single Pixi environment that supports all models with GPU support. It's easy to create a single Pixi environment that supports all models with CPU support, but I've found it to be impossible to create a single Pixi environment that supports all models with GPU support. I'm running all of these models on a Lambda Labs H100 node, so I'm using the GPU environment for all models. So, I need to activate a different environment for each model type to ensure that the correct dependencies are installed and that GPU support is available.
+
 ### Step 2.2: Test GPU support
 Before running any models, verify your GPU environments:
 
