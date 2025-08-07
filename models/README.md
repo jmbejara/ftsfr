@@ -351,6 +351,11 @@ cd ~/${FS_FOLDER}/ftsfr
 ./setup_lambdalabs.sh  # Run setup on first connection
 ```
 
+To sync back to local machine:
+```bash
+rsync -avzh --progress --exclude='.pixi/' --exclude='.git/' -e "ssh -i ~/.ssh/${SSH_KEY}" ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/ ./
+```
+
 ## Technical Details
 
 - **One-step-ahead forecasting**: Train once on 80% data, test without retraining
