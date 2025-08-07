@@ -29,35 +29,49 @@ def calculate_darts_MASE(
         raise ImportError("darts is required for MASE calculation but not available in this environment")
     
     hf_logger = logging.getLogger("hf.calculate_darts_MASE")
-    test_series = (
-        test_series.pivot(index="ds", columns="unique_id", values="y")
-        .reset_index()
-        .rename_axis(None, axis=1)
-    )
-    train_series = (
-        train_series.pivot(index="ds", columns="unique_id", values="y")
-        .reset_index()
-        .rename_axis(None, axis=1)
-    )
+    
+    try:
+        test_series = (
+            test_series.pivot(index="ds", columns="unique_id", values="y")
+            .reset_index()
+            .rename_axis(None, axis=1)
+        )
+        train_series = (
+            train_series.pivot(index="ds", columns="unique_id", values="y")
+            .reset_index()
+            .rename_axis(None, axis=1)
+        )
 
-    pred_series = (
-        pred_series.pivot(index="ds", columns="unique_id", values=value_column)
-        .reset_index()
-        .rename_axis(None, axis=1)
-    )
+        pred_series = (
+            pred_series.pivot(index="ds", columns="unique_id", values=value_column)
+            .reset_index()
+            .rename_axis(None, axis=1)
+        )
 
-    hf_logger.info(
-        "Converted train, test, and pred series into"
-        + " darts TimeSeries compatible format."
-    )
+        hf_logger.info(
+            "Converted train, test, and pred series into"
+            + " darts TimeSeries compatible format."
+        )
 
-    test_series = TimeSeries.from_dataframe(test_series, time_col="ds", fill_missing_dates=True, freq=None)
-    train_series = TimeSeries.from_dataframe(train_series, time_col="ds", fill_missing_dates=True, freq=None)
-    pred_series = TimeSeries.from_dataframe(pred_series, time_col="ds", fill_missing_dates=True, freq=None)
+        # Try to convert to TimeSeries with frequency inference
+        try:
+            test_series = TimeSeries.from_dataframe(test_series, time_col="ds", fill_missing_dates=True, freq=None)
+            train_series = TimeSeries.from_dataframe(train_series, time_col="ds", fill_missing_dates=True, freq=None)
+            pred_series = TimeSeries.from_dataframe(pred_series, time_col="ds", fill_missing_dates=True, freq=None)
+        except ValueError:
+            # Fallback to simple conversion without frequency inference
+            hf_logger.warning("Frequency inference failed, using simple conversion")
+            test_series = TimeSeries.from_dataframe(test_series, time_col="ds", fill_missing_dates=False)
+            train_series = TimeSeries.from_dataframe(train_series, time_col="ds", fill_missing_dates=False)
+            pred_series = TimeSeries.from_dataframe(pred_series, time_col="ds", fill_missing_dates=False)
 
-    hf_logger.info("Converted all three series into TimeSeries objects.")
+        hf_logger.info("Converted all three series into TimeSeries objects.")
 
-    return mase(test_series, pred_series, train_series, seasonality)
+        return mase(test_series, pred_series, train_series, seasonality)
+        
+    except Exception as e:
+        hf_logger.error(f"Error in MASE calculation: {e}")
+        raise e
 
 
 def extend_df(df, train_series_len, frequency, seasonality, interpolate=True):

@@ -210,8 +210,8 @@ class NixtlaMain(forecasting_model):
                 )
                 nx_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
                 return self.errors["MASE"]
-            except ImportError:
-                nx_logger.warning("⚠ Darts not available - cannot calculate MASE")
+            except (ImportError, ValueError, TypeError) as e:
+                nx_logger.warning(f"⚠ Cannot calculate MASE: {e}")
                 self.errors["MASE"] = float('nan')
                 return self.errors["MASE"]
         else:
