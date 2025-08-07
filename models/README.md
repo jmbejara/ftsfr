@@ -154,9 +154,6 @@ export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
 pixi install -e gpu
 python -m pip install --upgrade pip
 
-# Prophet not installing on ARM64
-pip install prophet --no-binary :all:
-
 # Pixi environment issues on ARM64
 # If pixi fails with "No candidates were found for prophet"
 # Just use pip to install packages directly:
@@ -255,12 +252,12 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="texas-one-fs"
 
 # Washington, USA us-east-3
-NODE_IP="192.222.56.151"
+NODE_IP="192.222.59.82"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="washington-dc-three-fs"
 
 # Utah, USA us-west-3
-NODE_IP="209.20.157.38"
+NODE_IP="209.20.159.3"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="utah-fs"
 

@@ -95,6 +95,13 @@ def create_estimator(model_config, env_vars):
     # Extract dataset parameters
     test_split, frequency, seasonality, data_path, output_dir = env_vars
 
+    # Convert frequency for GluonTS models (ME -> M)
+    def convert_frequency_for_gluonts(freq):
+        """Convert frequency strings for GluonTS compatibility."""
+        if freq == "ME":
+            return "M"  # Month end -> Month
+        return freq
+
     # Process imports if any
     imports_context = {}
     if "imports" in model_config:
@@ -156,7 +163,7 @@ def create_estimator(model_config, env_vars):
     # GluonTS models that need frequency
     if any(name in model_name for name in ["DeepAREstimator", "WaveNetEstimator"]):
         if "freq" not in params:
-            params["freq"] = frequency
+            params["freq"] = convert_frequency_for_gluonts(frequency)
 
     # GluonTS models that need context_length
     if any(

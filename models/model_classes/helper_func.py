@@ -3,12 +3,20 @@ Helper functions for multiple independent classes.
 """
 
 from pandas.tseries.frequencies import to_offset
-from darts import TimeSeries
-from darts.metrics import mase
 import traceback
 from utilsforecast.preprocessing import fill_gaps
 
 import logging
+
+# Conditional imports to avoid dependency issues
+try:
+    from darts import TimeSeries
+    from darts.metrics import mase
+    DARTS_AVAILABLE = True
+except ImportError:
+    DARTS_AVAILABLE = False
+    TimeSeries = None
+    mase = None
 
 
 def calculate_darts_MASE(
@@ -17,6 +25,9 @@ def calculate_darts_MASE(
     """
     Calculates mase using darts.
     """
+    if not DARTS_AVAILABLE:
+        raise ImportError("darts is required for MASE calculation but not available in this environment")
+    
     hf_logger = logging.getLogger("hf.calculate_darts_MASE")
     test_series = (
         test_series.pivot(index="ds", columns="unique_id", values="y")
