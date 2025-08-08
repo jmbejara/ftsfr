@@ -8,6 +8,9 @@ import pandas as pd
 from tabulate import tabulate
 import logging
 
+import torch
+torch.set_float32_matmul_precision('medium')
+
 # from warnings import filterwarnings
 # filterwarnings("ignore")
 

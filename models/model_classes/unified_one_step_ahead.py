@@ -52,64 +52,45 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     test_end = test_series.end_time()
 
     # For global models, use historical_forecasts with explicit parameters
-    if not is_local:
-        logger.info("Using historical_forecasts for global model")
-        predictions = model.historical_forecasts(
-            series=raw_series,
-            start=test_start,
-            forecast_horizon=1,
-            stride=1,
-            retrain=False,  # Model already trained, don't retrain
-            last_points_only=False,
-            verbose=False,
-        )
-        
-        # Handle case where historical_forecasts returns a list
-        if isinstance(predictions, list):
-            logger.info(f"historical_forecasts returned a list of {len(predictions)} TimeSeries")
-            # Concatenate all predictions into a single TimeSeries
-            if len(predictions) > 0:
-                # Concatenate one by one
-                result = predictions[0]
-                for pred in predictions[1:]:
-                    result = TimeSeries.concatenate(result, pred, axis=0)
-                predictions = result
-            else:
-                raise ValueError("No predictions returned from historical_forecasts")
-        
-        logger.info(f"Final predictions shape: {predictions.shape}")
-        
-    else:
-        # For local models, we need to be more careful
-        logger.info("Performing manual one-step-ahead for local model")
-        predictions_list = []
+    
+    # Make retrain condition True if the following models are used
+    # ExponentialSmoothing
+    # Simple ExponentialSmoothing
+    # Theta
+    # Prophet
+    # Naive models
+    # Else don't need to retrain
+    model_name = str(model)
+    retrain_model = model_name.startswith(("ExponentialSmoothing",
+                                           "Theta",
+                                           "Prophet",
+                                           "Naive"))
 
-        # Get the frequency of the series
-        freq = train_series.freq
-
-        # Iterate through each test point
-        test_dates = pd.date_range(start=test_start, end=test_end, freq=freq)
-
-        for i, current_date in enumerate(
-            tqdm(test_dates, desc="One-step-ahead forecasting")
-        ):
-            # Get all data up to current point (excluding current point)
-            historical_data = raw_series[:current_date]
-
-            # For local models, we need to ensure we don't retrain
-            # We'll use the already fitted model
-            pred = model.predict(n=1, series=historical_data)
-            predictions_list.append(pred)
-
-        # Concatenate all predictions
-        # Each prediction is a TimeSeries of length 1
-        if len(predictions_list) > 0:
-            result = predictions_list[0]
-            for pred in predictions_list[1:]:
+    logger.info("Using historical_forecasts for global model")
+    predictions = model.historical_forecasts(
+        series=raw_series,
+        start=test_start,
+        forecast_horizon=1,
+        stride=1,
+        retrain=retrain_model,
+        last_points_only=False, # I think this should be set to True.
+        verbose=False,
+    )
+    
+    # Handle case where historical_forecasts returns a list
+    if isinstance(predictions, list):
+        logger.info(f"historical_forecasts returned a list of {len(predictions)} TimeSeries")
+        # Concatenate all predictions into a single TimeSeries
+        if len(predictions) > 0:
+            # Concatenate one by one
+            result = predictions[0]
+            for pred in predictions[1:]:
                 result = TimeSeries.concatenate(result, pred, axis=0)
             predictions = result
         else:
-            raise ValueError("No predictions generated for local model")
+            raise ValueError("No predictions returned from historical_forecasts")
+    
+    logger.info(f"Final predictions shape: {predictions.shape}")
 
     # Ensure predictions have the same number of components as test_series
     if predictions.n_components != test_series.n_components:

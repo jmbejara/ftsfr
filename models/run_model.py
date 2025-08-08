@@ -273,10 +273,13 @@ def create_estimator(model_config, env_vars):
                 params["trainer_kwargs"] = {}
             params["trainer_kwargs"]["max_epochs"] = n_epochs
             print(f"Overriding max_epochs to {n_epochs} via environment variable for GluonTS model")
-        else:
-            # Other models use n_epochs directly
+        elif any(name in model_name for name in ["DLinearModel", "NLinearModel", "TransformerModel", "NBEATSModel", "NHiTSModel", "TiDEModel"]):
+            # Darts neural models use n_epochs directly
             params["n_epochs"] = n_epochs
-            print(f"Overriding n_epochs to {n_epochs} via environment variable")
+            print(f"Overriding n_epochs to {n_epochs} via environment variable for Darts neural model")
+        else:
+            # Skip n_epochs for models that don't support it (e.g., ARIMA, Prophet, etc.)
+            print(f"Skipping n_epochs override for {model_name} - not a neural model")
 
     return estimator_class(**params)
 
@@ -309,7 +312,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     # Setup logging
     data_path = env_vars[3]
 
-    log_path = Path().resolve().parent / "model_logs" / model_name
+    log_path = Path().resolve() / "model_logs" / "run_model_runs" / model_name
     Path(log_path).mkdir(parents=True, exist_ok=True)
     log_path = log_path / (dataset_name + ".log")
     logging.basicConfig(
