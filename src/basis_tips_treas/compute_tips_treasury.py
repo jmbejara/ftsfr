@@ -12,7 +12,7 @@ OUTPUT_DIR = config("OUTPUT_DIR")
 # ------------------------------------------------------------------------------
 def import_inflation_swap_data():
     # Load Bloomberg output saved as parquet
-    swaps_path = os.path.join(OUTPUT_DIR, "treasury_inflation_swaps.parquet")
+    swaps_path = DATA_DIR /  "treasury_inflation_swaps.parquet"
 
     # Read parquet and ensure "Dates" is datetime
     swaps = pd.read_parquet(swaps_path)
