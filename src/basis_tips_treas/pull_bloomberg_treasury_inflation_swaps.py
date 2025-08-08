@@ -1,22 +1,24 @@
 from xbbg import blp
-from decouple import config
+from pathlib import Path
+
+from settings import config
 
 OUTPUT_DIR = config("OUTPUT_DIR")
-START_DATE = config("START_DATE", "2020-01-01")
-END_DATE = config("END_DATE", "2025-01-01")
+START_DATE = config("START_DATE", default="2020-01-01")
+END_DATE = config("END_DATE", default="2025-01-01")
 
 
 def pull_treasury_inflation_swaps(
-    start_date=START_DATE, end_date=END_DATE, output_path="treasury_inflation_swaps.csv"
+    start_date: str = START_DATE,
+    end_date: str = END_DATE,
 ):
     """
     Connects to Bloomberg via xbbg, pulls historical daily prices for USD
-    Treasury Inflation Swaps, and saves them to a CSV with columns matching
-    the provided treasury_inflation_swaps.csv file.
+    Treasury Inflation Swaps, and returns a DataFrame with columns matching
+    the expected schema.
 
     :param start_date: Start date in 'YYYY-MM-DD' format (str).
     :param end_date: End date in 'YYYY-MM-DD' format (str).
-    :param output_path: Path to save the resulting CSV file.
     :return: A pandas DataFrame containing the replicated data.
     """
 
@@ -48,10 +50,13 @@ def pull_treasury_inflation_swaps(
     col_order = ["Dates"] + tickers
     df = df[col_order]
 
-    df.to_csv(output_path, index=False)
-
     return df
 
 
 if __name__ == "__main__":
-    pull_treasury_inflation_swaps()
+    # Pull data and save to the configured OUTPUT_DIR
+    df = pull_treasury_inflation_swaps()
+    output_dir = Path(OUTPUT_DIR)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / "treasury_inflation_swaps.parquet"
+    df.to_parquet(output_path, index=False)

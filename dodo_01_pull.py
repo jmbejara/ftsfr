@@ -13,7 +13,6 @@ from pathlib import Path
 
 # Import common utilities
 from dodo_common import (
-    BASE_DIR,
     DATA_DIR,
     OUTPUT_DIR,
     notebook_subtask,
@@ -97,7 +96,7 @@ def task_pull():
                 DATA_DIR / data_module / "fed_yield_curve_all.parquet",
                 DATA_DIR / data_module / "fed_yield_curve.parquet",
                 DATA_DIR / data_module / "fed_tips_yield_curve.parquet",
-                DATA_DIR / data_module / "treasury_inflation_swaps.csv",
+                DATA_DIR / data_module / "treasury_inflation_swaps.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_fed_yield_curve.py",

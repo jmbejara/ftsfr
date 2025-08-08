@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from decouple import config
+from settings import config
 
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
@@ -11,11 +11,15 @@ OUTPUT_DIR = config("OUTPUT_DIR")
 # Import inflation swap data
 # ------------------------------------------------------------------------------
 def import_inflation_swap_data():
-    # Point to the CSV file instead of an Excel file
-    swaps_path = os.path.join(OUTPUT_DIR, "treasury_inflation_swaps.csv")
+    # Load Bloomberg output saved as parquet
+    swaps_path = os.path.join(OUTPUT_DIR, "treasury_inflation_swaps.parquet")
 
-    # Read CSV; explicitly parse the "Dates" column as datetime
-    swaps = pd.read_csv(swaps_path, parse_dates=["Dates"])
+    # Read parquet and ensure "Dates" is datetime
+    swaps = pd.read_parquet(swaps_path)
+    if "Dates" in swaps.columns and not pd.api.types.is_datetime64_any_dtype(
+        swaps["Dates"]
+    ):
+        swaps["Dates"] = pd.to_datetime(swaps["Dates"]) 
 
     # Create a column mapping based on the schema you provided
     column_map = {
@@ -177,7 +181,6 @@ def compute_tips_treasury():
     output_path = os.path.join(DATA_DIR, "tips_treasury_implied_rf.parquet")
     merged.to_parquet(output_path, compression="snappy")
 
-    print(f"Data saved to {output_path}")
     return merged
 
 

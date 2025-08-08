@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from statsmodels.regression.linear_model import OLS
 from statsmodels.tools.tools import add_constant
-from decouple import config
+from settings import config
 
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
