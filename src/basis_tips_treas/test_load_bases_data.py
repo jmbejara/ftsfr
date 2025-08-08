@@ -50,7 +50,7 @@ OUTPUT_DIR = config("OUTPUT_DIR")
 #     overlaps).
 #     """
 #     filename = "fwswaprate_data.xlsx"
-#     dirpath = Path(dirpath) 
+#     dirpath = Path(dirpath)
 #     fxswap = pd.read_excel(dirpath / filename, skiprows=[0, 1, 2]).set_index("date")
 #     # fxswap.head()
 #     # fxswap.info()
@@ -66,7 +66,7 @@ OUTPUT_DIR = config("OUTPUT_DIR")
 
 def read_treasury_cash_futures_bases(dirpath=DATA_DIR):
     filename = "irr_panel_b.csv"
-    dirpath = Path(dirpath) 
+    dirpath = Path(dirpath)
     df = pd.read_csv(dirpath / filename, parse_dates=["date"]).set_index("date")
     # The PL column was manually created by Jay to match FV, with a fallback
     # of TU when FV was missing. This column should not be used in any
@@ -77,7 +77,7 @@ def read_treasury_cash_futures_bases(dirpath=DATA_DIR):
 
 def read_interest_swap_spread_bases(dirpath=DATA_DIR):
     filename = "swap_spreads_panel.csv"
-    dirpath = Path(dirpath) 
+    dirpath = Path(dirpath)
     df = pd.read_csv(dirpath / filename, parse_dates=["date"]).set_index("date")
     # TODO: I'm not sure on the units repoted.
     df = df / 100
@@ -86,7 +86,7 @@ def read_interest_swap_spread_bases(dirpath=DATA_DIR):
 
 def read_adrien_bases_replication(dirpath=DATA_DIR):
     """Load bases data replicated by Adrien"""
-    df = pd.read_stata(dirpath  / "Final_Spreads.dta")
+    df = pd.read_stata(dirpath / "Final_Spreads.dta")
     df = df.rename(columns={"data": "date"}).set_index("date")
 
     sa_ordering = [  # Missing Treasury SF bases
@@ -235,6 +235,7 @@ def load_box(
     """
     raise NotImplementedError
     import load_bloomberg
+
     bl = load_bloomberg.load_selected(data_dir=data_dir)
     ds = load_datastream.load_selected(data_dir=data_dir)
     ds = ds[["USD_6m_OIS", "USD_1y_OIS"]]
@@ -246,9 +247,7 @@ def load_box(
             "USD_OIS_18m": "USD_18m_OIS",
         }
     )
-    filepath = (
-        data_dir  / "box" / "box_spreads.dta"
-    )
+    filepath = data_dir / "box" / "box_spreads.dta"
     df_box = pd.read_stata(filepath).set_index("date")
     df = pd.concat([df_box, df_ois], axis=1)
     df = df.dropna(subset=df_box.columns, how="all")
@@ -281,11 +280,7 @@ def load_cds_bond(
     "cds_bond_ig_r": "CDS-Bond IG-Implied Rf",
     """
     filepath = (
-        data_dir
-        
-        / "from_siriwardane_et_al"
-        / "cds-bond"
-        / "cds_bond_implied_rf.dta"
+        data_dir / "from_siriwardane_et_al" / "cds-bond" / "cds_bond_implied_rf.dta"
     )
     df = pd.read_stata(filepath).set_index("date")
     # (10000 * df["cds_bond_hy"]).plot()
@@ -319,9 +314,8 @@ def load_CIP(
     """
     raise NotImplementedError
     import load_datastream
-    filepath = (
-        data_dir  / "cip" / "cip_implied_rf.dta"
-    )
+
+    filepath = data_dir / "cip" / "cip_implied_rf.dta"
     df_cip = pd.read_stata(filepath).set_index("date")
 
     ds = load_datastream.load_selected(data_dir=data_dir)
@@ -375,11 +369,7 @@ def load_equity_sf(
     """
     raise NotImplementedError
     filepath = (
-        data_dir
-        
-        / "from_siriwardane_et_al"
-        / "equity-sf"
-        / "equity_sf_implied_rf.dta"
+        data_dir / "from_siriwardane_et_al" / "equity-sf" / "equity_sf_implied_rf.dta"
     )
     df_equity = pd.read_stata(filepath).set_index("date")
 
@@ -413,7 +403,6 @@ def load_tips_treasury(
     )
     filepath = (
         data_dir
-        
         / "from_siriwardane_et_al"
         / "tip-treasury"
         / "tips_treasury_implied_rf.dta"
@@ -445,7 +434,6 @@ def load_treasury_sf(
     raise NotImplementedError("This doesn't match the paper's plot very well.")
     filepath = (
         data_dir
-        
         / "from_siriwardane_et_al"
         / "treasury-sf"
         / "treasury_sf_implied_rf.dta"
@@ -470,11 +458,7 @@ def load_treasury_sf(
 def load_treasury_swap():
     raise NotImplementedError
     filepath = (
-        data_dir
-        
-        / "from_siriwardane_et_al"
-        / "treasury-swap"
-        / "tswap_implied_rf.dta"
+        data_dir / "from_siriwardane_et_al" / "treasury-swap" / "tswap_implied_rf.dta"
     )
     df = pd.read_stata(filepath).set_index("date")
     df.info()
@@ -544,7 +528,7 @@ def load_combined_spreads_long(data_dir=DATA_DIR, rename=True):
     In the raw data, variables labeled "raw" are the raw spreads.
     Without raw means the absolute value has been applied.
     """
-    #data_dir = Path(data_dir)
+    # data_dir = Path(data_dir)
     # filepath = (
     #     data_dir
     #     / "arbitrage_spread_panel.dta"
@@ -553,7 +537,9 @@ def load_combined_spreads_long(data_dir=DATA_DIR, rename=True):
     df = pd.read_stata(filepath)
     df = df.rename()
     if rename:
-        non_raw_name_map = {key.split("raw_")[1]:value for key, value in name_map.items()}
+        non_raw_name_map = {
+            key.split("raw_")[1]: value for key, value in name_map.items()
+        }
         df["full_trade"] = df["full_trade"].replace(non_raw_name_map)
     return df
 
@@ -568,10 +554,13 @@ def demo():
     # df_old.loc["2010":"2020", ['Treasury_SF_02Y', 'Treasury_SF_05Y', 'Treasury_SF_10Y', 'Treasury_SF_30Y']].plot()
     df = load_combined_spreads_wide(data_dir=DATA_DIR)
     df.columns
-    df.loc["2010":"2020", ['Treasury_SF_10Y', 'Treasury_SF_02Y', 'Treasury_SF_20Y', 'Treasury_SF_30Y']].plot()
-    
-class TestDataCloseness(unittest.TestCase):
+    df.loc[
+        "2010":"2020",
+        ["Treasury_SF_10Y", "Treasury_SF_02Y", "Treasury_SF_20Y", "Treasury_SF_30Y"],
+    ].plot()
 
+
+class TestDataCloseness(unittest.TestCase):
     def test_data_closeness(self):
         # Load the expected DataFrame using the function
         df_expected = load_combined_spreads_wide()
@@ -579,25 +568,29 @@ class TestDataCloseness(unittest.TestCase):
         # In a real test, df_bloomberg would be produced by the code under test.
         df_bloomberg = compute_tips_treasury.import_inflation_swap_data()
 
-        #Data cleaning
-        df_expected = df_expected[[
-            "Treasury_Swap_01Y",
-            "Treasury_Swap_02Y",
-            "Treasury_Swap_03Y",
-            "Treasury_Swap_05Y",
-            "Treasury_Swap_10Y",
-            "Treasury_Swap_20Y",
-            "Treasury_Swap_30Y",
-        ]]
-        df_bloomberg = df_bloomberg.rename(columns={
-            "inf_swap_1y": "Treasury_Swap_01Y",
-            "inf_swap_2y": "Treasury_Swap_02Y",
-            "inf_swap_3y": "Treasury_Swap_03Y",
-            "inf_swap_5y": "Treasury_Swap_05Y",
-            "inf_swap_10y": "Treasury_Swap_10Y",
-            "inf_swap_20y": "Treasury_Swap_20Y",
-            "inf_swap_30y": "Treasury_Swap_30Y",
-        })
+        # Data cleaning
+        df_expected = df_expected[
+            [
+                "Treasury_Swap_01Y",
+                "Treasury_Swap_02Y",
+                "Treasury_Swap_03Y",
+                "Treasury_Swap_05Y",
+                "Treasury_Swap_10Y",
+                "Treasury_Swap_20Y",
+                "Treasury_Swap_30Y",
+            ]
+        ]
+        df_bloomberg = df_bloomberg.rename(
+            columns={
+                "inf_swap_1y": "Treasury_Swap_01Y",
+                "inf_swap_2y": "Treasury_Swap_02Y",
+                "inf_swap_3y": "Treasury_Swap_03Y",
+                "inf_swap_5y": "Treasury_Swap_05Y",
+                "inf_swap_10y": "Treasury_Swap_10Y",
+                "inf_swap_20y": "Treasury_Swap_20Y",
+                "inf_swap_30y": "Treasury_Swap_30Y",
+            }
+        )
 
         # Align the two DataFrames on their common dates
         common_dates = df_bloomberg.index.intersection(df_expected.index)
@@ -605,15 +598,19 @@ class TestDataCloseness(unittest.TestCase):
         df_expected_aligned = df_expected.loc[common_dates]
 
         # Convert all columns to numeric (non-convertible entries become NaN)
-        df_bloomberg_aligned = df_bloomberg_aligned.apply(pd.to_numeric, errors='coerce')
-        df_expected_aligned = df_expected_aligned.apply(pd.to_numeric, errors='coerce')
+        df_bloomberg_aligned = df_bloomberg_aligned.apply(
+            pd.to_numeric, errors="coerce"
+        )
+        df_expected_aligned = df_expected_aligned.apply(pd.to_numeric, errors="coerce")
 
         # Select only numeric columns
         df_bloomberg_numeric = df_bloomberg_aligned.select_dtypes(include=[np.number])
         df_expected_numeric = df_expected_aligned.select_dtypes(include=[np.number])
 
         # Restrict to the common columns across both DataFrames
-        common_cols = df_bloomberg_numeric.columns.intersection(df_expected_numeric.columns)
+        common_cols = df_bloomberg_numeric.columns.intersection(
+            df_expected_numeric.columns
+        )
         df_bloomberg_numeric = df_bloomberg_numeric[common_cols]
         df_expected_numeric = df_expected_numeric[common_cols]
 
@@ -622,16 +619,17 @@ class TestDataCloseness(unittest.TestCase):
             df_bloomberg_numeric.values,
             df_expected_numeric.values,
             rtol=0.001,
-            equal_nan=True
+            equal_nan=True,
         )
 
         self.assertTrue(are_equal, "DataFrames are not equal within 2% tolerance")
 
+
 if __name__ == "__main__":
     unittest.main()
-    #df = load_combined_spreads_wide(data_dir=OUTPUT_DIR)
-    #path = config.OUTPUT_DIR / "pulled"
+    # df = load_combined_spreads_wide(data_dir=OUTPUT_DIR)
+    # path = config.OUTPUT_DIR / "pulled"
     # path.mkdir(parents=True, exist_ok=True)
-    #df.to_parquet(path / "arbitrage_spread_wide.parquet")
+    # df.to_parquet(path / "arbitrage_spread_wide.parquet")
     # df.dropna().to_parquet(path / "basis_data_combined_balanced.parquet")
-    #pass
+    # pass

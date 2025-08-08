@@ -15,6 +15,7 @@ from settings import config
 
 DATA_DIR = config("DATA_DIR") / "futures_returns"
 
+
 def load_futures_returns(data_dir=DATA_DIR):
     path = data_dir / "futures_returns.parquet"
     return pd.read_parquet(path)
@@ -24,8 +25,9 @@ def load_lme_metals(data_dir=DATA_DIR):
     path = data_dir / "lme_metals.parquet"
     return pd.read_parquet(path)
 
-def load_gsci_data(data_dir = DATA_DIR):
-    df = pd.read_parquet(data_dir/"gsci_indices.parquet")
+
+def load_gsci_data(data_dir=DATA_DIR):
+    df = pd.read_parquet(data_dir / "gsci_indices.parquet")
     df["Date"] = pd.to_datetime(df["index"])
     df = df.sort_values("Date")
     df = df.drop(columns="index")
@@ -42,25 +44,23 @@ def load_gsci_data(data_dir = DATA_DIR):
     return df_return
 
 
-def load_commodities_future(data_dir = DATA_DIR):
-    df = pd.read_parquet(data_dir/"commodity_futures.parquet")
+def load_commodities_future(data_dir=DATA_DIR):
+    df = pd.read_parquet(data_dir / "commodity_futures.parquet")
     return df
 
-def load_commodities_manual_old(data_dir = DATA_DIR):
-    df = pd.read_csv(data_dir/"clean_1970_2008_commodities_data.csv")
+
+def load_commodities_manual_old(data_dir=DATA_DIR):
+    df = pd.read_csv(data_dir / "clean_1970_2008_commodities_data.csv")
     return df
 
-def load_commodities_manual_new(data_dir = DATA_DIR):
-    df = pd.read_csv(data_dir/"clean_2009_2024_commodities_data.csv")
+
+def load_commodities_manual_new(data_dir=DATA_DIR):
+    df = pd.read_csv(data_dir / "clean_2009_2024_commodities_data.csv")
     return df
+
 
 def load_commodities_manual():
     clean_data_df_1970 = load_commodities_manual_old()
     clean_data_df_2009 = load_commodities_manual_new()
-    df = pd.concat([clean_data_df_1970,clean_data_df_2009],ignore_index=True)
+    df = pd.concat([clean_data_df_1970, clean_data_df_2009], ignore_index=True)
     return df
-
-
-
-
-

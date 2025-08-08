@@ -1,10 +1,10 @@
 """
 Tests functions in calc_swap_spreads responsible for calculation and plots.
 """
-import pandas as pd
-from datetime import datetime, timedelta
+
 from calc_swap_spreads import *
 from pull_bloomberg import *
+
 
 def test_calc_swap_spreads():
     """Tests calc_swap_spreads to ensure that the output dataframe
@@ -19,19 +19,20 @@ def test_calc_swap_spreads():
 
     total_list = []
     output = calc_swap_spreads(treasury_df, swap_df)
-    years = [1,2,3,5,10,20,30]
+    years = [1, 2, 3, 5, 10, 20, 30]
     for year in years:
-        total_list.append(f'Arb_Swap_{year}')
+        total_list.append(f"Arb_Swap_{year}")
     for year in years:
-        total_list.append(f'tswap_{year}_rf')
-    assert [a for a,_ in output.columns] == total_list
-    
+        total_list.append(f"tswap_{year}_rf")
+    assert [a for a, _ in output.columns] == total_list
+
+
 def test_swap_main():
     """Tests swap_main to check if it saves the correct files in the correct
     destination
     Note: It only passes when connected to a bloomberg-enabled machine
     """
     swap_main()
-    file_dir = os.path.join(data_dir , 'calc_spread')
-    file = os.path.join(file_dir, 'calc_merged.pkl')
+    file_dir = os.path.join(data_dir, "calc_spread")
+    file = os.path.join(file_dir, "calc_merged.pkl")
     assert os.path.exists(file)

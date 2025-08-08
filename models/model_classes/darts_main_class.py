@@ -20,7 +20,6 @@ import numpy as np
 import pandas as pd
 from darts import TimeSeries
 from darts.dataprocessing.transformers import Scaler
-from darts.metrics import mase
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
 from tabulate import tabulate
@@ -46,9 +45,8 @@ class DartsMain(forecasting_model):
     ):
         # Darts-specific imports only when needed
         from darts import TimeSeries
-        from darts.dataprocessing.transformers import Scaler
-        from darts.utils.missing_values import fill_missing_values
         from darts.utils.model_selection import train_test_split
+
         dm_logger = logging.getLogger("DartsMain")
         dm_logger.info("DartsMain __init__() called.")
 
@@ -213,18 +211,21 @@ class DartsMain(forecasting_model):
     def save_forecast(self):
         # Add debugging to understand the type of pred_series
         dm_logger.info(f"pred_series type: {type(self.pred_series)}")
-        if hasattr(self.pred_series, 'shape'):
+        if hasattr(self.pred_series, "shape"):
             dm_logger.info(f"pred_series shape: {self.pred_series.shape}")
         elif isinstance(self.pred_series, list):
-            dm_logger.info(f"pred_series is a list with {len(self.pred_series)} elements")
+            dm_logger.info(
+                f"pred_series is a list with {len(self.pred_series)} elements"
+            )
             # If it's still a list, try to concatenate it
             if len(self.pred_series) > 0:
                 from darts import TimeSeries
+
                 self.pred_series = TimeSeries.concatenate(self.pred_series, axis=0)
                 dm_logger.info("Concatenated list of TimeSeries into single TimeSeries")
             else:
                 raise ValueError("pred_series is an empty list")
-        
+
         # Save to parquet
         temp_df = self.pred_series.to_dataframe(time_as_index=False)
         temp_df.to_parquet(self.forecast_path)
@@ -243,29 +244,36 @@ class DartsMain(forecasting_model):
         if self.pred_series is None:
             dm_logger.error("calculate_error called without predictions.")
             raise ValueError("Please call self.forecast() first.")
-        
+
         # Add debugging information
         dm_logger.info(f"test_series components: {self.test_series.n_components}")
         dm_logger.info(f"pred_series components: {self.pred_series.n_components}")
         dm_logger.info(f"test_series shape: {self.test_series.shape}")
         dm_logger.info(f"pred_series shape: {self.pred_series.shape}")
-        
+
         if metric == "MASE":
             from darts.metrics import mase
+
             try:
                 # For MASE, the insample series needs to:
                 # 1. Start before pred_series
                 # 2. Extend until at least one time step before pred_series starts
-                
+
                 # Print debug info
-                print(f"DEBUG: train_series range: {self.train_series.start_time()} to {self.train_series.end_time()}")
-                print(f"DEBUG: test_series range: {self.test_series.start_time()} to {self.test_series.end_time()}")
-                print(f"DEBUG: pred_series range: {self.pred_series.start_time()} to {self.pred_series.end_time()}")
-                
+                print(
+                    f"DEBUG: train_series range: {self.train_series.start_time()} to {self.train_series.end_time()}"
+                )
+                print(
+                    f"DEBUG: test_series range: {self.test_series.start_time()} to {self.test_series.end_time()}"
+                )
+                print(
+                    f"DEBUG: pred_series range: {self.pred_series.start_time()} to {self.pred_series.end_time()}"
+                )
+
                 # Since we're doing one-step-ahead, predictions should align with test
                 # But MASE needs historical data. Let's use the full series up to pred start
                 pred_start = self.pred_series.start_time()
-                
+
                 # Get the full historical series up to the prediction start
                 # We need to include data up to one step before predictions
                 try:
@@ -281,16 +289,22 @@ class DartsMain(forecasting_model):
                     # If any issues, fall back to train_series
                     print("DEBUG: Failed to slice raw_series, using train_series")
                     historical_series = self.train_series
-                
+
                 self.errors["MASE"] = mase(
-                    self.test_series, self.pred_series, historical_series, self.seasonality
+                    self.test_series,
+                    self.pred_series,
+                    historical_series,
+                    self.seasonality,
                 )
                 dm_logger.info("MASE = " + str(self.errors["MASE"]) + ".")
                 return self.errors["MASE"]
             except ValueError as e:
                 if "cannot use MASE with periodical signals" in str(e):
-                    dm_logger.warning("MASE failed due to periodical signals, falling back to MAE")
+                    dm_logger.warning(
+                        "MASE failed due to periodical signals, falling back to MAE"
+                    )
                     from darts.metrics import mae
+
                     self.errors["MAE"] = mae(self.test_series, self.pred_series)
                     dm_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
                     return self.errors["MAE"]
@@ -298,6 +312,7 @@ class DartsMain(forecasting_model):
                     raise e
         elif metric == "MAE":
             from darts.metrics import mae
+
             self.errors["MAE"] = mae(self.test_series, self.pred_series)
             dm_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
             return self.errors["MAE"]

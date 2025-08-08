@@ -5,10 +5,9 @@ OUTPUT_DIR = config("OUTPUT_DIR")
 START_DATE = config("START_DATE", "2020-01-01")
 END_DATE = config("END_DATE", "2025-01-01")
 
+
 def pull_treasury_inflation_swaps(
-    start_date=START_DATE,
-    end_date=END_DATE,
-    output_path="treasury_inflation_swaps.csv"
+    start_date=START_DATE, end_date=END_DATE, output_path="treasury_inflation_swaps.csv"
 ):
     """
     Connects to Bloomberg via xbbg, pulls historical daily prices for USD
@@ -23,11 +22,11 @@ def pull_treasury_inflation_swaps(
 
     # Tickers to replicate. Adjust as needed for 1M, 3M, 6M, etc.
     tickers = [
-        "USSWIT1 BGN Curncy",   # 1Y
-        "USSWIT2 BGN Curncy",   # 2Y
-        "USSWIT3 BGN Curncy",   # 3Y
-        "USSWIT4 BGN Curncy",   # 4Y
-        "USSWIT5 BGN Curncy",   # 5Y
+        "USSWIT1 BGN Curncy",  # 1Y
+        "USSWIT2 BGN Curncy",  # 2Y
+        "USSWIT3 BGN Curncy",  # 3Y
+        "USSWIT4 BGN Curncy",  # 4Y
+        "USSWIT5 BGN Curncy",  # 5Y
         "USSWIT10 BGN Curncy",  # 10Y
         "USSWIT20 BGN Curncy",  # 20Y
         "USSWIT30 BGN Curncy",  # 30Y
@@ -36,12 +35,7 @@ def pull_treasury_inflation_swaps(
     fields = ["PX_LAST"]
 
     # Pull data using xbbg's bdh function
-    df = blp.bdh(
-        tickers=tickers,
-        flds=fields,
-        start_date=start_date,
-        end_date=end_date
-    )
+    df = blp.bdh(tickers=tickers, flds=fields, start_date=start_date, end_date=end_date)
     # 'df' is a multi-index DataFrame with (date) as the index and (ticker, field) as columns.
     # Drop the second level of columns ("PX_LAST"), so columns are just the tickers
     df.columns = df.columns.droplevel(level=1)

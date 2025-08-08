@@ -5,7 +5,6 @@ This module provides a consistent way to perform one-step-ahead forecasting
 across Darts, Nixtla, and GluonTS models.
 """
 
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import logging
@@ -13,6 +12,7 @@ import logging
 # Conditional imports to avoid dependency issues
 try:
     from darts import TimeSeries
+
     DARTS_AVAILABLE = True
 except ImportError:
     DARTS_AVAILABLE = False
@@ -52,7 +52,7 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     test_end = test_series.end_time()
 
     # For global models, use historical_forecasts with explicit parameters
-    
+
     # Make retrain condition True if the following models are used
     # ExponentialSmoothing
     # Simple ExponentialSmoothing
@@ -61,10 +61,9 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     # Naive models
     # Else don't need to retrain
     model_name = str(model)
-    retrain_model = model_name.startswith(("ExponentialSmoothing",
-                                           "Theta",
-                                           "Prophet",
-                                           "Naive"))
+    retrain_model = model_name.startswith(
+        ("ExponentialSmoothing", "Theta", "Prophet", "Naive")
+    )
 
     logger.info("Using historical_forecasts for global model")
     predictions = model.historical_forecasts(
@@ -73,13 +72,15 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
         forecast_horizon=1,
         stride=1,
         retrain=retrain_model,
-        last_points_only=False, # I think this should be set to True.
+        last_points_only=False,  # I think this should be set to True.
         verbose=False,
     )
-    
+
     # Handle case where historical_forecasts returns a list
     if isinstance(predictions, list):
-        logger.info(f"historical_forecasts returned a list of {len(predictions)} TimeSeries")
+        logger.info(
+            f"historical_forecasts returned a list of {len(predictions)} TimeSeries"
+        )
         # Concatenate all predictions into a single TimeSeries
         if len(predictions) > 0:
             # Concatenate one by one
@@ -89,19 +90,25 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
             predictions = result
         else:
             raise ValueError("No predictions returned from historical_forecasts")
-    
+
     logger.info(f"Final predictions shape: {predictions.shape}")
 
     # Ensure predictions have the same number of components as test_series
     if predictions.n_components != test_series.n_components:
-        logger.warning(f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}")
+        logger.warning(
+            f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}"
+        )
         # If predictions have more components, take only the first test_series.n_components
         if predictions.n_components > test_series.n_components:
-            predictions = predictions[:, :test_series.n_components]
-            logger.info(f"Truncated predictions to {test_series.n_components} components")
+            predictions = predictions[:, : test_series.n_components]
+            logger.info(
+                f"Truncated predictions to {test_series.n_components} components"
+            )
         else:
             # If predictions have fewer components, this is a problem
-            raise ValueError(f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})")
+            raise ValueError(
+                f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})"
+            )
 
     logger.info(f"Generated predictions with shape: {predictions.shape}")
     return predictions
@@ -125,23 +132,23 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
     # For NeuralForecast, we can use the predict method directly on the full dataset
     # and then filter to get only the test predictions
     logger.info("Using NeuralForecast predict method on full dataset")
-    
+
     try:
         # Predict on the full dataset (this will give us predictions for all future points)
         predictions = nf_model.predict(raw_df)
-        
+
         # Filter to only include test dates
         test_dates = set(test_df["ds"].unique())
         pred_df = predictions[predictions["ds"].isin(test_dates)].copy()
-        
+
         logger.info(f"Generated {len(pred_df)} predictions for test dates")
         return pred_df
-        
+
     except Exception as e:
         logger.error(f"Error in NeuralForecast prediction: {e}")
         # Fallback: try a simpler approach
         logger.info("Trying fallback approach with test data only")
-        
+
         # Use the test data directly for prediction
         predictions = nf_model.predict(test_df)
         logger.info(f"Fallback generated {len(predictions)} predictions")
@@ -244,7 +251,7 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
         if not DARTS_AVAILABLE:
             logger.warning("darts not available, skipping verification for darts model")
             return True
-            
+
         # For Darts TimeSeries
         if isinstance(predictions, TimeSeries):
             pred_length = len(predictions)
@@ -255,7 +262,9 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
                 logger.info("✓ Darts predictions length matches test data length")
                 return True
             else:
-                logger.warning(f"⚠ Darts predictions length ({pred_length}) != test data length ({test_length})")
+                logger.warning(
+                    f"⚠ Darts predictions length ({pred_length}) != test data length ({test_length})"
+                )
                 return False
         else:
             logger.warning("⚠ Darts predictions not in TimeSeries format")
@@ -272,7 +281,9 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
                 logger.info("✓ Nixtla predictions count matches test data count")
                 return True
             else:
-                logger.warning(f"⚠ Nixtla predictions count ({pred_count}) != test data count ({test_count})")
+                logger.warning(
+                    f"⚠ Nixtla predictions count ({pred_count}) != test data count ({test_count})"
+                )
                 return False
         else:
             logger.warning("⚠ Nixtla predictions not in DataFrame format")
@@ -289,7 +300,9 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
                 logger.info("✓ GluonTS predictions count matches test data count")
                 return True
             else:
-                logger.warning(f"⚠ GluonTS predictions count ({pred_count}) != test data count ({test_count})")
+                logger.warning(
+                    f"⚠ GluonTS predictions count ({pred_count}) != test data count ({test_count})"
+                )
                 return False
         else:
             logger.warning("⚠ GluonTS predictions not in DataFrame format")

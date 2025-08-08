@@ -4,10 +4,12 @@ from io import BytesIO
 from pathlib import Path
 
 from settings import config
-DATA_DIR = config('DATA_DIR')
+
+DATA_DIR = config("DATA_DIR")
 
 # Define the URL for the TIPS yield data
 TIPS_URL = "https://www.federalreserve.gov/data/yield-curve-tables/feds200805.csv"
+
 
 def pull_fed_tips_yield_curve():
     """
@@ -26,31 +28,32 @@ def pull_fed_tips_yield_curve():
     response = requests.get(TIPS_URL)
     if response.status_code != 200:
         raise Exception(f"Failed to fetch TIPS data: HTTP {response.status_code}")
-    
+
     # Read CSV while skipping the first 19 rows (metadata)
     df = pd.read_csv(BytesIO(response.content), skiprows=18)
-    
+
     # Convert 'Date' column to datetime format
-    #df.rename(columns={'Date': 'date'}, inplace=True)
-    #df['date'] = pd.to_datetime(df['date'], format="%Y%m%d", errors='coerce')
+    # df.rename(columns={'Date': 'date'}, inplace=True)
+    # df['date'] = pd.to_datetime(df['date'], format="%Y%m%d", errors='coerce')
 
     # List of relevant columns (for 2y, 5y, 10y, 20y TIPS yields)
-    #maturity_cols = ['TIPS_Treasury_02Y', 'TIPS_Treasury_05Y', 'TIPS_Treasury_10Y', 'TIPS_Treasury_20Y']
-    
+    # maturity_cols = ['TIPS_Treasury_02Y', 'TIPS_Treasury_05Y', 'TIPS_Treasury_10Y', 'TIPS_Treasury_20Y']
+
     # Select necessary columns
-    #df_yields = df[['date'] + maturity_cols].copy()
+    # df_yields = df[['date'] + maturity_cols].copy()
 
     # Convert yields from percentage to decimal
-    #for col in maturity_cols:
+    # for col in maturity_cols:
     #    df_yields[col] = pd.to_numeric(df_yields[col], errors='coerce') / 100.0
-    
+
     # Drop missing date rows
-    #df_yields.dropna(subset=['date'], inplace=True)
+    # df_yields.dropna(subset=['date'], inplace=True)
 
     # Sort by date for time series consistency
-    #df_yields.sort_values(by='date', inplace=True)
-    
+    # df_yields.sort_values(by='date', inplace=True)
+
     return df
+
 
 def save_tips_yield_curve(df, data_dir):
     """
@@ -59,37 +62,39 @@ def save_tips_yield_curve(df, data_dir):
     path = Path(data_dir) / "fed_tips_yield_curve.parquet"
     df.to_parquet(path)
 
+
 def load_tips_yield_curve(data_dir):
     """
     Load the TIPS yield curve DataFrame from a parquet file.
     Selects and renames the following columns:
-    
+
     Source columns: TIPSY02, TIPSY05, TIPSY10, TIPSY20, TIPSY30
     Target columns: ['TIPS_Treasury_02Y', 'TIPS_Treasury_05Y', 'TIPS_Treasury_10Y', 'TIPS_Treasury_20Y']
-    
+
     Note: TIPSY30 is ignored since only four target columns are provided.
     """
     path = Path(data_dir) / "fed_tips_yield_curve.parquet"
     df = pd.read_parquet(path)
-    
+
     # Select only the required columns (ignoring TIPSY30)
-    selected_cols = ['TIPSY02', 'TIPSY05', 'TIPSY10', 'TIPSY20']
+    selected_cols = ["TIPSY02", "TIPSY05", "TIPSY10", "TIPSY20"]
     df = df[selected_cols]
-    
+
     # Rename the selected columns as specified.
     rename_mapping = {
-        'TIPSY02': 'TIPS_Treasury_02Y',
-        'TIPSY05': 'TIPS_Treasury_05Y',
-        'TIPSY10': 'TIPS_Treasury_10Y',
-        'TIPSY20': 'TIPS_Treasury_20Y'
+        "TIPSY02": "TIPS_Treasury_02Y",
+        "TIPSY05": "TIPS_Treasury_05Y",
+        "TIPSY10": "TIPS_Treasury_10Y",
+        "TIPSY20": "TIPS_Treasury_20Y",
     }
     df = df.rename(columns=rename_mapping)
-    
+
     return df
+
 
 # Example usage
 if __name__ == "__main__":
     tips_df = pull_fed_tips_yield_curve()
     save_tips_yield_curve(tips_df, DATA_DIR)
     # To load the data later
-    #loaded_tips_df = load_tips_yield_curve(DATA_DIR)
+    # loaded_tips_df = load_tips_yield_curve(DATA_DIR)

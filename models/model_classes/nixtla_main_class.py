@@ -33,6 +33,7 @@ class NixtlaMain(forecasting_model):
     ):
         # Only import torch here, not neuralforecast
         import torch
+
         nx_logger.info("NixtlaMain __init__ called.")
 
         # This helps with organising
@@ -102,7 +103,7 @@ class NixtlaMain(forecasting_model):
         # Use provided parameters or defaults
         if estimator_params is None:
             estimator_params = {"h": 1, "input_size": seasonality * 4}
-        
+
         # MPS is causing buffer errors
         if torch.backends.mps.is_available():
             nx_logger.info("MPS available, but will be ignored.")
@@ -114,7 +115,7 @@ class NixtlaMain(forecasting_model):
             self.estimator = estimator(**estimator_params)
 
         # Stores the nf object
-        self.nf = None # Initialize to None, will be set in train()
+        self.nf = None  # Initialize to None, will be set in train()
         # Error metrics
         self.errors = defaultdict(float)
 
@@ -137,6 +138,7 @@ class NixtlaMain(forecasting_model):
     def train(self):
         nx_logger.info("Model training started.")
         from neuralforecast import NeuralForecast
+
         self.nf = NeuralForecast(models=[self.estimator], freq=self.frequency)
         self.nf.fit(df=self.train_series)
         nx_logger.info("Model trained.")
@@ -150,14 +152,17 @@ class NixtlaMain(forecasting_model):
 
     def load_model(self):
         from neuralforecast import NeuralForecast
+
         self.nf = NeuralForecast.load(path=str(self.model_path))
         nx_logger.info('Model loaded from "' + str(self.model_path) + '".')
 
     @common_error_catch
     def forecast(self):
         nx_logger.info("Starting unified one-step-ahead forecasting for Nixtla model")
-        import torch
-        from .unified_one_step_ahead import perform_one_step_ahead_nixtla, verify_one_step_ahead
+        from .unified_one_step_ahead import (
+            perform_one_step_ahead_nixtla,
+            verify_one_step_ahead,
+        )
 
         self.pred_series = perform_one_step_ahead_nixtla(
             nf_model=self.nf,
@@ -169,6 +174,7 @@ class NixtlaMain(forecasting_model):
         # Verify that we're doing one-step-ahead (only if darts is available)
         try:
             from darts import TimeSeries
+
             is_valid = verify_one_step_ahead(
                 predictions=self.pred_series,
                 test_data=self.test_series,
@@ -180,7 +186,9 @@ class NixtlaMain(forecasting_model):
             else:
                 nx_logger.warning("⚠ One-step-ahead forecasting verification failed")
         except ImportError:
-            nx_logger.warning("⚠ Darts not available - skipping one-step-ahead verification")
+            nx_logger.warning(
+                "⚠ Darts not available - skipping one-step-ahead verification"
+            )
 
         nx_logger.info("Forecasting complete. Internal variable updated.")
 
@@ -212,7 +220,7 @@ class NixtlaMain(forecasting_model):
                 return self.errors["MASE"]
             except (ImportError, ValueError, TypeError) as e:
                 nx_logger.warning(f"⚠ Cannot calculate MASE: {e}")
-                self.errors["MASE"] = float('nan')
+                self.errors["MASE"] = float("nan")
                 return self.errors["MASE"]
         else:
             raise ValueError("Metric not supported.")

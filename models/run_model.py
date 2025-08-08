@@ -131,7 +131,9 @@ def get_nixtla_estimator_params(model_config, env_vars):
         # Use a very small number of steps for debugging (e.g., 50 steps)
         max_steps = n_epochs * 50
         params["max_steps"] = max_steps
-        print(f"Overriding max_steps to {max_steps} via environment variable for Nixtla model")
+        print(
+            f"Overriding max_steps to {max_steps} via environment variable for Nixtla model"
+        )
 
     return params
 
@@ -261,22 +263,46 @@ def create_estimator(model_config, env_vars):
 
     # Environment variable overrides for debugging
     # Allow overriding n_epochs via environment variable for debugging
-    print(f"DEBUG: Checking for N_EPOCHS environment variable. Available env vars: {[k for k in os.environ.keys() if 'EPOCH' in k.upper()]}")
+    print(
+        f"DEBUG: Checking for N_EPOCHS environment variable. Available env vars: {[k for k in os.environ.keys() if 'EPOCH' in k.upper()]}"
+    )
     if "N_EPOCHS" in os.environ:
         n_epochs = int(os.environ["N_EPOCHS"])
         print(f"DEBUG: Found N_EPOCHS={n_epochs}")
-        
+
         # Handle different parameter names for different model types
-        if any(name in model_name for name in ["DeepAREstimator", "SimpleFeedForwardEstimator", "PatchTSTEstimator", "WaveNetEstimator"]):
+        if any(
+            name in model_name
+            for name in [
+                "DeepAREstimator",
+                "SimpleFeedForwardEstimator",
+                "PatchTSTEstimator",
+                "WaveNetEstimator",
+            ]
+        ):
             # GluonTS models use trainer_kwargs with max_epochs
             if "trainer_kwargs" not in params:
                 params["trainer_kwargs"] = {}
             params["trainer_kwargs"]["max_epochs"] = n_epochs
-            print(f"Overriding max_epochs to {n_epochs} via environment variable for GluonTS model")
-        elif any(name in model_name for name in ["DLinearModel", "NLinearModel", "TransformerModel", "NBEATSModel", "NHiTSModel", "TiDEModel"]):
+            print(
+                f"Overriding max_epochs to {n_epochs} via environment variable for GluonTS model"
+            )
+        elif any(
+            name in model_name
+            for name in [
+                "DLinearModel",
+                "NLinearModel",
+                "TransformerModel",
+                "NBEATSModel",
+                "NHiTSModel",
+                "TiDEModel",
+            ]
+        ):
             # Darts neural models use n_epochs directly
             params["n_epochs"] = n_epochs
-            print(f"Overriding n_epochs to {n_epochs} via environment variable for Darts neural model")
+            print(
+                f"Overriding n_epochs to {n_epochs} via environment variable for Darts neural model"
+            )
         else:
             # Skip n_epochs for models that don't support it (e.g., ARIMA, Prophet, etc.)
             print(f"Skipping n_epochs override for {model_name} - not a neural model")
@@ -332,10 +358,12 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     # Dynamically import the required model class only when needed
     if model_class == "DartsLocal":
         from model_classes.darts_local_class import DartsLocal
+
         estimator = create_estimator(model_config, env_vars)
         model_obj = DartsLocal(estimator, model_name, *env_vars)
     elif model_class == "DartsGlobal":
         from model_classes.darts_global_class import DartsGlobal
+
         estimator = create_estimator(model_config, env_vars)
         model_obj = DartsGlobal(
             estimator,
@@ -348,14 +376,18 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     elif model_class == "NixtlaMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.nixtla_main_class import NixtlaMain
+
         # For Nixtla models, we need the estimator class and parameters
         estimator_class = get_estimator_class(model_config)
         # Get estimator parameters for Nixtla models (including n_epochs override)
         estimator_params = get_nixtla_estimator_params(model_config, env_vars)
-        model_obj = NixtlaMain(estimator_class, model_name, *env_vars, estimator_params=estimator_params)
+        model_obj = NixtlaMain(
+            estimator_class, model_name, *env_vars, estimator_params=estimator_params
+        )
     elif model_class == "GluontsMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.gluonts_main_class import GluontsMain
+
         estimator = create_estimator(model_config, env_vars)
         model_obj = GluontsMain(estimator, model_name, *env_vars)
     elif model_class == "TimesFM":
@@ -364,6 +396,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         if timesfm_path not in sys.path:
             sys.path.insert(0, timesfm_path)
         from main import TimesFMForecasting
+
         model_obj = TimesFMForecasting(
             model_config.get("model_version", "500m"), *env_vars
         )

@@ -8,7 +8,12 @@ This file contains all tasks related to:
 """
 
 # Import common utilities
-from dodo_common import DATA_DIR, OUTPUT_DIR, load_subscriptions, load_all_module_requirements
+from dodo_common import (
+    DATA_DIR,
+    OUTPUT_DIR,
+    load_subscriptions,
+    load_all_module_requirements,
+)
 from dependency_tracker import get_available_datasets
 
 # Load configuration
@@ -21,7 +26,8 @@ module_requirements_dict = load_all_module_requirements()
 module_requirements = {}
 for module_name, required_sources in module_requirements_dict.items():
     module_requirements[module_name] = all(
-        subscriptions_toml["data_sources"].get(source, False) for source in required_sources
+        subscriptions_toml["data_sources"].get(source, False)
+        for source in required_sources
     )
 
 

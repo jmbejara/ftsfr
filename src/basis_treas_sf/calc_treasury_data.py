@@ -241,7 +241,9 @@ def compute_treasury_output(df_long: pd.DataFrame) -> pd.DataFrame:
     df_out = df_long[["Date", "Tenor", "T_SF_Rf", "rf_ois_t_sf_mat", "T_SF_TTM"]].copy()
 
     df_wide = df_out.pivot(index="Date", columns="Tenor")
-    df_wide.columns = ["_".join([str(c) for c in col]).strip() for col in df_wide.columns.values]
+    df_wide.columns = [
+        "_".join([str(c) for c in col]).strip() for col in df_wide.columns.values
+    ]
     df_wide.reset_index(inplace=True)
 
     rename_dict = {

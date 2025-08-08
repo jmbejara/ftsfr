@@ -180,7 +180,9 @@ def implied_daily_fx_returns(fx_data, currency_list):
             continue
 
         spot_col = f"{curr_name}_spot"
-        fx_df[f"{spot_col}_ratio"] = fx_df[spot_col].shift(1) / fx_df[spot_col]  # change in spot price ratio
+        fx_df[f"{spot_col}_ratio"] = (
+            fx_df[spot_col].shift(1) / fx_df[spot_col]
+        )  # change in spot price ratio
         curr_ret_col = f"{curr_name}_return"
 
         # keep interest conversion consistent with US
@@ -251,14 +253,14 @@ def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
     df_merged = implied_daily_fx_returns(df_merged, CURRENCIES)
 
     # Change things up
-    df_merged = df_merged.reset_index().rename(columns={"index":"date"})
+    df_merged = df_merged.reset_index().rename(columns={"index": "date"})
     df_long = df_merged.melt(
-        id_vars=["date"],       # columns to keep fixed
-        var_name="currency",    # name for former column headers
-        value_name="returns"       # name for the values
+        id_vars=["date"],  # columns to keep fixed
+        var_name="currency",  # name for former column headers
+        value_name="returns",  # name for the values
     )
     # specified unique_id, ds, y ordering
-    df_long = df_long[['currency', 'date', 'returns']]
+    df_long = df_long[["currency", "date", "returns"]]
 
     return df_long
 

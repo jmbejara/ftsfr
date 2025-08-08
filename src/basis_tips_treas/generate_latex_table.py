@@ -27,11 +27,11 @@ from settings import config
 OUTPUT_DATA = Path(config("OUTPUT_DIR"))
 
 # Optional: Suppress scientific notation and set float formatting for LaTeX output
-pd.set_option('display.float_format', lambda x: '%.2f' % x)
-float_format_func = lambda x: '{:.2f}'.format(x)
+pd.set_option("display.float_format", lambda x: "%.2f" % x)
+float_format_func = lambda x: "{:.2f}".format(x)
 
 # Define the path to the summary CSV file
-csv_file = OUTPUT_DATA / 'tips_treasury_summary.csv'
+csv_file = OUTPUT_DATA / "tips_treasury_summary.csv"
 
 # Read the CSV file into a DataFrame, using the first column as the index
 df_summary = pd.read_csv(csv_file, index_col=0)
@@ -43,7 +43,7 @@ latex_table_string = df_summary.to_latex(float_format=float_format_func, escape=
 print(latex_table_string)
 
 # Define the output file path for the LaTeX table
-output_tex_file = OUTPUT_DATA / 'tips_treasury_summary_table.tex'
+output_tex_file = OUTPUT_DATA / "tips_treasury_summary_table.tex"
 
 # Write the LaTeX table string to the .tex file
 with open(output_tex_file, "w") as f:

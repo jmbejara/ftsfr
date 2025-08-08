@@ -28,7 +28,8 @@ module_requirements_dict = load_all_module_requirements()
 module_requirements = {}
 for module_name, required_sources in module_requirements_dict.items():
     module_requirements[module_name] = all(
-        subscriptions_toml["data_sources"].get(source, False) for source in required_sources
+        subscriptions_toml["data_sources"].get(source, False)
+        for source in required_sources
     )
 
 
