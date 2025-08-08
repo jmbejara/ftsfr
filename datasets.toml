@@ -91,7 +91,7 @@ seasonality = 12
 
 ################################################################################
 [us_treasury_returns]
-required_data_sources = ["wrds_crsp"]
+required_data_sources = ["wrds_crsp", "he_kelly_manela"]
 
 [us_treasury_returns.ftsfr_treas_bond_returns]
 description = """This data module contains the returns of individual treasury bonds sourced from the CRSP database."""
