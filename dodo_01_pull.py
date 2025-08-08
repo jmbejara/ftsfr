@@ -13,6 +13,7 @@ from pathlib import Path
 
 # Import common utilities
 from dodo_common import (
+    BASE_DIR,
     DATA_DIR,
     OUTPUT_DIR,
     notebook_subtask,
@@ -453,7 +454,7 @@ def task_format():
         yield from notebook_subtask(
             {
                 "name": "basis_treas_sf_notebook",
-                "notebook_path": "./src/basis_treas_sf/01_explore_basis_trade_data_new.ipynb",
+                "notebook_path": "./src/basis_treas_sf/summary_basis_treas_sf.ipynb",
                 "file_dep": [
                     "./src/basis_treas_sf/calc_treasury_data.py",
                     DATA_DIR / "treasury_sf_output.csv",
@@ -487,7 +488,7 @@ def task_format():
         yield from notebook_subtask(
             {
                 "name": "basis_treas_swap_overview",
-                "notebook_path": "./src/basis_treas_swap/overview.ipynb",
+                "notebook_path": "./src/basis_treas_swap/summary_basis_treas_swap.ipynb",
                 "file_dep": [
                     "./src/basis_treas_swap/pull_bloomberg.py",
                     "./src/basis_treas_swap/calc_swap_spreads.py",

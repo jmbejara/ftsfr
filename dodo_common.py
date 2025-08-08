@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 import toml
 
-sys.path.insert(1, "./src/")
+sys.path.insert(1, str((Path(__file__).parent / "src").resolve()))
 
 from settings import config
 from dependency_tracker import (
@@ -15,9 +15,12 @@ from dependency_tracker import (
 )
 
 # Common configuration
+BASE_DIR = Path(config("BASE_DIR"))
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 OS_TYPE = config("OS_TYPE")
+
+
 
 # Get pixi executable path
 PIXI_EXECUTABLE = shutil.which("pixi")
