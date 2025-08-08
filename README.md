@@ -122,7 +122,7 @@ pip install -r requirements.txt
 ```
 If you have a Bloomberg Terminal, you can install the Bloomberg API using the following command:
 ```bash
-blpapi --index-url https://blpapi.bloomberg.com/repository/releases/python/simple/
+python -m pip install --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/ blpapi
 ```
 
 Then, follow the pattern in the `.env.example` file to set your environment variables in a `.env` file.
