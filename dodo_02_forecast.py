@@ -13,14 +13,14 @@ from dodo_common import (
     DATA_DIR,
     OUTPUT_DIR,
     PIXI_EXECUTABLE,
-    load_config,
+    load_subscriptions,
     load_all_module_requirements,
 )
 from dependency_tracker import get_available_datasets
 
 # Load configuration
-config_toml = load_config()
-models = config_toml["models"]
+subscriptions_toml = load_subscriptions()
+models = subscriptions_toml["models"]
 models_activated = [model for model in models if models[model]]
 
 # Load module requirements to determine available datasets
@@ -28,7 +28,7 @@ module_requirements_dict = load_all_module_requirements()
 module_requirements = {}
 for module_name, required_sources in module_requirements_dict.items():
     module_requirements[module_name] = all(
-        config_toml["data_sources"].get(source, False) for source in required_sources
+        subscriptions_toml["data_sources"].get(source, False) for source in required_sources
     )
 
 

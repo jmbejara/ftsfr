@@ -4,7 +4,7 @@ You can view the current version of the website here: https://jeremybejarano.com
 
 ## Overview
 
-This repository contains a collection of financial time-series forecasting models. It produces testing benchmarks for practitioners. One key feature is that users can specify which data sources (i.e., subscriptions) they have access to in `config.toml`, and the system will automatically determine which modules can be run based on the user's available data sources.
+This repository contains a collection of financial time-series forecasting models. It produces testing benchmarks for practitioners. One key feature is that users can specify which data sources (i.e., subscriptions) they have access to in `subscriptions.toml`, and the system will automatically determine which modules can be run based on the user's available data sources.
 
 ### Architecture: Data Sources, Data Modules, and Datasets
 
@@ -15,7 +15,7 @@ This repository is organized around three key concepts:
    - WRDS (Wharton Research Data Services) subscriptions (Markit, CRSP, Compustat, etc.)
    - Public data sources (Federal Reserve, Ken French Data Library, etc.)
    
-   Users specify which data sources (subscriptions) they have access to in `config.toml`.
+   Users specify which data sources (subscriptions) they have access to in `subscriptions.toml`.
 
 2. **Data Modules**: Self-contained units of code organized in subdirectories under `src/`. Each data module:
    - Contains all related code for a specific financial data domain
@@ -45,7 +45,7 @@ Yangge
 
 This repository uses two main configuration files:
 
-### config.toml
+### subscriptions.toml
 Controls which data sources and models are enabled. Key sections:
 - `[cache]` - Whether to use cached data or pull fresh data
 - `[data_sources]` - Enable/disable various data providers (Bloomberg, WRDS, public sources)
@@ -127,7 +127,7 @@ blpapi --index-url https://blpapi.bloomberg.com/repository/releases/python/simpl
 
 Then, follow the pattern in the `.env.example` file to set your environment variables in a `.env` file.
 
-Then, set the values in `config.toml` to your desired values. This file is used to configure the datasets that will be downloaded, based of the subscriptions that you have, and the benchmarks that will be run.
+Then, set the values in `subscriptions.toml` to your desired values. This file is used to configure the datasets that will be downloaded, based of the subscriptions that you have, and the benchmarks that will be run.
 
 Finally, run the pipeline (which is broken down into three major parts):
 

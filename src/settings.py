@@ -182,7 +182,7 @@ def find_all_caps_cli_vars(argv=sys.argv):
     return result
 
 
-def load_config():
+def load_subscriptions():
     # candidate paths: ./env then ../.env, then ../../.env
     estimated_project_root = find_project_root()
     candidates = [
@@ -223,7 +223,7 @@ def if_relative_make_abs(path):
 ## Define defaults
 ########################################################
 cli_vars = find_all_caps_cli_vars()
-_config = load_config()
+_config = load_subscriptions()
 defaults = {}
 
 

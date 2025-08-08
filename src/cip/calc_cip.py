@@ -355,10 +355,10 @@ def load_raw_data(end_date="2025-03-01"):
 
     # Get project root and config
     project_root = Path(__file__).resolve().parent.parent.parent
-    with open(f"{project_root}/config.toml", "r") as f:
-        config_toml = toml.load(f)
+    with open(f"{project_root}/subscriptions.toml", "r") as f:
+        subscriptions_toml = toml.load(f)
 
-    data_sources = config_toml["data_sources"].copy()
+    data_sources = subscriptions_toml["data_sources"].copy()
     BLOOMBERG = data_sources["bloomberg_terminal"]
 
     if not BLOOMBERG:

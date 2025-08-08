@@ -37,7 +37,7 @@ import subprocess
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from run_model import run_model, load_config
+from run_model import run_model, load_subscriptions
 
 
 def get_model_environment(model_name: str, config_path: str = "models_config.toml") -> str:
@@ -47,7 +47,7 @@ def get_model_environment(model_name: str, config_path: str = "models_config.tom
     Returns:
         str: The pixi command to run the model in the correct environment
     """
-    config = load_config(config_path)
+    config = load_subscriptions(config_path)
     if model_name not in config:
         return "pixi run run-model"  # Default fallback
     
@@ -244,7 +244,7 @@ def get_all_datasets() -> List[str]:
 
 def get_all_models(config_path: str = "models_config.toml") -> List[str]:
     """Get all available models from models_config.toml."""
-    config = load_config(config_path)
+    config = load_subscriptions(config_path)
     return list(config.keys())
 
 

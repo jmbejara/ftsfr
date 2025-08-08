@@ -82,4 +82,4 @@ would be nice to use data up until the present day.
 - WRDS is not a monolithic subscription. Each dataset listed above typically requires a separate subscription through the WRDS platform.
 - Public data sources (Ken French Data Library, Fed Yield Curve) typically don't require paid subscriptions.
 - Access credentials for WRDS are configured in environment variables. Please set the `.env` file following the `.env.example` file.
-- Specify which subscriptions you have access to in the `config.toml` file.
+- Specify which subscriptions you have access to in the `subscriptions.toml` file.

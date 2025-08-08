@@ -195,9 +195,9 @@ def notebook_subtask(task_config):
     }
 
 
-# Load configuration from config.toml
-def load_config():
-    with open("config.toml", "r") as f:
+# Load configuration from subscriptions.toml
+def load_subscriptions():
+    with open("subscriptions.toml", "r") as f:
         return toml.load(f)
 
 

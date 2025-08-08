@@ -17,13 +17,13 @@ from dodo_common import (
     OUTPUT_DIR,
     notebook_subtask,
     copy_dir_contents_to_folder,
-    load_config,
+    load_subscriptions,
     load_all_module_requirements,
 )
 
 # Load configuration
-config_toml = load_config()
-data_sources = config_toml["data_sources"].copy()
+subscriptions_toml = load_subscriptions()
+data_sources = subscriptions_toml["data_sources"].copy()
 
 # Check if we're being called by create_data_glimpses.py
 is_data_glimpses = any("create_data_glimpses" in arg for arg in sys.argv)
@@ -64,7 +64,7 @@ for module_name, required_sources in module_requirements_dict.items():
         data_sources.get(source, False) for source in required_sources
     )
 
-use_cache = config_toml["cache"]["use_cache"]
+use_cache = subscriptions_toml["cache"]["use_cache"]
 
 
 def task_config():
@@ -75,13 +75,13 @@ def task_config():
             "python ./src/settings.py",
         ],
         "targets": [DATA_DIR, OUTPUT_DIR],
-        "file_dep": ["./src/settings.py", "./config.toml"],
+        "file_dep": ["./src/settings.py", "./subscriptions.toml"],
         "clean": [],
     }
 
 
 def task_pull():
-    """Pull selected data_sources based on config.toml configuration"""
+    """Pull selected data_sources based on subscriptions.toml configuration"""
 
     data_module = "cds_bond_basis"
     if module_requirements[data_module] and not use_cache:

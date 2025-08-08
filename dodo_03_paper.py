@@ -8,12 +8,12 @@ This file contains all tasks related to:
 """
 
 # Import common utilities
-from dodo_common import DATA_DIR, OUTPUT_DIR, load_config, load_all_module_requirements
+from dodo_common import DATA_DIR, OUTPUT_DIR, load_subscriptions, load_all_module_requirements
 from dependency_tracker import get_available_datasets
 
 # Load configuration
-config_toml = load_config()
-models = config_toml["models"]
+subscriptions_toml = load_subscriptions()
+models = subscriptions_toml["models"]
 models_activated = [model for model in models if models[model]]
 
 # Load module requirements to determine available datasets
@@ -21,7 +21,7 @@ module_requirements_dict = load_all_module_requirements()
 module_requirements = {}
 for module_name, required_sources in module_requirements_dict.items():
     module_requirements[module_name] = all(
-        config_toml["data_sources"].get(source, False) for source in required_sources
+        subscriptions_toml["data_sources"].get(source, False) for source in required_sources
     )
 
 
@@ -60,8 +60,6 @@ def task_assemble_results():
     # Check for result files at task generation time
     check_forecast_results()
 
-    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
-
     # Simplified file dependencies - only depend on the assemble script
     # The script itself will handle missing files gracefully
     return {
@@ -81,28 +79,21 @@ def task_assemble_results():
 
 def task_compile_latex_docs():
     """Compile the LaTeX documents to PDFs"""
-    if config_toml["reports"]["is_latex_installed"]:
-        return {
-            "actions": [
-                "latexmk -xelatex -halt-on-error -cd ./reports/draft_ftsfr.tex",  # Compile
-                "latexmk -xelatex -halt-on-error -c -cd ./reports/draft_ftsfr.tex",  # Clean
-            ],
-            "targets": [
-                "./reports/draft_ftsfr.pdf",
-            ],
-            "file_dep": [
-                "./reports/draft_ftsfr.tex",
-                "./src/assemble_results.py",
-            ],
-            "clean": True,
-        }
-    else:
-        return {
-            "actions": [],
-            "targets": [],
-            "file_dep": [],
-            "clean": [],
-        }
+
+    return {
+        "actions": [
+            "latexmk -xelatex -halt-on-error -cd ./reports/draft_ftsfr.tex",  # Compile
+            "latexmk -xelatex -halt-on-error -c -cd ./reports/draft_ftsfr.tex",  # Clean
+        ],
+        "targets": [
+            "./reports/draft_ftsfr.pdf",
+        ],
+        "file_dep": [
+            "./reports/draft_ftsfr.tex",
+            "./src/assemble_results.py",
+        ],
+        "clean": True,
+    }
 
 
 # def task_convert_pdfs_to_markdown():

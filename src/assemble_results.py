@@ -17,8 +17,8 @@ BASE_DIR = config("BASE_DIR")
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
 
-# Read config.toml
-with open(BASE_DIR / "config.toml", "r") as f:
+# Read subscriptions.toml
+with open(BASE_DIR / "subscriptions.toml", "r") as f:
     benchmarks = toml.load(f)
 
 models = benchmarks["models"]

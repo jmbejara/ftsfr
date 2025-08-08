@@ -28,7 +28,7 @@ from config_reader import get_model_config
 filterwarnings("ignore")
 
 
-def load_config(config_path="models_config.toml"):
+def load_subscriptions(config_path="models_config.toml"):
     """Load the models configuration from TOML file."""
     with open(config_path, "rb") as f:
         return tomli.load(f)
@@ -294,7 +294,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         workflow: Which workflow to run ('main', 'train', 'inference', 'evaluate')
     """
     # Load configuration
-    config = load_config(config_path)
+    config = load_subscriptions(config_path)
 
     if model_name not in config:
         raise ValueError(f"Model '{model_name}' not found in configuration")

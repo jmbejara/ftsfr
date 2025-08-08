@@ -8,7 +8,6 @@
 
 # Exclude _output directory since it's should generated automatically
 /_output/*
-config.toml
 
 # files and dirs in models
 /models/*/.pixi
