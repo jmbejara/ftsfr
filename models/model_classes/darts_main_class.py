@@ -253,8 +253,37 @@ class DartsMain(forecasting_model):
         if metric == "MASE":
             from darts.metrics import mase
             try:
+                # For MASE, the insample series needs to:
+                # 1. Start before pred_series
+                # 2. Extend until at least one time step before pred_series starts
+                
+                # Print debug info
+                print(f"DEBUG: train_series range: {self.train_series.start_time()} to {self.train_series.end_time()}")
+                print(f"DEBUG: test_series range: {self.test_series.start_time()} to {self.test_series.end_time()}")
+                print(f"DEBUG: pred_series range: {self.pred_series.start_time()} to {self.pred_series.end_time()}")
+                
+                # Since we're doing one-step-ahead, predictions should align with test
+                # But MASE needs historical data. Let's use the full series up to pred start
+                pred_start = self.pred_series.start_time()
+                
+                # Get the full historical series up to the prediction start
+                # We need to include data up to one step before predictions
+                try:
+                    # Get the index of pred_start in raw_series
+                    pred_start_idx = self.raw_series.get_index_at_point(pred_start)
+                    if pred_start_idx > 0:
+                        # Slice raw_series to include everything before pred_start
+                        historical_series = self.raw_series[:pred_start_idx]
+                    else:
+                        # Fallback to train_series
+                        historical_series = self.train_series
+                except:
+                    # If any issues, fall back to train_series
+                    print("DEBUG: Failed to slice raw_series, using train_series")
+                    historical_series = self.train_series
+                
                 self.errors["MASE"] = mase(
-                    self.test_series, self.pred_series, self.train_series, self.seasonality
+                    self.test_series, self.pred_series, historical_series, self.seasonality
                 )
                 dm_logger.info("MASE = " + str(self.errors["MASE"]) + ".")
                 return self.errors["MASE"]
