@@ -83,6 +83,64 @@ def task_config():
 def task_pull():
     """Pull selected data_sources based on subscriptions.toml configuration"""
 
+    data_module = "basis_tips_treas"
+    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_fed_tips_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_bloomberg_treasury_inflation_swaps.py --OUTPUT_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "fed_yield_curve_all.parquet",
+                DATA_DIR / data_module / "fed_yield_curve.parquet",
+                DATA_DIR / data_module / "fed_tips_yield_curve.parquet",
+                DATA_DIR / data_module / "treasury_inflation_swaps.csv",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/pull_fed_yield_curve.py",
+                f"./src/{data_module}/pull_fed_tips_yield_curve.py",
+                f"./src/{data_module}/pull_bloomberg_treasury_inflation_swaps.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "basis_treas_sf"
+    if module_requirements.get(data_module, False) and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                "python ./src/basis_treas_sf/clean_treas_sf_excel.py",
+            ],
+            "targets": [
+                DATA_DIR / "treasury_df.csv",
+                DATA_DIR / "ois_df.csv",
+                DATA_DIR / "last_day_df.csv",
+            ],
+            "file_dep": [
+                "./src/basis_treas_sf/clean_treas_sf_excel.py",
+            ],
+            "clean": [],
+        }
+
+    data_module = "basis_treas_swap"
+    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/pull_bloomberg.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "bbg" / "raw_tyields.pkl",
+                DATA_DIR / data_module / "bbg" / "raw_syields.pkl",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/pull_bloomberg.py",
+            ],
+            "clean": [],
+        }
+
     data_module = "cds_bond_basis"
     if module_requirements[data_module] and not use_cache:
         yield {
@@ -338,6 +396,107 @@ def task_pull():
 
 def task_format():
     """Format and process pulled data into standardized datasets"""
+
+    data_module = "basis_tips_treas"
+    if module_requirements.get(data_module, False):
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/compute_tips_treasury.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/generate_figures.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/generate_latex_table.py --OUTPUT_DIR={OUTPUT_DIR}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "tips_treasury_implied_rf.parquet",
+                OUTPUT_DIR / "tips_treasury_spreads.png",
+                OUTPUT_DIR / "tips_treasury_summary.csv",
+                OUTPUT_DIR / "tips_treasury_summary_table.tex",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/compute_tips_treasury.py",
+                f"./src/{data_module}/generate_figures.py",
+                f"./src/{data_module}/generate_latex_table.py",
+            ],
+            "clean": [],
+        }
+
+        yield from notebook_subtask(
+            {
+                "name": "summary_basis_tips_treas_ipynb",
+                "notebook_path": "./src/basis_tips_treas/summary_basis_tips_treas.ipynb",
+                "file_dep": [
+                    DATA_DIR / data_module / "tips_treasury_implied_rf.parquet",
+                    f"./src/{data_module}/generate_figures.py",
+                ],
+                "targets": [],
+            }
+        )
+
+    data_module = "basis_treas_sf"
+    if module_requirements.get(data_module, False):
+        yield {
+            "name": data_module,
+            "actions": [
+                "python ./src/basis_treas_sf/calc_treasury_data.py",
+            ],
+            "targets": [
+                DATA_DIR / "treasury_sf_output.csv",
+            ],
+            "file_dep": [
+                DATA_DIR / "treasury_df.csv",
+                DATA_DIR / "ois_df.csv",
+                DATA_DIR / "last_day_df.csv",
+                "./src/basis_treas_sf/calc_treasury_data.py",
+            ],
+            "clean": [],
+        }
+        yield from notebook_subtask(
+            {
+                "name": "basis_treas_sf_notebook",
+                "notebook_path": "./src/basis_treas_sf/01_explore_basis_trade_data_new.ipynb",
+                "file_dep": [
+                    "./src/basis_treas_sf/calc_treasury_data.py",
+                    DATA_DIR / "treasury_sf_output.csv",
+                ],
+                "targets": [],
+            }
+        )
+
+    data_module = "basis_treas_swap"
+    if module_requirements.get(data_module, False):
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_swap_spreads.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/supplementary.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/plot_figure.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "calc_spread" / "calc_merged.pkl",
+                OUTPUT_DIR / "replicated_swap_spread_arb_figure.png",
+                OUTPUT_DIR / "updated_swap_spread_arb_figure.png",
+                OUTPUT_DIR / "table.txt",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/calc_swap_spreads.py",
+                f"./src/{data_module}/supplementary.py",
+                f"./src/{data_module}/plot_figure.py",
+            ],
+            "clean": [],
+        }
+        yield from notebook_subtask(
+            {
+                "name": "basis_treas_swap_overview",
+                "notebook_path": "./src/basis_treas_swap/overview.ipynb",
+                "file_dep": [
+                    "./src/basis_treas_swap/pull_bloomberg.py",
+                    "./src/basis_treas_swap/calc_swap_spreads.py",
+                    "./src/basis_treas_swap/plot_figure.py",
+                    "./src/basis_treas_swap/supplementary.py",
+                ],
+                "targets": [],
+            }
+        )
 
     data_module = "cds_bond_basis"
     if module_requirements[data_module]:
@@ -719,6 +878,10 @@ def task_compile_sphinx_docs():
         task_deps.append("format:summary_corp_bond_returns_ipynb")
     if module_requirements.get("us_treasury_returns", False):
         task_deps.append("format:summary_treasury_bond_returns_ipynb")
+    if module_requirements.get("basis_treas_swap", False):
+        task_deps.append("format:basis_treas_swap_overview")
+    if module_requirements.get("basis_treas_sf", False):
+        task_deps.append("format:basis_treas_sf_notebook")
 
     return {
         "actions": [
