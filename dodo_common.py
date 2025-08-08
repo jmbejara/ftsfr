@@ -3,6 +3,7 @@ Common utilities and configuration shared across all dodo files.
 """
 
 import sys
+import os
 from pathlib import Path
 import shutil
 import toml
@@ -13,6 +14,18 @@ from settings import config
 from dependency_tracker import (
     load_module_requirements,
 )
+
+# Ensure child processes (spawned by tasks) can import modules from `src/`
+_src_path = str((Path(__file__).parent / "src").resolve())
+os.environ["PYTHONPATH"] = (
+    _src_path
+    + (
+        os.pathsep + os.environ.get("PYTHONPATH", "")
+        if os.environ.get("PYTHONPATH")
+        else ""
+    )
+)
+
 
 # Common configuration
 BASE_DIR = Path(config("BASE_DIR"))
