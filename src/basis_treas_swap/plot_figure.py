@@ -99,7 +99,7 @@ def plot_main():
         s_df = clean_raw_syields(pull_raw_syields())
         t_df = clean_raw_tyields(pull_raw_tyields())
         arb_df = calc_swap_spreads(t_df, s_df)
-    end = pd.Timestamp(config("END_DATE")).date()
+    end = pd.Timestamp("2025-08-01").date()
 
     rep_df = supplementary_main()
 

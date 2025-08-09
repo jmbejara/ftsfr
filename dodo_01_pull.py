@@ -423,7 +423,7 @@ def task_format():
         yield from notebook_subtask(
             {
                 "name": "summary_basis_tips_treas_ipynb",
-                "notebook_path": "./src/basis_tips_treas/summary_basis_tips_treas.ipynb",
+                "notebook_path": "./src/basis_tips_treas/summary_basis_tips_treas_ipynb.py",
                 "file_dep": [
                     DATA_DIR / data_module / "tips_treasury_implied_rf.parquet",
                     f"./src/{data_module}/generate_figures.py",
@@ -453,7 +453,7 @@ def task_format():
         yield from notebook_subtask(
             {
                 "name": "basis_treas_sf_notebook",
-                "notebook_path": "./src/basis_treas_sf/summary_basis_treas_sf.ipynb",
+                "notebook_path": "./src/basis_treas_sf/summary_basis_treas_sf_ipynb.py",
                 "file_dep": [
                     "./src/basis_treas_sf/calc_treasury_data.py",
                     DATA_DIR / "treasury_sf_output.csv",
@@ -487,7 +487,7 @@ def task_format():
         yield from notebook_subtask(
             {
                 "name": "basis_treas_swap_overview",
-                "notebook_path": "./src/basis_treas_swap/summary_basis_treas_swap.ipynb",
+                "notebook_path": "./src/basis_treas_swap/summary_basis_treas_swap_ipynb.py",
                 "file_dep": [
                     "./src/basis_treas_swap/pull_bloomberg.py",
                     "./src/basis_treas_swap/calc_swap_spreads.py",
