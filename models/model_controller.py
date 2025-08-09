@@ -29,7 +29,7 @@ import json
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from run_model import run_model, load_subscriptions
+from run_model import run_model, load_config
 
 
 def run_model_wrapper(model_name, config_path, workflow="main"):
@@ -223,7 +223,7 @@ def main():
     args = parser.parse_args()
 
     # Load configuration
-    config = load_subscriptions(args.config)
+    config = load_config(args.config)
 
     # Handle list command
     if args.list:

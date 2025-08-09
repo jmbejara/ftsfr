@@ -37,7 +37,7 @@ class DartsLocal(DartsMain):
         interpolation=False,
     ):
         # Import Darts-specific utilities only when needed
-
+        from darts.utils.missing_values import fill_missing_values
         dl_logger.info("DartsLocal object initialized.")
 
         super().__init__(
@@ -72,7 +72,6 @@ class DartsLocal(DartsMain):
     def forecast_workflow(self):
         # Import Darts-specific utilities only when needed
         from darts.utils.missing_values import fill_missing_values
-
         dl_logger.info(
             "forecast_workflow called. Predictions made for each "
             + "entity separately."
