@@ -122,8 +122,8 @@ required_data_sources = ["fed_yield_curve"]
 [fed_yield_curve.ftsfr_treas_yield_curve_zero_coupon]
 description = """Nelson-Seigel-Svensson zero-coupon yield curve, 
 tenors 1-30 years, 1961-present"""
-frequency = "D"
-seasonality = 365 # Calendar days per year (or 252 for business days)
+frequency = "B"
+seasonality = 5 # Calendar days per year (or 252 for business days)
 
 ################################################################################
 [foreign_exchange]

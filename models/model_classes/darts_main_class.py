@@ -11,7 +11,7 @@ from pathlib import Path
 
 import logging
 
-dm_logger = logging.getLogger("DartsMain")
+DartsMain_logger = logging.getLogger("DartsMain")
 
 # from warnings import filterwarnings
 # filterwarnings("ignore")
@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 from darts import TimeSeries
 from darts.dataprocessing.transformers import Scaler
+from darts.metrics import mase
 from darts.utils.missing_values import fill_missing_values
 from darts.utils.model_selection import train_test_split
 from tabulate import tabulate
@@ -45,10 +46,10 @@ class DartsMain(forecasting_model):
     ):
         # Darts-specific imports only when needed
         from darts import TimeSeries
+        from darts.dataprocessing.transformers import Scaler
+        from darts.utils.missing_values import fill_missing_values
         from darts.utils.model_selection import train_test_split
-
-        dm_logger = logging.getLogger("DartsMain")
-        dm_logger.info("DartsMain __init__() called.")
+        DartsMain_logger.info("DartsMain __init__() called.")
 
         # This helps with organising
         dataset_name = str(os.path.basename(data_path)).split(".")[0]
@@ -59,7 +60,7 @@ class DartsMain(forecasting_model):
         # Fills missing dates and extends if required
         df, test_split = process_df(df, frequency, seasonality, test_split)
 
-        dm_logger.info("Read and processed dataframe.")
+        DartsMain_logger.info("Read and processed dataframe.")
 
         # This pivot adds all values for an entity as a TS in each column
         proc_df = df.pivot(index="ds", columns="unique_id", values="y")
@@ -70,32 +71,32 @@ class DartsMain(forecasting_model):
         # TimeSeries object is important for darts
         raw_series = TimeSeries.from_dataframe(proc_df)
 
-        dm_logger.info("Created darts TimeSeries object.")
+        DartsMain_logger.info("Created darts TimeSeries object.")
 
         if f32:
             raw_series = raw_series.astype(np.float32)
-            dm_logger.info("Converted to np.float32.")
+            DartsMain_logger.info("Converted to np.float32.")
 
         # Replace NaNs automatically
         if interpolation:
             raw_series = fill_missing_values(raw_series)
-            dm_logger.info("Replaced NaN values.")
+            DartsMain_logger.info("Replaced NaN values.")
 
         if scaling:
             transformer = Scaler()
             raw_series = transformer.fit_transform(raw_series)
-            dm_logger.info("Performed scaling on the dataset.")
+            DartsMain_logger.info("Performed scaling on the dataset.")
 
         # Splitting into train and test
         train_series, test_series = train_test_split(raw_series, test_size=test_split)
-        dm_logger.info("Generated train and test series.")
+        DartsMain_logger.info("Generated train and test series.")
 
         # Path to save model once trained
         model_path = output_path / "models" / model_name / dataset_name
         Path(model_path).mkdir(parents=True, exist_ok=True)
         model_path = model_path / "saved_model"  # Without an extension
 
-        dm_logger.info(
+        DartsMain_logger.info(
             "Created model path and required folders if they " + "weren't present."
         )
 
@@ -104,7 +105,7 @@ class DartsMain(forecasting_model):
         Path(forecast_path).mkdir(parents=True, exist_ok=True)
         forecast_path = forecast_path / "forecasts.parquet"
 
-        dm_logger.info(
+        DartsMain_logger.info(
             "Created forecast path and required folders if " + "they weren't present."
         )
 
@@ -113,7 +114,7 @@ class DartsMain(forecasting_model):
         result_path.mkdir(parents=True, exist_ok=True)
         result_path = result_path / str(dataset_name + ".csv")
 
-        dm_logger.info(
+        DartsMain_logger.info(
             "Created result path and required folders if they " + "weren't present."
         )
 
@@ -145,7 +146,7 @@ class DartsMain(forecasting_model):
         # Error metrics
         self.errors = defaultdict(float)
 
-        dm_logger.info("Set up internal variables.")
+        DartsMain_logger.info("Set up internal variables.")
 
         print("Object Initialized:")
         print(
@@ -159,33 +160,33 @@ class DartsMain(forecasting_model):
             )
         )
 
-        dm_logger.info("Object fully initialized.")
+        DartsMain_logger.info("Object fully initialized.")
 
     @common_error_catch
     def _train_test_split(self, entity_data):
         self.train_series, self.test_series = train_test_split(
             entity_data, test_size=self.test_split
         )
-        dm_logger.info("Internal train and test series updated")
+        DartsMain_logger.info("Internal train and test series updated")
 
     @common_error_catch
     def train(self):
-        dm_logger.info("Model training started.")
+        DartsMain_logger.info("Model training started.")
         self.model.fit(self.train_series)
-        dm_logger.info("Model trained.")
+        DartsMain_logger.info("Model trained.")
 
     @common_error_catch
     def save_model(self):
         self.model.save(self.model_path)
-        dm_logger.info('Model saved to "' + str(self.model_path) + '".')
+        DartsMain_logger.info('Model saved to "' + str(self.model_path) + '".')
 
     def load_model(self):
         self.model = self.model.untrained_model().load(self.model_path)
-        dm_logger.info('Model loaded from "' + str(self.model_path) + '".')
+        DartsMain_logger.info('Model loaded from "' + str(self.model_path) + '".')
 
     @common_error_catch
     def forecast(self):
-        dm_logger.info("Starting unified one-step-ahead forecasting")
+        DartsMain_logger.info("Starting unified one-step-ahead forecasting")
 
         # Use the unified one-step-ahead implementation
         self.pred_series = perform_one_step_ahead_darts(
@@ -201,40 +202,37 @@ class DartsMain(forecasting_model):
         )
 
         if is_valid:
-            dm_logger.info("✓ One-step-ahead forecasting verified")
+            DartsMain_logger.info("✓ One-step-ahead forecasting verified")
         else:
-            dm_logger.warning("⚠ One-step-ahead forecasting verification failed")
+            DartsMain_logger.warning("⚠ One-step-ahead forecasting verification failed")
 
-        dm_logger.info("Model inference complete. Internal variable updated.")
+        DartsMain_logger.info("Model inference complete. Internal variable updated.")
 
     @common_error_catch
     def save_forecast(self):
         # Add debugging to understand the type of pred_series
-        dm_logger.info(f"pred_series type: {type(self.pred_series)}")
-        if hasattr(self.pred_series, "shape"):
-            dm_logger.info(f"pred_series shape: {self.pred_series.shape}")
+        DartsMain_logger.info(f"pred_series type: {type(self.pred_series)}")
+        if hasattr(self.pred_series, 'shape'):
+            DartsMain_logger.info(f"pred_series shape: {self.pred_series.shape}")
         elif isinstance(self.pred_series, list):
-            dm_logger.info(
-                f"pred_series is a list with {len(self.pred_series)} elements"
-            )
+            DartsMain_logger.info(f"pred_series is a list with {len(self.pred_series)} elements")
             # If it's still a list, try to concatenate it
             if len(self.pred_series) > 0:
                 from darts import TimeSeries
-
                 self.pred_series = TimeSeries.concatenate(self.pred_series, axis=0)
-                dm_logger.info("Concatenated list of TimeSeries into single TimeSeries")
+                DartsMain_logger.info("Concatenated list of TimeSeries into single TimeSeries")
             else:
                 raise ValueError("pred_series is an empty list")
-
+        
         # Save to parquet
         temp_df = self.pred_series.to_dataframe(time_as_index=False)
         temp_df.to_parquet(self.forecast_path)
-        dm_logger.info('Predictions saved to "' + str(self.forecast_path) + '".')
+        DartsMain_logger.info('Predictions saved to "' + str(self.forecast_path) + '".')
 
     def load_forecast(self):
         temp_df = pd.read_parquet(self.forecast_path)
         self.pred_series = TimeSeries.from_dataframe(temp_df, time_col="ds")
-        dm_logger.info(
+        DartsMain_logger.info(
             "Model forecasts loaded from "
             + self.forecast_path
             + ". Internal variable updated."
@@ -242,38 +240,31 @@ class DartsMain(forecasting_model):
 
     def calculate_error(self, metric="MASE"):
         if self.pred_series is None:
-            dm_logger.error("calculate_error called without predictions.")
+            DartsMain_logger.error("calculate_error called without predictions.")
             raise ValueError("Please call self.forecast() first.")
-
+        
         # Add debugging information
-        dm_logger.info(f"test_series components: {self.test_series.n_components}")
-        dm_logger.info(f"pred_series components: {self.pred_series.n_components}")
-        dm_logger.info(f"test_series shape: {self.test_series.shape}")
-        dm_logger.info(f"pred_series shape: {self.pred_series.shape}")
-
+        DartsMain_logger.info(f"test_series components: {self.test_series.n_components}")
+        DartsMain_logger.info(f"pred_series components: {self.pred_series.n_components}")
+        DartsMain_logger.info(f"test_series shape: {self.test_series.shape}")
+        DartsMain_logger.info(f"pred_series shape: {self.pred_series.shape}")
+        
         if metric == "MASE":
             from darts.metrics import mase
-
             try:
                 # For MASE, the insample series needs to:
                 # 1. Start before pred_series
                 # 2. Extend until at least one time step before pred_series starts
-
+                
                 # Print debug info
-                print(
-                    f"DEBUG: train_series range: {self.train_series.start_time()} to {self.train_series.end_time()}"
-                )
-                print(
-                    f"DEBUG: test_series range: {self.test_series.start_time()} to {self.test_series.end_time()}"
-                )
-                print(
-                    f"DEBUG: pred_series range: {self.pred_series.start_time()} to {self.pred_series.end_time()}"
-                )
-
+                print(f"DEBUG: train_series range: {self.train_series.start_time()} to {self.train_series.end_time()}")
+                print(f"DEBUG: test_series range: {self.test_series.start_time()} to {self.test_series.end_time()}")
+                print(f"DEBUG: pred_series range: {self.pred_series.start_time()} to {self.pred_series.end_time()}")
+                
                 # Since we're doing one-step-ahead, predictions should align with test
                 # But MASE needs historical data. Let's use the full series up to pred start
                 pred_start = self.pred_series.start_time()
-
+                
                 # Get the full historical series up to the prediction start
                 # We need to include data up to one step before predictions
                 try:
@@ -289,33 +280,26 @@ class DartsMain(forecasting_model):
                     # If any issues, fall back to train_series
                     print("DEBUG: Failed to slice raw_series, using train_series")
                     historical_series = self.train_series
-
+                
                 self.errors["MASE"] = mase(
-                    self.test_series,
-                    self.pred_series,
-                    historical_series,
-                    self.seasonality,
+                    self.test_series, self.pred_series, historical_series, self.seasonality
                 )
-                dm_logger.info("MASE = " + str(self.errors["MASE"]) + ".")
+                DartsMain_logger.info("MASE = " + str(self.errors["MASE"]) + ".")
                 return self.errors["MASE"]
             except ValueError as e:
                 if "cannot use MASE with periodical signals" in str(e):
-                    dm_logger.warning(
-                        "MASE failed due to periodical signals, falling back to MAE"
-                    )
+                    DartsMain_logger.warning("MASE failed due to periodical signals, falling back to MAE")
                     from darts.metrics import mae
-
                     self.errors["MAE"] = mae(self.test_series, self.pred_series)
-                    dm_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
+                    DartsMain_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
                     return self.errors["MAE"]
                 else:
                     raise e
         elif metric == "MAE":
             from darts.metrics import mae
-
             self.errors["MAE"] = mae(self.test_series, self.pred_series)
-            dm_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
+            DartsMain_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
             return self.errors["MAE"]
         else:
-            dm_logger.error("calculate_error called for an unsupported metric.")
+            DartsMain_logger.error("calculate_error called for an unsupported metric.")
             raise ValueError("Metric not supported.")

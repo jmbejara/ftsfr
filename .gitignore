@@ -14,6 +14,7 @@
 /models/*/pixi.lock
 /models/testing
 /models/model_logs
+/models/lightning_logs
 
 # Secrets saved in environment files
 .env*

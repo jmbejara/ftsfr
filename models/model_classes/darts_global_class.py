@@ -7,10 +7,10 @@ Transformer.
 import pandas as pd
 from tabulate import tabulate
 import logging
+DartsGlobal_logger = logging.getLogger("DartsGlobal")
 
 import torch
-
-torch.set_float32_matmul_precision("medium")
+torch.set_float32_matmul_precision('medium')
 
 # from warnings import filterwarnings
 # filterwarnings("ignore")
@@ -19,8 +19,6 @@ from .darts_main_class import DartsMain
 from .helper_func import common_error_catch
 
 # Darts-specific imports are moved inside methods
-
-dg_logger = logging.getLogger("DartsGlobal")
 
 
 class DartsGlobal(DartsMain):
@@ -37,7 +35,7 @@ class DartsGlobal(DartsMain):
         interpolation=True,
         f32=False,
     ):
-        dg_logger.info("DartsGlobal object initialized.")
+        DartsGlobal_logger.info("DartsGlobal object initialized.")
 
         super().__init__(
             estimator,
@@ -52,19 +50,15 @@ class DartsGlobal(DartsMain):
             f32,
         )
 
-        dg_logger.info("DartsGlobal super().__init__() complete.")
+        DartsGlobal_logger.info("DartsGlobal super().__init__() complete.")
 
         # self.model_path += ".pt"
 
     @common_error_catch
     def forecast(self):
         # Darts-specific imports only when needed
-        from .unified_one_step_ahead import (
-            perform_one_step_ahead_darts,
-            verify_one_step_ahead,
-        )
-
-        dg_logger.info("Starting unified one-step-ahead forecasting for global model")
+        from .unified_one_step_ahead import perform_one_step_ahead_darts, verify_one_step_ahead
+        DartsGlobal_logger.info("Starting unified one-step-ahead forecasting for global model")
 
         # Use the unified one-step-ahead implementation
         self.pred_series = perform_one_step_ahead_darts(
@@ -80,11 +74,11 @@ class DartsGlobal(DartsMain):
         )
 
         if is_valid:
-            dg_logger.info("✓ One-step-ahead forecasting verified")
+            DartsGlobal_logger.info("✓ One-step-ahead forecasting verified")
         else:
-            dg_logger.warning("⚠ One-step-ahead forecasting verification failed")
+            DartsGlobal_logger.warning("⚠ One-step-ahead forecasting verification failed")
 
-        dg_logger.info(
+        DartsGlobal_logger.info(
             "DartsGlobal forecast called. "
             + "Predicted series acquired. "
             + "Internal pred_series updated."
@@ -118,4 +112,4 @@ class DartsGlobal(DartsMain):
 
         forecast_res.to_csv(self.result_path)
 
-        dg_logger.info('Results saved to "' + str(self.result_path) + '".')
+        DartsGlobal_logger.info('Results saved to "' + str(self.result_path) + '".')

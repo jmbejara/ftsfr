@@ -19,6 +19,7 @@ torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu
 lightning = { version = ">=2.3.0" }
 darts = "*"
 prophet = "*"
+catboost = "*"
 
 [dependencies]
 python = "3.11.*"
