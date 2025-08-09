@@ -185,8 +185,9 @@ def common_error_catch(f):
             return f(*args)
         except Exception:
             print_sep()
-            print(traceback.format_exc())
-            print(f"\nError in {f.__name__}." + " Full traceback above \u2191")
+            print(f"\nError in {f.__name__}. Please check logs. "+\
+                   "There is a possibility that this error is insignificant "+\
+                   "and can be ignored.")
             hf_logger.exception(f"Error in {f.__name__}.")
             print_sep()
             return None

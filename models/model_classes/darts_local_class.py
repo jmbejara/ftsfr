@@ -16,11 +16,10 @@ import pandas as pd
 from tabulate import tabulate
 from tqdm import tqdm
 import logging
+DartsLocal_logger = logging.getLogger("DartsLocal")
 
 from .darts_main_class import DartsMain
 from .helper_func import common_error_catch
-
-dl_logger = logging.getLogger("DartsLocal")
 
 
 class DartsLocal(DartsMain):
@@ -38,7 +37,7 @@ class DartsLocal(DartsMain):
     ):
         # Import Darts-specific utilities only when needed
         from darts.utils.missing_values import fill_missing_values
-        dl_logger.info("DartsLocal object initialized.")
+        DartsLocal_logger.info("DartsLocal object initialized.")
 
         super().__init__(
             estimator,
@@ -52,7 +51,7 @@ class DartsLocal(DartsMain):
             interpolation,
         )
 
-        dl_logger.info("DartsLocal super().__init__() complete.")
+        DartsLocal_logger.info("DartsLocal super().__init__() complete.")
 
         self.median_mase = np.nan
         self.mase_list = []
@@ -66,13 +65,13 @@ class DartsLocal(DartsMain):
             else {},
         }
 
-        dl_logger.info("DartsLocal internal variables set.")
+        DartsLocal_logger.info("DartsLocal internal variables set.")
 
     @common_error_catch
     def forecast_workflow(self):
         # Import Darts-specific utilities only when needed
         from darts.utils.missing_values import fill_missing_values
-        dl_logger.info(
+        DartsLocal_logger.info(
             "forecast_workflow called. Predictions made for each "
             + "entity separately."
         )
@@ -80,9 +79,9 @@ class DartsLocal(DartsMain):
         auto_mode = False
         # Training on each entity and calculating MASE
         self.print_sep()
-        dl_logger.info("Starting loop for the workflow on each entity.")
+        DartsLocal_logger.info("Starting loop for the workflow on each entity.")
         for id in tqdm(raw_series.columns):
-            dl_logger.info("Processing id: " + id + ".")
+            DartsLocal_logger.info("Processing id: " + id + ".")
             # Select the date and the column for current id
             entity_data = raw_series[[id]].copy()
             # Removing leading/trailing NaNs which show up due to different
@@ -90,10 +89,10 @@ class DartsLocal(DartsMain):
             entity_data = entity_data.strip()
             entity_data = fill_missing_values(entity_data)
 
-            dl_logger.info("Pre-processed entity data.")
+            DartsLocal_logger.info("Pre-processed entity data.")
 
             if len(entity_data) <= 10:
-                dl_logger.info("Data too small, so skipped.")
+                DartsLocal_logger.info("Data too small, so skipped.")
                 continue
 
             self.raw_series = entity_data
@@ -103,7 +102,7 @@ class DartsLocal(DartsMain):
             self.train()
             self.forecast()
             id_mase = self.calculate_error()
-            dl_logger.info("MASE: " + str(id_mase) + ".")
+            DartsLocal_logger.info("MASE: " + str(id_mase) + ".")
             # Resets the model
             self.model = self.model.untrained_model()
 
@@ -121,18 +120,18 @@ class DartsLocal(DartsMain):
             self.errors["MASE"] = np.nan
             self.median_mase = np.nan
 
-        dl_logger.info(
+        DartsLocal_logger.info(
             f"Mean MASE: {self.errors['MASE']} | " + "Median MASE: {self.median_mase}"
         )
 
     def main_workflow(self):
-        dl_logger.info("main_workflow called.")
+        DartsLocal_logger.info("main_workflow called.")
         self.forecast_workflow()
         self.print_summary()
         self.save_results()
 
     def print_summary(self):
-        dl_logger.info("print_summary called.")
+        DartsLocal_logger.info("print_summary called.")
         print(
             tabulate(
                 [
@@ -162,7 +161,7 @@ class DartsLocal(DartsMain):
         )
 
         forecast_res.to_csv(self.result_path)
-        dl_logger.info("Results saved to " + str(self.result_path))
+        DartsLocal_logger.info("Results saved to " + str(self.result_path))
 
     def save_model(self):
         """Save model configuration (not trained models) for DartsLocal.
@@ -183,7 +182,7 @@ class DartsLocal(DartsMain):
                 },
                 f,
             )
-        dl_logger.info(f'Model configuration saved to "{config_path}"')
+        DartsLocal_logger.info(f'Model configuration saved to "{config_path}"')
 
     def load_model(self):
         """Load model configuration and recreate untrained model."""
@@ -196,11 +195,11 @@ class DartsLocal(DartsMain):
         model_class = data["model_config"]["class"]
         model_params = data["model_config"]["params"]
         self.model = model_class(**model_params)
-        dl_logger.info(f'Model configuration loaded from "{config_path}"')
+        DartsLocal_logger.info(f'Model configuration loaded from "{config_path}"')
 
     def training_workflow(self):
         """Training workflow for DartsLocal - saves configuration only."""
-        dl_logger.info("DartsLocal training_workflow called.")
+        DartsLocal_logger.info("DartsLocal training_workflow called.")
         # For DartsLocal, we don't train in advance
         # Just save the model configuration
         self.save_model()
@@ -208,7 +207,7 @@ class DartsLocal(DartsMain):
 
     def inference_workflow(self):
         """Inference workflow - loads config and trains per entity."""
-        dl_logger.info("DartsLocal inference_workflow called.")
+        DartsLocal_logger.info("DartsLocal inference_workflow called.")
         # Load model configuration
         self.load_model()
         # Run the regular forecast workflow (which trains per entity)

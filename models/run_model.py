@@ -352,12 +352,17 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         estimator_class = get_estimator_class(model_config)
         # Get estimator parameters for Nixtla models (including n_epochs override)
         estimator_params = get_nixtla_estimator_params(model_config, env_vars)
-        model_obj = NixtlaMain(estimator_class, model_name, *env_vars, estimator_params=estimator_params)
+        model_obj = NixtlaMain(estimator_class,
+                               model_name,
+                               *env_vars,
+                               estimator_params=estimator_params)
     elif model_class == "GluontsMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.gluonts_main_class import GluontsMain
         estimator = create_estimator(model_config, env_vars)
-        model_obj = GluontsMain(estimator, model_name, *env_vars)
+        model_obj = GluontsMain(estimator,
+                                model_name,
+                                *env_vars)
     elif model_class == "TimesFM":
         # Add the timesfm directory to the path for local import
         timesfm_path = os.path.join(os.path.dirname(__file__), "timesfm")

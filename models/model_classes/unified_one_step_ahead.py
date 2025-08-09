@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import logging
+Uni_logger = logging.getLogger("unified_one_step_ahead")
 
 # Conditional imports to avoid dependency issues
 try:
@@ -17,8 +18,6 @@ try:
 except ImportError:
     DARTS_AVAILABLE = False
     TimeSeries = None
-
-logger = logging.getLogger("unified_one_step_ahead")
 
 
 def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
@@ -34,7 +33,7 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     Returns:
         TimeSeries: One-step-ahead predictions
     """
-    logger.info("Starting Darts one-step-ahead forecasting")
+    Uni_logger.info("Starting Darts one-step-ahead forecasting")
 
     # Determine if it's a local or global model
     try:
@@ -45,7 +44,7 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
         # Fallback: check if model has specific methods
         is_local = hasattr(model, "fit") and not hasattr(model, "trainer")
 
-    logger.info(f"Model type: {'Local' if is_local else 'Global'}")
+    Uni_logger.info(f"Model type: {'Local' if is_local else 'Global'}")
 
     # Get test start time
     test_start = test_series.start_time()
@@ -61,13 +60,13 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     # Naive models
     # Else don't need to retrain
     model_name = str(type(model))
-    retrain_model = model_name.startswith(("ExponentialSmoothing",
-                                           "Theta",
-                                           "Prophet",
-                                           "Naive"))
+    retrain_model = any([x in model_name for x in [".ExponentialSmoothing",
+                                                   ".Theta",
+                                                   ".Prophet",
+                                                   ".Naive"]])
 
-    logger.info("retrain_model = " + str(retrain_model))
-    logger.info("Using historical_forecasts")
+    Uni_logger.info("retrain_model = " + str(retrain_model))
+    Uni_logger.info("Using historical_forecasts")
     predictions = model.historical_forecasts(
         series=raw_series,
         start=test_start,
@@ -80,7 +79,7 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     
     # Handle case where historical_forecasts returns a list
     if isinstance(predictions, list):
-        logger.info(f"historical_forecasts returned a list of {len(predictions)} TimeSeries")
+        Uni_logger.info(f"historical_forecasts returned a list of {len(predictions)} TimeSeries")
         # Concatenate all predictions into a single TimeSeries
         if len(predictions) > 0:
             # Concatenate one by one
@@ -91,20 +90,20 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
         else:
             raise ValueError("No predictions returned from historical_forecasts")
     
-    logger.info(f"Final predictions shape: {predictions.shape}")
+    Uni_logger.info(f"Final predictions shape: {predictions.shape}")
 
     # Ensure predictions have the same number of components as test_series
     if predictions.n_components != test_series.n_components:
-        logger.warning(f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}")
+        Uni_logger.warning(f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}")
         # If predictions have more components, take only the first test_series.n_components
         if predictions.n_components > test_series.n_components:
             predictions = predictions[:, :test_series.n_components]
-            logger.info(f"Truncated predictions to {test_series.n_components} components")
+            Uni_logger.info(f"Truncated predictions to {test_series.n_components} components")
         else:
             # If predictions have fewer components, this is a problem
             raise ValueError(f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})")
 
-    logger.info(f"Generated predictions with shape: {predictions.shape}")
+    Uni_logger.info(f"Generated predictions with shape: {predictions.shape}")
     return predictions
 
 
@@ -121,31 +120,46 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
     Returns:
         pd.DataFrame: One-step-ahead predictions with columns ['ds', 'unique_id', 'y']
     """
-    logger.info("Starting Nixtla one-step-ahead forecasting")
+    Uni_logger.info("Starting Nixtla one-step-ahead forecasting")
 
     # For NeuralForecast, we can use the predict method directly on the full dataset
     # and then filter to get only the test predictions
-    logger.info("Using NeuralForecast predict method on full dataset")
+    Uni_logger.info("Using NeuralForecast predict method on full dataset")
     
     try:
-        # Predict on the full dataset (this will give us predictions for all future points)
-        predictions = nf_model.predict(raw_df)
-        
-        # Filter to only include test dates
-        test_dates = set(test_df["ds"].unique())
-        pred_df = predictions[predictions["ds"].isin(test_dates)].copy()
-        
-        logger.info(f"Generated {len(pred_df)} predictions for test dates")
+        # The loop keeps concatenating forecasts to pred_df
+        pred_df = nf_model.predict(train_df)
+        first_date = test_df["ds"].unique()[0]
+        pred_df["ds"] = first_date
+        df = raw_df
+        Uni_logger.info("Got predictions for date: " + \
+                       first_date.strftime("%Y-%m-%d, %r") + ".")
+
+        # Sliding window forecasts
+        # Predict 1 date right after the dataset in the arguments
+        # After each prediction the next prediction uses the actual value in the
+        # test dataset instead of relying on the previous predicted value.
+        Uni_logger.info("Starting for loop to get sliding window forecasts.")
+        for i in test_df["ds"].unique()[1:]:
+            # Get predictions for the next date
+            temp_pred_df = nf_model.predict(df[df.ds < i])
+            # Lining up the dates
+            temp_pred_df['ds'] = i
+            pred_df = pd.concat([pred_df, temp_pred_df],
+                                    ignore_index = True)
+            Uni_logger.info("Got predictions for date: " + \
+                           i.strftime("%Y-%m-%d, %r") + ".")
+
         return pred_df
         
     except Exception as e:
-        logger.error(f"Error in NeuralForecast prediction: {e}")
+        Uni_logger.error(f"Error in NeuralForecast prediction: {e}")
         # Fallback: try a simpler approach
-        logger.info("Trying fallback approach with test data only")
+        Uni_logger.info("Trying fallback approach with test data only")
         
         # Use the test data directly for prediction
         predictions = nf_model.predict(test_df)
-        logger.info(f"Fallback generated {len(predictions)} predictions")
+        Uni_logger.info(f"Fallback generated {len(predictions)} predictions")
         return predictions
 
 
@@ -161,7 +175,7 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
     Returns:
         pd.DataFrame: One-step-ahead predictions with columns ['ds', 'unique_id', 'y']
     """
-    logger.info("Starting GluonTS one-step-ahead forecasting")
+    Uni_logger.info("Starting GluonTS one-step-ahead forecasting")
 
     # Convert datasets to lists for easier manipulation
     test_series = list(test_ds)
@@ -171,7 +185,7 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
     train_length = len(train_series[0]["target"])
     test_length = len(test_series[0]["target"])
 
-    logger.info(
+    Uni_logger.info(
         f"Train length: {train_length}, Test length: {test_length - train_length}"
     )
 
@@ -223,7 +237,7 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
                 )
 
     pred_df = pd.DataFrame(result)
-    logger.info(f"Generated {len(pred_df)} one-step-ahead predictions")
+    Uni_logger.info(f"Generated {len(pred_df)} one-step-ahead predictions")
     return pred_df
 
 
@@ -239,11 +253,11 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
     Returns:
         bool: True if predictions appear to be one-step-ahead
     """
-    logger.info(f"Verifying one-step-ahead predictions for {model_type} model")
+    Uni_logger.info(f"Verifying one-step-ahead predictions for {model_type} model")
 
     if model_type == "darts":
         if not DARTS_AVAILABLE:
-            logger.warning("darts not available, skipping verification for darts model")
+            Uni_logger.warning("darts not available, skipping verification for darts model")
             return True
             
         # For Darts TimeSeries
@@ -253,13 +267,13 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
 
             # Check that we have one prediction per test point
             if pred_length == test_length:
-                logger.info("✓ Darts predictions length matches test data length")
+                Uni_logger.info("✓ Darts predictions length matches test data length")
                 return True
             else:
-                logger.warning(f"⚠ Darts predictions length ({pred_length}) != test data length ({test_length})")
+                Uni_logger.warning(f"⚠ Darts predictions length ({pred_length}) != test data length ({test_length})")
                 return False
         else:
-            logger.warning("⚠ Darts predictions not in TimeSeries format")
+            Uni_logger.warning("⚠ Darts predictions not in TimeSeries format")
             return False
 
     elif model_type == "nixtla":
@@ -270,13 +284,13 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
 
             # Check that we have one prediction per test point
             if pred_count == test_count:
-                logger.info("✓ Nixtla predictions count matches test data count")
+                Uni_logger.info("✓ Nixtla predictions count matches test data count")
                 return True
             else:
-                logger.warning(f"⚠ Nixtla predictions count ({pred_count}) != test data count ({test_count})")
+                Uni_logger.warning(f"⚠ Nixtla predictions count ({pred_count}) != test data count ({test_count})")
                 return False
         else:
-            logger.warning("⚠ Nixtla predictions not in DataFrame format")
+            Uni_logger.warning("⚠ Nixtla predictions not in DataFrame format")
             return False
 
     elif model_type == "gluonts":
@@ -287,16 +301,16 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
 
             # Check that we have one prediction per test point
             if pred_count == test_count:
-                logger.info("✓ GluonTS predictions count matches test data count")
+                Uni_logger.info("✓ GluonTS predictions count matches test data count")
                 return True
             else:
-                logger.warning(f"⚠ GluonTS predictions count ({pred_count}) != test data count ({test_count})")
+                Uni_logger.warning(f"⚠ GluonTS predictions count ({pred_count}) != test data count ({test_count})")
                 return False
         else:
-            logger.warning("⚠ GluonTS predictions not in DataFrame format")
+            Uni_logger.warning("⚠ GluonTS predictions not in DataFrame format")
             return False
 
     else:
         # Generic verification
-        logger.info("Generic verification - assuming one-step-ahead")
+        Uni_logger.info("Generic verification - assuming one-step-ahead")
         return True

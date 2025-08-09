@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import logging
 
-fm_logger = logging.getLogger("forecasting_model")
+foreMod_logger = logging.getLogger("forecasting_model")
 
 
 class forecasting_model(ABC):
@@ -76,7 +76,7 @@ class forecasting_model(ABC):
 
         This method should be called by the forecast() method in each model class.
         """
-        fm_logger.info("Starting unified one-step-ahead forecasting")
+        foreMod_logger.info("Starting unified one-step-ahead forecasting")
 
         # Check if we have the necessary attributes
         if (
@@ -90,21 +90,21 @@ class forecasting_model(ABC):
 
         # Model should already be trained at this point
         if not hasattr(self.model, "is_fitted") or not self.model.is_fitted:
-            fm_logger.warning(
+            foreMod_logger.warning(
                 "Model appears to not be fitted. Ensure train() was called before forecast()"
             )
 
-        fm_logger.info("One-step-ahead forecasting completed")
+        foreMod_logger.info("One-step-ahead forecasting completed")
 
         # Subclasses should implement the actual forecasting logic
         raise NotImplementedError("Subclasses must implement one_step_ahead_forecast")
 
     def main_workflow(self):
         """
-        Trains the model -> Saves the model -> Get predictions ->
-        Saves predictions -> Calculates error -> Prints summary -> Saves results
+        Train the model -> Save the model -> Get predictions ->
+        Save predictions -> Calculate error -> Print summary -> Save results
         """
-        fm_logger.info("main_workflow called.")
+        foreMod_logger.info("main_workflow called.")
         self.train()
         self.save_model()
         self.forecast()
@@ -115,18 +115,18 @@ class forecasting_model(ABC):
 
     def training_workflow(self):
         """
-        Trains the model -> Saves the model
+        Train the model -> Save the model
         """
-        fm_logger.info("training_workflow called.")
+        foreMod_logger.info("training_workflow called.")
         self.train()
         self.save_model()
 
     def inference_workflow(self):
         """
-        Loads the model -> Get predictions -> Saves predictions ->
-        Calculates error -> Prints summary -> Saves results
+        Load the model -> Get predictions -> Save predictions ->
+        Calculate error -> Print summary -> Save results
         """
-        fm_logger.info("inference_workflow called.")
+        foreMod_logger.info("inference_workflow called.")
         self.load_model()
         self.forecast()
         self.save_forecast()
