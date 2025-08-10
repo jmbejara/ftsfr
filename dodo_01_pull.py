@@ -107,21 +107,21 @@ def task_pull():
         }
 
     data_module = "basis_treas_sf"
-    if module_requirements.get(data_module, False) and not use_cache:
+    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
         yield {
             "name": data_module,
             "actions": [
-                "python ./src/basis_treas_sf/pull_bbg_basis_treas_sf.py",
-                "python ./src/basis_treas_sf/clean_treas_sf_excel.py",
+                f"python ./src/{data_module}/pull_bbg_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/clean_treas_sf_excel.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / "treasury_df.csv",
-                DATA_DIR / "ois_df.csv",
-                DATA_DIR / "last_day_df.csv",
+                DATA_DIR / data_module / "treasury_df.csv",
+                DATA_DIR / data_module / "ois_df.csv",
+                DATA_DIR / data_module / "last_day_df.csv",
             ],
             "file_dep": [
-                "./src/basis_treas_sf/clean_treas_sf_excel.py",
-                "./src/basis_treas_sf/pull_bbg_basis_treas_sf.py",
+                f"./src/{data_module}/clean_treas_sf_excel.py",
+                f"./src/{data_module}/pull_bbg_basis_treas_sf.py",
             ],
             "clean": [],
         }

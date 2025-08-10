@@ -31,6 +31,34 @@
 # us      microseconds
 # ns      nanoseconds
 
+
+################################################################################
+[basis_tips_treas]
+data_module_name = "Basis: TIPS-Treasury"
+data_module_description = """
+Contains code for pulling Fed yield curves, TIPS yields, and Bloomberg inflation swaps,
+and formatting the TIPS-Treasury arbitrage series.
+"""
+required_data_sources = ["fed_yield_curve", "bloomberg_terminal"]
+
+################################################################################
+[basis_treas_swap]
+data_module_name = "Basis: Treasury-Swap"
+data_module_description = """
+Contains code that pulls Bloomberg Treasury and swap yields and replicates the 
+Treasury-Swap arbitrage spreads from Segmented Arbitrage.
+"""
+required_data_sources = ["bloomberg_terminal"]
+
+################################################################################
+[basis_treas_sf]
+data_module_name = "Basis: Treasury-SF"
+data_module_description = """
+Contains code that pulls Bloomberg Treasury and SF yields and replicates the 
+Treasury-SF arbitrage spreads from Segmented Arbitrage.
+"""
+required_data_sources = ["bloomberg_terminal"]
+
 ################################################################################
 [cds_bond_basis]
 data_module_name = "CDS Bond Basis"
@@ -238,21 +266,3 @@ seasonality = 12  # Months per year
 description = """CRSP monthly stock returns (without dividends), 1926-present"""
 frequency = "ME"
 seasonality = 12
-
-################################################################################
-[basis_tips_treas]
-data_module_name = "Basis: TIPS-Treasury"
-data_module_description = """
-Contains code for pulling Fed yield curves, TIPS yields, and Bloomberg inflation swaps,
-and formatting the TIPS-Treasury arbitrage series.
-"""
-required_data_sources = ["fed_yield_curve", "bloomberg_terminal"]
-
-################################################################################
-[basis_treas_swap]
-data_module_name = "Basis: Treasury-Swap"
-data_module_description = """
-Contains code that pulls Bloomberg Treasury and swap yields and replicates the 
-Treasury-Swap arbitrage spreads from Segmented Arbitrage.
-"""
-required_data_sources = ["bloomberg_terminal"]
