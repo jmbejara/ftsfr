@@ -1,6 +1,8 @@
 # %%
 from pathlib import Path
 import os
+import sys
+import asyncio
 import pandas as pd
 
 from settings import config
@@ -16,6 +18,13 @@ from supplementary import replication_df
 
 DATA_DIR = config("DATA_DIR")
 DATA_DIR = DATA_DIR / "basis_treas_swap"
+
+# Ensure Windows uses a selector event loop to avoid ZMQ RuntimeWarning during nbconvert
+if sys.platform.startswith("win"):
+    try:
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    except Exception:
+        pass
 
 # %%
 """

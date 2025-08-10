@@ -11,6 +11,8 @@ import pandas as pd
 from settings import config
 from pull_bbg_treas_swap import load_syields, load_tyields
 
+DATA_DIR = config("DATA_DIR")
+
 
 def calc_swap_spreads(treasury_df: pd.DataFrame, swap_df: pd.DataFrame) -> pd.DataFrame:
     """Combines the treasury and swap data and calculates the spreads
@@ -44,20 +46,16 @@ def calc_swap_spreads(treasury_df: pd.DataFrame, swap_df: pd.DataFrame) -> pd.Da
     return merged_df
 
 
-def swap_main() -> None:
+def swap_main(data_dir: Path = DATA_DIR) -> None:
     """Load cleaned inputs from disk, compute spreads, and save results."""
-    swap_df = load_syields()
-    treasury_df = load_tyields()
+    swap_df = load_syields(data_dir=data_dir)
+    treasury_df = load_tyields(data_dir=data_dir)
 
     arb_df = calc_swap_spreads(treasury_df, swap_df)
 
-    # Save under module-specific data dir
-    data_dir = Path(config("DATA_DIR")) / "basis_treas_swap"
-    file_dir = data_dir / "calc_spread"
-    file_dir.mkdir(parents=True, exist_ok=True)
-    file = file_dir / "calc_merged.parquet"
+    file = data_dir / "calc_merged.parquet"
     arb_df.to_parquet(file)
 
 
 if __name__ == "__main__":
-    swap_main()
+    swap_main(data_dir=DATA_DIR)

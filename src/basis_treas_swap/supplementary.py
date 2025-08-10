@@ -12,6 +12,7 @@ import pull_bbg_treas_swap
 from calc_swap_spreads import calc_swap_spreads
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
+DATA_DIR = config("DATA_DIR")
 
 
 def replication_df(treasury_df, swap_df):
@@ -58,13 +59,13 @@ def sup_table(calc_df, file_name="table.txt"):
     return means
 
 
-def supplementary_main() -> pd.DataFrame:
+def supplementary_main(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Load inputs from disk, save the table, and return replication DataFrame."""
-    swap_df = pull_bbg_treas_swap.load_syields()
-    treasury_df = pull_bbg_treas_swap.load_tyields()
+    swap_df = pull_bbg_treas_swap.load_syields(data_dir=data_dir)
+    treasury_df = pull_bbg_treas_swap.load_tyields(data_dir=data_dir)
     sup_table(calc_swap_spreads(treasury_df, swap_df))
     return replication_df(treasury_df, swap_df)
 
 
 if __name__ == "__main__":
-    supplementary_main()
+    supplementary_main(data_dir=DATA_DIR)

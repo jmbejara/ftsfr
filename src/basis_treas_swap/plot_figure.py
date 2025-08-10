@@ -9,7 +9,6 @@ each plotting function to accept explicit `start_date` and `end_date` values.
 Format step only: loads inputs from disk; no external pulls here.
 """
 
-import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -27,7 +26,8 @@ DEFAULT_END_DATE: Optional[date] = None  # None means use full available range
 # Specific cut-off used for the replicated figure
 REPLICATION_END_DATE: date = pd.Timestamp("2025-08-01").date()
 
-output_dir = Path(config("OUTPUT_DIR"))
+DATA_DIR = config("DATA_DIR")
+OUTPUT_DIR = config("OUTPUT_DIR")
 
 
 def plot_figure(
@@ -106,8 +106,14 @@ def plot_supplementary(
             trea = trea.loc[start_dt:]
             swap = swap.loc[start_dt:]
 
-        plt.plot(np.log(100 * trea.dropna()), label=f"{year}Y Treasury", linewidth=1)
-        plt.plot(np.log(100 * swap.dropna()), label=f"{year}Y Swap", linewidth=1)
+        # Drop non-positive values before taking logs to avoid RuntimeWarning
+        trea_plot = trea.dropna()
+        trea_plot = trea_plot[trea_plot > 0]
+        swap_plot = swap.dropna()
+        swap_plot = swap_plot[swap_plot > 0]
+
+        plt.plot(np.log(100 * trea_plot), label=f"{year}Y Treasury", linewidth=1)
+        plt.plot(np.log(100 * swap_plot), label=f"{year}Y Swap", linewidth=1)
 
         plt.title("Treasury and Swap Rates")
         plt.xlabel("Dates")
@@ -120,7 +126,7 @@ def plot_supplementary(
         plt.close()
 
 
-def plot_main() -> None:
+def plot_main(data_dir: Path = DATA_DIR) -> None:
     """
     Create and save the replicated, updated, and supplementary plots.
 
@@ -128,36 +134,35 @@ def plot_main() -> None:
     - Updated plot uses full available range (no end date cap).
     - Supplementary plots use full available range.
     """
-    output_dir.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    data_dir = Path(config("DATA_DIR")) / "basis_treas_swap"
-    file = data_dir / "calc_spread" / "calc_merged.parquet"
+    file = data_dir / "calc_merged.parquet"
     # Load precomputed arbitrage spreads created in format step
     arb_df = pd.read_parquet(file)
 
-    rep_df = supplementary_main()
+    rep_df = supplementary_main(data_dir=data_dir)
 
     plot_figure(
         arb_df,
-        os.path.join(output_dir, "replicated_swap_spread_arb_figure.png"),
+        OUTPUT_DIR / "replicated_swap_spread_arb_figure.png",
         start_date=DEFAULT_START_DATE,
         end_date=REPLICATION_END_DATE,
     )
 
     plot_figure(
         arb_df,
-        os.path.join(output_dir, "updated_swap_spread_arb_figure.png"),
+        OUTPUT_DIR / "updated_swap_spread_arb_figure.png",
         start_date=DEFAULT_START_DATE,
         end_date=None,  # show full available range
     )
 
     plot_supplementary(
         rep_df,
-        os.path.join(output_dir, "replication_figure.png"),
+        OUTPUT_DIR / "replication_figure.png",
         start_date=DEFAULT_START_DATE,
         end_date=None,
     )
 
 
 if __name__ == "__main__":
-    plot_main()
+    plot_main(data_dir=DATA_DIR)
