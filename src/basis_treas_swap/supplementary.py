@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 
 from settings import config
-from pull_bloomberg import (
+from pull_bbg_treas_swap import (
     pull_raw_syields,
     pull_raw_tyields,
     clean_raw_syields,

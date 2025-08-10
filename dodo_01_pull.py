@@ -129,14 +129,14 @@ def task_pull():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/pull_bloomberg.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_bbg_treas_swap.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "bbg" / "raw_tyields.pkl",
                 DATA_DIR / data_module / "bbg" / "raw_syields.pkl",
             ],
             "file_dep": [
-                f"./src/{data_module}/pull_bloomberg.py",
+                f"./src/{data_module}/pull_bbg_treas_swap.py",
             ],
             "clean": [],
         }
@@ -489,7 +489,7 @@ def task_format():
                 "name": "basis_treas_swap_overview",
                 "notebook_path": "./src/basis_treas_swap/summary_basis_treas_swap_ipynb.py",
                 "file_dep": [
-                    "./src/basis_treas_swap/pull_bloomberg.py",
+                    "./src/basis_treas_swap/pull_bbg_treas_swap.py",
                     "./src/basis_treas_swap/calc_swap_spreads.py",
                     "./src/basis_treas_swap/plot_figure.py",
                     "./src/basis_treas_swap/supplementary.py",

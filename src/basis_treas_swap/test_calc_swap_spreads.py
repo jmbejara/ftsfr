@@ -3,7 +3,7 @@ Tests functions in calc_swap_spreads responsible for calculation and plots.
 """
 
 from calc_swap_spreads import *
-from pull_bloomberg import *
+from pull_bbg_treas_swap import *
 
 
 def test_calc_swap_spreads():

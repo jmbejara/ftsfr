@@ -33,7 +33,7 @@ We first pull the required data from Bloomberg using xbbg and other libraries. W
 """
 
 # %%
-from pull_bloomberg import *
+from pull_bbg_treas_swap import *
 
 raw_df_t = pull_raw_tyields()
 raw_df_s = pull_raw_syields()
