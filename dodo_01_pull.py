@@ -248,13 +248,20 @@ def task_pull():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/pull_wrds_fx.py --DATA_DIR={DATA_DIR / data_module}"
+                f"python ./src/{data_module}/pull_wrds_fx.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_bbg_foreign_exchange.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "fx_daily_data.parquet",
                 DATA_DIR / data_module / "fx_monthly_data.parquet",
+                DATA_DIR / data_module / "fx_spot_rates.parquet",
+                DATA_DIR / data_module / "fx_forward_points.parquet",
+                DATA_DIR / data_module / "fx_interest_rates.parquet",
             ],
-            "file_dep": [f"./src/{data_module}/pull_wrds_fx.py"],
+            "file_dep": [
+                f"./src/{data_module}/pull_wrds_fx.py",
+                f"./src/{data_module}/pull_bbg_foreign_exchange.py",
+            ],
         }
 
     data_module = "fed_yield_curve"
