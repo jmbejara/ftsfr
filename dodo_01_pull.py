@@ -111,6 +111,7 @@ def task_pull():
         yield {
             "name": data_module,
             "actions": [
+                "python ./src/basis_treas_sf/pull_bbg_basis_treas_sf.py",
                 "python ./src/basis_treas_sf/clean_treas_sf_excel.py",
             ],
             "targets": [
@@ -120,6 +121,7 @@ def task_pull():
             ],
             "file_dep": [
                 "./src/basis_treas_sf/clean_treas_sf_excel.py",
+                "./src/basis_treas_sf/pull_bbg_basis_treas_sf.py",
             ],
             "clean": [],
         }

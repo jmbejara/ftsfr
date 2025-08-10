@@ -328,7 +328,7 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="central-texas-three-fs"
 
 # Texas, USA us-south-1
-NODE_IP="104.171.202.199"
+NODE_IP="104.171.203.35"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="texas-one-fs"
 
