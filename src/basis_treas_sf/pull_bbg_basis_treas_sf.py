@@ -228,17 +228,14 @@ def load_last_day(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    module_dir = DATA_DIR / "basis_treas_sf"
-    module_dir.mkdir(parents=True, exist_ok=True)
-
     ois = pull_ois_history()
     ois = rename_ois_columns(ois)
-    ois.to_parquet(module_dir / "ois.parquet", index=False)
+    ois.to_parquet(DATA_DIR / "ois.parquet", index=False)
 
     tre = pull_futures_history()
-    tre.to_parquet(module_dir / "treasury_df.parquet", index=False)
+    tre.to_parquet(DATA_DIR / "treasury_df.parquet", index=False)
 
     last_day = build_last_day_mapping_from_dates(tre["Date"])
-    last_day.to_parquet(module_dir / "last_day.parquet", index=False)
+    last_day.to_parquet(DATA_DIR / "last_day.parquet", index=False)
 
 

@@ -437,7 +437,7 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                "python ./src/basis_treas_sf/calc_treasury_data.py",
+                f"python ./src/{data_module}/calc_treasury_data.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_sf_output.csv",
@@ -446,17 +446,17 @@ def task_format():
                 DATA_DIR / data_module / "treasury_df.parquet",
                 DATA_DIR / data_module / "ois.parquet",
                 DATA_DIR / data_module / "last_day.parquet",
-                "./src/basis_treas_sf/calc_treasury_data.py",
+                f"./src/{data_module}/calc_treasury_data.py",
             ],
             "clean": [],
         }
         yield from notebook_subtask(
             {
                 "name": "basis_treas_sf_notebook",
-                "notebook_path": "./src/basis_treas_sf/summary_basis_treas_sf_ipynb.py",
+                "notebook_path": f"./src/{data_module}/summary_basis_treas_sf_ipynb.py",
                 "file_dep": [
-                    "./src/basis_treas_sf/calc_treasury_data.py",
-                    DATA_DIR / "treasury_sf_output.csv",
+                    f"./src/{data_module}/calc_treasury_data.py",
+                    DATA_DIR / data_module / "treasury_sf_output.csv",
                 ],
                 "targets": [],
             }
@@ -487,12 +487,12 @@ def task_format():
         yield from notebook_subtask(
             {
                 "name": "basis_treas_swap_overview",
-                "notebook_path": "./src/basis_treas_swap/summary_basis_treas_swap_ipynb.py",
+                "notebook_path": f"./src/{data_module}/summary_basis_treas_swap_ipynb.py",
                 "file_dep": [
-                    "./src/basis_treas_swap/pull_bbg_treas_swap.py",
-                    "./src/basis_treas_swap/calc_swap_spreads.py",
-                    "./src/basis_treas_swap/plot_figure.py",
-                    "./src/basis_treas_swap/supplementary.py",
+                    f"./src/{data_module}/pull_bbg_treas_swap.py",
+                    f"./src/{data_module}/calc_swap_spreads.py",
+                    f"./src/{data_module}/plot_figure.py",
+                    f"./src/{data_module}/supplementary.py",
                 ],
                 "targets": [],
             }

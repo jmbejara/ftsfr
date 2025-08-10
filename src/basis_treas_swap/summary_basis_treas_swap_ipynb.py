@@ -14,6 +14,9 @@ from plot_figure import (
 )
 from supplementary import replication_df
 
+DATA_DIR = config("DATA_DIR")
+DATA_DIR = DATA_DIR / "basis_treas_swap"
+
 # %%
 """
 # Recreating the Treasury Swap Arbitrage Analysis from "Segmented Arbitrage"
@@ -59,8 +62,8 @@ Load cleaned Treasury and Swap yields from disk and compute the arbitrage spread
 """
 
 # %%
-tyields = pull_bbg_treas_swap.load_tyields()
-syields = pull_bbg_treas_swap.load_syields()
+tyields = pull_bbg_treas_swap.load_tyields(data_dir=DATA_DIR)
+syields = pull_bbg_treas_swap.load_syields(data_dir=DATA_DIR)
 calc_df = calc_swap_spreads(tyields, syields)
 
 # %%
