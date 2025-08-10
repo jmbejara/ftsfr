@@ -336,7 +336,11 @@ if __name__ == "__main__":
     treasury_df = pd.read_parquet(treasury_file)
     ois_df = pd.read_parquet(ois_file)
     # Ensure expected OIS columns exist (in case longer-tenor columns were included)
-    keep_cols = [c for c in ois_df.columns if c in ["Date", "OIS_1W", "OIS_1M", "OIS_3M", "OIS_6M", "OIS_1Y"]]
+    keep_cols = [
+        c
+        for c in ois_df.columns
+        if c in ["Date", "OIS_1W", "OIS_1M", "OIS_3M", "OIS_6M", "OIS_1Y"]
+    ]
     ois_df = ois_df[keep_cols]
     last_day_df = pd.read_parquet(last_day_file)
 

@@ -5,15 +5,16 @@ This module provides a consistent way to perform one-step-ahead forecasting
 across Darts, Nixtla, and GluonTS models.
 """
 
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import logging
+
 Uni_logger = logging.getLogger("unified_one_step_ahead")
 
 # Conditional imports to avoid dependency issues
 try:
     from darts import TimeSeries
+
     DARTS_AVAILABLE = True
 except ImportError:
     DARTS_AVAILABLE = False
@@ -51,7 +52,7 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     test_end = test_series.end_time()
 
     # For global models, use historical_forecasts with explicit parameters
-    
+
     # Make retrain condition True if the following models are used
     # ExponentialSmoothing
     # Simple ExponentialSmoothing
@@ -60,10 +61,12 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     # Naive models
     # Else don't need to retrain
     model_name = str(type(model))
-    retrain_model = any([x in model_name for x in [".ExponentialSmoothing",
-                                                   ".Theta",
-                                                   ".Prophet",
-                                                   ".Naive"]])
+    retrain_model = any(
+        [
+            x in model_name
+            for x in [".ExponentialSmoothing", ".Theta", ".Prophet", ".Naive"]
+        ]
+    )
 
     Uni_logger.info("retrain_model = " + str(retrain_model))
     Uni_logger.info("Using historical_forecasts")
@@ -73,13 +76,15 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
         forecast_horizon=1,
         stride=1,
         retrain=retrain_model,
-        last_points_only=True, # I think this should be set to True. Prev: False
+        last_points_only=True,  # I think this should be set to True. Prev: False
         verbose=False,
     )
-    
+
     # Handle case where historical_forecasts returns a list
     if isinstance(predictions, list):
-        Uni_logger.info(f"historical_forecasts returned a list of {len(predictions)} TimeSeries")
+        Uni_logger.info(
+            f"historical_forecasts returned a list of {len(predictions)} TimeSeries"
+        )
         # Concatenate all predictions into a single TimeSeries
         if len(predictions) > 0:
             # Concatenate one by one
@@ -89,19 +94,25 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
             predictions = result
         else:
             raise ValueError("No predictions returned from historical_forecasts")
-    
+
     Uni_logger.info(f"Final predictions shape: {predictions.shape}")
 
     # Ensure predictions have the same number of components as test_series
     if predictions.n_components != test_series.n_components:
-        Uni_logger.warning(f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}")
+        Uni_logger.warning(
+            f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}"
+        )
         # If predictions have more components, take only the first test_series.n_components
         if predictions.n_components > test_series.n_components:
-            predictions = predictions[:, :test_series.n_components]
-            Uni_logger.info(f"Truncated predictions to {test_series.n_components} components")
+            predictions = predictions[:, : test_series.n_components]
+            Uni_logger.info(
+                f"Truncated predictions to {test_series.n_components} components"
+            )
         else:
             # If predictions have fewer components, this is a problem
-            raise ValueError(f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})")
+            raise ValueError(
+                f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})"
+            )
 
     Uni_logger.info(f"Generated predictions with shape: {predictions.shape}")
     return predictions
@@ -125,15 +136,16 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
     # For NeuralForecast, we can use the predict method directly on the full dataset
     # and then filter to get only the test predictions
     Uni_logger.info("Using NeuralForecast predict method on full dataset")
-    
+
     try:
         # The loop keeps concatenating forecasts to pred_df
         pred_df = nf_model.predict(train_df)
         first_date = test_df["ds"].unique()[0]
         pred_df["ds"] = first_date
         df = raw_df
-        Uni_logger.info("Got predictions for date: " + \
-                       first_date.strftime("%Y-%m-%d, %r") + ".")
+        Uni_logger.info(
+            "Got predictions for date: " + first_date.strftime("%Y-%m-%d, %r") + "."
+        )
 
         # Sliding window forecasts
         # Predict 1 date right after the dataset in the arguments
@@ -144,19 +156,19 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
             # Get predictions for the next date
             temp_pred_df = nf_model.predict(df[df.ds < i])
             # Lining up the dates
-            temp_pred_df['ds'] = i
-            pred_df = pd.concat([pred_df, temp_pred_df],
-                                    ignore_index = True)
-            Uni_logger.info("Got predictions for date: " + \
-                           i.strftime("%Y-%m-%d, %r") + ".")
+            temp_pred_df["ds"] = i
+            pred_df = pd.concat([pred_df, temp_pred_df], ignore_index=True)
+            Uni_logger.info(
+                "Got predictions for date: " + i.strftime("%Y-%m-%d, %r") + "."
+            )
 
         return pred_df
-        
+
     except Exception as e:
         Uni_logger.error(f"Error in NeuralForecast prediction: {e}")
         # Fallback: try a simpler approach
         Uni_logger.info("Trying fallback approach with test data only")
-        
+
         # Use the test data directly for prediction
         predictions = nf_model.predict(test_df)
         Uni_logger.info(f"Fallback generated {len(predictions)} predictions")
@@ -257,9 +269,11 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
 
     if model_type == "darts":
         if not DARTS_AVAILABLE:
-            Uni_logger.warning("darts not available, skipping verification for darts model")
+            Uni_logger.warning(
+                "darts not available, skipping verification for darts model"
+            )
             return True
-            
+
         # For Darts TimeSeries
         if isinstance(predictions, TimeSeries):
             pred_length = len(predictions)
@@ -270,7 +284,9 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
                 Uni_logger.info("✓ Darts predictions length matches test data length")
                 return True
             else:
-                Uni_logger.warning(f"⚠ Darts predictions length ({pred_length}) != test data length ({test_length})")
+                Uni_logger.warning(
+                    f"⚠ Darts predictions length ({pred_length}) != test data length ({test_length})"
+                )
                 return False
         else:
             Uni_logger.warning("⚠ Darts predictions not in TimeSeries format")
@@ -287,7 +303,9 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
                 Uni_logger.info("✓ Nixtla predictions count matches test data count")
                 return True
             else:
-                Uni_logger.warning(f"⚠ Nixtla predictions count ({pred_count}) != test data count ({test_count})")
+                Uni_logger.warning(
+                    f"⚠ Nixtla predictions count ({pred_count}) != test data count ({test_count})"
+                )
                 return False
         else:
             Uni_logger.warning("⚠ Nixtla predictions not in DataFrame format")
@@ -304,7 +322,9 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
                 Uni_logger.info("✓ GluonTS predictions count matches test data count")
                 return True
             else:
-                Uni_logger.warning(f"⚠ GluonTS predictions count ({pred_count}) != test data count ({test_count})")
+                Uni_logger.warning(
+                    f"⚠ GluonTS predictions count ({pred_count}) != test data count ({test_count})"
+                )
                 return False
         else:
             Uni_logger.warning("⚠ GluonTS predictions not in DataFrame format")

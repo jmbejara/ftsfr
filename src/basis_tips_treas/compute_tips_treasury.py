@@ -12,14 +12,14 @@ OUTPUT_DIR = config("OUTPUT_DIR")
 # ------------------------------------------------------------------------------
 def import_inflation_swap_data():
     # Load Bloomberg output saved as parquet
-    swaps_path = DATA_DIR /  "treasury_inflation_swaps.parquet"
+    swaps_path = DATA_DIR / "treasury_inflation_swaps.parquet"
 
     # Read parquet and ensure "Dates" is datetime
     swaps = pd.read_parquet(swaps_path)
     if "Dates" in swaps.columns and not pd.api.types.is_datetime64_any_dtype(
         swaps["Dates"]
     ):
-        swaps["Dates"] = pd.to_datetime(swaps["Dates"]) 
+        swaps["Dates"] = pd.to_datetime(swaps["Dates"])
 
     # Create a column mapping based on the schema you provided
     column_map = {

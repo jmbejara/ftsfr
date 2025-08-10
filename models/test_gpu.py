@@ -116,7 +116,7 @@ def test_lightning_gpu():
             devices = find_usable_cuda_devices(1)
             if devices:
                 print(f"  Usable CUDA devices: {devices}")
-                
+
                 # Test creating a simple trainer with GPU
                 trainer = pl.Trainer(accelerator="gpu", devices=1)
                 print("  ✓ Successfully created GPU trainer")

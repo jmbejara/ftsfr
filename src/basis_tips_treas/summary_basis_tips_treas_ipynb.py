@@ -41,6 +41,7 @@ import seaborn as sns
 import warnings
 
 from settings import config
+
 DATA_DIR = config("DATA_DIR")
 DATA_DIR = DATA_DIR / "basis_tips_treas"
 

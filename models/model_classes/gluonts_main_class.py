@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 from tabulate import tabulate
 import logging
+
 GluontsMain_logger = logging.getLogger("GluontsMain")
 
 from .forecasting_model import forecasting_model
@@ -32,6 +33,7 @@ class GluontsMain(forecasting_model):
     ):
         # GluonTS-specific imports only when needed
         from gluonts.dataset.pandas import PandasDataset
+
         GluontsMain_logger.info("GluontsMain __init__ called.")
 
         # This helps with organising
@@ -42,7 +44,9 @@ class GluontsMain(forecasting_model):
         model_path = output_path / "models" / model_name / dataset_name
         Path(model_path).mkdir(parents=True, exist_ok=True)
 
-        GluontsMain_logger.info("Created model path and its +" + "folders if they were missing.")
+        GluontsMain_logger.info(
+            "Created model path and its +" + "folders if they were missing."
+        )
 
         # Path to save forecasts generated after training the model
         forecast_path = output_path / "forecasts" / model_name / dataset_name
@@ -58,7 +62,9 @@ class GluontsMain(forecasting_model):
         result_path.mkdir(parents=True, exist_ok=True)
         result_path = result_path / str(dataset_name + ".csv")
 
-        GluontsMain_logger.info("Created result_path and its " + "folders if they were missing.")
+        GluontsMain_logger.info(
+            "Created result_path and its " + "folders if they were missing."
+        )
 
         # Data pre-processing
         raw_df = pd.read_parquet(data_path)
@@ -164,18 +170,25 @@ class GluontsMain(forecasting_model):
 
     @common_error_catch
     def save_model(self):
-        from gluonts.model.predictor import Predictor
+
         self.model.serialize(self.model_path)
         GluontsMain_logger.info('Model saved to "' + str(self.model_path) + '".')
 
     def load_model(self):
         from gluonts.model.predictor import Predictor
+
         self.model = Predictor.deserialize(self.model_path)
         GluontsMain_logger.info('Model loaded from "' + str(self.model_path) + '".')
 
     def forecast(self):
-        from .unified_one_step_ahead import perform_one_step_ahead_gluonts, verify_one_step_ahead
-        GluontsMain_logger.info("Starting unified one-step-ahead forecasting for GluonTS model")
+        from .unified_one_step_ahead import (
+            perform_one_step_ahead_gluonts,
+            verify_one_step_ahead,
+        )
+
+        GluontsMain_logger.info(
+            "Starting unified one-step-ahead forecasting for GluonTS model"
+        )
 
         # Use the unified one-step-ahead implementation
         self.pred_series = perform_one_step_ahead_gluonts(
@@ -196,7 +209,9 @@ class GluontsMain(forecasting_model):
         if is_valid:
             GluontsMain_logger.info("✓ One-step-ahead forecasting verified")
         else:
-            GluontsMain_logger.warning("⚠ One-step-ahead forecasting verification failed")
+            GluontsMain_logger.warning(
+                "⚠ One-step-ahead forecasting verification failed"
+            )
 
         GluontsMain_logger.info("Forecasting complete. Internal variable updated.")
 
@@ -207,67 +222,73 @@ class GluontsMain(forecasting_model):
 
     def load_forecast(self):
         self.pred_series = pd.read_parquet(self.forecast_path)
-        GluontsMain_logger.info('Loaded forecasts from "' + str(self.forecast_path) + '".')
+        GluontsMain_logger.info(
+            'Loaded forecasts from "' + str(self.forecast_path) + '".'
+        )
 
     def calculate_gluonts_mase(self, test_data, train_data, pred_series, seasonality):
         """
         Calculate MASE for GluonTS models without depending on darts.
-        
+
         Args:
             test_data: DataFrame with test data
-            train_data: DataFrame with training data  
+            train_data: DataFrame with training data
             pred_series: DataFrame with predictions
             seasonality: Seasonality period
-            
+
         Returns:
             float: MASE score
         """
         GluontsMain_logger.info("Calculating MASE for GluonTS model")
-        
+
         # Calculate mean absolute error of predictions
         # Merge test data with predictions on ds and unique_id
         merged = test_data.merge(
-            pred_series, 
-            on=['ds', 'unique_id'], 
-            suffixes=('_actual', '_pred')
+            pred_series, on=["ds", "unique_id"], suffixes=("_actual", "_pred")
         )
-        
+
         # Calculate absolute errors
-        merged['abs_error'] = np.abs(merged['y_actual'] - merged['y_pred'])
-        mae_forecast = merged['abs_error'].mean()
-        
+        merged["abs_error"] = np.abs(merged["y_actual"] - merged["y_pred"])
+        mae_forecast = merged["abs_error"].mean()
+
         # Calculate mean absolute error of naive forecast on training data
         # For each series, calculate the naive forecast error
         naive_errors = []
-        
-        for series_id in train_data['unique_id'].unique():
-            series_data = train_data[train_data['unique_id'] == series_id].sort_values('ds')
-            
+
+        for series_id in train_data["unique_id"].unique():
+            series_data = train_data[train_data["unique_id"] == series_id].sort_values(
+                "ds"
+            )
+
             if len(series_data) > seasonality:
                 # Calculate naive forecast (value from seasonality periods ago)
                 series_data = series_data.reset_index(drop=True)
-                naive_forecast = series_data['y'].shift(seasonality)
-                actual_values = series_data['y']
-                
+                naive_forecast = series_data["y"].shift(seasonality)
+                actual_values = series_data["y"]
+
                 # Calculate absolute errors for naive forecast
                 naive_abs_errors = np.abs(actual_values - naive_forecast)
                 # Remove NaN values (first seasonality periods)
                 naive_abs_errors = naive_abs_errors.dropna()
-                
+
                 if len(naive_abs_errors) > 0:
                     naive_errors.extend(naive_abs_errors.tolist())
-        
+
         if len(naive_errors) == 0:
-            GluontsMain_logger.warning("No naive forecast errors calculated, using fallback")
+            GluontsMain_logger.warning(
+                "No naive forecast errors calculated, using fallback"
+            )
             mae_naive = 1.0  # Fallback value
         else:
             mae_naive = np.mean(naive_errors)
-        
+
         # Calculate MASE
-        mase = mae_forecast / mae_naive if mae_naive > 0 else float('inf')
-        
-        GluontsMain_logger.info(f"MASE calculated: {mase:.4f} (MAE_forecast: {mae_forecast:.4f}, MAE_naive: {mae_naive:.4f})")
-        
+        mase = mae_forecast / mae_naive if mae_naive > 0 else float("inf")
+
+        GluontsMain_logger.info(
+            f"MASE calculated: {mase:.4f} (MAE_forecast: {mae_forecast:.4f}, MAE_naive: {mae_naive:.4f})"
+        )
+
         return mase
 
     def calculate_error(self, metric="MASE"):

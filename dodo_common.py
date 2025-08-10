@@ -17,13 +17,10 @@ from dependency_tracker import (
 
 # Ensure child processes (spawned by tasks) can import modules from `src/`
 _src_path = str((Path(__file__).parent / "src").resolve())
-os.environ["PYTHONPATH"] = (
-    _src_path
-    + (
-        os.pathsep + os.environ.get("PYTHONPATH", "")
-        if os.environ.get("PYTHONPATH")
-        else ""
-    )
+os.environ["PYTHONPATH"] = _src_path + (
+    os.pathsep + os.environ.get("PYTHONPATH", "")
+    if os.environ.get("PYTHONPATH")
+    else ""
 )
 
 
@@ -32,7 +29,6 @@ BASE_DIR = Path(config("BASE_DIR"))
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 OS_TYPE = config("OS_TYPE")
-
 
 
 # Get pixi executable path

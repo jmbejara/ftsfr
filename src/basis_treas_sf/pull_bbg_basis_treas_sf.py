@@ -46,13 +46,17 @@ def ois_tickers() -> List[str]:
     ]
 
 
-def pull_ois_history(start_date: str = START_DATE, end_date: str = END_DATE) -> pd.DataFrame:
+def pull_ois_history(
+    start_date: str = START_DATE, end_date: str = END_DATE
+) -> pd.DataFrame:
     """Fetch historical USD OIS levels (PX_LAST) from Bloomberg via xbbg.
 
     Returns Date + ticker columns. Consumers rename to compact labels later.
     """
     tickers = ois_tickers()
-    df = blp.bdh(tickers=tickers, flds=["PX_LAST"], start_date=start_date, end_date=end_date)
+    df = blp.bdh(
+        tickers=tickers, flds=["PX_LAST"], start_date=start_date, end_date=end_date
+    )
 
     if isinstance(df.columns, pd.MultiIndex) and df.columns.nlevels == 2:
         df.columns = df.columns.droplevel(level=1)
@@ -69,10 +73,14 @@ def _first_available_field(
     """Return the first Bloomberg field that yields data for the given ticker."""
     for fld in candidates:
         try:
-            df = blp.bdh(tickers=[ticker], flds=[fld], start_date=start_date, end_date=end_date)
+            df = blp.bdh(
+                tickers=[ticker], flds=[fld], start_date=start_date, end_date=end_date
+            )
             if df is None or df.empty:
                 continue
-            series = df.droplevel(1, axis=1) if isinstance(df.columns, pd.MultiIndex) else df
+            series = (
+                df.droplevel(1, axis=1) if isinstance(df.columns, pd.MultiIndex) else df
+            )
             if series.iloc[:, 0].notna().any():
                 return fld
         except Exception:
@@ -110,7 +118,9 @@ def _quarter_contract_label(dt: pd.Timestamp, offset_quarters: int = 0) -> str:
     return f"{month_abbr} {yy:02d}"
 
 
-def pull_futures_history(start_date: str = START_DATE, end_date: str = END_DATE) -> pd.DataFrame:
+def pull_futures_history(
+    start_date: str = START_DATE, end_date: str = END_DATE
+) -> pd.DataFrame:
     """Fetch Treasury futures inputs needed downstream.
 
     For each tenor and for near (1) and deferred (2) generic contracts, pull:
@@ -184,7 +194,11 @@ def pull_futures_history(start_date: str = START_DATE, end_date: str = END_DATE)
 
     # Add Contract columns derived from Date (quarter cycle)
     for v, offset in [(1, 0), (2, 1)]:
-        contracts = treasury_df["Date"].apply(lambda dt: _quarter_contract_label(pd.to_datetime(dt), offset_quarters=offset))
+        contracts = treasury_df["Date"].apply(
+            lambda dt: _quarter_contract_label(
+                pd.to_datetime(dt), offset_quarters=offset
+            )
+        )
         for tenor in tenor_to_tickers.keys():
             treasury_df[f"Contract_{v}_{tenor}"] = contracts
 
@@ -210,7 +224,9 @@ def build_last_day_mapping_from_dates(dates: pd.Series) -> pd.DataFrame:
     df_dates = pd.DataFrame({"Date": pd.to_datetime(dates)})
     df_dates["Mat_Month"] = df_dates["Date"].dt.month
     df_dates["Mat_Year"] = df_dates["Date"].dt.year
-    df_dates = df_dates.sort_values("Date").drop_duplicates(["Mat_Year", "Mat_Month"], keep="last")
+    df_dates = df_dates.sort_values("Date").drop_duplicates(
+        ["Mat_Year", "Mat_Month"], keep="last"
+    )
     df_dates["Mat_Day"] = df_dates["Date"].dt.day
     return df_dates[["Date", "Mat_Month", "Mat_Year", "Mat_Day"]].reset_index(drop=True)
 
@@ -237,5 +253,3 @@ if __name__ == "__main__":
 
     last_day = build_last_day_mapping_from_dates(tre["Date"])
     last_day.to_parquet(DATA_DIR / "last_day.parquet", index=False)
-
-

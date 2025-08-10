@@ -46,7 +46,6 @@ import sys
 import warnings
 from pathlib import Path
 from platform import system
-from datetime import date
 
 from decouple import Config, RepositoryEnv, undefined
 from decouple import config as _config_decouple

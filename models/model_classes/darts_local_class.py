@@ -16,6 +16,7 @@ import pandas as pd
 from tabulate import tabulate
 from tqdm import tqdm
 import logging
+
 DartsLocal_logger = logging.getLogger("DartsLocal")
 
 from .darts_main_class import DartsMain
@@ -36,7 +37,7 @@ class DartsLocal(DartsMain):
         interpolation=False,
     ):
         # Import Darts-specific utilities only when needed
-        from darts.utils.missing_values import fill_missing_values
+
         DartsLocal_logger.info("DartsLocal object initialized.")
 
         super().__init__(
@@ -71,6 +72,7 @@ class DartsLocal(DartsMain):
     def forecast_workflow(self):
         # Import Darts-specific utilities only when needed
         from darts.utils.missing_values import fill_missing_values
+
         DartsLocal_logger.info(
             "forecast_workflow called. Predictions made for each "
             + "entity separately."

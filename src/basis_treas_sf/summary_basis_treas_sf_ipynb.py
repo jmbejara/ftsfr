@@ -109,8 +109,6 @@ See `calc_treasury_data.py` functions for details: `parse_contract_date`, `inter
 # %%
 
 
- 
-
 # %%
 """
 ### What is the Treasury spot-futures basis trade?

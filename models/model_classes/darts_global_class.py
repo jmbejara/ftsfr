@@ -7,10 +7,12 @@ Transformer.
 import pandas as pd
 from tabulate import tabulate
 import logging
+
 DartsGlobal_logger = logging.getLogger("DartsGlobal")
 
 import torch
-torch.set_float32_matmul_precision('medium')
+
+torch.set_float32_matmul_precision("medium")
 
 # from warnings import filterwarnings
 # filterwarnings("ignore")
@@ -57,8 +59,14 @@ class DartsGlobal(DartsMain):
     @common_error_catch
     def forecast(self):
         # Darts-specific imports only when needed
-        from .unified_one_step_ahead import perform_one_step_ahead_darts, verify_one_step_ahead
-        DartsGlobal_logger.info("Starting unified one-step-ahead forecasting for global model")
+        from .unified_one_step_ahead import (
+            perform_one_step_ahead_darts,
+            verify_one_step_ahead,
+        )
+
+        DartsGlobal_logger.info(
+            "Starting unified one-step-ahead forecasting for global model"
+        )
 
         # Use the unified one-step-ahead implementation
         self.pred_series = perform_one_step_ahead_darts(
@@ -76,7 +84,9 @@ class DartsGlobal(DartsMain):
         if is_valid:
             DartsGlobal_logger.info("✓ One-step-ahead forecasting verified")
         else:
-            DartsGlobal_logger.warning("⚠ One-step-ahead forecasting verification failed")
+            DartsGlobal_logger.warning(
+                "⚠ One-step-ahead forecasting verification failed"
+            )
 
         DartsGlobal_logger.info(
             "DartsGlobal forecast called. "
