@@ -1,10 +1,24 @@
 # %%
+from pathlib import Path
+import os
+import pandas as pd
+
+from settings import config
+import pull_bbg_treas_swap
+from calc_swap_spreads import calc_swap_spreads
+from plot_figure import (
+    plot_figure,
+    plot_supplementary,
+    DEFAULT_START_DATE,
+    REPLICATION_END_DATE,
+)
+from supplementary import replication_df
+
+# %%
 """
 # Recreating the Treasury Swap Arbitrage Analysis from "Segmented Arbitrage"
 
-This notebook briefly summarises our process of recreating the Treasury-Swap arbitrage spread plot from the Siriwardane, Sunderam, and Wallen (2023) paper "Segmented Arbitrage."
-
-
+This notebook summarizes the process of recreating the Treasury-Swap arbitrage spread plot from Siriwardane, Sunderam, and Wallen (2023), "Segmented Arbitrage."
 """
 
 # %%
@@ -24,21 +38,15 @@ The core logic of this arbitrage opportunity is that when the treasury yield and
 
 # %%
 """
-### Data Collection from Bloomberg
+### Data Loading
 """
 
 # %%
 """
-We first pull the required data from Bloomberg using xbbg and other libraries. We also perform a small preprocessing step.
+In accordance with the project rules, this notebook only loads data from disk.
+The raw pull from Bloomberg happens once in the pull step; the cleaned files are
+saved to disk and loaded here for analysis and plotting.
 """
-
-# %%
-from pull_bbg_treas_swap import *
-
-raw_df_t = pull_raw_tyields()
-raw_df_s = pull_raw_syields()
-clean_df_t = clean_raw_tyields(raw_df_t)
-clean_df_s = clean_raw_syields(raw_df_s)
 
 # %%
 """
@@ -47,13 +55,13 @@ clean_df_s = clean_raw_syields(raw_df_s)
 
 # %%
 """
-Now that we have the data, we calculate the arbitrage spread. The assumption here is that if this value goes negative, then this is an arb. We pay fixed in the swap agreement and receive the floating rate. Then, we purchase a treasury on repo, meaning that we are receiving the treasury rate and paying a floating repo rate. Thus, we get paid T_rate - Swap_rate + Swap_floating - Repo_Floating. Hence, this is not a true arbitrage unless you are guaranteed that you can secure 3mo treasury repos at a lower floating rate than you would receive in the swap (most likely SOFR).
+Load cleaned Treasury and Swap yields from disk and compute the arbitrage spreads.
 """
 
 # %%
-from calc_swap_spreads import *
-
-calc_df = calc_swap_spreads(clean_df_t, clean_df_s)
+tyields = pull_bbg_treas_swap.load_tyields()
+syields = pull_bbg_treas_swap.load_syields()
+calc_df = calc_swap_spreads(tyields, syields)
 
 # %%
 """
@@ -62,19 +70,17 @@ calc_df = calc_swap_spreads(clean_df_t, clean_df_s)
 
 # %%
 """
-Once we have the data, we use a simple plotting function to plot the data and save it in "\\..\\_output". This plot measures the arbitrage opportunity, as anywhere the series is negative, the treasury super replicates the swap.
+Once we have the spreads, we plot the replicated and updated figures and save them in the output directory.
 """
 
 # %%
-from settings import config
-from pathlib import Path
-from plot_figure import *
-
 output_dir = Path(config("OUTPUT_DIR"))
-end_date = pd.Timestamp(config("END_DATE")).date()
 
 plot_figure(
-    calc_df, os.path.join(output_dir, "replicated_swap_spread_arb_figure.png"), end_date
+    calc_df,
+    os.path.join(output_dir, "replicated_swap_spread_arb_figure.png"),
+    start_date=DEFAULT_START_DATE,
+    end_date=REPLICATION_END_DATE,
 )
 
 # %%
@@ -85,7 +91,12 @@ Ever since the paper's publishing, more data has been added to Bloomberg which c
 """
 
 # %%
-plot_figure(calc_df, os.path.join(output_dir, "updated_swap_spread_arb_figure.png"))
+plot_figure(
+    calc_df,
+    os.path.join(output_dir, "updated_swap_spread_arb_figure.png"),
+    start_date=DEFAULT_START_DATE,
+    end_date=None,
+)
 
 # %%
 """
@@ -99,12 +110,17 @@ plot_figure(calc_df, os.path.join(output_dir, "updated_swap_spread_arb_figure.pn
 
 # %%
 """
-We also generate a set of plots that shows the two rates over the extended period. In theory, since the treasury super replicates the swap, the treasury rate should be lower than the swap rate across these periods.
+Generate supplementary plots of Treasury versus Swap rates over time.
 """
 
 # %%
-replicated_df = supplementary_main()
-plot_supplementary(replicated_df, os.path.join(output_dir, "replication_figure.png"))
+replicated_df = replication_df(tyields, syields)
+plot_supplementary(
+    replicated_df,
+    os.path.join(output_dir, "replication_figure.png"),
+    start_date=DEFAULT_START_DATE,
+    end_date=None,
+)
 
 # %%
 """
@@ -113,11 +129,14 @@ plot_supplementary(replicated_df, os.path.join(output_dir, "replication_figure.p
 
 # %%
 """
-We generate a table the represents the average swap-treasury spread over the extended period. Again, negative values represent arbitrage opportunities.
+We generate a small summary table of the mean arbitrage spread by tenor.
 """
 
 # %%
-print(sup_table(replicated_df).to_markdown())
+years = [1, 2, 3, 5, 10, 20, 30]
+means = calc_df[[f"Arb_Swap_{y}" for y in years]].mean()
+means.index = [f"Arb Swap {y}" for y in years]
+pd.DataFrame(means, columns=["Mean(bps)"])
 
 # %%
 """

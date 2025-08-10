@@ -6,6 +6,8 @@ Pull and load Bloomberg Treasury and Swap yield data.
 - pull_ functions ALWAYS fetch from Bloomberg and never touch disk.
 - load_ functions ALWAYS load from disk and never fetch from external sources.
 - Cleaning functions are pure transformations with no side effects.
+
+All files are saved as Parquet in DATA_DIR.
 """
 
 from datetime import timedelta
@@ -133,17 +135,17 @@ def load_syields(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    # Pull, clean, and save to Parquet
+    # Pull, clean, and save
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     raw_t = pull_raw_tyields()
     raw_s = pull_raw_syields()
 
-    # Save raw
+    # Save raw as Parquet
     raw_t.to_parquet(DATA_DIR / "raw_tyields.parquet")
     raw_s.to_parquet(DATA_DIR / "raw_syields.parquet")
 
-    # Clean and save
+    # Clean and save as Parquet for downstream format step
     t_clean = clean_raw_tyields(raw_t)
     s_clean = clean_raw_syields(raw_s)
     t_clean.to_parquet(DATA_DIR / "tyields.parquet")

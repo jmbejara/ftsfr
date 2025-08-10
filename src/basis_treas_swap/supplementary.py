@@ -1,15 +1,14 @@
-"""Functions to generate supplementary table and plots"""
+"""Functions to generate supplementary table and plots.
 
-import pandas as pd
+Format step only: loads data from disk; no external pulls here.
+"""
+
 from pathlib import Path
 
+import pandas as pd
+
 from settings import config
-from pull_bbg_treas_swap import (
-    pull_raw_syields,
-    pull_raw_tyields,
-    clean_raw_syields,
-    clean_raw_tyields,
-)
+import pull_bbg_treas_swap
 from calc_swap_spreads import calc_swap_spreads
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
@@ -59,10 +58,10 @@ def sup_table(calc_df, file_name="table.txt"):
     return means
 
 
-def supplementary_main():
-    """Main function which runs the functions for supplementary data/table."""
-    swap_df = clean_raw_syields(pull_raw_syields())
-    treasury_df = clean_raw_tyields(pull_raw_tyields())
+def supplementary_main() -> pd.DataFrame:
+    """Load inputs from disk, save the table, and return replication DataFrame."""
+    swap_df = pull_bbg_treas_swap.load_syields()
+    treasury_df = pull_bbg_treas_swap.load_tyields()
     sup_table(calc_swap_spreads(treasury_df, swap_df))
     return replication_df(treasury_df, swap_df)
 

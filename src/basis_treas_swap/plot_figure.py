@@ -5,6 +5,8 @@ Utilities to create and save the replicated, updated, and supplementary plots.
 
 This module centralizes date handling via top-level defaults while allowing
 each plotting function to accept explicit `start_date` and `end_date` values.
+
+Format step only: loads inputs from disk; no external pulls here.
 """
 
 import os
@@ -16,7 +18,6 @@ from datetime import date
 from typing import Optional
 
 from settings import config
-from calc_swap_spreads import calc_swap_spreads
 from supplementary import supplementary_main
 
 # Defaults for plotting windows
@@ -130,21 +131,9 @@ def plot_main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     data_dir = Path(config("DATA_DIR")) / "basis_treas_swap"
-    file = data_dir / "calc_spread" / "calc_merged.pkl"
-    if file.exists():
-        arb_df = pd.read_pickle(file)
-    else:
-        # Fallback: run bloom and compute
-        from pull_bbg_treas_swap import (
-            pull_raw_syields,
-            pull_raw_tyields,
-            clean_raw_syields,
-            clean_raw_tyields,
-        )
-
-        s_df = clean_raw_syields(pull_raw_syields())
-        t_df = clean_raw_tyields(pull_raw_tyields())
-        arb_df = calc_swap_spreads(t_df, s_df)
+    file = data_dir / "calc_spread" / "calc_merged.parquet"
+    # Load precomputed arbitrage spreads created in format step
+    arb_df = pd.read_parquet(file)
 
     rep_df = supplementary_main()
 

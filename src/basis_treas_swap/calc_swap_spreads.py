@@ -1,22 +1,18 @@
 """
-Responsible for calculating the spreads, and saving them.
+Responsible for calculating the Treasury-Swap arbitrage spreads and saving them.
+
+Format step only: loads cleaned data from disk and performs calculations.
 """
 
-import pandas as pd
 from pathlib import Path
 
+import pandas as pd
+
 from settings import config
-from pull_bbg_treas_swap import (
-    pull_raw_syields,
-    pull_raw_tyields,
-    clean_raw_syields,
-    clean_raw_tyields,
-)
-
-output_dir = Path(config("OUTPUT_DIR"))
+from pull_bbg_treas_swap import load_syields, load_tyields
 
 
-def calc_swap_spreads(treasury_df, swap_df):
+def calc_swap_spreads(treasury_df: pd.DataFrame, swap_df: pd.DataFrame) -> pd.DataFrame:
     """Combines the treasury and swap data and calculates the spreads
 
     :param treasury_df: DataFrame containing the treasury yield data
@@ -48,10 +44,10 @@ def calc_swap_spreads(treasury_df, swap_df):
     return merged_df
 
 
-def swap_main():
-    """Calculates the spreads and saves them."""
-    swap_df = clean_raw_syields(pull_raw_syields())
-    treasury_df = clean_raw_tyields(pull_raw_tyields())
+def swap_main() -> None:
+    """Load cleaned inputs from disk, compute spreads, and save results."""
+    swap_df = load_syields()
+    treasury_df = load_tyields()
 
     arb_df = calc_swap_spreads(treasury_df, swap_df)
 
@@ -59,8 +55,8 @@ def swap_main():
     data_dir = Path(config("DATA_DIR")) / "basis_treas_swap"
     file_dir = data_dir / "calc_spread"
     file_dir.mkdir(parents=True, exist_ok=True)
-    file = file_dir / "calc_merged.pkl"
-    arb_df.to_pickle(file)
+    file = file_dir / "calc_merged.parquet"
+    arb_df.to_parquet(file)
 
 
 if __name__ == "__main__":

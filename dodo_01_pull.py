@@ -134,8 +134,8 @@ def task_pull():
                 f"python ./src/{data_module}/pull_bbg_treas_swap.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "bbg" / "raw_tyields.pkl",
-                DATA_DIR / data_module / "bbg" / "raw_syields.pkl",
+                DATA_DIR / data_module / "raw_tyields.parquet",
+                DATA_DIR / data_module / "raw_syields.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_bbg_treas_swap.py",
@@ -474,7 +474,7 @@ def task_format():
                 f"python ./src/{data_module}/plot_figure.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "calc_spread" / "calc_merged.pkl",
+                DATA_DIR / data_module / "calc_spread" / "calc_merged.parquet",
                 OUTPUT_DIR / "replicated_swap_spread_arb_figure.png",
                 OUTPUT_DIR / "updated_swap_spread_arb_figure.png",
                 OUTPUT_DIR / "table.txt",

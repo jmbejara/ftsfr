@@ -46,6 +46,7 @@ import sys
 import warnings
 from pathlib import Path
 from platform import system
+from datetime import date
 
 from decouple import Config, RepositoryEnv, undefined
 from decouple import config as _config_decouple
@@ -289,6 +290,9 @@ defaults = {
     "MANUAL_DATA_DIR": if_relative_make_abs(Path("data_manual")),
     "OUTPUT_DIR": if_relative_make_abs(Path("_output")),
     "DOCS_BUILD_DIR": if_relative_make_abs(Path("_docs")),
+    # Provide sane defaults for commonly used date bounds
+    # Used by various modules/notebooks when an END_DATE is not explicitly set
+    "END_DATE": "2025-06-01",
     **defaults,
 }
 
