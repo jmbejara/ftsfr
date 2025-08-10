@@ -1,163 +1,150 @@
 """
-Pulls data from Bloomberg or local files. Cleans if required.
+pull_bbg_treas_swap.py
+
+Pull and load Bloomberg Treasury and Swap yield data.
+
+- pull_ functions ALWAYS fetch from Bloomberg and never touch disk.
+- load_ functions ALWAYS load from disk and never fetch from external sources.
+- Cleaning functions are pure transformations with no side effects.
 """
+
+from datetime import timedelta
+from pathlib import Path
 
 import pandas as pd
 from xbbg import blp
-from datetime import timedelta
-import os
-from pathlib import Path
+
 from settings import config
 
-data_dir = Path(config("DATA_DIR"))
+DATA_DIR: Path = config("DATA_DIR")
 
 
-def pull_raw_tyields(override_download=False):
-    """Pull raw treasury yield data
-
-    :param override_download: If set to True, downloaded data is ignored
-    :type override_download: bool, default = False
-
-    :return: Raw treasury yield data
-    :rtype: pd.DataFrame
+def pull_raw_tyields() -> pd.DataFrame:
     """
-    file_dir = os.path.join(data_dir, "bbg")
-    file = os.path.join(file_dir, "raw_tyields.pkl")
-    if os.path.exists(file) and not override_download:
-        print("Loading local treasury yield data.")
-        df = pd.read_pickle(file)
-    else:
-        print("Fetching treasury yield data from Bloomberg")
-        TODAY = pd.to_datetime("today").normalize() - timedelta(days=1)
-        months = [1, 2, 3, 4, 6, 12]
-        years = [2, 3, 5, 7, 10, 20, 30]
-        t_list = [f"GB{x} Govt" for x in months] + [f"GT{x} Govt" for x in years]
-        try:
-            df = blp.bdh(
-                tickers=t_list,
-                flds=[
-                    "PX_LAST",
-                ],
-                start_date="2000-01-01",
-                end_date=TODAY,
-            )
-        except Exception as e:
-            print("Failed Bloomberg data pull.  See error below.")
-            raise e
-        df = df.rename(columns={"GB12 Govt": "GT1 Govt"})
-        if not os.path.exists(file_dir):
-            os.makedirs(file_dir)
-        df.to_pickle(file)
+    Pull raw Treasury yields from Bloomberg.
+
+    Returns
+    - pd.DataFrame: MultiIndex columns by ticker with daily PX_LAST values.
+    """
+    today = pd.to_datetime("today").normalize() - timedelta(days=1)
+    months = [1, 2, 3, 4, 6, 12]
+    years = [2, 3, 5, 7, 10, 20, 30]
+    tickers = [f"GB{x} Govt" for x in months] + [f"GT{x} Govt" for x in years]
+    df = blp.bdh(
+        tickers=tickers, flds=["PX_LAST"], start_date="2000-01-01", end_date=today
+    )
+    # Align the former 12M bill series name with 1Y convention
+    df = df.rename(columns={"GB12 Govt": "GT1 Govt"})
     return df
 
 
-def pull_raw_syields(override_download=False):
-    """Pull raw swap yield data
-
-    :param override_download: If set to True, downloaded data is ignored
-    :type override_download: bool, default = False
-
-    :return: Raw swap yield data
-    :rtype: pd.DataFrame
+def pull_raw_syields() -> pd.DataFrame:
     """
-    file_dir = os.path.join(data_dir, "bbg")
-    file = os.path.join(file_dir, "raw_syields.pkl")
-    if os.path.exists(file) and not override_download:
-        print("Loading local swap yield data.")
-        df = pd.read_pickle(file)
-    else:
-        print("Fetching swap yield data from Bloomberg")
-        TODAY = pd.to_datetime("today").normalize() - timedelta(days=1)
-        years = [1, 2, 3, 5, 10, 20, 30]
-        swap_list = [f"USSO{x} CMPN Curncy" for x in years]
-        try:
-            df = blp.bdh(
-                tickers=swap_list,
-                flds=[
-                    "PX_LAST",
-                ],
-                start_date="2000-01-01",
-                end_date=TODAY,
-            )
-        except Exception as e:
-            print("Failed Bloomberg data pull. See error below.")
-            raise e
-        if not os.path.exists(file_dir):
-            os.makedirs(file_dir)
-        df.to_pickle(file)
+    Pull raw Swap yields from Bloomberg.
+
+    Returns
+    - pd.DataFrame: MultiIndex columns by ticker with daily PX_LAST values.
+    """
+    today = pd.to_datetime("today").normalize() - timedelta(days=1)
+    years = [1, 2, 3, 5, 10, 20, 30]
+    tickers = [f"USSO{x} CMPN Curncy" for x in years]
+    df = blp.bdh(
+        tickers=tickers, flds=["PX_LAST"], start_date="2000-01-01", end_date=today
+    )
     return df
 
 
-def clean_raw_tyields(raw_df, override=False, save_data=True):
-    """Cleans treasury yield data
-
-    :param raw_df: Data Frame to clean
-    :type raw_df: pd.DataFrame
-    :param override: If set to True, downloaded data is ignored
-    :type override: bool, default = False
-    :type save_data: bool, default = True
-
-    :return: Cleaned treasury yield data frame
-    :rtype: pd.DataFrame
+def clean_raw_tyields(raw_df: pd.DataFrame) -> pd.DataFrame:
     """
-    if save_data:
-        file_dir = os.path.join(data_dir, "bbg")
-        file = os.path.join(file_dir, "tyields.pkl")
-        if os.path.exists(file) and not override:
-            print("Loading local cleaned treasury yield data.")
-            df = pd.read_pickle(file)
-        else:
-            df = raw_df.apply(pd.to_numeric, errors="coerce")
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
-            df.to_pickle(file)
-    else:
-        df = raw_df.apply(pd.to_numeric, errors="coerce")
-    return df
+    Clean Treasury yields by coercing numeric dtypes.
 
+    Parameters
+    - raw_df (pd.DataFrame): Raw Treasury yields.
 
-def clean_raw_syields(raw_df, override=False, save_data=True):
-    """Cleans swap yield data
-
-    :param raw_df: Data Frame to clean
-    :type raw_df: pd.DataFrame
-    :param override: If set to True, downloaded data is ignored
-    :type override: bool, default = False
-    :type save_data: bool, default = True
-
-    :return: Cleaned swap yield data frame
-    :rtype: pd.DataFrame
+    Returns
+    - pd.DataFrame: Cleaned Treasury yields.
     """
-    if save_data:
-        file_dir = os.path.join(data_dir, "bbg")
-        file = os.path.join(file_dir, "syields.pkl")
-        if os.path.exists(file) and not override:
-            print("Loading local cleaned swap yield data.")
-            df = pd.read_pickle(file)
-        else:
-            df = raw_df.apply(pd.to_numeric, errors="coerce")
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
-
-            df.to_pickle(file)
-    else:
-        df = raw_df.apply(pd.to_numeric, errors="coerce")
-    return df
+    return raw_df.apply(pd.to_numeric, errors="coerce")
 
 
-def bloom_main():
-    """Main function which pulls data and cleans it
-
-    :return: Cleaned treasury yield and swap yield data frame
-    :rtype: pd.DataFrame
+def clean_raw_syields(raw_df: pd.DataFrame) -> pd.DataFrame:
     """
+    Clean Swap yields by coercing numeric dtypes.
 
-    tyields = clean_raw_tyields(pull_raw_tyields())
+    Parameters
+    - raw_df (pd.DataFrame): Raw Swap yields.
 
-    syields = clean_raw_syields(pull_raw_syields())
+    Returns
+    - pd.DataFrame: Cleaned Swap yields.
+    """
+    return raw_df.apply(pd.to_numeric, errors="coerce")
 
-    return tyields, syields
+
+def load_raw_tyields(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    """
+    Load raw Treasury yields from disk.
+
+    Parameters
+    - data_dir (Path): Base data directory.
+
+    Returns
+    - pd.DataFrame: Raw Treasury yields.
+    """
+    return pd.read_parquet(data_dir / "raw_tyields.parquet")
+
+
+def load_raw_syields(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    """
+    Load raw Swap yields from disk.
+
+    Parameters
+    - data_dir (Path): Base data directory.
+
+    Returns
+    - pd.DataFrame: Raw Swap yields.
+    """
+    return pd.read_parquet(data_dir / "raw_syields.parquet")
+
+
+def load_tyields(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    """
+    Load cleaned Treasury yields from disk.
+
+    Parameters
+    - data_dir (Path): Base data directory.
+
+    Returns
+    - pd.DataFrame: Cleaned Treasury yields.
+    """
+    return pd.read_parquet(data_dir / "tyields.parquet")
+
+
+def load_syields(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    """
+    Load cleaned Swap yields from disk.
+
+    Parameters
+    - data_dir (Path): Base data directory.
+
+    Returns
+    - pd.DataFrame: Cleaned Swap yields.
+    """
+    return pd.read_parquet(data_dir / "syields.parquet")
 
 
 if __name__ == "__main__":
-    bloom_main()
+    # Pull, clean, and save to Parquet
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    raw_t = pull_raw_tyields()
+    raw_s = pull_raw_syields()
+
+    # Save raw
+    raw_t.to_parquet(DATA_DIR / "raw_tyields.parquet")
+    raw_s.to_parquet(DATA_DIR / "raw_syields.parquet")
+
+    # Clean and save
+    t_clean = clean_raw_tyields(raw_t)
+    s_clean = clean_raw_syields(raw_s)
+    t_clean.to_parquet(DATA_DIR / "tyields.parquet")
+    s_clean.to_parquet(DATA_DIR / "syields.parquet")

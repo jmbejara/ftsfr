@@ -3,10 +3,9 @@ Tests functions in pull_bbg_treas_swap responsible for the raw and clean data.
 """
 
 import pandas as pd
-import os
+from pathlib import Path
 import pull_bbg_treas_swap
 import numpy as np
-from pathlib import Path
 from settings import config
 
 data_dir = Path(config("DATA_DIR"))
@@ -22,10 +21,7 @@ def test_pull_raw_tyields():
     df = pull_bbg_treas_swap.pull_raw_tyields()
     colu = [a for a, _ in df.columns]
     assert colu == t_list
-
-    file_dir = os.path.join(data_dir, "bbg")
-    file = os.path.join(file_dir, "raw_tyields.pkl")
-    assert os.path.exists(file)
+    # Pull does not save to disk; saving is handled in the module's __main__
 
 
 def test_pull_raw_syields():
@@ -37,10 +33,7 @@ def test_pull_raw_syields():
     df = pull_bbg_treas_swap.pull_raw_syields()
     colu = [a for a, _ in df.columns]
     assert colu == swap_list
-
-    file_dir = os.path.join(data_dir, "bbg")
-    file = os.path.join(file_dir, "raw_syields.pkl")
-    assert os.path.exists(file)
+    # Pull does not save to disk; saving is handled in the module's __main__
 
 
 def test_clean_raw_tyields():
@@ -55,7 +48,7 @@ def test_clean_raw_tyields():
     test_df["test3"] = ["1.3", "9.01", "3.62"]
     test_df["test4"] = ["sesdf", "teststr", "fakenews"]
     test_len = len(test_df)
-    test_df = pull_bbg_treas_swap.clean_raw_tyields(test_df, override=False, save_data=False)
+    test_df = pull_bbg_treas_swap.clean_raw_tyields(test_df)
     assert ((test_df.dtypes == np.int64) | (test_df.dtypes == np.float64)).all()
 
     assert len(test_df) == test_len
@@ -73,7 +66,7 @@ def test_clean_raw_syields():
     test_df["test3"] = ["1.3", "9.01", "3.62"]
     test_df["test4"] = ["sesdf", "teststr", "fakenews"]
     test_len = len(test_df)
-    test_df = pull_bbg_treas_swap.clean_raw_syields(test_df, override=False, save_data=False)
+    test_df = pull_bbg_treas_swap.clean_raw_syields(test_df)
     assert ((test_df.dtypes == np.int64) | (test_df.dtypes == np.float64)).all()
 
     assert len(test_df) == test_len
