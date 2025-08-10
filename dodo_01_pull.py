@@ -21,6 +21,8 @@ from dodo_common import (
     load_all_module_requirements,
 )
 
+from dependency_tracker import get_docs_task_dependencies
+
 # Load configuration
 subscriptions_toml = load_subscriptions()
 data_sources = subscriptions_toml["data_sources"].copy()
@@ -866,22 +868,7 @@ def task_compile_sphinx_docs():
         """Touch a file"""
         Path("./docs/.nojekyll").touch()
 
-    # Task dependencies on the format tasks that now contain the notebooks
-    task_deps = []
-    if module_requirements.get("cds_bond_basis", False):
-        task_deps.append("format:summary_cds_bond_basis_ipynb")
-    if module_requirements.get("cds_returns", False):
-        task_deps.append("format:summary_cds_returns_ipynb")
-    if module_requirements.get("cip", False):
-        task_deps.append("format:summary_cip_ipynb")
-    if module_requirements.get("corp_bond_returns", False):
-        task_deps.append("format:summary_corp_bond_returns_ipynb")
-    if module_requirements.get("us_treasury_returns", False):
-        task_deps.append("format:summary_treasury_bond_returns_ipynb")
-    if module_requirements.get("basis_treas_swap", False):
-        task_deps.append("format:basis_treas_swap_overview")
-    if module_requirements.get("basis_treas_sf", False):
-        task_deps.append("format:basis_treas_sf_notebook")
+    task_deps = get_docs_task_dependencies(module_requirements)
 
     return {
         "actions": [

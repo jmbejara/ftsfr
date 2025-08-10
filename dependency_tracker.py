@@ -147,3 +147,33 @@ def get_format_task_name(module_name):
     }
 
     return task_name_mapping.get(module_name, module_name)
+
+
+def get_docs_task_dependencies(module_requirements):
+    """
+    Return a list of documentation-related task dependencies based on available modules.
+
+    This consolidates the mapping between data modules and the corresponding
+    notebook tasks that should be built before compiling documentation.
+
+    Args:
+        module_requirements: Dict mapping module names to boolean availability
+
+    Returns:
+        List of task dependency strings (e.g., "format:summary_cip_ipynb")
+    """
+    docs_task_by_module = {
+        "cds_bond_basis": "format:summary_cds_bond_basis_ipynb",
+        "cds_returns": "format:summary_cds_returns_ipynb",
+        "cip": "format:summary_cip_ipynb",
+        "corp_bond_returns": "format:summary_corp_bond_returns_ipynb",
+        "us_treasury_returns": "format:summary_treasury_bond_returns_ipynb",
+        "basis_treas_swap": "format:basis_treas_swap_overview",
+        "basis_treas_sf": "format:basis_treas_sf_notebook",
+    }
+
+    return [
+        task_name
+        for module_name, task_name in docs_task_by_module.items()
+        if module_requirements.get(module_name, False)
+    ]
