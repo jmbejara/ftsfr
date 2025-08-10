@@ -14,6 +14,9 @@ What follows:
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
+from IPython.display import display
+import sys
+import asyncio
 
 from settings import config
 from calc_treasury_data import load_treasury_sf_output
@@ -21,6 +24,13 @@ import load_bases_data
 
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
+
+# Ensure Windows uses a selector event loop to avoid ZMQ RuntimeWarning during nbconvert
+if sys.platform.startswith("win"):
+    try:
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    except Exception:
+        pass
 
 DATA_DIR = DATA_DIR / "basis_treas_sf"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -44,7 +54,13 @@ ax.grid(True)
 fig = ax.get_figure()
 plot_path = OUTPUT_DIR / "treasury_sf_basis_ours.png"
 fig.savefig(plot_path, dpi=300, bbox_inches="tight")
-plt.show()
+# Provide accessible alt text for the rendered figure
+display(
+    fig,
+    metadata={
+        "image/alt": "Treasury Spot-Futures Basis (project output) time series for 2Y, 5Y, 10Y, 20Y, 30Y tenors in basis points."
+    },
+)
 
 # %%
 df_ref = load_bases_data.load_combined_spreads_wide(
@@ -83,7 +99,13 @@ plt.xlabel("")
 plt.tight_layout()
 plot_path = OUTPUT_DIR / "treasury_sf_basis_overlay_siriwardane.png"
 fig.savefig(plot_path, dpi=300, bbox_inches="tight")
-plt.show()
+# Provide accessible alt text for the overlay figure
+display(
+    fig,
+    metadata={
+        "image/alt": "Overlay of Treasury Spot-Futures Basis: this project vs. Siriwardane et al., by tenor (2Y, 5Y, 10Y, 20Y, 30Y)."
+    },
+)
 
 # %%
 """

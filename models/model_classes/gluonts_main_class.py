@@ -170,7 +170,6 @@ class GluontsMain(forecasting_model):
 
     @common_error_catch
     def save_model(self):
-
         self.model.serialize(self.model_path)
         GluontsMain_logger.info('Model saved to "' + str(self.model_path) + '".')
 

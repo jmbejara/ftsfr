@@ -281,7 +281,8 @@ def compute_treasury_output(df_long: pd.DataFrame) -> pd.DataFrame:
             "Treasury_SF_30Y",
         ]
     ].copy()
-    df_final.ffill(inplace=True, limit=5)
+    # Forward fill small gaps and explicitly infer dtypes to avoid pandas downcasting warnings
+    df_final = df_final.ffill(limit=5).infer_objects(copy=False)
 
     return df_final
 
