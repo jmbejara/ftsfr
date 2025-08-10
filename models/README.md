@@ -343,7 +343,7 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="utah-fs"
 
 ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP} "mkdir -p ~/${FS_FOLDER}/ftsfr"
-rsync -avzh --progress --delete --exclude='_output/' --exclude='.pixi/' -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
+rsync -avzh --progress --delete --exclude='_output/' --exclude='.pixi/' --exclude="./models/lightning_logs/" -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
 ```
 
 To Connect via SSH:

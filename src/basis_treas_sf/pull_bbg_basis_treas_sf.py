@@ -1,22 +1,26 @@
 """
 pull_bbg_basis_treas_sf.py
 
-Pull USD OIS term structure from Bloomberg via xbbg and materialize an
-Excel file compatible with `clean_treas_sf_excel.py`.
+Pull USD OIS term structure and Treasury futures inputs from Bloomberg via xbbg,
+and write standardized parquet files used downstream by `calc_treasury_data.py`.
+
+Outputs (saved under DATA_DIR/basis_treas_sf):
+- ois.parquet: Date + OIS tenors (1W, 1M, 3M, 6M, 1Y)
+- treasury_df.parquet: Date + per-tenor columns for near (1) and deferred (2)
+  contracts: Implied_Repo_v_<tenor>, Vol_v_<tenor>, Contract_v_<tenor>, Price_v_<tenor>
+- last_day.parquet: Mapping of (Mat_Year, Mat_Month) -> Mat_Day (last calendar day)
 
 Notes
 -----
-- This script only handles OIS. The Treasury spot-futures inputs remain
-  sourced from the manually maintained Excel referenced by
-  `clean_treas_sf_excel.py`.
-- No printing to stdout to keep scripts quiet, per project style guide.
+- No printing to stdout per project style guide.
+- Replaces prior reliance on a manual Excel file.
 """
 
 from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import List
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 from xbbg import blp
@@ -25,16 +29,13 @@ from settings import config
 
 
 # Configuration via settings.py
-MANUAL_DATA_DIR: Path = config("MANUAL_DATA_DIR")
+DATA_DIR: Path = config("DATA_DIR")
 START_DATE: str = config("START_DATE", default="2004-01-01")
 END_DATE: str = config("END_DATE", default=str(date.today()))
 
 
 def ois_tickers() -> List[str]:
-    """Bloomberg tickers for USD OIS curve used downstream.
-
-    Matches the mapping expected in `clean_treas_sf_excel.py`.
-    """
+    """Bloomberg tickers for USD OIS curve used downstream."""
     return [
         "USSO1Z CMPN Curncy",  # 1W
         "USSOA CMPN Curncy",  # 1M
@@ -42,86 +43,202 @@ def ois_tickers() -> List[str]:
         "USSOC CMPN Curncy",  # 3M
         "USSOF CMPN Curncy",  # 6M
         "USSO1 CMPN Curncy",  # 1Y
-        "USSO2 CMPN Curncy",  # 2Y
-        "USSO3 CMPN Curncy",  # 3Y
-        "USSO4 CMPN Curncy",  # 4Y
-        "USSO5 CMPN Curncy",  # 5Y
-        "USSO7 CMPN Curncy",  # 7Y
-        "USSO10 CMPN Curncy",  # 10Y
-        "USSO15 CMPN Curncy",  # 15Y
-        "USSO20 CMPN Curncy",  # 20Y
-        "USSO30 CMPN Curncy",  # 30Y
     ]
 
 
 def pull_ois_history(start_date: str = START_DATE, end_date: str = END_DATE) -> pd.DataFrame:
     """Fetch historical USD OIS levels (PX_LAST) from Bloomberg via xbbg.
 
-    Returns a DataFrame with columns ["Date", <tickers...>] where tickers are
-    the Bloomberg composite OIS mnemonics used by the cleaning script.
+    Returns Date + ticker columns. Consumers rename to compact labels later.
     """
     tickers = ois_tickers()
     df = blp.bdh(tickers=tickers, flds=["PX_LAST"], start_date=start_date, end_date=end_date)
 
-    # Drop the field-level in the MultiIndex columns, yielding tickers-only columns
     if isinstance(df.columns, pd.MultiIndex) and df.columns.nlevels == 2:
         df.columns = df.columns.droplevel(level=1)
 
     df = df.reset_index().rename(columns={"index": "Date", "date": "Date"})
-    # Ensure Date is datetime (no tz)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)
-    # Columns in desired order: Date then tickers
     df = df[["Date", *tickers]]
     return df
 
 
-def write_bloomberg_style_excel_for_ois(df: pd.DataFrame, excel_path: Path) -> None:
-    """Write an Excel file shaped like a typical Bloomberg export that the
-    existing cleaning script expects to read and post-process.
+def _first_available_field(
+    ticker: str, candidates: Iterable[str], start_date: str, end_date: str
+) -> Optional[str]:
+    """Return the first Bloomberg field that yields data for the given ticker."""
+    for fld in candidates:
+        try:
+            df = blp.bdh(tickers=[ticker], flds=[fld], start_date=start_date, end_date=end_date)
+            if df is None or df.empty:
+                continue
+            series = df.droplevel(1, axis=1) if isinstance(df.columns, pd.MultiIndex) else df
+            if series.iloc[:, 0].notna().any():
+                return fld
+        except Exception:
+            continue
+    return None
 
-    The shape satisfies the operations in `clean_treas_sf_excel.py`:
-    - Drop first 4 columns
-    - Drop top 3 rows
-    - Drop rows with index 1 and 2 (post-reset)
-    - Use row 0 as header ("Date" plus tickers)
-    - Data starts after that
+
+def futures_ticker_map() -> Dict[int, Tuple[str, str]]:
+    """Map tenor (years) to (near, deferred) generic Bloomberg futures tickers."""
+    mapping: Dict[int, Tuple[str, str]] = {
+        2: ("TU1 Comdty", "TU2 Comdty"),
+        5: ("FV1 Comdty", "FV2 Comdty"),
+        10: ("TY1 Comdty", "TY2 Comdty"),
+        30: ("US1 Comdty", "US2 Comdty"),
+        # Optional proxy for 20Y: Ultra 10y (TN). Keep guarded; may be sparse.
+        20: ("TN1 Comdty", "TN2 Comdty"),
+    }
+    return mapping
+
+
+def _quarter_contract_label(dt: pd.Timestamp, offset_quarters: int = 0) -> str:
+    """Return a contract label like 'DEC 21' for the given date plus offset."""
+    q_months = [3, 6, 9, 12]
+    y, m = dt.year, dt.month
+    next_month = next((qm for qm in q_months if qm > m), None)
+    if next_month is None:
+        next_month = 3
+        y += 1
+    total_quarters = q_months.index(next_month) + offset_quarters
+    y += total_quarters // 4
+    m_idx = total_quarters % 4
+    month = q_months[m_idx]
+    month_abbr = {3: "MAR", 6: "JUN", 9: "SEP", 12: "DEC"}[month]
+    yy = y % 100
+    return f"{month_abbr} {yy:02d}"
+
+
+def pull_futures_history(start_date: str = START_DATE, end_date: str = END_DATE) -> pd.DataFrame:
+    """Fetch Treasury futures inputs needed downstream.
+
+    For each tenor and for near (1) and deferred (2) generic contracts, pull:
+    - Price (PX_LAST)
+    - Volume (VOLUME)
+    - Implied Repo (first available among common field names)
     """
-    tickers = [c for c in df.columns if c != "Date"]
+    tenor_to_tickers = futures_ticker_map()
 
-    # Build padded rows matching the expected Bloomberg-like layout
-    left_pad_cols = 4
+    sample_ticker = next(iter(tenor_to_tickers.values()))[0]
+    implied_repo_field = _first_available_field(
+        sample_ticker,
+        candidates=["IMPL_REPO", "IMP_REPO", "IMPLIED_REPO", "FUT_IMP_REPO", "IRR"],
+        start_date=start_date,
+        end_date=end_date,
+    )
 
-    # 3 top rows to be discarded entirely
-    top_pad = [["" for _ in range(left_pad_cols + 1 + len(tickers))] for _ in range(3)]
+    frames: List[pd.DataFrame] = []
+    for tenor, (near_tkr, def_tkr) in tenor_to_tickers.items():
+        # Price
+        px = blp.bdh(
+            tickers=[near_tkr, def_tkr],
+            flds=["PX_LAST"],
+            start_date=start_date,
+            end_date=end_date,
+        )
+        if isinstance(px.columns, pd.MultiIndex):
+            px = px.droplevel(1, axis=1)
+        px = px.reset_index().rename(columns={"index": "Date", "date": "Date"})
+        px.columns = ["Date", f"Price_1_{tenor}", f"Price_2_{tenor}"]
 
-    # Header row: Date + tickers
-    header_row = ["" for _ in range(left_pad_cols)] + ["Date", *tickers]
+        # Volume
+        vol = blp.bdh(
+            tickers=[near_tkr, def_tkr],
+            flds=["VOLUME"],
+            start_date=start_date,
+            end_date=end_date,
+        )
+        if isinstance(vol.columns, pd.MultiIndex):
+            vol = vol.droplevel(1, axis=1)
+        vol = vol.reset_index().rename(columns={"index": "Date", "date": "Date"})
+        vol.columns = ["Date", f"Vol_1_{tenor}", f"Vol_2_{tenor}"]
 
-    # 2 additional rows often present in BBG exports (fld desc / currency)
-    # We insert blank rows that will be dropped by the cleaning script
-    drop_rows_after_header = [["" for _ in range(left_pad_cols + 1 + len(tickers))] for _ in range(2)]
+        # Implied Repo (optional)
+        if implied_repo_field is not None:
+            irr = blp.bdh(
+                tickers=[near_tkr, def_tkr],
+                flds=[implied_repo_field],
+                start_date=start_date,
+                end_date=end_date,
+            )
+            if isinstance(irr.columns, pd.MultiIndex):
+                irr = irr.droplevel(1, axis=1)
+            irr = irr.reset_index().rename(columns={"index": "Date", "date": "Date"})
+            irr.columns = ["Date", f"Implied_Repo_1_{tenor}", f"Implied_Repo_2_{tenor}"]
+        else:
+            irr = px[["Date"]].copy()
+            irr[f"Implied_Repo_1_{tenor}"] = pd.NA
+            irr[f"Implied_Repo_2_{tenor}"] = pd.NA
 
-    # Actual data rows
-    data_rows: List[List[object]] = []
-    for _, row in df.iterrows():
-        data_rows.append([
-            *(["" for _ in range(left_pad_cols)]),
-            row["Date"],
-            *[row[t] for t in tickers],
-        ])
+        # Merge on Date
+        df = px.merge(vol, on="Date", how="outer").merge(irr, on="Date", how="outer")
+        frames.append(df)
 
-    # Combine all parts
-    full_rows = top_pad + [header_row] + drop_rows_after_header + data_rows
-    sheet_df = pd.DataFrame(full_rows)
+    # Combine all tenors on Date
+    from functools import reduce
 
-    excel_path.parent.mkdir(parents=True, exist_ok=True)
-    with pd.ExcelWriter(excel_path, engine="xlsxwriter") as writer:
-        sheet_df.to_excel(writer, index=False, header=False)
+    treasury_df = reduce(lambda a, b: a.merge(b, on="Date", how="outer"), frames)
+    treasury_df.sort_values("Date", inplace=True)
+    treasury_df.reset_index(drop=True, inplace=True)
+
+    # Add Contract columns derived from Date (quarter cycle)
+    for v, offset in [(1, 0), (2, 1)]:
+        contracts = treasury_df["Date"].apply(lambda dt: _quarter_contract_label(pd.to_datetime(dt), offset_quarters=offset))
+        for tenor in tenor_to_tickers.keys():
+            treasury_df[f"Contract_{v}_{tenor}"] = contracts
+
+    return treasury_df
+
+
+def rename_ois_columns(df_ois: pd.DataFrame) -> pd.DataFrame:
+    """Rename Bloomberg OIS tickers to compact labels expected downstream."""
+    rename_map = {
+        "USSO1Z CMPN Curncy": "OIS_1W",
+        "USSOA CMPN Curncy": "OIS_1M",
+        "USSOC CMPN Curncy": "OIS_3M",
+        "USSOF CMPN Curncy": "OIS_6M",
+        "USSO1 CMPN Curncy": "OIS_1Y",
+    }
+    df = df_ois.copy()
+    df.columns = [c if c not in rename_map else rename_map[c] for c in df.columns]
+    return df
+
+
+def build_last_day_mapping_from_dates(dates: pd.Series) -> pd.DataFrame:
+    """Construct (Mat_Year, Mat_Month) -> Mat_Day mapping as last calendar day."""
+    df_dates = pd.DataFrame({"Date": pd.to_datetime(dates)})
+    df_dates["Mat_Month"] = df_dates["Date"].dt.month
+    df_dates["Mat_Year"] = df_dates["Date"].dt.year
+    df_dates = df_dates.sort_values("Date").drop_duplicates(["Mat_Year", "Mat_Month"], keep="last")
+    df_dates["Mat_Day"] = df_dates["Date"].dt.day
+    return df_dates[["Date", "Mat_Month", "Mat_Year", "Mat_Day"]].reset_index(drop=True)
+
+
+def load_ois(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / "ois.parquet")
+
+
+def load_treasury_df(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / "treasury_df.parquet")
+
+
+def load_last_day(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / "last_day.parquet")
 
 
 if __name__ == "__main__":
+    module_dir = DATA_DIR / "basis_treas_sf"
+    module_dir.mkdir(parents=True, exist_ok=True)
+
     ois = pull_ois_history()
-    out_path = Path(MANUAL_DATA_DIR) / "OIS.xlsx"
-    write_bloomberg_style_excel_for_ois(ois, out_path)
+    ois = rename_ois_columns(ois)
+    ois.to_parquet(module_dir / "ois.parquet", index=False)
+
+    tre = pull_futures_history()
+    tre.to_parquet(module_dir / "treasury_df.parquet", index=False)
+
+    last_day = build_last_day_mapping_from_dates(tre["Date"])
+    last_day.to_parquet(module_dir / "last_day.parquet", index=False)
 
 

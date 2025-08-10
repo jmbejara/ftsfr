@@ -112,15 +112,13 @@ def task_pull():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_bbg_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/clean_treas_sf_excel.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "treasury_df.csv",
-                DATA_DIR / data_module / "ois_df.csv",
-                DATA_DIR / data_module / "last_day_df.csv",
+                DATA_DIR / data_module / "treasury_df.parquet",
+                DATA_DIR / data_module / "ois.parquet",
+                DATA_DIR / data_module / "last_day.parquet",
             ],
             "file_dep": [
-                f"./src/{data_module}/clean_treas_sf_excel.py",
                 f"./src/{data_module}/pull_bbg_basis_treas_sf.py",
             ],
             "clean": [],
@@ -442,12 +440,12 @@ def task_format():
                 "python ./src/basis_treas_sf/calc_treasury_data.py",
             ],
             "targets": [
-                DATA_DIR / "treasury_sf_output.csv",
+                DATA_DIR / data_module / "treasury_sf_output.csv",
             ],
             "file_dep": [
-                DATA_DIR / "treasury_df.csv",
-                DATA_DIR / "ois_df.csv",
-                DATA_DIR / "last_day_df.csv",
+                DATA_DIR / data_module / "treasury_df.parquet",
+                DATA_DIR / data_module / "ois.parquet",
+                DATA_DIR / data_module / "last_day.parquet",
                 "./src/basis_treas_sf/calc_treasury_data.py",
             ],
             "clean": [],

@@ -90,9 +90,9 @@ plt.show()
 ### How the Treasury spot-futures basis is computed (summary)
 
 Inputs loaded in `calc_treasury_data.py`:
-- `treasury_df.csv`: contract strings, implied repo rates, volumes, prices for near/deferred contracts.
-- `ois_df.csv`: USD OIS tenors (1W, 1M, 3M, 6M, 1Y).
-- `last_day_df.csv`: month/year → settlement day mapping for futures.
+- `treasury_df.parquet`: contract strings, implied repo rates, volumes, prices for near/deferred contracts.
+- `ois.parquet`: USD OIS tenors (1W, 1M, 3M, 6M, 1Y).
+- `last_day.parquet`: month/year → settlement day mapping for futures.
 
 Computation outline:
 - Parse contract strings (e.g., "DEC 21") to month/year; merge settlement day; build a maturity date and compute TTM in days for each contract.

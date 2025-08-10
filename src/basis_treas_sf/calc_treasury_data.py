@@ -329,14 +329,16 @@ def load_treasury_sf_output(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    # Read inputs from disk
-    treasury_file = DATA_DIR / "treasury_df.csv"
-    ois_file = DATA_DIR / "ois_df.csv"
-    last_day_file = DATA_DIR / "last_day_df.csv"
+    treasury_file = DATA_DIR / "treasury_df.parquet"
+    ois_file = DATA_DIR / "ois.parquet"
+    last_day_file = DATA_DIR / "last_day.parquet"
 
-    treasury_df = pd.read_csv(treasury_file)
-    ois_df = pd.read_csv(ois_file)
-    last_day_df = pd.read_csv(last_day_file)
+    treasury_df = pd.read_parquet(treasury_file)
+    ois_df = pd.read_parquet(ois_file)
+    # Ensure expected OIS columns exist (in case longer-tenor columns were included)
+    keep_cols = [c for c in ois_df.columns if c in ["Date", "OIS_1W", "OIS_1M", "OIS_3M", "OIS_6M", "OIS_1Y"]]
+    ois_df = ois_df[keep_cols]
+    last_day_df = pd.read_parquet(last_day_file)
 
     # Compute
     df_long = compute_treasury_long(treasury_df, ois_df, last_day_df)
