@@ -1,0 +1,269 @@
+# Models Configuration File V2
+# This file defines all available forecasting models and their parameters
+# Dataset-specific parameters (frequency, seasonality, test_split) are now in datasets_config.toml
+
+# Local Darts Models (univariate, per-series training)
+
+[arima]
+class = "DartsLocal"
+estimator_class = "darts.models.ARIMA"
+display_name = "ARIMA"
+estimator_params = { p = 1, d = 1, q = 1 }
+
+[auto_arima]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoARIMA"
+display_name = "AutoARIMA"
+# season_length will be set from dataset config
+
+[auto_ces]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoCES"
+display_name = "AutoCES"
+# season_length will be set from dataset config
+
+[auto_ets]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoETS"
+display_name = "AutoETS"
+# season_length will be set from dataset config
+
+[auto_mfles]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoMFLES"
+display_name = "AutoMFLES"
+estimator_params = { test_size = 1 }
+# season_length will be set from dataset config
+
+[auto_tbats]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoTBATS"
+display_name = "AutoTBATS"
+# season_length will be set from dataset config
+
+[auto_theta]
+class = "DartsLocal"
+estimator_class = "darts.models.AutoTheta"
+display_name = "AutoTheta"
+# season_length will be set from dataset config
+
+[ets]
+class = "DartsLocal"
+estimator_class = "darts.models.ExponentialSmoothing"
+display_name = "Exponential Smoothing"
+imports = ["from darts.utils.utils import ModelMode, SeasonalityMode"]
+estimator_params = { trend = "ModelMode.ADDITIVE", seasonal = "SeasonalityMode.NONE" }
+
+[naive_drift]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveDrift"
+display_name = "NaiveDrift"
+estimator_params = {}
+
+[naive_mean]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveMean"
+display_name = "NaiveMean"
+estimator_params = {}
+
+[naive_movav]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveMovingAverage"
+display_name = "NaiveMovingAverage"
+# input_chunk_length will be set to seasonality * 4
+
+[naive_seasonal]
+class = "DartsLocal"
+estimator_class = "darts.models.NaiveSeasonal"
+display_name = "NaiveSeasonal"
+# K will be set to seasonality
+
+[pr]
+class = "DartsLocal"
+estimator_class = "darts.models.SKLearnModel"
+display_name = "Pooled Regression"
+imports = ["from sklearn.linear_model import TweedieRegressor"]
+estimator_params = { model = "TweedieRegressor(power=0)", output_chunk_length = 1, multi_models = false }
+# lags will be set to seasonality * 4
+
+[prophet]
+class = "DartsLocal"
+estimator_class = "darts.models.Prophet"
+display_name = "Prophet"
+estimator_params = {}
+
+[ses]
+class = "DartsLocal"
+estimator_class = "darts.models.ExponentialSmoothing"
+display_name = "Simple Exponential Smoothing"
+imports = ["from darts.utils.utils import ModelMode, SeasonalityMode"]
+estimator_params = { trend = "ModelMode.NONE", seasonal = "SeasonalityMode.NONE" }
+
+[tbats]
+class = "DartsLocal"
+estimator_class = "darts.models.TBATS"
+display_name = "TBATS"
+# season_length will be set from dataset config
+
+[theta]
+class = "DartsLocal"
+estimator_class = "darts.models.Theta"
+display_name = "Theta"
+imports = ["from darts.utils.utils import SeasonalityMode"]
+estimator_params = { season_mode = "SeasonalityMode.ADDITIVE" }
+
+# Global Darts Models (multivariate, global training)
+
+[dlinear]
+class = "DartsGlobal"
+estimator_class = "darts.models.DLinearModel"
+display_name = "DLinear"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[global_naive_agg]
+class = "DartsGlobal"
+estimator_class = "darts.models.GlobalNaiveAggregate"
+display_name = "Global Naive Aggregate"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[global_naive_dri]
+class = "DartsGlobal"
+estimator_class = "darts.models.GlobalNaiveDrift"
+display_name = "Global Naive Drift"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[global_naive_sea]
+class = "DartsGlobal"
+estimator_class = "darts.models.GlobalNaiveSeasonal"
+display_name = "Global Naive Seasonal"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[nbeats]
+class = "DartsGlobal"
+estimator_class = "darts.models.NBEATSModel"
+display_name = "N-BEATS"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[nhits]
+class = "DartsGlobal"
+estimator_class = "darts.models.NHiTSModel"
+display_name = "NHiTS"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[nlinear]
+class = "DartsGlobal"
+estimator_class = "darts.models.NLinearModel"
+display_name = "NLinear"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[tide]
+class = "DartsGlobal"
+estimator_class = "darts.models.TiDEModel"
+display_name = "TiDE"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[transformer]
+class = "DartsGlobal"
+estimator_class = "darts.models.TransformerModel"
+display_name = "Transformer"
+scaling = true
+interpolation = true
+f32 = true
+estimator_params = { output_chunk_length = 1 }
+# input_chunk_length will be set to seasonality * 4
+
+[catboost]
+class = "DartsGlobal"
+estimator_class = "darts.models.CatBoostModel"
+display_name = "CatBoost"
+scaling = false
+interpolation = true
+f32 = false
+special_handler = "catboost"  # For GPU/CPU detection
+estimator_params = { output_chunk_length = 1, multi_models = false }
+# lags will be set to seasonality * 4
+
+# Nixtla Models
+
+[autoformer]
+class = "NixtlaMain"
+estimator_class = "neuralforecast.models.Autoformer"
+display_name = "Autoformer"
+estimator_params = { h = 1 }
+# input_size will be set to seasonality * 4
+
+[informer]
+class = "NixtlaMain"
+estimator_class = "neuralforecast.models.Informer"
+display_name = "Informer"
+estimator_params = { h = 1 }
+# input_size will be set to seasonality * 4
+
+# GluonTS Models
+
+[deepar]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.DeepAREstimator"
+display_name = "DeepAR"
+estimator_params = { prediction_length = 1 }
+# freq and context_length will be set from dataset config
+
+[ffnn]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.SimpleFeedForwardEstimator"
+display_name = "FFNN"
+estimator_params = { prediction_length = 1 }
+# context_length will be set to seasonality * 4
+
+[patchtst]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.PatchTSTEstimator"
+display_name = "PatchTST"
+estimator_params = { prediction_length = 1, stride = 4 }
+# patch_len and context_length will be set from dataset config
+
+[wavenet]
+class = "GluontsMain"
+estimator_class = "gluonts.torch.WaveNetEstimator"
+display_name = "WaveNet"
+estimator_params = { prediction_length = 1 }
+# freq will be set from dataset config
+
+# Special Models
+
+[timesfm]
+class = "TimesFM"
+display_name = "TimesFM"
+model_version = "500m"  # or "200m"
