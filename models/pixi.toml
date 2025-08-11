@@ -10,42 +10,38 @@ run-controller = "python model_controller.py"
 test-gpu = "python test_gpu.py"
 
 [feature.gpu]
-system-requirements = {cuda = "11.8"}
+system-requirements = {cuda = "12.8"}
 platforms = ["linux-64"]  # ARM64 not supported due to PyTorch CUDA dependency on Triton
 
 [feature.gpu.pypi-dependencies]
 # Core PyTorch packages with CUDA support
-torch = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu118" }
-torchvision = { version = "==0.18.1", index = "https://download.pytorch.org/whl/cu118" }
-torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cu118" }
+torch = { version = ">=2.3.1", index = "https://download.pytorch.org/whl/cu128" }
+torchvision = { version = ">=0.18.1", index = "https://download.pytorch.org/whl/cu128" }
+torchaudio = { version = ">=2.3.1", index = "https://download.pytorch.org/whl/cu128" }
 lightning = { version = ">=2.3.0" }
 # Forecasting libraries - let pip resolver handle compatible versions
-darts = "*"
 gluonts = "*"
+darts = "*"
 neuralforecast = "*"
-timesfm = "*"
 catboost = "*"
 prophet = "*"
-tensorflow = "==2.15.0"
 
 [feature.cpu.pypi-dependencies]
-torch = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cpu" }
-torchvision = { version = "==0.18.1", index = "https://download.pytorch.org/whl/cpu" }
-torchaudio = { version = "==2.3.1", index = "https://download.pytorch.org/whl/cpu" }
+torch = { version = ">=2.3.1", index = "https://download.pytorch.org/whl/cpu" }
+torchvision = { version = ">=0.18.1", index = "https://download.pytorch.org/whl/cpu" }
+torchaudio = { version = ">=2.3.1", index = "https://download.pytorch.org/whl/cpu" }
 lightning = { version = ">=2.3.0" }
 # Forecasting libraries
-darts = "*"
 gluonts = "*"
+darts = "*"
 neuralforecast = "*"
-timesfm = "*"
 catboost = "*"
 prophet = "*"
-tensorflow = "*"
 
 [dependencies]
-python = "3.11.*"  # TimesFM requires 3.11
+python = "3.11.*"
 pip = "*"
-numpy = ">=1.23,<1.24"
+numpy = "<2.0.0"
 pandas = "*"
 tqdm = "*"
 packaging = "*"
