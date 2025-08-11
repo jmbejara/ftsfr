@@ -15,6 +15,69 @@ from dependency_tracker import (
     load_module_requirements,
 )
 
+# --------------------------------------------------------------------
+# Safer file copy/move behavior for Windows/corporate shares
+# --------------------------------------------------------------------
+# Disable metadata copying that can fail on network drives
+def _noop(*_args, **_kwargs):
+    pass
+
+shutil.copymode = _noop  # used by shutil.copy
+shutil.copystat = _noop  # used by shutil.copy2 / copytree
+shutil.copy2 = shutil.copy  # make copy2 behave like copy (no metadata)
+
+
+def _python_copy_file_command(source_path: Path, destination_path: Path) -> str:
+    """Return a Python command string that safely copies a single file.
+
+    Uses shutil.copyfile (content only) and creates the destination parent directory.
+    """
+    src = str(Path(source_path))
+    dst = str(Path(destination_path))
+    return (
+        "python -c \"import shutil, os; from pathlib import Path; "
+        f"src=r'{src}'; dst=r'{dst}'; "
+        "Path(dst).parent.mkdir(parents=True, exist_ok=True); "
+        "shutil.copyfile(src, dst)\""
+    )
+
+
+def _python_move_file_command(source_path: Path, destination_path: Path) -> str:
+    """Return a Python command string that safely moves a single file.
+
+    Ensures the destination directory exists, then uses shutil.move.
+    shutil.move will internally copy (using our patched behavior) if needed.
+    """
+    src = str(Path(source_path))
+    dst = str(Path(destination_path))
+    return (
+        "python -c \"import shutil; from pathlib import Path; "
+        f"src=r'{src}'; dst=r'{dst}'; "
+        "Path(dst).parent.mkdir(parents=True, exist_ok=True); "
+        "shutil.move(src, dst)\""
+    )
+
+
+def _python_copy_tree_command(dir_path: Path, destination_folder: Path) -> str:
+    """Return a Python command string that safely copies all contents of a directory.
+
+    Recursively creates directories and copies files using shutil.copyfile.
+    """
+    src = str(Path(dir_path))
+    dst = str(Path(destination_folder))
+    code = (
+        "import os, shutil; from pathlib import Path; "
+        f"src=r'{src}'; dst=r'{dst}'; "
+        "Path(dst).mkdir(parents=True, exist_ok=True); "
+        "\nfor root, dirs, files in os.walk(src):\n"
+        "    rel = os.path.relpath(root, src)\n"
+        "    target = os.path.join(dst, rel)\n"
+        "    os.makedirs(target, exist_ok=True)\n"
+        "    for f in files:\n"
+        "        shutil.copyfile(os.path.join(root, f), os.path.join(target, f))\n"
+    )
+    return f'python -c "{code}"'
+
 # Ensure child processes (spawned by tasks) can import modules from `src/`
 _src_path = str((Path(__file__).parent / "src").resolve())
 os.environ["PYTHONPATH"] = _src_path + (
@@ -70,11 +133,7 @@ def mv(from_path, to_path):
     from_path = Path(from_path)
     to_path = Path(to_path)
     to_path.mkdir(parents=True, exist_ok=True)
-    if OS_TYPE == "nix":
-        command = f"mv {from_path} {to_path}"
-    else:
-        command = f"move {from_path} {to_path}"
-    return command
+    return _python_move_file_command(from_path, to_path / from_path.name)
 
 
 def copy_dir_contents_to_folder(dir_path, destination_folder):
@@ -82,11 +141,7 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
     dir_path = Path(dir_path)
     destination_folder = Path(destination_folder)
     destination_folder.mkdir(parents=True, exist_ok=True)
-    if OS_TYPE == "nix":
-        command = f"cp -r {dir_path}/ {destination_folder}"
-    else:
-        command = f"xcopy /E /I {dir_path}/ {destination_folder}"
-    return command
+    return _python_copy_tree_command(dir_path, destination_folder)
 
 
 def notebook_subtask(task_config):
@@ -122,9 +177,7 @@ def notebook_subtask(task_config):
             f"mkdir -p {OUTPUT_DIR}"
             if OS_TYPE == "nix"
             else f"mkdir {OUTPUT_DIR} 2>nul || echo.",
-            f"cp {source_path} {py_path}"
-            if OS_TYPE == "nix"
-            else f"copy {source_path} {py_path}",
+            _python_copy_file_command(source_path, py_path),
         ]
     elif source_path.suffix == ".ipynb":
         normalize_actions = [
@@ -156,14 +209,9 @@ def notebook_subtask(task_config):
         notebook_transfer_cmd = mv(working_notebook, OUTPUT_DIR / "_notebook_build")
     else:
         # For .ipynb sources, preserve the original by copying
-        if OS_TYPE == "nix":
-            notebook_transfer_cmd = (
-                f"cp {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
-            )
-        else:
-            notebook_transfer_cmd = (
-                f"copy {working_notebook} {OUTPUT_DIR / '_notebook_build'}"
-            )
+        notebook_transfer_cmd = _python_copy_file_command(
+            working_notebook, OUTPUT_DIR / "_notebook_build" / working_notebook.name
+        )
 
     # For .py sources, clear outputs before moving; for .ipynb sources, after copying
     clear_output_action = (
