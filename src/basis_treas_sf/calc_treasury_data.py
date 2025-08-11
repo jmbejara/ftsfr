@@ -323,8 +323,8 @@ def save_arbitrage_spread_plots(
 
 def load_treasury_sf_output(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Load the saved Treasury SF output from disk."""
-    path = Path(data_dir) / "treasury_sf_output.csv"
-    df = pd.read_csv(path)
+    path = Path(data_dir) / "treasury_sf_output.parquet"
+    df = pd.read_parquet(path)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)
     return df
 
@@ -353,5 +353,5 @@ if __name__ == "__main__":
 
     # Build final output and save to disk
     df_final = compute_treasury_output(df_long)
-    output_file = DATA_DIR / "treasury_sf_output.csv"
-    df_final.to_csv(output_file, index=False)
+    output_file = DATA_DIR / "treasury_sf_output.parquet"
+    df_final.to_parquet(output_file, index=False)

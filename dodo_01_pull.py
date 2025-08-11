@@ -449,7 +449,7 @@ def task_format():
                 f"python ./src/{data_module}/calc_treasury_data.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "treasury_sf_output.csv",
+                DATA_DIR / data_module / "treasury_sf_output.parquet",
             ],
             "file_dep": [
                 DATA_DIR / data_module / "treasury_df.parquet",
@@ -465,7 +465,7 @@ def task_format():
                 "notebook_path": f"./src/{data_module}/summary_basis_treas_sf_ipynb.py",
                 "file_dep": [
                     f"./src/{data_module}/calc_treasury_data.py",
-                    DATA_DIR / data_module / "treasury_sf_output.csv",
+                    DATA_DIR / data_module / "treasury_sf_output.parquet",
                 ],
                 "targets": [],
             }
