@@ -168,8 +168,9 @@ def get_docs_task_dependencies(module_requirements):
         "cip": "format:summary_cip_ipynb",
         "corp_bond_returns": "format:summary_corp_bond_returns_ipynb",
         "us_treasury_returns": "format:summary_treasury_bond_returns_ipynb",
-        "basis_treas_swap": "format:basis_treas_swap_overview",
-        "basis_treas_sf": "format:basis_treas_sf_notebook",
+        "basis_tips_treas": "format:summary_basis_tips_treas_ipynb",
+        "basis_treas_sf": "format:summary_basis_treas_sf_ipynb",
+        "basis_treas_swap": "format:summary_basis_treas_swap_ipynb",
     }
 
     return [

@@ -461,7 +461,7 @@ def task_format():
         }
         yield from notebook_subtask(
             {
-                "name": "basis_treas_sf_notebook",
+                "name": "summary_basis_treas_sf_ipynb",
                 "notebook_path": f"./src/{data_module}/summary_basis_treas_sf_ipynb.py",
                 "file_dep": [
                     f"./src/{data_module}/calc_treasury_data.py",
@@ -495,7 +495,7 @@ def task_format():
         }
         yield from notebook_subtask(
             {
-                "name": "basis_treas_swap_overview",
+                "name": "summary_basis_treas_swap_ipynb",
                 "notebook_path": f"./src/{data_module}/summary_basis_treas_swap_ipynb.py",
                 "file_dep": [
                     f"./src/{data_module}/pull_bbg_treas_swap.py",
