@@ -36,18 +36,12 @@ pixi shell -e gpu
 
 ### Step 2.1: Using framework-specific Pixi configs
 
-If you want to isolate GPU dependencies per library, use one of the new Pixi TOML files in this directory:
+If you want to isolate GPU dependencies, use one of the two Pixi TOML files in this directory:
 
-- **GluonTS**:  
-  `pixi shell --manifest-path gluonts -e gpu`
-- **Darts**:  
-  `pixi shell --manifest-path darts -e gpu`
-- **Nixtla (NeuralForecast)**:  
-  `pixi shell --manifest-path nixtla -e gpu`
 - **TimesFM**:  
   `pixi shell --manifest-path timesfm -e gpu`
+- All libraries: pixi shell
 
-This is important because it is impossible to create a single Pixi environment that supports all models with GPU support. It's easy to create a single Pixi environment that supports all models with CPU support, but I've found it to be impossible to create a single Pixi environment that supports all models with GPU support. I'm running all of these models on a Lambda Labs H100 node, so I'm using the GPU environment for all models. So, I need to activate a different environment for each model type to ensure that the correct dependencies are installed and that GPU support is available.
 
 ### Step 2.2: Test GPU support
 Before running any models, verify your GPU environments:
