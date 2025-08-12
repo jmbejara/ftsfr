@@ -36,11 +36,107 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import pandas as pd
+import warnings
 
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
 END_DATE = pd.Timestamp.today().strftime("%Y-%m-%d")
+
+
+def _warn_on_sparse_series(
+    df: pd.DataFrame,
+    tickers: list[str],
+    fields: list[str],
+    start_date: str,
+    end_date: str,
+    coverage_threshold: float = 0.7,
+) -> None:
+    """Raise a warning for each series whose non-null coverage is below threshold.
+
+    Coverage is measured over the rows returned between start_date and end_date.
+    The function never raises; it only emits warnings.
+    """
+    # Convert date bounds
+    start_ts = pd.to_datetime(start_date)
+    end_ts = pd.to_datetime(end_date)
+
+    # Determine date vector
+    if "index" in df.columns:
+        date_values = pd.to_datetime(df["index"], errors="coerce")
+    else:
+        # If index is already datetime-like, keep; else coerce
+        if isinstance(df.index, pd.DatetimeIndex):
+            date_values = df.index
+        else:
+            date_values = pd.to_datetime(df.index, errors="coerce")
+
+    # If entirely empty, warn for all expected series
+    if df.shape[0] == 0:
+        for tkr in tickers:
+            for fld in fields:
+                warnings.warn(
+                    f"Bloomberg series returned empty data: ticker='{tkr}', field='{fld}'",
+                    RuntimeWarning,
+                )
+        return
+
+    # Build expected column identifiers for both flattened and MultiIndex cases
+    is_multi = isinstance(df.columns, pd.MultiIndex)
+
+    expected_cols_flat = {f"{t}_{fld}": (t, fld) for t in tickers for fld in fields}
+    expected_cols_multi = {(t, fld): (t, fld) for t in tickers for fld in fields}
+
+    # Mask rows within requested date bounds
+    in_range = (date_values >= start_ts) & (date_values <= end_ts)
+
+    # If no rows within date range, warn for all expected series
+    if in_range.sum() == 0:
+        for tkr in tickers:
+            for fld in fields:
+                warnings.warn(
+                    f"No rows returned in requested date range for ticker='{tkr}', field='{fld}'",
+                    RuntimeWarning,
+                )
+        return
+
+    # Per-series coverage evaluation
+    if is_multi:
+        for key in expected_cols_multi:
+            if key not in df.columns:
+                tkr, fld = key
+                warnings.warn(
+                    f"Bloomberg series missing from result: ticker='{tkr}', field='{fld}'",
+                    RuntimeWarning,
+                )
+                continue
+            series = df.loc[in_range, key]
+            total = series.shape[0]
+            non_null = series.notna().sum()
+            coverage = (non_null / total) if total else 0.0
+            if coverage < coverage_threshold:
+                tkr, fld = key
+                warnings.warn(
+                    f"Low coverage ({coverage:.1%}) for ticker='{tkr}', field='{fld}' between {start_ts.date()} and {end_ts.date()}",
+                    RuntimeWarning,
+                )
+    else:
+        for col_flat, (tkr, fld) in expected_cols_flat.items():
+            if col_flat not in df.columns:
+                warnings.warn(
+                    f"Bloomberg series missing from result: ticker='{tkr}', field='{fld}'",
+                    RuntimeWarning,
+                )
+                continue
+            series = df.loc[in_range, col_flat]
+            total = series.shape[0]
+            non_null = series.notna().sum()
+            coverage = (non_null / total) if total else 0.0
+            if coverage < coverage_threshold:
+                warnings.warn(
+                    f"Low coverage ({coverage:.1%}) for ticker='{tkr}', field='{fld}' between {start_ts.date()} and {end_ts.date()}",
+                    RuntimeWarning,
+                )
 
 
 def pull_commodity_futures(start_date="1950-01-01", end_date=END_DATE):
@@ -178,6 +274,15 @@ def pull_commodity_futures(start_date="1950-01-01", end_date=END_DATE):
         df.columns = [f"{t[0]}_{t[1]}" for t in df.columns]
         df.reset_index(inplace=True)
 
+    # Warn on sparse or missing series (non-fatal)
+    _warn_on_sparse_series(
+        df=df,
+        tickers=commodity_futures_tickers,
+        fields=fields,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
     return df
 
 
@@ -229,6 +334,15 @@ def pull_lme_metals(start_date="1950-01-01", end_date=END_DATE):
         df.columns = [f"{t[0]}_{t[1]}" for t in df.columns]
         df.reset_index(inplace=True)
 
+    # Warn on sparse or missing series (non-fatal)
+    _warn_on_sparse_series(
+        df=df,
+        tickers=lme_metals_tickers,
+        fields=fields,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
     return df
 
 
@@ -257,6 +371,15 @@ def pull_precious_metals_spot(start_date="1950-01-01", end_date=END_DATE):
     if not df.empty and isinstance(df.columns, pd.MultiIndex):
         df.columns = [f"{t[0]}_{t[1]}" for t in df.columns]
         df.reset_index(inplace=True)
+
+    # Warn on sparse or missing series (non-fatal)
+    _warn_on_sparse_series(
+        df=df,
+        tickers=tickers,
+        fields=fields,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
     return df
 
@@ -344,6 +467,15 @@ def pull_gsci_indices(start_date="1950-01-01", end_date=END_DATE):
     if not df.empty and isinstance(df.columns, pd.MultiIndex):
         df.columns = [f"{t[0]}_{t[1]}" for t in df.columns]
         df.reset_index(inplace=True)
+
+    # Warn on sparse or missing series (non-fatal)
+    _warn_on_sparse_series(
+        df=df,
+        tickers=gsci_indices_tickers,
+        fields=fields,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
     return df
 
