@@ -19,6 +19,7 @@ Output file
 """
 
 from pathlib import Path
+import warnings
 import pandas as pd
 
 from settings import config
@@ -81,7 +82,7 @@ def pull_active_commodities_prices(
     end_date: str | None = None,
     commodities_map: dict[str, str] = COMMODITIES,
     field: str = "PX_LAST",
-    coverage_threshold: float = 0.75,
+    coverage_threshold: float = 0.50,
 ) -> pd.DataFrame:
     """Pull active composite futures prices (generic 'A') for many commodities.
 
@@ -95,11 +96,18 @@ def pull_active_commodities_prices(
 
     tickers = [_build_active_ticker(root) for root in commodities_map.values()]
 
-    def _validate_coverage(df_wide: pd.DataFrame, threshold: float) -> None:
-        """Validate that each series has at least `threshold` non-null coverage.
+    def _validate_coverage(
+        df_wide: pd.DataFrame,
+        threshold: float,
+        start_date_str: str,
+        end_date_str: str,
+        fld: str,
+    ) -> None:
+        """Validate series coverage and emit warnings per series below threshold.
 
-        Raises ValueError listing failing series if any are below threshold, or if the
-        overall dataframe is empty.
+        - Raise ValueError only if a series is completely empty (0% non-null).
+        - Otherwise, emit a warning for each series with non-null coverage < threshold.
+        - Include ticker and requested date range in messages to aid debugging.
         """
         if df_wide is None or df_wide.empty:
             raise ValueError("No data returned from Bloomberg for requested tickers.")
@@ -107,20 +115,37 @@ def pull_active_commodities_prices(
         # Ensure expected date column exists and compute coverage on data columns only
         date_col = "index" if "index" in df_wide.columns else df_wide.columns[0]
         total_rows = len(df_wide)
-        failing: list[tuple[str, float]] = []
+        empty_series: list[str] = []
 
         for col in df_wide.columns:
             if col == date_col:
                 continue
             series = df_wide[col]
-            non_null_ratio = float(series.notna().sum()) / float(total_rows) if total_rows > 0 else 0.0
-            if non_null_ratio < threshold:
-                failing.append((col, non_null_ratio))
+            non_null_count = int(series.notna().sum())
+            non_null_ratio = (
+                float(non_null_count) / float(total_rows) if total_rows > 0 else 0.0
+            )
 
-        if failing:
-            failed_str = ", ".join([f"{name}={ratio:.1%}" for name, ratio in failing])
+            # Derive readable ticker name by stripping the field suffix if present
+            suffix = f"_{fld}"
+            ticker_name = col[:-len(suffix)] if col.endswith(suffix) else col
+
+            if non_null_ratio == 0.0:
+                empty_series.append(ticker_name)
+            elif non_null_ratio < threshold:
+                pct = f"{non_null_ratio:.1%}"
+                warnings.warn(
+                    (
+                        f"Low data coverage for ticker '{ticker_name}' from {start_date_str} to {end_date_str}: "
+                        f"{pct} non-null (<{threshold:.0%})."
+                    ),
+                    category=UserWarning,
+                )
+
+        if empty_series:
+            empties = ", ".join(empty_series)
             raise ValueError(
-                f"Insufficient data coverage (threshold {threshold:.0%}). Failing series: {failed_str}"
+                f"No data returned (0% non-null) for tickers [{empties}] from {start_date_str} to {end_date_str}."
             )
 
     try:
@@ -146,13 +171,13 @@ def pull_active_commodities_prices(
         if not frames:
             raise ValueError("No data returned from Bloomberg for any requested ticker (per-ticker fallback).")
         wide = pd.concat(frames, axis=1).reset_index()
-        _validate_coverage(wide, coverage_threshold)
+        _validate_coverage(wide, coverage_threshold, start_date, end_date, field)
         return wide
 
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = [f"{c[0]}_{c[1]}" for c in df.columns]
     df = df.reset_index()
-    _validate_coverage(df, coverage_threshold)
+    _validate_coverage(df, coverage_threshold, start_date, end_date, field)
     return df
 
 

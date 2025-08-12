@@ -24,6 +24,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 from xbbg import blp
+import warnings
 
 from settings import config
 
@@ -32,6 +33,7 @@ from settings import config
 DATA_DIR: Path = config("DATA_DIR")
 START_DATE: str = config("START_DATE", default="2004-01-01")
 END_DATE: str = config("END_DATE", default=str(date.today()))
+MIN_NON_NULL_RATIO: float = 0.5
 
 
 def ois_tickers() -> List[str]:
@@ -64,6 +66,18 @@ def pull_ois_history(
     df = df.reset_index().rename(columns={"index": "Date", "date": "Date"})
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)
     df = df[["Date", *tickers]]
+
+    # Coverage checks per ticker series
+    total_rows = len(df)
+    for tkr in tickers:
+        if tkr in df.columns:
+            non_null_ratio = (df[tkr].notna().sum() / total_rows) if total_rows > 0 else 0.0
+            if non_null_ratio < MIN_NON_NULL_RATIO:
+                warnings.warn(
+                    f"Low data coverage for {tkr} [PX_LAST] from {start_date} to {end_date}: "
+                    f"{non_null_ratio:.1%} non-null",
+                    category=UserWarning,
+                )
     return df
 
 
@@ -149,6 +163,21 @@ def pull_futures_history(
         )
         if isinstance(px.columns, pd.MultiIndex):
             px = px.droplevel(1, axis=1)
+        # Coverage checks for Price series (by ticker)
+        if isinstance(px, pd.DataFrame) and not px.empty:
+            total_rows_px = len(px)
+        else:
+            total_rows_px = 0
+        for tkr in [near_tkr, def_tkr]:
+            series_non_null_ratio = (
+                (px[tkr].notna().sum() / total_rows_px) if (total_rows_px > 0 and tkr in px.columns) else 0.0
+            )
+            if series_non_null_ratio < MIN_NON_NULL_RATIO:
+                warnings.warn(
+                    f"Low data coverage for {tkr} [PX_LAST] from {start_date} to {end_date}: "
+                    f"{series_non_null_ratio:.1%} non-null",
+                    category=UserWarning,
+                )
         px = px.reset_index().rename(columns={"index": "Date", "date": "Date"})
         px.columns = ["Date", f"Price_1_{tenor}", f"Price_2_{tenor}"]
 
@@ -161,6 +190,21 @@ def pull_futures_history(
         )
         if isinstance(vol.columns, pd.MultiIndex):
             vol = vol.droplevel(1, axis=1)
+        # Coverage checks for Volume series (by ticker)
+        if isinstance(vol, pd.DataFrame) and not vol.empty:
+            total_rows_vol = len(vol)
+        else:
+            total_rows_vol = 0
+        for tkr in [near_tkr, def_tkr]:
+            series_non_null_ratio = (
+                (vol[tkr].notna().sum() / total_rows_vol) if (total_rows_vol > 0 and tkr in vol.columns) else 0.0
+            )
+            if series_non_null_ratio < MIN_NON_NULL_RATIO:
+                warnings.warn(
+                    f"Low data coverage for {tkr} [VOLUME] from {start_date} to {end_date}: "
+                    f"{series_non_null_ratio:.1%} non-null",
+                    category=UserWarning,
+                )
         vol = vol.reset_index().rename(columns={"index": "Date", "date": "Date"})
         vol.columns = ["Date", f"Vol_1_{tenor}", f"Vol_2_{tenor}"]
 
@@ -174,12 +218,36 @@ def pull_futures_history(
             )
             if isinstance(irr.columns, pd.MultiIndex):
                 irr = irr.droplevel(1, axis=1)
+            # Coverage checks for Implied Repo series (by ticker)
+            if isinstance(irr, pd.DataFrame) and not irr.empty:
+                total_rows_irr = len(irr)
+            else:
+                total_rows_irr = 0
+            for tkr in [near_tkr, def_tkr]:
+                series_non_null_ratio = (
+                    (irr[tkr].notna().sum() / total_rows_irr) if (total_rows_irr > 0 and tkr in irr.columns) else 0.0
+                )
+                if series_non_null_ratio < MIN_NON_NULL_RATIO:
+                    warnings.warn(
+                        f"Low data coverage for {tkr} [{implied_repo_field}] from {start_date} to {end_date}: "
+                        f"{series_non_null_ratio:.1%} non-null",
+                        category=UserWarning,
+                    )
             irr = irr.reset_index().rename(columns={"index": "Date", "date": "Date"})
             irr.columns = ["Date", f"Implied_Repo_1_{tenor}", f"Implied_Repo_2_{tenor}"]
         else:
             irr = px[["Date"]].copy()
             irr[f"Implied_Repo_1_{tenor}"] = pd.NA
             irr[f"Implied_Repo_2_{tenor}"] = pd.NA
+            # Warn explicitly for missing implied repo field (0% coverage)
+            warnings.warn(
+                f"Low data coverage for {near_tkr} [IMPLIED_REPO] from {start_date} to {end_date}: 0.0% non-null",
+                category=UserWarning,
+            )
+            warnings.warn(
+                f"Low data coverage for {def_tkr} [IMPLIED_REPO] from {start_date} to {end_date}: 0.0% non-null",
+                category=UserWarning,
+            )
 
         # Merge on Date
         df = px.merge(vol, on="Date", how="outer").merge(irr, on="Date", how="outer")
