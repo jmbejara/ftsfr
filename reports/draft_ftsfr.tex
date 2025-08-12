@@ -674,6 +674,34 @@ TODO: Viren
 \subsubsection{Foreign Exchange}
 \label{sec:fx}
 % Lettau et al. (2014) and Menkhoff et al. (2012)
+The Foreign Currencies returns series we generated uses spot rate changes and local repo rates to generate a USD-based
+foreign currency returns. 
+
+We are replicating a process where we convert our USD into the foreign currency $i$ at end of day $t - 1$, 
+invest it in the repo market, then switch the currency back to USD on day $t$. 
+
+\begin{equation}
+  ret_{t, i} \;=\; \frac{spot_{t - 1, i}}{spot_{t, i}}  \times fret_{t, i}
+\end{equation}
+
+where
+- $i$ is the foreign currency
+- $t$ is the date of the implied foreign currency return
+- $ret$ is the return of USD invested in the foreign currency
+- $fret$ is the return of the foreign currency when invested in their overnight repo market
+- $spot$ is the spot price of the currency (**how much 1 USD is worth in the foreign currency**)
+
+\begin{figure}
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/FX_returns.png} \\[\abovecaptionskip]
+  \end{tabular}
+
+  \caption{Foreign Currency Returns}
+  \label{fig:CIP_replicate}
+\end{figure}
+
+\FloatBarrier
 
 \subsubsection{Commodities}
 \label{sec:commodities}
