@@ -23,6 +23,11 @@ from dodo_common import (
 
 from dependency_tracker import get_docs_task_dependencies
 
+DOIT_CONFIG = {
+    "backend": "sqlite3",
+    "dep_file": "./.doit-db-.sqlite",
+}
+
 # Load configuration
 subscriptions_toml = load_subscriptions()
 data_sources = subscriptions_toml["data_sources"].copy()
@@ -195,14 +200,19 @@ def task_pull():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/pull_bbg_commodities.py --DATA_DIR={DATA_DIR / data_module}"
+                f"python ./src/{data_module}/pull_bbg_commodities_basis.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_bbg_active_commodities.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "commodity_futures.parquet",
                 DATA_DIR / data_module / "lme_metals.parquet",
                 DATA_DIR / data_module / "gsci_indices.parquet",
+                DATA_DIR / data_module / "commodity_futures_active.parquet",
             ],
-            "file_dep": [f"./src/{data_module}/pull_bbg_commodities.py"],
+            "file_dep": [
+                f"./src/{data_module}/pull_bbg_commodities_basis.py",
+                f"./src/{data_module}/pull_bbg_active_commodities.py",
+            ],
         }
 
     data_module = "cip"
