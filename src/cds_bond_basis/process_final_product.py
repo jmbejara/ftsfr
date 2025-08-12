@@ -43,6 +43,10 @@ def process_cb_spread(df):
 
     df = df[df["rfr"].abs() < 1]  # remove unreasonable data, rfr is in absolute space
 
+    # change to percent
+    df['rfr'] = df['rfr'] * 100
+
+    # labeling
     rating_map = {(0, 1): "HY", (1, 0): "IG", (1, 1): "IG + HY"}
 
     # build a tuple series, then map
@@ -212,7 +216,7 @@ def generate_graph(df, col="rfr"):
             linewidth=1.0
         )
         handles_all.append(ln)
-        labels_all.append(f"rating {rating} → {col}")
+        labels_all.append(f"{rating} → {col}")
 
     # horizontal zero line
     ax1.axhline(0, color="black", linewidth=0.8)
