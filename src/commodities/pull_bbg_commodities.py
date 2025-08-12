@@ -86,6 +86,9 @@ def pull_commodity_futures(start_date="1950-01-01", end_date=END_DATE):
         "CL1 Comdty",
         "CL2 Comdty",
         "CL3 Comdty",  # WTI Crude
+        "RB1 Comdty",
+        "RB2 Comdty",
+        "RB3 Comdty",  # Gasoline (RBOB)
         "XB1 Comdty",
         "XB2 Comdty",
         "XB3 Comdty",  # RBOB Gasoline
@@ -95,6 +98,9 @@ def pull_commodity_futures(start_date="1950-01-01", end_date=END_DATE):
         "NG1 Comdty",
         "NG2 Comdty",
         "NG3 Comdty",  # Natural Gas
+        "HU1 Comdty",
+        "HU2 Comdty",
+        "HU3 Comdty",  # Unleaded Gas
         # Agriculture
         "CT1 Comdty",
         "CT2 Comdty",
@@ -108,6 +114,24 @@ def pull_commodity_futures(start_date="1950-01-01", end_date=END_DATE):
         "SB1 Comdty",
         "SB2 Comdty",
         "SB3 Comdty",  # Sugar
+        "LB1 Comdty",
+        "LB2 Comdty",
+        "LB3 Comdty",  # Lumber
+        "O 1 Comdty",
+        "O 2 Comdty",
+        "O 3 Comdty",  # Oats
+        "JO1 Comdty",
+        "JO2 Comdty",
+        "JO3 Comdty",  # Orange Juice
+        "RR1 Comdty",
+        "RR2 Comdty",
+        "RR3 Comdty",  # Rough Rice
+        "SM1 Comdty",
+        "SM2 Comdty",
+        "SM3 Comdty",  # Soybean Meal
+        "WC1 Comdty",
+        "WC2 Comdty",
+        "WC3 Comdty",  # Canola
         "S 1 Comdty",
         "S 2 Comdty",
         "S 3 Comdty",  # Soybeans
@@ -131,12 +155,24 @@ def pull_commodity_futures(start_date="1950-01-01", end_date=END_DATE):
         "LC2 Comdty",
         "LC3 Comdty",  # Live Cattle
         # Metals
+        "AL1 Comdty",
+        "AL2 Comdty",
+        "AL3 Comdty",  # Aluminium
+        "HG1 Comdty",
+        "HG2 Comdty",
+        "HG3 Comdty",  # Copper
         "GC1 Comdty",
         "GC2 Comdty",
         "GC3 Comdty",  # Gold
         "SI1 Comdty",
         "SI2 Comdty",
         "SI3 Comdty",  # Silver
+        "PA1 Comdty",
+        "PA2 Comdty",
+        "PA3 Comdty",  # Palladium
+        "PL1 Comdty",
+        "PL2 Comdty",
+        "PL3 Comdty",  # Platinum
     ]
 
     fields = ["PX_LAST"]
