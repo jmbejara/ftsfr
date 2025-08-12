@@ -281,8 +281,11 @@ def compute_treasury_output(df_long: pd.DataFrame) -> pd.DataFrame:
             "Treasury_SF_30Y",
         ]
     ].copy()
-    # Forward fill small gaps and explicitly infer dtypes to avoid pandas downcasting warnings
-    df_final = df_final.ffill(limit=5).infer_objects(copy=False)
+    # Forward-fill only value columns to avoid object downcasting warnings on DataFrame-wide ffill
+    value_cols = [c for c in df_final.columns if c != "Date"]
+    df_final.loc[:, value_cols] = (
+        df_final[value_cols].astype(float).ffill(limit=5)
+    )
 
     return df_final
 
