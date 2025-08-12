@@ -91,23 +91,34 @@ def task_pull():
     """Pull selected data_sources based on subscriptions.toml configuration"""
 
     data_module = "basis_tips_treas"
-    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
+    if module_requirements.get(data_module, False) and not use_cache:
         yield {
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_fed_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/pull_fed_tips_yield_curve.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/pull_bloomberg_treasury_inflation_swaps.py --OUTPUT_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "fed_yield_curve_all.parquet",
                 DATA_DIR / data_module / "fed_yield_curve.parquet",
                 DATA_DIR / data_module / "fed_tips_yield_curve.parquet",
-                DATA_DIR / data_module / "treasury_inflation_swaps.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_fed_yield_curve.py",
                 f"./src/{data_module}/pull_fed_tips_yield_curve.py",
+            ],
+            "clean": [],
+        }
+    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
+        yield {
+            "name": f"{data_module}_bbg",
+            "actions": [
+                f"python ./src/{data_module}/pull_bloomberg_treasury_inflation_swaps.py --OUTPUT_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "treasury_inflation_swaps.parquet",
+            ],
+            "file_dep": [
                 f"./src/{data_module}/pull_bloomberg_treasury_inflation_swaps.py",
             ],
             "clean": [],
@@ -259,17 +270,28 @@ def task_pull():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/pull_wrds_fx.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/pull_bbg_foreign_exchange.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "fx_daily_data.parquet",
                 DATA_DIR / data_module / "fx_monthly_data.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/pull_wrds_fx.py",
+            ],
+        }
+
+    if module_requirements[data_module] and not use_cache and not bbg_skip:
+        yield {
+            "name": f"{data_module}_bbg",
+            "actions": [
+                f"python ./src/{data_module}/pull_bbg_foreign_exchange.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
                 DATA_DIR / data_module / "fx_spot_rates.parquet",
                 DATA_DIR / data_module / "fx_forward_points.parquet",
                 DATA_DIR / data_module / "fx_interest_rates.parquet",
             ],
             "file_dep": [
-                f"./src/{data_module}/pull_wrds_fx.py",
                 f"./src/{data_module}/pull_bbg_foreign_exchange.py",
             ],
         }
