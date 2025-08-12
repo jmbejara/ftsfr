@@ -47,7 +47,7 @@ def process_cb_spread(df):
     df['rfr'] = df['rfr'] * 100
 
     # labeling
-    rating_map = {(0, 1): "HY", (1, 0): "IG", (1, 1): "IG + HY"}
+    rating_map = {(0, 1): "High Yield", (1, 0): "Investment Grade", (1, 1): "IG + HY"}
 
     # build a tuple series, then map
     df["c_rating"] = df[["size_ig", "size_jk"]].apply(tuple, axis=1).map(rating_map)
