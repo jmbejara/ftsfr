@@ -1,46 +1,34 @@
 """
-Fetches and loads commodity futures data from Bloomberg.
+pull_bbg_commodities_basis.py
 
-This module handles futures price data retrieval for commodities including
-energy, agriculture, livestock, and metals. It also pulls GSCI excess return
-indices and LME metals spot/forward data.
+Purpose
+-------
+Pulls both futures prices and spot (or spot-proxy) prices for a broad set of
+commodities so basis can be computed consistently: Basis = Futures − Spot.
 
-Data includes:
-- First, second, and third nearest futures contracts for 19 commodities
-- LME metals spot and 3-month forward prices
-- Goldman Sachs Commodity Index (GSCI) excess return indices
+What this module pulls
+----------------------
+- Generic futures (1st/2nd/3rd nearby) for energy, agriculture, livestock, metals
+  using Bloomberg `Comdty` tickers (e.g., "CL1 Comdty").
+- LME metals spot and 3-month forward prices for base metals (Al, Ni, Pb, Zn, Cu)
+  using Bloomberg `Comdty` tickers (e.g., "LMCADY Comdty", "LMCADS03 Comdty").
+- GSCI Excess Return indices as supplemental series for many commodities
+  (e.g., "SPGCCLP Index").
+- Precious metals USD spot for Gold, Silver, Platinum, Palladium using
+  Bloomberg `Curncy` tickers ("XAUUSD Curncy", "XAGUSD Curncy",
+  "XPTUSD Curncy", "XPDUSD Curncy").
+- Spot proxies for commodities lacking reliable Bloomberg spot series by
+  extracting the 1st generic futures from the pulled futures panel.
 
-
-TODO: Yangge, check to see if the commodities in this table are all pulled in the code below.
-
-Sector Commodity Symbol N Basis Freq. of bw. Excess returns Volatility Sharpe ratio (%)
-Agriculture Canola WC 97 0.12 83.02 -0.73 19.37 -3.75
-Cocoa CC 160 -0.01 25.43 4.52 30.19 14.98
-Coffee KC 149 0.08 81.88 6.45 35.96 17.95
-Corn C- 152 0.30 99.57 -1.10 24.09 -4.55
-Cotton CT 170 0.07 78.21 2.07 23.17 8.93
-Lumber LB 114 -0.01 31.50 3.71 24.88 14.90
-Oats O- 119 -0.03 44.42 0.06 29.57 0.22
-Orange juice JO 178 -0.05 23.50 1.55 30.54 5.09
-Rough rice RR 119 0.35 97.08 -1.23 25.56 -4.82
-Soybean meal SM 191 -0.19 0.43 6.81 30.71 22.18
-Soybeans S- 182 -0.01 34.62 4.53 27.42 16.51
-Wheat W- 133 0.45 98.72 1.75 24.18 7.25
-Energy Crude Oil CL 241 0.13 85.48 12.54 32.41 38.68
-Gasoline RB 251 -0.09 0.00 -11.35 40.52 -28.02
-Heating Oil HO 246 -0.02 30.37 12.33 31.85 38.72
-Natural gas NG 250 0.48 96.89 2.26 49.33 4.59
-Unleaded gas HU 198 0.01 69.64 9.94 29.24 33.98
-Livestock Feeder cattle FC 141 0.18 97.75 3.55 16.02 22.13
-Lean hogs LH 175 0.34 97.07 5.81 20.93 27.78
-Live cattle LC 136 0.08 85.47 5.52 15.81 34.93
-Metals Aluminium AL 252 0.05 100.00 -2.76 18.04 -15.28
-Copper HG 197 -0.03 31.12 8.92 24.94 35.78
-Gold GC 229 -0.03 7.84 0.28 19.10 1.44
-Palladium PA 69 0.19 77.29 6.98 30.56 22.85
-Platinum PL 78 -0.17 17.95 5.66 21.53 26.30
-Silver SI 198 0.12 99.51 1.56 30.79 5.07
-
+Notes on basis construction
+---------------------------
+- For LME base metals: use LME spot vs 1st generic futures.
+- For precious metals: use USD spot (XAU/XAG/XPT/XPD) vs 1st generic futures.
+- For other commodities where no robust spot is available from Bloomberg in this
+  module, we provide a transparent spot-proxy constructed from the 1st generic
+  futures. This enables basis calculation but is a proxy rather than true cash.
+  If true spot sources are required later (e.g., location-specific cash quotes),
+  add a dedicated pull function and replace the proxy.
 """
 
 import sys
@@ -244,6 +232,57 @@ def pull_lme_metals(start_date="1950-01-01", end_date=END_DATE):
     return df
 
 
+def pull_precious_metals_spot(start_date="1950-01-01", end_date=END_DATE):
+    """
+    Fetch USD spot prices for precious metals using Bloomberg `Curncy` tickers.
+
+    Includes Gold (XAU), Silver (XAG), Platinum (XPT), Palladium (XPD).
+
+    Returns a wide DataFrame with PX_LAST columns and a date index reset to
+    an "index" column.
+    """
+    from xbbg import blp
+
+    tickers = [
+        "XAUUSD Curncy",  # Gold spot USD
+        "XAGUSD Curncy",  # Silver spot USD
+        "XPTUSD Curncy",  # Platinum spot USD
+        "XPDUSD Curncy",  # Palladium spot USD
+    ]
+
+    fields = ["PX_LAST"]
+
+    df = blp.bdh(tickers=tickers, flds=fields, start_date=start_date, end_date=end_date)
+
+    if not df.empty and isinstance(df.columns, pd.MultiIndex):
+        df.columns = [f"{t[0]}_{t[1]}" for t in df.columns]
+        df.reset_index(inplace=True)
+
+    return df
+
+
+def build_spot_proxies_from_futures_df(df_futures: pd.DataFrame) -> pd.DataFrame:
+    """
+    Construct spot proxies by extracting 1st generic futures series from the
+    futures panel. This is a transparent proxy for commodities lacking a robust
+    Bloomberg spot series.
+
+    The function expects a wide DataFrame as returned by `pull_commodity_futures`.
+    It selects columns that end with "1 Comdty_PX_LAST" and returns a new wide
+    DataFrame (including the date column named "index").
+    """
+    if df_futures is None or df_futures.empty:
+        return df_futures
+
+    date_col = "index" if "index" in df_futures.columns else df_futures.columns[0]
+    proxy_cols = [
+        c for c in df_futures.columns if c != date_col and c.endswith("1 Comdty_PX_LAST")
+    ]
+
+    cols = [date_col] + proxy_cols
+    return df_futures[cols].copy()
+
+
 def pull_gsci_indices(start_date="1950-01-01", end_date=END_DATE):
     """
     Fetch Goldman Sachs Commodity Index excess returns from Bloomberg using xbbg.
@@ -422,6 +461,12 @@ def load_lme_metals(data_dir=DATA_DIR):
     return pd.read_parquet(path)
 
 
+def load_precious_metals_spot(data_dir=DATA_DIR):
+    """Load precious metals USD spot prices from parquet file."""
+    path = data_dir / "precious_metals_spot.parquet"
+    return pd.read_parquet(path)
+
+
 def load_gsci_indices(data_dir=DATA_DIR):
     """Load Goldman Sachs Commodity Index excess returns from parquet file.
 
@@ -469,6 +514,84 @@ def load_gsci_indices(data_dir=DATA_DIR):
     return pd.read_parquet(path)
 
 
+def load_commodity_spot_proxies(data_dir=DATA_DIR):
+    """Load spot proxies (1st generic futures) from parquet file."""
+    path = data_dir / "commodity_spot_proxies.parquet"
+    return pd.read_parquet(path)
+
+
+def compute_basis_series(
+    futures_df: pd.DataFrame,
+    futures_col: str,
+    spot_df: pd.DataFrame,
+    spot_col: str,
+    date_col: str = "index",
+) -> pd.DataFrame:
+    """Compute basis = futures − spot for a single pair of columns.
+
+    Returns a DataFrame with columns: [date_col, futures_col, spot_col, "basis"].
+    """
+    merged = (
+        futures_df[[date_col, futures_col]]
+        .merge(spot_df[[date_col, spot_col]], on=date_col, how="inner")
+        .copy()
+    )
+    merged["basis"] = merged[futures_col] - merged[spot_col]
+    return merged
+
+
+def compute_precious_metals_basis(
+    futures_df: pd.DataFrame, precious_spot_df: pd.DataFrame, date_col: str = "index"
+) -> dict[str, pd.DataFrame]:
+    """Compute basis for precious metals using USD spot:
+
+    - GC1 Comdty vs XAUUSD Curncy
+    - SI1 Comdty vs XAGUSD Curncy
+    - PL1 Comdty vs XPTUSD Curncy
+    - PA1 Comdty vs XPDUSD Curncy
+
+    Returns a dict mapping commodity roots to basis DataFrames.
+    """
+    mapping: list[tuple[str, str, str]] = [
+        ("GC1 Comdty_PX_LAST", "XAUUSD Curncy_PX_LAST", "GC"),
+        ("SI1 Comdty_PX_LAST", "XAGUSD Curncy_PX_LAST", "SI"),
+        ("PL1 Comdty_PX_LAST", "XPTUSD Curncy_PX_LAST", "PL"),
+        ("PA1 Comdty_PX_LAST", "XPDUSD Curncy_PX_LAST", "PA"),
+    ]
+
+    out: dict[str, pd.DataFrame] = {}
+    for fut_col, spot_col, root in mapping:
+        if fut_col in futures_df.columns and spot_col in precious_spot_df.columns:
+            out[root] = compute_basis_series(
+                futures_df, fut_col, precious_spot_df, spot_col, date_col=date_col
+            )
+    return out
+
+
+def compute_lme_base_metals_basis(
+    futures_df: pd.DataFrame, lme_df: pd.DataFrame, date_col: str = "index"
+) -> dict[str, pd.DataFrame]:
+    """Compute basis for LME base metals using LME spot series:
+
+    - AL1 Comdty vs LMAHDY Comdty (Aluminum)
+    - HG1 Comdty vs LMCADY Comdty (Copper)
+
+    Returns a dict mapping commodity roots to basis DataFrames.
+    """
+    mapping: list[tuple[str, str, str]] = [
+        ("AL1 Comdty_PX_LAST", "LMAHDY Comdty_PX_LAST", "AL"),
+        ("HG1 Comdty_PX_LAST", "LMCADY Comdty_PX_LAST", "HG"),
+    ]
+
+    out: dict[str, pd.DataFrame] = {}
+    for fut_col, spot_col, root in mapping:
+        if fut_col in futures_df.columns and spot_col in lme_df.columns:
+            out[root] = compute_basis_series(
+                futures_df, fut_col, lme_df, spot_col, date_col=date_col
+            )
+    return out
+
+
 if __name__ == "__main__":
     # Ensure data directory exists
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -477,9 +600,17 @@ if __name__ == "__main__":
     commodity_futures_df = pull_commodity_futures()
     commodity_futures_df.to_parquet(DATA_DIR / "commodity_futures.parquet")
 
+    # Derive and save spot proxies from 1st generic futures
+    spot_proxies_df = build_spot_proxies_from_futures_df(commodity_futures_df)
+    spot_proxies_df.to_parquet(DATA_DIR / "commodity_spot_proxies.parquet")
+
     # Pull and save LME metals data
     lme_metals_df = pull_lme_metals()
     lme_metals_df.to_parquet(DATA_DIR / "lme_metals.parquet")
+
+    # Pull and save precious metals USD spot data
+    precious_spot_df = pull_precious_metals_spot()
+    precious_spot_df.to_parquet(DATA_DIR / "precious_metals_spot.parquet")
 
     # Pull and save GSCI indices data
     gsci_indices_df = pull_gsci_indices()
