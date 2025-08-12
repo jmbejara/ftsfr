@@ -15,12 +15,14 @@ from dependency_tracker import (
     load_module_requirements,
 )
 
+
 # --------------------------------------------------------------------
 # Safer file copy/move behavior for Windows/corporate shares
 # --------------------------------------------------------------------
 # Disable metadata copying that can fail on network drives
 def _noop(*_args, **_kwargs):
     pass
+
 
 shutil.copymode = _noop  # used by shutil.copy
 shutil.copystat = _noop  # used by shutil.copy2 / copytree
@@ -35,10 +37,10 @@ def _python_copy_file_command(source_path: Path, destination_path: Path) -> str:
     src = str(Path(source_path))
     dst = str(Path(destination_path))
     return (
-        "python -c \"import shutil, os; from pathlib import Path; "
+        'python -c "import shutil, os; from pathlib import Path; '
         f"src=r'{src}'; dst=r'{dst}'; "
         "Path(dst).parent.mkdir(parents=True, exist_ok=True); "
-        "shutil.copyfile(src, dst)\""
+        'shutil.copyfile(src, dst)"'
     )
 
 
@@ -51,10 +53,10 @@ def _python_move_file_command(source_path: Path, destination_path: Path) -> str:
     src = str(Path(source_path))
     dst = str(Path(destination_path))
     return (
-        "python -c \"import shutil; from pathlib import Path; "
+        'python -c "import shutil; from pathlib import Path; '
         f"src=r'{src}'; dst=r'{dst}'; "
         "Path(dst).parent.mkdir(parents=True, exist_ok=True); "
-        "shutil.move(src, dst)\""
+        'shutil.move(src, dst)"'
     )
 
 
@@ -77,6 +79,7 @@ def _python_copy_tree_command(dir_path: Path, destination_folder: Path) -> str:
         "        shutil.copyfile(os.path.join(root, f), os.path.join(target, f))\n"
     )
     return f'python -c "{code}"'
+
 
 # Ensure child processes (spawned by tasks) can import modules from `src/`
 _src_path = str((Path(__file__).parent / "src").resolve())

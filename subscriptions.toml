@@ -13,7 +13,7 @@ nyu_call_report = true
 open_source_bond = true
 
 ## Subscription data sets. Subscription needed, api key needed.
-# Set to false if subscription is available, data will be pulled from source
+# Set to true if subscription is available, data will be pulled from source
 bloomberg_terminal = true
 wrds_bank_premium = true
 wrds_bond_returns = true

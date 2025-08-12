@@ -17,6 +17,7 @@ Notes:
   - Assumes standardized ftsfr format with columns: 'unique_id', 'ds', 'y'.
   - Change MODEL_NAME to try 'dlinear' or 'nlinear'.
 """
+
 import os
 import sys
 from pathlib import Path
@@ -38,7 +39,6 @@ from config_reader import get_model_config  # type: ignore
 
 # Choose a global model: 'dlinear' or 'nlinear' (default: 'dlinear')
 MODEL_NAME: str = os.environ.get("MODEL_NAME", "dlinear")
-
 
 
 def load_panel_series(dataset_path: Path) -> List[TimeSeries]:
@@ -107,7 +107,9 @@ def main():
         horizon = len(test_s)
         fcst_list.append(model.predict(n=horizon, series=train_s))
 
-    mase_mean = mase(actual_series=test_list, pred_series=fcst_list, insample=train_list)
+    mase_mean = mase(
+        actual_series=test_list, pred_series=fcst_list, insample=train_list
+    )
 
     # Summary
     print("Darts Global Example")
@@ -115,7 +117,11 @@ def main():
     print(f"  Model:   {MODEL_NAME}")
     print(f"  Num series: {len(series_list)}")
     print(f"  Frequency: {frequency}, Seasonality: {seasonality}")
-    print(f"  Mean MASE across series: {mase_mean:.4f}" if mase_mean == mase_mean else "  Mean MASE: NaN (undefined)")
+    print(
+        f"  Mean MASE across series: {mase_mean:.4f}"
+        if mase_mean == mase_mean
+        else "  Mean MASE: NaN (undefined)"
+    )
 
 
 if __name__ == "__main__":
