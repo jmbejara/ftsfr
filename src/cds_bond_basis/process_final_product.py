@@ -207,11 +207,11 @@ def generate_graph(df, col="rfr"):
     handles_all, labels_all = [], []
 
     # plot each rating as a separate line
-    for idx, rating in enumerate(["HY", "IG"]):
+    for idx, rating in enumerate(["High Yield", "Investment Grade"]):
         series = df_grouped[df_grouped["c_rating"] == rating]
         (ln,) = ax1.plot(
             series["date"], series[col],
-            label=f"rating {rating} → {col}",
+            label=f"rating {rating}",
             color=primary_colors[idx % len(primary_colors)],
             linewidth=1.0
         )
