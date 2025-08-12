@@ -196,6 +196,8 @@ def implied_daily_fx_returns(fx_data, currency_list):
     return fx_df
 
 
+import matplotlib.pyplot as plt
+
 def graph_fx_returns(fx_df, currency_list, region_name):
     """
     Graphs the FX returns for a set of currencies in a given region.
@@ -211,13 +213,19 @@ def graph_fx_returns(fx_df, currency_list, region_name):
 
     # Plot
     fig, ax = plt.subplots(figsize=(10, 5))
-    fx_df[ret_list].plot(ax=ax, title=f"Annualized Daily Returns of {region_name}")
+    
+    fx_df[ret_list].plot(ax=ax, title="")
+
+    # Add axis labels
+    ax.set_xlabel("Date")
+    ax.set_ylabel(f"Annualized Daily Returns (Percent) of {region_name}")
 
     # Move legend to the right side
     ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
 
     plt.tight_layout()
     plt.show()
+
 
 
 def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):
