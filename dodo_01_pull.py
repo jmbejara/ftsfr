@@ -25,7 +25,7 @@ from dependency_tracker import get_docs_task_dependencies
 
 DOIT_CONFIG = {
     "backend": "sqlite3",
-    "dep_file": "./.doit-db-.sqlite",
+    "dep_file": "./.doit-db.sqlite",
 }
 
 # Load configuration
