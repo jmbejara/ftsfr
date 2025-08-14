@@ -58,15 +58,14 @@ class TimesFMForecasting(forecasting_model):
         )
 
         df = pd.read_parquet(data_path).rename(columns={"id": "unique_id"})
-        df, test_split = process_df(df, frequency, seasonality, test_split)
-        df = custom_interpolate(df)
-        df = df.sort_values(["unique_id", "ds"])
-        df = df.reset_index(drop=True)
+        train_data, test_data, test_split = process_df(df, frequency, seasonality, test_split)
+        df = pd.concat([train_data, test_data]).\
+                       sort_values(["unique_id", "ds"]).\
+                       reset_index(drop = True)
 
         logger.info("Read and processed dataframe.")
 
         test_length = int(test_split * len(df.ds.unique()))
-        unique_dates = sorted(np.unique(df["ds"].values))
 
         # Names
         self.dataset_name = dataset_name
@@ -80,8 +79,8 @@ class TimesFMForecasting(forecasting_model):
         # Dataframes
         self.raw_data = df
         self.pred_data = None
-        self.train_data = df[df.ds < unique_dates[-test_length]]
-        self.test_data = df[df.ds >= unique_dates[-test_length]]
+        self.train_data = train_data
+        self.test_data = test_data
 
         logger.info("Generated train and test series.")
 
