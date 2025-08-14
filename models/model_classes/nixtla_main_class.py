@@ -73,19 +73,12 @@ class NixtlaMain(forecasting_model):
 
         # Data pre-processing
         df = pd.read_parquet(data_path).rename(columns={"id": "unique_id"})
-        df, test_split = process_df(df, frequency, seasonality, test_split)
-        df = custom_interpolate(df)
+        train_data, test_data, test_split = process_df(df,
+                                                       frequency,
+                                                       seasonality,
+                                                       test_split)
 
         NixtlaMain_logger.info("Data read and pre-processed.")
-
-        # Unique dates defines the number of entries per entity
-        # makes calculating test_length and subsequent splits easier
-        unique_dates = df["ds"].unique()
-        test_length = int(test_split * len(unique_dates))
-        test_data = df[df.ds >= unique_dates[-test_length]]
-        train_data = df[df.ds < unique_dates[-test_length]]
-
-        NixtlaMain_logger.info("Data split into train and test.")
 
         # Names
         self.dataset_name = dataset_name
@@ -149,7 +142,8 @@ class NixtlaMain(forecasting_model):
         from neuralforecast import NeuralForecast
 
         self.nf = NeuralForecast(models=[self.estimator],
-                                 freq=self.frequency)
+                                 freq=self.frequency,
+                                 local_scaler_type = None)
         self.nf.fit(df=self.train_data)
         NixtlaMain_logger.info("Model trained.")
 
@@ -177,10 +171,10 @@ class NixtlaMain(forecasting_model):
         )
 
         self.pred_data = perform_one_step_ahead_nixtla(
-            nf_model=self.nf,
-            train_df=self.train_data,
-            test_df=self.test_data,
-            raw_df=self.raw_data,
+            nf_model = self.nf,
+            train_df = self.train_data,
+            test_df = self.test_data,
+            raw_df = self.raw_data,
         )
 
         # Verify that we're doing one-step-ahead (only if darts is available)
@@ -188,9 +182,9 @@ class NixtlaMain(forecasting_model):
             from darts import TimeSeries
 
             is_valid = verify_one_step_ahead(
-                predictions=self.pred_data,
-                test_data=self.test_data,
-                model_type="nixtla",
+                predictions = self.pred_data,
+                test_data = self.test_data,
+                model_type = "nixtla",
             )
 
             if is_valid:
