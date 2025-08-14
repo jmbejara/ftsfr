@@ -78,10 +78,10 @@ class TimesFMForecasting(forecasting_model):
         self.result_path = result_path
 
         # Dataframes
-        self.raw_series = df
-        self.pred_series = None
-        self.train_series = df[df.ds < unique_dates[-test_length]]
-        self.test_series = df[df.ds >= unique_dates[-test_length]]
+        self.raw_data = df
+        self.pred_data = None
+        self.train_data = df[df.ds < unique_dates[-test_length]]
+        self.test_data = df[df.ds >= unique_dates[-test_length]]
 
         logger.info("Generated train and test series.")
 
@@ -160,7 +160,7 @@ class TimesFMForecasting(forecasting_model):
     @common_error_catch
     def forecast(self):
         logger.info("Getting model predictions.")
-        df = self.raw_series
+        df = self.raw_data
         tfm = self.tfm
         result = pd.DataFrame(columns=df.columns)
 
@@ -188,7 +188,7 @@ class TimesFMForecasting(forecasting_model):
             logger.info("Processed DataFrame and added to result.")
         result = result.drop(["y"], axis=1)
         result = result.rename(columns={"timesfm": "y"})
-        self.pred_series = result
+        self.pred_data = result
 
         logger.info(
             "Got all predictions. Processed result " + "and updated internal variable."
@@ -196,14 +196,14 @@ class TimesFMForecasting(forecasting_model):
 
     @common_error_catch
     def save_forecast(self):
-        if self.pred_series is None:
+        if self.pred_data is None:
             logger.error(
-                "Cannot save forecast: pred_series is None. Forecast method may have failed."
+                "Cannot save forecast: pred_data is None. Forecast method may have failed."
             )
             raise ValueError(
-                "pred_series is None - forecast method did not complete successfully"
+                "pred_data is None - forecast method did not complete successfully"
             )
-        self.pred_series.to_parquet(self.forecast_path, engine="pyarrow")
+        self.pred_data.to_parquet(self.forecast_path, engine="pyarrow")
         logger.info('Predictions saved to "' + str(self.forecast_path) + '".')
 
     @common_error_catch
@@ -217,7 +217,7 @@ class TimesFMForecasting(forecasting_model):
             raise ImportError(
                 "darts is required for loading forecasts but not available in this environment"
             )
-        self.pred_series = TimeSeries.from_dataframe(temp_df, time_col="ds")
+        self.pred_data = TimeSeries.from_dataframe(temp_df, time_col="ds")
         logger.info(
             "Model forecasts loaded from "
             + self.forecast_path
@@ -225,17 +225,17 @@ class TimesFMForecasting(forecasting_model):
         )
 
     def calculate_error(self, metric="MASE"):
-        if self.pred_series is None:
+        if self.pred_data is None:
             logger.error(
-                "Cannot calculate error: pred_series is None. Forecast method may have failed."
+                "Cannot calculate error: pred_data is None. Forecast method may have failed."
             )
             raise ValueError(
-                "pred_series is None - forecast method did not complete successfully"
+                "pred_data is None - forecast method did not complete successfully"
             )
 
         if metric == "MASE":
             self.errors["MASE"] = calculate_darts_MASE(
-                self.test_series, self.train_series, self.pred_series, self.seasonality
+                self.test_data, self.train_data, self.pred_data, self.seasonality
             )
             logger.info("MASE = " + str(self.errors["MASE"]) + ".")
             return self.errors["MASE"]
@@ -249,7 +249,7 @@ class TimesFMForecasting(forecasting_model):
                 [
                     ["Model", self.model_name],
                     ["Dataset", self.dataset_name],
-                    ["Entities", len(self.raw_series["unique_id"].unique())],
+                    ["Entities", len(self.raw_data["unique_id"].unique())],
                     ["Frequency", self.frequency],
                     ["Seasonality", self.seasonality],
                     ["Global MASE", self.errors["MASE"]],
@@ -264,7 +264,7 @@ class TimesFMForecasting(forecasting_model):
             {
                 "Model": [self.model_name],
                 "Dataset": [self.dataset_name],
-                "Entities": [len(self.raw_series["unique_id"].unique())],
+                "Entities": [len(self.raw_data["unique_id"].unique())],
                 "Frequency": [self.frequency],
                 "Seasonality": [self.seasonality],
                 "Global MASE": [self.errors["MASE"]],

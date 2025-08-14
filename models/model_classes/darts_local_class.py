@@ -77,15 +77,15 @@ class DartsLocal(DartsMain):
             "forecast_workflow called. Predictions made for each "
             + "entity separately."
         )
-        raw_series = self.raw_series.copy()
+        raw_data = self.raw_data.copy()
         auto_mode = False
         # Training on each entity and calculating MASE
         self.print_sep()
         DartsLocal_logger.info("Starting loop for the workflow on each entity.")
-        for id in tqdm(raw_series.columns):
+        for id in tqdm(raw_data.columns):
             DartsLocal_logger.info("Processing id: " + id + ".")
             # Select the date and the column for current id
-            entity_data = raw_series[[id]].copy()
+            entity_data = raw_data[[id]].copy()
             # Removing leading/trailing NaNs which show up due to different
             # start times of different series
             entity_data = entity_data.strip()
@@ -97,7 +97,7 @@ class DartsLocal(DartsMain):
                 DartsLocal_logger.info("Data too small, so skipped.")
                 continue
 
-            self.raw_series = entity_data
+            self.raw_data = entity_data
 
             # Updates internal train and test series
             self._train_test_split(entity_data)
@@ -113,7 +113,7 @@ class DartsLocal(DartsMain):
 
         self.print_sep()
         self.save_forecast()
-        self.raw_series = raw_series
+        self.raw_data = raw_data
 
         if self.mase_list:
             self.errors["MASE"] = sum(self.mase_list) / len(self.mase_list)

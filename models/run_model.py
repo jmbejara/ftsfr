@@ -369,9 +369,6 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
             estimator,
             model_name,
             *env_vars,
-            scaling=model_config.get("scaling", True),
-            interpolation=model_config.get("interpolation", True),
-            f32=model_config.get("f32", False),
         )
     elif model_class == "NixtlaMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"

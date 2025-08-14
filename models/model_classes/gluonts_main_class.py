@@ -15,10 +15,9 @@ import logging
 GluontsMain_logger = logging.getLogger("GluontsMain")
 
 from .forecasting_model import forecasting_model
-from .helper_func import process_df, custom_interpolate, common_error_catch
+from .helper_func import process_df, common_error_catch
 
 # GluonTS-specific imports are moved inside methods
-
 
 class GluontsMain(forecasting_model):
     def __init__(
@@ -70,34 +69,28 @@ class GluontsMain(forecasting_model):
         raw_df = pd.read_parquet(data_path)
         raw_df = raw_df.rename(columns={"id": "unique_id"})
         # Fills missing dates and extends if required
-        raw_df, test_split = process_df(raw_df, frequency, seasonality, test_split)
+        train_data, test_data, test_split = process_df(raw_df,
+                                                           frequency,
+                                                           seasonality,
+                                                           test_split)
 
         GluontsMain_logger.info("Data read and pre-processed.")
 
-        # Fills all the np.nans
-        raw_df = custom_interpolate(raw_df)
-        GluontsMain_logger.info("Data interpolated.")
         # Sorting for consistency
-        raw_df = raw_df.sort_values(["unique_id", "ds"])
-        # Sorting makes the indices shuffled
-        raw_df = raw_df.reset_index(drop=True)
+        train_data = train_data.sort_values(["unique_id", "ds"]).\
+                                    reset_index(drop=True).\
+                                    set_index("ds")
         GluontsMain_logger.info("Sorted values along unique_id and then ds.")
-        # Some float and double issues
-        raw_df["y"] = raw_df["y"].astype(np.float32)
-        GluontsMain_logger.info("Converted target values to np.float32.")
+
+        raw_df = pd.concat([train_data, test_data]).\
+                    sort_values(["unique_id", "ds"]).\
+                    reset_index(drop = True)
 
         # Unique dates defines the number of entries per entity
         # makes calculating test_length and subsequent splits easier
-        unique_dates = raw_df["ds"].unique()
-        test_length = int(test_split * len(unique_dates))
 
-        # Splitting to train and test
-        # Train data for GluonTS is the entire df - test entries
-        train_data = raw_df[raw_df["ds"] < unique_dates[-test_length]]
         # Test data for GluonTS is the entire dataframe with the dates as index
         test_data = raw_df.set_index("ds")
-        # Train data for GluonTS with dates as index
-        train_data = train_data.set_index("ds")
 
         GluontsMain_logger.info("Created train and test series from DataFrame.")
 
@@ -131,9 +124,9 @@ class GluontsMain(forecasting_model):
         self.result_path = result_path
 
         # Series
-        self.test_series = test_ds
-        self.train_series = train_ds
-        self.pred_series = None
+        self.test_data = test_ds
+        self.train_data = train_ds
+        self.pred_data = None
         self.raw_df = raw_df
 
         # Important variables
@@ -165,7 +158,7 @@ class GluontsMain(forecasting_model):
 
     def train(self):
         GluontsMain_logger.info("Model training started.")
-        self.model = self.model.train(training_data=self.train_series)
+        self.model = self.model.train(training_data=self.train_data)
         GluontsMain_logger.info("Model trained.")
 
     @common_error_catch
@@ -190,8 +183,8 @@ class GluontsMain(forecasting_model):
         )
 
         # Use the unified one-step-ahead implementation
-        self.pred_series = perform_one_step_ahead_gluonts(
-            model=self.model, train_ds=self.train_series, test_ds=self.test_series
+        self.pred_data = perform_one_step_ahead_gluonts(
+            model=self.model, train_ds=self.train_data, test_ds=self.test_data
         )
 
         # For verification, we need the test data in DataFrame format
@@ -202,7 +195,7 @@ class GluontsMain(forecasting_model):
 
         # Verify that we're doing one-step-ahead
         is_valid = verify_one_step_ahead(
-            predictions=self.pred_series, test_data=test_df, model_type="gluonts"
+            predictions=self.pred_data, test_data=test_df, model_type="gluonts"
         )
 
         if is_valid:
@@ -216,23 +209,23 @@ class GluontsMain(forecasting_model):
 
     @common_error_catch
     def save_forecast(self):
-        self.pred_series.to_parquet(self.forecast_path)
+        self.pred_data.to_parquet(self.forecast_path)
         GluontsMain_logger.info('Saved forecasts to "' + str(self.forecast_path) + '".')
 
     def load_forecast(self):
-        self.pred_series = pd.read_parquet(self.forecast_path)
+        self.pred_data = pd.read_parquet(self.forecast_path)
         GluontsMain_logger.info(
             'Loaded forecasts from "' + str(self.forecast_path) + '".'
         )
 
-    def calculate_gluonts_mase(self, test_data, train_data, pred_series, seasonality):
+    def calculate_gluonts_mase(self, test_data, train_data, pred_data, seasonality):
         """
         Calculate MASE for GluonTS models without depending on darts.
 
         Args:
             test_data: DataFrame with test data
             train_data: DataFrame with training data
-            pred_series: DataFrame with predictions
+            pred_data: DataFrame with predictions
             seasonality: Seasonality period
 
         Returns:
@@ -243,7 +236,7 @@ class GluontsMain(forecasting_model):
         # Calculate mean absolute error of predictions
         # Merge test data with predictions on ds and unique_id
         merged = test_data.merge(
-            pred_series, on=["ds", "unique_id"], suffixes=("_actual", "_pred")
+            pred_data, on=["ds", "unique_id"], suffixes=("_actual", "_pred")
         )
 
         # Calculate absolute errors
@@ -301,7 +294,7 @@ class GluontsMain(forecasting_model):
             train_data = df[df.ds < unique_dates[-test_length]]
 
             self.errors["MASE"] = self.calculate_gluonts_mase(
-                test_data, train_data, self.pred_series, self.seasonality
+                test_data, train_data, self.pred_data, self.seasonality
             )
 
             GluontsMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")

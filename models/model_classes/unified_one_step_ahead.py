@@ -21,15 +21,15 @@ except ImportError:
     TimeSeries = None
 
 
-def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
+def perform_one_step_ahead_darts(model, train_data, test_data, raw_data):
     """
     Performs one-step-ahead forecasting for Darts models.
 
     Args:
         model: Trained Darts model
-        train_series: Training TimeSeries
-        test_series: Test TimeSeries
-        raw_series: Full TimeSeries (train + test)
+        train_data: Training TimeSeries
+        test_data: Test TimeSeries
+        raw_data: Full TimeSeries (train + test)
 
     Returns:
         TimeSeries: One-step-ahead predictions
@@ -48,8 +48,8 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     Uni_logger.info(f"Model type: {'Local' if is_local else 'Global'}")
 
     # Get test start time
-    test_start = test_series.start_time()
-    test_end = test_series.end_time()
+    test_start = test_data.start_time()
+    test_end = test_data.end_time()
 
     # For global models, use historical_forecasts with explicit parameters
 
@@ -71,7 +71,7 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     Uni_logger.info("retrain_model = " + str(retrain_model))
     Uni_logger.info("Using historical_forecasts")
     predictions = model.historical_forecasts(
-        series=raw_series,
+        series=raw_data,
         start=test_start,
         forecast_horizon=1,
         stride=1,
@@ -97,21 +97,21 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
 
     Uni_logger.info(f"Final predictions shape: {predictions.shape}")
 
-    # Ensure predictions have the same number of components as test_series
-    if predictions.n_components != test_series.n_components:
+    # Ensure predictions have the same number of components as test_data
+    if predictions.n_components != test_data.n_components:
         Uni_logger.warning(
-            f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}"
+            f"Predictions have {predictions.n_components} components, test_data has {test_data.n_components}"
         )
-        # If predictions have more components, take only the first test_series.n_components
-        if predictions.n_components > test_series.n_components:
-            predictions = predictions[:, : test_series.n_components]
+        # If predictions have more components, take only the first test_data.n_components
+        if predictions.n_components > test_data.n_components:
+            predictions = predictions[:, : test_data.n_components]
             Uni_logger.info(
-                f"Truncated predictions to {test_series.n_components} components"
+                f"Truncated predictions to {test_data.n_components} components"
             )
         else:
             # If predictions have fewer components, this is a problem
             raise ValueError(
-                f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})"
+                f"Predictions have fewer components ({predictions.n_components}) than test_data ({test_data.n_components})"
             )
 
     Uni_logger.info(f"Generated predictions with shape: {predictions.shape}")
@@ -190,12 +190,12 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
     Uni_logger.info("Starting GluonTS one-step-ahead forecasting")
 
     # Convert datasets to lists for easier manipulation
-    test_series = list(test_ds)
-    train_series = list(train_ds)
+    test_data = list(test_ds)
+    train_data = list(train_ds)
 
     # Determine the range of predictions needed
-    train_length = len(train_series[0]["target"])
-    test_length = len(test_series[0]["target"])
+    train_length = len(train_data[0]["target"])
+    test_length = len(test_data[0]["target"])
 
     Uni_logger.info(
         f"Train length: {train_length}, Test length: {test_length - train_length}"
@@ -207,10 +207,10 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
     for i in tqdm(range(train_length, test_length), desc="One-step-ahead forecasting"):
         # Create temporary dataset with data up to current point
         temp_dataset = []
-        for series in test_series:
-            temp_series = series.copy()
-            temp_series["target"] = temp_series["target"][:i]
-            temp_dataset.append(temp_series)
+        for series in test_data:
+            temp_data = series.copy()
+            temp_data["target"] = temp_data["target"][:i]
+            temp_dataset.append(temp_data)
 
         # Get prediction for next time step
         predictions = list(model.predict(temp_dataset, num_samples=1))

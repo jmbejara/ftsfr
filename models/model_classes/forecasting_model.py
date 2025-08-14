@@ -81,11 +81,11 @@ class forecasting_model(ABC):
         # Check if we have the necessary attributes
         if (
             not hasattr(self, "model")
-            or not hasattr(self, "train_series")
-            or not hasattr(self, "test_series")
+            or not hasattr(self, "train_data")
+            or not hasattr(self, "test_data")
         ):
             raise AttributeError(
-                "Model must have 'model', 'train_series', and 'test_series' attributes"
+                "Model must have 'model', 'train_data', and 'test_data' attributes"
             )
 
         # Model should already be trained at this point
