@@ -55,7 +55,8 @@ class DartsMain(forecasting_model):
                                                            seasonality,
                                                            test_split)
 
-        DartsMain_logger.info("Read and processed dataframe.")
+        DartsMain_logger.info("Completed pre-processing and received "+\
+                              "train and test data")
 
         raw_df = pd.concat([train_data, test_data])
         raw_df = raw_df.pivot(index="ds",
@@ -64,7 +65,7 @@ class DartsMain(forecasting_model):
 
         raw_data = TimeSeries.from_dataframe(raw_df)
 
-        DartsMain_logger.info("Created raw TimeSeries object.")
+        DartsMain_logger.info("Made raw_df TimeSeries.")
 
         # This pivot adds all values for an entity as a TS in each column
         train_data = train_data.pivot(index="ds", columns="unique_id", values="y")
@@ -75,13 +76,13 @@ class DartsMain(forecasting_model):
         # Removing column index
         test_data.rename_axis(None, axis=1, inplace=True)
 
-        DartsMain_logger.info("Pivot both train and test series.")
+        DartsMain_logger.info("Pivot both train and test data.")
 
         # Splitting into train and test
         train_data = TimeSeries.from_dataframe(train_data)
         test_data = TimeSeries.from_dataframe(test_data)
 
-        DartsMain_logger.info("Generated train and test TimeSeries objects.")
+        DartsMain_logger.info("Made TimeSeries objects for train and test.")
 
         # Path to save model once trained
         model_path = output_path / "models" / model_name / dataset_name

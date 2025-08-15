@@ -44,7 +44,7 @@ class GluontsMain(forecasting_model):
         Path(model_path).mkdir(parents=True, exist_ok=True)
 
         GluontsMain_logger.info(
-            "Created model path and its +" + "folders if they were missing."
+            "Created model path and its folders that were missing."
         )
 
         # Path to save forecasts generated after training the model
@@ -53,7 +53,7 @@ class GluontsMain(forecasting_model):
         forecast_path = forecast_path / "forecasts.parquet"
 
         GluontsMain_logger.info(
-            "Created forecast_path and its " + "folders if they were missing."
+            "Created forecast_path and its folders that were missing."
         )
 
         # Path to save results which include the error metric
@@ -62,7 +62,7 @@ class GluontsMain(forecasting_model):
         result_path = result_path / str(dataset_name + ".csv")
 
         GluontsMain_logger.info(
-            "Created result_path and its " + "folders if they were missing."
+            "Created result_path and its folders that were missing."
         )
 
         # Data pre-processing
@@ -73,21 +73,22 @@ class GluontsMain(forecasting_model):
                                                            frequency,
                                                            seasonality,
                                                            test_split)
-
-        GluontsMain_logger.info("Data read and pre-processed.")
+        
+        GluontsMain_logger.info("Completed pre-processing and received "+\
+                                "train and test data")
 
         # Sorting for consistency
         train_data = train_data.sort_values(["unique_id", "ds"]).\
                                     reset_index(drop=True).\
                                     set_index("ds")
-        GluontsMain_logger.info("Sorted values along unique_id and then ds.")
+        
+        GluontsMain_logger.info("Sorted train data.")
 
         raw_df = pd.concat([train_data, test_data]).\
                     sort_values(["unique_id", "ds"]).\
                     reset_index(drop = True)
-
-        # Unique dates defines the number of entries per entity
-        # makes calculating test_length and subsequent splits easier
+        
+        GluontsMain_logger.info("Created raw_df from train and test data.")
 
         # Test data for GluonTS is the entire dataframe with the dates as index
         test_data = raw_df.set_index("ds")

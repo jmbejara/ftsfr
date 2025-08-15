@@ -20,7 +20,6 @@ from .helper_func import (
     common_error_catch,
     calculate_darts_MASE,
     process_df,
-    custom_interpolate,
 )
 
 
@@ -50,7 +49,7 @@ class NixtlaMain(forecasting_model):
         Path(model_path).mkdir(parents=True, exist_ok=True)
 
         NixtlaMain_logger.info(
-            "Created model path and its " + "folders if they were missing."
+            "Created model path and its folders that were missing."
         )
 
         # Path to save forecasts generated after training the model
@@ -59,7 +58,7 @@ class NixtlaMain(forecasting_model):
         forecast_path = forecast_path / "forecasts.parquet"
 
         NixtlaMain_logger.info(
-            "Created forecast_path and its " + "folders if they were missing."
+            "Created forecast_path and its folders that were missing."
         )
 
         # Path to save results which include the error metric
@@ -68,7 +67,7 @@ class NixtlaMain(forecasting_model):
         result_path = result_path / str(dataset_name + ".csv")
 
         NixtlaMain_logger.info(
-            "Created result_path and its " + "folders if they were missing."
+            "Created result_path and its folders that were missing."
         )
 
         # Data pre-processing
@@ -78,7 +77,8 @@ class NixtlaMain(forecasting_model):
                                                        seasonality,
                                                        test_split)
 
-        NixtlaMain_logger.info("Data read and pre-processed.")
+        NixtlaMain_logger.info("Completed pre-processing and received "+\
+                                "train and test data")
 
         # Names
         self.dataset_name = dataset_name
