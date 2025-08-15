@@ -137,47 +137,6 @@ def test_lightning_gpu():
         return False
 
 
-def test_tensorflow_gpu():
-    """Test TensorFlow GPU support (for GluonTS/TimesFM)."""
-    print("\nTesting TensorFlow GPU support...")
-    try:
-        import tensorflow as tf
-
-        print("✓ TensorFlow imported successfully")
-        print(f"  TensorFlow version: {tf.__version__}")
-
-        # List physical devices
-        gpus = tf.config.list_physical_devices("GPU")
-        print(f"  GPU devices found: {len(gpus)}")
-
-        if gpus:
-            for i, gpu in enumerate(gpus):
-                print(f"  GPU {i}: {gpu}")
-
-            # Test tensor creation
-            try:
-                with tf.device("/GPU:0"):
-                    a = tf.constant([[1.0, 2.0], [3.0, 4.0]])
-                    b = tf.constant([[1.0, 1.0], [0.0, 1.0]])
-                    c = tf.matmul(a, b)
-                print("  ✓ Successfully performed GPU computation")
-                return True
-            except Exception as e:
-                print(f"  ✗ Failed to perform GPU computation: {e}")
-                return False
-        else:
-            print("  ✗ No GPU devices found")
-            return False
-
-    except ImportError:
-        print("✗ TensorFlow not installed")
-        print("  Install with: pip install tensorflow")
-        return False
-    except Exception as e:
-        print(f"✗ Error testing TensorFlow: {e}")
-        return False
-
-
 def print_summary(results):
     """Print summary of GPU test results."""
     print("\n" + "=" * 60)
@@ -203,8 +162,6 @@ def print_summary(results):
             print("  Visit: https://pytorch.org/get-started/locally/")
         if not results.get("lightning", False) and results.get("torch", False):
             print("- Install PyTorch Lightning: pip install lightning")
-        if not results.get("tensorflow", False):
-            print("- Install TensorFlow with GPU support if using GluonTS/TimesFM")
 
 
 def main():
@@ -213,7 +170,7 @@ def main():
     )
     parser.add_argument(
         "--framework",
-        choices=["all", "torch", "tensorflow", "cuda"],
+        choices=["all", "torch", "cuda"],
         default="all",
         help="Which framework to test (default: all)",
     )
@@ -232,9 +189,6 @@ def main():
     if args.framework in ["all", "torch"]:
         results["torch"] = test_torch_gpu()
         results["lightning"] = test_lightning_gpu()
-
-    if args.framework in ["all", "tensorflow"]:
-        results["tensorflow"] = test_tensorflow_gpu()
 
     print_summary(results)
 

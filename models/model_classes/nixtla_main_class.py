@@ -20,7 +20,6 @@ from .helper_func import (
     common_error_catch,
     calculate_darts_MASE,
     process_df,
-    custom_interpolate,
 )
 
 
@@ -50,7 +49,7 @@ class NixtlaMain(forecasting_model):
         Path(model_path).mkdir(parents=True, exist_ok=True)
 
         NixtlaMain_logger.info(
-            "Created model path and its " + "folders if they were missing."
+            "Created model path and its folders that were missing."
         )
 
         # Path to save forecasts generated after training the model
@@ -59,7 +58,7 @@ class NixtlaMain(forecasting_model):
         forecast_path = forecast_path / "forecasts.parquet"
 
         NixtlaMain_logger.info(
-            "Created forecast_path and its " + "folders if they were missing."
+            "Created forecast_path and its folders that were missing."
         )
 
         # Path to save results which include the error metric
@@ -68,24 +67,18 @@ class NixtlaMain(forecasting_model):
         result_path = result_path / str(dataset_name + ".csv")
 
         NixtlaMain_logger.info(
-            "Created result_path and its " + "folders if they were missing."
+            "Created result_path and its folders that were missing."
         )
 
         # Data pre-processing
         df = pd.read_parquet(data_path).rename(columns={"id": "unique_id"})
-        df, test_split = process_df(df, frequency, seasonality, test_split)
-        df = custom_interpolate(df)
+        train_data, test_data, test_split = process_df(df,
+                                                       frequency,
+                                                       seasonality,
+                                                       test_split)
 
-        NixtlaMain_logger.info("Data read and pre-processed.")
-
-        # Unique dates defines the number of entries per entity
-        # makes calculating test_length and subsequent splits easier
-        unique_dates = df["ds"].unique()
-        test_length = int(test_split * len(unique_dates))
-        test_data = df[df.ds >= unique_dates[-test_length]]
-        train_data = df[df.ds < unique_dates[-test_length]]
-
-        NixtlaMain_logger.info("Data split into train and test.")
+        NixtlaMain_logger.info("Completed pre-processing and received "+\
+                                "train and test data")
 
         # Names
         self.dataset_name = dataset_name
@@ -98,10 +91,10 @@ class NixtlaMain(forecasting_model):
         self.result_path = result_path
 
         # Dataframes
-        self.raw_series = df
-        self.train_series = train_data
-        self.test_series = test_data
-        self.pred_series = None
+        self.raw_data = df
+        self.train_data = train_data
+        self.test_data = test_data
+        self.pred_data = None
 
         # Important variables
         self.seasonality = seasonality
@@ -148,8 +141,10 @@ class NixtlaMain(forecasting_model):
         NixtlaMain_logger.info("Model training started.")
         from neuralforecast import NeuralForecast
 
-        self.nf = NeuralForecast(models=[self.estimator], freq=self.frequency)
-        self.nf.fit(df=self.train_series)
+        self.nf = NeuralForecast(models=[self.estimator],
+                                 freq=self.frequency,
+                                 local_scaler_type = None)
+        self.nf.fit(df=self.train_data)
         NixtlaMain_logger.info("Model trained.")
 
     @common_error_catch
@@ -175,21 +170,22 @@ class NixtlaMain(forecasting_model):
             verify_one_step_ahead,
         )
 
-        self.pred_series = perform_one_step_ahead_nixtla(
-            nf_model=self.nf,
-            train_df=self.train_series,
-            test_df=self.test_series,
-            raw_df=self.raw_series,
+        self.pred_data = perform_one_step_ahead_nixtla(
+            nf_model = self.nf,
+            train_df = self.train_data,
+            test_df = self.test_data,
+            raw_df = self.raw_data,
         )
 
         # Verify that we're doing one-step-ahead (only if darts is available)
         try:
+            # Import for checking if darts is available
             from darts import TimeSeries
 
             is_valid = verify_one_step_ahead(
-                predictions=self.pred_series,
-                test_data=self.test_series,
-                model_type="nixtla",
+                predictions = self.pred_data,
+                test_data = self.test_data,
+                model_type = "nixtla",
             )
 
             if is_valid:
@@ -207,18 +203,18 @@ class NixtlaMain(forecasting_model):
 
     @common_error_catch
     def save_forecast(self):
-        if self.pred_series is None:
+        if self.pred_data is None:
             NixtlaMain_logger.error(
                 "No forecasts to save - forecast() must be called first"
             )
             raise ValueError("No forecasts available to save")
-        self.pred_series.to_parquet(self.forecast_path, engine="pyarrow")
+        self.pred_data.to_parquet(self.forecast_path, engine="pyarrow")
         NixtlaMain_logger.info('Saved forecasts to "' + str(self.forecast_path) + '".')
 
     def load_forecast(self):
         temp_df = pd.read_parquet(self.forecast_path)
         # For Nixtla models, we work with pandas DataFrames, not darts TimeSeries
-        self.pred_series = temp_df
+        self.pred_data = temp_df
         NixtlaMain_logger.info(
             'Loaded forecasts from "' + str(self.forecast_path) + '".'
         )
@@ -227,9 +223,9 @@ class NixtlaMain(forecasting_model):
         if metric == "MASE":
             try:
                 self.errors["MASE"] = calculate_darts_MASE(
-                    self.test_series,
-                    self.train_series,
-                    self.pred_series,
+                    self.test_data,
+                    self.train_data,
+                    self.pred_data,
                     self.seasonality,
                     self.model_name.title(),
                 )
@@ -248,7 +244,7 @@ class NixtlaMain(forecasting_model):
                 [
                     ["Model", self.model_name],
                     ["Dataset", self.dataset_name],
-                    ["Entities", len(self.train_series["unique_id"].unique())],
+                    ["Entities", len(self.train_data["unique_id"].unique())],
                     ["Frequency", self.frequency],
                     ["Seasonality", self.seasonality],
                     ["Global MASE", self.errors["MASE"]],
@@ -263,7 +259,7 @@ class NixtlaMain(forecasting_model):
             {
                 "Model": [self.model_name],
                 "Dataset": [self.dataset_name],
-                "Entities": [len(self.train_series["unique_id"].unique())],
+                "Entities": [len(self.train_data["unique_id"].unique())],
                 "Frequency": [self.frequency],
                 "Seasonality": [self.seasonality],
                 "Global MASE": [self.errors["MASE"]],

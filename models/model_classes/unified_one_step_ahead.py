@@ -21,15 +21,14 @@ except ImportError:
     TimeSeries = None
 
 
-def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
+def perform_one_step_ahead_darts(model, test_data, raw_data):
     """
     Performs one-step-ahead forecasting for Darts models.
 
     Args:
         model: Trained Darts model
-        train_series: Training TimeSeries
-        test_series: Test TimeSeries
-        raw_series: Full TimeSeries (train + test)
+        test_data: Test TimeSeries
+        raw_data: Full TimeSeries (train + test)
 
     Returns:
         TimeSeries: One-step-ahead predictions
@@ -48,8 +47,7 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     Uni_logger.info(f"Model type: {'Local' if is_local else 'Global'}")
 
     # Get test start time
-    test_start = test_series.start_time()
-    test_end = test_series.end_time()
+    test_start = test_data.start_time()
 
     # For global models, use historical_forecasts with explicit parameters
 
@@ -61,17 +59,15 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
     # Naive models
     # Else don't need to retrain
     model_name = str(type(model))
-    retrain_model = any(
-        [
-            x in model_name
-            for x in [".ExponentialSmoothing", ".Theta", ".Prophet", ".Naive"]
-        ]
-    )
+    retrain_model = (".ExponentialSmoothing" in model_name) or\
+                    (".Theta" in model_name) or\
+                    (".Prophet" in model_name) or\
+                    (".Naive" in model_name)
 
     Uni_logger.info("retrain_model = " + str(retrain_model))
     Uni_logger.info("Using historical_forecasts")
     predictions = model.historical_forecasts(
-        series=raw_series,
+        series=raw_data,
         start=test_start,
         forecast_horizon=1,
         stride=1,
@@ -97,36 +93,35 @@ def perform_one_step_ahead_darts(model, train_series, test_series, raw_series):
 
     Uni_logger.info(f"Final predictions shape: {predictions.shape}")
 
-    # Ensure predictions have the same number of components as test_series
-    if predictions.n_components != test_series.n_components:
+    # Ensure predictions have the same number of components as test_data
+    if predictions.n_components != test_data.n_components:
         Uni_logger.warning(
-            f"Predictions have {predictions.n_components} components, test_series has {test_series.n_components}"
+            f"Predictions have {predictions.n_components} components, test_data has {test_data.n_components}"
         )
-        # If predictions have more components, take only the first test_series.n_components
-        if predictions.n_components > test_series.n_components:
-            predictions = predictions[:, : test_series.n_components]
+        # If predictions have more components, take only the first test_data.n_components
+        if predictions.n_components > test_data.n_components:
+            predictions = predictions[:, : test_data.n_components]
             Uni_logger.info(
-                f"Truncated predictions to {test_series.n_components} components"
+                f"Truncated predictions to {test_data.n_components} components"
             )
         else:
             # If predictions have fewer components, this is a problem
             raise ValueError(
-                f"Predictions have fewer components ({predictions.n_components}) than test_series ({test_series.n_components})"
+                f"Predictions have fewer components ({predictions.n_components}) than test_data ({test_data.n_components})"
             )
 
     Uni_logger.info(f"Generated predictions with shape: {predictions.shape}")
     return predictions
 
-
-def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
+def perform_one_step_ahead_nixtla(nf_model, train_data, test_data, raw_data):
     """
     Performs one-step-ahead forecasting for Nixtla NeuralForecast models.
 
     Args:
         nf_model: NeuralForecast model instance (already fitted)
-        train_df: Training DataFrame with columns ['ds', 'unique_id', 'y']
-        test_df: Test DataFrame with columns ['ds', 'unique_id', 'y']
-        raw_df: Full DataFrame (train + test)
+        train_data: Training DataFrame with columns ['ds', 'unique_id', 'y']
+        test_data: Test DataFrame with columns ['ds', 'unique_id', 'y']
+        raw_data: Full DataFrame (train + test)
 
     Returns:
         pd.DataFrame: One-step-ahead predictions with columns ['ds', 'unique_id', 'y']
@@ -138,11 +133,11 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
     Uni_logger.info("Using NeuralForecast predict method on full dataset")
 
     try:
-        # The loop keeps concatenating forecasts to pred_df
-        pred_df = nf_model.predict(train_df)
-        first_date = test_df["ds"].unique()[0]
-        pred_df["ds"] = first_date
-        df = raw_df
+        # The loop keeps concatenating forecasts to pred_data
+        pred_data = nf_model.predict(train_data)
+        first_date = test_data["ds"].unique()[0]
+        pred_data["ds"] = first_date
+        df = raw_data
         Uni_logger.info(
             "Got predictions for date: " + first_date.strftime("%Y-%m-%d, %r") + "."
         )
@@ -152,17 +147,17 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
         # After each prediction the next prediction uses the actual value in the
         # test dataset instead of relying on the previous predicted value.
         Uni_logger.info("Starting for loop to get sliding window forecasts.")
-        for i in test_df["ds"].unique()[1:]:
+        for i in test_data["ds"].unique()[1:]:
             # Get predictions for the next date
-            temp_pred_df = nf_model.predict(df[df.ds < i])
+            temp_pred_data = nf_model.predict(df[df.ds < i])
             # Lining up the dates
-            temp_pred_df["ds"] = i
-            pred_df = pd.concat([pred_df, temp_pred_df], ignore_index=True)
+            temp_pred_data["ds"] = i
+            pred_data = pd.concat([pred_data, temp_pred_data], ignore_index=True)
             Uni_logger.info(
                 "Got predictions for date: " + i.strftime("%Y-%m-%d, %r") + "."
             )
 
-        return pred_df
+        return pred_data
 
     except Exception as e:
         Uni_logger.error(f"Error in NeuralForecast prediction: {e}")
@@ -170,19 +165,19 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
         Uni_logger.info("Trying fallback approach with test data only")
 
         # Use the test data directly for prediction
-        predictions = nf_model.predict(test_df)
+        predictions = nf_model.predict(test_data)
         Uni_logger.info(f"Fallback generated {len(predictions)} predictions")
         return predictions
 
 
-def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
+def perform_one_step_ahead_gluonts(model, train_data, test_data):
     """
     Performs one-step-ahead forecasting for GluonTS models.
 
     Args:
         model: Trained GluonTS predictor
-        train_ds: Training dataset (GluonTS format)
-        test_ds: Test dataset (GluonTS format)
+        train_data: Training dataset (GluonTS format)
+        test_data: Test dataset (GluonTS format)
 
     Returns:
         pd.DataFrame: One-step-ahead predictions with columns ['ds', 'unique_id', 'y']
@@ -190,12 +185,12 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
     Uni_logger.info("Starting GluonTS one-step-ahead forecasting")
 
     # Convert datasets to lists for easier manipulation
-    test_series = list(test_ds)
-    train_series = list(train_ds)
+    test_data = list(test_data)
+    train_data = list(train_data)
 
     # Determine the range of predictions needed
-    train_length = len(train_series[0]["target"])
-    test_length = len(test_series[0]["target"])
+    train_length = len(train_data[0]["target"])
+    test_length = len(test_data[0]["target"])
 
     Uni_logger.info(
         f"Train length: {train_length}, Test length: {test_length - train_length}"
@@ -207,10 +202,10 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
     for i in tqdm(range(train_length, test_length), desc="One-step-ahead forecasting"):
         # Create temporary dataset with data up to current point
         temp_dataset = []
-        for series in test_series:
-            temp_series = series.copy()
-            temp_series["target"] = temp_series["target"][:i]
-            temp_dataset.append(temp_series)
+        for series in test_data:
+            temp_data = series.copy()
+            temp_data["target"] = temp_data["target"][:i]
+            temp_dataset.append(temp_data)
 
         # Get prediction for next time step
         predictions = list(model.predict(temp_dataset, num_samples=1))
@@ -248,9 +243,9 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
                     }
                 )
 
-    pred_df = pd.DataFrame(result)
-    Uni_logger.info(f"Generated {len(pred_df)} one-step-ahead predictions")
-    return pred_df
+    pred_data = pd.DataFrame(result)
+    Uni_logger.info(f"Generated {len(pred_data)} one-step-ahead predictions")
+    return pred_data
 
 
 def verify_one_step_ahead(predictions, test_data, model_type="generic"):

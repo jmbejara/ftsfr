@@ -69,16 +69,16 @@ class DartsGlobal(DartsMain):
         )
 
         # Use the unified one-step-ahead implementation
-        self.pred_series = perform_one_step_ahead_darts(
+        self.pred_data = perform_one_step_ahead_darts(
             model=self.model,
-            train_series=self.train_series,
-            test_series=self.test_series,
-            raw_series=self.raw_series,
+            train_data=self.train_data,
+            test_data=self.test_data,
+            raw_data=self.raw_data,
         )
 
         # Verify that we're doing one-step-ahead
         is_valid = verify_one_step_ahead(
-            predictions=self.pred_series, test_data=self.test_series, model_type="darts"
+            predictions=self.pred_data, test_data=self.test_data, model_type="darts"
         )
 
         if is_valid:
@@ -91,7 +91,7 @@ class DartsGlobal(DartsMain):
         DartsGlobal_logger.info(
             "DartsGlobal forecast called. "
             + "Predicted series acquired. "
-            + "Internal pred_series updated."
+            + "Internal pred_data updated."
         )
 
     def print_summary(self):
@@ -100,7 +100,7 @@ class DartsGlobal(DartsMain):
                 [
                     ["Model", self.model_name],
                     ["Dataset", self.dataset_name],
-                    ["Entities", self.train_series.n_components],
+                    ["Entities", self.train_data.n_components],
                     ["Frequency", self.frequency],
                     ["Seasonality", self.seasonality],
                     ["Global MASE", self.errors["MASE"]],
@@ -115,7 +115,7 @@ class DartsGlobal(DartsMain):
             {
                 "Model": [self.model_name],
                 "Dataset": [self.dataset_name],
-                "Entities": [self.train_series.n_components],
+                "Entities": [self.train_data.n_components],
                 "Global MASE": [self.errors["MASE"]],
             }
         )

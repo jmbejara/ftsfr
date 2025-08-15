@@ -70,37 +70,27 @@ class DartsLocal(DartsMain):
 
     @common_error_catch
     def forecast_workflow(self):
-        # Import Darts-specific utilities only when needed
-        from darts.utils.missing_values import fill_missing_values
-
         DartsLocal_logger.info(
             "forecast_workflow called. Predictions made for each "
             + "entity separately."
         )
-        raw_series = self.raw_series.copy()
-        auto_mode = False
+
+        raw_data = self.raw_data.copy()
+        train_data = self.train_data.copy()
+        test_data = self.test_data.copy()
+
         # Training on each entity and calculating MASE
         self.print_sep()
         DartsLocal_logger.info("Starting loop for the workflow on each entity.")
-        for id in tqdm(raw_series.columns):
+        for id in tqdm(train_data.columns):
             DartsLocal_logger.info("Processing id: " + id + ".")
-            # Select the date and the column for current id
-            entity_data = raw_series[[id]].copy()
-            # Removing leading/trailing NaNs which show up due to different
-            # start times of different series
-            entity_data = entity_data.strip()
-            entity_data = fill_missing_values(entity_data)
 
-            DartsLocal_logger.info("Pre-processed entity data.")
-
-            if len(entity_data) <= 10:
-                DartsLocal_logger.info("Data too small, so skipped.")
-                continue
-
-            self.raw_series = entity_data
+            # Updating internal variables to only contain the current series
+            self.train_data = train_data[[id]].copy()
+            self.test_data = test_data[[id]].copy()
+            self.raw_data = raw_data[[id]].copy()
 
             # Updates internal train and test series
-            self._train_test_split(entity_data)
             self.train()
             self.forecast()
             id_mase = self.calculate_error()
@@ -113,14 +103,16 @@ class DartsLocal(DartsMain):
 
         self.print_sep()
         self.save_forecast()
-        self.raw_series = raw_series
+        self.raw_data = raw_data
+        self.train_data = train_data
+        self.test_data = test_data
 
         if self.mase_list:
             self.errors["MASE"] = sum(self.mase_list) / len(self.mase_list)
             self.median_mase = statistics.median(self.mase_list)
         else:
-            self.errors["MASE"] = np.nan
-            self.median_mase = np.nan
+            self.errors["MASE"] = 0.0
+            self.median_mase = 0.0
 
         DartsLocal_logger.info(
             f"Mean MASE: {self.errors['MASE']} | " + "Median MASE: {self.median_mase}"

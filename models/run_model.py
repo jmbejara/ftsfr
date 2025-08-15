@@ -369,9 +369,6 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
             estimator,
             model_name,
             *env_vars,
-            scaling=model_config.get("scaling", True),
-            interpolation=model_config.get("interpolation", True),
-            f32=model_config.get("f32", False),
         )
     elif model_class == "NixtlaMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
@@ -387,7 +384,6 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     elif model_class == "GluontsMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.gluonts_main_class import GluontsMain
-
         estimator = create_estimator(model_config, env_vars)
         model_obj = GluontsMain(estimator, model_name, *env_vars)
     elif model_class == "TimesFM":
