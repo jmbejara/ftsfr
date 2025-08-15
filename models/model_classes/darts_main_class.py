@@ -15,7 +15,7 @@ DartsMain_logger = logging.getLogger("DartsMain")
 
 # from warnings import filterwarnings
 # filterwarnings("ignore")
-
+import numpy as np
 import pandas as pd
 from darts import TimeSeries
 from darts.utils.model_selection import train_test_split
@@ -147,20 +147,13 @@ class DartsMain(forecasting_model):
                 [
                     ["Model", model_name],
                     ["Dataset", dataset_name],
-                    ["Total Entities", self.raw_data.n_components],
+                    ["Total Entities", self.train_data.n_components],
                 ],
                 tablefmt="fancy_grid",
             )
         )
 
         DartsMain_logger.info("Object fully initialized.")
-
-    @common_error_catch
-    def _train_test_split(self, entity_data):
-        self.train_data, self.test_data = train_test_split(
-            entity_data, test_size=self.test_split
-        )
-        DartsMain_logger.info("Internal train and test series updated")
 
     @common_error_catch
     def train(self):
@@ -183,10 +176,9 @@ class DartsMain(forecasting_model):
 
         # Use the unified one-step-ahead implementation
         self.pred_data = perform_one_step_ahead_darts(
-            model=self.model,
-            train_data=self.train_data,
-            test_data=self.test_data,
-            raw_data=self.raw_data,
+            model = self.model,
+            test_data = self.test_data,
+            raw_data = self.raw_data,
         )
 
         # Verify that we're doing one-step-ahead
@@ -270,33 +262,19 @@ class DartsMain(forecasting_model):
                     f"DEBUG: pred_data range: {self.pred_data.start_time()} to {self.pred_data.end_time()}"
                 )
 
-                # Since we're doing one-step-ahead, predictions should align with test
-                # But MASE needs historical data. Let's use the full series up to pred start
-                pred_start = self.pred_data.start_time()
-
-                # Get the full historical series up to the prediction start
-                # We need to include data up to one step before predictions
-                try:
-                    # Get the index of pred_start in raw_data
-                    pred_start_idx = self.raw_data.get_index_at_point(pred_start)
-                    if pred_start_idx > 0:
-                        # Slice raw_data to include everything before pred_start
-                        historical_data = self.raw_data[:pred_start_idx]
-                    else:
-                        # Fallback to train_data
-                        historical_data = self.train_data
-                except:
-                    # If any issues, fall back to train_data
-                    print("DEBUG: Failed to slice raw_data, using train_data")
-                    historical_data = self.train_data
-
-                self.errors["MASE"] = mase(
+                temp = mase(
                     self.test_data,
                     self.pred_data,
-                    historical_data,
+                    self.train_data,
                     self.seasonality,
                 )
-                DartsMain_logger.info("MASE = " + str(self.errors["MASE"]) + ".")
+
+                if temp == np.nan:
+                    temp = 0.0
+
+                self.errors["MASE"] = temp
+
+                DartsMain_logger.info("MASE = " + str(temp) + ".")
                 return self.errors["MASE"]
             except ValueError as e:
                 if "cannot use MASE with periodical signals" in str(e):

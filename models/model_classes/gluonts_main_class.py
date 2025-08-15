@@ -185,7 +185,7 @@ class GluontsMain(forecasting_model):
 
         # Use the unified one-step-ahead implementation
         self.pred_data = perform_one_step_ahead_gluonts(
-            model=self.model, train_ds=self.train_data, test_ds=self.test_data
+            model=self.model, train_data=self.train_data, test_data=self.test_data
         )
 
         # For verification, we need the test data in DataFrame format

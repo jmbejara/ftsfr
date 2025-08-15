@@ -21,13 +21,12 @@ except ImportError:
     TimeSeries = None
 
 
-def perform_one_step_ahead_darts(model, train_data, test_data, raw_data):
+def perform_one_step_ahead_darts(model, test_data, raw_data):
     """
     Performs one-step-ahead forecasting for Darts models.
 
     Args:
         model: Trained Darts model
-        train_data: Training TimeSeries
         test_data: Test TimeSeries
         raw_data: Full TimeSeries (train + test)
 
@@ -49,7 +48,6 @@ def perform_one_step_ahead_darts(model, train_data, test_data, raw_data):
 
     # Get test start time
     test_start = test_data.start_time()
-    test_end = test_data.end_time()
 
     # For global models, use historical_forecasts with explicit parameters
 
@@ -61,12 +59,10 @@ def perform_one_step_ahead_darts(model, train_data, test_data, raw_data):
     # Naive models
     # Else don't need to retrain
     model_name = str(type(model))
-    retrain_model = any(
-        [
-            x in model_name
-            for x in [".ExponentialSmoothing", ".Theta", ".Prophet", ".Naive"]
-        ]
-    )
+    retrain_model = (".ExponentialSmoothing" in model_name) or\
+                    (".Theta" in model_name) or\
+                    (".Prophet" in model_name) or\
+                    (".Naive" in model_name)
 
     Uni_logger.info("retrain_model = " + str(retrain_model))
     Uni_logger.info("Using historical_forecasts")
@@ -117,16 +113,15 @@ def perform_one_step_ahead_darts(model, train_data, test_data, raw_data):
     Uni_logger.info(f"Generated predictions with shape: {predictions.shape}")
     return predictions
 
-
-def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
+def perform_one_step_ahead_nixtla(nf_model, train_data, test_data, raw_data):
     """
     Performs one-step-ahead forecasting for Nixtla NeuralForecast models.
 
     Args:
         nf_model: NeuralForecast model instance (already fitted)
-        train_df: Training DataFrame with columns ['ds', 'unique_id', 'y']
-        test_df: Test DataFrame with columns ['ds', 'unique_id', 'y']
-        raw_df: Full DataFrame (train + test)
+        train_data: Training DataFrame with columns ['ds', 'unique_id', 'y']
+        test_data: Test DataFrame with columns ['ds', 'unique_id', 'y']
+        raw_data: Full DataFrame (train + test)
 
     Returns:
         pd.DataFrame: One-step-ahead predictions with columns ['ds', 'unique_id', 'y']
@@ -138,11 +133,11 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
     Uni_logger.info("Using NeuralForecast predict method on full dataset")
 
     try:
-        # The loop keeps concatenating forecasts to pred_df
-        pred_df = nf_model.predict(train_df)
-        first_date = test_df["ds"].unique()[0]
-        pred_df["ds"] = first_date
-        df = raw_df
+        # The loop keeps concatenating forecasts to pred_data
+        pred_data = nf_model.predict(train_data)
+        first_date = test_data["ds"].unique()[0]
+        pred_data["ds"] = first_date
+        df = raw_data
         Uni_logger.info(
             "Got predictions for date: " + first_date.strftime("%Y-%m-%d, %r") + "."
         )
@@ -152,17 +147,17 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
         # After each prediction the next prediction uses the actual value in the
         # test dataset instead of relying on the previous predicted value.
         Uni_logger.info("Starting for loop to get sliding window forecasts.")
-        for i in test_df["ds"].unique()[1:]:
+        for i in test_data["ds"].unique()[1:]:
             # Get predictions for the next date
-            temp_pred_df = nf_model.predict(df[df.ds < i])
+            temp_pred_data = nf_model.predict(df[df.ds < i])
             # Lining up the dates
-            temp_pred_df["ds"] = i
-            pred_df = pd.concat([pred_df, temp_pred_df], ignore_index=True)
+            temp_pred_data["ds"] = i
+            pred_data = pd.concat([pred_data, temp_pred_data], ignore_index=True)
             Uni_logger.info(
                 "Got predictions for date: " + i.strftime("%Y-%m-%d, %r") + "."
             )
 
-        return pred_df
+        return pred_data
 
     except Exception as e:
         Uni_logger.error(f"Error in NeuralForecast prediction: {e}")
@@ -170,19 +165,19 @@ def perform_one_step_ahead_nixtla(nf_model, train_df, test_df, raw_df):
         Uni_logger.info("Trying fallback approach with test data only")
 
         # Use the test data directly for prediction
-        predictions = nf_model.predict(test_df)
+        predictions = nf_model.predict(test_data)
         Uni_logger.info(f"Fallback generated {len(predictions)} predictions")
         return predictions
 
 
-def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
+def perform_one_step_ahead_gluonts(model, train_data, test_data):
     """
     Performs one-step-ahead forecasting for GluonTS models.
 
     Args:
         model: Trained GluonTS predictor
-        train_ds: Training dataset (GluonTS format)
-        test_ds: Test dataset (GluonTS format)
+        train_data: Training dataset (GluonTS format)
+        test_data: Test dataset (GluonTS format)
 
     Returns:
         pd.DataFrame: One-step-ahead predictions with columns ['ds', 'unique_id', 'y']
@@ -190,8 +185,8 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
     Uni_logger.info("Starting GluonTS one-step-ahead forecasting")
 
     # Convert datasets to lists for easier manipulation
-    test_data = list(test_ds)
-    train_data = list(train_ds)
+    test_data = list(test_data)
+    train_data = list(train_data)
 
     # Determine the range of predictions needed
     train_length = len(train_data[0]["target"])
@@ -248,9 +243,9 @@ def perform_one_step_ahead_gluonts(model, train_ds, test_ds):
                     }
                 )
 
-    pred_df = pd.DataFrame(result)
-    Uni_logger.info(f"Generated {len(pred_df)} one-step-ahead predictions")
-    return pred_df
+    pred_data = pd.DataFrame(result)
+    Uni_logger.info(f"Generated {len(pred_data)} one-step-ahead predictions")
+    return pred_data
 
 
 def verify_one_step_ahead(predictions, test_data, model_type="generic"):

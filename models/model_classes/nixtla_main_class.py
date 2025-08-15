@@ -179,6 +179,7 @@ class NixtlaMain(forecasting_model):
 
         # Verify that we're doing one-step-ahead (only if darts is available)
         try:
+            # Import for checking if darts is available
             from darts import TimeSeries
 
             is_valid = verify_one_step_ahead(
