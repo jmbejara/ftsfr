@@ -2,7 +2,7 @@
 pull_bbg_basis_treas_sf.py
 
 Pull USD OIS term structure and Treasury futures inputs from Bloomberg via xbbg,
-and write standardized parquet files used downstream by `calc_treasury_data.py`.
+and write standardized parquet files used downstream by `calc_basis_treas_sf.py`.
 
 Outputs (saved under DATA_DIR/basis_treas_sf):
 - ois.parquet: Date + OIS tenors (1W, 1M, 3M, 6M, 1Y)

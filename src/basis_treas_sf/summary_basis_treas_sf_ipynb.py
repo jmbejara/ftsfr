@@ -19,7 +19,7 @@ import sys
 import asyncio
 
 from settings import config
-from calc_treasury_data import load_treasury_sf_output
+from calc_basis_treas_sf import load_treasury_sf_output
 import load_bases_data
 
 DATA_DIR = config("DATA_DIR")
@@ -111,7 +111,7 @@ display(
 """
 ### How the Treasury spot-futures basis is computed (summary)
 
-Inputs loaded in `calc_treasury_data.py`:
+Inputs loaded in `calc_basis_treas_sf.py`:
 - `treasury_df.parquet`: contract strings, implied repo rates, volumes, prices for near/deferred contracts.
 - `ois.parquet`: USD OIS tenors (1W, 1M, 3M, 6M, 1Y).
 - `last_day.parquet`: month/year → settlement day mapping for futures.
@@ -123,7 +123,7 @@ Computation outline:
 - Clean: flag outliers via a ±45-day rolling MAD by tenor; set flagged values to NaN; require volume in the deferred contract.
 - Pivot long → wide; produce series `Treasury_SF_2Y, 5Y, 10Y, 20Y, 30Y`; forward-fill small gaps.
 
-See `calc_treasury_data.py` functions for details: `parse_contract_date`, `interpolate_ois`, `rolling_outlier_flag`, `compute_treasury_long`, `compute_treasury_output`. 
+See `calc_basis_treas_sf.py` functions for details: `parse_contract_date`, `interpolate_ois`, `rolling_outlier_flag`, `compute_treasury_long`, `compute_treasury_output`. 
 
 
 """

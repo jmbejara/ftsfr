@@ -1,5 +1,5 @@
 """
-calc_treasury_data.py
+calc_basis_treas_sf.py
 
 This module reads the intermediate pulled data, processes the Treasury Spot-Futures data by:
     - Reshaping from wide to long format.
@@ -10,7 +10,7 @@ This module reads the intermediate pulled data, processes the Treasury Spot-Futu
     - Saving the final output in wide format.
 
 Usage:
-  python src/calc_treasury_data.py
+  python src/calc_basis_treas_sf.py
 """
 
 import sys
@@ -22,13 +22,13 @@ import numpy as np
 import pandas as pd
 
 # Ensure 'src' is in sys.path
-sys.path.append(str(Path("./src").resolve()))
+sys.path.append(str(Path("..").resolve()))
 
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
-
+# DATA_DIR = DATA_DIR / "basis_treas_sf"
 
 # -------------------------
 # Helper functions
@@ -159,17 +159,17 @@ def compute_treasury_long(
         cond_special = df_long[contract_col].isin(["DEC 21", "MAR 22"])
         df_long.loc[cond_special, "Mat_Day"] = 31
 
-        def make_mat_date(row):
+        def make_mat_date(row, version):
             try:
                 return datetime(
-                    int(row[f"Mat_Year_{v}"]),
-                    int(row[f"Mat_Month_{v}"]),
+                    int(row[f"Mat_Year_{version}"]),
+                    int(row[f"Mat_Month_{version}"]),
                     int(row["Mat_Day"]),
                 )
             except Exception:
                 return pd.NaT
 
-        df_long[mat_date_col] = df_long.apply(make_mat_date, axis=1)
+        df_long[mat_date_col] = df_long.apply(lambda row: make_mat_date(row, v), axis=1)
         df_long[ttm_col] = (df_long[mat_date_col] - df_long["Date"]).dt.days
 
         # Clean up temporary columns
@@ -226,6 +226,14 @@ def compute_treasury_long(
 
     # Drop rows without trading volume in deferred contract (Vol_2)
     df_long = df_long[df_long["Vol_2"].notnull()].copy()
+
+    # Debug: Print some info about the data
+    print(f"Unique tenors: {sorted(df_long['Tenor'].unique())}")
+    print(f"Shape after filtering: {df_long.shape}")
+    print(f"TTM_1 null count: {df_long['TTM_1'].isnull().sum()}")
+    print(f"TTM_2 null count: {df_long['TTM_2'].isnull().sum()}")
+    print(f"Mat_Date_1 null count: {df_long['Mat_Date_1'].isnull().sum()}")
+    print(f"Mat_Date_2 null count: {df_long['Mat_Date_2'].isnull().sum()}")
 
     return df_long
 
@@ -304,14 +312,14 @@ def calc_treasury(
 
 
 def save_arbitrage_spread_plots(
-    df_long: pd.DataFrame, output_dir: Path, tenors=(2, 5, 10, 20, 30)
+    df_long: pd.DataFrame, output_dir: Path = OUTPUT_DIR, tenors=(2, 5, 10, 20, 30)
 ) -> None:
     """Save arbitrage spread plots for the given tenors."""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     for tenor in tenors:
         df_plot = df_long[df_long["Tenor"] == str(tenor)]
         if df_plot.empty:
-            continue
+            raise ValueError(f"No data found for tenor {tenor}")
         plt.figure(figsize=(10, 5))
         plt.plot(df_plot["Date"], df_plot["arb"], label=f"Tenor = {tenor} years")
         plt.ylabel("Arbitrage Spread (bps)")

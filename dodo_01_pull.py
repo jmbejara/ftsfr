@@ -478,7 +478,7 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/calc_treasury_data.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/calc_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_sf_output.parquet",
@@ -487,7 +487,7 @@ def task_format():
                 DATA_DIR / data_module / "treasury_df.parquet",
                 DATA_DIR / data_module / "ois.parquet",
                 DATA_DIR / data_module / "last_day.parquet",
-                f"./src/{data_module}/calc_treasury_data.py",
+                f"./src/{data_module}/calc_basis_treas_sf.py",
             ],
             "clean": [],
         }
@@ -496,7 +496,7 @@ def task_format():
                 "name": "summary_basis_treas_sf_ipynb",
                 "notebook_path": f"./src/{data_module}/summary_basis_treas_sf_ipynb.py",
                 "file_dep": [
-                    f"./src/{data_module}/calc_treasury_data.py",
+                    f"./src/{data_module}/calc_basis_treas_sf.py",
                     DATA_DIR / data_module / "treasury_sf_output.parquet",
                 ],
                 "targets": [],
