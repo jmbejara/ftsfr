@@ -10,18 +10,19 @@ from collections import defaultdict
 from pathlib import Path
 import logging
 
-NixtlaMain_logger = logging.getLogger("NixtlaMain")
-
 import pandas as pd
 from tabulate import tabulate
+import torch
 
 from .forecasting_model import forecasting_model
 from .helper_func import (
     common_error_catch,
     calculate_darts_MASE,
     process_df,
+    custom_interpolate,
 )
 
+NixtlaMain_logger = logging.getLogger("NixtlaMain")
 
 class NixtlaMain(forecasting_model):
     def __init__(
@@ -35,8 +36,6 @@ class NixtlaMain(forecasting_model):
         output_path,
         estimator_params=None,
     ):
-        # Only import torch here, not neuralforecast
-        import torch
 
         NixtlaMain_logger.info("NixtlaMain __init__ called.")
 
@@ -91,7 +90,7 @@ class NixtlaMain(forecasting_model):
         self.result_path = result_path
 
         # Dataframes
-        self.raw_data = df
+        self.raw_data = custom_interpolate(pd.concat([train_data, test_data]))
         self.train_data = train_data
         self.test_data = test_data
         self.pred_data = None
@@ -172,9 +171,9 @@ class NixtlaMain(forecasting_model):
 
         self.pred_data = perform_one_step_ahead_nixtla(
             nf_model = self.nf,
-            train_df = self.train_data,
-            test_df = self.test_data,
-            raw_df = self.raw_data,
+            train_data = self.train_data,
+            test_data = self.test_data,
+            raw_data = self.raw_data,
         )
 
         # Verify that we're doing one-step-ahead (only if darts is available)

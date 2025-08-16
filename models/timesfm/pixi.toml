@@ -4,7 +4,7 @@ name = "ftsfr_timesfm"
 platforms = ["linux-64"]
 
 [tasks]
-run = "python run_model.py --model timesfm"
+run = "python ../run_model.py --model timesfm"
 run-model = "python run_model.py"
 test-gpu = "python test_gpu.py"
 

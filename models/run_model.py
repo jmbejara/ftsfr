@@ -335,9 +335,6 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
     dataset_name = dataset_config[5]
 
-    # Setup logging
-    data_path = env_vars[3]
-
     log_path = Path().resolve() / "model_logs" / "run_model_runs" / model_name
     Path(log_path).mkdir(parents=True, exist_ok=True)
     log_path = log_path / (dataset_name + ".log")
@@ -348,7 +345,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         level=logging.DEBUG,
     )
 
-    logger = logging.getLogger("main")
+    logger = logging.getLogger("run_model")
     logger.info(f"Running {model_name} model. Environment variables read.")
 
     # Handle special models

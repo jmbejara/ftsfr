@@ -220,11 +220,11 @@ class DartsMain(forecasting_model):
         DartsMain_logger.info('Predictions saved to "' + str(self.forecast_path) + '".')
 
     def load_forecast(self):
-        temp_df = pd.read_parquet(self.forecast_path)
+        temp_df = pd.read_parquet(self.forecast_path).rename(columns = {"time": "ds"})
         self.pred_data = TimeSeries.from_dataframe(temp_df, time_col="ds")
         DartsMain_logger.info(
             "Model forecasts loaded from "
-            + self.forecast_path
+            + str(self.forecast_path)
             + ". Internal variable updated."
         )
 

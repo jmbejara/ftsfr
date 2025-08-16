@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from pandas.tseries.frequencies import to_offset
 from utilsforecast.preprocessing import fill_gaps
+from traceback import print_tb
 
 import logging
 
@@ -39,18 +40,15 @@ def calculate_darts_MASE(
     try:
         test_data = (
             test_data.pivot(index="ds", columns="unique_id", values="y")
-            .reset_index()
             .rename_axis(None, axis=1)
         )
         train_data = (
             train_data.pivot(index="ds", columns="unique_id", values="y")
-            .reset_index()
             .rename_axis(None, axis=1)
         )
 
         pred_data = (
             pred_data.pivot(index="ds", columns="unique_id", values=value_column)
-            .reset_index()
             .rename_axis(None, axis=1)
         )
 
@@ -61,15 +59,9 @@ def calculate_darts_MASE(
 
         # Try to convert to TimeSeries with frequency inference
         try:
-            test_data = TimeSeries.from_dataframe(
-                test_data, time_col="ds", fill_missing_dates=True, freq=None
-            )
-            train_data = TimeSeries.from_dataframe(
-                train_data, time_col="ds", fill_missing_dates=True, freq=None
-            )
-            pred_data = TimeSeries.from_dataframe(
-                pred_data, time_col="ds", fill_missing_dates=True, freq=None
-            )
+            test_data = TimeSeries.from_dataframe(test_data)
+            train_data = TimeSeries.from_dataframe(train_data)
+            pred_data = TimeSeries.from_dataframe(pred_data)
         except ValueError:
             # Fallback to simple conversion without frequency inference
             hf_logger.warning("Frequency inference failed, using simple conversion")
@@ -116,7 +108,7 @@ def scaled_data(train_data, test_data):
     # Using Sk-learns minmax scaling, scale both series
     # Reference: https://scikit-learn.org/stable/modules/preprocessing.html
 
-    scaled_data_logger = logging.getLogger("scaled_data")
+    scaled_data_logger = logging.getLogger("hf.scaled_data")
     
     from sklearn import preprocessing
 
@@ -166,7 +158,7 @@ def split_train_test(df, test_split):
     """
     Splits a dataframe using the cutoff date method
     """
-    stt_logger = logging.getLogger("split_train_test")
+    stt_logger = logging.getLogger("hf.split_train_test")
 
     stt_logger.info("split_train_test called.")
 
@@ -282,6 +274,9 @@ def process_df(df, frequency, seasonality, test_split):
     # The train series should now have all defined entries
     # The test series doesn't have any synthetic data
 
+    train_data.reset_index(drop = True, inplace=True)
+    test_data.reset_index(drop= True, inplace= True)
+
     hf_logger.info("Pre-processing complete.")
 
     return (train_data, test_data, test_split)
@@ -310,6 +305,7 @@ def common_error_catch(f):
                 + "There is a possibility that this error is insignificant "
                 + "and can be ignored."
             )
+            print_tb()
             hf_logger.exception(f"Error in {f.__name__}.")
             print_sep()
             return None

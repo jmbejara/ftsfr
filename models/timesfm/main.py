@@ -65,7 +65,7 @@ class TimesFMForecasting(forecasting_model):
 
         logger.info("Read and processed dataframe.")
 
-        test_length = int(test_split * len(df.ds.unique()))
+        test_length = int(test_split * len(df['ds'].unique()))
 
         # Names
         self.dataset_name = dataset_name
