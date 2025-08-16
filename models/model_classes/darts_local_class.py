@@ -33,8 +33,6 @@ class DartsLocal(DartsMain):
         seasonality,
         data_path,
         output_path,
-        scaling=False,
-        interpolation=False,
     ):
         # Import Darts-specific utilities only when needed
 
@@ -48,8 +46,6 @@ class DartsLocal(DartsMain):
             seasonality,
             data_path,
             output_path,
-            scaling,
-            interpolation,
         )
 
         DartsLocal_logger.info("DartsLocal super().__init__() complete.")

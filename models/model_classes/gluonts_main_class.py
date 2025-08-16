@@ -70,9 +70,9 @@ class GluontsMain(forecasting_model):
         raw_df = raw_df.rename(columns={"id": "unique_id"})
         # Fills missing dates and extends if required
         train_data, test_data, test_split = process_df(raw_df,
-                                                           frequency,
-                                                           seasonality,
-                                                           test_split)
+                                                       frequency,
+                                                       seasonality,
+                                                       test_split)
         
         GluontsMain_logger.info("Completed pre-processing and received "+\
                                 "train and test data")

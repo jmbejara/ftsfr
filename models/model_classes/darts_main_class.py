@@ -51,9 +51,9 @@ class DartsMain(forecasting_model):
 
         # Fills missing dates and extends if required
         train_data, test_data, test_split = process_df(df,
-                                                           frequency,
-                                                           seasonality,
-                                                           test_split)
+                                                       frequency,
+                                                       seasonality,
+                                                       test_split)
 
         DartsMain_logger.info("Completed pre-processing and received "+\
                               "train and test data")

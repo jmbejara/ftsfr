@@ -171,7 +171,7 @@ def split_train_test(df, test_split):
     stt_logger.info("split_train_test called.")
 
     unique_dates = df['ds'].unique()
-    test_length = test_split * len(unique_dates)
+    test_length = int(test_split * len(unique_dates))
 
     cutoff_date = unique_dates[-test_length]
     stt_logger.info(f"Cutoff date: {cutoff_date}")
@@ -247,7 +247,7 @@ def process_df(df, frequency, seasonality, test_split):
                 + "Series is shorter than seasonality."
             )
             raise ValueError(
-                "Series too short. " + "Please select appropriate test split."
+                "Series too short. Please select appropriate test split."
             )
 
     test_length = int(test_split * len_ud)
@@ -258,6 +258,7 @@ def process_df(df, frequency, seasonality, test_split):
         hf_logger.info("Train series shorter than seasonality * 4.")
         df = extend_df(df, train_data_len, frequency, seasonality)
 
+        unique_dates = df['ds'].unique()
         test_split = float(test_length / len(unique_dates))
     
     # Split using the cutoff-date method

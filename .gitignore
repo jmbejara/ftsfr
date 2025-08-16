@@ -12,6 +12,8 @@
 # files and dirs in models
 /models/*/.pixi
 /models/*/pixi.lock
+/models/.pixi
+/models/pixi.lock
 /models/testing
 /models/model_logs
 /models/lightning_logs

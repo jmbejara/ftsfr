@@ -33,9 +33,6 @@ class DartsGlobal(DartsMain):
         seasonality,
         data_path,
         output_path,
-        scaling=False,
-        interpolation=True,
-        f32=False,
     ):
         DartsGlobal_logger.info("DartsGlobal object initialized.")
 
@@ -47,9 +44,6 @@ class DartsGlobal(DartsMain):
             seasonality,
             data_path,
             output_path,
-            scaling,
-            interpolation,
-            f32,
         )
 
         DartsGlobal_logger.info("DartsGlobal super().__init__() complete.")
@@ -71,7 +65,6 @@ class DartsGlobal(DartsMain):
         # Use the unified one-step-ahead implementation
         self.pred_data = perform_one_step_ahead_darts(
             model=self.model,
-            train_data=self.train_data,
             test_data=self.test_data,
             raw_data=self.raw_data,
         )

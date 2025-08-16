@@ -118,9 +118,6 @@ estimator_params = { season_mode = "SeasonalityMode.ADDITIVE" }
 class = "DartsGlobal"
 estimator_class = "darts.models.DLinearModel"
 display_name = "DLinear"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -128,9 +125,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.GlobalNaiveAggregate"
 display_name = "Global Naive Aggregate"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -138,9 +132,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.GlobalNaiveDrift"
 display_name = "Global Naive Drift"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -148,9 +139,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.GlobalNaiveSeasonal"
 display_name = "Global Naive Seasonal"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -158,9 +146,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.NBEATSModel"
 display_name = "N-BEATS"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -168,9 +153,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.NHiTSModel"
 display_name = "NHiTS"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -178,9 +160,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.NLinearModel"
 display_name = "NLinear"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -188,9 +167,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.TiDEModel"
 display_name = "TiDE"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -198,9 +174,6 @@ estimator_params = { output_chunk_length = 1 }
 class = "DartsGlobal"
 estimator_class = "darts.models.TransformerModel"
 display_name = "Transformer"
-scaling = true
-interpolation = true
-f32 = true
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
