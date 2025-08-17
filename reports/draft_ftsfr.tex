@@ -281,6 +281,15 @@ cheapest-to-deliver noise, and we winsorise the extreme 1\% of spreads; the
 resulting series replicates the persistently negative swap spreads documented by
 \citet{Jermann2020}, \citet{Du2023}, and \citet{Hanson2023}.
 
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/replicated_swap_spread_arb_figure.png}
+  \end{tabular}
+  \caption{Treasury Swap Arbitrage spreads.}
+  \label{fig:treasury_swap_basis}
+\end{figure}
+
 \paragraph{TIPS-Treasury Arbitrage}
 Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we splice Federal Reserve zero-coupon TIPS yields with Bloomberg constant-maturity inflation-swap rates to create synthetic nominal yields, then difference these against equal-maturity zero-coupon Treasury yields for the 2-, 5-, 10- and 20-year tenors.  We exclude days with missing swap quotes or illiquid TIPS issues, drop outliers beyond the extreme 1\%, and harmonise all series to 17:00 ET closes to obtain a clean daily TIPS-Treasury basis series.
 
