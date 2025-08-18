@@ -165,7 +165,7 @@ def plot_tips_treasury_spreads(
     title_dates = (
         f"({start_date[:4] if start_date else ''}-{end_date[:4] if end_date else ''})"
     )
-    ax.set_title(f"TIPS Treasury Rates {title_dates}", fontsize=16)
+    ax.set_title(f"TIPS Treasury Arbitrage Spreads {title_dates}", fontsize=16)
     ax.set_xlabel("Date", fontsize=14)
     ax.set_ylabel("Spread (bps)", fontsize=14)
     ax.grid(True, axis="y")
