@@ -10,7 +10,7 @@ Pull and load Bloomberg Treasury and Swap yield data.
 All files are saved as Parquet in DATA_DIR.
 """
 
-from datetime import timedelta
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -19,39 +19,43 @@ from xbbg import blp
 from settings import config
 
 DATA_DIR: Path = config("DATA_DIR")
+START_DATE: str = config("START_DATE", default="2000-01-01")
+END_DATE: str = config("END_DATE", default=str(date.today()))
 
 
-def pull_raw_tyields() -> pd.DataFrame:
+def pull_raw_tyields(
+    start_date: str = START_DATE, end_date: str = END_DATE
+) -> pd.DataFrame:
     """
     Pull raw Treasury yields from Bloomberg.
 
     Returns
     - pd.DataFrame: MultiIndex columns by ticker with daily PX_LAST values.
     """
-    today = pd.to_datetime("today").normalize() - timedelta(days=1)
     months = [1, 2, 3, 4, 6, 12]
     years = [2, 3, 5, 7, 10, 20, 30]
     tickers = [f"GB{x} Govt" for x in months] + [f"GT{x} Govt" for x in years]
     df = blp.bdh(
-        tickers=tickers, flds=["PX_LAST"], start_date="2000-01-01", end_date=today
+        tickers=tickers, flds=["PX_LAST"], start_date=start_date, end_date=end_date
     )
     # Align the former 12M bill series name with 1Y convention
     df = df.rename(columns={"GB12 Govt": "GT1 Govt"})
     return df
 
 
-def pull_raw_syields() -> pd.DataFrame:
+def pull_raw_syields(
+    start_date: str = START_DATE, end_date: str = END_DATE
+) -> pd.DataFrame:
     """
     Pull raw Swap yields from Bloomberg.
 
     Returns
     - pd.DataFrame: MultiIndex columns by ticker with daily PX_LAST values.
     """
-    today = pd.to_datetime("today").normalize() - timedelta(days=1)
     years = [1, 2, 3, 5, 10, 20, 30]
     tickers = [f"USSO{x} CMPN Curncy" for x in years]
     df = blp.bdh(
-        tickers=tickers, flds=["PX_LAST"], start_date="2000-01-01", end_date=today
+        tickers=tickers, flds=["PX_LAST"], start_date=start_date, end_date=end_date
     )
     return df
 

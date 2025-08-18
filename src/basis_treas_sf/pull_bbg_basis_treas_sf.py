@@ -9,7 +9,7 @@ Outputs (saved under DATA_DIR/basis_treas_sf):
 - ois.parquet: Date + OIS tenors (1W, 1M, 3M, 6M, 1Y)
 - Individual futures files for each tenor:
   - treasury_2y.parquet: 2Y futures data
-  - treasury_5y.parquet: 5Y futures data  
+  - treasury_5y.parquet: 5Y futures data
   - treasury_10y.parquet: 10Y futures data
   - treasury_30y.parquet: 30Y futures data
   - treasury_20y.parquet: 20Y futures data (Ultra 10Y proxy)
@@ -25,7 +25,7 @@ Treasury Futures (via futures_ticker_map() for each tenor 2Y, 5Y, 10Y, 20Y, 30Y)
 - CURRENT_CONTRACT_MONTH_YR: Current Contract Month/Year
 - FUT_ACTUAL_REPO_RT: Actual Repo Rate
 - FUT_AGGTE_OPEN_INT: Aggregate Open Interest
-- FUT_AGGTE_VOL: Aggregate Volume of Futures Contracts  
+- FUT_AGGTE_VOL: Aggregate Volume of Futures Contracts
 - FUT_CNVS_FACTOR: Conversion Factor
 - FUT_CTD_CUSIP: Cheapest to Deliver CUSIP
 - FUT_CTD_GROSS_BASIS: Cheapest to Deliver Gross Basis
@@ -46,54 +46,54 @@ Notes
 Definitions
 -----------
 
-- CNVS_FACTOR_EOD: End of day conversion factor of the cheapest to deliver bond. For current day CTD 
-data, use the end of day fields: Cheapest to Deliver CUSIP - End of Day (FO049, CTD_CUSIP_EOD) and 
-Conversion Factor - End of Day (FO050, CNVS_FACTOR_EOD). The fields will return blank/'0' until some 
-time (to be determined) after future's close. For historical CTD data, use fields: Cheapest to Deliver 
+- CNVS_FACTOR_EOD: End of day conversion factor of the cheapest to deliver bond. For current day CTD
+data, use the end of day fields: Cheapest to Deliver CUSIP - End of Day (FO049, CTD_CUSIP_EOD) and
+Conversion Factor - End of Day (FO050, CNVS_FACTOR_EOD). The fields will return blank/'0' until some
+time (to be determined) after future's close. For historical CTD data, use fields: Cheapest to Deliver
 CUSIP (FO064, FUT_CTD_CUSIP) and Conversion Factor (FO052, FUT_CNVS_FACTOR (FUT_CONV_FACTOR).
 
-- CONVENTIONAL_CTD_FORWARD_FRSK: Price sensitivity of the future contract to changes in yield, computed 
-according to the contract's conventional forward basis. The cheapest to deliver (CTD) bond is used in 
-this calculation, where the settlement date is the last delivery date and the maturity date is the 
-maturity of the cheapest to deliver. The price at delivery date is the futures price times the CTD 
-conversion factor. The resulting risk is divided by the conversion factor. Options: Option risk is 
+- CONVENTIONAL_CTD_FORWARD_FRSK: Price sensitivity of the future contract to changes in yield, computed
+according to the contract's conventional forward basis. The cheapest to deliver (CTD) bond is used in
+this calculation, where the settlement date is the last delivery date and the maturity date is the
+maturity of the cheapest to deliver. The price at delivery date is the futures price times the CTD
+conversion factor. The resulting risk is divided by the conversion factor. Options: Option risk is
 obtained by delta scaling of the futures risk.
 
-- CTD_CUSIP_EOD: End of day Committee on Uniform Securities Identification Procedures (CUSIP) number of 
-the cheapest to deliver (CTD) bond. For current day CTD data, use the end of day fields: Cheapest to 
-Deliver CUSIP - End of Day (FO049, CTD_CUSIP_EOD) and Conversion Factor - End of Day (FO050, 
-CNVS_FACTOR_EOD). The fields will return blank/'0' until some time (to be determined) after future's 
-close. For historical CTD data, use fields: Cheapest to Deliver CUSIP (FO064, FUT_CTD_CUSIP) and 
+- CTD_CUSIP_EOD: End of day Committee on Uniform Securities Identification Procedures (CUSIP) number of
+the cheapest to deliver (CTD) bond. For current day CTD data, use the end of day fields: Cheapest to
+Deliver CUSIP - End of Day (FO049, CTD_CUSIP_EOD) and Conversion Factor - End of Day (FO050,
+CNVS_FACTOR_EOD). The fields will return blank/'0' until some time (to be determined) after future's
+close. For historical CTD data, use fields: Cheapest to Deliver CUSIP (FO064, FUT_CTD_CUSIP) and
 Conversion Factor (FO052, FUT_CNVS_FACTOR (FUT_CONV_FACTOR).
 
 - CURRENT_CONTRACT_MONTH_YR: Current Contract Month/Year
 
-- FUT_ACTUAL_REPO_RT: The cash-and-carry return for the indicated number of days and day count of the 
+- FUT_ACTUAL_REPO_RT: The cash-and-carry return for the indicated number of days and day count of the
 CTD bond.
 
-- FUT_AGGTE_OPEN_INT: The total number of futures contracts that have not been closed, liquidated, or 
+- FUT_AGGTE_OPEN_INT: The total number of futures contracts that have not been closed, liquidated, or
 delivered for all currently listed contracts in a series.
 
-- FUT_AGGTE_VOL: The total number of futures contracts traded for all currently listed contracts in a 
+- FUT_AGGTE_VOL: The total number of futures contracts traded for all currently listed contracts in a
 series.
 
-- FUT_CNVS_FACTOR: An adjustment factor used to compute the proper futures invoice price for bonds with 
-differing coupons/maturities deliverable into the same futures contract. The conversion factor is 
+- FUT_CNVS_FACTOR: An adjustment factor used to compute the proper futures invoice price for bonds with
+differing coupons/maturities deliverable into the same futures contract. The conversion factor is
 calculated by the exchange. Returns the cheapest to deliver (CTD) factor by default.
 
 - FUT_CTD_CUSIP: The Cusip of the cheapest to deliver bond.
 
-- FUT_CTD_GROSS_BASIS: The cheapest to deliver bond's price minus the delivery price. The pricing 
-source for historical values of FO075 is based on the futures settlement price and bond prices using 
-the following pricing source: Treasury futures: BBT3, Gilt futures: BVL4, Euro-Zone futures (French, 
-German, Italy, Spain, etc.): BVL4, Canada bond futures: BVN4, Japan bond futures: BVT3, All other bond 
+- FUT_CTD_GROSS_BASIS: The cheapest to deliver bond's price minus the delivery price. The pricing
+source for historical values of FO075 is based on the futures settlement price and bond prices using
+the following pricing source: Treasury futures: BBT3, Gilt futures: BVL4, Euro-Zone futures (French,
+German, Italy, Spain, etc.): BVL4, Canada bond futures: BVN4, Japan bond futures: BVT3, All other bond
 futures: BGN.
 
 - FUT_CTD_NET_BASIS: The cheapest to deliver bond's gross basis adjusted for net carry.
 
 - FUT_CUR_GEN_TICKER: Current Generic Futures Ticker
 
-- FUT_IMPLIED_REPO_RT: The cash-and-carry return for the indicated number of days and day count of the 
+- FUT_IMPLIED_REPO_RT: The cash-and-carry return for the indicated number of days and day count of the
 Cheapest to Deliver bond.
 
 - FUT_PX: Futures Trade Price
@@ -118,7 +118,7 @@ from settings import config
 # Configuration via settings.py
 DATA_DIR: Path = config("DATA_DIR")
 # DATA_DIR = DATA_DIR / "basis_treas_sf"
-START_DATE: str = config("START_DATE", default="2004-01-01")
+START_DATE: str = config("START_DATE", default="2000-01-01")
 END_DATE: str = config("END_DATE", default=str(date.today()))
 MIN_NON_NULL_RATIO: float = 0.5
 
@@ -169,7 +169,9 @@ def pull_ois_history(
     total_rows = len(df)
     for tkr in tickers:
         if tkr in df.columns:
-            non_null_ratio = (df[tkr].notna().sum() / total_rows) if total_rows > 0 else 0.0
+            non_null_ratio = (
+                (df[tkr].notna().sum() / total_rows) if total_rows > 0 else 0.0
+            )
             if non_null_ratio < MIN_NON_NULL_RATIO:
                 warnings.warn(
                     f"Low data coverage for {tkr} [PX_LAST] from {start_date} to {end_date}: "
@@ -197,16 +199,22 @@ def _check_coverage(df: pl.DataFrame, message="") -> None:
     """Check coverage of a DataFrame."""
     total_rows = len(df)
     for col in df.columns:
-        non_null_ratio = (df[col].is_not_null().sum() / total_rows) if total_rows > 0 else 0.0
+        non_null_ratio = (
+            (df[col].is_not_null().sum() / total_rows) if total_rows > 0 else 0.0
+        )
         if non_null_ratio < MIN_NON_NULL_RATIO:
             print(message)
-            warnings.warn(f"Low data coverage for {col}: {non_null_ratio:.1%} non-null", category=UserWarning)
+            warnings.warn(
+                f"Low data coverage for {col}: {non_null_ratio:.1%} non-null",
+                category=UserWarning,
+            )
+
 
 def pull_futures_for_tenor(
     tenor: int, start_date: str = START_DATE, end_date: str = END_DATE
 ) -> Tuple[pl.DataFrame, pl.DataFrame]:
     """Fetch Treasury futures data for a specific tenor.
-    
+
     Pulls both near (1) and deferred (2) contracts for all specified Bloomberg fields.
     Returns DataFrame with properly named columns to avoid conflicts.
 
@@ -254,26 +262,26 @@ def pull_futures_for_tenor(
     tenor_to_tickers = futures_ticker_map()
     if tenor not in tenor_to_tickers:
         raise ValueError(f"Unsupported tenor: {tenor}")
-    
+
     near_tkr, def_tkr = tenor_to_tickers[tenor]
-    
+
     # Define all Bloomberg fields to pull
     fields = [
-        "PX_LAST",                    # Last Price
+        "PX_LAST",  # Last Price
         "CURRENT_CONTRACT_MONTH_YR",  # Current Contract Month/Year
-        "FUT_ACTUAL_REPO_RT",         # Actual Repo Rate
-        "FUT_AGGTE_OPEN_INT",         # Aggregate Open Interest
-        "FUT_AGGTE_VOL",              # Aggregate Volume of Futures Contracts
-        "FUT_CNVS_FACTOR",            # Conversion Factor
-        "FUT_CTD_CUSIP",              # Cheapest to Deliver CUSIP
-        "FUT_CTD_GROSS_BASIS",        # Cheapest to Deliver Gross Basis
-        "FUT_CTD_NET_BASIS",          # Cheapest to Deliver Net Basis
-        "FUT_CUR_GEN_TICKER",         # Current Generic Futures Ticker
-        "FUT_IMPLIED_REPO_RT",        # Implied Repo Rate of CTD Bond
-        "FUT_PX",                     # Futures Trade Price
-        "CONVENTIONAL_CTD_FORWARD_FRSK", # Conventional CTD Forward Risk
-        "CTD_CUSIP_EOD",              # Cheapest to Deliver CUSIP - End of Day
-        "CNVS_FACTOR_EOD",            # Conversion Factor - End of Day
+        "FUT_ACTUAL_REPO_RT",  # Actual Repo Rate
+        "FUT_AGGTE_OPEN_INT",  # Aggregate Open Interest
+        "FUT_AGGTE_VOL",  # Aggregate Volume of Futures Contracts
+        "FUT_CNVS_FACTOR",  # Conversion Factor
+        "FUT_CTD_CUSIP",  # Cheapest to Deliver CUSIP
+        "FUT_CTD_GROSS_BASIS",  # Cheapest to Deliver Gross Basis
+        "FUT_CTD_NET_BASIS",  # Cheapest to Deliver Net Basis
+        "FUT_CUR_GEN_TICKER",  # Current Generic Futures Ticker
+        "FUT_IMPLIED_REPO_RT",  # Implied Repo Rate of CTD Bond
+        "FUT_PX",  # Futures Trade Price
+        "CONVENTIONAL_CTD_FORWARD_FRSK",  # Conventional CTD Forward Risk
+        "CTD_CUSIP_EOD",  # Cheapest to Deliver CUSIP - End of Day
+        "CNVS_FACTOR_EOD",  # Conversion Factor - End of Day
     ]
 
     # Pull data for both contracts
@@ -284,20 +292,19 @@ def pull_futures_for_tenor(
         end_date=end_date,
         timeout=10000,
     )
-    
+
     df1 = df[near_tkr]
     df2 = df[def_tkr]
     df1.index.name = "Date"
     df2.index.name = "Date"
     df1.reset_index(inplace=True)
     df2.reset_index(inplace=True)
-    
+
     df1 = pl.from_pandas(df1)
     df2 = pl.from_pandas(df2)
 
     _check_coverage(df1, message=f"Tenor={tenor}")
     _check_coverage(df2, message=f"Tenor={tenor}")
-
 
     return df1, df2
 
@@ -306,7 +313,9 @@ def load_ois(data_dir: Path = DATA_DIR) -> pl.DataFrame:
     return pl.read_parquet(Path(data_dir) / "ois.parquet")
 
 
-def load_treasury_tenor(tenor: int, data_dir: Path = DATA_DIR) -> Tuple[pl.DataFrame, pl.DataFrame]:
+def load_treasury_tenor(
+    tenor: int, data_dir: Path = DATA_DIR
+) -> Tuple[pl.DataFrame, pl.DataFrame]:
     """Load Treasury futures data for a specific tenor."""
     df1 = pl.read_parquet(Path(data_dir) / f"treasury_{tenor}y_1.parquet")
     df2 = pl.read_parquet(Path(data_dir) / f"treasury_{tenor}y_2.parquet")
@@ -317,11 +326,11 @@ if __name__ == "__main__":
     # Create output directory
     output_dir = DATA_DIR / "basis_treas_sf"
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Pull and save OIS data
     ois = pull_ois_history()
     ois.write_parquet(output_dir / "ois.parquet")
-    
+
     # Pull and save futures data for each tenor separately
     tenors = [2, 5, 10, 20, 30]
     for tenor in tenors:
@@ -331,4 +340,3 @@ if __name__ == "__main__":
         futures_data2.write_parquet(output_dir / f"treasury_{tenor}y_2.parquet")
         futures_data1.write_csv(output_dir / f"treasury_{tenor}y_1.csv")
         futures_data2.write_csv(output_dir / f"treasury_{tenor}y_2.csv")
-        

@@ -399,7 +399,9 @@ def build_spot_proxies_from_futures_df(df_futures: pd.DataFrame) -> pd.DataFrame
 
     date_col = "index" if "index" in df_futures.columns else df_futures.columns[0]
     proxy_cols = [
-        c for c in df_futures.columns if c != date_col and c.endswith("1 Comdty_PX_LAST")
+        c
+        for c in df_futures.columns
+        if c != date_col and c.endswith("1 Comdty_PX_LAST")
     ]
 
     cols = [date_col] + proxy_cols

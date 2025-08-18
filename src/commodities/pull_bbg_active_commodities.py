@@ -128,7 +128,7 @@ def pull_active_commodities_prices(
 
             # Derive readable ticker name by stripping the field suffix if present
             suffix = f"_{fld}"
-            ticker_name = col[:-len(suffix)] if col.endswith(suffix) else col
+            ticker_name = col[: -len(suffix)] if col.endswith(suffix) else col
 
             if non_null_ratio == 0.0:
                 empty_series.append(ticker_name)
@@ -149,7 +149,9 @@ def pull_active_commodities_prices(
             )
 
     try:
-        df = blp.bdh(tickers=tickers, flds=[field], start_date=start_date, end_date=end_date)
+        df = blp.bdh(
+            tickers=tickers, flds=[field], start_date=start_date, end_date=end_date
+        )
     except Exception:
         df = None
 
@@ -157,7 +159,9 @@ def pull_active_commodities_prices(
         frames: list[pd.DataFrame] = []
         for tkr in tickers:
             try:
-                sub = blp.bdh(tickers=tkr, flds=[field], start_date=start_date, end_date=end_date)
+                sub = blp.bdh(
+                    tickers=tkr, flds=[field], start_date=start_date, end_date=end_date
+                )
             except Exception:
                 continue
             if sub is None or sub.empty:
@@ -169,7 +173,9 @@ def pull_active_commodities_prices(
                 sub = sub.rename(columns={only: f"{tkr}_{only}"})
             frames.append(sub)
         if not frames:
-            raise ValueError("No data returned from Bloomberg for any requested ticker (per-ticker fallback).")
+            raise ValueError(
+                "No data returned from Bloomberg for any requested ticker (per-ticker fallback)."
+            )
         wide = pd.concat(frames, axis=1).reset_index()
         _validate_coverage(wide, coverage_threshold, start_date, end_date, field)
         return wide
@@ -191,5 +197,3 @@ if __name__ == "__main__":
     df = pull_active_commodities_prices()
     path = DATA_DIR / "commodity_futures_active.parquet"
     df.to_parquet(path)
-
-

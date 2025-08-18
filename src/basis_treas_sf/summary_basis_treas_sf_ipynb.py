@@ -20,7 +20,6 @@ import asyncio
 
 from settings import config
 from calc_basis_treas_sf import load_treasury_sf_output
-import format_bbg_basis_treas_sf
 import load_bases_data
 
 DATA_DIR = config("DATA_DIR")

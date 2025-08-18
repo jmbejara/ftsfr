@@ -196,7 +196,7 @@ def implied_daily_fx_returns(fx_data, currency_list):
     return fx_df
 
 
-import matplotlib.pyplot as plt
+
 
 def graph_fx_returns(fx_df, currency_list, region_name):
     """
@@ -213,7 +213,7 @@ def graph_fx_returns(fx_df, currency_list, region_name):
 
     # Plot
     fig, ax = plt.subplots(figsize=(10, 5))
-    
+
     fx_df[ret_list].plot(ax=ax, title="")
 
     # Add axis labels
@@ -225,7 +225,6 @@ def graph_fx_returns(fx_df, currency_list, region_name):
 
     plt.tight_layout()
     plt.show()
-
 
 
 def calculate_fx(end_date="2025-03-01", data_dir=DATA_DIR):

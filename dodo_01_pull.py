@@ -113,13 +113,13 @@ def task_pull():
         yield {
             "name": f"{data_module}_bbg",
             "actions": [
-                f"python ./src/{data_module}/pull_bloomberg_treasury_inflation_swaps.py --OUTPUT_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_bbg_treasury_inflation_swaps.py --OUTPUT_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_inflation_swaps.parquet",
             ],
             "file_dep": [
-                f"./src/{data_module}/pull_bloomberg_treasury_inflation_swaps.py",
+                f"./src/{data_module}/pull_bbg_treasury_inflation_swaps.py",
             ],
             "clean": [],
         }

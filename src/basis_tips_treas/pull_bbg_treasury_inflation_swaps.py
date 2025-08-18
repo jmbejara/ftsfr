@@ -1,11 +1,12 @@
 from xbbg import blp
 from pathlib import Path
+from datetime import date
 
 from settings import config
 
 OUTPUT_DIR = config("OUTPUT_DIR")
-START_DATE = config("START_DATE", default="2020-01-01")
-END_DATE = config("END_DATE", default="2025-01-01")
+START_DATE: str = config("START_DATE", default="2000-01-01")
+END_DATE: str = config("END_DATE", default=str(date.today()))
 
 
 def pull_treasury_inflation_swaps(

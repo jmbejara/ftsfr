@@ -31,6 +31,7 @@ DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
 # DATA_DIR = DATA_DIR / "basis_treas_sf"
 
+
 # -------------------------
 # Helper functions
 # -------------------------
@@ -281,9 +282,7 @@ def compute_treasury_output(df_long: pd.DataFrame) -> pd.DataFrame:
     ].copy()
     # Forward-fill only value columns to avoid object downcasting warnings on DataFrame-wide ffill
     value_cols = [c for c in df_final.columns if c != "Date"]
-    df_final.loc[:, value_cols] = (
-        df_final[value_cols].astype(float).ffill(limit=5)
-    )
+    df_final.loc[:, value_cols] = df_final[value_cols].astype(float).ffill(limit=5)
 
     return df_final
 
@@ -335,7 +334,7 @@ if __name__ == "__main__":
     treasury_df = format_bbg_basis_treas_sf.load_treasury_df(data_dir=DATA_DIR)
     ois_df = format_bbg_basis_treas_sf.load_ois(data_dir=DATA_DIR)
     last_day_df = format_bbg_basis_treas_sf.load_last_day(data_dir=DATA_DIR)
-    
+
     # Ensure expected OIS columns exist (in case longer-tenor columns were included)
     keep_cols = [
         c
