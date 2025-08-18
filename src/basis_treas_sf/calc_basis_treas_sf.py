@@ -25,6 +25,7 @@ import pandas as pd
 sys.path.append(str(Path("..").resolve()))
 
 from settings import config
+import format_bbg_basis_treas_sf
 
 DATA_DIR = config("DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
@@ -117,19 +118,8 @@ def compute_treasury_long(
     treasury_df["Date"] = pd.to_datetime(treasury_df["Date"]).dt.tz_localize(None)
     ois_df["Date"] = pd.to_datetime(ois_df["Date"]).dt.tz_localize(None)
 
-    stubnames = [
-        "Contract_1",
-        "Contract_2",
-        "Implied_Repo_1",
-        "Implied_Repo_2",
-        "Vol_1",
-        "Vol_2",
-        "Price_1",
-        "Price_2",
-    ]
-    df_long = pd.wide_to_long(
-        treasury_df, stubnames=stubnames, i="Date", j="Tenor", sep="_", suffix=r"\d+"
-    ).reset_index()
+    # Data is already in long format, no need for wide_to_long
+    df_long = treasury_df.copy()
 
     # Filter dates > June 22, 2004
     cutoff_date = datetime(2004, 6, 22)
@@ -341,12 +331,11 @@ def load_treasury_sf_output(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    treasury_file = DATA_DIR / "treasury_df.parquet"
-    ois_file = DATA_DIR / "ois.parquet"
-    last_day_file = DATA_DIR / "last_day.parquet"
-
-    treasury_df = pd.read_parquet(treasury_file)
-    ois_df = pd.read_parquet(ois_file)
+    # Load data using the format module's load functions
+    treasury_df = format_bbg_basis_treas_sf.load_treasury_df(data_dir=DATA_DIR)
+    ois_df = format_bbg_basis_treas_sf.load_ois(data_dir=DATA_DIR)
+    last_day_df = format_bbg_basis_treas_sf.load_last_day(data_dir=DATA_DIR)
+    
     # Ensure expected OIS columns exist (in case longer-tenor columns were included)
     keep_cols = [
         c
@@ -354,7 +343,6 @@ if __name__ == "__main__":
         if c in ["Date", "OIS_1W", "OIS_1M", "OIS_3M", "OIS_6M", "OIS_1Y"]
     ]
     ois_df = ois_df[keep_cols]
-    last_day_df = pd.read_parquet(last_day_file)
 
     # Compute
     df_long = compute_treasury_long(treasury_df, ois_df, last_day_df)

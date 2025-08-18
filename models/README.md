@@ -338,7 +338,7 @@ FS_FOLDER="utah-fs"
 ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP} "mkdir -p ~/${FS_FOLDER}/ftsfr"
 if [ "$(basename "$PWD")" = "ftsfr" ]; then
   echo "Correct directory"
-  rsync -avzh --progress --delete --exclude='_output/' --exclude='.pixi/' --exclude="./models/lightning_logs/" -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
+  rsync -avzh --progress --delete --exclude='_docs/' --exclude='docs/' --exclude='_output/' --exclude='.pixi/' --exclude="./models/lightning_logs/" -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
 else
   echo "Error: Current directory is not 'ftsfr'. Please 'cd' into the 'ftsfr' directory before running rsync."
 fi
@@ -362,3 +362,11 @@ rsync -avzh --progress --exclude='.pixi/' --exclude='.git/' -e "ssh -i ~/.ssh/${
 - **No look-ahead bias**: Each forecast uses only historical data
 - **Unified evaluation**: All models use MASE (Mean Absolute Scaled Error)
 - **Automatic dataset detection**: Reads configuration from `datasets.toml`
+
+
+## DEBUGGING
+
+
+export DATASET_PATH="../_data/cds_returns/ftsfr_CDS_contract_returns.parquet"
+export N_EPOCHS=5 && export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True && python run_model.py --model dlinear
+

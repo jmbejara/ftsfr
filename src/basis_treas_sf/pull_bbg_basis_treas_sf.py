@@ -110,12 +110,14 @@ from typing import Dict, List, Tuple
 import pandas as pd
 from xbbg import blp
 import warnings
+import polars as pl
 
 from settings import config
 
 
 # Configuration via settings.py
 DATA_DIR: Path = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "basis_treas_sf"
 START_DATE: str = config("START_DATE", default="2004-01-01")
 END_DATE: str = config("END_DATE", default=str(date.today()))
 MIN_NON_NULL_RATIO: float = 0.5
@@ -135,10 +137,21 @@ def ois_tickers() -> List[str]:
 
 def pull_ois_history(
     start_date: str = START_DATE, end_date: str = END_DATE
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """Fetch historical USD OIS levels (PX_LAST) from Bloomberg via xbbg.
 
     Returns Date + ticker columns. Consumers rename to compact labels later.
+
+    >>> ois.glimpse(max_items_per_column=2)
+    Rows: 5587
+    Columns: 7
+    $ Date               <datetime[ns]> 2004-01-01 00:00:00, 2004-01-02 00:00:00
+    $ USSO1Z CMPN Curncy          <f64> 1.0, 1.0
+    $ USSOA CMPN Curncy           <f64> 1.01, 1.005
+    $ USSOB CMPN Curncy           <f64> 1.008, 1.009
+    $ USSOC CMPN Curncy           <f64> 1.015, 1.016
+    $ USSOF CMPN Curncy           <f64> 1.058, 1.077
+    $ USSO1 CMPN Curncy           <f64> 1.29, 1.353
     """
     tickers = ois_tickers()
     df = blp.bdh(
@@ -163,6 +176,7 @@ def pull_ois_history(
                     f"{non_null_ratio:.1%} non-null",
                     category=UserWarning,
                 )
+    df = pl.from_pandas(df)
     return df
 
 
@@ -179,13 +193,63 @@ def futures_ticker_map() -> Dict[int, Tuple[str, str]]:
     return mapping
 
 
+def _check_coverage(df: pl.DataFrame, message="") -> None:
+    """Check coverage of a DataFrame."""
+    total_rows = len(df)
+    for col in df.columns:
+        non_null_ratio = (df[col].is_not_null().sum() / total_rows) if total_rows > 0 else 0.0
+        if non_null_ratio < MIN_NON_NULL_RATIO:
+            print(message)
+            warnings.warn(f"Low data coverage for {col}: {non_null_ratio:.1%} non-null", category=UserWarning)
+
 def pull_futures_for_tenor(
     tenor: int, start_date: str = START_DATE, end_date: str = END_DATE
-) -> pd.DataFrame:
+) -> Tuple[pl.DataFrame, pl.DataFrame]:
     """Fetch Treasury futures data for a specific tenor.
     
     Pulls both near (1) and deferred (2) contracts for all specified Bloomberg fields.
     Returns DataFrame with properly named columns to avoid conflicts.
+
+    >>> futures_data1.tail().glimpse(max_items_per_column=2)
+    Rows: 5
+    Columns: 16
+    $ Date                          <date> 2025-05-26, 2025-05-27
+    $ PX_LAST                        <f64> None, 112.90625
+    $ CURRENT_CONTRACT_MONTH_YR      <str> None, 'JUN 25'
+    $ FUT_ACTUAL_REPO_RT             <f64> None, 4.32315
+    $ FUT_AGGTE_OPEN_INT             <f64> None, 1899157.0
+    $ FUT_AGGTE_VOL                  <f64> 111905.0, 2322952.0
+    $ FUT_CNVS_FACTOR                <f64> None, 0.875
+    $ FUT_CTD_CUSIP                  <str> None, '912810QN'
+    $ FUT_CTD_GROSS_BASIS            <f64> None, 6.6236
+    $ FUT_CTD_NET_BASIS              <f64> None, 5.4914
+    $ FUT_CUR_GEN_TICKER             <str> None, 'USM5'
+    $ FUT_IMPLIED_REPO_RT            <f64> None, 2.4574
+    $ FUT_PX                         <f64> None, 112.6875
+    $ CONVENTIONAL_CTD_FORWARD_FRSK  <f64> None, 12.3176
+    $ CTD_CUSIP_EOD                  <str> None, '912810QN'
+    $ CNVS_FACTOR_EOD                <f64> None, 0.875
+
+    >>> futures_data2.tail().glimpse(max_items_per_column=2)
+    Rows: 5
+    Columns: 16
+    $ Date                          <date> 2025-05-26, 2025-05-27
+    $ PX_LAST                        <f64> None, 112.5625
+    $ CURRENT_CONTRACT_MONTH_YR      <str> None, 'SEP 25'
+    $ FUT_ACTUAL_REPO_RT             <f64> None, 4.32281
+    $ FUT_AGGTE_OPEN_INT             <f64> None, 1899157.0
+    $ FUT_AGGTE_VOL                  <f64> 111905.0, 2322952.0
+    $ FUT_CNVS_FACTOR                <f64> None, 0.8762
+    $ FUT_CTD_CUSIP                  <str> None, '912810QN'
+    $ FUT_CTD_GROSS_BASIS            <f64> None, 11.9276
+    $ FUT_CTD_NET_BASIS              <f64> None, 7.5302
+    $ FUT_CUR_GEN_TICKER             <str> None, 'USU5'
+    $ FUT_IMPLIED_REPO_RT            <f64> None, 3.64143
+    $ FUT_PX                         <f64> None, 112.375
+    $ CONVENTIONAL_CTD_FORWARD_FRSK  <f64> None, 12.14
+    $ CTD_CUSIP_EOD                  <str> None, '912810QN'
+    $ CNVS_FACTOR_EOD                <f64> None, 0.8762
+
     """
     tenor_to_tickers = futures_ticker_map()
     if tenor not in tenor_to_tickers:
@@ -221,88 +285,50 @@ def pull_futures_for_tenor(
         timeout=10000,
     )
     
-    if isinstance(df.columns, pd.MultiIndex):
-        df = df.droplevel(1, axis=1)
+    df1 = df[near_tkr]
+    df2 = df[def_tkr]
+    df1.index.name = "Date"
+    df2.index.name = "Date"
+    df1.reset_index(inplace=True)
+    df2.reset_index(inplace=True)
     
-    # Reset index and rename columns
-    df = df.reset_index().rename(columns={"index": "Date", "date": "Date"})
-    df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)
-    
-    # Rename columns to include tenor and contract version (1 for near, 2 for deferred)
-    # This avoids column name conflicts when combining later
-    rename_map = {}
-    for field in fields:
-        # Find columns containing this field
-        field_cols = [col for col in df.columns if field in col and col != "Date"]
-        if len(field_cols) >= 2:
-            # First occurrence is near contract (1), second is deferred (2)
-            rename_map[field_cols[0]] = f"{field}_1_{tenor}"
-            rename_map[field_cols[1]] = f"{field}_2_{tenor}"
-        elif len(field_cols) == 1:
-            # Only one occurrence, treat as near contract
-            rename_map[field_cols[0]] = f"{field}_1_{tenor}"
-    
-    df = df.rename(columns=rename_map)
-    
-    # Coverage checks for all series
-    total_rows = len(df)
-    for field in fields:
-        col_1 = f"{field}_1_{tenor}"
-        col_2 = f"{field}_2_{tenor}"
-        if col_1 in df.columns:
-            non_null_ratio = df[col_1].notna().sum() / total_rows if total_rows > 0 else 0.0
-            if non_null_ratio < MIN_NON_NULL_RATIO:
-                warnings.warn(
-                    f"Low data coverage for {near_tkr} [{field}] from {start_date} to {end_date}: "
-                    f"{non_null_ratio:.1%} non-null",
-                    category=UserWarning,
-                )
-        if col_2 in df.columns:
-            non_null_ratio = df[col_2].notna().sum() / total_rows if total_rows > 0 else 0.0
-            if non_null_ratio < MIN_NON_NULL_RATIO:
-                warnings.warn(
-                    f"Low data coverage for {def_tkr} [{field}] from {start_date} to {end_date}: "
-                    f"{non_null_ratio:.1%} non-null",
-                    category=UserWarning,
-                )
-    
-    return df
+    df1 = pl.from_pandas(df1)
+    df2 = pl.from_pandas(df2)
+
+    _check_coverage(df1, message=f"Tenor={tenor}")
+    _check_coverage(df2, message=f"Tenor={tenor}")
 
 
-def load_ois(data_dir: Path = DATA_DIR) -> pd.DataFrame:
-    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / "ois.parquet")
+    return df1, df2
 
 
-def load_treasury_tenor(tenor: int, data_dir: Path = DATA_DIR) -> pd.DataFrame:
+def load_ois(data_dir: Path = DATA_DIR) -> pl.DataFrame:
+    return pl.read_parquet(Path(data_dir) / "ois.parquet")
+
+
+def load_treasury_tenor(tenor: int, data_dir: Path = DATA_DIR) -> Tuple[pl.DataFrame, pl.DataFrame]:
     """Load Treasury futures data for a specific tenor."""
-    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / f"treasury_{tenor}y.parquet")
+    df1 = pl.read_parquet(Path(data_dir) / f"treasury_{tenor}y_1.parquet")
+    df2 = pl.read_parquet(Path(data_dir) / f"treasury_{tenor}y_2.parquet")
+    return df1, df2
 
 
 if __name__ == "__main__":
     # Create output directory
     output_dir = DATA_DIR / "basis_treas_sf"
     output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Output directory: {output_dir}")
     
     # Pull and save OIS data
-    print("Pulling OIS data...")
     ois = pull_ois_history()
-    # Save in multiple formats as requested
-    ois.to_parquet(output_dir / "ois.parquet", index=False)
-    ois.to_csv(output_dir / "ois.csv", index=False)
-    ois.to_excel(output_dir / "ois.xlsx", index=False)
-    print("Successfully pulled and saved OIS data in all formats")
+    ois.write_parquet(output_dir / "ois.parquet")
     
     # Pull and save futures data for each tenor separately
     tenors = [2, 5, 10, 20, 30]
     for tenor in tenors:
-        try:
-            futures_data = pull_futures_for_tenor(tenor)
-            # Save in multiple formats as requested
-            futures_data.to_parquet(output_dir / f"treasury_{tenor}y.parquet", index=False)
-            futures_data.to_csv(output_dir / f"treasury_{tenor}y.csv", index=False)
-            futures_data.to_excel(output_dir / f"treasury_{tenor}y.xlsx", index=False)
-            print(f"Successfully pulled and saved {tenor}Y futures data in all formats")
-        except Exception as e:
-            warnings.warn(f"Failed to pull data for {tenor}Y tenor: {e}", category=UserWarning)
-            print(f"Warning: Failed to pull data for {tenor}Y tenor: {e}")
+        futures_data1, futures_data2 = pull_futures_for_tenor(tenor)
+        # Save futures data for each tenor
+        futures_data1.write_parquet(output_dir / f"treasury_{tenor}y_1.parquet")
+        futures_data2.write_parquet(output_dir / f"treasury_{tenor}y_2.parquet")
+        futures_data1.write_csv(output_dir / f"treasury_{tenor}y_1.csv")
+        futures_data2.write_csv(output_dir / f"treasury_{tenor}y_2.csv")
+        

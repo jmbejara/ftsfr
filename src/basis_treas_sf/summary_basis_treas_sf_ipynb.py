@@ -20,6 +20,7 @@ import asyncio
 
 from settings import config
 from calc_basis_treas_sf import load_treasury_sf_output
+import format_bbg_basis_treas_sf
 import load_bases_data
 
 DATA_DIR = config("DATA_DIR")
@@ -44,7 +45,7 @@ tenors = [
 ]
 
 # %%
-df_mine = load_treasury_sf_output(data_dir=DATA_DIR).sort_values("Date")
+df_mine = load_treasury_sf_output(data_dir=DATA_DIR.parent).sort_values("Date")
 tenors_plot_mine = [c for c in tenors if c in df_mine.columns]
 ax = df_mine.set_index("Date")[tenors_plot_mine].plot(figsize=(12, 6))
 ax.set_title("Treasury Spot-Futures Basis (This project)")
@@ -64,7 +65,7 @@ display(
 
 # %%
 df_ref = load_bases_data.load_combined_spreads_wide(
-    data_dir=DATA_DIR, raw=False, rename=True
+    data_dir=DATA_DIR.parent, raw=False, rename=True
 )
 df_ref = df_ref.reset_index().rename(columns={"date": "Date"})
 df_ref["Date"] = pd.to_datetime(df_ref["Date"]).dt.tz_localize(None)
@@ -118,7 +119,7 @@ Inputs loaded in `calc_basis_treas_sf.py`:
 
 Computation outline:
 - Parse contract strings (e.g., "DEC 21") to month/year; merge settlement day; build a maturity date and compute TTM in days for each contract.
-- Interpolate OIS to the contract’s TTM using a piecewise-linear rule across 1W/1M/3M/6M/1Y.
+- Interpolate OIS to the contract's TTM using a piecewise-linear rule across 1W/1M/3M/6M/1Y.
 - Define basis for the deferred contract: `(Implied_Repo_2 − OIS_2) × 100` bps.
 - Clean: flag outliers via a ±45-day rolling MAD by tenor; set flagged values to NaN; require volume in the deferred contract.
 - Pivot long → wide; produce series `Treasury_SF_2Y, 5Y, 10Y, 20Y, 30Y`; forward-fill small gaps.

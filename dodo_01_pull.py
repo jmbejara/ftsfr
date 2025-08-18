@@ -132,12 +132,36 @@ def task_pull():
                 f"python ./src/{data_module}/pull_bbg_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
+                DATA_DIR / data_module / "treasury_2y_1.parquet",
+                DATA_DIR / data_module / "treasury_2y_2.parquet",
+                DATA_DIR / data_module / "treasury_5y_1.parquet",
+                DATA_DIR / data_module / "treasury_5y_2.parquet",
+                DATA_DIR / data_module / "treasury_10y_1.parquet",
+                DATA_DIR / data_module / "treasury_10y_2.parquet",
+                DATA_DIR / data_module / "treasury_20y_1.parquet",
+                DATA_DIR / data_module / "treasury_20y_2.parquet",
+                DATA_DIR / data_module / "treasury_30y_1.parquet",
+                DATA_DIR / data_module / "treasury_30y_2.parquet",
+                DATA_DIR / data_module / "ois.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/pull_bbg_basis_treas_sf.py",
+            ],
+            "clean": [],
+        }
+    if module_requirements.get(data_module, False) and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/format_bbg_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
                 DATA_DIR / data_module / "treasury_df.parquet",
                 DATA_DIR / data_module / "ois.parquet",
                 DATA_DIR / data_module / "last_day.parquet",
             ],
             "file_dep": [
-                f"./src/{data_module}/pull_bbg_basis_treas_sf.py",
+                f"./src/{data_module}/format_bbg_basis_treas_sf.py",
             ],
             "clean": [],
         }

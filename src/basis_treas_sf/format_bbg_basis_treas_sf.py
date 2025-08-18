@@ -9,11 +9,11 @@ and additional derived fields.
 
 Inputs (from DATA_DIR/basis_treas_sf):
 - ois.parquet: USD OIS rates
-- treasury_2y.parquet: 2Y Treasury futures data
-- treasury_5y.parquet: 5Y Treasury futures data
-- treasury_10y.parquet: 10Y Treasury futures data
-- treasury_20y.parquet: 20Y Treasury futures data (Ultra 10Y proxy)
-- treasury_30y.parquet: 30Y Treasury futures data
+- treasury_2y_1.parquet, treasury_2y_2.parquet: 2Y Treasury futures data (near/deferred)
+- treasury_5y_1.parquet, treasury_5y_2.parquet: 5Y Treasury futures data (near/deferred)
+- treasury_10y_1.parquet, treasury_10y_2.parquet: 10Y Treasury futures data (near/deferred)
+- treasury_20y_1.parquet, treasury_20y_2.parquet: 20Y Treasury futures data (near/deferred)
+- treasury_30y_1.parquet, treasury_30y_2.parquet: 30Y Treasury futures data (near/deferred)
 
 Outputs (saved under DATA_DIR/basis_treas_sf):
 - treasury_df.parquet: Combined Treasury futures data with all tenors
@@ -22,7 +22,7 @@ Outputs (saved under DATA_DIR/basis_treas_sf):
 - treasury_df.xlsx: Excel version of combined data
 
 Process:
-1. Load individual tenor files
+1. Load individual tenor files (both near and deferred contracts)
 2. Combine all tenors on Date column
 3. Rename OIS columns to compact labels
 4. Add derived Contract columns for quarter cycle
@@ -97,40 +97,61 @@ def combine_treasury_futures_data(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     # Define tenors to combine
     tenors = [2, 5, 10, 20, 30]
     
-    frames: List[pd.DataFrame] = []
-    for tenor in tenors:
-        filepath = output_dir / f"treasury_{tenor}y.parquet"
-        if filepath.exists():
-            try:
-                df = pd.read_parquet(filepath)
-                frames.append(df)
-                print(f"Loaded {tenor}Y futures data: {len(df)} rows")
-            except Exception as e:
-                print(f"Error loading {tenor}Y futures data: {e}")
-        else:
-            print(f"Warning: {filepath} not found, skipping {tenor}Y tenor")
+    # Start with an empty DataFrame
+    treasury_df = None
     
-    if not frames:
+    for tenor in tenors:
+        # Load both near (1) and deferred (2) contracts for this tenor
+        filepath_1 = output_dir / f"treasury_{tenor}y_1.parquet"
+        filepath_2 = output_dir / f"treasury_{tenor}y_2.parquet"
+        
+        if filepath_1.exists() and filepath_2.exists():
+            try:
+                df1 = pd.read_parquet(filepath_1)
+                df2 = pd.read_parquet(filepath_2)
+                
+                # Rename columns to match expected names in calc function
+                # Key fields: FUT_IMPLIED_REPO_RT -> Implied_Repo, FUT_AGGTE_VOL -> Vol, PX_LAST -> Price
+                df1_renamed = df1.rename(columns={
+                    'FUT_IMPLIED_REPO_RT': 'Implied_Repo_1',
+                    'FUT_AGGTE_VOL': 'Vol_1', 
+                    'PX_LAST': 'Price_1',
+                    'CURRENT_CONTRACT_MONTH_YR': 'Contract_1'
+                })
+                df2_renamed = df2.rename(columns={
+                    'FUT_IMPLIED_REPO_RT': 'Implied_Repo_2',
+                    'FUT_AGGTE_VOL': 'Vol_2',
+                    'PX_LAST': 'Price_2', 
+                    'CURRENT_CONTRACT_MONTH_YR': 'Contract_2'
+                })
+                
+                # Select only the columns needed for the calc function
+                df1_selected = df1_renamed[['Date', 'Implied_Repo_1', 'Vol_1', 'Price_1', 'Contract_1']]
+                df2_selected = df2_renamed[['Date', 'Implied_Repo_2', 'Vol_2', 'Price_2', 'Contract_2']]
+                
+                # Merge near and deferred contracts for this tenor
+                df_tenor = df1_selected.merge(df2_selected, on="Date", how="outer")
+                
+                # Add tenor information
+                df_tenor['Tenor'] = tenor
+                
+                # Append to the main DataFrame
+                if treasury_df is None:
+                    treasury_df = df_tenor
+                else:
+                    treasury_df = pd.concat([treasury_df, df_tenor], ignore_index=True)
+                    
+            except Exception as e:
+                raise RuntimeError(f"Error loading {tenor}Y futures data: {e}")
+        else:
+            raise FileNotFoundError(f"Missing files for {tenor}Y tenor: {filepath_1} or {filepath_2}")
+    
+    if treasury_df is None:
         raise FileNotFoundError("No treasury futures files found to combine")
     
-    print(f"Combining {len(frames)} tenor files...")
-    
-    # Combine all tenors on Date
-    treasury_df = reduce(lambda a, b: a.merge(b, on="Date", how="outer"), frames)
-    treasury_df.sort_values("Date", inplace=True)
+    # Sort by Date and Tenor
+    treasury_df.sort_values(["Date", "Tenor"], inplace=True)
     treasury_df.reset_index(drop=True, inplace=True)
-    
-    print(f"Combined data shape: {treasury_df.shape}")
-    
-    # Add Contract columns derived from Date (quarter cycle)
-    for v, offset in [(1, 0), (2, 1)]:
-        contracts = treasury_df["Date"].apply(
-            lambda dt: _quarter_contract_label(
-                pd.to_datetime(dt), offset_quarters=offset
-            )
-        )
-        for tenor in tenors:
-            treasury_df[f"Contract_{v}_{tenor}"] = contracts
     
     return treasury_df
 
@@ -152,32 +173,22 @@ def load_last_day(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
 if __name__ == "__main__":
     output_dir = DATA_DIR / "basis_treas_sf"
-    print(f"Output directory: {output_dir}")
     
-    print("Loading and formatting OIS data...")
     # Load and rename OIS data
     ois = load_ois()
     ois = rename_ois_columns(ois)
-    ois.to_parquet(output_dir / "ois_formatted.parquet", index=False)
-    print("Successfully saved formatted OIS data")
+    ois.to_parquet(output_dir / "ois.parquet", index=False)
     
-    print("Combining Treasury futures data...")
     # Combine Treasury futures data
     treasury_df = combine_treasury_futures_data()
     
-    print("Saving combined data in multiple formats...")
     # Save combined data in multiple formats
     treasury_df.to_parquet(output_dir / "treasury_df.parquet", index=False)
     treasury_df.to_csv(output_dir / "treasury_df.csv", index=False)
     treasury_df.to_excel(output_dir / "treasury_df.xlsx", index=False)
-    print("Successfully saved combined Treasury data")
     
-    print("Building last day mapping...")
     # Build and save last day mapping
     last_day = build_last_day_mapping_from_dates(treasury_df["Date"])
     last_day.to_parquet(output_dir / "last_day.parquet", index=False)
     last_day.to_csv(output_dir / "last_day.csv", index=False)
     last_day.to_excel(output_dir / "last_day.xlsx", index=False)
-    print("Successfully saved last day mapping")
-    
-    print("All formatting complete!")
