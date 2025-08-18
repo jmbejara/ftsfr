@@ -157,7 +157,6 @@ def task_pull():
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_df.parquet",
-                DATA_DIR / data_module / "ois.parquet",
                 DATA_DIR / data_module / "last_day.parquet",
             ],
             "file_dep": [

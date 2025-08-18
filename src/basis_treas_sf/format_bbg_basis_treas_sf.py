@@ -7,7 +7,7 @@ This script takes the individual parquet files created by pull_bbg_basis_treas_s
 and combines them into a single consolidated dataset with proper column naming
 and additional derived fields.
 
-Inputs (from DATA_DIR/basis_treas_sf):
+Inputs (from DATA_DIR):
 - ois.parquet: USD OIS rates
 - treasury_2y_1.parquet, treasury_2y_2.parquet: 2Y Treasury futures data (near/deferred)
 - treasury_5y_1.parquet, treasury_5y_2.parquet: 5Y Treasury futures data (near/deferred)
@@ -15,7 +15,7 @@ Inputs (from DATA_DIR/basis_treas_sf):
 - treasury_20y_1.parquet, treasury_20y_2.parquet: 20Y Treasury futures data (near/deferred)
 - treasury_30y_1.parquet, treasury_30y_2.parquet: 30Y Treasury futures data (near/deferred)
 
-Outputs (saved under DATA_DIR/basis_treas_sf):
+Outputs (saved under DATA_DIR):
 - treasury_df.parquet: Combined Treasury futures data with all tenors
 - last_day.parquet: Mapping of (Mat_Year, Mat_Month) -> Mat_Day (last calendar day)
 - treasury_df.csv: CSV version of combined data
@@ -38,9 +38,9 @@ import pandas as pd
 
 from settings import config
 
-
 # Configuration via settings.py
 DATA_DIR: Path = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "basis_treas_sf"
 
 
 def rename_ois_columns(df_ois: pd.DataFrame) -> pd.DataFrame:
@@ -89,7 +89,6 @@ def build_last_day_mapping_from_dates(dates: pd.Series) -> pd.DataFrame:
 
 def combine_treasury_futures_data(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Combine individual tenor files into a single consolidated DataFrame."""
-    output_dir = Path(data_dir) / "basis_treas_sf"
 
     # Define tenors to combine
     tenors = [2, 5, 10, 20, 30]
@@ -99,8 +98,8 @@ def combine_treasury_futures_data(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
     for tenor in tenors:
         # Load both near (1) and deferred (2) contracts for this tenor
-        filepath_1 = output_dir / f"treasury_{tenor}y_1.parquet"
-        filepath_2 = output_dir / f"treasury_{tenor}y_2.parquet"
+        filepath_1 = data_dir / f"treasury_{tenor}y_1.parquet"
+        filepath_2 = data_dir / f"treasury_{tenor}y_2.parquet"
 
         if filepath_1.exists() and filepath_2.exists():
             try:
@@ -165,37 +164,34 @@ def combine_treasury_futures_data(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
 def load_ois(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Load OIS data from parquet file."""
-    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / "ois.parquet")
+    df = pd.read_parquet(Path(data_dir) / "ois.parquet")
+    df_renamed = rename_ois_columns(df)
+    return df_renamed
 
 
 def load_treasury_df(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Load combined Treasury futures data from parquet file."""
-    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / "treasury_df.parquet")
+    return pd.read_parquet(Path(data_dir) / "treasury_df.parquet")
 
 
 def load_last_day(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Load last day mapping from parquet file."""
-    return pd.read_parquet(Path(data_dir) / "basis_treas_sf" / "last_day.parquet")
+    return pd.read_parquet(Path(data_dir) / "last_day.parquet")
 
 
 if __name__ == "__main__":
-    output_dir = DATA_DIR / "basis_treas_sf"
 
     # Load and rename OIS data
-    ois = load_ois()
-    ois = rename_ois_columns(ois)
-    ois.to_parquet(output_dir / "ois.parquet", index=False)
+    ois = load_ois(data_dir=DATA_DIR)
 
     # Combine Treasury futures data
-    treasury_df = combine_treasury_futures_data()
+    treasury_df = combine_treasury_futures_data(data_dir=DATA_DIR)
 
     # Save combined data in multiple formats
-    treasury_df.to_parquet(output_dir / "treasury_df.parquet", index=False)
-    treasury_df.to_csv(output_dir / "treasury_df.csv", index=False)
-    treasury_df.to_excel(output_dir / "treasury_df.xlsx", index=False)
+    treasury_df.to_parquet(DATA_DIR / "treasury_df.parquet", index=False)
+    treasury_df.to_csv(DATA_DIR / "treasury_df.csv", index=False)
 
     # Build and save last day mapping
     last_day = build_last_day_mapping_from_dates(treasury_df["Date"])
-    last_day.to_parquet(output_dir / "last_day.parquet", index=False)
-    last_day.to_csv(output_dir / "last_day.csv", index=False)
-    last_day.to_excel(output_dir / "last_day.xlsx", index=False)
+    last_day.to_parquet(DATA_DIR / "last_day.parquet", index=False)
+    last_day.to_csv(DATA_DIR / "last_day.csv", index=False)
