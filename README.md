@@ -360,15 +360,7 @@ Other options. It's probably best to stick to those above for simplicity
 
 # Useful Commands
 
-(We can delete this later. I'm putting these here as they're useful for me while I'm developing)
-
-To run pre-commit hooks on all files:
-
-```bash
-pre-commit run --all-files
-```
-
-to format all files and fix linting errors:
+To format all files and fix linting errors:
 
 ```bash
 ruff format . && ruff check --fix --show-fixes .
