@@ -293,12 +293,22 @@ resulting series replicates the persistently negative swap spreads documented by
 \paragraph{TIPS-Treasury Arbitrage}
 Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we splice Federal Reserve zero-coupon TIPS yields with Bloomberg constant-maturity inflation-swap rates to create synthetic nominal yields, then difference these against equal-maturity zero-coupon Treasury yields for the 2-, 5-, 10- and 20-year tenors.  We exclude days with missing swap quotes or illiquid TIPS issues, drop outliers beyond the extreme 1\%, and harmonise all series to 17:00 ET closes to obtain a clean daily TIPS-Treasury basis series.
 
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/TIPS-treasury-arbitrage.png}
+  \end{tabular}
+  \caption{TIPS-Treasury Arbitrage spreads.}
+  \label{fig:tips_treasury_basis}
+\end{figure}
+
 \paragraph{CDS-Bond Basis}
 % TODO: Check this paragraph.
 % we should be doing duration matching, added that in
 % i am removing RFR when over 1, representing 100%
 % - Vincent
 Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a duration-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorise extreme 100\% bases, and require each bond to appear in TRACE's cleaned WRDS dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
+
 
 % TODO: Vincent and Alex
 % 1. Change y axis label so that it shows percents. Change rfr to "Implied Risk-Free Rate (percent)"

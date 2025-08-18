@@ -39,7 +39,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
-
+import sys
+sys.path.append("..")
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
@@ -92,9 +93,9 @@ The cell below computes summary statistics using `generate_figures.py` for each 
 # %%
 import generate_figures
 
-# Compute summary statistics for the period 2010-01-01 to 2020-02-28
+# Compute summary statistics for the period 2020-01-01 to 2025-01-01
 summary_stats = generate_figures.generate_summary_statistics(
-    test, "2010-01-01", "2020-02-28"
+    test, "2020-01-01", "2025-01-01"
 )
 summary_stats
 
@@ -125,11 +126,11 @@ plt.show()
 """
 ### Plot TIPS-Treasury Spreads
 
-The following cell plots the arbitrage spreads for various maturities (2Y, 5Y, 10Y, 20Y) over the period 2010-2020.
+The following cell plots the arbitrage spreads for various maturities (2Y, 5Y, 10Y, 20Y) over the period 2020-01-01 to 2025-01-01.
 """
 
 # %%
-fig = generate_figures.plot_tips_treasury_spreads(test, "2010-01-01", "2020-02-28")
+fig = generate_figures.plot_tips_treasury_spreads(test, "2020-01-01", "2025-01-01")
 plt.show()
 
 # %%
