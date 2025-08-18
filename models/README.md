@@ -315,14 +315,13 @@ estimator_params = { param1 = "value1" }
 
 ### Data Sync
 ```bash
-
 # Central Texas, USA us-south-3
 NODE_IP="192.222.55.203"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="central-texas-three-fs"
 
 # Texas, USA us-south-1
-NODE_IP="104.171.203.35"
+NODE_IP="104.171.202.141"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="texas-one-fs"
 
@@ -337,7 +336,12 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="utah-fs"
 
 ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP} "mkdir -p ~/${FS_FOLDER}/ftsfr"
-rsync -avzh --progress --delete --exclude='_output/' --exclude='.pixi/' --exclude="./models/lightning_logs/" -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
+if [ "$(basename "$PWD")" = "ftsfr" ]; then
+  echo "Correct directory"
+  rsync -avzh --progress --delete --exclude='_output/' --exclude='.pixi/' --exclude="./models/lightning_logs/" -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
+else
+  echo "Error: Current directory is not 'ftsfr'. Please 'cd' into the 'ftsfr' directory before running rsync."
+fi
 ```
 
 To Connect via SSH:
