@@ -216,7 +216,7 @@ def generate_graph(df, col="rfr"):
             linewidth=1.0
         )
         handles_all.append(ln)
-        labels_all.append(f"{rating} → {col}")
+        labels_all.append(f"{rating}")
 
     # horizontal zero line
     ax1.axhline(0, color="black", linewidth=0.8)
