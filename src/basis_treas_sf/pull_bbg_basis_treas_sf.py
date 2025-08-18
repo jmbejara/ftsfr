@@ -7,20 +7,75 @@ and write standardized parquet files used downstream by `calc_basis_treas_sf.py`
 Outputs (saved under DATA_DIR/basis_treas_sf):
 - ois.parquet: Date + OIS tenors (1W, 1M, 3M, 6M, 1Y)
 - treasury_df.parquet: Date + per-tenor columns for near (1) and deferred (2)
-  contracts: Implied_Repo_v_<tenor>, Vol_v_<tenor>, Contract_v_<tenor>, Price_v_<tenor>
+  contracts with all specified Bloomberg fields (e.g., PX_LAST_1_<tenor>, FUT_AGGTE_VOL_2_<tenor>, etc.)
 - last_day.parquet: Mapping of (Mat_Year, Mat_Month) -> Mat_Day (last calendar day)
+
+Fields Pulled by Security Type
+------------------------------
+
+USD OIS Rates (via ois_tickers()):
+- PX_LAST: Last Price for each OIS tenor (1W, 1M, 2M, 3M, 6M, 1Y)
+
+Treasury Futures (via futures_ticker_map() for each tenor 2Y, 5Y, 10Y, 20Y, 30Y):
+- PX_LAST: Last Price (Futures Trade Price)
+- CURRENT_CONTRACT_MONTH_YR: Current Contract Month/Year
+- FUT_ACTUAL_REPO_RT: Actual Repo Rate
+- FUT_AGGTE_OPEN_INT: Aggregate Open Interest
+- FUT_AGGTE_VOL: Aggregate Volume of Futures Contracts  
+- FUT_CNVS_FACTOR: Conversion Factor
+- FUT_CTD_CUSIP: Cheapest to Deliver CUSIP
+- FUT_CTD_GROSS_BASIS: Cheapest to Deliver Gross Basis
+- FUT_CTD_NET_BASIS: Cheapest to Deliver Net Basis
+- FUT_CUR_GEN_TICKER: Current Generic Futures Ticker
+- FUT_IMPLIED_REPO_RT: Implied Repo Rate of CTD Bond
+- FUT_PX: Futures Trade Price
+- CONVENTIONAL_CTD_FORWARD_FRSK: Conventional CTD Forward Risk
+- CTD_CUSIP_EOD: Cheapest to Deliver CUSIP - End of Day
+- CNVS_FACTOR_EOD: Conversion Factor - End of Day
 
 Notes
 -----
 - No printing to stdout per project style guide.
 - Replaces prior reliance on a manual Excel file.
+
+Field Descriptions
+-----------------
+- CNVS_FACTOR_EOD: End of day conversion factor of the cheapest to deliver bond. For current day CTD data, use the end of day fields: Cheapest to Deliver CUSIP - End of Day (FO049, CTD_CUSIP_EOD) and Conversion Factor - End of Day (FO050, CNVS_FACTOR_EOD). The fields will return blank/'0' until some time (to be determined) after future's close. For historical CTD data, use fields: Cheapest to Deliver CUSIP (FO064, FUT_CTD_CUSIP) and Conversion Factor (FO052, FUT_CNVS_FACTOR (FUT_CONV_FACTOR).
+
+- CONVENTIONAL_CTD_FORWARD_FRSK: Price sensitivity of the future contract to changes in yield, computed according to the contract's conventional forward basis. The cheapest to deliver (CTD) bond is used in this calculation, where the settlement date is the last delivery date and the maturity date is the maturity of the cheapest to deliver. The price at delivery date is the futures price times the CTD conversion factor. The resulting risk is divided by the conversion factor. Options: Option risk is obtained by delta scaling of the futures risk.
+
+- CTD_CUSIP_EOD: End of day Committee on Uniform Securities Identification Procedures (CUSIP) number of the cheapest to deliver (CTD) bond. For current day CTD data, use the end of day fields: Cheapest to Deliver CUSIP - End of Day (FO049, CTD_CUSIP_EOD) and Conversion Factor - End of Day (FO050, CNVS_FACTOR_EOD). The fields will return blank/'0' until some time (to be determined) after future's close. For historical CTD data, use fields: Cheapest to Deliver CUSIP (FO064, FUT_CTD_CUSIP) and Conversion Factor (FO052, FUT_CNVS_FACTOR (FUT_CONV_FACTOR).
+
+- CURRENT_CONTRACT_MONTH_YR: Current Contract Month/Year
+
+- FUT_ACTUAL_REPO_RT: The cash-and-carry return for the indicated number of days and day count of the CTD bond.
+
+- FUT_AGGTE_OPEN_INT: The total number of futures contracts that have not been closed, liquidated, or delivered for all currently listed contracts in a series.
+
+- FUT_AGGTE_VOL: The total number of futures contracts traded for all currently listed contracts in a series.
+
+- FUT_CNVS_FACTOR: An adjustment factor used to compute the proper futures invoice price for bonds with differing coupons/maturities deliverable into the same futures contract. The conversion factor is calculated by the exchange. Returns the cheapest to deliver (CTD) factor by default.
+
+- FUT_CTD_CUSIP: The Cusip of the cheapest to deliver bond.
+
+- FUT_CTD_GROSS_BASIS: The cheapest to deliver bond's price minus the delivery price. The pricing source for historical values of FO075 is based on the futures settlement price and bond prices using the following pricing source: Treasury futures: BBT3, Gilt futures: BVL4, Euro-Zone futures (French, German, Italy, Spain, etc.): BVL4, Canada bond futures: BVN4, Japan bond futures: BVT3, All other bond futures: BGN.
+
+- FUT_CTD_NET_BASIS: The cheapest to deliver bond's gross basis adjusted for net carry.
+
+- FUT_CUR_GEN_TICKER: Current Generic Futures Ticker
+
+- FUT_IMPLIED_REPO_RT: The cash-and-carry return for the indicated number of days and day count of the Cheapest to Deliver bond.
+
+- FUT_PX: Futures Trade Price
+
+- PX_LAST: Last Price
 """
 
 from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import pandas as pd
 from xbbg import blp
@@ -81,25 +136,7 @@ def pull_ois_history(
     return df
 
 
-def _first_available_field(
-    ticker: str, candidates: Iterable[str], start_date: str, end_date: str
-) -> Optional[str]:
-    """Return the first Bloomberg field that yields data for the given ticker."""
-    for fld in candidates:
-        try:
-            df = blp.bdh(
-                tickers=[ticker], flds=[fld], start_date=start_date, end_date=end_date
-            )
-            if df is None or df.empty:
-                continue
-            series = (
-                df.droplevel(1, axis=1) if isinstance(df.columns, pd.MultiIndex) else df
-            )
-            if series.iloc[:, 0].notna().any():
-                return fld
-        except Exception:
-            continue
-    return None
+
 
 
 def futures_ticker_map() -> Dict[int, Tuple[str, str]]:
@@ -137,125 +174,90 @@ def pull_futures_history(
 ) -> pd.DataFrame:
     """Fetch Treasury futures inputs needed downstream.
 
-    For each tenor and for near (1) and deferred (2) generic contracts, pull:
-    - Price (PX_LAST)
-    - Volume (VOLUME)
-    - Implied Repo (first available among common field names)
+    For each tenor and for near (1) and deferred (2) generic contracts, pull all
+    specified Bloomberg fields including price, volume, implied repo, CTD data,
+    and other futures metrics.
     """
     tenor_to_tickers = futures_ticker_map()
-
-    sample_ticker = next(iter(tenor_to_tickers.values()))[0]
-    implied_repo_field = _first_available_field(
-        sample_ticker,
-        candidates=["IMPL_REPO", "IMP_REPO", "IMPLIED_REPO", "FUT_IMP_REPO", "IRR"],
-        start_date=start_date,
-        end_date=end_date,
-    )
+    
+    # Define all Bloomberg fields to pull
+    fields = [
+        "PX_LAST",                    # Last Price
+        "CURRENT_CONTRACT_MONTH_YR",  # Current Contract Month/Year
+        "FUT_ACTUAL_REPO_RT",         # Actual Repo Rate
+        "FUT_AGGTE_OPEN_INT",         # Aggregate Open Interest
+        "FUT_AGGTE_VOL",              # Aggregate Volume of Futures Contracts
+        "FUT_CNVS_FACTOR",            # Conversion Factor
+        "FUT_CTD_CUSIP",              # Cheapest to Deliver CUSIP
+        "FUT_CTD_GROSS_BASIS",        # Cheapest to Deliver Gross Basis
+        "FUT_CTD_NET_BASIS",          # Cheapest to Deliver Net Basis
+        "FUT_CUR_GEN_TICKER",         # Current Generic Futures Ticker
+        "FUT_IMPLIED_REPO_RT",        # Implied Repo Rate of CTD Bond
+        "FUT_PX",                     # Futures Trade Price
+        "CONVENTIONAL_CTD_FORWARD_FRSK", # Conventional CTD Forward Risk
+        "CTD_CUSIP_EOD",              # Cheapest to Deliver CUSIP - End of Day
+        "CNVS_FACTOR_EOD",            # Conversion Factor - End of Day
+    ]
 
     frames: List[pd.DataFrame] = []
     for tenor, (near_tkr, def_tkr) in tenor_to_tickers.items():
-        # Price
-        px = blp.bdh(
+        # Pull all fields for both near and deferred contracts
+        df = blp.bdh(
             tickers=[near_tkr, def_tkr],
-            flds=["PX_LAST"],
+            flds=fields,
             start_date=start_date,
             end_date=end_date,
         )
-        if isinstance(px.columns, pd.MultiIndex):
-            px = px.droplevel(1, axis=1)
-        # Coverage checks for Price series (by ticker)
-        if isinstance(px, pd.DataFrame) and not px.empty:
-            total_rows_px = len(px)
-        else:
-            total_rows_px = 0
-        for tkr in [near_tkr, def_tkr]:
-            series_non_null_ratio = (
-                (px[tkr].notna().sum() / total_rows_px) if (total_rows_px > 0 and tkr in px.columns) else 0.0
-            )
-            if series_non_null_ratio < MIN_NON_NULL_RATIO:
-                warnings.warn(
-                    f"Low data coverage for {tkr} [PX_LAST] from {start_date} to {end_date}: "
-                    f"{series_non_null_ratio:.1%} non-null",
-                    category=UserWarning,
-                )
-        px = px.reset_index().rename(columns={"index": "Date", "date": "Date"})
-        px.columns = ["Date", f"Price_1_{tenor}", f"Price_2_{tenor}"]
-
-        # Volume
-        vol = blp.bdh(
-            tickers=[near_tkr, def_tkr],
-            flds=["VOLUME"],
-            start_date=start_date,
-            end_date=end_date,
-        )
-        if isinstance(vol.columns, pd.MultiIndex):
-            vol = vol.droplevel(1, axis=1)
-        # Coverage checks for Volume series (by ticker)
-        if isinstance(vol, pd.DataFrame) and not vol.empty:
-            total_rows_vol = len(vol)
-        else:
-            total_rows_vol = 0
-        for tkr in [near_tkr, def_tkr]:
-            series_non_null_ratio = (
-                (vol[tkr].notna().sum() / total_rows_vol) if (total_rows_vol > 0 and tkr in vol.columns) else 0.0
-            )
-            if series_non_null_ratio < MIN_NON_NULL_RATIO:
-                warnings.warn(
-                    f"Low data coverage for {tkr} [VOLUME] from {start_date} to {end_date}: "
-                    f"{series_non_null_ratio:.1%} non-null",
-                    category=UserWarning,
-                )
-        vol = vol.reset_index().rename(columns={"index": "Date", "date": "Date"})
-        vol.columns = ["Date", f"Vol_1_{tenor}", f"Vol_2_{tenor}"]
-
-        # Implied Repo (optional)
-        if implied_repo_field is not None:
-            irr = blp.bdh(
-                tickers=[near_tkr, def_tkr],
-                flds=[implied_repo_field],
-                start_date=start_date,
-                end_date=end_date,
-            )
-            if isinstance(irr.columns, pd.MultiIndex):
-                irr = irr.droplevel(1, axis=1)
-            # Coverage checks for Implied Repo series (by ticker)
-            if isinstance(irr, pd.DataFrame) and not irr.empty:
-                total_rows_irr = len(irr)
-            else:
-                total_rows_irr = 0
-            for tkr in [near_tkr, def_tkr]:
-                series_non_null_ratio = (
-                    (irr[tkr].notna().sum() / total_rows_irr) if (total_rows_irr > 0 and tkr in irr.columns) else 0.0
-                )
-                if series_non_null_ratio < MIN_NON_NULL_RATIO:
+        
+        if isinstance(df.columns, pd.MultiIndex):
+            df = df.droplevel(1, axis=1)
+        
+        # Reset index and rename columns
+        df = df.reset_index().rename(columns={"index": "Date", "date": "Date"})
+        
+        # Rename columns to include tenor and contract version (1 for near, 2 for deferred)
+        # Bloomberg returns columns with ticker names, so we need to map them correctly
+        rename_map = {}
+        for field in fields:
+            if field in df.columns:
+                # Find the column names that contain this field
+                field_cols = [col for col in df.columns if field in col]
+                if len(field_cols) >= 2:
+                    # First occurrence is near contract (1), second is deferred (2)
+                    rename_map[field_cols[0]] = f"{field}_1_{tenor}"
+                    rename_map[field_cols[1]] = f"{field}_2_{tenor}"
+                elif len(field_cols) == 1:
+                    # Only one occurrence, treat as near contract
+                    rename_map[field_cols[0]] = f"{field}_1_{tenor}"
+        
+        df = df.rename(columns=rename_map)
+        
+        # Coverage checks for all series
+        total_rows = len(df)
+        for field in fields:
+            col_1 = f"{field}_1_{tenor}"
+            col_2 = f"{field}_2_{tenor}"
+            if col_1 in df.columns:
+                non_null_ratio = df[col_1].notna().sum() / total_rows if total_rows > 0 else 0.0
+                if non_null_ratio < MIN_NON_NULL_RATIO:
                     warnings.warn(
-                        f"Low data coverage for {tkr} [{implied_repo_field}] from {start_date} to {end_date}: "
-                        f"{series_non_null_ratio:.1%} non-null",
+                        f"Low data coverage for {near_tkr} [{field}] from {start_date} to {end_date}: "
+                        f"{non_null_ratio:.1%} non-null",
                         category=UserWarning,
                     )
-            irr = irr.reset_index().rename(columns={"index": "Date", "date": "Date"})
-            irr.columns = ["Date", f"Implied_Repo_1_{tenor}", f"Implied_Repo_2_{tenor}"]
-        else:
-            irr = px[["Date"]].copy()
-            irr[f"Implied_Repo_1_{tenor}"] = pd.NA
-            irr[f"Implied_Repo_2_{tenor}"] = pd.NA
-            # Warn explicitly for missing implied repo field (0% coverage)
-            warnings.warn(
-                f"Low data coverage for {near_tkr} [IMPLIED_REPO] from {start_date} to {end_date}: 0.0% non-null",
-                category=UserWarning,
-            )
-            warnings.warn(
-                f"Low data coverage for {def_tkr} [IMPLIED_REPO] from {start_date} to {end_date}: 0.0% non-null",
-                category=UserWarning,
-            )
-
-        # Merge on Date
-        df = px.merge(vol, on="Date", how="outer").merge(irr, on="Date", how="outer")
+            if col_2 in df.columns:
+                non_null_ratio = df[col_2].notna().sum() / total_rows if total_rows > 0 else 0.0
+                if non_null_ratio < MIN_NON_NULL_RATIO:
+                    warnings.warn(
+                        f"Low data coverage for {def_tkr} [{field}] from {start_date} to {end_date}: "
+                        f"{non_null_ratio:.1%} non-null",
+                        category=UserWarning,
+                    )
+        
         frames.append(df)
 
     # Combine all tenors on Date
     from functools import reduce
-
     treasury_df = reduce(lambda a, b: a.merge(b, on="Date", how="outer"), frames)
     treasury_df.sort_values("Date", inplace=True)
     treasury_df.reset_index(drop=True, inplace=True)
