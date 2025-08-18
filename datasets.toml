@@ -164,10 +164,6 @@ currencies relative to the US dollar
 required_data_sources = ["bloomberg_terminal"]
 
 ################################################################################
-[futures_returns]
-required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
-
-################################################################################
 [he_kelly_manela]
 required_data_sources = ["he_kelly_manela"]
 

@@ -13,7 +13,7 @@ import pandas as pd
 
 from settings import config
 
-DATA_DIR = config("DATA_DIR") / "futures_returns"
+DATA_DIR = config("DATA_DIR")
 
 
 def load_futures_returns(data_dir=DATA_DIR):
