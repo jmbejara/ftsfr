@@ -323,20 +323,17 @@ def load_treasury_tenor(
 
 
 if __name__ == "__main__":
-    # Create output directory
-    output_dir = DATA_DIR / "basis_treas_sf"
-    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Pull and save OIS data
     ois = pull_ois_history()
-    ois.write_parquet(output_dir / "ois.parquet")
+    ois.write_parquet(DATA_DIR / "ois.parquet")
 
     # Pull and save futures data for each tenor separately
     tenors = [2, 5, 10, 20, 30]
     for tenor in tenors:
         futures_data1, futures_data2 = pull_futures_for_tenor(tenor)
         # Save futures data for each tenor
-        futures_data1.write_parquet(output_dir / f"treasury_{tenor}y_1.parquet")
-        futures_data2.write_parquet(output_dir / f"treasury_{tenor}y_2.parquet")
-        futures_data1.write_csv(output_dir / f"treasury_{tenor}y_1.csv")
-        futures_data2.write_csv(output_dir / f"treasury_{tenor}y_2.csv")
+        futures_data1.write_parquet(DATA_DIR / f"treasury_{tenor}y_1.parquet")
+        futures_data2.write_parquet(DATA_DIR / f"treasury_{tenor}y_2.parquet")
+        futures_data1.write_csv(DATA_DIR / f"treasury_{tenor}y_1.csv")
+        futures_data2.write_csv(DATA_DIR / f"treasury_{tenor}y_2.csv")
