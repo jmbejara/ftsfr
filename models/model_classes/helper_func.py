@@ -1,5 +1,5 @@
 """
-Helper functions for multiple independent classes.
+Helper functions to be used independent of classes.
 """
 
 import numpy as np
@@ -213,8 +213,14 @@ def custom_interpolate(df):
 
 def process_df(df, frequency, seasonality, test_split):
     """
-    Fills missing dates as per frequency. Extends if train_data is less than
-    4 * seasonality.
+    This function performs the following:
+        1. Fill in missing dates based on the frequency provided
+        2. Handles 'seasonal' test_split
+        3. Extends the DataFrame backwards if training data is small
+        4. Splits DataFrame into train and test using cutoff date method
+        5. Interpolates train data based on custom strategy
+        6. Scales both train and test using Min-Max scaling
+        7. Converts both to np.float32
     """
     hf_logger = logging.getLogger("hf.process_df")
 

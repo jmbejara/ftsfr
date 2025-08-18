@@ -12,14 +12,14 @@ import numpy as np
 from tabulate import tabulate
 import logging
 
-GluontsMain_logger = logging.getLogger("GluontsMain")
-
 from .forecasting_model import forecasting_model
 from .helper_func import process_df,\
                          common_error_catch,\
                          custom_interpolate,\
                          split_train_test,\
                          calculate_darts_MASE
+
+GluontsMain_logger = logging.getLogger("GluontsMain")
 
 # GluonTS-specific imports are moved inside methods
 

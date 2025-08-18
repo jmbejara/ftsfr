@@ -17,9 +17,8 @@ DartsMain_logger = logging.getLogger("DartsMain")
 # filterwarnings("ignore")
 import numpy as np
 import pandas as pd
-from darts import TimeSeries
-from darts.utils.model_selection import train_test_split
 from tabulate import tabulate
+from darts import TimeSeries
 
 from .forecasting_model import forecasting_model
 from .helper_func import process_df, common_error_catch
@@ -37,8 +36,6 @@ class DartsMain(forecasting_model):
         data_path,
         output_path,
     ):
-        # Darts-specific imports only when needed
-        from darts import TimeSeries
 
         DartsMain_logger.info("DartsMain __init__() called.")
 
@@ -205,8 +202,6 @@ class DartsMain(forecasting_model):
             )
             # If it's still a list, try to concatenate it
             if len(self.pred_data) > 0:
-                from darts import TimeSeries
-
                 self.pred_data = TimeSeries.concatenate(self.pred_data, axis=0)
                 DartsMain_logger.info(
                     "Concatenated list of TimeSeries into single TimeSeries"

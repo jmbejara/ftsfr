@@ -335,7 +335,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
     dataset_name = dataset_config[5]
 
-    log_path = Path().resolve() / "model_logs" / "run_model_runs" / model_name
+    log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
     Path(log_path).mkdir(parents=True, exist_ok=True)
     log_path = log_path / (dataset_name + ".log")
     logging.basicConfig(
@@ -345,7 +345,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         level=logging.DEBUG,
     )
 
-    logger = logging.getLogger("run_model")
+    logger = logging.getLogger(f"run_model_{model_name}")
     logger.info(f"Running {model_name} model. Environment variables read.")
 
     # Handle special models
@@ -376,7 +376,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         # Get estimator parameters for Nixtla models (including n_epochs override)
         estimator_params = get_nixtla_estimator_params(model_config, env_vars)
         model_obj = NixtlaMain(
-            estimator_class, model_name, *env_vars, estimator_params=estimator_params
+            estimator_class, model_name, *env_vars, estimator_params=estimator_params,
         )
     elif model_class == "GluontsMain":
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"

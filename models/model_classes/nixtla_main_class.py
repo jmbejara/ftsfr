@@ -12,15 +12,9 @@ import logging
 
 import pandas as pd
 from tabulate import tabulate
-import torch
 
 from .forecasting_model import forecasting_model
-from .helper_func import (
-    common_error_catch,
-    calculate_darts_MASE,
-    process_df,
-    custom_interpolate,
-)
+from .helper_func import common_error_catch,calculate_darts_MASE, process_df, custom_interpolate
 
 NixtlaMain_logger = logging.getLogger("NixtlaMain")
 
@@ -106,7 +100,8 @@ class NixtlaMain(forecasting_model):
             estimator_params = {"h": 1, "input_size": seasonality * 4}
 
         # MPS is causing buffer errors
-        if torch.backends.mps.is_available():
+        from torch.backends.mps import is_available
+        if is_available():
             NixtlaMain_logger.info("MPS available, but will be ignored.")
             estimator_params["accelerator"] = "cpu"
             self.estimator = estimator(**estimator_params)

@@ -10,7 +10,7 @@ Priority order:
 import os
 import tomli
 from pathlib import Path
-
+from cutoff_calc import cutoff_calc
 
 def read_dataset_config(dataset_path, datasets_toml_path="../datasets.toml"):
     """
@@ -99,13 +99,19 @@ def get_model_config(environment_dict=None):
     if environment_dict.get("OUTPUT_DIR", None) is not None:
         output_dir = Path(environment_dict["OUTPUT_DIR"])
     else:
-        output_dir = Path().resolve().parent / "_output"
+        output_dir = Path(__file__).resolve().parent.parent / "_output"
+
+    cutoff_date = cutoff_calc(dataset_path,
+                              dataset_name,
+                              frequency,
+                              seasonality,
+                              test_split)
 
     # Print configuration being used
     print(f"\nConfiguration for dataset: {dataset_name}")
     print(f"  Frequency: {frequency}")
     print(f"  Seasonality: {seasonality}")
-    print(f"  Test split: {test_split}")
+    print(f"  Test cutoff date: {cutoff_date}")
     if "description" in dataset_config:
         print(f"  Description: {dataset_config['description']}")
     print()

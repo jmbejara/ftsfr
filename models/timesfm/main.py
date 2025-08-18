@@ -284,7 +284,7 @@ if __name__ == "__main__":
     dataset_name = str(os.path.basename(data_path)).split(".")[0]
     dataset_name = dataset_name.removeprefix("ftsfr_")
 
-    log_path = Path().resolve().parent / "model_logs" / "timesfm"
+    log_path = Path(__file__).resolve().parent.parent / "model_logs" / "timesfm"
     Path(log_path).mkdir(parents=True, exist_ok=True)
     log_path = log_path / (dataset_name + ".log")
     logging.basicConfig(
