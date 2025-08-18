@@ -111,7 +111,7 @@ def task_pull():
         }
     if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
         yield {
-            "name": f"{data_module}_bbg",
+            "name": f"bbg:{data_module}",
             "actions": [
                 f"python ./src/{data_module}/pull_bbg_treasury_inflation_swaps.py --OUTPUT_DIR={DATA_DIR / data_module}",
             ],
@@ -127,7 +127,7 @@ def task_pull():
     data_module = "basis_treas_sf"
     if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
         yield {
-            "name": data_module,
+            "name": f"bbg:{data_module}",
             "actions": [
                 f"python ./src/{data_module}/pull_bbg_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
             ],
@@ -169,7 +169,7 @@ def task_pull():
     data_module = "basis_treas_swap"
     if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
         yield {
-            "name": data_module,
+            "name": f"bbg:{data_module}",
             "actions": [
                 f"python ./src/{data_module}/pull_bbg_treas_swap.py --DATA_DIR={DATA_DIR / data_module}",
             ],
@@ -306,7 +306,7 @@ def task_pull():
 
     if module_requirements[data_module] and not use_cache and not bbg_skip:
         yield {
-            "name": f"{data_module}_bbg",
+            "name": f"bbg:{data_module}",
             "actions": [
                 f"python ./src/{data_module}/pull_bbg_foreign_exchange.py --DATA_DIR={DATA_DIR / data_module}",
             ],
