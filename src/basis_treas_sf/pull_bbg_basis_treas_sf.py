@@ -108,7 +108,6 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import pandas as pd
-from xbbg import blp
 import warnings
 import polars as pl
 
@@ -153,6 +152,7 @@ def pull_ois_history(
     $ USSOF CMPN Curncy           <f64> 1.058, 1.077
     $ USSO1 CMPN Curncy           <f64> 1.29, 1.353
     """
+    from xbbg import blp
     tickers = ois_tickers()
     df = blp.bdh(
         tickers=tickers, flds=["PX_LAST"], start_date=start_date, end_date=end_date
@@ -259,6 +259,7 @@ def pull_futures_for_tenor(
     $ CNVS_FACTOR_EOD                <f64> None, 0.8762
 
     """
+    from xbbg import blp
     tenor_to_tickers = futures_ticker_map()
     if tenor not in tenor_to_tickers:
         raise ValueError(f"Unsupported tenor: {tenor}")
