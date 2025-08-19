@@ -27,7 +27,6 @@ DEFAULT_END_DATE: Optional[date] = None  # None means use full available range
 REPLICATION_END_DATE: date = pd.Timestamp("2025-08-01").date()
 
 DATA_DIR = config("DATA_DIR")
-OUTPUT_DIR = config("OUTPUT_DIR")
 
 
 def plot_figure(
@@ -134,7 +133,7 @@ def plot_main(data_dir: Path = DATA_DIR) -> None:
     - Updated plot uses full available range (no end date cap).
     - Supplementary plots use full available range.
     """
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     file = data_dir / "calc_merged.parquet"
     # Load precomputed arbitrage spreads created in format step
@@ -144,21 +143,21 @@ def plot_main(data_dir: Path = DATA_DIR) -> None:
 
     plot_figure(
         arb_df,
-        OUTPUT_DIR / "replicated_swap_spread_arb_figure.png",
+        DATA_DIR / "replicated_swap_spread_arb_figure.png",
         start_date=DEFAULT_START_DATE,
         end_date=REPLICATION_END_DATE,
     )
 
     plot_figure(
         arb_df,
-        OUTPUT_DIR / "updated_swap_spread_arb_figure.png",
+        DATA_DIR / "updated_swap_spread_arb_figure.png",
         start_date=DEFAULT_START_DATE,
         end_date=None,  # show full available range
     )
 
     plot_supplementary(
         rep_df,
-        OUTPUT_DIR / "replication_figure.png",
+        DATA_DIR / "replication_figure.png",
         start_date=DEFAULT_START_DATE,
         end_date=None,
     )

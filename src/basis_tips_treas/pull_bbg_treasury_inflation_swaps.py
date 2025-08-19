@@ -1,13 +1,14 @@
-from xbbg import blp
 from pathlib import Path
 from datetime import date
-
+import sys
+import polars as pl
+sys.path.append("..")
 from settings import config
 
-OUTPUT_DIR = config("OUTPUT_DIR")
 START_DATE: str = config("START_DATE", default="2000-01-01")
 END_DATE: str = config("END_DATE", default=str(date.today()))
-
+DATA_DIR = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "basis_tips_treas"
 
 def pull_treasury_inflation_swaps(
     start_date: str = START_DATE,
@@ -22,7 +23,7 @@ def pull_treasury_inflation_swaps(
     :param end_date: End date in 'YYYY-MM-DD' format (str).
     :return: A pandas DataFrame containing the replicated data.
     """
-
+    from xbbg import blp
     # Tickers to replicate. Adjust as needed for 1M, 3M, 6M, etc.
     tickers = [
         "USSWIT1 BGN Curncy",  # 1Y
@@ -54,10 +55,14 @@ def pull_treasury_inflation_swaps(
     return df
 
 
+def load_treasury_inflation_swaps(data_dir: Path = DATA_DIR) -> pl.DataFrame:
+    """
+    Loads the treasury inflation swaps data from the configured DATA_DIR.
+    """
+    return pl.read_parquet(data_dir / "treasury_inflation_swaps.parquet")
+
 if __name__ == "__main__":
-    # Pull data and save to the configured OUTPUT_DIR
+    # Pull data and save to the configured DATA_DIR
     df = pull_treasury_inflation_swaps()
-    output_dir = Path(OUTPUT_DIR)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / "treasury_inflation_swaps.parquet"
+    output_path = DATA_DIR / "treasury_inflation_swaps.parquet"
     df.to_parquet(output_path, index=False)

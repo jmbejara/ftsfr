@@ -4,7 +4,6 @@ import numpy as np
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-OUTPUT_DIR = config("OUTPUT_DIR")
 
 
 # ------------------------------------------------------------------------------

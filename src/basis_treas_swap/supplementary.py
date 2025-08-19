@@ -11,7 +11,6 @@ from settings import config
 import pull_bbg_treas_swap
 from calc_swap_spreads import calc_swap_spreads
 
-OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 DATA_DIR = config("DATA_DIR")
 
 
@@ -53,7 +52,7 @@ def sup_table(calc_df, file_name="table.txt"):
     means = df.mean()
     means.rename()
     means_str = pd.DataFrame(means, columns=["Mean(bps)"]).to_latex()
-    file = OUTPUT_DIR / file_name
+    file = DATA_DIR / file_name
     with open(file, "w") as table:
         table.write(means_str)
     return means

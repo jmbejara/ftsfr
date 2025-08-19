@@ -36,7 +36,6 @@ from settings import config
 import pull_bbg_foreign_exchange
 
 DATA_DIR = config("DATA_DIR")
-OUTPUT_DIR = config("OUTPUT_DIR")
 
 CURRENCIES = ["AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NZD", "SEK", "USD"]
 
