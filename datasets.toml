@@ -131,11 +131,6 @@ description = """This data module contains the returns of the treasury bond port
 frequency = "ME"
 seasonality = 12
 
-################################################################################
-
-[crb_commodity]
-required_data_sources = ["bloomberg_terminal"]
-
 
 ################################################################################
 [fed_yield_curve]
