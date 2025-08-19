@@ -28,9 +28,7 @@ from settings import config
 import format_bbg_basis_treas_sf
 
 DATA_DIR = config("DATA_DIR")
-OUTPUT_DIR = config("OUTPUT_DIR")
 # DATA_DIR = DATA_DIR / "basis_treas_sf"
-
 
 # -------------------------
 # Helper functions
@@ -301,12 +299,12 @@ def calc_treasury(
 
 
 def save_arbitrage_spread_plots(
-    df_long: pd.DataFrame, output_dir: Path = OUTPUT_DIR, tenors=(2, 5, 10, 20, 30)
+    df_long: pd.DataFrame, data_dir: Path = DATA_DIR, tenors=(2, 5, 10, 20, 30)
 ) -> None:
     """Save arbitrage spread plots for the given tenors."""
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    Path(data_dir).mkdir(parents=True, exist_ok=True)
     for tenor in tenors:
-        df_plot = df_long[df_long["Tenor"] == str(tenor)]
+        df_plot = df_long[df_long["Tenor"] == tenor]
         if df_plot.empty:
             raise ValueError(f"No data found for tenor {tenor}")
         plt.figure(figsize=(10, 5))
@@ -316,7 +314,7 @@ def save_arbitrage_spread_plots(
         plt.title(f"Tenor = {tenor} years")
         plt.legend()
         plt.tight_layout()
-        plot_path = Path(output_dir) / f"arbitrage_spread_{tenor}.pdf"
+        plot_path = Path(data_dir) / f"arbitrage_spread_{tenor}.pdf"
         plt.savefig(plot_path)
         plt.close()
 
@@ -345,9 +343,10 @@ if __name__ == "__main__":
 
     # Compute
     df_long = compute_treasury_long(treasury_df, ois_df, last_day_df)
+    # df_long.info()
 
     # Save plots
-    save_arbitrage_spread_plots(df_long, OUTPUT_DIR)
+    save_arbitrage_spread_plots(df_long, DATA_DIR)
 
     # Build final output and save to disk
     df_final = compute_treasury_output(df_long)

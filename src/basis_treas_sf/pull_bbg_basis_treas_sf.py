@@ -188,9 +188,9 @@ def futures_ticker_map() -> Dict[int, Tuple[str, str]]:
         2: ("TU1 Comdty", "TU2 Comdty"),
         5: ("FV1 Comdty", "FV2 Comdty"),
         10: ("TY1 Comdty", "TY2 Comdty"),
-        30: ("US1 Comdty", "US2 Comdty"),
-        # Optional proxy for 20Y: Ultra 10y (TN). Keep guarded; may be sparse.
-        20: ("TN1 Comdty", "TN2 Comdty"),
+        20: ("US1 Comdty", "US2 Comdty"),
+        30: ("WN1 Comdty", "WN2 Comdty"),
+        # 10: ("TN1 Comdty", "TN2 Comdty"), # Ultra Ten Year. All implied repo rates are missing
     }
     return mapping
 

@@ -18,12 +18,12 @@ from IPython.display import display
 import sys
 import asyncio
 
+sys.path.append("..")
 from settings import config
 from calc_basis_treas_sf import load_treasury_sf_output
 import load_bases_data
 
 DATA_DIR = config("DATA_DIR")
-OUTPUT_DIR = config("OUTPUT_DIR")
 
 # Ensure Windows uses a selector event loop to avoid ZMQ RuntimeWarning during nbconvert
 if sys.platform.startswith("win"):
@@ -33,7 +33,6 @@ if sys.platform.startswith("win"):
         pass
 
 DATA_DIR = DATA_DIR / "basis_treas_sf"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 tenors = [
     "Treasury_SF_2Y",
@@ -44,7 +43,7 @@ tenors = [
 ]
 
 # %%
-df_mine = load_treasury_sf_output(data_dir=DATA_DIR.parent).sort_values("Date")
+df_mine = load_treasury_sf_output(data_dir=DATA_DIR).sort_values("Date")
 tenors_plot_mine = [c for c in tenors if c in df_mine.columns]
 ax = df_mine.set_index("Date")[tenors_plot_mine].plot(figsize=(12, 6))
 ax.set_title("Treasury Spot-Futures Basis (This project)")
@@ -52,7 +51,7 @@ ax.set_ylabel("Basis (bps)")
 ax.set_xlabel("")
 ax.grid(True)
 fig = ax.get_figure()
-plot_path = OUTPUT_DIR / "treasury_sf_basis_ours.png"
+plot_path = DATA_DIR / "treasury_sf_basis_ours.png"
 fig.savefig(plot_path, dpi=300, bbox_inches="tight")
 # Provide accessible alt text for the rendered figure
 display(
@@ -64,7 +63,7 @@ display(
 
 # %%
 df_ref = load_bases_data.load_combined_spreads_wide(
-    data_dir=DATA_DIR.parent, raw=False, rename=True
+    data_dir=DATA_DIR, raw=False, rename=True
 )
 df_ref = df_ref.reset_index().rename(columns={"date": "Date"})
 df_ref["Date"] = pd.to_datetime(df_ref["Date"]).dt.tz_localize(None)
@@ -97,7 +96,7 @@ for i, col in enumerate(tenors_overlay):
 axes[0].legend()
 plt.xlabel("")
 plt.tight_layout()
-plot_path = OUTPUT_DIR / "treasury_sf_basis_overlay_siriwardane.png"
+plot_path = DATA_DIR / "treasury_sf_basis_overlay_siriwardane.png"
 fig.savefig(plot_path, dpi=300, bbox_inches="tight")
 # Provide accessible alt text for the overlay figure
 display(
