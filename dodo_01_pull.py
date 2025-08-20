@@ -113,7 +113,7 @@ def task_pull():
         yield {
             "name": f"bbg:{data_module}",
             "actions": [
-                f"python ./src/{data_module}/pull_bbg_treasury_inflation_swaps.py --OUTPUT_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_bbg_treasury_inflation_swaps.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_inflation_swaps.parquet",
@@ -666,7 +666,10 @@ def task_format():
             "targets": [
                 DATA_DIR / data_module / "commodities_returns.parquet",
             ],
-            "file_dep": [f"./src/{data_module}/calc_commodities_returns.py"],
+            "file_dep": [
+                f"./src/{data_module}/calc_commodities_returns.py",
+                f"./src/{data_module}/replicate_cmdty.py",
+            ],
         }
 
     data_module = "corp_bond_returns"
