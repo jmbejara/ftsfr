@@ -656,21 +656,21 @@ def task_format():
             }
         )
 
-    data_module = "commodities"
-    if module_requirements[data_module] and not use_cache:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/calc_commodities_returns.py --DATA_DIR={DATA_DIR / data_module}"
-            ],
-            "targets": [
-                DATA_DIR / data_module / "commodities_returns.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/calc_commodities_returns.py",
-                f"./src/{data_module}/replicate_cmdty.py",
-            ],
-        }
+    # data_module = "commodities"
+    # if module_requirements[data_module] and not use_cache:
+    #     yield {
+    #         "name": data_module,
+    #         "actions": [
+    #             f"python ./src/{data_module}/calc_commodities_returns.py --DATA_DIR={DATA_DIR / data_module}"
+    #         ],
+    #         "targets": [
+    #             DATA_DIR / data_module / "commodities_returns.parquet",
+    #         ],
+    #         "file_dep": [
+    #             f"./src/{data_module}/calc_commodities_returns.py",
+    #             f"./src/{data_module}/replicate_cmdty.py",
+    #         ],
+    #     }
 
     data_module = "corp_bond_returns"
     if module_requirements[data_module]:
