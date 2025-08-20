@@ -1,6 +1,7 @@
 import sys
 import zipfile
 from pathlib import Path
+import urllib3
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -8,6 +9,9 @@ from io import BytesIO
 
 import pandas as pd
 import requests
+
+# Suppress SSL warnings when verify=False
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from settings import config
 
@@ -20,7 +24,7 @@ def pull_he_kelly_manela(data_dir=DATA_DIR):
     Download the He-Kelly-Manela factors and test portfolios data
     """
     # DATA_DIR.mkdir(parents=True, exist_ok=True)
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     zip_file = BytesIO(response.content)
     with zipfile.ZipFile(zip_file, "r") as zip_ref:
         zip_ref.extractall(data_dir)

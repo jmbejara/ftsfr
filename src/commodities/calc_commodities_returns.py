@@ -10,6 +10,8 @@ from replicate_cmdty import generate_corr_matrix, decide_optimal_pairs
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
+BASE_DIR = Path(config("BASE_DIR"))
+
 metal_map = {
     "Aluminum": ("LMAHDY Comdty_PX_LAST", "LMAHDS03 Comdty_PX_LAST"),
     "Nickel": ("LMNIDY Comdty_PX_LAST", "LMNIDS03 Comdty_PX_LAST"),
@@ -104,10 +106,10 @@ def calc_return_manual(df):
 
 def generate_replication_gsci(data_dir=DATA_DIR):
     df_return1 = load_futures_data.load_gsci_data()
-    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty()
+    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(data_dir=BASE_DIR / "_data" / "he_kelly_manela")
     corr_matrix1 = generate_corr_matrix(df_return1, hkm_df)
     corr_matrix_float1 = corr_matrix1.astype(float)
-    optimal_pairs_df1, _, _ = decide_optimal_pairs(corr_matrix_float1)
+    optimal_pairs_df1 = decide_optimal_pairs(corr_matrix_float1)
     optimal_pairs_df1["GSCI Index"] = optimal_pairs_df1["Commodity_1"].str.replace(
         "_PX_LAST_Return", "", regex=False
     )
@@ -177,7 +179,7 @@ def compute_second_contract_return(commodity_futures_df, date_col="index"):
     for col in second_contract_cols:
         df_monthly[col] = pd.to_numeric(df_monthly[col], errors="coerce")
 
-    ret_df = df_monthly[second_contract_cols].pct_change()
+    ret_df = df_monthly[second_contract_cols].pct_change(fill_method=None)
     ret_df["yyyymm"] = ret_df.index.strftime("%Y%m")
     ret_df["Date"] = ret_df.index.to_timestamp("M")
 
@@ -189,7 +191,7 @@ def compute_second_contract_return(commodity_futures_df, date_col="index"):
 
 
 def generate_replication_future_ticker():
-    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty()
+    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(data_dir=BASE_DIR / "_data" / "he_kelly_manela")
     commodity_futures_df = load_futures_data.load_commodities_future()
     lme_df = load_futures_data.load_lme_metals()
     monthly_1mprice = calc_lme_monthly_1mprice(lme_df, metal_map, date_col="index")
@@ -208,7 +210,7 @@ def generate_replication_future_ticker():
     carry_sub = combined_df.loc[common_idx]
     corr_matrix2 = generate_corr_matrix(he_kelly_sub, carry_sub)
     corr_matrix_float2 = corr_matrix2.astype(float)
-    optimal_pairs_df2, _, _ = decide_optimal_pairs(corr_matrix_float2)
+    optimal_pairs_df2 = decide_optimal_pairs(corr_matrix_float2)
 
     optimal_pairs_df2["Commodity_Name"] = optimal_pairs_df2["Commodity_2"].map(
         ticker_to_commodity
@@ -219,14 +221,14 @@ def generate_replication_future_ticker():
 
 
 def generate_replication_manual():
-    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty()
+    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(data_dir=BASE_DIR / "_data" / "he_kelly_manela")
     df = load_futures_data.load_commodities_manual()
     monthly_return = calc_return_manual(df)
     monthly_return["yyyymm"] = monthly_return["Month"].dt.strftime("%Y%m")
     monthly_return = monthly_return.set_index("yyyymm")
     corr_matrix3 = generate_corr_matrix(monthly_return, hkm_df)
     corr_matrix_float3 = corr_matrix3.astype(float)
-    optimal_pairs_df3, _, _ = decide_optimal_pairs(corr_matrix_float3)
+    optimal_pairs_df3 = decide_optimal_pairs(corr_matrix_float3)
     optimal_pairs_df3["Commodity_Name"] = optimal_pairs_df3["Commodity_2"].map(
         ticker_to_commodity
     )

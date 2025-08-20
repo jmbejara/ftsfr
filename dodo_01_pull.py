@@ -657,7 +657,7 @@ def task_format():
         )
 
     data_module = "commodities"
-    if module_requirements[data_module] and not use_cache and not bbg_skip:
+    if module_requirements[data_module] and not use_cache:
         yield {
             "name": data_module,
             "actions": [

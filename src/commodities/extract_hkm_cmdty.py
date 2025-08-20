@@ -1,24 +1,15 @@
 import sys
 from pathlib import Path
 
-project_root = Path().resolve().parent
-# sys.path.insert(0, str(project_root))
-# import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-
-import seaborn as sns
 from he_kelly_manela.pull_he_kelly_manela import load_he_kelly_manela_all
 from settings import config
 
-sns.set()
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+DATA_DIR = Path(config("DATA_DIR"))
 
 
-HE_DATA_DIR = Path(config("DATA_DIR")) / "he_kelly_manela"
-
-
-def extract_hkm_cmdty(data_dir=HE_DATA_DIR):
+def extract_hkm_cmdty(data_dir=DATA_DIR):
     he_kelly_manela = load_he_kelly_manela_all(data_dir)
     he_kelly_manela.columns.str.contains("cmd").sum()
 

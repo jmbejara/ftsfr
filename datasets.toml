@@ -101,7 +101,7 @@ required_data_sources = ["bloomberg_terminal"]
 
 ################################################################################
 [commodities]
-required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
+required_data_sources = ["bloomberg_terminal", "wrds_datastream", "he_kelly_manela"]
 
 ################################################################################
 [corp_bond_returns]
