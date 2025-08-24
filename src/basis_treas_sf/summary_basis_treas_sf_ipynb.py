@@ -46,18 +46,18 @@ tenors = [
 df_mine = load_treasury_sf_output(data_dir=DATA_DIR).sort_values("Date")
 tenors_plot_mine = [c for c in tenors if c in df_mine.columns]
 ax = df_mine.set_index("Date")[tenors_plot_mine].plot(figsize=(12, 6))
-ax.set_title("Treasury Spot-Futures Basis (This project)")
+ax.set_title("Treasury Spot-Futures Basis (FTSFR Replication)")
 ax.set_ylabel("Basis (bps)")
 ax.set_xlabel("")
 ax.grid(True)
 fig = ax.get_figure()
-plot_path = DATA_DIR / "treasury_sf_basis_ours.png"
+plot_path = DATA_DIR / "treasury_sf_basis_ftsfr.png"
 fig.savefig(plot_path, dpi=300, bbox_inches="tight")
 # Provide accessible alt text for the rendered figure
 display(
     fig,
     metadata={
-        "image/alt": "Treasury Spot-Futures Basis (project output) time series for 2Y, 5Y, 10Y, 20Y, 30Y tenors in basis points."
+        "image/alt": "Treasury Spot-Futures Basis (FTSFR Replication) time series for 2Y, 5Y, 10Y, 20Y, 30Y tenors in basis points."
     },
 )
 
@@ -85,7 +85,7 @@ if len(tenors_overlay) == 1:
 
 for i, col in enumerate(tenors_overlay):
     ax = axes[i]
-    df_mine.set_index("Date")[col].plot(ax=ax, label="This project", color="C0")
+    df_mine.set_index("Date")[col].plot(ax=ax, label="FTSFR Replication", color="C0")
     df_ref.set_index("Date")[col].plot(
         ax=ax, label="Siriwardane et al.", color="C1", alpha=0.7
     )
@@ -102,7 +102,7 @@ fig.savefig(plot_path, dpi=300, bbox_inches="tight")
 display(
     fig,
     metadata={
-        "image/alt": "Overlay of Treasury Spot-Futures Basis: this project vs. Siriwardane et al., by tenor (2Y, 5Y, 10Y, 20Y, 30Y)."
+        "image/alt": "Overlay of Treasury Spot-Futures Basis: FTSFR Replication vs. Siriwardane et al., by tenor (2Y, 5Y, 10Y, 20Y, 30Y)."
     },
 )
 
