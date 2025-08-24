@@ -26,6 +26,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
 import json
 
+import logging
+
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 

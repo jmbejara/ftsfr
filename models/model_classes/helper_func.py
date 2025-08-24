@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from pandas.tseries.frequencies import to_offset
 from utilsforecast.preprocessing import fill_gaps
-from traceback import print_tb, tb_frame
+import traceback
 
 import logging
 
@@ -315,14 +315,14 @@ def common_error_catch(f):
         hf_logger = logging.getLogger("hf.common_error_catch")
         try:
             return f(*args)
-        except Exception:
+        except Exception as ex:
             print_sep()
             print(
                 f"\nError in {f.__name__}. Please check logs. "
                 + "There is a possibility that this error is insignificant "
                 + "and can be ignored."
             )
-            print_tb(tb_frame)
+            traceback.print_exception(ex)
             hf_logger.exception(f"Error in {f.__name__}.")
             print_sep()
             return None

@@ -158,8 +158,10 @@ def create_estimator(model_config, env_vars):
     # Convert frequency for GluonTS models (ME -> M)
     def convert_frequency_for_gluonts(freq):
         """Convert frequency strings for GluonTS compatibility."""
-        if freq == "ME":
+        if freq == "ME" or freq == "MS":
             return "M"  # Month end -> Month
+        if freq == "QE" or freq == "QS":
+            return "Q"
         return freq
 
     # Process imports if any

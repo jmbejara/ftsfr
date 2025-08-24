@@ -192,7 +192,7 @@ estimator_params = { h = 1 }
 class = "NixtlaMain"
 estimator_class = "neuralforecast.models.NBEATS"
 display_name = "NBeats"
-estimator_params = { h = 1 }
+estimator_params = { h = 1, stack_types = ['identity'] }
 
 [autoformer]
 class = "NixtlaMain"
