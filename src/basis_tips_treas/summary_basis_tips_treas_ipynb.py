@@ -1,8 +1,8 @@
 # %%
 """
-# TIPS-Treasury Arbitrage Replication (2010-2020)
+# TIPS-Treasury Arbitrage Replication (2004-2025)
 
-This notebook replicates the TIPS–Treasury arbitrage strategy for the period 2010–2020 following the methodology of Fleckenstein et al. (2014). It also outlines how a trader could implement this strategy in practice.
+This notebook replicates the TIPS–Treasury arbitrage strategy for the period 2004–2025 following the methodology of Fleckenstein et al. (2014). It also outlines how a trader could implement this strategy in practice.
 """
 
 # %%
@@ -45,7 +45,7 @@ sys.path.append("..")
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-DATA_DIR = DATA_DIR / "basis_tips_treas"
+#DATA_DIR = DATA_DIR / "basis_tips_treas"
 
 warnings.filterwarnings("ignore")
 sns.set_theme(style="dark")
@@ -88,15 +88,15 @@ test
 """
 ### Generate Summary Statistics
 
-The cell below computes summary statistics using `generate_figures.py` for each TIPS-Treasury arbitrage series over the period 2010-2020.
+The cell below computes summary statistics using `generate_figures.py` for each TIPS-Treasury arbitrage series over the period 2004-2025.
 """
 
 # %%
 import generate_figures
 
-# Compute summary statistics for the period 2020-01-01 to 2025-01-01
+# Compute summary statistics for the period 2004-01-01 to 2025-01-01
 summary_stats = generate_figures.generate_summary_statistics(
-    test, "2020-01-01", "2025-01-01"
+    test, "2000-01-01", "2025-01-01"
 )
 summary_stats
 
@@ -127,11 +127,11 @@ plt.show()
 """
 ### Plot TIPS-Treasury Spreads
 
-The following cell plots the arbitrage spreads for various maturities (2Y, 5Y, 10Y, 20Y) over the period 2020-01-01 to 2025-01-01.
+The following cell plots the arbitrage spreads for various maturities (2Y, 5Y, 10Y, 20Y) over the period 2004-07-21 to 2025-05-30.
 """
 
 # %%
-fig = generate_figures.plot_tips_treasury_spreads(test, "2020-01-01", "2025-01-01")
+fig = generate_figures.plot_tips_treasury_spreads(test, "2004-07-21", "2025-05-30")
 plt.show()
 
 # %%
