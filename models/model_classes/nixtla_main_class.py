@@ -164,12 +164,18 @@ class NixtlaMain(forecasting_model):
             verify_one_step_ahead,
         )
 
-        self.pred_data = perform_one_step_ahead_nixtla(
+        temp_df = perform_one_step_ahead_nixtla(
             nf_model = self.nf,
             train_data = self.train_data,
             test_data = self.test_data,
             raw_data = self.raw_data,
         )
+
+        for col in temp_df.columns:
+            if (col != "unique_id") and (col != "ds"):
+                break
+
+        self.pred_data = temp_df.rename(columns = {col : "y"})
 
         # Verify that we're doing one-step-ahead (only if darts is available)
         try:
@@ -221,7 +227,6 @@ class NixtlaMain(forecasting_model):
                     self.train_data,
                     self.pred_data,
                     self.seasonality,
-                    self.model_name.title(),
                 )
                 NixtlaMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
                 return self.errors["MASE"]

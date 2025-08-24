@@ -114,11 +114,11 @@ estimator_params = { season_mode = "SeasonalityMode.ADDITIVE" }
 
 # Global Darts Models (multivariate, global training)
 
-[dlinear]
-class = "DartsGlobal"
-estimator_class = "darts.models.DLinearModel"
-display_name = "DLinear"
-estimator_params = { output_chunk_length = 1 }
+# [dlinear]
+# class = "DartsGlobal"
+# estimator_class = "darts.models.DLinearModel"
+# display_name = "DLinear"
+# estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
 [global_naive_agg]
@@ -142,24 +142,10 @@ display_name = "Global Naive Seasonal"
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
-[nbeats]
-class = "DartsGlobal"
-estimator_class = "darts.models.NBEATSModel"
-display_name = "N-BEATS"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
-
 [nhits]
 class = "DartsGlobal"
 estimator_class = "darts.models.NHiTSModel"
 display_name = "NHiTS"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
-
-[nlinear]
-class = "DartsGlobal"
-estimator_class = "darts.models.NLinearModel"
-display_name = "NLinear"
 estimator_params = { output_chunk_length = 1 }
 # input_chunk_length will be set to seasonality * 4
 
@@ -189,6 +175,24 @@ estimator_params = { output_chunk_length = 1, multi_models = false }
 # lags will be set to seasonality * 4
 
 # Nixtla Models
+
+[dlinear]
+class = "NixtlaMain"
+estimator_class = "neuralforecast.models.DLinear"
+display_name = "DLinear"
+estimator_params = { h = 1 }
+
+[nlinear]
+class = "NixtlaMain"
+estimator_class = "neuralforecast.models.NLinear"
+display_name = "NLinear"
+estimator_params = { h = 1 }
+
+[nbeats]
+class = "NixtlaMain"
+estimator_class = "neuralforecast.models.NBEATS"
+display_name = "NBeats"
+estimator_params = { h = 1 }
 
 [autoformer]
 class = "NixtlaMain"

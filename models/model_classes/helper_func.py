@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from pandas.tseries.frequencies import to_offset
 from utilsforecast.preprocessing import fill_gaps
-from traceback import print_tb
+from traceback import print_tb, tb_frame
 
 import logging
 
@@ -187,7 +187,17 @@ def custom_interpolate(df):
     hf_logger.info("Pivot dataframe to have each entity as a column.")
 
     # Interpolates per entity
-    proc_df = proc_df.interpolate(limit_direction="both")
+    proc_df_int = proc_df.interpolate(method = "linear", limit_direction="both")
+
+    random_number_gen = np.random.default_rng()
+
+    # Gaussian noise to add to interpolated values
+    values_to_add = pd.Series(np.absolute(random_number_gen.normal(size = proc_df.shape[0])) / 1000,
+                               index = proc_df.index)
+
+    proc_df_replace_nan = proc_df_int.add(values_to_add, axis = 0)
+
+    proc_df = proc_df.fillna(proc_df_replace_nan)
 
     hf_logger.info("Forward and backward filling performed.")
 
@@ -225,6 +235,10 @@ def process_df(df, frequency, seasonality, test_split):
     hf_logger = logging.getLogger("hf.process_df")
 
     hf_logger.info("process_df called.")
+
+    df['y'] = df['y'].astype(np.float32)
+
+    df['y'].loc[(df['y'] == float("inf")) | (df['y'] == float("-inf"))] = np.nan
 
     # This only adds NaNs as values for missing dates.
     df = fill_gaps(df, freq=frequency, start="global", end="global")
@@ -272,9 +286,6 @@ def process_df(df, frequency, seasonality, test_split):
     train_data, test_data = scaled_data(train_data, test_data)
     hf_logger.info("Performed scaling on train and test.")
 
-    # float32 conversion is standardised accross implementations
-    train_data['y'] = train_data['y'].astype(np.float32)
-    test_data['y'] = test_data['y'].astype(np.float32)
     hf_logger.info("Converted train and test to np.float32.")
 
     # The train series should now have all defined entries
@@ -311,7 +322,7 @@ def common_error_catch(f):
                 + "There is a possibility that this error is insignificant "
                 + "and can be ignored."
             )
-            print_tb()
+            print_tb(tb_frame)
             hf_logger.exception(f"Error in {f.__name__}.")
             print_sep()
             return None

@@ -99,8 +99,10 @@ class GluontsMain(forecasting_model):
         # Convert frequency for GluonTS compatibility (ME -> M)
         def convert_frequency_for_gluonts(freq):
             """Convert frequency strings for GluonTS compatibility."""
-            if freq == "ME":
+            if freq == "ME" or freq == "MS":
                 return "M"  # Month end -> Month
+            elif freq == "QE" or freq == "QS":
+                return "Q"
             return freq
 
         gluonts_frequency = convert_frequency_for_gluonts(frequency)
