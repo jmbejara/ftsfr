@@ -629,7 +629,47 @@ Following \cite{He2017}, we include comprehensive datasets across multiple asset
 % Fama-French 25 portfolios and CRSP universe
 % Explain exclusion of small stocks, ADRs, etc. following Fama-French (1993)
 
-The equity dataset follows \cite{Fama1993}, whose cleaning methodology has become the canonical approach in asset pricing research, establishing the foundation for thousands of subsequent studies. The essential data transformations in Fama-French are critical for avoiding common pitfalls in equity research. First, their precise definition of book equity carefully accounts for balance sheet complexities: book value of stockholders' equity plus deferred taxes and investment tax credits minus the book value of preferred stock, with a hierarchical approach to valuing preferred stock (redemption, liquidation, or par value). This standardization is crucial because inconsistent book equity definitions can dramatically alter value factor exposures and lead to spurious results. Second, their exclusion criteria eliminate securities that would contaminate standard equity analysis: ADRs (which reflect foreign market dynamics), REITs and units of beneficial interest (which have fundamentally different cash flow structures), and firms with negative book equity (which represent financial distress and behave differently from normal equity securities). Third, their timing conventions—forming portfolios in June using market equity from June and book equity from fiscal year $t-1$—ensure that accounting information would have been publicly available to investors, avoiding look-ahead bias that has plagued many studies. Fourth, they require firms to appear on COMPUSTAT for two years before inclusion, directly addressing the survivorship bias documented by \cite{Banz1986} where COMPUSTAT retroactively adds successful firms' histories. Finally, using NYSE breakpoints for size and book-to-market sorting prevents the results from being dominated by the numerous small NASDAQ and AMEX stocks that entered the sample after 1972. These seemingly technical choices have profound impacts: studies that deviate from these conventions often find dramatically different results, and the stability of the size and value effects across decades of out-of-sample testing validates these careful data handling procedures. By open-sourcing code that implements these exact transformations, we enable researchers to avoid the numerous subtle errors that can arise when attempting to reconstruct this canonical dataset from raw CRSP and COMPUSTAT data.
+The equity dataset follows \cite{Fama1993}, whose cleaning methodology has 
+become the canonical approach in asset pricing research, establishing the 
+foundation for thousands of subsequent studies. The essential data transformations 
+in Fama-French are critical for avoiding common pitfalls in equity research. 
+First, their precise definition of book equity carefully accounts for balance 
+sheet complexities: book value of stockholders' equity plus deferred taxes and 
+investment tax credits minus the book value of preferred stock, with 
+a hierarchical approach to valuing preferred stock (redemption, liquidation, or 
+par value). This standardization is crucial because inconsistent book equity 
+definitions can dramatically alter value factor exposures and lead to spurious 
+results. Second, their exclusion criteria eliminate securities that would 
+contaminate standard equity analysis: ADRs (which reflect foreign market dynamics), 
+REITs and units of beneficial interest (which have fundamentally different 
+cash flow structures), and firms with negative book equity 
+(which represent financial distress and behave differently from normal equity 
+securities). Third, their timing conventions—forming portfolios in June using 
+market equity from June and book equity from fiscal year $t-1$—ensure that 
+accounting information would have been publicly available to investors, avoiding 
+look-ahead bias that has plagued many studies. Fourth, they require firms to appear 
+on COMPUSTAT for two years before inclusion, directly addressing the survivorship 
+bias documented by \cite{Banz1986} where COMPUSTAT retroactively adds successful 
+firms' histories. Finally, using NYSE breakpoints for size and book-to-market 
+sorting prevents the results from being dominated by the numerous small 
+NASDAQ and AMEX stocks that entered the sample after 1972. These seemingly 
+technical choices have profound impacts: studies that deviate from these conventions 
+often find dramatically different results, and the stability of the size and value 
+effects across decades of out-of-sample testing validates these careful data 
+handling procedures. By open-sourcing code that implements these exact 
+transformations, we enable researchers to avoid the numerous subtle errors that 
+can arise when attempting to reconstruct this canonical dataset from raw CRSP and 
+COMPUSTAT data.
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/daily_avg_returns_CRSP_COMPU.jpeg}
+  \end{tabular}
+  \caption{Average returns of all stocks for each given date}
+  \label{fig:treasury_swap_basis}
+\end{figure}
+
 
 \subsubsection{US Treasuries}
 \label{sec:treasuries}
