@@ -18,7 +18,7 @@ import subprocess
 import logging
 from pathlib import Path
 from warnings import filterwarnings
-
+import torch
 
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -93,51 +93,6 @@ def get_estimator_class(model_config):
     return estimator_class
 
 
-def get_nixtla_estimator_params(model_config, env_vars):
-    """
-    Get estimator parameters for Nixtla models, including environment variable overrides.
-
-    Args:
-        model_config: Dictionary containing model configuration
-        env_vars: Environment variables tuple (test_split, frequency, seasonality, data_path, output_dir)
-
-    Returns:
-        Dictionary of estimator parameters
-    """
-    # Extract dataset parameters
-    test_split, frequency, seasonality, data_path, output_dir = env_vars
-
-    # Process imports if any
-    imports_context = {}
-    if "imports" in model_config:
-        imports_context = process_imports(model_config["imports"])
-
-    # Process estimator parameters
-    params = {}
-    for key, value in model_config.get("estimator_params", {}).items():
-        # Evaluate special parameters (like ModelMode.ADDITIVE)
-        value = evaluate_special_params(value, imports_context)
-        params[key] = value
-
-    # Set default input_size for Nixtla models
-    if "input_size" not in params:
-        params["input_size"] = seasonality * 4
-
-    # Environment variable overrides for debugging
-    # Allow overriding max_steps via environment variable for debugging
-    if "N_EPOCHS" in os.environ:
-        n_epochs = int(os.environ["N_EPOCHS"])
-        # For Nixtla models, use max_steps instead of max_epochs (which is deprecated)
-        # Use a very small number of steps for debugging (e.g., 50 steps)
-        max_steps = n_epochs * 50
-        params["max_steps"] = max_steps
-        print(
-            f"Overriding max_steps to {max_steps} via environment variable for Nixtla model"
-        )
-
-    return params
-
-
 def create_estimator(model_config, env_vars):
     """
     Create an estimator instance based on the model configuration.
@@ -160,7 +115,7 @@ def create_estimator(model_config, env_vars):
         """Convert frequency strings for GluonTS compatibility."""
         if freq == "ME" or freq == "MS":
             return "M"  # Month end -> Month
-        if freq == "QE" or freq == "QS":
+        elif freq == "QE" or freq == "QS":
             return "Q"
         return freq
 
@@ -218,10 +173,16 @@ def create_estimator(model_config, env_vars):
         for name in [
             "Autoformer",
             "Informer",
+            "DLinear",
+            "NLinear",
+            "NBEATS"
         ]
     ):
         if "input_size" not in params:
             params["input_size"] = seasonality * 4
+        
+        if torch.backends.mps.is_available():
+            params['accelerator'] = "cpu"
 
     # Models that need lags
     if "CatBoostModel" in model_name or (
@@ -305,14 +266,22 @@ def create_estimator(model_config, env_vars):
             print(
                 f"Overriding n_epochs to {n_epochs} via environment variable for Darts neural model"
             )
+        elif model_config["class"] == "NixtlaMain":
+            n_epochs = int(os.environ["N_EPOCHS"])
+            # For Nixtla models, use max_steps instead of max_epochs (which is deprecated)
+            # Use a very small number of steps for debugging (e.g., 50 steps)
+            max_steps = n_epochs * 50
+            params["max_steps"] = max_steps
+            print(
+                f"Overriding max_steps to {max_steps} via environment variable for Nixtla model"
+            )
         else:
             # Skip n_epochs for models that don't support it (e.g., ARIMA, Prophet, etc.)
             print(f"Skipping n_epochs override for {model_name} - not a neural model")
 
     return estimator_class(**params)
 
-
-def run_model(model_name, config_path="models_config.toml", workflow="main"):
+def run_model(model_name, config_path="models_config.toml", workflow="main", setup_logging = True):
     """
     Run a specific model based on its configuration.
 
@@ -320,6 +289,7 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         model_name: Name of the model to run (e.g., 'arima', 'transformer')
         config_path: Path to the configuration file
         workflow: Which workflow to run ('main', 'train', 'inference', 'evaluate')
+        setup_logging: Setup logging or not using basicConfig and others
     """
     # Load configuration
     config = load_config(config_path)
@@ -337,15 +307,20 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
     dataset_name = dataset_config[5]
 
-    log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
-    Path(log_path).mkdir(parents=True, exist_ok=True)
-    log_path = log_path / (dataset_name + ".log")
-    logging.basicConfig(
-        filename=log_path,
-        filemode="w",
-        format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
-        level=logging.DEBUG,
-    )
+    # Nixtla model imports break logging
+    # So keeping the create_estimator function here and logging after it
+    estimator = create_estimator(model_config, env_vars)
+
+    if setup_logging:
+        log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
+        Path(log_path).mkdir(parents=True, exist_ok=True)
+        log_path = log_path / (dataset_name + ".log")
+        logging.basicConfig(
+            filename=log_path,
+            filemode="w",
+            format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
+            level=logging.DEBUG,
+        )
 
     logger = logging.getLogger(f"run_model_{model_name}")
     logger.info(f"Running {model_name} model. Environment variables read.")
@@ -354,37 +329,21 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
     model_class = model_config["class"]
     display_name = model_config.get("display_name", model_name)
 
+    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+
     # Dynamically import the required model class only when needed
     if model_class == "DartsLocal":
         from model_classes.darts_local_class import DartsLocal
-
-        estimator = create_estimator(model_config, env_vars)
-        model_obj = DartsLocal(estimator, model_name, *env_vars)
+        object_class = DartsLocal
     elif model_class == "DartsGlobal":
         from model_classes.darts_global_class import DartsGlobal
-
-        estimator = create_estimator(model_config, env_vars)
-        model_obj = DartsGlobal(
-            estimator,
-            model_name,
-            *env_vars,
-        )
+        object_class = DartsGlobal
     elif model_class == "NixtlaMain":
-        os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.nixtla_main_class import NixtlaMain
-
-        # For Nixtla models, we need the estimator class and parameters
-        estimator_class = get_estimator_class(model_config)
-        # Get estimator parameters for Nixtla models (including n_epochs override)
-        estimator_params = get_nixtla_estimator_params(model_config, env_vars)
-        model_obj = NixtlaMain(
-            estimator_class, model_name, *env_vars, estimator_params=estimator_params,
-        )
+        object_class = NixtlaMain
     elif model_class == "GluontsMain":
-        os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         from model_classes.gluonts_main_class import GluontsMain
-        estimator = create_estimator(model_config, env_vars)
-        model_obj = GluontsMain(estimator, model_name, *env_vars)
+        object_class = GluontsMain
     elif model_class == "TimesFM":
         # Add the timesfm directory to the path for local import
         timesfm_path = os.path.join(os.path.dirname(__file__), "timesfm")
@@ -399,6 +358,8 @@ def run_model(model_name, config_path="models_config.toml", workflow="main"):
         return
     else:
         raise ValueError(f"Unknown model class: {model_class}")
+
+    model_obj = object_class(estimator, model_name, *env_vars)
 
     # Run the selected workflow
     if workflow == "main":

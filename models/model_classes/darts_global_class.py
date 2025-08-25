@@ -10,10 +10,6 @@ import logging
 
 DartsGlobal_logger = logging.getLogger("DartsGlobal")
 
-import torch
-
-torch.set_float32_matmul_precision("medium")
-
 # from warnings import filterwarnings
 # filterwarnings("ignore")
 
