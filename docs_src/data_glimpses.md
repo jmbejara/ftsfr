@@ -4428,18 +4428,20 @@ ds: min=1963-07-01 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_nyu_call_report_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_cash_liquidity.parquet`
-**Size:** 15.5 MB | **Type:** Parquet | **Shape:** 1,919,810 rows × 3 columns
+**Size:** 23.4 MB | **Type:** Parquet | **Shape:** 1,919,808 rows × 4 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.6% null)
+__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-0.004637848248033172, max=inf, mean=inf, median=0.05778003041054232
+y: min=-0.004637848248033172, max=1.0230938416422288, mean=0.08, median=0.05778000501127537
+__index_level_0__: min=0, max=1919809, mean=959904.72, median=959905.5
 ```
 
 ### Date/Datetime Column Statistics
@@ -4474,7 +4476,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_holding_company_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet`
-**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 833,010 rows × 3 columns
+**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 832,642 rows × 3 columns
 
 ### Columns
 ```
@@ -4485,7 +4487,7 @@ y                                        Float64         (0.0% null)
 
 ### Numeric Column Statistics
 ```
-y: min=-61371.42307692308, max=inf, mean=inf, median=10.979716024340771
+y: min=-61371.42307692308, max=14698.6, mean=11.29, median=10.97832010425305
 ```
 
 ### Date/Datetime Column Statistics
@@ -4497,18 +4499,20 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_leverage.parquet`
-**Size:** 15.1 MB | **Type:** Parquet | **Shape:** 1,919,810 rows × 3 columns
+**Size:** 22.9 MB | **Type:** Parquet | **Shape:** 1,915,411 rows × 4 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (3.3% null)
+__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-61371.42307692308, max=inf, mean=inf, median=11.125577574699662
+y: min=-61371.42307692308, max=36527.066666666666, mean=11.51, median=11.116404014942502
+__index_level_0__: min=0, max=1919809, mean=959382.54, median=958681.0
 ```
 
 ### Date/Datetime Column Statistics

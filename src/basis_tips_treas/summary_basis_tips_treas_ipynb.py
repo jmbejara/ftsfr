@@ -2,7 +2,7 @@
 """
 # TIPS-Treasury Arbitrage Replication (2004-2025)
 
-This notebook replicates the TIPS–Treasury arbitrage strategy for the period 2004–2025 following the methodology of Fleckenstein et al. (2014). It also outlines how a trader could implement this strategy in practice.
+This notebook replicates the TIPS-Treasury arbitrage strategy for the period 2004-2025 following the methodology of Fleckenstein et al. (2014). It also outlines how a trader could implement this strategy in practice.
 """
 
 # %%
@@ -45,7 +45,7 @@ sys.path.append("..")
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-#DATA_DIR = DATA_DIR / "basis_tips_treas"
+DATA_DIR = DATA_DIR / "basis_tips_treas"
 
 warnings.filterwarnings("ignore")
 sns.set_theme(style="dark")
@@ -157,5 +157,5 @@ This strategy, while theoretically risk-free, requires meticulous execution and 
 """
 ## Conclusion
 
-The analysis confirms that a positive TIPS-Treasury arbitrage spread persisted throughout 2010–2020. Although the magnitude of the mispricing is lower than during the earlier period covered by Fleckenstein et al. (2014), the spread remains statistically and economically significant. This persistence underscores the impact of market frictions and funding constraints on arbitrage opportunities. In practice, traders could exploit this anomaly by constructing synthetic nominal positions using TIPS, inflation swaps, and nominal Treasury bonds, while carefully managing execution and funding risks.
+The analysis confirms that a positive TIPS-Treasury arbitrage spread persisted throughout 2010-2020. Although the magnitude of the mispricing is lower than during the earlier period covered by Fleckenstein et al. (2014), the spread remains statistically and economically significant. This persistence underscores the impact of market frictions and funding constraints on arbitrage opportunities. In practice, traders could exploit this anomaly by constructing synthetic nominal positions using TIPS, inflation swaps, and nominal Treasury bonds, while carefully managing execution and funding risks.
 """
