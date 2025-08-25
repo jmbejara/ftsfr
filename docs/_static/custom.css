@@ -1,0 +1,79 @@
+/* Custom CSS to make documentation wider with reasonable max width */
+
+/* Override pydata-sphinx-theme's max width constraint with a reasonable limit */
+:root {
+    --pst-body-max-width: 2200px !important;
+    --pst-sidebar-primary-width: 20rem !important;
+    --pst-sidebar-secondary-width: 20rem !important;
+  }
+  
+  /* Additional overrides to ensure wider content with max width */
+  .bd-main .bd-content {
+    max-width: 2200px !important;
+    width: 100% !important;
+    flex-grow: 1;
+    margin: 0 auto; /* Center content when it reaches max width */
+  }
+  
+  /* Make the article container wider with max width */
+  .bd-article-container {
+    max-width: 2200px !important;
+    width: 100% !important;
+    margin: 0 auto;
+  }
+  
+  /* Override the main container constraints with reasonable max width */
+  .bd-container {
+    max-width: 2200px !important; /* Slightly wider to accommodate sidebars */
+    width: 100% !important;
+    margin: 0 auto;
+  }
+  
+  /* Ensure the main content area expands with max width */
+  div#main-content, 
+  main.bd-main,
+  div.bd-content {
+    max-width: 2200px !important;
+    width: 100% !important;
+    margin: 0 auto;
+  }
+  
+  /* Override container classes with reasonable max width */
+  .container, .container-fluid, .container-lg, .container-xl {
+    max-width: 2200px !important;
+    width: 100% !important;
+    margin: 0 auto;
+  }
+  
+  /* Target the article itself */
+  article.bd-article {
+    max-width: 2200px !important;
+    width: 100% !important;
+    margin: 0 auto;
+  }
+  
+  /* Override sphinx-book-theme specific constraints */
+  .bd-page-width {
+    max-width: 2200px !important;
+    margin: 0 auto;
+  }
+  
+  /* Make sidebars wider to show more content */
+  .bd-sidebar-primary, .bd-sidebar-secondary {
+    flex: 0 0 20rem !important;
+    min-width: 20rem !important;
+    max-width: 20rem !important;
+  }
+  
+  /* Ensure content area takes remaining space */
+  .bd-content {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  
+  /* Additional override for the content wrapper */
+  .bd-content-container {
+    max-width: 2200px !important;
+    width: 100% !important;
+    margin: 0 auto;
+  } 

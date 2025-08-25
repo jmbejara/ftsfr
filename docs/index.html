@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Financial Time Series Forecasting Repository (FTSFR) &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Sources and Data Sets" href="data_sources_and_modules.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1 current active">
+                <a class="reference internal" href="#">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses.html">Data Glimpses Report</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/combined_filters.html">OptionsFilters Summary</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/portfolios.html">Portfolio Construction</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/index.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Financial Time Series Forecasting Repository (FTSFR)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-ftsfr">Why FTSFR?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem">The Problem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#our-solution">Our Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replications-of-studies-from-academic-literature">Replications of Studies from Academic Literature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-sources">Data Sources</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#public-data-sources-no-subscription-required">Public Data Sources <em>(No subscription required)</em></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#academic-subscription-sources-commonly-available-via-university-subscriptions">Academic Subscription Sources <em>(Commonly available via university subscriptions)</em></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-contents">Documentation Contents</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#research-impact">Research Impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation">Citation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">Contributing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgments">Acknowledgments</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and Tables</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="financial-time-series-forecasting-repository-ftsfr">
+<h1>Financial Time Series Forecasting Repository (FTSFR)<a class="headerlink" href="#financial-time-series-forecasting-repository-ftsfr" title="Link to this heading">#</a></h1>
+<p><strong>A standardized macro-finance data repository for global time series forecasting research</strong></p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>The Financial Time Series Forecasting Repository (FTSFR) addresses a critical gap in quantitative finance research: the lack of standardized datasets for evaluating and comparing time series forecasting models. When researchers evaluate their own forecasting models on their own arbitrarily chosen datasets, apples-to-apples comparisons across forecasting algorithms are not possible. This repository provides a comprehensive collection of financial and macroeconomic datasets that have been cleaned, formatted, and standardized according to academic best practices. We hope that this repository will serve as a useful time series forecasting benchmark.</p>
+</section>
+<section id="why-ftsfr">
+<h2>Why FTSFR?<a class="headerlink" href="#why-ftsfr" title="Link to this heading">#</a></h2>
+<section id="the-problem">
+<h3>The Problem<a class="headerlink" href="#the-problem" title="Link to this heading">#</a></h3>
+<p>When comparing different time series forecasting algorithms, researchers need <strong>apples-to-apples comparisons</strong>. Each forecasting model must be evaluated on identical datasets that have been:</p>
+<ul class="simple">
+<li><p>Prepared using the same methodology</p></li>
+<li><p>Cleaned with consistent standards</p></li>
+<li><p>Sampled over the same time periods</p></li>
+<li><p>Formatted in the same way</p></li>
+</ul>
+<p>We are inspired by the work of the Monash Time Series Data Repository (MTSDR), which provides a collection offreely available datasets for benchmarking  time series forecasting models. However, we are motivated by the desire to provide datasets from topics in finance and economics, which are often not freely available (e.g., require a subscription to access).</p>
+</section>
+<section id="our-solution">
+<h3>Our Solution<a class="headerlink" href="#our-solution" title="Link to this heading">#</a></h3>
+<p>We provide researchers with easy access to a ready-to-use repository of financial and macroeconomic datasets that have been cleaned, formatted, and standardized according to academic best practices. Although most of the data in this repository requires a subscription to access, we provide what we think is the next-best thing: a codebase that automates the end-to-end process for assembling various financial and macroeconomic data, from the data pull step to the final cleaning and transformation step. Most of our code pulls from the Wharton Research Data Services (WRDS), which is a subscription-based service commonly available at most universities. Our quickstart guide provides a short and simple guide to get you started.</p>
+</section>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>📡 Streamlined data collection from multiple sources (e.g., WRDS, FRED, etc.)</p></li>
+<li><p>🎯 Academic Standards: Replicates cleaning procedures for each datasetfrom academic literature</p></li>
+<li><p>🤖 Fully reproducible data preparation workflows</p></li>
+<li><p>📈 Spans multiple financial domains:</p>
+<ul>
+<li><p>Equity Markets: Returns, portfolios, and characteristics</p></li>
+<li><p>Fixed Income: Treasury, corporate, and sovereign bonds</p></li>
+<li><p>Credit Markets: CDS spreads and bond-CDS basis</p></li>
+<li><p>Derivatives: Options and futures data</p></li>
+<li><p>Foreign Exchange: Currency portfolios and rates</p></li>
+<li><p>Commodities: Futures and spot prices</p></li>
+<li><p>Banking: Call report data and bank-specific metrics</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="replications-of-studies-from-academic-literature">
+<h2>Replications of Studies from Academic Literature<a class="headerlink" href="#replications-of-studies-from-academic-literature" title="Link to this heading">#</a></h2>
+<p>Each of the cleaned datasets that we provide follow the procedures outlined in a published academic paper. We feel that these benchmarks are most useful when they follow the same procedures commonly used in the literature. We replicate the procedures outlined in or use the data provided via the following papers:</p>
+<ul class="simple">
+<li><p>Barth, Daniel, and R. Jay Kahn. “Hedge funds and the Treasury cash-futures disconnect.” OFR WP (2021): 21-01.</p></li>
+<li><p>Borri, Nicola, and Adrien Verdelhan. “Sovereign risk premia.” (2011).</p></li>
+<li><p>Constantinides, George M., Jens Carsten Jackwerth, and Alexi Savov. “The puzzle of index option returns.” Review of Asset Pricing Studies 3, no. 2 (2013): 229-257.</p></li>
+<li><p>Drechsler, Itamar, Alexi Savov, and Philipp Schnabl. “The deposits channel of monetary policy.” The Quarterly Journal of Economics 132, no. 4 (2017): 1819-1876.</p></li>
+<li><p>Du, Wenxin, Alexander Tepper, and Adrien Verdelhan. “Deviations from covered interest rate parity.” The Journal of Finance 73, no. 3 (2018): 915-957.</p></li>
+<li><p>Du, Wenxin, Benjamin Hébert, and Wenhao Li. “Intermediary balance sheets and the treasury yield curve.” Journal of Financial Economics 150, no. 3 (2023): 103722.</p></li>
+<li><p>Duffie, Darrell. “Credit swap valuation.” Financial Analysts Journal 55, no. 1 (1999): 73-87.</p></li>
+<li><p>Fama, Eugene F., and Kenneth R. French. “Common risk factors in the returns on stocks and bonds.” Journal of financial economics 33, no. 1 (1993): 3-56.</p></li>
+<li><p>Fleckenstein, Matthias, Francis A. Longstaff, and Hanno Lustig. “The TIPS‐treasury bond puzzle.” the Journal of Finance 69, no. 5 (2014): 2151-2197.</p></li>
+<li><p>Gürkaynak, Refet S., Brian Sack, and Jonathan H. Wright. “The TIPS yield curve and inflation compensation.” American Economic Journal: Macroeconomics 2, no. 1 (2010): 70-92.</p></li>
+<li><p>Gürkaynak, Refet S., Brian Sack, and Jonathan H. Wright. “The US Treasury yield curve: 1961 to the present.” Journal of monetary Economics 54, no. 8 (2007): 2291-2304.</p></li>
+<li><p>He, Zhiguo, Bryan Kelly, and Asaf Manela. “Intermediary asset pricing: New evidence from many asset classes.” Journal of Financial Economics 126, no. 1 (2017): 1-35.</p></li>
+<li><p>J Jermann, Urban. “Negative swap spreads and limited arbitrage.” The Review of Financial Studies 33, no. 1 (2020): 212-238.</p></li>
+<li><p>Lettau, Martin, Matteo Maggiori, and Michael Weber. “Conditional risk premia in currency markets and other asset classes.” Journal of Financial Economics 114, no. 2 (2014): 197-225.</p></li>
+<li><p>Menkhoff, Lukas, Lucio Sarno, Maik Schmeling, and Andreas Schrimpf. “Carry trades and global foreign exchange volatility.” The Journal of Finance 67, no. 2 (2012): 681-718.</p></li>
+<li><p>Nozawa, Yoshio. “What drives the cross‐section of credit spreads?: A variance decomposition approach.” The Journal of Finance 72, no. 5 (2017): 2045-2072.</p></li>
+<li><p>Palhares, Diogo. Cash-flow maturity and risk premia in CDS markets. The University of Chicago, 2013.</p></li>
+<li><p>Ronn, Aimee Gerbarg, and Ehud I. Ronn. “The box spread arbitrage conditions: theory, tests, and investment strategies.” Review of Financial Studies 2, no. 1 (1989): 91-108.</p></li>
+<li><p>Siriwardane, Emil, Adi Sunderam, and Jonathan L. Wallen. Segmented arbitrage. No. w30561. National Bureau of Economic Research, 2022.</p></li>
+<li><p>Van Binsbergen, Jules H., William F. Diamond, and Marco Grotteria. “Risk-free interest rates.” Journal of Financial Economics 143, no. 1 (2022): 1-29.</p></li>
+<li><p>Yang, Fan. “Investment shocks and the commodity basis spread.” Journal of Financial Economics 110, no. 1 (2013): 164-184.</p></li>
+</ul>
+</section>
+<section id="data-sources">
+<h2>Data Sources<a class="headerlink" href="#data-sources" title="Link to this heading">#</a></h2>
+<p>Our repository leverages both <strong>publicly available</strong> and <strong>subscription-based</strong> data sources:</p>
+<section id="public-data-sources-no-subscription-required">
+<h3>Public Data Sources <em>(No subscription required)</em><a class="headerlink" href="#public-data-sources-no-subscription-required" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>He, Kelly, Manela test portfolios</p></li>
+<li><p>Ken French Data Library</p></li>
+<li><p>Federal Reserve economic data</p></li>
+<li><p>NYU Call Report archive</p></li>
+<li><p>Open Source Bond Asset Pricing</p></li>
+</ul>
+</section>
+<section id="academic-subscription-sources-commonly-available-via-university-subscriptions">
+<h3>Academic Subscription Sources <em>(Commonly available via university subscriptions)</em><a class="headerlink" href="#academic-subscription-sources-commonly-available-via-university-subscriptions" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>WRDS Compustat North America</p></li>
+<li><p>WRDS CRSP (Stocks, Bonds, Treasury)</p></li>
+<li><p>WRDS Markit CDS data</p></li>
+<li><p>WRDS Bond Returns</p></li>
+<li><p>WRDS Mergent FISD</p></li>
+<li><p>WRDS Bank Premium</p></li>
+<li><p>Bloomberg Terminal</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While some datasets require paid subscriptions, they are commonly available through academic institutions. Our code automates the data retrieval process once you have the appropriate access credentials. If you don’t have access to any of the above data sources, you can still use our code to pull from only the data sources that you have subscriptions for. The code will automatically skip the data sources that you don’t have access to. However, in that case, you won’t be able to assemble the full suite of benchmark datasets.</p>
+</div>
+</section>
+</section>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Installation</strong>: Follow our <a class="reference internal" href="data_sources_and_modules.html#installation"><span class="std std-ref">quickstart guide</span></a> to set up the environment</p></li>
+<li><p><strong>Configuration</strong>: Set up your data source credentials and specify available subscriptions</p></li>
+<li><p><strong>Data Download</strong>: Run the automated ETL pipeline to build your standardized datasets</p></li>
+<li><p><strong>Benchmarking</strong>: Use our baseline models to establish performance benchmarks</p></li>
+</ol>
+</section>
+<section id="documentation-contents">
+<h2>Documentation Contents<a class="headerlink" href="#documentation-contents" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses.html">Data Glimpses Report</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-1-merge-the-redcodes-of-firms-on-to-the-corporate-bonds">Step 1: Merge the Redcodes of firms on to the corporate bonds.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-2-cds-data-pull-and-cds-data-processing">Step 2: CDS data pull and CDS data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-3-processing">Step 3: Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-4-results">Step 4: Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cleaning_options.html">Cleaning Summary: Options Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html#treasury-bond-returns-summary">Treasury Bond Returns Summary</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+</div>
+</section>
+<section id="research-impact">
+<h2>Research Impact<a class="headerlink" href="#research-impact" title="Link to this heading">#</a></h2>
+<p>This repository facilitates rigorous empirical research by providing:</p>
+<ul class="simple">
+<li><p><strong>Standardized benchmarks</strong> for forecasting algorithm evaluation</p></li>
+<li><p><strong>Reproducible results</strong> through consistent data preparation</p></li>
+<li><p><strong>Comprehensive coverage</strong> across financial markets and instruments</p></li>
+<li><p><strong>Academic credibility</strong> through literature-consistent methodologies</p></li>
+</ul>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Link to this heading">#</a></h2>
+<p>If you use FTSFR in your research, please cite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bejarano</span><span class="p">,</span> <span class="n">J</span><span class="o">.</span> <span class="n">et</span> <span class="n">al</span><span class="o">.</span> <span class="p">(</span><span class="mi">2024</span><span class="p">)</span><span class="o">.</span> <span class="n">Financial</span> <span class="n">Time</span> <span class="n">Series</span> <span class="n">Forecasting</span> <span class="n">Repository</span><span class="p">:</span> 
+<span class="n">A</span> <span class="n">Standardized</span> <span class="n">Macro</span><span class="o">-</span><span class="n">Finance</span> <span class="n">Data</span> <span class="n">Repository</span> <span class="k">for</span> <span class="n">Global</span> <span class="n">Time</span> <span class="n">Series</span> <span class="n">Forecasting</span><span class="o">.</span> 
+<span class="p">[</span><span class="n">Working</span> <span class="n">Paper</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h2>
+<p>We welcome contributions from the research community. Whether you’re:</p>
+<ul class="simple">
+<li><p>Adding new data sources</p></li>
+<li><p>Improving cleaning methodologies</p></li>
+<li><p>Implementing additional forecasting benchmarks</p></li>
+<li><p>Enhancing documentation</p></li>
+</ul>
+<p>Please see our contribution guidelines for more information.</p>
+</section>
+<section id="acknowledgments">
+<h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Link to this heading">#</a></h2>
+<p>We would like to thank the following individuals. With their permission, we have adapted and used pieces oftheir code in this repository.</p>
+<ul class="simple">
+<li><p>Om Mehta and Kunj Shah, for their replication of the Covered Interest Rate Parity (CIP) arbitrage spreads that appear in <em>Siriwardane, Sunderam, and Wallen. “Segmented arbitrage”, 2022.</em> and <em>Rime, Schrimpf, and Syrstad. “Segmented money markets and covered interest parity arbitrage”, 2017</em>, available at <a class="github reference external" href="https://github.com/Kunj121/CIP">Kunj121/CIP</a></p></li>
+<li><p>Kyle Parran and Duncan Park, for their replication of the construction of the commodity futures returns that appear in and <em>He, Kelly, and Manela. “Intermediary asset pricing: New evidence from many asset classes.” Journal of Financial Economics, 2017</em> and <em>Yang, Fan. “Investment shocks and the commodity basis spread.” (2013)</em>, available at <a class="github reference external" href="https://github.com/kyleparran/final_project_group_09">kyleparran/final_project_group_09</a></p></li>
+<li><p>Haoshu Wang and Guanyu Chen, for their replication of the construction of the Treasury Spot-Futures basis as it appears in <em>Siriwardane, Sunderam, and Wallen. “Segmented arbitrage”, 2022.</em></p></li>
+<li><p>Arsh Kumar and Raiden Egbert, for their replication of the construction of the Treasury Swap basis as it appears in <em>Siriwardane, Sunderam, and Wallen. “Segmented arbitrage”, 2022.</em></p></li>
+<li><p>Bailey Meche and Raul Renteria, for their replication of the construction of the TIPS-Treasury basis as it appears in <em>Siriwardane, Sunderam, and Wallen. “Segmented arbitrage”, 2022.</em></p></li>
+</ul>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Academic Collaboration</strong>: This project represents a collaborative effort among researchers to advance the state of financial time series forecasting. We encourage academic partnerships and welcome contributors who are interested in pushing the boundaries of empirical finance research.</p>
+</div>
+</section>
+<section id="indices-and-tables">
+<h2>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="data_sources_and_modules.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Data Sources and Data Sets</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-ftsfr">Why FTSFR?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem">The Problem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#our-solution">Our Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replications-of-studies-from-academic-literature">Replications of Studies from Academic Literature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-sources">Data Sources</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#public-data-sources-no-subscription-required">Public Data Sources <em>(No subscription required)</em></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#academic-subscription-sources-commonly-available-via-university-subscriptions">Academic Subscription Sources <em>(Commonly available via university subscriptions)</em></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-contents">Documentation Contents</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#research-impact">Research Impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation">Citation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">Contributing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgments">Acknowledgments</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and Tables</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
