@@ -331,7 +331,7 @@ SSH_KEY="jeremy.pem"
 FS_FOLDER="washington-dc-three-fs"
 
 # Utah, USA us-west-3
-NODE_IP="209.20.159.3"
+NODE_IP="209.20.156.160"
 SSH_KEY="jeremy.pem"
 FS_FOLDER="utah-fs"
 
@@ -353,7 +353,7 @@ cd ~/${FS_FOLDER}/ftsfr
 
 To sync back to local machine:
 ```bash
-rsync -avzh --progress --exclude='.pixi/' --exclude='.git/' -e "ssh -i ~/.ssh/${SSH_KEY}" ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/ ./
+rsync -avzh --progress --exclude='.pixi/' --exclude='.git/' --exclude='_data/' -e "ssh -i ~/.ssh/${SSH_KEY}" ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/ ./
 ```
 
 ## Technical Details
