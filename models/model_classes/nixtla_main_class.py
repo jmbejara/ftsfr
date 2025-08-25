@@ -8,15 +8,15 @@ NOTE: Currently doesn't support training on MPS.
 import os
 from collections import defaultdict
 from pathlib import Path
-import logging
 
 import pandas as pd
 from tabulate import tabulate
+import logging
 
 from .forecasting_model import forecasting_model
-from .helper_func import common_error_catch,calculate_darts_MASE, process_df, custom_interpolate
+from .helper_func import common_error_catch, calculate_darts_MASE, process_df, custom_interpolate
 
-NixtlaMain_logger = logging.getLogger("NixtlaMain")
+NixtlaMain_logger = logging.getLogger("Nixtla")
 
 class NixtlaMain(forecasting_model):
     def __init__(
@@ -28,7 +28,6 @@ class NixtlaMain(forecasting_model):
         seasonality,
         data_path,
         output_path,
-        estimator_params=None,
     ):
 
         NixtlaMain_logger.info("NixtlaMain __init__ called.")
@@ -93,22 +92,8 @@ class NixtlaMain(forecasting_model):
         self.seasonality = seasonality
         self.frequency = frequency
 
-        # Model related variables
-        # Stores base class
-        # Use provided parameters or defaults
-        if estimator_params is None:
-            estimator_params = {"h": 1, "input_size": seasonality * 4}
 
-        # MPS is causing buffer errors
-        from torch.backends.mps import is_available
-        if is_available():
-            NixtlaMain_logger.info("MPS available, but will be ignored.")
-            estimator_params["accelerator"] = "cpu"
-            self.estimator = estimator(**estimator_params)
-        else:
-            # Auto detect if not on MPS
-            NixtlaMain_logger.info("MPS not available. Auto detection enabled.")
-            self.estimator = estimator(**estimator_params)
+        self.estimator = estimator
 
         # Stores the nf object
         self.nf = None  # Initialize to None, will be set in train()

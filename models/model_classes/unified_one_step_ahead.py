@@ -138,9 +138,6 @@ def perform_one_step_ahead_nixtla(nf_model, train_data, test_data, raw_data):
         first_date = test_data["ds"].unique()[0]
         pred_data["ds"] = first_date
         df = raw_data
-        Uni_logger.info(
-            "Got predictions for date: " + first_date.strftime("%Y-%m-%d, %r") + "."
-        )
 
         # Sliding window forecasts
         # Predict 1 date right after the dataset in the arguments
@@ -153,9 +150,6 @@ def perform_one_step_ahead_nixtla(nf_model, train_data, test_data, raw_data):
             # Lining up the dates
             temp_pred_data["ds"] = i
             pred_data = pd.concat([pred_data, temp_pred_data], ignore_index=True)
-            Uni_logger.info(
-                "Got predictions for date: " + i.strftime("%Y-%m-%d, %r") + "."
-            )
 
         return pred_data
 

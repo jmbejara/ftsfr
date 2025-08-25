@@ -101,7 +101,7 @@ required_data_sources = ["bloomberg_terminal"]
 
 ################################################################################
 [commodities]
-required_data_sources = ["bloomberg_terminal", "wrds_datastream", "he_kelly_manela"]
+required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
 
 ################################################################################
 [corp_bond_returns]
@@ -164,18 +164,18 @@ required_data_sources = ["he_kelly_manela"]
 
 [he_kelly_manela.ftsfr_he_kelly_manela_factors_monthly]
 description = """Monthly factors from He, Kelly, and Manela (2017)"""
-frequency = "ME"
+frequency = "MS"
 seasonality = 12
 
 [he_kelly_manela.ftsfr_he_kelly_manela_factors_daily]
 description = """Daily factors from He, Kelly, and Manela (2017)"""
-frequency = "D"
+frequency = "B"
 seasonality = 252
 
 [he_kelly_manela.ftsfr_he_kelly_manela_all]
 description = """All factors from He, Kelly, and Manela (2017)"""
-frequency = "D"
-seasonality = 252
+frequency = "MS"
+seasonality = 12
 
 
 ################################################################################

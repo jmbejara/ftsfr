@@ -18,6 +18,8 @@ Usage:
     python run_all_models_all_datasets.py
     python run_all_models_all_datasets.py --parallel --workers 4
     python run_all_models_all_datasets.py --models arima transformer --datasets cds_returns.ftsfr_CDS_contract_returns
+
+NOTE: It does not support TimesFM currently.
 """
 
 import os
@@ -41,36 +43,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from run_model import run_model, load_config
 
 logger = logging.getLogger("run_all")
-
-
-def get_model_environment(
-    model_name: str, config_path: str = "models_config.toml"
-) -> str:
-    """
-    Determine which Pixi environment a model needs based on its configuration.
-
-    Returns:
-        str: The pixi command to run the model in the correct environment
-    """
-    # logger.info("get_model_env called")
-    # config = load_config(config_path)
-    # if model_name not in config:
-    #     return "pixi run run-model"  # Default fallback
-
-    # model_config = config[model_name]
-    # model_class = model_config.get("class", "")
-
-    # # Map model classes to their required environments
-    # if model_class == "GluontsMain":
-    #     return "pixi run run-model --manifest-path gluonts -e gpu"
-    # elif model_class == "NixtlaMain":
-    #     return "pixi run run-model --manifest-path nixtla -e gpu"
-    # elif model_class == "TimesFM":
-    #     return "pixi run run-model --manifest-path timesfm -e gpu"
-    # elif model_class in ["DartsLocal", "DartsGlobal"]:
-    #     return "pixi run run-model --manifest-path darts -e gpu"
-    # else:
-    return "python run_model.py"  # Default
 
 
 def run_single_model_dataset_with_environment(
@@ -99,15 +71,12 @@ def run_single_model_dataset_with_environment(
     }
 
     try:
-        # Determine the correct environment for this model
-        pixi_env = get_model_environment(model_name, config_path)
-        result["environment"] = pixi_env
 
         # Set environment variables for this run
         os.environ["DATASET_PATH"] = dataset_path
 
         # Run the model with the correct Pixi environment
-        cmd = f"{pixi_env} --model {model_name} --workflow {workflow}"
+        cmd = f"python run_model.py --model {model_name} --workflow {workflow}"
 
         # Execute the command
         process = subprocess.run(
@@ -217,7 +186,10 @@ def run_single_model_dataset(
 
 def setup_logging(log_dir: Path) -> logging.Logger:
     """Setup comprehensive logging for the batch run."""
-    log_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        log_dir.mkdir(parents=True, exist_ok=True)
+    except:
+        pass
 
     # Create a unique log file for this run
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
