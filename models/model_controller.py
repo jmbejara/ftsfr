@@ -37,7 +37,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from run_model import run_model, load_config
 
 
-def run_model_wrapper(model_name, config_path, workflow="main"):
+def run_model_wrapper(model_name, config_path, workflow="main", log_path = None):
     """
     Wrapper function for running a model that captures output and errors.
 
@@ -46,7 +46,7 @@ def run_model_wrapper(model_name, config_path, workflow="main"):
     """
     start_time = datetime.now()
     try:
-        run_model(model_name, config_path, workflow, False)
+        run_model(model_name, config_path, workflow, log_path)
         duration = (datetime.now() - start_time).total_seconds()
         return model_name, True, duration, None
     except Exception as e:
@@ -54,7 +54,7 @@ def run_model_wrapper(model_name, config_path, workflow="main"):
         return model_name, False, duration, str(e)
 
 
-def run_models_sequential(models, config_path, workflow="main"):
+def run_models_sequential(models, config_path, workflow="main", log_path = None):
     """Run models sequentially."""
     results = []
     total_models = len(models)
@@ -64,7 +64,7 @@ def run_models_sequential(models, config_path, workflow="main"):
 
     for i, model_name in enumerate(models, 1):
         print(f"\n[{i}/{total_models}] Running {model_name}...")
-        result = run_model_wrapper(model_name, config_path, workflow)
+        result = run_model_wrapper(model_name, config_path, workflow, log_path)
         results.append(result)
 
         if result[1]:  # Success
@@ -75,7 +75,7 @@ def run_models_sequential(models, config_path, workflow="main"):
     return results
 
 
-def run_models_parallel(models, config_path, workflow="main", max_workers=None):
+def run_models_parallel(models, config_path, workflow="main", max_workers=None, log_path = None):
     """Run models in parallel using ProcessPoolExecutor."""
     results = []
     total_models = len(models)
@@ -92,7 +92,7 @@ def run_models_parallel(models, config_path, workflow="main", max_workers=None):
         # Submit all tasks
         futures = {
             executor.submit(
-                run_model_wrapper, model_name, config_path, workflow
+                run_model_wrapper, model_name, config_path, workflow, log_path
             ): model_name
             for model_name in models
         }
@@ -271,9 +271,9 @@ def main():
     start_time = datetime.now()
 
     if args.parallel:
-        results = run_models_parallel(models, args.config, args.workflow, args.workers)
+        results = run_models_parallel(models, args.config, args.workflow, args.workers, log_path)
     else:
-        results = run_models_sequential(models, args.config, args.workflow)
+        results = run_models_sequential(models, args.config, args.workflow, log_path)
 
     total_duration = (datetime.now() - start_time).total_seconds()
 

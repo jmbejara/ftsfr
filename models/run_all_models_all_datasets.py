@@ -156,7 +156,7 @@ def run_single_model_dataset(
         os.environ["DATASET_PATH"] = dataset_path
 
         # Run the model
-        run_model(model_name, config_path, workflow, False)
+        run_model(model_name, config_path, workflow)
 
         # Success
         end_time = datetime.now()

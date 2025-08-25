@@ -281,7 +281,7 @@ def create_estimator(model_config, env_vars):
 
     return estimator_class(**params)
 
-def run_model(model_name, config_path="models_config.toml", workflow="main", setup_logging = True, log_path = None):
+def run_model(model_name, config_path="models_config.toml", workflow="main", log_path = None):
     """
     Run a specific model based on its configuration.
 
@@ -309,27 +309,26 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", set
     # Nixtla model imports break logging
     # So keeping the create_estimator function here and logging after it
     estimator = create_estimator(model_config, env_vars)
-    if setup_logging:
-        if log_path is None:
-            log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
+
+    if log_path is None:
+        log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
         try:
-            Path(log_path).mkdir(parents=True, exist_ok=True)
+            log_path.mkdir(parents=True, exist_ok=True)
         except:
             pass
         log_path = log_path / (dataset_name + ".log")
-        logging.basicConfig(
-            filename=log_path,
-            filemode="w",
-            format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
-            level=logging.DEBUG,
-        )
+    logging.basicConfig(
+        filename=log_path,
+        filemode="w",
+        format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
+        level=logging.DEBUG,
+    )
 
     logger = logging.getLogger(f"run_model_{model_name}")
     logger.info(f"Running {model_name} model. Environment variables read.")
 
     # Handle special models
     model_class = model_config["class"]
-    display_name = model_config.get("display_name", model_name)
 
     os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
