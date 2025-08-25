@@ -25,8 +25,11 @@ import multiprocessing
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
 import json
-
+from time import strftime
+from pathlib import Path
 import logging
+
+logger = logging.getLogger("model_controller")
 
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -43,7 +46,7 @@ def run_model_wrapper(model_name, config_path, workflow="main"):
     """
     start_time = datetime.now()
     try:
-        run_model(model_name, config_path, workflow)
+        run_model(model_name, config_path, workflow, False)
         duration = (datetime.now() - start_time).total_seconds()
         return model_name, True, duration, None
     except Exception as e:
@@ -184,6 +187,21 @@ def list_available_models(config):
 
 
 def main():
+
+    log_path = Path(__file__).resolve().parent / "model_logs" / "model_controller_logs"
+    try:
+        Path(log_path).mkdir(parents = True, exist_ok = True)
+    except:
+        pass
+    log_path = log_path / (strftime("%d%b%Y-%H:%M:%S") + ".log")
+    logging.basicConfig(filename = log_path,
+                        filemode = "w", # Overwrites previously existing logs
+                        format = "%(asctime)s - %(name)-12s"+\
+                        " - %(levelname)s - %(message)s",
+                        level = logging.DEBUG)
+
+    logger.info("Running main.")
+
     """Main entry point."""
     parser = argparse.ArgumentParser(
         description="Controller for running multiple forecasting models"

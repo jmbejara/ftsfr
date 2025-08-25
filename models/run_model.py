@@ -281,7 +281,7 @@ def create_estimator(model_config, env_vars):
 
     return estimator_class(**params)
 
-def run_model(model_name, config_path="models_config.toml", workflow="main", setup_logging = True):
+def run_model(model_name, config_path="models_config.toml", workflow="main", setup_logging = True, log_path = None):
     """
     Run a specific model based on its configuration.
 
@@ -289,7 +289,6 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", set
         model_name: Name of the model to run (e.g., 'arima', 'transformer')
         config_path: Path to the configuration file
         workflow: Which workflow to run ('main', 'train', 'inference', 'evaluate')
-        setup_logging: Setup logging or not using basicConfig and others
     """
     # Load configuration
     config = load_config(config_path)
@@ -310,10 +309,13 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", set
     # Nixtla model imports break logging
     # So keeping the create_estimator function here and logging after it
     estimator = create_estimator(model_config, env_vars)
-
     if setup_logging:
-        log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
-        Path(log_path).mkdir(parents=True, exist_ok=True)
+        if log_path is None:
+            log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
+        try:
+            Path(log_path).mkdir(parents=True, exist_ok=True)
+        except:
+            pass
         log_path = log_path / (dataset_name + ".log")
         logging.basicConfig(
             filename=log_path,

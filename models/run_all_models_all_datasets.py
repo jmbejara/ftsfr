@@ -186,7 +186,10 @@ def run_single_model_dataset(
 
 def setup_logging(log_dir: Path) -> logging.Logger:
     """Setup comprehensive logging for the batch run."""
-    log_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        log_dir.mkdir(parents=True, exist_ok=True)
+    except:
+        pass
 
     # Create a unique log file for this run
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
