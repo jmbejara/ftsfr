@@ -83,6 +83,17 @@ Contains code that replicated the CDS bond basis calculations from Segmented Arb
 """
 required_data_sources = ["open_source_bond", "wrds_markit"]
 
+[cds_bond_basis.ftsfr_CDS_bond_basis_aggregated]
+description = """Long format of CDS bond basis, aggregated"""
+frequency = "ME"
+seasonality = 12
+
+[cds_bond_basis.ftsfr_CDS_bond_basis_non_aggregated]
+description = """Long format of CDS bond basis, non-aggregated"""
+frequency = "ME"
+seasonality = 12
+
+
 ################################################################################
 [cds_returns]
 data_module_name = "CDS Returns"
@@ -114,6 +125,11 @@ data_module_description = """
 Contains code that replicated the CIP arbitrage calculations from Segmented Arbitrage
 """
 required_data_sources = ["bloomberg_terminal"]
+
+[cip.ftsfr_CIP_spreads]
+description = """Long format of CIP spreads"""
+frequency = "ME"
+seasonality = 12
 
 ################################################################################
 [commodities]
@@ -173,6 +189,11 @@ Contains code that shows returns of holding portfolios of various foreign
 currencies relative to the US dollar
 """
 required_data_sources = ["bloomberg_terminal"]
+
+[foreign_exchange.ftsfr_FX_returns]
+description = """Long format of FX returns"""
+frequency = "ME"
+seasonality = 12
 
 ################################################################################
 [he_kelly_manela]
@@ -253,12 +274,12 @@ frequency = "D"
 seasonality = 252 # Business days per year
 
 ################################################################################
-[sovereign_bonds]
-required_data_sources = ["wrds_crsp"]
+# [sovereign_bonds]
+# required_data_sources = ["wrds_crsp"]
 
 ################################################################################
-[wrds_bank_premium]
-required_data_sources = ["wrds_bank_premium"]
+# [wrds_bank_premium]
+# required_data_sources = ["wrds_bank_premium"]
 
 ################################################################################
 [wrds_crsp_compustat]
