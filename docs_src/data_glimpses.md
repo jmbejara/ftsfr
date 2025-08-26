@@ -1,10 +1,11 @@
 # Data Glimpses Report
-Total files: 111
+Total files: 112
 
 ## Summary of Datasets by Task
 
 ### Format
 #### Format: Basis Tips Treas
+- [`ftsfr_tips_treasury_implied_rf.parquet`](#ftsfr-tips-treasury-implied-rf-parquet)
 - [`tips_treasury_implied_rf.parquet`](#tips-treasury-implied-rf-parquet)
 - [`tips_treasury_summary.csv`](#tips-treasury-summary-csv)
 #### Format: Basis Treas Sf
@@ -728,9 +729,32 @@ Date: min=1961-06-14 00:00:00, max=2025-08-15 00:00:00
 
 ---
 
+## ftsfr_tips_treasury_implied_rf.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_tips_treas/ftsfr_tips_treasury_implied_rf.parquet`
+**Size:** 176690 bytes | **Type:** Parquet | **Shape:** 20,800 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Date           
+y                                        Float64         (0.7% null)
+```
+
+### Numeric Column Statistics
+```
+y: min=-10.444064962304989, max=594.0780835704351, mean=305.53, median=307.09253815564
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=2004-07-21, max=2025-05-30
+```
+
+---
+
 ## tips_treasury_implied_rf.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_tips_treas/tips_treasury_implied_rf.parquet`
-**Size:** 855688 bytes | **Type:** Parquet | **Shape:** 5,200 rows × 18 columns
+**Size:** 855526 bytes | **Type:** Parquet | **Shape:** 5,200 rows × 18 columns
 
 ### Columns
 ```

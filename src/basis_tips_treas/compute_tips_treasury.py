@@ -1,4 +1,5 @@
 import os
+import polars as pl
 import pandas as pd
 import numpy as np
 from settings import config
@@ -9,9 +10,9 @@ DATA_DIR = config("DATA_DIR")
 # ------------------------------------------------------------------------------
 # Import inflation swap data
 # ------------------------------------------------------------------------------
-def import_inflation_swap_data():
+def import_inflation_swap_data(data_dir=DATA_DIR):
     # Load Bloomberg output saved as parquet
-    swaps_path = DATA_DIR / "treasury_inflation_swaps.parquet"
+    swaps_path = os.path.join(data_dir, "treasury_inflation_swaps.parquet")
 
     # Read parquet and ensure "Dates" is datetime
     swaps = pd.read_parquet(swaps_path)
@@ -62,9 +63,9 @@ def import_inflation_swap_data():
 # ------------------------------------------------------------------------------
 # Read in zero-coupon TIPS and Treasury yields
 # ------------------------------------------------------------------------------
-def import_treasury_yields():
+def import_treasury_yields(data_dir=DATA_DIR):
     # Define the path to the parquet file
-    nom_path = os.path.join(DATA_DIR, "fed_yield_curve.parquet")
+    nom_path = os.path.join(data_dir, "fed_yield_curve.parquet")
 
     # Read the parquet file; date is assumed to be in the index
     nom = pd.read_parquet(nom_path)
@@ -91,8 +92,8 @@ def import_treasury_yields():
     return nom
 
 
-def import_tips_yields():
-    real_path = os.path.join(DATA_DIR, "fed_tips_yield_curve.parquet")
+def import_tips_yields(data_dir=DATA_DIR):
+    real_path = os.path.join(data_dir, "fed_tips_yield_curve.parquet")
     real = pd.read_parquet(real_path)
 
     if not pd.api.types.is_datetime64_any_dtype(real["Date"]):
@@ -111,7 +112,7 @@ def import_tips_yields():
 # ------------------------------------------------------------------------------
 # Merge all data, compute implied riskless rate from TIPS
 # ------------------------------------------------------------------------------
-def compute_tips_treasury():
+def compute_tips_treasury(data_dir=DATA_DIR):
     """
     Create Constant-Maturity TIPS-Treasury Arbitrage Series and Compute Implied Risk-Free Rates
 
@@ -144,9 +145,9 @@ def compute_tips_treasury():
     Data quality is maintained by generating missing value indicators and filtering out observations with too many missing values.
     The resulting dataset is saved as a parquet file with Snappy compression, making it ready for further analysis.
     """
-    real = import_tips_yields()
-    nom = import_treasury_yields()
-    swaps = import_inflation_swap_data()
+    real = import_tips_yields(data_dir=data_dir)
+    nom = import_treasury_yields(data_dir=data_dir)
+    swaps = import_inflation_swap_data(data_dir=data_dir)
 
     merged = pd.merge(real, nom, on="date", how="inner")
     merged = pd.merge(merged, swaps, on="date", how="inner")
@@ -177,11 +178,14 @@ def compute_tips_treasury():
     )
     merged = merged[cols_to_keep]
 
-    output_path = os.path.join(DATA_DIR, "tips_treasury_implied_rf.parquet")
-    merged.to_parquet(output_path, compression="snappy")
-
     return merged
+
+def load_tips_treasury(data_dir=DATA_DIR):
+    df = pl.read_parquet(os.path.join(data_dir, "tips_treasury_implied_rf.parquet"))
+    df = df.drop("__index_level_0__")
+    return df
 
 
 if __name__ == "__main__":
-    compute_tips_treasury()
+    merged = compute_tips_treasury(data_dir=DATA_DIR)
+    merged.to_parquet(os.path.join(DATA_DIR, "tips_treasury_implied_rf.parquet"), compression="snappy")

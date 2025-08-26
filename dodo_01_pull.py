@@ -469,17 +469,20 @@ def task_format():
                 f"python ./src/{data_module}/compute_tips_treasury.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/generate_figures.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/generate_latex_table.py --OUTPUT_DIR={OUTPUT_DIR}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "tips_treasury_implied_rf.parquet",
                 OUTPUT_DIR / "tips_treasury_spreads.png",
                 OUTPUT_DIR / "tips_treasury_summary.csv",
                 OUTPUT_DIR / "tips_treasury_summary_table.tex",
+                DATA_DIR / data_module / "ftsfr_tips_treasury_implied_rf.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/compute_tips_treasury.py",
                 f"./src/{data_module}/generate_figures.py",
                 f"./src/{data_module}/generate_latex_table.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }

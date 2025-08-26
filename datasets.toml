@@ -41,6 +41,11 @@ and formatting the TIPS-Treasury arbitrage series.
 """
 required_data_sources = ["fed_yield_curve", "bloomberg_terminal"]
 
+[basis_tips_treas.ftsfr_tips_treasury_implied_rf]
+description = """Long format of TIPS-Treasury implied RF"""
+frequency = "ME"
+seasonality = 12
+
 ################################################################################
 [basis_treas_swap]
 data_module_name = "Basis: Treasury-Swap"
