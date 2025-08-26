@@ -99,7 +99,7 @@ def get_model_config(environment_dict=None):
     if environment_dict.get("OUTPUT_DIR", None) is not None:
         output_dir = Path(environment_dict["OUTPUT_DIR"])
     else:
-        output_dir = Path().resolve().parent / "_output"
+        output_dir = Path(__file__).resolve().parent / "_output"
 
     # Print configuration being used
     print(f"\nConfiguration for dataset: {dataset_name}")
