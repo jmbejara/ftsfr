@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Total files: 113
+Total files: 114
 
 ## Summary of Datasets by Task
 
@@ -15,7 +15,8 @@ Total files: 113
 - [`treasury_df.parquet`](#treasury-df-parquet)
 - [`treasury_sf_output.parquet`](#treasury-sf-output-parquet)
 #### Format: Basis Treas Swap
-- [`calc_merged.parquet`](#calc-merged-parquet)
+- [`ftsfr_treasury_swap_basis.parquet`](#ftsfr-treasury-swap-basis-parquet)
+- [`swap_spreads.parquet`](#swap-spreads-parquet)
 #### Format: Cds Bond Basis
 - [`Final_data.parquet`](#final-data-parquet)
 - [`Red_Data.parquet`](#red-data-parquet)
@@ -1450,50 +1451,25 @@ Date: min=2004-06-23 00:00:00, max=2025-05-30 00:00:00
 
 ---
 
-## calc_merged.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_swap/calc_merged.parquet`
-**Size:** 363741 bytes | **Type:** Parquet | **Shape:** 6,177 rows × 15 columns
+## ftsfr_treasury_swap_basis.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_swap/ftsfr_treasury_swap_basis.parquet`
+**Size:** 183250 bytes | **Type:** Parquet | **Shape:** 43,155 rows × 3 columns
 
 ### Columns
 ```
-('Arb_Swap_1', '')                       Float64         (27.4% null)
-('Arb_Swap_2', '')                       Float64         (0.2% null)
-('Arb_Swap_3', '')                       Float64         (5.0% null)
-('Arb_Swap_5', '')                       Float64         (1.0% null)
-('Arb_Swap_10', '')                      Float64         (28.4% null)
-('Arb_Swap_20', '')                      Float64         (78.1% null)
-('Arb_Swap_30', '')                      Float64         (41.4% null)
-('tswap_1_rf', '')                       Float64        
-('tswap_2_rf', '')                       Float64         (0.2% null)
-('tswap_3_rf', '')                       Float64         (1.0% null)
-('tswap_5_rf', '')                       Float64         (1.0% null)
-('tswap_10_rf', '')                      Float64         (28.3% null)
-('tswap_20_rf', '')                      Float64         (41.5% null)
-('tswap_30_rf', '')                      Float64         (41.4% null)
-__index_level_0__                        Date           
+unique_id                                String         
+ds                                       Date           
+y                                        Float64         (25.8% null)
 ```
 
 ### Numeric Column Statistics
 ```
-('Arb_Swap_1', ''): min=-46.150000000000006, max=38.119999999999976, mean=-0.64, median=-0.449999999999999
-('Arb_Swap_2', ''): min=-34.94999999999999, max=63.9, mean=2.52, median=-1.7000000000000002
-('Arb_Swap_3', ''): min=-48.63999999999997, max=87.79999999999997, mean=0.22, median=-6.000000000000005
-('Arb_Swap_5', ''): min=-51.85000000000004, max=85.50000000000004, mean=-1.56, median=-9.599999999999998
-('Arb_Swap_10', ''): min=-66.135, max=37.400000000000055, mean=-25.58, median=-23.0
-('Arb_Swap_20', ''): min=-99.10900000000002, max=-28.800000000000004, mean=-61.43, median=-65.39999999999999
-('Arb_Swap_30', ''): min=-105.0, max=-23.99999999999998, mean=-59.10, median=-55.2
-('tswap_1_rf', ''): min=0.967, max=567.4000000000001, mean=187.34, median=127.4
-('tswap_2_rf', ''): min=-1.5, max=564.75, mean=202.14, median=156.15
-('tswap_3_rf', ''): min=-2.0, max=564.15, mean=218.12, median=177.4
-('tswap_5_rf', ''): min=3.5000000000000004, max=566.6, mean=250.32, median=235.1
-('tswap_10_rf', ''): min=28.999999999999996, max=460.56, mean=237.04, median=233.2
-('tswap_20_rf', ''): min=48.1, max=456.36, mean=247.54, median=241.35
-('tswap_30_rf', ''): min=43.2, max=433.7, mean=248.36, median=247.725
+y: min=-105.0, max=87.79999999999997, mean=-12.67, median=-10.899999999999999
 ```
 
 ### Date/Datetime Column Statistics
 ```
-__index_level_0__: min=2001-12-04, max=2025-08-11
+ds: min=2001-12-20, max=2025-08-11
 ```
 
 ---
@@ -1574,6 +1550,54 @@ __index_level_0__                        Date
 ### Date/Datetime Column Statistics
 ```
 __index_level_0__: min=2000-01-03, max=2025-08-11
+```
+
+---
+
+## swap_spreads.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_swap/swap_spreads.parquet`
+**Size:** 362421 bytes | **Type:** Parquet | **Shape:** 6,177 rows × 15 columns
+
+### Columns
+```
+Arb_Swap_1                               Float64         (27.4% null)
+Arb_Swap_2                               Float64         (0.2% null)
+Arb_Swap_3                               Float64         (5.0% null)
+Arb_Swap_5                               Float64         (1.0% null)
+Arb_Swap_10                              Float64         (28.4% null)
+Arb_Swap_20                              Float64         (78.1% null)
+Arb_Swap_30                              Float64         (41.4% null)
+tswap_1_rf                               Float64        
+tswap_2_rf                               Float64         (0.2% null)
+tswap_3_rf                               Float64         (1.0% null)
+tswap_5_rf                               Float64         (1.0% null)
+tswap_10_rf                              Float64         (28.3% null)
+tswap_20_rf                              Float64         (41.5% null)
+tswap_30_rf                              Float64         (41.4% null)
+__index_level_0__                        Date           
+```
+
+### Numeric Column Statistics
+```
+Arb_Swap_1: min=-46.150000000000006, max=38.119999999999976, mean=-0.64, median=-0.449999999999999
+Arb_Swap_2: min=-34.94999999999999, max=63.9, mean=2.52, median=-1.7000000000000002
+Arb_Swap_3: min=-48.63999999999997, max=87.79999999999997, mean=0.22, median=-6.000000000000005
+Arb_Swap_5: min=-51.85000000000004, max=85.50000000000004, mean=-1.56, median=-9.599999999999998
+Arb_Swap_10: min=-66.135, max=37.400000000000055, mean=-25.58, median=-23.0
+Arb_Swap_20: min=-99.10900000000002, max=-28.800000000000004, mean=-61.43, median=-65.39999999999999
+Arb_Swap_30: min=-105.0, max=-23.99999999999998, mean=-59.10, median=-55.2
+tswap_1_rf: min=0.967, max=567.4000000000001, mean=187.34, median=127.4
+tswap_2_rf: min=-1.5, max=564.75, mean=202.14, median=156.15
+tswap_3_rf: min=-2.0, max=564.15, mean=218.12, median=177.4
+tswap_5_rf: min=3.5000000000000004, max=566.6, mean=250.32, median=235.1
+tswap_10_rf: min=28.999999999999996, max=460.56, mean=237.04, median=233.2
+tswap_20_rf: min=48.1, max=456.36, mean=247.54, median=241.35
+tswap_30_rf: min=43.2, max=433.7, mean=248.36, median=247.725
+```
+
+### Date/Datetime Column Statistics
+```
+__index_level_0__: min=2001-12-04, max=2025-08-11
 ```
 
 ---

@@ -70,7 +70,10 @@ Treasury-Swap arbitrage spreads from Segmented Arbitrage.
 """
 required_data_sources = ["bloomberg_terminal"]
 
-
+[basis_treas_swap.ftsfr_treasury_swap_basis]
+description = """Long format of Treasury-Swap basis"""
+frequency = "ME"
+seasonality = 12
 
 ################################################################################
 [cds_bond_basis]

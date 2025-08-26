@@ -43,19 +43,29 @@ def calc_swap_spreads(treasury_df: pd.DataFrame, swap_df: pd.DataFrame) -> pd.Da
     merged_df = merged_df[arb_list + tswap_list]
     merged_df = merged_df.dropna(how="all")
 
+    # Ensure columns are a single Index, not MultiIndex
+    if isinstance(merged_df.columns, pd.MultiIndex):
+        merged_df.columns = merged_df.columns.get_level_values(0)
+
     return merged_df
 
 
-def swap_main(data_dir: Path = DATA_DIR) -> None:
+def assemble_swap_spreads(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Load cleaned inputs from disk, compute spreads, and save results."""
     swap_df = load_syields(data_dir=data_dir)
     treasury_df = load_tyields(data_dir=data_dir)
 
     arb_df = calc_swap_spreads(treasury_df, swap_df)
+    return arb_df
 
-    file = data_dir / "calc_merged.parquet"
-    arb_df.to_parquet(file)
 
+def load_swap_spreads(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    """Load swap spreads from disk."""
+    file = data_dir / "swap_spreads.parquet"
+    return pd.read_parquet(file)
 
 if __name__ == "__main__":
-    swap_main(data_dir=DATA_DIR)
+    df = assemble_swap_spreads(data_dir=DATA_DIR)
+    file = DATA_DIR / "swap_spreads.parquet"
+    df.to_parquet(file)
+

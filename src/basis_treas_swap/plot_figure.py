@@ -135,7 +135,7 @@ def plot_main(data_dir: Path = DATA_DIR) -> None:
     """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    file = data_dir / "calc_merged.parquet"
+    file = data_dir / "swap_spreads.parquet"
     # Load precomputed arbitrage spreads created in format step
     arb_df = pd.read_parquet(file)
 

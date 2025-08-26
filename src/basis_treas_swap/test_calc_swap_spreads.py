@@ -27,12 +27,3 @@ def test_calc_swap_spreads():
     assert [a for a, _ in output.columns] == total_list
 
 
-def test_swap_main():
-    """Tests swap_main to check if it saves the correct files in the correct
-    destination
-    Note: It only passes when connected to a bloomberg-enabled machine
-    """
-    swap_main()
-    file_dir = os.path.join(data_dir, "calc_spread")
-    file = os.path.join(file_dir, "calc_merged.pkl")
-    assert os.path.exists(file)

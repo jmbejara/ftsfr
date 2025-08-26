@@ -540,17 +540,20 @@ def task_format():
                 f"python ./src/{data_module}/calc_swap_spreads.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/supplementary.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/plot_figure.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "calc_merged.parquet",
+                DATA_DIR / data_module / "swap_spreads.parquet",
                 DATA_DIR / data_module / "replicated_swap_spread_arb_figure.png",
                 DATA_DIR / data_module / "updated_swap_spread_arb_figure.png",
                 DATA_DIR / data_module / "table.txt",
+                DATA_DIR / data_module / "ftsfr_treasury_swap_basis.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/calc_swap_spreads.py",
                 f"./src/{data_module}/supplementary.py",
                 f"./src/{data_module}/plot_figure.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }
