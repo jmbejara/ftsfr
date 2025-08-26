@@ -2,7 +2,7 @@
 The NixtlaMain class can help quickly create the necessary objects for
 forecasting with Nixtla's neuralforecast models.
 
-NOTE: Currently doesn't support training on MPS.
+Supports training on Apple Silicon (MPS), CUDA GPU, and CPU.
 """
 
 import os
@@ -120,6 +120,9 @@ class NixtlaMain(forecasting_model):
         NixtlaMain_logger.info("Model training started.")
         from neuralforecast import NeuralForecast
 
+        # Log the estimator configuration for debugging
+        NixtlaMain_logger.info(f"Estimator accelerator: {getattr(self.estimator, 'accelerator', 'Not set')}")
+        
         self.nf = NeuralForecast(models=[self.estimator],
                                  freq=self.frequency,
                                  local_scaler_type = None)

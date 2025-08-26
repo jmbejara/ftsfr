@@ -181,8 +181,16 @@ def create_estimator(model_config, env_vars):
         if "input_size" not in params:
             params["input_size"] = seasonality * 4
         
+        # Enable Apple Silicon (MPS) for Nixtla models if available
         if torch.backends.mps.is_available():
+            params['accelerator'] = "mps"
+            print(f"Using Apple Silicon (MPS) for {model_name}")
+        elif torch.cuda.is_available():
+            params['accelerator'] = "gpu"
+            print(f"Using CUDA GPU for {model_name}")
+        else:
             params['accelerator'] = "cpu"
+            print(f"Using CPU for {model_name}")
 
     # Models that need lags
     if "CatBoostModel" in model_name or (
@@ -229,6 +237,14 @@ def create_estimator(model_config, env_vars):
     print(
         f"DEBUG: Checking for N_EPOCHS environment variable. Available env vars: {[k for k in os.environ.keys() if 'EPOCH' in k.upper()]}"
     )
+    
+    # Debug device selection
+    if "accelerator" in params:
+        print(f"DEBUG: Model {model_name} will use accelerator: {params['accelerator']}")
+    if torch.backends.mps.is_available():
+        print(f"DEBUG: Apple Silicon (MPS) is available")
+    if torch.cuda.is_available():
+        print(f"DEBUG: CUDA GPU is available")
     if "N_EPOCHS" in os.environ:
         n_epochs = int(os.environ["N_EPOCHS"])
         print(f"DEBUG: Found N_EPOCHS={n_epochs}")
@@ -329,7 +345,13 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", set
     model_class = model_config["class"]
     display_name = model_config.get("display_name", model_name)
 
+    # Enable MPS fallback for better compatibility
     os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+    
+    # Additional MPS environment variables for better Apple Silicon support
+    if torch.backends.mps.is_available():
+        os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.0"
+        print("DEBUG: Set MPS environment variables for Apple Silicon")
 
     # Dynamically import the required model class only when needed
     if model_class == "DartsLocal":

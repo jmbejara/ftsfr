@@ -1,0 +1,20 @@
+torch
+torchvision
+torchaudio
+lightning
+# Forecasting libraries
+gluonts
+darts
+neuralforecast
+catboost
+prophet
+numpy
+pandas
+tqdm
+scipy
+statsmodels
+pyarrow
+fastparquet
+tabulate
+scikit-learn
+tomli

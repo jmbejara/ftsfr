@@ -43,6 +43,20 @@ If you want to isolate GPU dependencies, use one of the two Pixi TOML files in t
 - All libraries: pixi shell
 
 
+### Mac Alternative
+
+I did this:
+```bash
+conda create -n py310 python=3.10
+conda activate py310
+pip install -r requirements.txt # From within the models directory
+```
+Then, test with
+```
+python test_apple_silicon.py
+```
+
+
 ### Step 2.2: Test GPU support
 Before running any models, verify your GPU environments:
 
@@ -62,6 +76,7 @@ ls -la ../_data/*/ftsfr_*.parquet
 export DATASET_PATH="../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet"  # US Treasury
 # export DATASET_PATH="../_data/corp_bond_returns/ftsfr_corp_bond_returns.parquet"  # Corporate bonds
 # export DATASET_PATH="../_data/cds_returns/ftsfr_CDS_contract_returns.parquet"  # CDS
+# export DATASET_PATH="../_data/nyu_call_report/ftsfr_nyu_call_report_cash_liquidity.parquet"  # NYU Call Report
 
 # Run a simple model (ARIMA), with Darts
 python run_model.py --model arima
