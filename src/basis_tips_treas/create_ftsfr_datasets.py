@@ -11,9 +11,13 @@ DATA_DIR = config("DATA_DIR")
 
 df = compute_tips_treasury.load_tips_treasury(data_dir=DATA_DIR)
 
+# # Plot
+# df = df.select(["date", "arb_2", "arb_5", "arb_10", "arb_20"])
+# df.to_pandas().set_index("date").plot()
+
 df_long = (
     df.select(
-        ["date", "tips_treas_2_rf", "tips_treas_5_rf", "tips_treas_10_rf", "tips_treas_20_rf"]
+        ["date", "arb_2", "arb_5", "arb_10", "arb_20"]
     )
     .with_columns(
         pl.col("date").cast(pl.Date)
@@ -28,8 +32,10 @@ df_long = (
 )
 
 df_long.write_parquet(
-    Path(DATA_DIR) / "ftsfr_tips_treasury_implied_rf.parquet"
+    Path(DATA_DIR) / "ftsfr_tips_treasury_basis.parquet"
 )
+
+
 
 
 

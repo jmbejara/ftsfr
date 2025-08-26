@@ -476,7 +476,7 @@ def task_format():
                 OUTPUT_DIR / "tips_treasury_spreads.png",
                 OUTPUT_DIR / "tips_treasury_summary.csv",
                 OUTPUT_DIR / "tips_treasury_summary_table.tex",
-                DATA_DIR / data_module / "ftsfr_tips_treasury_implied_rf.parquet",
+                DATA_DIR / data_module / "ftsfr_tips_treasury_basis.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/compute_tips_treasury.py",
@@ -505,15 +505,18 @@ def task_format():
             "name": data_module,
             "actions": [
                 f"python ./src/{data_module}/calc_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
                 DATA_DIR / data_module / "treasury_sf_output.parquet",
+                DATA_DIR / data_module / "ftsfr_treasury_sf_basis.parquet",
             ],
             "file_dep": [
                 DATA_DIR / data_module / "treasury_df.parquet",
                 DATA_DIR / data_module / "ois.parquet",
                 DATA_DIR / data_module / "last_day.parquet",
                 f"./src/{data_module}/calc_basis_treas_sf.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
         }

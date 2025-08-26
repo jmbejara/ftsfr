@@ -41,10 +41,25 @@ and formatting the TIPS-Treasury arbitrage series.
 """
 required_data_sources = ["fed_yield_curve", "bloomberg_terminal"]
 
-[basis_tips_treas.ftsfr_tips_treasury_implied_rf]
-description = """Long format of TIPS-Treasury implied RF"""
+[basis_tips_treas.ftsfr_tips_treasury_basis]
+description = """Long format of TIPS-Treasury basis"""
 frequency = "ME"
 seasonality = 12
+
+################################################################################
+[basis_treas_sf]
+data_module_name = "Basis: Treasury-SF"
+data_module_description = """
+Contains code that pulls Bloomberg Treasury and SF yields and replicates the 
+Treasury-SF arbitrage spreads from Segmented Arbitrage.
+"""
+required_data_sources = ["bloomberg_terminal"]
+
+[basis_treas_sf.ftsfr_treasury_sf_basis]
+description = """Long format of Treasury-SF basis"""
+frequency = "ME"
+seasonality = 12
+
 
 ################################################################################
 [basis_treas_swap]
@@ -55,14 +70,7 @@ Treasury-Swap arbitrage spreads from Segmented Arbitrage.
 """
 required_data_sources = ["bloomberg_terminal"]
 
-################################################################################
-[basis_treas_sf]
-data_module_name = "Basis: Treasury-SF"
-data_module_description = """
-Contains code that pulls Bloomberg Treasury and SF yields and replicates the 
-Treasury-SF arbitrage spreads from Segmented Arbitrage.
-"""
-required_data_sources = ["bloomberg_terminal"]
+
 
 ################################################################################
 [cds_bond_basis]

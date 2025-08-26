@@ -1,14 +1,15 @@
 # Data Glimpses Report
-Total files: 112
+Total files: 113
 
 ## Summary of Datasets by Task
 
 ### Format
 #### Format: Basis Tips Treas
-- [`ftsfr_tips_treasury_implied_rf.parquet`](#ftsfr-tips-treasury-implied-rf-parquet)
+- [`ftsfr_tips_treasury_basis.parquet`](#ftsfr-tips-treasury-basis-parquet)
 - [`tips_treasury_implied_rf.parquet`](#tips-treasury-implied-rf-parquet)
 - [`tips_treasury_summary.csv`](#tips-treasury-summary-csv)
 #### Format: Basis Treas Sf
+- [`ftsfr_treasury_sf_basis.parquet`](#ftsfr-treasury-sf-basis-parquet)
 - [`last_day.parquet`](#last-day-parquet)
 - [`ois.parquet`](#ois-parquet)
 - [`treasury_df.parquet`](#treasury-df-parquet)
@@ -729,9 +730,9 @@ Date: min=1961-06-14 00:00:00, max=2025-08-15 00:00:00
 
 ---
 
-## ftsfr_tips_treasury_implied_rf.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_tips_treas/ftsfr_tips_treasury_implied_rf.parquet`
-**Size:** 176690 bytes | **Type:** Parquet | **Shape:** 20,800 rows × 3 columns
+## ftsfr_tips_treasury_basis.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_tips_treas/ftsfr_tips_treasury_basis.parquet`
+**Size:** 174349 bytes | **Type:** Parquet | **Shape:** 20,800 rows × 3 columns
 
 ### Columns
 ```
@@ -742,7 +743,7 @@ y                                        Float64         (0.7% null)
 
 ### Numeric Column Statistics
 ```
-y: min=-10.444064962304989, max=594.0780835704351, mean=305.53, median=307.09253815564
+y: min=-28.952341619528084, max=243.18891701256675, mean=24.87, median=23.50302543169036
 ```
 
 ### Date/Datetime Column Statistics
@@ -838,6 +839,29 @@ USSWIT30 BGN Curncy: min=1.085, max=3.5, mean=2.56, median=2.5278
 ### Date/Datetime Column Statistics
 ```
 Dates: min=2004-07-21, max=2025-05-30
+```
+
+---
+
+## ftsfr_treasury_sf_basis.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_sf/ftsfr_treasury_sf_basis.parquet`
+**Size:** 151914 bytes | **Type:** Parquet | **Shape:** 25,960 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Date           
+y                                        Float64         (5.5% null)
+```
+
+### Numeric Column Statistics
+```
+y: min=-420.7967777777778, max=288.82433333333336, mean=-23.23, median=-10.56133333333333
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=2004-06-23, max=2025-01-08
 ```
 
 ---
@@ -1398,7 +1422,7 @@ Date: min=2000-01-03, max=2025-05-30
 
 ## treasury_sf_output.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_sf/treasury_sf_output.parquet`
-**Size:** 281594 bytes | **Type:** Parquet | **Shape:** 5,293 rows × 6 columns
+**Size:** 281537 bytes | **Type:** Parquet | **Shape:** 5,293 rows × 6 columns
 
 ### Columns
 ```
