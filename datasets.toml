@@ -274,12 +274,12 @@ frequency = "D"
 seasonality = 252 # Business days per year
 
 ################################################################################
-# [sovereign_bonds]
-# required_data_sources = ["wrds_crsp"]
+[sovereign_bonds]
+required_data_sources = ["wrds_crsp"]
 
 ################################################################################
-# [wrds_bank_premium]
-# required_data_sources = ["wrds_bank_premium"]
+[wrds_bank_premium]
+required_data_sources = ["wrds_bank_premium"]
 
 ################################################################################
 [wrds_crsp_compustat]
