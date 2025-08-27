@@ -2300,12 +2300,12 @@ index: min=1999-02-08, max=2025-02-28
 
 ## ftsfr_CIP_spreads.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cip/ftsfr_CIP_spreads.parquet`
-**Size:** 515176 bytes | **Type:** Parquet | **Shape:** 43,490 rows × 3 columns
+**Size:** 515186 bytes | **Type:** Parquet | **Shape:** 43,490 rows × 3 columns
 
 ### Columns
 ```
-unique_id                                Date           
-ds                                       String         
+unique_id                                String         
+ds                                       Date           
 y                                        Float64        
 ```
 
@@ -2316,7 +2316,7 @@ y: min=-75.02010739148606, max=439.59367390435733, mean=18.90, median=12.6606122
 
 ### Date/Datetime Column Statistics
 ```
-unique_id: min=2001-12-04, max=2025-02-28
+ds: min=2001-12-04, max=2025-02-28
 ```
 
 ---
