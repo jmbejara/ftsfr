@@ -53,8 +53,25 @@ from config_reader import get_model_config
 
 filterwarnings("ignore")
 
-def load_config(config_path="models_config.toml"):
+def load_config(config_path=None):
     """Load the models configuration from TOML file."""
+    if config_path is None:
+        # Try to find models_config.toml relative to this file
+        current_dir = Path(__file__).parent
+        
+        # First try: current directory (when running from models/ folder)
+        config_path = current_dir / "models_config.toml"
+        if not config_path.exists():
+            # Second try: project root (when running from project root)
+            config_path = current_dir.parent / "models" / "models_config.toml"
+        
+        if not config_path.exists():
+            raise FileNotFoundError(
+                f"Could not find models_config.toml in either:\n"
+                f"  - {current_dir / 'models_config.toml'}\n"
+                f"  - {current_dir.parent / 'models' / 'models_config.toml'}"
+            )
+    
     with open(config_path, "rb") as f:
         return tomli.load(f)
 
@@ -312,7 +329,7 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
 
     return estimator_class(**params)
 
-def run_model(model_name, test_split, frequency, seasonality, data_path, output_dir, config_path="models_config.toml", workflow="main", log_path=None, n_epochs=None):
+def run_model(model_name, test_split, frequency, seasonality, data_path, output_dir, config_path=None, workflow="main", log_path=None, n_epochs=None):
     """
     Run a specific model based on its configuration.
 
@@ -468,8 +485,8 @@ def main():
     )
     parser.add_argument(
         "--config",
-        default="models_config.toml",
-        help="Path to the configuration file (default: models_config.toml)",
+        default=None,
+        help="Path to the configuration file (default: auto-detect models_config.toml)",
     )
     parser.add_argument(
         "--workflow",

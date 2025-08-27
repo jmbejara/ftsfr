@@ -75,7 +75,7 @@ def task_determine_cutoff_dates():
             OUTPUT_DIR / "available_datasets.csv",
         ],
         "targets": [
-            OUTPUT_DIR / "cutoff_dates.parquet",
+            OUTPUT_DIR / "cutoff_dates.csv",
         ],
     }
 
