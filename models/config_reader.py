@@ -85,6 +85,7 @@ def get_model_config(environment_dict=None):
     )
 
     # Handle test_split (default to 0.2 if not in config)
+    # Making the test_split too small leads to errors in MASE calculations
     test_split_env = environment_dict.get(
         "TEST_SPLIT", dataset_config.get("test_split", 0.2)
     )

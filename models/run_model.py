@@ -27,7 +27,6 @@ from config_reader import get_model_config
 
 filterwarnings("ignore")
 
-
 def load_config(config_path="models_config.toml"):
     """Load the models configuration from TOML file."""
     with open(config_path, "rb") as f:
@@ -322,27 +321,46 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", log
     ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
     dataset_name = dataset_config[5]
 
+    logger = logging.getLogger("test_run_model")
     # Nixtla model imports break logging
-    # So keeping the create_estimator function here and logging after it
+    # So keeping the create_estimator function here and setting up logging after it
     estimator = create_estimator(model_config, env_vars)
 
     if log_path is None:
+        # If run_model.py is called instead of through some other file
+        # This section sets up writing the logs to a file in run_model_runs
         log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
         try:
             log_path.mkdir(parents=True, exist_ok=True)
         except:
             pass
         log_path = log_path / (dataset_name + ".log")
-    logging.basicConfig(
-        filename=log_path,
-        filemode="w",
-        format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
-        level=logging.DEBUG,
-    )
+        logging.basicConfig(
+            filename=log_path,
+            filemode="w",
+            format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
+            level=logging.DEBUG,
+        )
+        remove_handler = False
+    else:
+        # Meant for calls from some other file
+        log_path = log_path / model_name
+        try:
+            log_path.mkdir(parents=True, exist_ok=True)
+        except:
+            pass
+        log_path = log_path / (dataset_name + ".log")
+        f = logging.Formatter("%(asctime)s - %(name)-12s - %(levelname)s - %(message)s")
+        logging.getLogger().setLevel(logging.DEBUG)
+        handler_file = logging.FileHandler(log_path, mode = "a")
+        handler_file.setLevel(logging.DEBUG)
+        handler_file.setFormatter(f)
+        logging.getLogger().addHandler(handler_file)
+        remove_handler = True
 
     logger = logging.getLogger(f"run_model_{model_name}")
+    
     logger.info(f"Running {model_name} model. Environment variables read.")
-
     # Handle special models
     model_class = model_config["class"]
 
@@ -399,6 +417,10 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", log
         model_obj.save_results()
     else:
         raise ValueError(f"Unknown workflow: {workflow}")
+    
+    if remove_handler:
+        h_to_remove = logging.getLogger().handlers[-1]
+        logging.getLogger().removeHandler(h_to_remove)
 
 
 def main():

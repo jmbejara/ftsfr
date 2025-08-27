@@ -192,7 +192,7 @@ def custom_interpolate(df):
     random_number_gen = np.random.default_rng()
 
     # Gaussian noise to add to interpolated values
-    values_to_add = pd.Series(np.absolute(random_number_gen.normal(size = proc_df.shape[0])) / 1000,
+    values_to_add = pd.Series(np.absolute(random_number_gen.normal(size = proc_df.shape[0])) / 100000,
                                index = proc_df.index)
 
     proc_df_replace_nan = proc_df_int.add(values_to_add, axis = 0)
@@ -286,6 +286,8 @@ def process_df(df, frequency, seasonality, test_split):
     train_data, test_data = scaled_data(train_data, test_data)
     hf_logger.info("Performed scaling on train and test.")
 
+    train_data['y'] = train_data['y'].astype(np.float32)
+    test_data['y'] = test_data['y'].astype(np.float32)
     hf_logger.info("Converted train and test to np.float32.")
 
     # The train series should now have all defined entries

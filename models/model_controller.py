@@ -29,8 +29,6 @@ from time import strftime
 from pathlib import Path
 import logging
 
-logger = logging.getLogger("model_controller")
-
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -188,19 +186,12 @@ def list_available_models(config):
 
 def main():
 
-    log_path = Path(__file__).resolve().parent / "model_logs" / "model_controller_logs"
+    log_path = Path(__file__).resolve().parent / "model_logs" / "model_controller_logs" / strftime("%d%b%Y-%H:%M:%S")
     try:
         Path(log_path).mkdir(parents = True, exist_ok = True)
     except:
         pass
-    log_path = log_path / (strftime("%d%b%Y-%H:%M:%S") + ".log")
-    logging.basicConfig(filename = log_path,
-                        filemode = "w", # Overwrites previously existing logs
-                        format = "%(asctime)s - %(name)-12s"+\
-                        " - %(levelname)s - %(message)s",
-                        level = logging.DEBUG)
-
-    logger.info("Running main.")
+    logging.basicConfig(level = logging.DEBUG)
 
     """Main entry point."""
     parser = argparse.ArgumentParser(
