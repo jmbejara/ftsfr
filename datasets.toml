@@ -83,10 +83,10 @@ Contains code that replicated the CDS bond basis calculations from Segmented Arb
 """
 required_data_sources = ["open_source_bond", "wrds_markit"]
 
-[cds_bond_basis.ftsfr_CDS_bond_basis_aggregated]
-description = """Long format of CDS bond basis, aggregated"""
-frequency = "ME"
-seasonality = 12
+# [cds_bond_basis.ftsfr_CDS_bond_basis_aggregated]
+# description = """Long format of CDS bond basis, aggregated"""
+# frequency = "ME"
+# seasonality = 12
 
 [cds_bond_basis.ftsfr_CDS_bond_basis_non_aggregated]
 description = """Long format of CDS bond basis, non-aggregated"""
