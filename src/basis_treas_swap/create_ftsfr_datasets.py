@@ -41,7 +41,7 @@ df_long = (
                 "Arb_Swap_30",
             ]
         )
-        .with_columns(pl.col("Date").cast(pl.Date))
+        .with_columns(pl.col("Date").cast(pl.Datetime))
         .unpivot(index=["Date"], variable_name="unique_id", value_name="y")
     )
     .rename({"Date": "ds"})

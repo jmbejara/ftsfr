@@ -733,12 +733,12 @@ Date: min=1961-06-14 00:00:00, max=2025-08-15 00:00:00
 
 ## ftsfr_tips_treasury_basis.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_tips_treas/ftsfr_tips_treasury_basis.parquet`
-**Size:** 174349 bytes | **Type:** Parquet | **Shape:** 20,800 rows × 3 columns
+**Size:** 188702 bytes | **Type:** Parquet | **Shape:** 20,800 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
-ds                                       Date           
+ds                                       Datetime(time_unit='us', time_zone=None)
 y                                        Float64         (0.7% null)
 ```
 
@@ -749,14 +749,14 @@ y: min=-28.952341619528084, max=243.18891701256675, mean=24.87, median=23.503025
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2004-07-21, max=2025-05-30
+ds: min=2004-07-21 00:00:00, max=2025-05-30 00:00:00
 ```
 
 ---
 
 ## tips_treasury_implied_rf.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_tips_treas/tips_treasury_implied_rf.parquet`
-**Size:** 855526 bytes | **Type:** Parquet | **Shape:** 5,200 rows × 18 columns
+**Size:** 855688 bytes | **Type:** Parquet | **Shape:** 5,200 rows × 18 columns
 
 ### Columns
 ```
@@ -846,12 +846,12 @@ Dates: min=2004-07-21, max=2025-05-30
 
 ## ftsfr_treasury_sf_basis.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_sf/ftsfr_treasury_sf_basis.parquet`
-**Size:** 151914 bytes | **Type:** Parquet | **Shape:** 25,960 rows × 3 columns
+**Size:** 166816 bytes | **Type:** Parquet | **Shape:** 25,960 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
-ds                                       Date           
+ds                                       Datetime(time_unit='us', time_zone=None)
 y                                        Float64         (5.5% null)
 ```
 
@@ -862,7 +862,7 @@ y: min=-420.7967777777778, max=288.82433333333336, mean=-23.23, median=-10.56133
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2004-06-23, max=2025-01-08
+ds: min=2004-06-23 00:00:00, max=2025-01-08 00:00:00
 ```
 
 ---
@@ -1423,7 +1423,7 @@ Date: min=2000-01-03, max=2025-05-30
 
 ## treasury_sf_output.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_sf/treasury_sf_output.parquet`
-**Size:** 281537 bytes | **Type:** Parquet | **Shape:** 5,293 rows × 6 columns
+**Size:** 281594 bytes | **Type:** Parquet | **Shape:** 5,293 rows × 6 columns
 
 ### Columns
 ```
@@ -1453,12 +1453,12 @@ Date: min=2004-06-23 00:00:00, max=2025-05-30 00:00:00
 
 ## ftsfr_treasury_swap_basis.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_swap/ftsfr_treasury_swap_basis.parquet`
-**Size:** 183250 bytes | **Type:** Parquet | **Shape:** 43,155 rows × 3 columns
+**Size:** 198143 bytes | **Type:** Parquet | **Shape:** 43,155 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
-ds                                       Date           
+ds                                       Datetime(time_unit='us', time_zone=None)
 y                                        Float64         (25.8% null)
 ```
 
@@ -1469,7 +1469,7 @@ y: min=-105.0, max=87.79999999999997, mean=-12.67, median=-10.899999999999999
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2001-12-20, max=2025-08-11
+ds: min=2001-12-20 00:00:00, max=2025-08-11 00:00:00
 ```
 
 ---
@@ -1556,7 +1556,7 @@ __index_level_0__: min=2000-01-03, max=2025-08-11
 
 ## swap_spreads.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/basis_treas_swap/swap_spreads.parquet`
-**Size:** 362421 bytes | **Type:** Parquet | **Shape:** 6,177 rows × 15 columns
+**Size:** 362564 bytes | **Type:** Parquet | **Shape:** 6,177 rows × 15 columns
 
 ### Columns
 ```

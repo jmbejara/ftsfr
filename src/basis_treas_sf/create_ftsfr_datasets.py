@@ -18,7 +18,7 @@ df_long = (
         ["Date", "Treasury_SF_2Y", "Treasury_SF_5Y", "Treasury_SF_10Y", "Treasury_SF_20Y", "Treasury_SF_30Y"]
     )
     .with_columns(
-        pl.col("Date").cast(pl.Date)
+        pl.col("Date").cast(pl.Datetime)
     )
     .unpivot(
         index=["Date"],

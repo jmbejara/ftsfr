@@ -20,7 +20,7 @@ df_long = (
         ["date", "arb_2", "arb_5", "arb_10", "arb_20"]
     )
     .with_columns(
-        pl.col("date").cast(pl.Date)
+        pl.col("date").cast(pl.Datetime)
     )
     .unpivot(
         index=["date"],
