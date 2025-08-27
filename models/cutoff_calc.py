@@ -181,7 +181,7 @@ def convert_to_expected_format(df, dataset_path):
 
 def calculate_cutoff_for_dataset(dataset_path, frequency, seasonality, test_split):
     """
-    Calculate the cutoff date for a single dataset.
+    Calculate the min date, cutoff date and max date for a single dataset.
     
     Args:
         dataset_path: Path to the dataset parquet file
@@ -190,7 +190,9 @@ def calculate_cutoff_for_dataset(dataset_path, frequency, seasonality, test_spli
         test_split: Fraction of data to use for testing
         
     Returns:
-        The cutoff date (first date in test set)
+        Tuple of (min_date, cutoff_date, max_date) where min_date is the minimum date,
+        cutoff_date is the first date in test set and max_date is the maximum date 
+        in the entire dataset
     """
     # Load the dataset
     df = pd.read_parquet(dataset_path)
@@ -198,31 +200,35 @@ def calculate_cutoff_for_dataset(dataset_path, frequency, seasonality, test_spli
     # Convert to expected format
     df = convert_to_expected_format(df, dataset_path)
     
+    # Get the min and max dates from the entire dataset
+    min_date = df['ds'].min()
+    max_date = df['ds'].max()
+    
     # Process the dataframe to get train/test split
     _, test_data, _ = process_df(df, frequency, seasonality, test_split)
     
     # Get the cutoff date (first date in test set)
     cutoff_date = test_data['ds'].min()
     
-    return cutoff_date
+    return min_date, cutoff_date, max_date
 
 
 def calculate_all_cutoff_dates(output_dir):
     """
-    Calculate cutoff dates for all available datasets.
+    Calculate min dates, cutoff dates and max dates for all available datasets.
     
     Args:
         output_dir: Directory containing available_datasets.csv and where to save cutoff_dates.parquet
         
     Returns:
-        DataFrame with all cutoff dates
+        DataFrame with all min dates, cutoff dates and max dates
     """
     # Load available datasets
     available_datasets = load_available_datasets(output_dir)
     
     if available_datasets.empty:
         print("Warning: No available datasets found!")
-        return pd.DataFrame(columns=["dataset_name", "full_name", "cutoff_date", "frequency", "seasonality"])
+        return pd.DataFrame(columns=["dataset_name", "full_name", "min_date", "cutoff_date", "max_date", "frequency", "seasonality"])
     
     print(f"Calculating cutoff dates for {len(available_datasets)} datasets...")
     
@@ -238,19 +244,21 @@ def calculate_all_cutoff_dates(output_dir):
             
             print(f"  Processing {row['full_name']}...")
             
-            cutoff_date = calculate_cutoff_for_dataset(
+            min_date, cutoff_date, max_date = calculate_cutoff_for_dataset(
                 dataset_path, frequency, seasonality, test_split
             )
             
             cutoff_results.append({
                 "full_name": row['full_name'],
+                "min_date": min_date,
                 "cutoff_date": cutoff_date,
+                "max_date": max_date,
                 "frequency": frequency,
                 "seasonality": seasonality,
                 "file_path": str(dataset_path)
             })
             
-            print(f"    Cutoff date: {cutoff_date}")
+            print(f"    Min date: {min_date}, Cutoff date: {cutoff_date}, Max date: {max_date}")
             
         except Exception as e:
             error_msg = f"Error processing {row['full_name']}: {str(e)}"
@@ -265,7 +273,15 @@ def calculate_all_cutoff_dates(output_dir):
     # Create DataFrame from results
     cutoff_df = pd.DataFrame(cutoff_results)
     
+    # Convert datetime columns to date format for cleaner output
     if not cutoff_df.empty:
+        cutoff_df['min_date'] = pd.to_datetime(cutoff_df['min_date']).dt.date
+        cutoff_df['cutoff_date'] = pd.to_datetime(cutoff_df['cutoff_date']).dt.date
+        cutoff_df['max_date'] = pd.to_datetime(cutoff_df['max_date']).dt.date
+        
+        # Reorder columns to have min_date, cutoff_date, max_date in sequence
+        cutoff_df = cutoff_df[['full_name', 'min_date', 'cutoff_date', 'max_date', 'frequency', 'seasonality', 'file_path']]
+        
         print(f"\nSuccessfully calculated cutoff dates for {len(cutoff_df)} datasets.")
     else:
         print("\nNo cutoff dates were calculated successfully.")
@@ -308,7 +324,7 @@ def main():
     # Display summary
     if not cutoff_df.empty:
         print("\nCutoff dates summary:")
-        print(cutoff_df[['full_name', 'cutoff_date', 'frequency', 'seasonality']].to_string(index=False))
+        print(cutoff_df[['full_name', 'min_date', 'cutoff_date', 'max_date', 'frequency', 'seasonality']].to_string(index=False))
     
     return cutoff_df
 
