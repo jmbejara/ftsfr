@@ -1626,7 +1626,7 @@ BOND_YIELD: min=-0.79189766622368, max=11.679347680642085, mean=0.05, median=0.0
 CS: min=-0.8427172227775009, max=11.666247680642083, mean=0.02, median=0.016088111511169248
 size_ig: min=0.0, max=1.0, mean=0.82, median=1.0
 size_jk: min=0.0, max=1.0, mean=0.98, median=1.0
-par_spread: min=-277.079498250281, max=1307.7831991672729, mean=0.06, median=0.0075582709649573716
+par_spread: min=-277.079498250281, max=1307.7831991672879, mean=0.06, median=0.0075582709649573716
 __index_level_0__: min=39, max=1393082, mean=692711.26, median=696221.0
 ```
 
@@ -1811,7 +1811,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=1.1816992084125149, max=2.442321441593389, mean=1.95, median=2.237723829667863
+y: min=1.1816992084125153, max=2.442321441593389, mean=1.95, median=2.237723829667863
 ```
 
 ### Date/Datetime Column Statistics
@@ -1823,18 +1823,20 @@ ds: min=2011-09-22 11:50:47, max=2014-01-19 07:45:18
 
 ## ftsfr_CDS_bond_basis_non_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet`
-**Size:** 5.0 MB | **Type:** Parquet | **Shape:** 585,507 rows × 3 columns
+**Size:** 7.1 MB | **Type:** Parquet | **Shape:** 552,410 rows × 4 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
+__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-99.98623956278941, max=99.84502978149779, mean=2.25, median=2.5790785585359948
+y: min=-99.98623956278941, max=99.84502978149779, mean=2.23, median=2.5577267376755635
+__index_level_0__: min=0, max=585506, mean=291580.04, median=292526.5
 ```
 
 ### Date/Datetime Column Statistics
