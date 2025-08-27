@@ -83,7 +83,82 @@ python run_model.py --model arima
 
 # Check results
 ls -la ../_output/raw_results/arima/
+
+## CLI Arguments vs Environment Variables
+
+The `run_model.py` script now supports CLI arguments for all configuration parameters. CLI arguments take priority over environment variables.
+
+### Quick Reference
+
+```bash
+# Basic usage
+python run_model.py --model MODEL_NAME [OPTIONS]
+
+# Essential options
+--dataset-path PATH      # Dataset file path
+--frequency FREQ         # Data frequency (D/M/Q)
+--seasonality NUM        # Seasonal period
+--test-split RATIO       # Test data fraction
+--n-epochs NUM          # Training epochs
+--workflow TYPE          # Workflow (main/train/inference/evaluate)
+--output-dir PATH        # Output directory
+
+# Common examples
+python run_model.py --model arima --dataset-path "../_data/test.parquet"
+python run_model.py --model deepar --n-epochs 5 --frequency "M"
+python run_model.py --model transformer --output-dir "../_output/custom"
 ```
+
+### Available CLI Arguments
+
+| Argument | Environment Variable | Description | Example |
+|----------|---------------------|-------------|---------|
+| `--dataset-path` | `DATASET_PATH` | Path to dataset file | `../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet` |
+| `--frequency` | `FREQUENCY` | Data frequency | `D` (daily), `M` (monthly), `Q` (quarterly) |
+| `--seasonality` | `SEASONALITY` | Seasonal period | `7` (weekly), `12` (monthly), `4` (quarterly) |
+| `--test-split` | `TEST_SPLIT` | Test data fraction | `0.2` (20%), `seasonal` (seasonal split) |
+| `--output-dir` | `OUTPUT_DIR` | Output directory | `../_output/custom` |
+| `--n-epochs` | `N_EPOCHS` | Training epochs | `5` (for quick testing) |
+| `--workflow` | N/A | Workflow type | `main`, `train`, `inference`, `evaluate` |
+| `--config` | N/A | Config file path | `models_config.toml` |
+
+### Priority Order
+
+1. **CLI arguments** (highest priority)
+2. **Environment variables** (fallback)
+3. **Dataset configuration** (from `datasets.toml`)
+4. **Default values** (lowest priority)
+
+This allows you to:
+- Override any parameter without setting environment variables
+- Use environment variables for persistent settings
+- Mix CLI and environment variable usage
+- Maintain backward compatibility
+
+### Common Use Cases
+
+```bash
+# Quick testing with limited epochs
+python run_model.py --model deepar --n-epochs 3
+python run_model.py --model transformer --n-epochs 5
+
+# Different workflows
+python run_model.py --model arima --workflow train
+python run_model.py --model deepar --workflow inference
+
+# Dataset switching
+python run_model.py --model arima --dataset-path "../_data/corp_bond_returns/ftsfr_corp_bond_returns.parquet"
+python run_model.py --model deepar --dataset-path "../_data/cds_returns/ftsfr_CDS_contract_returns.parquet" --frequency "M"
+
+# Parameter tuning
+python run_model.py --model arima --seasonality 12 --test-split 0.3
+python run_model.py --model transformer --output-dir "../_output/experiment_1"
+
+# Model comparison (same settings)
+python run_model.py --model arima --dataset-path "../_data/test.parquet" --frequency "D" --seasonality 7
+python run_model.py --model deepar --dataset-path "../_data/test.parquet" --frequency "D" --seasonality 7 --n-epochs 10
+```
+
 
 ## Production Run
 
@@ -201,10 +276,12 @@ cat ../_output/raw_results/arima/*.csv
 For faster iteration during development, you can limit the number of training epochs:
 
 ```bash
-# Limit to 5 epochs for quick testing
-export N_EPOCHS=5 && python run_model.py --model deepar
+# Using CLI arguments (recommended)
+python run_model.py --model deepar --n-epochs 5
+python run_model.py --model transformer --n-epochs 3
 
-# Limit to 3 epochs for very fast testing
+# Using environment variables (alternative)
+export N_EPOCHS=5 && python run_model.py --model deepar
 export N_EPOCHS=3 && python run_model.py --model transformer
 
 # Works with all model types:
@@ -228,13 +305,29 @@ INFO: `Trainer.fit` stopped: `max_epochs=5` reached.
 
 ## Troubleshooting
 
+### CLI Argument Issues
+
+```bash
+# Use double dashes (--), not single (-)
+python run_model.py --model arima --dataset-path "../_data/test.parquet"  # Correct
+
+# Quote values with spaces
+python run_model.py --model arima --output-dir "../_output/my custom folder"  # Correct
+
+# Check available options
+python run_model.py --model arima --help
+```
+
 ### Common Issues
 
 ```bash
 # Out of memory on GPU
 export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
 
-# Limit training epochs for debugging
+# Limit training epochs for debugging (CLI approach - recommended)
+python run_model.py --model deepar --n-epochs 5
+
+# Alternative: Using environment variables
 export N_EPOCHS=5 && python run_model.py --model deepar
 # Note: Use && not & to ensure environment variable is passed to the process
 

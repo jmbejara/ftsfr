@@ -23,6 +23,10 @@ import torch
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Enable MPS fallback for better compatibility with Apple Silicon
+# This must be set before any PyTorch operations to avoid NotImplementedError
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+
 from config_reader import get_model_config
 
 filterwarnings("ignore")
@@ -93,31 +97,21 @@ def get_estimator_class(model_config):
     return estimator_class
 
 
-def create_estimator(model_config, env_vars):
+def create_estimator(model_config, seasonality, frequency, n_epochs=None):
     """
     Create an estimator instance based on the model configuration.
 
     Args:
         model_config: Dictionary containing model configuration
-        env_vars: Environment variables tuple (test_split, frequency, seasonality, data_path, output_dir)
+        seasonality: Seasonal period length
+        frequency: Data frequency (e.g., 'D', 'M', 'Q')
+        n_epochs: Optional override for number of training epochs (for debugging)
 
     Returns:
         Instantiated estimator object
     """
     # Import the estimator class
     estimator_class = get_estimator_class(model_config)
-
-    # Extract dataset parameters
-    test_split, frequency, seasonality, data_path, output_dir = env_vars
-
-    # Convert frequency for GluonTS models (ME -> M)
-    def convert_frequency_for_gluonts(freq):
-        """Convert frequency strings for GluonTS compatibility."""
-        if freq == "ME" or freq == "MS":
-            return "M"  # Month end -> Month
-        elif freq == "QE" or freq == "QS":
-            return "Q"
-        return freq
 
     # Process imports if any
     imports_context = {}
@@ -205,6 +199,14 @@ def create_estimator(model_config, env_vars):
     # GluonTS models that need frequency
     if any(name in model_name for name in ["DeepAREstimator", "WaveNetEstimator"]):
         if "freq" not in params:
+            # Convert frequency for GluonTS models (ME -> M)
+            def convert_frequency_for_gluonts(freq):
+                """Convert frequency strings for GluonTS compatibility."""
+                if freq == "ME" or freq == "MS":
+                    return "M"  # Month end -> Month
+                elif freq == "QE" or freq == "QS":
+                    return "Q"
+                return freq
             params["freq"] = convert_frequency_for_gluonts(frequency)
 
     # GluonTS models that need context_length
@@ -218,6 +220,14 @@ def create_estimator(model_config, env_vars):
     ):
         if "context_length" not in params:
             params["context_length"] = seasonality * 4
+        
+        # Force CPU usage for GluonTS models on Apple Silicon to avoid MPS compatibility issues
+        # The _standard_gamma operation used by Student's t-distribution is not implemented on MPS
+        if torch.backends.mps.is_available():
+            if "trainer_kwargs" not in params:
+                params["trainer_kwargs"] = {}
+            params["trainer_kwargs"]["accelerator"] = "cpu"
+            print(f"Forcing CPU usage for GluonTS model {model_name} on Apple Silicon to avoid MPS compatibility issues")
 
     # PatchTST specific
     if "PatchTSTEstimator" in model_name and "patch_len" not in params:
@@ -232,23 +242,8 @@ def create_estimator(model_config, env_vars):
         except Exception:
             params["task_type"] = "CPU"
 
-    # Environment variable overrides for debugging
-    # Allow overriding n_epochs via environment variable for debugging
-    print(
-        f"DEBUG: Checking for N_EPOCHS environment variable. Available env vars: {[k for k in os.environ.keys() if 'EPOCH' in k.upper()]}"
-    )
-    
-    # Debug device selection
-    if "accelerator" in params:
-        print(f"DEBUG: Model {model_name} will use accelerator: {params['accelerator']}")
-    if torch.backends.mps.is_available():
-        print(f"DEBUG: Apple Silicon (MPS) is available")
-    if torch.cuda.is_available():
-        print(f"DEBUG: CUDA GPU is available")
-    if "N_EPOCHS" in os.environ:
-        n_epochs = int(os.environ["N_EPOCHS"])
-        print(f"DEBUG: Found N_EPOCHS={n_epochs}")
-
+    # Apply n_epochs override if provided
+    if n_epochs is not None:
         # Handle different parameter names for different model types
         if any(
             name in model_name
@@ -264,7 +259,7 @@ def create_estimator(model_config, env_vars):
                 params["trainer_kwargs"] = {}
             params["trainer_kwargs"]["max_epochs"] = n_epochs
             print(
-                f"Overriding max_epochs to {n_epochs} via environment variable for GluonTS model"
+                f"Overriding max_epochs to {n_epochs} for GluonTS model"
             )
         elif any(
             name in model_name
@@ -280,16 +275,15 @@ def create_estimator(model_config, env_vars):
             # Darts neural models use n_epochs directly
             params["n_epochs"] = n_epochs
             print(
-                f"Overriding n_epochs to {n_epochs} via environment variable for Darts neural model"
+                f"Overriding n_epochs to {n_epochs} for Darts neural model"
             )
         elif model_config["class"] == "NixtlaMain":
-            n_epochs = int(os.environ["N_EPOCHS"])
             # For Nixtla models, use max_steps instead of max_epochs (which is deprecated)
             # Use a very small number of steps for debugging (e.g., 50 steps)
             max_steps = n_epochs * 50
             params["max_steps"] = max_steps
             print(
-                f"Overriding max_steps to {max_steps} via environment variable for Nixtla model"
+                f"Overriding max_steps to {max_steps} for Nixtla model"
             )
         else:
             # Skip n_epochs for models that don't support it (e.g., ARIMA, Prophet, etc.)
@@ -297,14 +291,21 @@ def create_estimator(model_config, env_vars):
 
     return estimator_class(**params)
 
-def run_model(model_name, config_path="models_config.toml", workflow="main", log_path = None):
+def run_model(model_name, test_split, frequency, seasonality, data_path, output_dir, config_path="models_config.toml", workflow="main", log_path=None, n_epochs=None):
     """
     Run a specific model based on its configuration.
 
     Args:
         model_name: Name of the model to run (e.g., 'arima', 'transformer')
+        test_split: Fraction of data to use for testing
+        frequency: Data frequency (e.g., 'D', 'M', 'Q')
+        seasonality: Seasonal period length
+        data_path: Path to the dataset file
+        output_dir: Directory to save outputs
         config_path: Path to the configuration file
         workflow: Which workflow to run ('main', 'train', 'inference', 'evaluate')
+        log_path: Optional path for logging
+        n_epochs: Optional override for number of training epochs (for debugging)
     """
     # Load configuration
     config = load_config(config_path)
@@ -314,17 +315,14 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", log
 
     model_config = config[model_name]
 
-    # Read configuration (dataset config + environment overrides)
-    dataset_config = get_model_config(os.environ)
-    # Unpack for backward compatibility
-    env_vars = dataset_config[
-        :5
-    ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
-    dataset_name = dataset_config[5]
-
     # Nixtla model imports break logging
     # So keeping the create_estimator function here and logging after it
-    estimator = create_estimator(model_config, env_vars)
+    estimator = create_estimator(
+        model_config=model_config,
+        seasonality=seasonality,
+        frequency=frequency,
+        n_epochs=n_epochs
+    )
 
     if log_path is None:
         log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
@@ -332,6 +330,8 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", log
             log_path.mkdir(parents=True, exist_ok=True)
         except:
             pass
+        # Extract dataset name from data_path for logging
+        dataset_name = Path(data_path).stem
         log_path = log_path / (dataset_name + ".log")
     logging.basicConfig(
         filename=log_path,
@@ -341,14 +341,11 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", log
     )
 
     logger = logging.getLogger(f"run_model_{model_name}")
-    logger.info(f"Running {model_name} model. Environment variables read.")
+    logger.info(f"Running {model_name} model with parameters: test_split={test_split}, frequency={frequency}, seasonality={seasonality}, data_path={data_path}, output_dir={output_dir}")
 
     # Handle special models
     model_class = model_config["class"]
 
-    # Enable MPS fallback for better compatibility
-    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-    
     # Additional MPS environment variables for better Apple Silicon support
     if torch.backends.mps.is_available():
         os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.0"
@@ -375,14 +372,14 @@ def run_model(model_name, config_path="models_config.toml", workflow="main", log
         from main import TimesFMForecasting
 
         model_obj = TimesFMForecasting(
-            model_config.get("model_version", "500m"), *env_vars
+            model_config.get("model_version", "500m"), test_split, frequency, seasonality, data_path, output_dir
         )
         model_obj.inference_workflow()
         return
     else:
         raise ValueError(f"Unknown model class: {model_class}")
 
-    model_obj = object_class(estimator, model_name, *env_vars)
+    model_obj = object_class(estimator, model_name, test_split, frequency, seasonality, data_path, output_dir)
 
     # Run the selected workflow
     if workflow == "main":
@@ -422,11 +419,95 @@ def main():
         default="main",
         help="Which workflow to run (default: main)",
     )
+    # Add CLI arguments for all environment variables
+    parser.add_argument(
+        "--dataset-path",
+        help="Path to the dataset file (overrides DATASET_PATH env var, e.g. '../_data/us_treasury_returns/ftsfr_treas_bond_returns.parquet')",
+    )
+    parser.add_argument(
+        "--frequency",
+        help="Data frequency (overrides FREQUENCY env var, e.g. 'D' for daily, 'M' for monthly, 'Q' for quarterly)",
+    )
+    parser.add_argument(
+        "--seasonality",
+        type=int,
+        help="Seasonal period length (overrides SEASONALITY env var, e.g. 7 for weekly, 12 for monthly, 4 for quarterly)",
+    )
+    parser.add_argument(
+        "--test-split",
+        help="Fraction of data for testing (overrides TEST_SPLIT env var, e.g. 0.2 for 20 percent, 'seasonal' for seasonal split)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        help="Output directory (overrides OUTPUT_DIR env var, e.g. '../_output/custom')",
+    )
+    parser.add_argument(
+        "--n-epochs",
+        type=int,
+        help="Number of training epochs (overrides N_EPOCHS env var, e.g. 5 for quick testing)",
+    )
+    # Additional useful CLI arguments
+    parser.add_argument(
+        "--parallel",
+        action="store_true",
+        help="Enable parallel processing (if supported by the model)",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Number of parallel workers (default: 1)",
+    )
 
     args = parser.parse_args()
 
+    # Create a modified environment dictionary with CLI arguments taking priority
+    modified_env = os.environ.copy()
+    
+    # Override environment variables with CLI arguments if provided
+    if args.dataset_path:
+        modified_env["DATASET_PATH"] = args.dataset_path
+    if args.frequency:
+        modified_env["FREQUENCY"] = args.frequency
+    if args.seasonality:
+        modified_env["SEASONALITY"] = str(args.seasonality)
+    if args.test_split:
+        modified_env["TEST_SPLIT"] = args.test_split
+    if args.output_dir:
+        modified_env["OUTPUT_DIR"] = args.output_dir
+    if args.n_epochs:
+        modified_env["N_EPOCHS"] = str(args.n_epochs)
+
+    # Read configuration (dataset config + environment overrides)
+    dataset_config = get_model_config(modified_env)
+    # Unpack for backward compatibility
+    env_vars = dataset_config[
+        :5
+    ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
+    test_split = env_vars[0]
+    frequency = env_vars[1]
+    seasonality = env_vars[2]
+    data_path = env_vars[3]
+    output_dir = env_vars[4]
+
+    # Handle N_EPOCHS environment variable for debugging
+    n_epochs = None
+    if "N_EPOCHS" in modified_env:
+        n_epochs = int(modified_env["N_EPOCHS"])
+        print(f"DEBUG: Found N_EPOCHS={n_epochs}")
+
     # Run the specified model
-    run_model(args.model, args.config, args.workflow)
+    run_model(
+        args.model,
+        test_split,
+        frequency,
+        seasonality,
+        data_path,
+        output_dir,
+        args.config,
+        args.workflow,
+        n_epochs=n_epochs,
+    )
 
 
 if __name__ == "__main__":
