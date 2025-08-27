@@ -13,7 +13,7 @@ import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-# DATA_DIR = DATA_DIR / "wrds_crsp_compustat"
+# DATA_DIR = DATA_DIR / "cds_bond_basis"
 RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
 CORPORATES_MONTHLY_FILE_NAME = "corporate_bond_returns.parquet"
 CDS_FILE_NAME = (

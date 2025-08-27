@@ -37,6 +37,7 @@ def process_cb_spread(df):
             1 if it only contains IG
             2 if it contains both
     """
+    df = df.copy()
     df["FR"] = df["CS"]
     df["CB"] = df["par_spread"] - df["FR"]
     df["rfr"] = df["BOND_YIELD"] - df["CS"] - df["CB"]
