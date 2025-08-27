@@ -50,8 +50,13 @@ class DartsLocal(DartsMain):
 
         DartsLocal_logger.info("DartsLocal super().__init__() complete.")
 
+        # Initialize metric tracking for all three metrics
         self.median_mase = np.nan
+        self.median_mae = np.nan
+        self.median_rmse = np.nan
         self.mase_list = []
+        self.mae_list = []
+        self.rmse_list = []
         self.model_path += ".pkl"
 
         # Store model configuration for workflow separation
@@ -89,13 +94,18 @@ class DartsLocal(DartsMain):
             # Updates internal train and test series
             self.train()
             self.forecast()
-            id_mase = self.calculate_error()
-            DartsLocal_logger.info("MASE: " + str(id_mase) + ".")
+            error_metrics = self.calculate_error()
+            DartsLocal_logger.info(f"MASE: {error_metrics['MASE']}, MAE: {error_metrics['MAE']}, RMSE: {error_metrics['RMSE']}")
             # Resets the model
             self.model = self.model.untrained_model()
 
-            if id_mase is not None:
-                self.mase_list.append(id_mase)
+            # Store all three metrics for this entity
+            if error_metrics["MASE"] is not None and not np.isnan(error_metrics["MASE"]):
+                self.mase_list.append(error_metrics["MASE"])
+            if error_metrics["MAE"] is not None and not np.isnan(error_metrics["MAE"]):
+                self.mae_list.append(error_metrics["MAE"])
+            if error_metrics["RMSE"] is not None and not np.isnan(error_metrics["RMSE"]):
+                self.rmse_list.append(error_metrics["RMSE"])
 
         self.print_sep()
         self.save_forecast()
@@ -103,6 +113,7 @@ class DartsLocal(DartsMain):
         self.train_data = train_data
         self.test_data = test_data
 
+        # Calculate mean and median for all three metrics
         if self.mase_list:
             self.errors["MASE"] = sum(self.mase_list) / len(self.mase_list)
             self.median_mase = statistics.median(self.mase_list)
@@ -110,8 +121,24 @@ class DartsLocal(DartsMain):
             self.errors["MASE"] = 0.0
             self.median_mase = 0.0
 
+        if self.mae_list:
+            self.errors["MAE"] = sum(self.mae_list) / len(self.mae_list)
+            self.median_mae = statistics.median(self.mae_list)
+        else:
+            self.errors["MAE"] = 0.0
+            self.median_mae = 0.0
+
+        if self.rmse_list:
+            self.errors["RMSE"] = sum(self.rmse_list) / len(self.rmse_list)
+            self.median_rmse = statistics.median(self.rmse_list)
+        else:
+            self.errors["RMSE"] = 0.0
+            self.median_rmse = 0.0
+
         DartsLocal_logger.info(
-            f"Mean MASE: {self.errors['MASE']} | " + "Median MASE: {self.median_mase}"
+            f"Mean MASE: {self.errors['MASE']} | Median MASE: {self.median_mase} | "
+            f"Mean MAE: {self.errors['MAE']} | Median MAE: {self.median_mae} | "
+            f"Mean RMSE: {self.errors['RMSE']} | Median RMSE: {self.median_rmse}"
         )
 
     def main_workflow(self):
@@ -127,11 +154,15 @@ class DartsLocal(DartsMain):
                 [
                     ["Model", self.model_name],
                     ["Dataset", self.dataset_name],
-                    ["Entities", len(self.mase_list)],
+                    ["Entities", max(len(self.mase_list), len(self.mae_list), len(self.rmse_list))],
                     ["Frequency", self.frequency],
                     ["Seasonality", self.seasonality],
-                    ["Median MASE", self.median_mase],
                     ["Mean MASE", self.errors["MASE"]],
+                    ["Median MASE", self.median_mase],
+                    ["Mean MAE", self.errors["MAE"]],
+                    ["Median MAE", self.median_mae],
+                    ["Mean RMSE", self.errors["RMSE"]],
+                    ["Median RMSE", self.median_rmse],
                 ],
                 tablefmt="fancy_grid",
             )
@@ -143,10 +174,14 @@ class DartsLocal(DartsMain):
             {
                 "Model": [self.model_name],
                 "Dataset": [self.dataset_name],
-                "Entities": [len(self.mase_list)],
+                "Entities": [max(len(self.mase_list), len(self.mae_list), len(self.rmse_list))],
                 "Seasonality": [self.seasonality],
-                "Median_MASE": [self.median_mase],
                 "Mean_MASE": [self.errors["MASE"]],
+                "Median_MASE": [self.median_mase],
+                "Mean_MAE": [self.errors["MAE"]],
+                "Median_MAE": [self.median_mae],
+                "Mean_RMSE": [self.errors["RMSE"]],
+                "Median_RMSE": [self.median_rmse],
             }
         )
 

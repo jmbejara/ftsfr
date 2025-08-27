@@ -13,13 +13,15 @@ import logging
 # Conditional imports to avoid dependency issues
 try:
     from darts import TimeSeries
-    from darts.metrics import mase
+    from darts.metrics import mase, mae, rmse
 
     DARTS_AVAILABLE = True
 except ImportError:
     DARTS_AVAILABLE = False
     TimeSeries = None
     mase = None
+    mae = None
+    rmse = None
 
 MIN_SERIES_LEN = 30
 
@@ -81,6 +83,102 @@ def calculate_darts_MASE(
 
     except Exception as e:
         hf_logger.error(f"Error in MASE calculation: {e}")
+        raise e
+
+
+def calculate_darts_MAE(test_data, pred_data, value_column="y"):
+    """
+    Calculates MAE using darts by converting from Nixtla format.
+    """
+    if not DARTS_AVAILABLE:
+        raise ImportError(
+            "darts is required for MAE calculation but not available in this environment"
+        )
+
+    hf_logger = logging.getLogger("hf.calculate_darts_MAE")
+
+    try:
+        test_data = (
+            test_data.pivot(index="ds", columns="unique_id", values="y")
+            .rename_axis(None, axis=1)
+        )
+        pred_data = (
+            pred_data.pivot(index="ds", columns="unique_id", values=value_column)
+            .rename_axis(None, axis=1)
+        )
+
+        hf_logger.info(
+            "Converted test and pred series into darts TimeSeries compatible format."
+        )
+
+        # Try to convert to TimeSeries with frequency inference
+        try:
+            test_data = TimeSeries.from_dataframe(test_data)
+            pred_data = TimeSeries.from_dataframe(pred_data)
+        except ValueError:
+            # Fallback to simple conversion without frequency inference
+            hf_logger.warning("Frequency inference failed, using simple conversion")
+            test_data = TimeSeries.from_dataframe(
+                test_data, time_col="ds", fill_missing_dates=False
+            )
+            pred_data = TimeSeries.from_dataframe(
+                pred_data, time_col="ds", fill_missing_dates=False
+            )
+
+        hf_logger.info("Converted series into TimeSeries objects.")
+
+        return mae(test_data, pred_data)
+
+    except Exception as e:
+        hf_logger.error(f"Error in MAE calculation: {e}")
+        raise e
+
+
+def calculate_darts_RMSE(test_data, pred_data, value_column="y"):
+    """
+    Calculates RMSE using darts by converting from Nixtla format.
+    """
+    if not DARTS_AVAILABLE:
+        raise ImportError(
+            "darts is required for RMSE calculation but not available in this environment"
+        )
+
+    hf_logger = logging.getLogger("hf.calculate_darts_RMSE")
+
+    try:
+        test_data = (
+            test_data.pivot(index="ds", columns="unique_id", values="y")
+            .rename_axis(None, axis=1)
+        )
+        pred_data = (
+            pred_data.pivot(index="ds", columns="unique_id", values=value_column)
+            .rename_axis(None, axis=1)
+        )
+
+        hf_logger.info(
+            "Converted test and pred series into darts TimeSeries compatible format."
+        )
+
+        # Try to convert to TimeSeries with frequency inference
+        try:
+            test_data = TimeSeries.from_dataframe(test_data)
+            pred_data = TimeSeries.from_dataframe(pred_data)
+        except ValueError:
+            # Fallback to simple conversion without frequency inference
+            hf_logger.warning("Frequency inference failed, using simple conversion")
+            test_data = TimeSeries.from_dataframe(
+                test_data, time_col="ds", fill_missing_dates=False
+            )
+            pred_data = TimeSeries.from_dataframe(
+                pred_data, time_col="ds", fill_missing_dates=False
+            )
+
+        hf_logger.info("Converted series into TimeSeries objects.")
+
+        return rmse(test_data, pred_data)
+
+    except Exception as e:
+        hf_logger.error(f"Error in RMSE calculation: {e}")
         raise e
 
 def extend_df(df, train_data_len, frequency, seasonality, interpolate=True):

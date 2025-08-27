@@ -4,11 +4,12 @@
 
 # Local Darts Models (univariate, per-series training)
 
-[arima]
-class = "DartsLocal"
-estimator_class = "darts.models.ARIMA"
-display_name = "ARIMA"
-estimator_params = { p = 1, d = 1, q = 1 }
+# AutoARIMA is good enough
+# [arima]
+# class = "DartsLocal"
+# estimator_class = "darts.models.ARIMA"
+# display_name = "ARIMA"
+# estimator_params = { p = 1, d = 1, q = 1 }
 
 [auto_arima]
 class = "DartsLocal"

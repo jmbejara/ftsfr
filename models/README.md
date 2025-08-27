@@ -82,7 +82,7 @@ export DATASET_PATH="../_data/us_treasury_returns/ftsfr_treas_bond_returns.parqu
 python run_model.py --model arima
 
 # Check results
-ls -la ../_output/raw_results/arima/
+ls -la ../_output/forecasting/error_metrics/arima/
 
 ## CLI Arguments vs Environment Variables
 
@@ -263,10 +263,13 @@ python model_controller.py --models transformer nbeats dlinear --workflow evalua
 watch -n 1 nvidia-smi
 
 # Check output structure
-tree ../_output/
+tree ../_output/forecasting/
 
-# View results
-cat ../_output/raw_results/arima/*.csv
+# View error metrics results
+cat ../_output/forecasting/error_metrics/arima/*.csv
+
+# View logs
+tail -f ../_output/forecasting/logging/arima/*.log
 ```
 
 ## Debugging and Development
@@ -392,13 +395,72 @@ ls -la ../_data/*/ftsfr_*.parquet
 ```
 
 ### Output Structure
+
+All model outputs are organized under `{OUTPUT_DIR}/forecasting/` with a structured hierarchy:
+
 ```
-_output/
-├── models/          # Trained models
-├── forecasts/       # Predictions
-├── raw_results/     # MASE scores
-└── model_logs/      # Execution logs
+{OUTPUT_DIR}/
+└── forecasting/
+    ├── logging/
+    │   └── {model_name}/
+    │       └── {dataset_name}.log                    # Training and execution logs
+    ├── error_metrics/
+    │   └── {model_name}/
+    │       └── {dataset_name}.csv                    # MASE, MAE, RMSE metrics
+    ├── model_checkpoints/
+    │   └── {model_name}/
+    │       └── {dataset_name}/                       # Trained model files
+    │           ├── saved_model (for Darts models)
+    │           ├── *.ckpt (for neural models)
+    │           └── *.json (for GluonTS models)
+    └── forecasts/
+        └── {model_name}/
+            └── {dataset_name}/
+                └── forecasts.parquet                 # One-step-ahead predictions
 ```
+
+Where:
+- `{model_name}`: Model identifier (e.g., `arima`, `transformer`, `deepar`)
+- `{dataset_name}`: Dataset name with `ftsfr_` prefix removed (e.g., `treas_bond_returns`)
+- `{OUTPUT_DIR}`: Controlled by `--output-dir` CLI argument or `OUTPUT_DIR` environment variable (default: `../_output`)
+
+#### Error Metrics CSV Format
+
+The error metrics CSV contains comprehensive evaluation results:
+
+**For Local Models (DartsLocal):**
+```csv
+Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+arima,treas_bond_returns,156,12,1.234,1.156,0.045,0.041,0.067,0.062
+```
+
+**For Global Models (DartsGlobal, GluontsMain, NixtlaMain):**
+```csv
+Model,Dataset,Entities,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+transformer,treas_bond_returns,156,12,1.089,0.038,0.059
+```
+
+#### Controlling Output Location
+
+```bash
+# Use default output directory (../_output)
+python run_model.py --model arima
+
+# Use custom output directory
+python run_model.py --model arima --output-dir "/path/to/custom/output"
+
+# Set via environment variable
+export OUTPUT_DIR="/path/to/output"
+python run_model.py --model arima
+```
+
+#### Error Metrics Explained
+
+- **MASE (Mean Absolute Scaled Error)**: Primary metric, scales errors relative to seasonal naïve forecast
+- **MAE (Mean Absolute Error)**: Average absolute difference between predictions and actual values  
+- **RMSE (Root Mean Squared Error)**: Square root of average squared errors, penalizes large errors more heavily
+
+All three metrics are calculated and saved for every forecasting run, regardless of model type.
 
 ## Adding New Models
 

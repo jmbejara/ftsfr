@@ -7,6 +7,28 @@ This replaces the need for individual main.py files in each model directory.
 Usage:
     python run_model.py --model arima
     python run_model.py --model transformer --config custom_config.toml
+
+Output Structure:
+    All outputs are saved under {OUTPUT_DIR}/forecasting/ with the following structure:
+    
+    {OUTPUT_DIR}/
+    └── forecasting/
+        ├── logging/{model_name}/{dataset_name}.log       # Training and execution logs
+        ├── error_metrics/{model_name}/{dataset_name}.csv # MASE, MAE, RMSE metrics
+        ├── model_checkpoints/{model_name}/{dataset_name}/ # Trained model files
+        └── forecasts/{model_name}/{dataset_name}/         # Prediction results
+            └── forecasts.parquet
+
+    Where:
+    - {model_name}: The name of the forecasting model (e.g., 'arima', 'transformer')
+    - {dataset_name}: The dataset name without 'ftsfr_' prefix (e.g., 'treas_bond_returns')
+    - OUTPUT_DIR: Controlled by --output-dir CLI argument or OUTPUT_DIR environment variable
+
+Error Metrics:
+    - MASE: Mean Absolute Scaled Error (primary metric)
+    - MAE: Mean Absolute Error  
+    - RMSE: Root Mean Squared Error
+    All three metrics are calculated and saved for every forecasting run.
 """
 
 import os
@@ -305,6 +327,19 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
         workflow: Which workflow to run ('main', 'train', 'inference', 'evaluate')
         log_path: Optional path for logging
         n_epochs: Optional override for number of training epochs (for debugging)
+
+    Output Locations:
+        For a model 'arima' run on 'ftsfr_treas_bond_returns.parquet' with output_dir='../_output':
+        
+        Logs: ../_output/forecasting/logging/arima/treas_bond_returns.log
+        Error Metrics: ../_output/forecasting/error_metrics/arima/treas_bond_returns.csv
+        Model Files: ../_output/forecasting/model_checkpoints/arima/treas_bond_returns/
+        Forecasts: ../_output/forecasting/forecasts/arima/treas_bond_returns/forecasts.parquet
+
+    Error Metrics CSV Format:
+        Columns: Model, Dataset, Entities, Seasonality, [Global_]MASE, [Global_]MAE, [Global_]RMSE
+        - For local models (DartsLocal): Also includes Median_MASE, Median_MAE, Median_RMSE
+        - For global models: Uses Global_ prefix for metrics
     """
     # Load configuration
     config = load_config(config_path)
@@ -325,14 +360,14 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
 
     if log_path is None:
         # If run_model.py is called instead of through some other file
-        # This section sets up writing the logs to a file in run_model_runs
-        log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
+        # Use the new forecasting logging directory structure
+        log_path = Path(output_dir) / "forecasting" / "logging" / model_name
         try:
             log_path.mkdir(parents=True, exist_ok=True)
         except:
             pass
         # Extract dataset name from data_path for logging
-        dataset_name = Path(data_path).stem
+        dataset_name = Path(data_path).stem.removeprefix("ftsfr_")
         log_path = log_path / (dataset_name + ".log")
         logging.basicConfig(
             filename=log_path,
@@ -348,6 +383,8 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
             log_path.mkdir(parents=True, exist_ok=True)
         except:
             pass
+        # Extract dataset name from data_path for logging  
+        dataset_name = Path(data_path).stem.removeprefix("ftsfr_")
         log_path = log_path / (dataset_name + ".log")
         f = logging.Formatter("%(asctime)s - %(name)-12s - %(levelname)s - %(message)s")
         logging.getLogger().setLevel(logging.DEBUG)

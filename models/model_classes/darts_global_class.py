@@ -93,6 +93,8 @@ class DartsGlobal(DartsMain):
                     ["Frequency", self.frequency],
                     ["Seasonality", self.seasonality],
                     ["Global MASE", self.errors["MASE"]],
+                    ["Global MAE", self.errors["MAE"]],
+                    ["Global RMSE", self.errors["RMSE"]],
                 ],
                 tablefmt="fancy_grid",
             )
@@ -105,7 +107,9 @@ class DartsGlobal(DartsMain):
                 "Model": [self.model_name],
                 "Dataset": [self.dataset_name],
                 "Entities": [self.train_data.n_components],
-                "Global MASE": [self.errors["MASE"]],
+                "Global_MASE": [self.errors["MASE"]],
+                "Global_MAE": [self.errors["MAE"]],
+                "Global_RMSE": [self.errors["RMSE"]],
             }
         )
 

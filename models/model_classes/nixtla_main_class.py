@@ -36,16 +36,16 @@ class NixtlaMain(forecasting_model):
         dataset_name = str(os.path.basename(data_path)).split(".")[0]
         dataset_name = dataset_name.removeprefix("ftsfr_")
 
-        # Path to save model once trained
-        model_path = output_path / "models" / model_name / dataset_name
+        # Path to save model checkpoints
+        model_path = output_path / "forecasting" / "model_checkpoints" / model_name / dataset_name
         Path(model_path).mkdir(parents=True, exist_ok=True)
 
         NixtlaMain_logger.info(
-            "Created model path and its folders that were missing."
+            "Created model checkpoint path and its folders that were missing."
         )
 
         # Path to save forecasts generated after training the model
-        forecast_path = output_path / "forecasts" / model_name / dataset_name
+        forecast_path = output_path / "forecasting" / "forecasts" / model_name / dataset_name
         Path(forecast_path).mkdir(parents=True, exist_ok=True)
         forecast_path = forecast_path / "forecasts.parquet"
 
@@ -53,13 +53,13 @@ class NixtlaMain(forecasting_model):
             "Created forecast_path and its folders that were missing."
         )
 
-        # Path to save results which include the error metric
-        result_path = output_path / "raw_results" / model_name
+        # Path to save error metrics
+        result_path = output_path / "forecasting" / "error_metrics" / model_name
         result_path.mkdir(parents=True, exist_ok=True)
         result_path = result_path / str(dataset_name + ".csv")
 
         NixtlaMain_logger.info(
-            "Created result_path and its folders that were missing."
+            "Created error metrics path and its folders that were missing."
         )
 
         # Data pre-processing
@@ -207,23 +207,47 @@ class NixtlaMain(forecasting_model):
             'Loaded forecasts from "' + str(self.forecast_path) + '".'
         )
 
-    def calculate_error(self, metric="MASE"):
-        if metric == "MASE":
-            try:
-                self.errors["MASE"] = calculate_darts_MASE(
-                    self.test_data,
-                    self.train_data,
-                    self.pred_data,
-                    self.seasonality,
-                )
-                NixtlaMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
-                return self.errors["MASE"]
-            except (ImportError, ValueError, TypeError) as e:
-                NixtlaMain_logger.warning(f"⚠ Cannot calculate MASE: {e}")
-                self.errors["MASE"] = float("nan")
-                return self.errors["MASE"]
-        else:
-            raise ValueError("Metric not supported.")
+    def calculate_error(self):
+        """Calculate all error metrics (MASE, MAE, RMSE) for the forecasting results.
+        
+        Returns:
+            dict: Dictionary containing all calculated error metrics
+        """
+        # Calculate MASE
+        try:
+            self.errors["MASE"] = calculate_darts_MASE(
+                self.test_data,
+                self.train_data,
+                self.pred_data,
+                self.seasonality,
+            )
+            NixtlaMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
+        except (ImportError, ValueError, TypeError) as e:
+            NixtlaMain_logger.warning(f"⚠ Cannot calculate MASE: {e}")
+            self.errors["MASE"] = 0.0
+
+        # Calculate MAE and RMSE using the Darts conversion helper
+        try:
+            from .helper_func import calculate_darts_MAE, calculate_darts_RMSE
+            
+            self.errors["MAE"] = calculate_darts_MAE(
+                self.test_data,
+                self.pred_data,
+            )
+            NixtlaMain_logger.info("MAE: " + str(self.errors["MAE"]) + ".")
+            
+            self.errors["RMSE"] = calculate_darts_RMSE(
+                self.test_data,
+                self.pred_data,
+            )
+            NixtlaMain_logger.info("RMSE: " + str(self.errors["RMSE"]) + ".")
+            
+        except (ImportError, ValueError, TypeError) as e:
+            NixtlaMain_logger.warning(f"⚠ Cannot calculate MAE/RMSE: {e}")
+            self.errors["MAE"] = 0.0
+            self.errors["RMSE"] = 0.0
+
+        return self.errors
 
     def print_summary(self):
         print(
@@ -235,6 +259,8 @@ class NixtlaMain(forecasting_model):
                     ["Frequency", self.frequency],
                     ["Seasonality", self.seasonality],
                     ["Global MASE", self.errors["MASE"]],
+                    ["Global MAE", self.errors["MAE"]],
+                    ["Global RMSE", self.errors["RMSE"]],
                 ],
                 tablefmt="fancy_grid",
             )
@@ -249,7 +275,9 @@ class NixtlaMain(forecasting_model):
                 "Entities": [len(self.train_data["unique_id"].unique())],
                 "Frequency": [self.frequency],
                 "Seasonality": [self.seasonality],
-                "Global MASE": [self.errors["MASE"]],
+                "Global_MASE": [self.errors["MASE"]],
+                "Global_MAE": [self.errors["MAE"]],
+                "Global_RMSE": [self.errors["RMSE"]],
             }
         )
         forecast_res.to_csv(self.result_path)

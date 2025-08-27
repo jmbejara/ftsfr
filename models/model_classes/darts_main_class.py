@@ -81,17 +81,17 @@ class DartsMain(forecasting_model):
 
         DartsMain_logger.info("Made TimeSeries objects for train and test.")
 
-        # Path to save model once trained
-        model_path = output_path / "models" / model_name / dataset_name
+        # Path to save model checkpoints
+        model_path = output_path / "forecasting" / "model_checkpoints" / model_name / dataset_name
         Path(model_path).mkdir(parents=True, exist_ok=True)
         model_path = model_path / "saved_model"  # Without an extension
 
         DartsMain_logger.info(
-            "Created model path and required folders that weren't present."
+            "Created model checkpoint path and required folders that weren't present."
         )
 
         # Path to save forecasts generated after training the model
-        forecast_path = output_path / "forecasts" / model_name / dataset_name
+        forecast_path = output_path / "forecasting" / "forecasts" / model_name / dataset_name
         Path(forecast_path).mkdir(parents=True, exist_ok=True)
         forecast_path = forecast_path / "forecasts.parquet"
 
@@ -99,13 +99,13 @@ class DartsMain(forecasting_model):
             "Created forecast path and required folders that weren't present."
         )
 
-        # Path to save results which include the error metric
-        result_path = output_path / "raw_results" / model_name
+        # Path to save error metrics
+        result_path = output_path / "forecasting" / "error_metrics" / model_name
         result_path.mkdir(parents=True, exist_ok=True)
         result_path = result_path / str(dataset_name + ".csv")
 
         DartsMain_logger.info(
-            "Created result path and required folders that weren't present."
+            "Created error metrics path and required folders that weren't present."
         )
 
         # Names
@@ -223,7 +223,12 @@ class DartsMain(forecasting_model):
             + ". Internal variable updated."
         )
 
-    def calculate_error(self, metric="MASE"):
+    def calculate_error(self):
+        """Calculate all error metrics (MASE, MAE, RMSE) for the forecasting results.
+        
+        Returns:
+            dict: Dictionary containing all calculated error metrics
+        """
         if self.pred_data is None:
             DartsMain_logger.error("calculate_error called without predictions.")
             raise ValueError("Please call self.forecast() first.")
@@ -238,57 +243,64 @@ class DartsMain(forecasting_model):
         DartsMain_logger.info(f"test_data shape: {self.test_data.shape}")
         DartsMain_logger.info(f"pred_data shape: {self.pred_data.shape}")
 
-        if metric == "MASE":
-            from darts.metrics import mase
+        from darts.metrics import mase, mae, rmse
 
-            try:
-                # For MASE, the insample series needs to:
-                # 1. Start before pred_data
-                # 2. Extend until at least one time step before pred_data starts
+        # Calculate MASE
+        try:
+            # For MASE, the insample series needs to:
+            # 1. Start before pred_data
+            # 2. Extend until at least one time step before pred_data starts
 
-                # Print debug info
-                print(
-                    f"DEBUG: train_data range: {self.train_data.start_time()} to {self.train_data.end_time()}"
+            # Print debug info
+            print(
+                f"DEBUG: train_data range: {self.train_data.start_time()} to {self.train_data.end_time()}"
+            )
+            print(
+                f"DEBUG: test_data range: {self.test_data.start_time()} to {self.test_data.end_time()}"
+            )
+            print(
+                f"DEBUG: pred_data range: {self.pred_data.start_time()} to {self.pred_data.end_time()}"
+            )
+
+            mase_value = mase(
+                self.test_data,
+                self.pred_data,
+                self.train_data,
+                self.seasonality,
+            )
+
+            if mase_value == np.nan:
+                mase_value = 0.0
+
+            self.errors["MASE"] = mase_value
+            DartsMain_logger.info("MASE = " + str(mase_value) + ".")
+
+        except ValueError as e:
+            if "cannot use MASE with periodical signals" in str(e):
+                DartsMain_logger.warning(
+                    "MASE failed due to periodical signals, setting to 0.0"
                 )
-                print(
-                    f"DEBUG: test_data range: {self.test_data.start_time()} to {self.test_data.end_time()}"
-                )
-                print(
-                    f"DEBUG: pred_data range: {self.pred_data.start_time()} to {self.pred_data.end_time()}"
-                )
+                self.errors["MASE"] = 0.0
+            else:
+                DartsMain_logger.error(f"MASE calculation failed: {e}")
+                self.errors["MASE"] = 0.0
 
-                temp = mase(
-                    self.test_data,
-                    self.pred_data,
-                    self.train_data,
-                    self.seasonality,
-                )
+        # Calculate MAE (always calculated)
+        try:
+            mae_value = mae(self.test_data, self.pred_data)
+            self.errors["MAE"] = mae_value
+            DartsMain_logger.info("MAE = " + str(mae_value) + ".")
+        except Exception as e:
+            DartsMain_logger.error(f"MAE calculation failed: {e}")
+            self.errors["MAE"] = 0.0
 
-                if temp == np.nan:
-                    temp = 0.0
+        # Calculate RMSE
+        try:
+            rmse_value = rmse(self.test_data, self.pred_data)
+            self.errors["RMSE"] = rmse_value
+            DartsMain_logger.info("RMSE = " + str(rmse_value) + ".")
+        except Exception as e:
+            DartsMain_logger.error(f"RMSE calculation failed: {e}")
+            self.errors["RMSE"] = 0.0
 
-                self.errors["MASE"] = temp
-
-                DartsMain_logger.info("MASE = " + str(temp) + ".")
-                return self.errors["MASE"]
-            except ValueError as e:
-                if "cannot use MASE with periodical signals" in str(e):
-                    DartsMain_logger.warning(
-                        "MASE failed due to periodical signals, falling back to MAE"
-                    )
-                    from darts.metrics import mae
-
-                    self.errors["MAE"] = mae(self.test_data, self.pred_data)
-                    DartsMain_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
-                    return self.errors["MAE"]
-                else:
-                    raise e
-        elif metric == "MAE":
-            from darts.metrics import mae
-
-            self.errors["MAE"] = mae(self.test_data, self.pred_data)
-            DartsMain_logger.info("MAE = " + str(self.errors["MAE"]) + ".")
-            return self.errors["MAE"]
-        else:
-            DartsMain_logger.error("calculate_error called for an unsupported metric.")
-            raise ValueError("Metric not supported.")
+        return self.errors
