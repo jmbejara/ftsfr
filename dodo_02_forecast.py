@@ -6,13 +6,10 @@ This file contains all tasks related to:
 - Checking for required data files before running
 """
 
-from doit.action import CmdAction
-
 # Import common utilities
 from dodo_common import (
     DATA_DIR,
     OUTPUT_DIR,
-    PIXI_EXECUTABLE,
     load_subscriptions,
     load_all_module_requirements,
 )
@@ -20,8 +17,6 @@ from dependency_tracker import get_available_datasets
 
 # Load configuration
 subscriptions_toml = load_subscriptions()
-models = subscriptions_toml["models"]
-models_activated = [model for model in models if models[model]]
 
 # Load module requirements to determine available datasets
 module_requirements_dict = load_all_module_requirements()
@@ -50,41 +45,28 @@ def check_required_files():
         print("Continuing anyway...\n")
 
 
-def task_forecast():
-    """Generate forecast tasks for each combination of model and dataset."""
+def task_determine_available_datasets():
+    """Determine available datasets"""
+    return {
+        "actions": ["python models/determine_available_datasets.py"],
+        "file_dep": [
+            "./models/determine_available_datasets.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "available_datasets.csv",
+        ],
+    }
 
-    # Check for required files at task generation time
-    check_required_files()
 
-    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
-
-    for model in models_activated:
-        for dataset_name, dataset_info in available_datasets.items():
-            # Skip if the dataset file doesn't exist
-            if not dataset_info["path"].exists():
-                continue
-
-            yield {
-                "name": f"{model}:{dataset_name}",
-                "actions": [
-                    CmdAction(
-                        f"{PIXI_EXECUTABLE} run main",
-                        cwd=f"./models/{model}",
-                        env={
-                            "DATASET_PATH": str(dataset_info["path"]),
-                            "FREQUENCY": dataset_info["frequency"],
-                            "SEASONALITY": str(dataset_info["seasonality"]),
-                            "OUTPUT_DIR": str(OUTPUT_DIR),
-                        },
-                    )
-                ],
-                "targets": [
-                    OUTPUT_DIR / "raw_results" / f"{model}_{dataset_name}_results.csv"
-                ],
-                "file_dep": [
-                    f"./models/{model}/main.py",
-                    f"./models/{model}/pixi.toml",
-                ],
-                "clean": [],
-                "verbosity": 0,
-            }
+def task_determine_cutoff_dates():
+    """Determine cutoff dates for each dataset"""
+    return {
+        "actions": ["python models/cutoff_calc.py"],
+        "file_dep": [
+            "./models/cutoff_calc.py",
+            OUTPUT_DIR / "available_datasets.csv",
+        ],
+        "targets": [
+            OUTPUT_DIR / "cutoff_dates.parquet",
+        ],
+    }

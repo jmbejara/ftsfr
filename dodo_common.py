@@ -6,7 +6,7 @@ import sys
 import os
 from pathlib import Path
 import shutil
-import toml
+import tomli
 
 sys.path.insert(1, str((Path(__file__).parent / "src").resolve()))
 
@@ -260,8 +260,8 @@ def notebook_subtask(task_config):
 
 # Load configuration from subscriptions.toml
 def load_subscriptions():
-    with open("subscriptions.toml", "r") as f:
-        return toml.load(f)
+    with open("subscriptions.toml", "rb") as f:
+        return tomli.load(f)
 
 
 # Load module requirements from datasets.toml

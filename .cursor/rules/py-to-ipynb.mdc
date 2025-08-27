@@ -36,7 +36,7 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates # For date formatting on plot
 
-from chartbase.settings import config
+from settings import config
 import pull_nccbr
 from clean_deduplicate_by_reporter import (
     get_covered_leis_from_data,

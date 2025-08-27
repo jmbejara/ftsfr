@@ -18,3 +18,7 @@ fastparquet
 tabulate
 scikit-learn
 tomli
+# Other
+doit
+python-decouple
+polars

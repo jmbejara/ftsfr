@@ -6,7 +6,7 @@ Reads dependency information from datasets.toml to determine which
 data sources are required for each data module.
 """
 
-import toml
+import tomli
 from pathlib import Path
 
 
@@ -16,8 +16,8 @@ def load_module_requirements(datasets_toml_path="datasets.toml"):
 
     Returns a dictionary mapping data module names to their required data sources.
     """
-    with open(datasets_toml_path, "r") as f:
-        datasets_config = toml.load(f)
+    with open(datasets_toml_path, "rb") as f:
+        datasets_config = tomli.load(f)
 
     module_requirements = {}
 
@@ -92,8 +92,8 @@ def get_available_datasets(
         - is_balanced: Whether the dataset is balanced
         - description: Dataset description
     """
-    with open(datasets_toml_path, "r") as f:
-        datasets_config = toml.load(f)
+    with open(datasets_toml_path, "rb") as f:
+        datasets_config = tomli.load(f)
 
     available_datasets = {}
 
