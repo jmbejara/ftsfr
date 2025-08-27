@@ -17,6 +17,14 @@ from dependency_tracker import get_available_datasets
 import tomli
 from pathlib import Path
 
+def debug_action(cmd):
+    """Action function that prints command before executing"""
+    import subprocess
+    print(f"\n🔍 DEBUG: About to execute: {cmd}")
+    print("=" * 60)
+    result = subprocess.run(cmd, shell=True)
+    return result.returncode == 0
+
 # Load configuration
 subscriptions_toml = load_subscriptions()
 
@@ -56,7 +64,7 @@ def check_required_files():
 def task_determine_available_datasets():
     """Determine available datasets"""
     return {
-        "actions": ["python models/determine_available_datasets.py"],
+        "actions": [(debug_action, ["python models/determine_available_datasets.py"])],
         "file_dep": [
             "./models/determine_available_datasets.py",
         ],
@@ -69,7 +77,7 @@ def task_determine_available_datasets():
 def task_determine_cutoff_dates():
     """Determine cutoff dates for each dataset"""
     return {
-        "actions": ["python models/cutoff_calc.py"],
+        "actions": [(debug_action, ["python models/cutoff_calc.py"])],
         "file_dep": [
             "./models/cutoff_calc.py",
             OUTPUT_DIR / "available_datasets.csv",
@@ -105,7 +113,7 @@ def task_forecast_darts_local():
                 yield {
                     "name": f"{model_name}:{clean_dataset_name}",
                     "actions": [
-                        f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
+                        (debug_action, [f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"])
                     ],
                     "file_dep": [
                         "models/run_model.py",
@@ -146,7 +154,7 @@ def task_forecast_darts_global():
                 yield {
                     "name": f"{model_name}:{clean_dataset_name}",
                     "actions": [
-                        f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
+                        (debug_action, [f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"])
                     ],
                     "file_dep": [
                         "models/run_model.py",
@@ -187,7 +195,7 @@ def task_forecast_nixtla():
                 yield {
                     "name": f"{model_name}:{clean_dataset_name}",
                     "actions": [
-                        f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
+                        (debug_action, [f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"])
                     ],
                     "file_dep": [
                         "models/run_model.py",
@@ -228,7 +236,7 @@ def task_forecast_gluonts():
                 yield {
                     "name": f"{model_name}:{clean_dataset_name}",
                     "actions": [
-                        f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
+                        (debug_action, [f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"])
                     ],
                     "file_dep": [
                         "models/run_model.py",
@@ -269,7 +277,7 @@ def task_forecast_timesfm():
                 yield {
                     "name": f"{model_name}:{clean_dataset_name}",
                     "actions": [
-                        f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
+                        (debug_action, [f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"])
                     ],
                     "file_dep": [
                         "models/run_model.py",
