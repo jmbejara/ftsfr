@@ -20,9 +20,51 @@ from pathlib import Path
 def debug_action(cmd):
     """Action function that prints command before executing"""
     import subprocess
+    import time
+    import re
+    import pandas as pd
     print(f"\n🔍 DEBUG: About to execute: {cmd}")
     print("=" * 60)
+    
+    # Start timing
+    start_time = time.time()
     result = subprocess.run(cmd, shell=True)
+    end_time = time.time()
+    wall_time_seconds = end_time - start_time
+    
+    # Extract model name and dataset path from command for timing CSV
+    if result.returncode == 0 and "python models/run_model.py" in cmd:
+        try:
+            # Parse command to extract model name and dataset path
+            match = re.search(r'--model (\w+)', cmd)
+            model_name = match.group(1) if match else "unknown"
+            
+            match = re.search(r'--dataset-path ([^\s]+)', cmd)
+            dataset_path = match.group(1) if match else "unknown"
+            
+            # Extract dataset name from path (remove ftsfr_ prefix and file extension)
+            dataset_name = Path(dataset_path).stem.replace("ftsfr_", "")
+            
+            # Create timing directory and file
+            timing_dir = OUTPUT_DIR / "forecasting" / "timing" / model_name
+            timing_dir.mkdir(parents=True, exist_ok=True)
+            timing_file = timing_dir / f"{dataset_name}_timing.csv"
+            
+            # Create timing data
+            timing_data = pd.DataFrame({
+                "Model": [model_name],
+                "Dataset": [dataset_name],
+                "Wall_Time_Seconds": [wall_time_seconds]
+            })
+            
+            # Save timing CSV
+            timing_data.to_csv(timing_file, index=False)
+            print(f"⏱️  Execution time: {wall_time_seconds:.2f} seconds")
+            print(f"📊 Timing saved to: {timing_file}")
+            
+        except Exception as e:
+            print(f"⚠️  Warning: Could not save timing data: {e}")
+    
     return result.returncode == 0
 
 # Load configuration
@@ -124,6 +166,7 @@ def task_forecast_darts_local():
                     "targets": [
                         OUTPUT_DIR / "forecasting" / "error_metrics" / model_name / f"{clean_dataset_name}.csv",
                         OUTPUT_DIR / "forecasting" / "forecasts" / model_name / clean_dataset_name / "forecasts.parquet",
+                        OUTPUT_DIR / "forecasting" / "timing" / model_name / f"{clean_dataset_name}_timing.csv",
                     ],
                     "clean": True,
                 }
@@ -165,6 +208,7 @@ def task_forecast_darts_global():
                     "targets": [
                         OUTPUT_DIR / "forecasting" / "error_metrics" / model_name / f"{clean_dataset_name}.csv",
                         OUTPUT_DIR / "forecasting" / "forecasts" / model_name / clean_dataset_name / "forecasts.parquet",
+                        OUTPUT_DIR / "forecasting" / "timing" / model_name / f"{clean_dataset_name}_timing.csv",
                     ],
                     "clean": True,
                 }
@@ -206,6 +250,7 @@ def task_forecast_nixtla():
                     "targets": [
                         OUTPUT_DIR / "forecasting" / "error_metrics" / model_name / f"{clean_dataset_name}.csv",
                         OUTPUT_DIR / "forecasting" / "forecasts" / model_name / clean_dataset_name / "forecasts.parquet",
+                        OUTPUT_DIR / "forecasting" / "timing" / model_name / f"{clean_dataset_name}_timing.csv",
                     ],
                     "clean": True,
                 }
@@ -247,6 +292,7 @@ def task_forecast_gluonts():
                     "targets": [
                         OUTPUT_DIR / "forecasting" / "error_metrics" / model_name / f"{clean_dataset_name}.csv",
                         OUTPUT_DIR / "forecasting" / "forecasts" / model_name / clean_dataset_name / "forecasts.parquet",
+                        OUTPUT_DIR / "forecasting" / "timing" / model_name / f"{clean_dataset_name}_timing.csv",
                     ],
                     "clean": True,
                 }
@@ -288,6 +334,7 @@ def task_forecast_timesfm():
                     "targets": [
                         OUTPUT_DIR / "forecasting" / "error_metrics" / model_name / f"{clean_dataset_name}.csv",
                         OUTPUT_DIR / "forecasting" / "forecasts" / model_name / clean_dataset_name / "forecasts.parquet",
+                        OUTPUT_DIR / "forecasting" / "timing" / model_name / f"{clean_dataset_name}_timing.csv",
                     ],
                     "clean": True,
                 }
