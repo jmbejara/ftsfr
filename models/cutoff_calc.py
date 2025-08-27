@@ -34,6 +34,151 @@ def load_available_datasets(output_dir):
     return pd.read_csv(csv_path)
 
 
+def convert_to_expected_format(df, dataset_path):
+    """
+    Convert a DataFrame to the format expected by process_df.
+    
+    Expected format: DataFrame with columns ['ds', 'y', 'unique_id']
+    where 'ds' is datetime, 'y' is numeric values, and 'unique_id' identifies series.
+    
+    Args:
+        df: Input DataFrame
+        dataset_path: Path to the dataset file (for error messages)
+        
+    Returns:
+        DataFrame in the expected format
+    """
+    # Check if already in expected format (either order)
+    if all(col in df.columns for col in ['ds', 'y', 'unique_id']):
+        # The DataFrame has the right columns, but we need to ensure proper types and order
+        df = df.copy()
+        
+        # Reorder columns to match what process_df expects: ['ds', 'y', 'unique_id']
+        df = df[['ds', 'y', 'unique_id']]
+        
+        # Convert 'ds' to datetime if it's not already
+        if not pd.api.types.is_datetime64_any_dtype(df['ds']):
+            try:
+                df['ds'] = pd.to_datetime(df['ds'])
+            except Exception as e:
+                raise ValueError(f"Could not parse date column 'ds' in {dataset_path}: {e}")
+        
+        # Ensure 'y' is numeric
+        if not pd.api.types.is_numeric_dtype(df['y']):
+            try:
+                df['y'] = pd.to_numeric(df['y'], errors='coerce')
+                df = df.dropna(subset=['y'])
+            except Exception as e:
+                raise ValueError(f"Could not convert 'y' column to numeric in {dataset_path}: {e}")
+        
+        # Handle potential duplicate combinations of unique_id and ds
+        # This can cause issues in process_df
+        df = df.drop_duplicates(subset=['unique_id', 'ds'])
+        
+        # Ensure unique_id is string type
+        df['unique_id'] = df['unique_id'].astype(str)
+        
+        if df.empty:
+            raise ValueError(f"No valid data found in {dataset_path} after type conversion")
+        
+        return df
+    
+    # Handle wide format (multiple columns with dates as index)
+    if len(df.columns) > 2:
+        # Reset index to make date a column
+        df = df.reset_index()
+        
+        # Find the date column
+        date_col = None
+        for col in df.columns:
+            if pd.api.types.is_datetime64_any_dtype(df[col]) or pd.api.types.is_string_dtype(df[col]):
+                # Check if this looks like a date column
+                if col.lower() in ['date', 'time', 'ds'] or 'date' in col.lower():
+                    date_col = col
+                    break
+        
+        if date_col is None:
+            # Assume first column is date if it looks like it
+            first_col = df.columns[0]
+            if pd.api.types.is_datetime64_any_dtype(df[first_col]) or pd.api.types.is_string_dtype(df[first_col]):
+                date_col = first_col
+            else:
+                raise ValueError(f"Could not identify date column in {dataset_path}")
+        
+        # Convert date column to datetime if needed
+        if pd.api.types.is_string_dtype(df[date_col]):
+            try:
+                df[date_col] = pd.to_datetime(df[date_col])
+            except Exception as e:
+                raise ValueError(f"Could not parse date column '{date_col}' in {dataset_path}: {e}")
+        
+        # Melt to long format
+        value_columns = [col for col in df.columns if col != date_col]
+        df_melted = df.melt(id_vars=[date_col], var_name='unique_id', value_name='y')
+        
+        # Rename date column to 'ds'
+        df_melted = df_melted.rename(columns={date_col: 'ds'})
+        
+        # Drop rows with NaN values in 'y'
+        df_melted = df_melted.dropna(subset=['y'])
+        
+        # Ensure 'y' is numeric
+        df_melted['y'] = pd.to_numeric(df_melted['y'], errors='coerce')
+        df_melted = df_melted.dropna(subset=['y'])
+        
+        # Handle potential duplicate combinations of unique_id and ds
+        df_melted = df_melted.drop_duplicates(subset=['unique_id', 'ds'])
+        
+        # Ensure unique_id is string type
+        df_melted['unique_id'] = df_melted['unique_id'].astype(str)
+        
+        if df_melted.empty:
+            raise ValueError(f"No valid numeric data found in {dataset_path}")
+        
+        return df_melted
+    
+    # Handle long format but with different column names
+    elif len(df.columns) == 2:
+        # Check if we have date and value columns
+        date_col = None
+        value_col = None
+        
+        for col in df.columns:
+            if pd.api.types.is_datetime64_any_dtype(df[col]) or pd.api.types.is_string_dtype(df[col]):
+                date_col = col
+            elif pd.api.types.is_numeric_dtype(df[col]):
+                value_col = col
+        
+        if date_col is None or value_col is None:
+            raise ValueError(f"Could not identify date and value columns in {dataset_path}")
+        
+        # Convert date column to datetime if needed
+        if pd.api.types.is_string_dtype(df[date_col]):
+            try:
+                df[date_col] = pd.to_datetime(df[date_col])
+            except Exception as e:
+                raise ValueError(f"Could not parse date column '{date_col}' in {dataset_path}: {e}")
+        
+        # Create expected format
+        result = df[[date_col, value_col]].copy()
+        result.columns = ['ds', 'y']
+        result['unique_id'] = 'series_1'
+        
+        # Drop rows with NaN values
+        result = result.dropna()
+        
+        # Handle potential duplicate combinations of unique_id and ds
+        result = result.drop_duplicates(subset=['unique_id', 'ds'])
+        
+        if result.empty:
+            raise ValueError(f"No valid data found in {dataset_path}")
+        
+        return result
+    
+    else:
+        raise ValueError(f"Unexpected DataFrame shape in {dataset_path}: {df.shape}")
+
+
 def calculate_cutoff_for_dataset(dataset_path, frequency, seasonality, test_split):
     """
     Calculate the cutoff date for a single dataset.
@@ -50,27 +195,8 @@ def calculate_cutoff_for_dataset(dataset_path, frequency, seasonality, test_spli
     # Load the dataset
     df = pd.read_parquet(dataset_path)
     
-    # Ensure the dataframe has the expected format
-    if 'ds' not in df.columns or 'y' not in df.columns:
-        # Try to convert from wide to long format if needed
-        if len(df.columns) > 2:  # Likely wide format
-            df = df.reset_index()
-            if 'date' in df.columns:
-                df = df.rename(columns={'date': 'ds'})
-            elif 'time' in df.columns:
-                df = df.rename(columns={'time': 'ds'})
-            else:
-                # Assume first column is date
-                df = df.rename(columns={df.columns[0]: 'ds'})
-            
-            # Melt to long format
-            df = df.melt(id_vars=['ds'], var_name='unique_id', value_name='y')
-        else:
-            raise ValueError(f"Dataset {dataset_path} doesn't have expected 'ds' and 'y' columns")
-    
-    # Add unique_id if not present (required by process_df)
-    if 'unique_id' not in df.columns:
-        df['unique_id'] = 'series_1'
+    # Convert to expected format
+    df = convert_to_expected_format(df, dataset_path)
     
     # Process the dataframe to get train/test split
     _, test_data, _ = process_df(df, frequency, seasonality, test_split)
@@ -101,6 +227,7 @@ def calculate_all_cutoff_dates(output_dir):
     print(f"Calculating cutoff dates for {len(available_datasets)} datasets...")
     
     cutoff_results = []
+    failed_datasets = []
     
     for _, row in available_datasets.iterrows():
         try:
@@ -116,7 +243,6 @@ def calculate_all_cutoff_dates(output_dir):
             )
             
             cutoff_results.append({
-                "dataset_name": row['dataset_name'],
                 "full_name": row['full_name'],
                 "cutoff_date": cutoff_date,
                 "frequency": frequency,
@@ -127,7 +253,13 @@ def calculate_all_cutoff_dates(output_dir):
             print(f"    Cutoff date: {cutoff_date}")
             
         except Exception as e:
-            print(f"    Error processing {row['full_name']}: {str(e)}")
+            error_msg = f"Error processing {row['full_name']}: {str(e)}"
+            print(f"    {error_msg}")
+            failed_datasets.append({
+                "full_name": row['full_name'],
+                "error": str(e),
+                "file_path": str(row['file_path'])
+            })
             continue
     
     # Create DataFrame from results
@@ -137,6 +269,17 @@ def calculate_all_cutoff_dates(output_dir):
         print(f"\nSuccessfully calculated cutoff dates for {len(cutoff_df)} datasets.")
     else:
         print("\nNo cutoff dates were calculated successfully.")
+    
+    if failed_datasets:
+        print(f"\nFailed to process {len(failed_datasets)} datasets:")
+        for failed in failed_datasets:
+            print(f"  - {failed['full_name']}: {failed['error']}")
+        
+        # Save failed datasets for debugging
+        failed_df = pd.DataFrame(failed_datasets)
+        failed_path = output_dir / "failed_cutoff_calculations.csv"
+        failed_df.to_csv(failed_path, index=False)
+        print(f"\nSaved failed dataset details to: {failed_path}")
     
     return cutoff_df
 
@@ -156,9 +299,9 @@ def main():
     # Calculate cutoff dates for all datasets
     cutoff_df = calculate_all_cutoff_dates(output_dir)
     
-    # Save results to parquet file
-    output_path = output_dir / "cutoff_dates.parquet"
-    cutoff_df.to_parquet(output_path, index=False)
+    # Save results to CSV file
+    output_path = output_dir / "cutoff_dates.csv"
+    cutoff_df.to_csv(output_path, index=False)
     
     print(f"\nSaved cutoff dates to: {output_path}")
     

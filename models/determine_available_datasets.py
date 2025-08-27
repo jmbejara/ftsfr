@@ -50,28 +50,20 @@ def find_available_datasets(data_dir, datasets_config):
                     
                     if dataset_path.exists():
                         available_datasets.append({
-                            "section": section,
-                            "dataset_name": dataset_name,
                             "full_name": f"{section}.{dataset_name}",
                             "file_path": str(dataset_path),
                             "frequency": dataset_config.get("frequency", "D"),
-                            "seasonality": dataset_config.get("seasonality", 7),
-                            "description": dataset_config.get("description", ""),
-                            "required_data_sources": content.get("required_data_sources", [])
+                            "seasonality": dataset_config.get("seasonality", 7)
                         })
                     else:
                         # Try looking in the root data directory as fallback
                         dataset_path = data_dir / dataset_file
                         if dataset_path.exists():
                             available_datasets.append({
-                                "section": section,
-                                "dataset_name": dataset_name,
                                 "full_name": f"{section}.{dataset_name}",
                                 "file_path": str(dataset_path),
                                 "frequency": dataset_config.get("frequency", "D"),
-                                "seasonality": dataset_config.get("seasonality", 7),
-                                "description": dataset_config.get("description", ""),
-                                "required_data_sources": content.get("required_data_sources", [])
+                                "seasonality": dataset_config.get("seasonality", 7)
                             })
     
     return available_datasets
@@ -113,14 +105,10 @@ def find_available_datasets_with_requirements(data_dir, datasets_config, data_so
                     
                     if dataset_path.exists():
                         available_datasets.append({
-                            "section": section,
-                            "dataset_name": dataset_name,
                             "full_name": f"{section}.{dataset_name}",
                             "file_path": str(dataset_path),
                             "frequency": dataset_config.get("frequency", "D"),
-                            "seasonality": dataset_config.get("seasonality", 7),
-                            "description": dataset_config.get("description", ""),
-                            "required_data_sources": content.get("required_data_sources", [])
+                            "seasonality": dataset_config.get("seasonality", 7)
                         })
                     else:
                         # Try looking in the root data directory as fallback
@@ -185,8 +173,7 @@ def main():
         print("Make sure to run data pull tasks first.")
         # Create empty DataFrame to avoid errors
         df = pd.DataFrame(columns=[
-            "section", "dataset_name", "full_name", "file_path", 
-            "frequency", "seasonality", "description", "required_data_sources"
+            "full_name", "file_path", "frequency", "seasonality"
         ])
     else:
         # Convert to DataFrame
