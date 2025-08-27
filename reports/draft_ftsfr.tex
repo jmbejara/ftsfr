@@ -653,13 +653,7 @@ contaminate standard equity analysis: ADRs (which reflect foreign market dynamic
 REITs and units of beneficial interest (which have fundamentally different 
 cash flow structures), and firms with negative book equity 
 (which represent financial distress and behave differently from normal equity 
-securities). Third, their timing conventions—forming portfolios in June using 
-market equity from June and book equity from fiscal year $t-1$—ensure that 
-accounting information would have been publicly available to investors, avoiding 
-look-ahead bias that has plagued many studies. Fourth, they require firms to appear 
-on COMPUSTAT for two years before inclusion, directly addressing the survivorship 
-bias documented by \cite{Banz1986} where COMPUSTAT retroactively adds successful 
-firms' histories. Finally, using NYSE breakpoints for size and book-to-market 
+securities). Finally, using NYSE breakpoints for size and book-to-market 
 sorting prevents the results from being dominated by the numerous small 
 NASDAQ and AMEX stocks that entered the sample after 1972. These seemingly 
 technical choices have profound impacts: studies that deviate from these conventions 
@@ -667,8 +661,7 @@ often find dramatically different results, and the stability of the size and val
 effects across decades of out-of-sample testing validates these careful data 
 handling procedures. By open-sourcing code that implements these exact 
 transformations, we enable researchers to avoid the numerous subtle errors that 
-can arise when attempting to reconstruct this canonical dataset from raw CRSP and 
-COMPUSTAT data.
+can arise when attempting to reconstruct this canonical dataset from raw CRSP data.
 
 The following figures show summary statistics of the CRSP universe of stocks, 
 including the average returns of all stocks for each given date (Figure 6) 
@@ -682,7 +675,7 @@ the dataset is more diverse, leading to lower average returns and lower volatili
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/daily_avg_returns_CRSP_COMPU.png}
   \end{tabular}
-  \caption{Average returns of all stocks for each given date}
+  \caption{Average returns of all stocks for a given date}
   \label{fig:treasury_swap_basis}
 \end{figure}
 

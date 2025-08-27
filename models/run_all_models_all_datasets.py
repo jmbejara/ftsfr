@@ -35,7 +35,7 @@ from pathlib import Path
 from typing import List, Dict, Optional
 import traceback
 import subprocess
-
+from time import strftime
 
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -48,6 +48,7 @@ logger = logging.getLogger("run_all")
 def run_single_model_dataset_with_environment(
     model_name: str,
     dataset_path: str,
+    log_path,
     config_path: str = "models_config.toml",
     workflow: str = "main",
 ) -> Dict:
@@ -129,6 +130,7 @@ def run_single_model_dataset_with_environment(
 def run_single_model_dataset(
     model_name: str,
     dataset_path: str,
+    log_path,
     config_path: str = "models_config.toml",
     workflow: str = "main",
 ) -> Dict:
@@ -156,7 +158,7 @@ def run_single_model_dataset(
         os.environ["DATASET_PATH"] = dataset_path
 
         # Run the model
-        run_model(model_name, config_path, workflow)
+        run_model(model_name, config_path, workflow, log_path)
 
         # Success
         end_time = datetime.now()
@@ -186,6 +188,7 @@ def run_single_model_dataset(
 
 def setup_logging(log_dir: Path) -> logging.Logger:
     """Setup comprehensive logging for the batch run."""
+    log_dir = log_dir / strftime("%d%b%Y-%H:%M:%S")
     try:
         log_dir.mkdir(parents=True, exist_ok=True)
     except:
@@ -197,13 +200,14 @@ def setup_logging(log_dir: Path) -> logging.Logger:
 
     # Configure logging
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[logging.FileHandler(log_file), logging.StreamHandler(sys.stdout)],
+        level=logging.DEBUG,
+        format="%(asctime)s - %(name)-12s - %(levelname)s - %(message)s",
+        filename= log_file,
+        filemode = "a",
     )
 
     logger.info(f"Starting batch run - logging to {log_file}")
-    return logger
+    return (logger, log_dir)
 
 
 def get_all_datasets() -> List[str]:
@@ -241,6 +245,7 @@ def get_all_models(config_path: str = "models_config.toml") -> List[str]:
 def run_models_sequential(
     models: List[str],
     datasets: List[str],
+    log_path,
     config_path: str = "models_config.toml",
     workflow: str = "main",
     logger: Optional[logging.Logger] = None,
@@ -270,11 +275,11 @@ def run_models_sequential(
 
             if use_pixi_environments:
                 result = run_single_model_dataset_with_environment(
-                    model_name, dataset_path, config_path, workflow
+                    model_name, dataset_path, log_path, config_path, workflow
                 )
             else:
                 result = run_single_model_dataset(
-                    model_name, dataset_path, config_path, workflow
+                    model_name, dataset_path, log_path, config_path, workflow,
                 )
 
             results.append(result)
@@ -301,6 +306,7 @@ def run_models_sequential(
 def run_models_parallel(
     models: List[str],
     datasets: List[str],
+    log_path,
     config_path: str = "models_config.toml",
     workflow: str = "main",
     max_workers: Optional[int] = None,
@@ -336,6 +342,7 @@ def run_models_parallel(
                 else run_single_model_dataset,
                 model,
                 dataset,
+                log_path,
                 config_path,
                 workflow,
             ): (model, dataset)
@@ -500,7 +507,7 @@ def main():
 
     # Setup logging
     log_dir = Path(args.log_dir)
-    logger = setup_logging(log_dir)
+    logger, log_path = setup_logging(log_dir)
 
     # Get all models and datasets
     all_models = get_all_models(args.config)
@@ -544,6 +551,7 @@ def main():
         results = run_models_parallel(
             models,
             datasets,
+            log_path,
             args.config,
             args.workflow,
             args.workers,
@@ -554,6 +562,7 @@ def main():
         results = run_models_sequential(
             models,
             datasets,
+            log_path,
             args.config,
             args.workflow,
             logger,

@@ -6,6 +6,7 @@ across Darts, Nixtla, and GluonTS models.
 """
 
 import pandas as pd
+import numpy as np
 from tqdm import tqdm
 import logging
 
@@ -198,7 +199,7 @@ def perform_one_step_ahead_gluonts(model, train_data, test_data):
         temp_dataset = []
         for series in test_data:
             temp_data = series.copy()
-            temp_data["target"] = temp_data["target"][:i]
+            temp_data["target"] = temp_data["target"][:i].astype(np.float32)
             temp_dataset.append(temp_data)
 
         # Get prediction for next time step

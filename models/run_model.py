@@ -31,7 +31,6 @@ from config_reader import get_model_config
 
 filterwarnings("ignore")
 
-
 def load_config(config_path="models_config.toml"):
     """Load the models configuration from TOML file."""
     with open(config_path, "rb") as f:
@@ -325,6 +324,8 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
     )
 
     if log_path is None:
+        # If run_model.py is called instead of through some other file
+        # This section sets up writing the logs to a file in run_model_runs
         log_path = Path(__file__).resolve().parent / "model_logs" / "run_model_runs" / model_name
         try:
             log_path.mkdir(parents=True, exist_ok=True)
@@ -333,12 +334,28 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
         # Extract dataset name from data_path for logging
         dataset_name = Path(data_path).stem
         log_path = log_path / (dataset_name + ".log")
-    logging.basicConfig(
-        filename=log_path,
-        filemode="w",
-        format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
-        level=logging.DEBUG,
-    )
+        logging.basicConfig(
+            filename=log_path,
+            filemode="w",
+            format=f"%(asctime)s - {model_name} - %(name)-12s - %(levelname)s - %(message)s",
+            level=logging.DEBUG,
+        )
+        remove_handler = False
+    else:
+        # Meant for calls from some other file
+        log_path = log_path / model_name
+        try:
+            log_path.mkdir(parents=True, exist_ok=True)
+        except:
+            pass
+        log_path = log_path / (dataset_name + ".log")
+        f = logging.Formatter("%(asctime)s - %(name)-12s - %(levelname)s - %(message)s")
+        logging.getLogger().setLevel(logging.DEBUG)
+        handler_file = logging.FileHandler(log_path, mode = "a")
+        handler_file.setLevel(logging.DEBUG)
+        handler_file.setFormatter(f)
+        logging.getLogger().addHandler(handler_file)
+        remove_handler = True
 
     logger = logging.getLogger(f"run_model_{model_name}")
     logger.info(f"Running {model_name} model with parameters: test_split={test_split}, frequency={frequency}, seasonality={seasonality}, data_path={data_path}, output_dir={output_dir}")
@@ -396,6 +413,10 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
         model_obj.save_results()
     else:
         raise ValueError(f"Unknown workflow: {workflow}")
+    
+    if remove_handler:
+        h_to_remove = logging.getLogger().handlers[-1]
+        logging.getLogger().removeHandler(h_to_remove)
 
 
 def main():
