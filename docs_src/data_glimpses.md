@@ -2054,12 +2054,12 @@ ds: min=1961-06-14 00:00:00, max=2025-08-08 00:00:00
 
 ## ftsfr_FX_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/foreign_exchange/ftsfr_FX_returns.parquet`
-**Size:** 625360 bytes | **Type:** Parquet | **Shape:** 61,110 rows × 3 columns
+**Size:** 648110 bytes | **Type:** Parquet | **Shape:** 61,110 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
-ds                                       Date           
+ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (14.1% null)
 ```
 
@@ -2070,7 +2070,7 @@ y: min=-1.0326500049101444, max=8.548700375536482, mean=1.77, median=1.001082081
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=1999-02-08, max=2025-02-28
+ds: min=1999-02-08 00:00:00, max=2025-02-28 00:00:00
 ```
 
 ---
