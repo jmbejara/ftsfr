@@ -19,6 +19,7 @@ from dodo_common import (
     copy_dir_contents_to_folder,
     load_subscriptions,
     load_all_module_requirements,
+    debug_action,
 )
 
 from dependency_tracker import get_docs_task_dependencies
@@ -908,6 +909,35 @@ def task_format():
             ],
             "clean": [],
         }
+
+
+def task_determine_available_datasets():
+    """Determine available datasets"""
+    return {
+        "actions": [(debug_action, ["python models/determine_available_datasets.py"])],
+        "file_dep": [
+            "./models/determine_available_datasets.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "available_datasets.csv",
+        ],
+        "verbosity": 0,
+    }
+
+
+def task_determine_cutoff_dates():
+    """Determine cutoff dates for each dataset"""
+    return {
+        "actions": [(debug_action, ["python models/cutoff_calc.py"])],
+        "file_dep": [
+            "./models/cutoff_calc.py",
+            OUTPUT_DIR / "available_datasets.csv",
+        ],
+        "targets": [
+            OUTPUT_DIR / "cutoff_dates.csv",
+        ],
+        "verbosity": 0,
+    }
 
 
 def task_create_data_glimpses():

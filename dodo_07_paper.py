@@ -1,5 +1,5 @@
 """
-dodo_03_paper.py - Results assembly, report generation, and LaTeX compilation
+dodo_07_paper.py - Results assembly, report generation, and LaTeX compilation
 
 This file contains all tasks related to:
 - Assembling results from model runs

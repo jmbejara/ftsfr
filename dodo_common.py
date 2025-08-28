@@ -7,6 +7,10 @@ import os
 from pathlib import Path
 import shutil
 import tomli
+import subprocess
+import time
+import re
+import pandas as pd
 
 sys.path.insert(1, str((Path(__file__).parent / "src").resolve()))
 
@@ -105,6 +109,53 @@ if not PIXI_EXECUTABLE:
         PIXI_EXECUTABLE = str(Path.home() / ".pixi/bin/pixi")
     else:
         PIXI_EXECUTABLE = "pixi"  # Hope it's in PATH at runtime
+
+
+def debug_action(cmd):
+    """Action function that prints command before executing"""
+    print(f"\n🔍 DEBUG: About to execute: {cmd}")
+    print("=" * 60)
+    
+    # Start timing
+    start_time = time.time()
+    result = subprocess.run(cmd, shell=True)
+    end_time = time.time()
+    wall_time_seconds = end_time - start_time
+    
+    # Extract model name and dataset path from command for timing CSV
+    if result.returncode == 0 and "python models/run_model.py" in cmd:
+        try:
+            # Parse command to extract model name and dataset path
+            match = re.search(r'--model (\w+)', cmd)
+            model_name = match.group(1) if match else "unknown"
+            
+            match = re.search(r'--dataset-path ([^\s]+)', cmd)
+            dataset_path = match.group(1) if match else "unknown"
+            
+            # Extract dataset name from path (remove ftsfr_ prefix and file extension)
+            dataset_name = Path(dataset_path).stem.replace("ftsfr_", "")
+            
+            # Create timing directory and file
+            timing_dir = OUTPUT_DIR / "forecasting" / "timing" / model_name
+            timing_dir.mkdir(parents=True, exist_ok=True)
+            timing_file = timing_dir / f"{dataset_name}_timing.csv"
+            
+            # Create timing data
+            timing_data = pd.DataFrame({
+                "Model": [model_name],
+                "Dataset": [dataset_name],
+                "Wall_Time_Seconds": [wall_time_seconds]
+            })
+            
+            # Save timing CSV
+            timing_data.to_csv(timing_file, index=False)
+            print(f"⏱️  Execution time: {wall_time_seconds:.2f} seconds")
+            print(f"📊 Timing saved to: {timing_file}")
+            
+        except Exception as e:
+            print(f"⚠️  Warning: Could not save timing data: {e}")
+    
+    return result.returncode == 0
 
 
 # Helper functions for handling Jupyter Notebook tasks
@@ -267,3 +318,42 @@ def load_subscriptions():
 # Load module requirements from datasets.toml
 def load_all_module_requirements():
     return load_module_requirements()
+
+
+# Forecasting-specific utilities
+def load_models_config(config_path="models/models_config.toml"):
+    """Load the models configuration from TOML file."""
+    with open(config_path, "rb") as f:
+        return tomli.load(f)
+
+
+def setup_module_requirements():
+    """Set up module requirements based on subscriptions configuration."""
+    subscriptions_toml = load_subscriptions()
+    module_requirements_dict = load_all_module_requirements()
+    module_requirements = {}
+    for module_name, required_sources in module_requirements_dict.items():
+        module_requirements[module_name] = all(
+            subscriptions_toml["data_sources"].get(source, False)
+            for source in required_sources
+        )
+    return module_requirements, subscriptions_toml
+
+
+def check_required_files(module_requirements):
+    """Check if required data files exist before running forecasts"""
+    from dependency_tracker import get_available_datasets
+    
+    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
+
+    missing_files = []
+    for dataset_name, dataset_info in available_datasets.items():
+        if not dataset_info["path"].exists():
+            missing_files.append(str(dataset_info["path"]))
+
+    if missing_files:
+        print("\nWarning: The following required data files are missing:")
+        for f in missing_files:
+            print(f"  - {f}")
+        print("\nPlease run 'doit -f dodo_01_pull.py' first to generate these files.")
+        print("Continuing anyway...\n")
