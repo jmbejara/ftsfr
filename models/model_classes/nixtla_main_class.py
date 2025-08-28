@@ -14,9 +14,15 @@ from tabulate import tabulate
 import logging
 
 from .forecasting_model import forecasting_model
-from .helper_func import common_error_catch, calculate_darts_MASE, process_df, custom_interpolate
+from .helper_func import (
+    common_error_catch,
+    calculate_darts_MASE,
+    process_df,
+    custom_interpolate,
+)
 
 NixtlaMain_logger = logging.getLogger("Nixtla")
+
 
 class NixtlaMain(forecasting_model):
     def __init__(
@@ -29,7 +35,6 @@ class NixtlaMain(forecasting_model):
         data_path,
         output_path,
     ):
-
         NixtlaMain_logger.info("NixtlaMain __init__ called.")
 
         # This helps with organising
@@ -37,7 +42,13 @@ class NixtlaMain(forecasting_model):
         dataset_name = dataset_name.removeprefix("ftsfr_")
 
         # Path to save model checkpoints
-        model_path = output_path / "forecasting" / "model_checkpoints" / model_name / dataset_name
+        model_path = (
+            output_path
+            / "forecasting"
+            / "model_checkpoints"
+            / model_name
+            / dataset_name
+        )
         Path(model_path).mkdir(parents=True, exist_ok=True)
 
         NixtlaMain_logger.info(
@@ -45,7 +56,9 @@ class NixtlaMain(forecasting_model):
         )
 
         # Path to save forecasts generated after training the model
-        forecast_path = output_path / "forecasting" / "forecasts" / model_name / dataset_name
+        forecast_path = (
+            output_path / "forecasting" / "forecasts" / model_name / dataset_name
+        )
         Path(forecast_path).mkdir(parents=True, exist_ok=True)
         forecast_path = forecast_path / "forecasts.parquet"
 
@@ -64,13 +77,13 @@ class NixtlaMain(forecasting_model):
 
         # Data pre-processing
         df = pd.read_parquet(data_path).rename(columns={"id": "unique_id"})
-        train_data, test_data, test_split = process_df(df,
-                                                       frequency,
-                                                       seasonality,
-                                                       test_split)
+        train_data, test_data, test_split = process_df(
+            df, frequency, seasonality, test_split
+        )
 
-        NixtlaMain_logger.info("Completed pre-processing and received "+\
-                                "train and test data")
+        NixtlaMain_logger.info(
+            "Completed pre-processing and received " + "train and test data"
+        )
 
         # Names
         self.dataset_name = dataset_name
@@ -91,7 +104,6 @@ class NixtlaMain(forecasting_model):
         # Important variables
         self.seasonality = seasonality
         self.frequency = frequency
-
 
         self.estimator = estimator
 
@@ -121,11 +133,13 @@ class NixtlaMain(forecasting_model):
         from neuralforecast import NeuralForecast
 
         # Log the estimator configuration for debugging
-        NixtlaMain_logger.info(f"Estimator accelerator: {getattr(self.estimator, 'accelerator', 'Not set')}")
-        
-        self.nf = NeuralForecast(models=[self.estimator],
-                                 freq=self.frequency,
-                                 local_scaler_type = None)
+        NixtlaMain_logger.info(
+            f"Estimator accelerator: {getattr(self.estimator, 'accelerator', 'Not set')}"
+        )
+
+        self.nf = NeuralForecast(
+            models=[self.estimator], freq=self.frequency, local_scaler_type=None
+        )
         self.nf.fit(df=self.train_data)
         NixtlaMain_logger.info("Model trained.")
 
@@ -153,17 +167,17 @@ class NixtlaMain(forecasting_model):
         )
 
         temp_df = perform_one_step_ahead_nixtla(
-            nf_model = self.nf,
-            train_data = self.train_data,
-            test_data = self.test_data,
-            raw_data = self.raw_data,
+            nf_model=self.nf,
+            train_data=self.train_data,
+            test_data=self.test_data,
+            raw_data=self.raw_data,
         )
 
         for col in temp_df.columns:
             if (col != "unique_id") and (col != "ds"):
                 break
 
-        self.pred_data = temp_df.rename(columns = {col : "y"})
+        self.pred_data = temp_df.rename(columns={col: "y"})
 
         # Verify that we're doing one-step-ahead (only if darts is available)
         try:
@@ -171,9 +185,9 @@ class NixtlaMain(forecasting_model):
             from darts import TimeSeries
 
             is_valid = verify_one_step_ahead(
-                predictions = self.pred_data,
-                test_data = self.test_data,
-                model_type = "nixtla",
+                predictions=self.pred_data,
+                test_data=self.test_data,
+                model_type="nixtla",
             )
 
             if is_valid:
@@ -209,7 +223,7 @@ class NixtlaMain(forecasting_model):
 
     def calculate_error(self):
         """Calculate all error metrics (MASE, MAE, RMSE) for the forecasting results.
-        
+
         Returns:
             dict: Dictionary containing all calculated error metrics
         """
@@ -229,19 +243,19 @@ class NixtlaMain(forecasting_model):
         # Calculate MAE and RMSE using the Darts conversion helper
         try:
             from .helper_func import calculate_darts_MAE, calculate_darts_RMSE
-            
+
             self.errors["MAE"] = calculate_darts_MAE(
                 self.test_data,
                 self.pred_data,
             )
             NixtlaMain_logger.info("MAE: " + str(self.errors["MAE"]) + ".")
-            
+
             self.errors["RMSE"] = calculate_darts_RMSE(
                 self.test_data,
                 self.pred_data,
             )
             NixtlaMain_logger.info("RMSE: " + str(self.errors["RMSE"]) + ".")
-            
+
         except (ImportError, ValueError, TypeError) as e:
             NixtlaMain_logger.warning(f"⚠ Cannot calculate MAE/RMSE: {e}")
             self.errors["MAE"] = 0.0

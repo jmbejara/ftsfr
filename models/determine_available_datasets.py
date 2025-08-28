@@ -26,16 +26,16 @@ def load_datasets_config():
 def find_available_datasets(data_dir, datasets_config):
     """
     Find which datasets from the config are actually available as parquet files.
-    
+
     Args:
         data_dir: Path to the data directory
         datasets_config: Loaded datasets configuration
-        
+
     Returns:
         List of dictionaries with dataset information
     """
     available_datasets = []
-    
+
     # Search through all sections in the config
     for section, content in datasets_config.items():
         if isinstance(content, dict):
@@ -47,25 +47,29 @@ def find_available_datasets(data_dir, datasets_config):
                     dataset_file = f"{dataset_name}.parquet"
                     # Look in the section subdirectory first, then in the root data directory
                     dataset_path = data_dir / section / dataset_file
-                    
+
                     if dataset_path.exists():
-                        available_datasets.append({
-                            "full_name": f"{section}.{dataset_name}",
-                            "file_path": str(dataset_path),
-                            "frequency": dataset_config.get("frequency", "D"),
-                            "seasonality": dataset_config.get("seasonality", 7)
-                        })
+                        available_datasets.append(
+                            {
+                                "full_name": f"{section}.{dataset_name}",
+                                "file_path": str(dataset_path),
+                                "frequency": dataset_config.get("frequency", "D"),
+                                "seasonality": dataset_config.get("seasonality", 7),
+                            }
+                        )
                     else:
                         # Try looking in the root data directory as fallback
                         dataset_path = data_dir / dataset_file
                         if dataset_path.exists():
-                            available_datasets.append({
-                                "full_name": f"{section}.{dataset_name}",
-                                "file_path": str(dataset_path),
-                                "frequency": dataset_config.get("frequency", "D"),
-                                "seasonality": dataset_config.get("seasonality", 7)
-                            })
-    
+                            available_datasets.append(
+                                {
+                                    "full_name": f"{section}.{dataset_name}",
+                                    "file_path": str(dataset_path),
+                                    "frequency": dataset_config.get("frequency", "D"),
+                                    "seasonality": dataset_config.get("seasonality", 7),
+                                }
+                            )
+
     return available_datasets
 
 
@@ -73,17 +77,17 @@ def find_available_datasets_with_requirements(data_dir, datasets_config, data_so
     """
     Find which datasets from the config are available based on data source requirements
     and actual parquet file existence.
-    
+
     Args:
         data_dir: Path to the data directory
         datasets_config: Loaded datasets configuration
         data_sources: Dictionary of data source availability (True/False)
-        
+
     Returns:
         List of dictionaries with dataset information
     """
     available_datasets = []
-    
+
     # Search through all sections in the config
     for section, content in datasets_config.items():
         if isinstance(content, dict):
@@ -91,9 +95,12 @@ def find_available_datasets_with_requirements(data_dir, datasets_config, data_so
             module_required_sources = content.get("required_data_sources", [])
             if module_required_sources:
                 # Check if all required data sources are available
-                if not all(data_sources.get(source, False) for source in module_required_sources):
+                if not all(
+                    data_sources.get(source, False)
+                    for source in module_required_sources
+                ):
                     continue  # Skip this module if required sources aren't available
-            
+
             # Check if this section has dataset subsections
             for dataset_name, dataset_config in content.items():
                 if isinstance(dataset_config, dict) and "frequency" in dataset_config:
@@ -102,29 +109,37 @@ def find_available_datasets_with_requirements(data_dir, datasets_config, data_so
                     dataset_file = f"{dataset_name}.parquet"
                     # Look in the section subdirectory first, then in the root data directory
                     dataset_path = data_dir / section / dataset_file
-                    
+
                     if dataset_path.exists():
-                        available_datasets.append({
-                            "full_name": f"{section}.{dataset_name}",
-                            "file_path": str(dataset_path),
-                            "frequency": dataset_config.get("frequency", "D"),
-                            "seasonality": dataset_config.get("seasonality", 7)
-                        })
-                    else:
-                        # Try looking in the root data directory as fallback
-                        dataset_path = data_dir / dataset_file
-                        if dataset_path.exists():
-                            available_datasets.append({
-                                "section": section,
-                                "dataset_name": dataset_name,
+                        available_datasets.append(
+                            {
                                 "full_name": f"{section}.{dataset_name}",
                                 "file_path": str(dataset_path),
                                 "frequency": dataset_config.get("frequency", "D"),
                                 "seasonality": dataset_config.get("seasonality", 7),
-                                "description": dataset_config.get("description", ""),
-                                "required_data_sources": content.get("required_data_sources", [])
-                            })
-    
+                            }
+                        )
+                    else:
+                        # Try looking in the root data directory as fallback
+                        dataset_path = data_dir / dataset_file
+                        if dataset_path.exists():
+                            available_datasets.append(
+                                {
+                                    "section": section,
+                                    "dataset_name": dataset_name,
+                                    "full_name": f"{section}.{dataset_name}",
+                                    "file_path": str(dataset_path),
+                                    "frequency": dataset_config.get("frequency", "D"),
+                                    "seasonality": dataset_config.get("seasonality", 7),
+                                    "description": dataset_config.get(
+                                        "description", ""
+                                    ),
+                                    "required_data_sources": content.get(
+                                        "required_data_sources", []
+                                    ),
+                                }
+                            )
+
     return available_datasets
 
 
@@ -134,17 +149,19 @@ def main():
     try:
         # Try to get from environment first
         from settings import config
+
         data_dir = Path(config("DATA_DIR"))
     except ImportError:
         # Fallback to relative path
         data_dir = Path(__file__).parent.parent / "_data"
-    
+
     # Load datasets configuration
     datasets_config = load_datasets_config()
-    
+
     # Load subscriptions to check data source availability
     try:
         from dodo_common import load_subscriptions
+
         subscriptions_toml = load_subscriptions()
         data_sources = subscriptions_toml["data_sources"]
     except ImportError:
@@ -163,38 +180,43 @@ def main():
             "wrds_datastream": True,
             "wrds_optionmetrics": True,
         }
-    
+
     # Find available datasets based on data source availability
-    available_datasets = find_available_datasets_with_requirements(data_dir, datasets_config, data_sources)
-    
+    available_datasets = find_available_datasets_with_requirements(
+        data_dir, datasets_config, data_sources
+    )
+
     if not available_datasets:
         print("Warning: No available datasets found!")
         print(f"Checked in: {data_dir}")
         print("Make sure to run data pull tasks first.")
         # Create empty DataFrame to avoid errors
-        df = pd.DataFrame(columns=[
-            "full_name", "file_path", "frequency", "seasonality"
-        ])
+        df = pd.DataFrame(
+            columns=["full_name", "file_path", "frequency", "seasonality"]
+        )
     else:
         # Convert to DataFrame
         df = pd.DataFrame(available_datasets)
         print(f"Found {len(available_datasets)} available datasets:")
         for _, row in df.iterrows():
-            print(f"  - {row['full_name']} ({row['frequency']}, seasonality={row['seasonality']})")
-    
+            print(
+                f"  - {row['full_name']} ({row['frequency']}, seasonality={row['seasonality']})"
+            )
+
     # Save to CSV in OUTPUT_DIR
     try:
         from settings import config
+
         output_dir = Path(config("OUTPUT_DIR"))
     except ImportError:
         output_dir = Path(__file__).parent.parent / "_output"
-    
+
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "available_datasets.csv"
-    
+
     df.to_csv(output_path, index=False)
     print(f"\nSaved available datasets to: {output_path}")
-    
+
     return df
 
 

@@ -32,6 +32,7 @@ def pull_raw_tyields(
     - pd.DataFrame: MultiIndex columns by ticker with daily PX_LAST values.
     """
     from xbbg import blp
+
     months = [1, 2, 3, 4, 6, 12]
     years = [2, 3, 5, 7, 10, 20, 30]
     tickers = [f"GB{x} Govt" for x in months] + [f"GT{x} Govt" for x in years]
@@ -53,6 +54,7 @@ def pull_raw_syields(
     - pd.DataFrame: MultiIndex columns by ticker with daily PX_LAST values.
     """
     from xbbg import blp
+
     years = [1, 2, 3, 5, 10, 20, 30]
     tickers = [f"USSO{x} CMPN Curncy" for x in years]
     df = blp.bdh(

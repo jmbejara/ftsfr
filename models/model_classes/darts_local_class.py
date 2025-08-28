@@ -95,16 +95,22 @@ class DartsLocal(DartsMain):
             self.train()
             self.forecast()
             error_metrics = self.calculate_error()
-            DartsLocal_logger.info(f"MASE: {error_metrics['MASE']}, MAE: {error_metrics['MAE']}, RMSE: {error_metrics['RMSE']}")
+            DartsLocal_logger.info(
+                f"MASE: {error_metrics['MASE']}, MAE: {error_metrics['MAE']}, RMSE: {error_metrics['RMSE']}"
+            )
             # Resets the model
             self.model = self.model.untrained_model()
 
             # Store all three metrics for this entity
-            if error_metrics["MASE"] is not None and not np.isnan(error_metrics["MASE"]):
+            if error_metrics["MASE"] is not None and not np.isnan(
+                error_metrics["MASE"]
+            ):
                 self.mase_list.append(error_metrics["MASE"])
             if error_metrics["MAE"] is not None and not np.isnan(error_metrics["MAE"]):
                 self.mae_list.append(error_metrics["MAE"])
-            if error_metrics["RMSE"] is not None and not np.isnan(error_metrics["RMSE"]):
+            if error_metrics["RMSE"] is not None and not np.isnan(
+                error_metrics["RMSE"]
+            ):
                 self.rmse_list.append(error_metrics["RMSE"])
 
         self.print_sep()
@@ -154,7 +160,12 @@ class DartsLocal(DartsMain):
                 [
                     ["Model", self.model_name],
                     ["Dataset", self.dataset_name],
-                    ["Entities", max(len(self.mase_list), len(self.mae_list), len(self.rmse_list))],
+                    [
+                        "Entities",
+                        max(
+                            len(self.mase_list), len(self.mae_list), len(self.rmse_list)
+                        ),
+                    ],
                     ["Frequency", self.frequency],
                     ["Seasonality", self.seasonality],
                     ["Mean MASE", self.errors["MASE"]],
@@ -174,7 +185,9 @@ class DartsLocal(DartsMain):
             {
                 "Model": [self.model_name],
                 "Dataset": [self.dataset_name],
-                "Entities": [max(len(self.mase_list), len(self.mae_list), len(self.rmse_list))],
+                "Entities": [
+                    max(len(self.mase_list), len(self.mae_list), len(self.rmse_list))
+                ],
                 "Seasonality": [self.seasonality],
                 "Mean_MASE": [self.errors["MASE"]],
                 "Median_MASE": [self.median_mase],

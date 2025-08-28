@@ -72,7 +72,6 @@ def run_single_model_dataset_with_environment(
     }
 
     try:
-
         # Set environment variables for this run
         os.environ["DATASET_PATH"] = dataset_path
 
@@ -202,8 +201,8 @@ def setup_logging(log_dir: Path) -> logging.Logger:
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(asctime)s - %(name)-12s - %(levelname)s - %(message)s",
-        filename= log_file,
-        filemode = "a",
+        filename=log_file,
+        filemode="a",
     )
 
     logger.info(f"Starting batch run - logging to {log_file}")
@@ -279,7 +278,11 @@ def run_models_sequential(
                 )
             else:
                 result = run_single_model_dataset(
-                    model_name, dataset_path, log_path, config_path, workflow,
+                    model_name,
+                    dataset_path,
+                    log_path,
+                    config_path,
+                    workflow,
                 )
 
             results.append(result)

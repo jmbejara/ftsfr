@@ -180,6 +180,7 @@ def compute_tips_treasury(data_dir=DATA_DIR):
 
     return merged
 
+
 def load_tips_treasury(data_dir=DATA_DIR):
     df = pl.read_parquet(os.path.join(data_dir, "tips_treasury_implied_rf.parquet"))
     df = df.drop("__index_level_0__")
@@ -188,4 +189,6 @@ def load_tips_treasury(data_dir=DATA_DIR):
 
 if __name__ == "__main__":
     merged = compute_tips_treasury(data_dir=DATA_DIR)
-    merged.to_parquet(os.path.join(DATA_DIR, "tips_treasury_implied_rf.parquet"), compression="snappy")
+    merged.to_parquet(
+        os.path.join(DATA_DIR, "tips_treasury_implied_rf.parquet"), compression="snappy"
+    )

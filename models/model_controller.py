@@ -35,7 +35,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from run_model import run_model, load_config
 
 
-def run_model_wrapper(model_name, config_path, workflow="main", log_path = None):
+def run_model_wrapper(model_name, config_path, workflow="main", log_path=None):
     """
     Wrapper function for running a model that captures output and errors.
 
@@ -52,7 +52,7 @@ def run_model_wrapper(model_name, config_path, workflow="main", log_path = None)
         return model_name, False, duration, str(e)
 
 
-def run_models_sequential(models, config_path, workflow="main", log_path = None):
+def run_models_sequential(models, config_path, workflow="main", log_path=None):
     """Run models sequentially."""
     results = []
     total_models = len(models)
@@ -73,7 +73,9 @@ def run_models_sequential(models, config_path, workflow="main", log_path = None)
     return results
 
 
-def run_models_parallel(models, config_path, workflow="main", max_workers=None, log_path = None):
+def run_models_parallel(
+    models, config_path, workflow="main", max_workers=None, log_path=None
+):
     """Run models in parallel using ProcessPoolExecutor."""
     results = []
     total_models = len(models)
@@ -185,13 +187,17 @@ def list_available_models(config):
 
 
 def main():
-
-    log_path = Path(__file__).resolve().parent / "model_logs" / "model_controller_logs" / strftime("%d%b%Y-%H:%M:%S")
+    log_path = (
+        Path(__file__).resolve().parent
+        / "model_logs"
+        / "model_controller_logs"
+        / strftime("%d%b%Y-%H:%M:%S")
+    )
     try:
-        Path(log_path).mkdir(parents = True, exist_ok = True)
+        Path(log_path).mkdir(parents=True, exist_ok=True)
     except:
         pass
-    logging.basicConfig(level = logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
 
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -262,7 +268,9 @@ def main():
     start_time = datetime.now()
 
     if args.parallel:
-        results = run_models_parallel(models, args.config, args.workflow, args.workers, log_path)
+        results = run_models_parallel(
+            models, args.config, args.workflow, args.workers, log_path
+        )
     else:
         results = run_models_sequential(models, args.config, args.workflow, log_path)
 

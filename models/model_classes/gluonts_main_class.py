@@ -8,20 +8,22 @@ from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
-import numpy as np
 from tabulate import tabulate
 import logging
 
 from .forecasting_model import forecasting_model
-from .helper_func import process_df,\
-                         common_error_catch,\
-                         custom_interpolate,\
-                         split_train_test,\
-                         calculate_darts_MASE
+from .helper_func import (
+    process_df,
+    common_error_catch,
+    custom_interpolate,
+    split_train_test,
+    calculate_darts_MASE,
+)
 
 GluontsMain_logger = logging.getLogger("GluontsMain")
 
 # GluonTS-specific imports are moved inside methods
+
 
 class GluontsMain(forecasting_model):
     def __init__(
@@ -44,7 +46,13 @@ class GluontsMain(forecasting_model):
         dataset_name = dataset_name.removeprefix("ftsfr_")
 
         # Path to save model checkpoints
-        model_path = output_path / "forecasting" / "model_checkpoints" / model_name / dataset_name
+        model_path = (
+            output_path
+            / "forecasting"
+            / "model_checkpoints"
+            / model_name
+            / dataset_name
+        )
         Path(model_path).mkdir(parents=True, exist_ok=True)
 
         GluontsMain_logger.info(
@@ -52,7 +60,9 @@ class GluontsMain(forecasting_model):
         )
 
         # Path to save forecasts generated after training the model
-        forecast_path = output_path / "forecasting" / "forecasts" / model_name / dataset_name
+        forecast_path = (
+            output_path / "forecasting" / "forecasts" / model_name / dataset_name
+        )
         Path(forecast_path).mkdir(parents=True, exist_ok=True)
         forecast_path = forecast_path / "forecasts.parquet"
 
@@ -73,25 +83,27 @@ class GluontsMain(forecasting_model):
         raw_df = pd.read_parquet(data_path)
         raw_df = raw_df.rename(columns={"id": "unique_id"})
         # Fills missing dates and extends if required
-        train_data, test_data, test_split = process_df(raw_df,
-                                                       frequency,
-                                                       seasonality,
-                                                       test_split)
-        
-        GluontsMain_logger.info("Completed pre-processing and received "+\
-                                "train and test data")
+        train_data, test_data, test_split = process_df(
+            raw_df, frequency, seasonality, test_split
+        )
+
+        GluontsMain_logger.info(
+            "Completed pre-processing and received " + "train and test data"
+        )
 
         raw_df = pd.concat([train_data, test_data])
-        
+
         GluontsMain_logger.info("Created raw_df from train and test data.")
 
         # Test data for GluonTS is the entire dataframe with the dates as index
         test_data = custom_interpolate(raw_df.copy()).set_index("ds")
 
-        train_data = train_data.sort_values(["unique_id", "ds"]).\
-                                    reset_index(drop=True).\
-                                    set_index("ds")
-        
+        train_data = (
+            train_data.sort_values(["unique_id", "ds"])
+            .reset_index(drop=True)
+            .set_index("ds")
+        )
+
         GluontsMain_logger.info("Sorted train data.")
 
         GluontsMain_logger.info("Created train and test series from DataFrame.")
@@ -224,7 +236,7 @@ class GluontsMain(forecasting_model):
 
     def calculate_error(self):
         """Calculate all error metrics (MASE, MAE, RMSE) for the forecasting results.
-        
+
         Returns:
             dict: Dictionary containing all calculated error metrics
         """
@@ -233,10 +245,9 @@ class GluontsMain(forecasting_model):
 
         # Calculate MASE
         try:
-            self.errors["MASE"] = calculate_darts_MASE(test_data,
-                                                       train_data,
-                                                       self.pred_data,
-                                                       self.seasonality)
+            self.errors["MASE"] = calculate_darts_MASE(
+                test_data, train_data, self.pred_data, self.seasonality
+            )
             GluontsMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
         except Exception as e:
             GluontsMain_logger.error(f"MASE calculation failed: {e}")
@@ -245,13 +256,13 @@ class GluontsMain(forecasting_model):
         # Calculate MAE and RMSE
         try:
             from .helper_func import calculate_darts_MAE, calculate_darts_RMSE
-            
+
             self.errors["MAE"] = calculate_darts_MAE(test_data, self.pred_data)
             GluontsMain_logger.info("MAE: " + str(self.errors["MAE"]) + ".")
-            
+
             self.errors["RMSE"] = calculate_darts_RMSE(test_data, self.pred_data)
             GluontsMain_logger.info("RMSE: " + str(self.errors["RMSE"]) + ".")
-            
+
         except Exception as e:
             GluontsMain_logger.error(f"MAE/RMSE calculation failed: {e}")
             self.errors["MAE"] = 0.0

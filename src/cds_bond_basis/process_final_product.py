@@ -45,7 +45,7 @@ def process_cb_spread(df):
     df = df[df["rfr"].abs() < 1]  # remove unreasonable data, rfr is in absolute space
 
     # change to percent
-    df['rfr'] = df['rfr'] * 100
+    df["rfr"] = df["rfr"] * 100
 
     # labeling
     rating_map = {(0, 1): "High Yield", (1, 0): "Investment Grade", (1, 1): "IG + HY"}
@@ -128,8 +128,14 @@ def generate_graph(df, col="rfr"):
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
     # color palette (extendable)
-    primary_colors = ["tab:blue", "tab:orange", "tab:green",
-                      "tab:red", "tab:purple", "tab:brown"]
+    primary_colors = [
+        "tab:blue",
+        "tab:orange",
+        "tab:green",
+        "tab:red",
+        "tab:purple",
+        "tab:brown",
+    ]
 
     handles_all, labels_all = [], []
 
@@ -137,10 +143,11 @@ def generate_graph(df, col="rfr"):
     for idx, rating in enumerate(["High Yield", "Investment Grade"]):
         series = df_grouped[df_grouped["c_rating"] == rating]
         (ln,) = ax1.plot(
-            series["date"], series[col],
+            series["date"],
+            series[col],
             label=f"rating {rating}",
             color=primary_colors[idx % len(primary_colors)],
-            linewidth=1.0
+            linewidth=1.0,
         )
         handles_all.append(ln)
         labels_all.append(f"{rating}")
@@ -154,12 +161,13 @@ def generate_graph(df, col="rfr"):
     ax1.tick_params(axis="y", labelcolor="black")
     ax1.grid(True, linewidth=0.3, alpha=0.7)
     ax1.legend(
-        handles_all, labels_all,
+        handles_all,
+        labels_all,
         loc="lower center",
         bbox_to_anchor=(0.5, -0.25),
         ncol=min(len(labels_all), 6),
         frameon=False,
-        fontsize=10
+        fontsize=10,
     )
     # adjust layout to fit legend
     plt.subplots_adjust(bottom=0.25)

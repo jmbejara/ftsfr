@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+
 sys.path.append("../")
 import polars as pl
 
@@ -16,28 +17,13 @@ df = compute_tips_treasury.load_tips_treasury(data_dir=DATA_DIR)
 # df.to_pandas().set_index("date").plot()
 
 df_long = (
-    df.select(
-        ["date", "arb_2", "arb_5", "arb_10", "arb_20"]
+    (
+        df.select(["date", "arb_2", "arb_5", "arb_10", "arb_20"])
+        .with_columns(pl.col("date").cast(pl.Datetime))
+        .unpivot(index=["date"], variable_name="unique_id", value_name="y")
     )
-    .with_columns(
-        pl.col("date").cast(pl.Datetime)
-    )
-    .unpivot(
-        index=["date"],
-        variable_name="unique_id",
-        value_name="y"
-    )
-).rename({"date": "ds"}).select(
-    ["unique_id", "ds", "y"]
+    .rename({"date": "ds"})
+    .select(["unique_id", "ds", "y"])
 )
 
-df_long.write_parquet(
-    Path(DATA_DIR) / "ftsfr_tips_treasury_basis.parquet"
-)
-
-
-
-
-
-
-
+df_long.write_parquet(Path(DATA_DIR) / "ftsfr_tips_treasury_basis.parquet")

@@ -40,19 +40,16 @@ def calculate_darts_MASE(
     hf_logger = logging.getLogger("hf.calculate_darts_MASE")
 
     try:
-        test_data = (
-            test_data.pivot(index="ds", columns="unique_id", values="y")
-            .rename_axis(None, axis=1)
-        )
-        train_data = (
-            train_data.pivot(index="ds", columns="unique_id", values="y")
-            .rename_axis(None, axis=1)
-        )
+        test_data = test_data.pivot(
+            index="ds", columns="unique_id", values="y"
+        ).rename_axis(None, axis=1)
+        train_data = train_data.pivot(
+            index="ds", columns="unique_id", values="y"
+        ).rename_axis(None, axis=1)
 
-        pred_data = (
-            pred_data.pivot(index="ds", columns="unique_id", values=value_column)
-            .rename_axis(None, axis=1)
-        )
+        pred_data = pred_data.pivot(
+            index="ds", columns="unique_id", values=value_column
+        ).rename_axis(None, axis=1)
 
         hf_logger.info(
             "Converted train, test, and pred series into"
@@ -98,14 +95,12 @@ def calculate_darts_MAE(test_data, pred_data, value_column="y"):
     hf_logger = logging.getLogger("hf.calculate_darts_MAE")
 
     try:
-        test_data = (
-            test_data.pivot(index="ds", columns="unique_id", values="y")
-            .rename_axis(None, axis=1)
-        )
-        pred_data = (
-            pred_data.pivot(index="ds", columns="unique_id", values=value_column)
-            .rename_axis(None, axis=1)
-        )
+        test_data = test_data.pivot(
+            index="ds", columns="unique_id", values="y"
+        ).rename_axis(None, axis=1)
+        pred_data = pred_data.pivot(
+            index="ds", columns="unique_id", values=value_column
+        ).rename_axis(None, axis=1)
 
         hf_logger.info(
             "Converted test and pred series into darts TimeSeries compatible format."
@@ -146,14 +141,12 @@ def calculate_darts_RMSE(test_data, pred_data, value_column="y"):
     hf_logger = logging.getLogger("hf.calculate_darts_RMSE")
 
     try:
-        test_data = (
-            test_data.pivot(index="ds", columns="unique_id", values="y")
-            .rename_axis(None, axis=1)
-        )
-        pred_data = (
-            pred_data.pivot(index="ds", columns="unique_id", values=value_column)
-            .rename_axis(None, axis=1)
-        )
+        test_data = test_data.pivot(
+            index="ds", columns="unique_id", values="y"
+        ).rename_axis(None, axis=1)
+        pred_data = pred_data.pivot(
+            index="ds", columns="unique_id", values=value_column
+        ).rename_axis(None, axis=1)
 
         hf_logger.info(
             "Converted test and pred series into darts TimeSeries compatible format."
@@ -181,6 +174,7 @@ def calculate_darts_RMSE(test_data, pred_data, value_column="y"):
         hf_logger.error(f"Error in RMSE calculation: {e}")
         raise e
 
+
 def extend_df(df, train_data_len, frequency, seasonality, interpolate=True):
     """
     Extends a df to fit seasonality * 4 lags. Doesn't interpolate, but
@@ -201,23 +195,19 @@ def extend_df(df, train_data_len, frequency, seasonality, interpolate=True):
 
     return df
 
-def scaled_data(train_data, test_data):
 
+def scaled_data(train_data, test_data):
     # Using Sk-learns minmax scaling, scale both series
     # Reference: https://scikit-learn.org/stable/modules/preprocessing.html
 
     scaled_data_logger = logging.getLogger("hf.scaled_data")
-    
+
     from sklearn import preprocessing
 
     # Pivots so that scaling is done entity-wise
-    train_data = train_data.pivot(index="ds",
-                                      columns="unique_id",
-                                      values="y")
-    
-    test_data = test_data.pivot(index="ds",
-                                    columns="unique_id",
-                                    values="y")
+    train_data = train_data.pivot(index="ds", columns="unique_id", values="y")
+
+    test_data = test_data.pivot(index="ds", columns="unique_id", values="y")
 
     scaled_data_logger.info("Pivot train and test data to wide format.")
 
@@ -225,21 +215,22 @@ def scaled_data(train_data, test_data):
     # Trains on training data only
     scaled_train_data = mmScaler.fit_transform(train_data)
 
-    scaled_data_logger.info("MinMaxScaler fit on train_data and the "+\
-                            "latter transformed.")
+    scaled_data_logger.info(
+        "MinMaxScaler fit on train_data and the " + "latter transformed."
+    )
 
-    scaled_train_data = pd.DataFrame(scaled_train_data,
-                                       columns = train_data.columns,
-                                       index = train_data.index)
-    
+    scaled_train_data = pd.DataFrame(
+        scaled_train_data, columns=train_data.columns, index=train_data.index
+    )
+
     scaled_data_logger.info("Converted scaled train_data to pd.DataFrame.")
 
     # Only transforms test data but doesn't "learn" from it
     scaled_test_data = mmScaler.transform(test_data)
-    scaled_test_data = pd.DataFrame(scaled_test_data,
-                                      columns = test_data.columns,
-                                      index = test_data.index)
-    
+    scaled_test_data = pd.DataFrame(
+        scaled_test_data, columns=test_data.columns, index=test_data.index
+    )
+
     scaled_data_logger.info("Scaled test data with same train data scaler.")
 
     # Undo pivot
@@ -252,6 +243,7 @@ def scaled_data(train_data, test_data):
 
     return (scaled_train_data, scaled_test_data)
 
+
 def split_train_test(df, test_split):
     """
     Splits a dataframe using the cutoff date method
@@ -260,16 +252,17 @@ def split_train_test(df, test_split):
 
     stt_logger.info("split_train_test called.")
 
-    unique_dates = df['ds'].unique()
+    unique_dates = df["ds"].unique()
     test_length = int(test_split * len(unique_dates))
 
     cutoff_date = unique_dates[-test_length]
     stt_logger.info(f"Cutoff date: {cutoff_date}")
 
-    train_data = df[df['ds'] < cutoff_date]
-    test_data = df[df['ds'] >= cutoff_date]
+    train_data = df[df["ds"] < cutoff_date]
+    test_data = df[df["ds"] >= cutoff_date]
 
     return (train_data, test_data)
+
 
 def custom_interpolate(df):
     """
@@ -285,22 +278,24 @@ def custom_interpolate(df):
     hf_logger.info("Pivot dataframe to have each entity as a column.")
 
     # Interpolates per entity
-    proc_df_int = proc_df.interpolate(method = "linear", limit_direction="both")
+    proc_df_int = proc_df.interpolate(method="linear", limit_direction="both")
 
     random_number_gen = np.random.default_rng()
 
     # Gaussian noise to add to interpolated values
-    values_to_add = pd.Series(np.absolute(random_number_gen.normal(size = proc_df.shape[0])) / 100000,
-                               index = proc_df.index)
+    values_to_add = pd.Series(
+        np.absolute(random_number_gen.normal(size=proc_df.shape[0])) / 100000,
+        index=proc_df.index,
+    )
 
-    proc_df_replace_nan = proc_df_int.add(values_to_add, axis = 0)
+    proc_df_replace_nan = proc_df_int.add(values_to_add, axis=0)
 
     proc_df = proc_df.fillna(proc_df_replace_nan)
 
     hf_logger.info("Forward and backward filling performed.")
 
     # Calculate date-wise mean and replace any series which is all NaNs
-    date_wise_data_mean = proc_df.mean(axis = 1)
+    date_wise_data_mean = proc_df.mean(axis=1)
 
     for col in proc_df.columns:
         if proc_df[col].isna().all():
@@ -334,9 +329,9 @@ def process_df(df, frequency, seasonality, test_split):
 
     hf_logger.info("process_df called.")
 
-    df['y'] = df['y'].astype(np.float32)
+    df["y"] = df["y"].astype(np.float32)
 
-    df['y'].loc[(df['y'] == float("inf")) | (df['y'] == float("-inf"))] = np.nan
+    df["y"].loc[(df["y"] == float("inf")) | (df["y"] == float("-inf"))] = np.nan
 
     # This only adds NaNs as values for missing dates.
     df = fill_gaps(df, freq=frequency, start="global", end="global")
@@ -349,33 +344,29 @@ def process_df(df, frequency, seasonality, test_split):
     if test_split == "seasonal":
         if seasonality < len_ud:
             test_split = float(seasonality / len_ud)
-            hf_logger.info('Converted test_split from "seasonal" to ' + 
-                           f"{test_split}")
+            hf_logger.info('Converted test_split from "seasonal" to ' + f"{test_split}")
         else:
             hf_logger.error(
                 'test_split = "seasonal" is not applicable.'
                 + "Series is shorter than seasonality."
             )
-            raise ValueError(
-                "Series too short. Please select appropriate test split."
-            )
+            raise ValueError("Series too short. Please select appropriate test split.")
 
     test_length = int(test_split * len_ud)
     train_data_len = len_ud - test_length
 
-    if (train_data_len < 4 * seasonality) or (train_data_len < 
-                                                MIN_SERIES_LEN):
+    if (train_data_len < 4 * seasonality) or (train_data_len < MIN_SERIES_LEN):
         hf_logger.info("Train series shorter than seasonality * 4.")
         df = extend_df(df, train_data_len, frequency, seasonality)
 
-        unique_dates = df['ds'].unique()
+        unique_dates = df["ds"].unique()
         test_split = float(test_length / len(unique_dates))
-    
+
     # Split using the cutoff-date method
     train_data, test_data = split_train_test(df, test_split)
     hf_logger.info("Split data into train and test.")
 
-    # Interpolate in both directions and then fill all-nan entities with 
+    # Interpolate in both directions and then fill all-nan entities with
     # date-wise means
     train_data = custom_interpolate(train_data)
     hf_logger.info("Custom interpolation complete.")
@@ -384,15 +375,15 @@ def process_df(df, frequency, seasonality, test_split):
     train_data, test_data = scaled_data(train_data, test_data)
     hf_logger.info("Performed scaling on train and test.")
 
-    train_data['y'] = train_data['y'].astype(np.float32)
-    test_data['y'] = test_data['y'].astype(np.float32)
+    train_data["y"] = train_data["y"].astype(np.float32)
+    test_data["y"] = test_data["y"].astype(np.float32)
     hf_logger.info("Converted train and test to np.float32.")
 
     # The train series should now have all defined entries
     # The test series doesn't have any synthetic data
 
-    train_data.reset_index(drop = True, inplace=True)
-    test_data.reset_index(drop= True, inplace= True)
+    train_data.reset_index(drop=True, inplace=True)
+    test_data.reset_index(drop=True, inplace=True)
 
     hf_logger.info("Pre-processing complete.")
 

@@ -60,10 +60,12 @@ def perform_one_step_ahead_darts(model, test_data, raw_data):
     # Naive models
     # Else don't need to retrain
     model_name = str(type(model))
-    retrain_model = (".ExponentialSmoothing" in model_name) or\
-                    (".Theta" in model_name) or\
-                    (".Prophet" in model_name) or\
-                    (".Naive" in model_name)
+    retrain_model = (
+        (".ExponentialSmoothing" in model_name)
+        or (".Theta" in model_name)
+        or (".Prophet" in model_name)
+        or (".Naive" in model_name)
+    )
 
     Uni_logger.info("retrain_model = " + str(retrain_model))
     Uni_logger.info("Using historical_forecasts")
@@ -113,6 +115,7 @@ def perform_one_step_ahead_darts(model, test_data, raw_data):
 
     Uni_logger.info(f"Generated predictions with shape: {predictions.shape}")
     return predictions
+
 
 def perform_one_step_ahead_nixtla(nf_model, train_data, test_data, raw_data):
     """

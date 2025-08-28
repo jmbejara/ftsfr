@@ -88,23 +88,21 @@ def build_last_day_mapping_from_dates(dates: pd.Series) -> pd.DataFrame:
 
 
 def _prepare_tenor_dataframes(
-    df1_renamed: pd.DataFrame, 
-    df2_renamed: pd.DataFrame, 
-    tenor: int
+    df1_renamed: pd.DataFrame, df2_renamed: pd.DataFrame, tenor: int
 ) -> tuple[pd.DataFrame, pd.DataFrame] | None:
     """
     Prepare and validate tenor DataFrames for processing.
-    
+
     Returns:
         Tuple of (df1_selected, df2_selected) if successful, None if tenor should be skipped
     """
     required_columns_1 = ["Date", "Implied_Repo_1", "Vol_1", "Price_1", "Contract_1"]
     required_columns_2 = ["Date", "Implied_Repo_2", "Vol_2", "Price_2", "Contract_2"]
-    
+
     # Check which columns exist and create missing ones with empty values
     missing_columns_1 = []
     missing_columns_2 = []
-    
+
     for col in required_columns_1:
         if col not in df1_renamed.columns:
             if col == "Date":
@@ -113,7 +111,7 @@ def _prepare_tenor_dataframes(
                 return None
             else:
                 missing_columns_1.append(col)
-    
+
     for col in required_columns_2:
         if col not in df2_renamed.columns:
             if col == "Date":
@@ -122,16 +120,16 @@ def _prepare_tenor_dataframes(
                 return None
             else:
                 missing_columns_2.append(col)
-    
+
     # Only create empty columns if we have some actual data to work with
     if not df1_renamed.empty and missing_columns_1:
         for col in missing_columns_1:
             df1_renamed[col] = None
-    
+
     if not df2_renamed.empty and missing_columns_2:
         for col in missing_columns_2:
             df2_renamed[col] = None
-    
+
     # Select columns (now guaranteed to exist)
     df1_selected = df1_renamed[required_columns_1]
     df2_selected = df2_renamed[required_columns_2]
@@ -141,18 +139,20 @@ def _prepare_tenor_dataframes(
     if df1_selected.empty and df2_selected.empty:
         print(f"Warning: No data available for {tenor}Y tenor, skipping")
         return None
-    
+
     # Check if we have any non-null data in key columns (excluding Date)
     key_columns_1 = ["Implied_Repo_1", "Vol_1", "Price_1", "Contract_1"]
     key_columns_2 = ["Implied_Repo_2", "Vol_2", "Price_2", "Contract_2"]
-    
+
     has_data_1 = any(df1_selected[col].notna().any() for col in key_columns_1)
     has_data_2 = any(df2_selected[col].notna().any() for col in key_columns_2)
-    
+
     if not has_data_1 and not has_data_2:
-        print(f"Warning: No meaningful data (all key columns are null) for {tenor}Y tenor, skipping")
+        print(
+            f"Warning: No meaningful data (all key columns are null) for {tenor}Y tenor, skipping"
+        )
         return None
-    
+
     return df1_selected, df2_selected
 
 
@@ -196,7 +196,7 @@ def combine_treasury_futures_data(data_dir: Path = DATA_DIR) -> pd.DataFrame:
         result = _prepare_tenor_dataframes(df1_renamed, df2_renamed, tenor)
         if result is None:
             continue
-            
+
         df1_selected, df2_selected = result
 
         # Merge near and deferred contracts for this tenor
@@ -207,18 +207,24 @@ def combine_treasury_futures_data(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
         # Debug info
         non_null_counts = df_tenor.drop("Tenor", axis=1).notna().sum()
-        print(f"{tenor}Y tenor: {len(df_tenor)} rows, non-null counts: {dict(non_null_counts)}")
+        print(
+            f"{tenor}Y tenor: {len(df_tenor)} rows, non-null counts: {dict(non_null_counts)}"
+        )
 
         # Append to the main DataFrame
         if treasury_df is None:
             treasury_df = df_tenor
         else:
             # Only concatenate if we have meaningful data
-            if not df_tenor.empty and df_tenor.drop("Tenor", axis=1).notna().any().any():
+            if (
+                not df_tenor.empty
+                and df_tenor.drop("Tenor", axis=1).notna().any().any()
+            ):
                 treasury_df = pd.concat([treasury_df, df_tenor], ignore_index=True)
             else:
-                print(f"Warning: {tenor}Y tenor has no meaningful data after merge, skipping concatenation")
-
+                print(
+                    f"Warning: {tenor}Y tenor has no meaningful data after merge, skipping concatenation"
+                )
 
     if treasury_df is None:
         raise FileNotFoundError("No treasury futures files found to combine")
@@ -230,13 +236,13 @@ def combine_treasury_futures_data(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     # Print summary of processed tenors and data quality
     processed_tenors = sorted(treasury_df["Tenor"].unique())
     print(f"Successfully processed tenors: {processed_tenors}")
-    
+
     # Data quality summary
     total_rows = len(treasury_df)
     non_null_counts = treasury_df.notna().sum()
     print(f"Total rows: {total_rows}")
     print(f"Non-null counts per column: {dict(non_null_counts)}")
-    
+
     # Check for excessive null data
     null_percentage = (treasury_df.isnull().sum() / len(treasury_df)) * 100
     high_null_cols = null_percentage[null_percentage > 80].index.tolist()
@@ -264,7 +270,6 @@ def load_last_day(data_dir: Path = DATA_DIR) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-
     # Load and rename OIS data
     ois = load_ois(data_dir=DATA_DIR)
 

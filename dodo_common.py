@@ -115,46 +115,48 @@ def debug_action(cmd):
     """Action function that prints command before executing"""
     print(f"\n🔍 DEBUG: About to execute: {cmd}")
     print("=" * 60)
-    
+
     # Start timing
     start_time = time.time()
     result = subprocess.run(cmd, shell=True)
     end_time = time.time()
     wall_time_seconds = end_time - start_time
-    
+
     # Extract model name and dataset path from command for timing CSV
     if result.returncode == 0 and "python models/run_model.py" in cmd:
         try:
             # Parse command to extract model name and dataset path
-            match = re.search(r'--model (\w+)', cmd)
+            match = re.search(r"--model (\w+)", cmd)
             model_name = match.group(1) if match else "unknown"
-            
-            match = re.search(r'--dataset-path ([^\s]+)', cmd)
+
+            match = re.search(r"--dataset-path ([^\s]+)", cmd)
             dataset_path = match.group(1) if match else "unknown"
-            
+
             # Extract dataset name from path (remove ftsfr_ prefix and file extension)
             dataset_name = Path(dataset_path).stem.replace("ftsfr_", "")
-            
+
             # Create timing directory and file
             timing_dir = OUTPUT_DIR / "forecasting" / "timing" / model_name
             timing_dir.mkdir(parents=True, exist_ok=True)
             timing_file = timing_dir / f"{dataset_name}_timing.csv"
-            
+
             # Create timing data
-            timing_data = pd.DataFrame({
-                "Model": [model_name],
-                "Dataset": [dataset_name],
-                "Wall_Time_Seconds": [wall_time_seconds]
-            })
-            
+            timing_data = pd.DataFrame(
+                {
+                    "Model": [model_name],
+                    "Dataset": [dataset_name],
+                    "Wall_Time_Seconds": [wall_time_seconds],
+                }
+            )
+
             # Save timing CSV
             timing_data.to_csv(timing_file, index=False)
             print(f"⏱️  Execution time: {wall_time_seconds:.2f} seconds")
             print(f"📊 Timing saved to: {timing_file}")
-            
+
         except Exception as e:
             print(f"⚠️  Warning: Could not save timing data: {e}")
-    
+
     return result.returncode == 0
 
 
@@ -343,7 +345,7 @@ def setup_module_requirements():
 def check_required_files(module_requirements):
     """Check if required data files exist before running forecasts"""
     from dependency_tracker import get_available_datasets
-    
+
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
 
     missing_files = []

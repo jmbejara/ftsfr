@@ -106,7 +106,9 @@ def calc_return_manual(df):
 
 def generate_replication_gsci(data_dir=DATA_DIR):
     df_return1 = load_futures_data.load_gsci_data()
-    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(data_dir=BASE_DIR / "_data" / "he_kelly_manela")
+    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(
+        data_dir=BASE_DIR / "_data" / "he_kelly_manela"
+    )
     corr_matrix1 = generate_corr_matrix(df_return1, hkm_df)
     corr_matrix_float1 = corr_matrix1.astype(float)
     optimal_pairs_df1 = decide_optimal_pairs(corr_matrix_float1)
@@ -191,7 +193,9 @@ def compute_second_contract_return(commodity_futures_df, date_col="index"):
 
 
 def generate_replication_future_ticker():
-    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(data_dir=BASE_DIR / "_data" / "he_kelly_manela")
+    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(
+        data_dir=BASE_DIR / "_data" / "he_kelly_manela"
+    )
     commodity_futures_df = load_futures_data.load_commodities_future()
     lme_df = load_futures_data.load_lme_metals()
     monthly_1mprice = calc_lme_monthly_1mprice(lme_df, metal_map, date_col="index")
@@ -221,7 +225,9 @@ def generate_replication_future_ticker():
 
 
 def generate_replication_manual():
-    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(data_dir=BASE_DIR / "_data" / "he_kelly_manela")
+    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(
+        data_dir=BASE_DIR / "_data" / "he_kelly_manela"
+    )
     df = load_futures_data.load_commodities_manual()
     monthly_return = calc_return_manual(df)
     monthly_return["yyyymm"] = monthly_return["Month"].dt.strftime("%Y%m")

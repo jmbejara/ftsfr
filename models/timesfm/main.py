@@ -58,14 +58,18 @@ class TimesFMForecasting(forecasting_model):
         )
 
         df = pd.read_parquet(data_path).rename(columns={"id": "unique_id"})
-        train_data, test_data, test_split = process_df(df, frequency, seasonality, test_split)
-        df = pd.concat([train_data, test_data]).\
-                       sort_values(["unique_id", "ds"]).\
-                       reset_index(drop = True)
+        train_data, test_data, test_split = process_df(
+            df, frequency, seasonality, test_split
+        )
+        df = (
+            pd.concat([train_data, test_data])
+            .sort_values(["unique_id", "ds"])
+            .reset_index(drop=True)
+        )
 
         logger.info("Read and processed dataframe.")
 
-        test_length = int(test_split * len(df['ds'].unique()))
+        test_length = int(test_split * len(df["ds"].unique()))
 
         # Names
         self.dataset_name = dataset_name

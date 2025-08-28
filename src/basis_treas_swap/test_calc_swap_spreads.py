@@ -25,5 +25,3 @@ def test_calc_swap_spreads():
     for year in years:
         total_list.append(f"tswap_{year}_rf")
     assert [a for a, _ in output.columns] == total_list
-
-

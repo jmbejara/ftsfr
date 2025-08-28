@@ -36,7 +36,6 @@ class DartsMain(forecasting_model):
         data_path,
         output_path,
     ):
-
         DartsMain_logger.info("DartsMain __init__() called.")
 
         # This helps with organising
@@ -47,18 +46,16 @@ class DartsMain(forecasting_model):
         df = pd.read_parquet(data_path).rename(columns={"id": "unique_id"})
 
         # Fills missing dates and extends if required
-        train_data, test_data, test_split = process_df(df,
-                                                       frequency,
-                                                       seasonality,
-                                                       test_split)
+        train_data, test_data, test_split = process_df(
+            df, frequency, seasonality, test_split
+        )
 
-        DartsMain_logger.info("Completed pre-processing and received "+\
-                              "train and test data")
+        DartsMain_logger.info(
+            "Completed pre-processing and received " + "train and test data"
+        )
 
         raw_df = pd.concat([train_data, test_data])
-        raw_df = raw_df.pivot(index="ds",
-                              columns="unique_id",
-                              values="y")
+        raw_df = raw_df.pivot(index="ds", columns="unique_id", values="y")
 
         raw_data = TimeSeries.from_dataframe(raw_df)
 
@@ -82,7 +79,13 @@ class DartsMain(forecasting_model):
         DartsMain_logger.info("Made TimeSeries objects for train and test.")
 
         # Path to save model checkpoints
-        model_path = output_path / "forecasting" / "model_checkpoints" / model_name / dataset_name
+        model_path = (
+            output_path
+            / "forecasting"
+            / "model_checkpoints"
+            / model_name
+            / dataset_name
+        )
         Path(model_path).mkdir(parents=True, exist_ok=True)
         model_path = model_path / "saved_model"  # Without an extension
 
@@ -91,7 +94,9 @@ class DartsMain(forecasting_model):
         )
 
         # Path to save forecasts generated after training the model
-        forecast_path = output_path / "forecasting" / "forecasts" / model_name / dataset_name
+        forecast_path = (
+            output_path / "forecasting" / "forecasts" / model_name / dataset_name
+        )
         Path(forecast_path).mkdir(parents=True, exist_ok=True)
         forecast_path = forecast_path / "forecasts.parquet"
 
@@ -119,10 +124,10 @@ class DartsMain(forecasting_model):
         self.model_path = str(model_path)
 
         # Series
-        self.raw_data = raw_data # Helps with predictions
+        self.raw_data = raw_data  # Helps with predictions
         self.train_data = train_data
         self.test_data = test_data
-        self.pred_data = None # None to check if predictions have been made
+        self.pred_data = None  # None to check if predictions have been made
 
         # Important variables
         # This is the ratio of test entries to total entries in the df
@@ -173,9 +178,9 @@ class DartsMain(forecasting_model):
 
         # Use the unified one-step-ahead implementation
         self.pred_data = perform_one_step_ahead_darts(
-            model = self.model,
-            test_data = self.test_data,
-            raw_data = self.raw_data,
+            model=self.model,
+            test_data=self.test_data,
+            raw_data=self.raw_data,
         )
 
         # Verify that we're doing one-step-ahead
@@ -215,7 +220,7 @@ class DartsMain(forecasting_model):
         DartsMain_logger.info('Predictions saved to "' + str(self.forecast_path) + '".')
 
     def load_forecast(self):
-        temp_df = pd.read_parquet(self.forecast_path).rename(columns = {"time": "ds"})
+        temp_df = pd.read_parquet(self.forecast_path).rename(columns={"time": "ds"})
         self.pred_data = TimeSeries.from_dataframe(temp_df, time_col="ds")
         DartsMain_logger.info(
             "Model forecasts loaded from "
@@ -225,7 +230,7 @@ class DartsMain(forecasting_model):
 
     def calculate_error(self):
         """Calculate all error metrics (MASE, MAE, RMSE) for the forecasting results.
-        
+
         Returns:
             dict: Dictionary containing all calculated error metrics
         """
@@ -234,12 +239,8 @@ class DartsMain(forecasting_model):
             raise ValueError("Please call self.forecast() first.")
 
         # Add debugging information
-        DartsMain_logger.info(
-            f"test_data components: {self.test_data.n_components}"
-        )
-        DartsMain_logger.info(
-            f"pred_data components: {self.pred_data.n_components}"
-        )
+        DartsMain_logger.info(f"test_data components: {self.test_data.n_components}")
+        DartsMain_logger.info(f"pred_data components: {self.pred_data.n_components}")
         DartsMain_logger.info(f"test_data shape: {self.test_data.shape}")
         DartsMain_logger.info(f"pred_data shape: {self.pred_data.shape}")
 

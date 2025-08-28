@@ -69,6 +69,3 @@ df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_aggregated.parquet")
 df_stacked2.drop_duplicates(subset=["unique_id", "ds"], inplace=True)
 
 df_stacked2.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_non_aggregated.parquet")
-
-
-

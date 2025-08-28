@@ -153,6 +153,7 @@ def pull_ois_history(
     $ USSO1 CMPN Curncy           <f64> 1.29, 1.353
     """
     from xbbg import blp
+
     tickers = ois_tickers()
     df = blp.bdh(
         tickers=tickers, flds=["PX_LAST"], start_date=start_date, end_date=end_date
@@ -260,6 +261,7 @@ def pull_futures_for_tenor(
 
     """
     from xbbg import blp
+
     tenor_to_tickers = futures_ticker_map()
     if tenor not in tenor_to_tickers:
         raise ValueError(f"Unsupported tenor: {tenor}")
@@ -324,7 +326,6 @@ def load_treasury_tenor(
 
 
 if __name__ == "__main__":
-
     # Pull and save OIS data
     ois = pull_ois_history()
     ois.write_parquet(DATA_DIR / "ois.parquet")

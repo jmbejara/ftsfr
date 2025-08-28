@@ -195,8 +195,6 @@ def implied_daily_fx_returns(fx_data, currency_list):
     return fx_df
 
 
-
-
 def graph_fx_returns(fx_df, currency_list, region_name):
     """
     Graphs the FX returns for a set of currencies in a given region.

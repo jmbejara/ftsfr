@@ -64,8 +64,8 @@ def load_swap_spreads(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     file = data_dir / "swap_spreads.parquet"
     return pd.read_parquet(file)
 
+
 if __name__ == "__main__":
     df = assemble_swap_spreads(data_dir=DATA_DIR)
     file = DATA_DIR / "swap_spreads.parquet"
     df.to_parquet(file)
-

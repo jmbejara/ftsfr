@@ -10,7 +10,7 @@ Usage:
 
 Output Structure:
     All outputs are saved under {OUTPUT_DIR}/forecasting/ with the following structure:
-    
+
     {OUTPUT_DIR}/
     └── forecasting/
         ├── logging/{model_name}/{dataset_name}.log       # Training and execution logs
@@ -26,7 +26,7 @@ Output Structure:
 
 Error Metrics:
     - MASE: Mean Absolute Scaled Error (primary metric)
-    - MAE: Mean Absolute Error  
+    - MAE: Mean Absolute Error
     - RMSE: Root Mean Squared Error
     All three metrics are calculated and saved for every forecasting run.
 """
@@ -53,25 +53,26 @@ from config_reader import get_model_config
 
 filterwarnings("ignore")
 
+
 def load_config(config_path=None):
     """Load the models configuration from TOML file."""
     if config_path is None:
         # Try to find models_config.toml relative to this file
         current_dir = Path(__file__).parent
-        
+
         # First try: current directory (when running from models/ folder)
         config_path = current_dir / "models_config.toml"
         if not config_path.exists():
             # Second try: project root (when running from project root)
             config_path = current_dir.parent / "models" / "models_config.toml"
-        
+
         if not config_path.exists():
             raise FileNotFoundError(
                 f"Could not find models_config.toml in either:\n"
                 f"  - {current_dir / 'models_config.toml'}\n"
                 f"  - {current_dir.parent / 'models' / 'models_config.toml'}"
             )
-    
+
     with open(config_path, "rb") as f:
         return tomli.load(f)
 
@@ -202,26 +203,20 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
     # Nixtla models that need input_size (typically seasonality * 4)
     if any(
         name in model_name
-        for name in [
-            "Autoformer",
-            "Informer",
-            "DLinear",
-            "NLinear",
-            "NBEATS"
-        ]
+        for name in ["Autoformer", "Informer", "DLinear", "NLinear", "NBEATS"]
     ):
         if "input_size" not in params:
             params["input_size"] = seasonality * 4
-        
+
         # Enable Apple Silicon (MPS) for Nixtla models if available
         if torch.backends.mps.is_available():
-            params['accelerator'] = "mps"
+            params["accelerator"] = "mps"
             print(f"Using Apple Silicon (MPS) for {model_name}")
         elif torch.cuda.is_available():
-            params['accelerator'] = "gpu"
+            params["accelerator"] = "gpu"
             print(f"Using CUDA GPU for {model_name}")
         else:
-            params['accelerator'] = "cpu"
+            params["accelerator"] = "cpu"
             print(f"Using CPU for {model_name}")
 
     # Models that need lags
@@ -245,6 +240,7 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
                 elif freq == "QE" or freq == "QS":
                     return "Q"
                 return freq
+
             params["freq"] = convert_frequency_for_gluonts(frequency)
 
     # GluonTS models that need context_length
@@ -258,14 +254,16 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
     ):
         if "context_length" not in params:
             params["context_length"] = seasonality * 4
-        
+
         # Force CPU usage for GluonTS models on Apple Silicon to avoid MPS compatibility issues
         # The _standard_gamma operation used by Student's t-distribution is not implemented on MPS
         if torch.backends.mps.is_available():
             if "trainer_kwargs" not in params:
                 params["trainer_kwargs"] = {}
             params["trainer_kwargs"]["accelerator"] = "cpu"
-            print(f"Forcing CPU usage for GluonTS model {model_name} on Apple Silicon to avoid MPS compatibility issues")
+            print(
+                f"Forcing CPU usage for GluonTS model {model_name} on Apple Silicon to avoid MPS compatibility issues"
+            )
 
     # PatchTST specific
     if "PatchTSTEstimator" in model_name and "patch_len" not in params:
@@ -296,9 +294,7 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
             if "trainer_kwargs" not in params:
                 params["trainer_kwargs"] = {}
             params["trainer_kwargs"]["max_epochs"] = n_epochs
-            print(
-                f"Overriding max_epochs to {n_epochs} for GluonTS model"
-            )
+            print(f"Overriding max_epochs to {n_epochs} for GluonTS model")
         elif any(
             name in model_name
             for name in [
@@ -312,24 +308,32 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
         ):
             # Darts neural models use n_epochs directly
             params["n_epochs"] = n_epochs
-            print(
-                f"Overriding n_epochs to {n_epochs} for Darts neural model"
-            )
+            print(f"Overriding n_epochs to {n_epochs} for Darts neural model")
         elif model_config["class"] == "NixtlaMain":
             # For Nixtla models, use max_steps instead of max_epochs (which is deprecated)
             # Use a very small number of steps for debugging (e.g., 50 steps)
             max_steps = n_epochs * 50
             params["max_steps"] = max_steps
-            print(
-                f"Overriding max_steps to {max_steps} for Nixtla model"
-            )
+            print(f"Overriding max_steps to {max_steps} for Nixtla model")
         else:
             # Skip n_epochs for models that don't support it (e.g., ARIMA, Prophet, etc.)
             print(f"Skipping n_epochs override for {model_name} - not a neural model")
 
     return estimator_class(**params)
 
-def run_model(model_name, test_split, frequency, seasonality, data_path, output_dir, config_path=None, workflow="main", log_path=None, n_epochs=None):
+
+def run_model(
+    model_name,
+    test_split,
+    frequency,
+    seasonality,
+    data_path,
+    output_dir,
+    config_path=None,
+    workflow="main",
+    log_path=None,
+    n_epochs=None,
+):
     """
     Run a specific model based on its configuration.
 
@@ -347,7 +351,7 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
 
     Output Locations:
         For a model 'arima' run on 'ftsfr_treas_bond_returns.parquet' with output_dir='../_output':
-        
+
         Logs: ../_output/forecasting/logging/arima/treas_bond_returns.log
         Error Metrics: ../_output/forecasting/error_metrics/arima/treas_bond_returns.csv
         Model Files: ../_output/forecasting/model_checkpoints/arima/treas_bond_returns/
@@ -372,7 +376,7 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
         model_config=model_config,
         seasonality=seasonality,
         frequency=frequency,
-        n_epochs=n_epochs
+        n_epochs=n_epochs,
     )
 
     if log_path is None:
@@ -400,19 +404,21 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
             log_path.mkdir(parents=True, exist_ok=True)
         except:
             pass
-        # Extract dataset name from data_path for logging  
+        # Extract dataset name from data_path for logging
         dataset_name = Path(data_path).stem.removeprefix("ftsfr_")
         log_path = log_path / (dataset_name + ".log")
         f = logging.Formatter("%(asctime)s - %(name)-12s - %(levelname)s - %(message)s")
         logging.getLogger().setLevel(logging.DEBUG)
-        handler_file = logging.FileHandler(log_path, mode = "a")
+        handler_file = logging.FileHandler(log_path, mode="a")
         handler_file.setLevel(logging.DEBUG)
         handler_file.setFormatter(f)
         logging.getLogger().addHandler(handler_file)
         remove_handler = True
 
     logger = logging.getLogger(f"run_model_{model_name}")
-    logger.info(f"Running {model_name} model with parameters: test_split={test_split}, frequency={frequency}, seasonality={seasonality}, data_path={data_path}, output_dir={output_dir}")
+    logger.info(
+        f"Running {model_name} model with parameters: test_split={test_split}, frequency={frequency}, seasonality={seasonality}, data_path={data_path}, output_dir={output_dir}"
+    )
 
     # Handle special models
     model_class = model_config["class"]
@@ -425,15 +431,19 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
     # Dynamically import the required model class only when needed
     if model_class == "DartsLocal":
         from model_classes.darts_local_class import DartsLocal
+
         object_class = DartsLocal
     elif model_class == "DartsGlobal":
         from model_classes.darts_global_class import DartsGlobal
+
         object_class = DartsGlobal
     elif model_class == "NixtlaMain":
         from model_classes.nixtla_main_class import NixtlaMain
+
         object_class = NixtlaMain
     elif model_class == "GluontsMain":
         from model_classes.gluonts_main_class import GluontsMain
+
         object_class = GluontsMain
     elif model_class == "TimesFM":
         # Add the timesfm directory to the path for local import
@@ -443,14 +453,21 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
         from main import TimesFMForecasting
 
         model_obj = TimesFMForecasting(
-            model_config.get("model_version", "500m"), test_split, frequency, seasonality, data_path, output_dir
+            model_config.get("model_version", "500m"),
+            test_split,
+            frequency,
+            seasonality,
+            data_path,
+            output_dir,
         )
         model_obj.inference_workflow()
         return
     else:
         raise ValueError(f"Unknown model class: {model_class}")
 
-    model_obj = object_class(estimator, model_name, test_split, frequency, seasonality, data_path, output_dir)
+    model_obj = object_class(
+        estimator, model_name, test_split, frequency, seasonality, data_path, output_dir
+    )
 
     # Run the selected workflow
     if workflow == "main":
@@ -467,7 +484,7 @@ def run_model(model_name, test_split, frequency, seasonality, data_path, output_
         model_obj.save_results()
     else:
         raise ValueError(f"Unknown workflow: {workflow}")
-    
+
     if remove_handler:
         h_to_remove = logging.getLogger().handlers[-1]
         logging.getLogger().removeHandler(h_to_remove)
@@ -538,7 +555,7 @@ def main():
 
     # Create a modified environment dictionary with CLI arguments taking priority
     modified_env = os.environ.copy()
-    
+
     # Override environment variables with CLI arguments if provided
     if args.dataset_path:
         modified_env["DATASET_PATH"] = args.dataset_path
