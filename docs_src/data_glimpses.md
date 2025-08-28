@@ -1,7 +1,14 @@
 # Data Glimpses Report
-Total files: 114
+Total files: 116
 
 ## Summary of Datasets by Task
+
+### Determine Available Datasets
+- [`available_datasets.csv`](#available-datasets-csv)
+
+### Determine Cutoff Dates
+- [`available_datasets.csv`](#available-datasets-csv)
+- [`cutoff_dates.csv`](#cutoff-dates-csv)
 
 ### Format
 #### Format: Basis Tips Treas
@@ -6755,6 +6762,47 @@ y: min=-1.0, max=26.583827, mean=0.01, median=0.0
 ### Date/Datetime Column Statistics
 ```
 ds: min=1925-12-31 00:00:00, max=2024-12-31 00:00:00
+```
+
+---
+
+## available_datasets.csv
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/available_datasets.csv`
+**Size:** 4249 bytes | **Type:** Csv | **Shape:** 27 rows × 4 columns
+
+### Columns
+```
+full_name                                String         
+file_path                                String         
+frequency                                String         
+seasonality                              Int64          
+```
+
+### Numeric Column Statistics
+```
+seasonality: min=4, max=252, mean=63.89, median=12.0
+```
+
+---
+
+## cutoff_dates.csv
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/cutoff_dates.csv`
+**Size:** 5170 bytes | **Type:** Csv | **Shape:** 27 rows × 7 columns
+
+### Columns
+```
+full_name                                String         
+min_date                                 String         
+cutoff_date                              String         
+max_date                                 String         
+frequency                                String         
+seasonality                              Int64          
+file_path                                String         
+```
+
+### Numeric Column Statistics
+```
+seasonality: min=4, max=252, mean=63.89, median=12.0
 ```
 
 ---

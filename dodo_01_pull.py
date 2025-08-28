@@ -36,31 +36,6 @@ data_sources = subscriptions_toml["data_sources"].copy()
 # Check if we're being called by create_data_glimpses.py
 is_data_glimpses = any("create_data_glimpses" in arg for arg in sys.argv)
 
-bbg_skip = False
-# Skip Bloomberg Terminal prompt when being imported by create_data_glimpses.py
-if data_sources["bloomberg_terminal"] and not is_data_glimpses:
-    # Interactive check for Bloomberg Terminal
-    while True:
-        response = (
-            input("Is the Bloomberg Terminal open in the background? (yes/no/SKIP): ")
-            .strip()
-            .lower()
-        )
-        if response in ["yes"]:
-            print("Proceeding with Bloomberg Terminal enabled...")
-            break
-        elif response == "no":
-            print(
-                "Aborting. Please open the Bloomberg Terminal and keep it running in the background."
-            )
-            sys.exit(1)
-        elif response in ["skip", ""]:
-            print("Skipping Bloomberg Terminal data sources...")
-            bbg_skip = True
-            break
-        else:
-            print("Please enter 'yes', 'no', or 'skip'.")
-
 
 # Load module requirements from datasets.toml
 module_requirements_dict = load_all_module_requirements()
@@ -110,46 +85,8 @@ def task_pull():
             ],
             "clean": [],
         }
-    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
-        yield {
-            "name": f"bbg:{data_module}",
-            "actions": [
-                f"python ./src/{data_module}/pull_bbg_treasury_inflation_swaps.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "treasury_inflation_swaps.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/pull_bbg_treasury_inflation_swaps.py",
-            ],
-            "clean": [],
-        }
 
     data_module = "basis_treas_sf"
-    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
-        yield {
-            "name": f"bbg:{data_module}",
-            "actions": [
-                f"python ./src/{data_module}/pull_bbg_basis_treas_sf.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "treasury_2y_1.parquet",
-                DATA_DIR / data_module / "treasury_2y_2.parquet",
-                DATA_DIR / data_module / "treasury_5y_1.parquet",
-                DATA_DIR / data_module / "treasury_5y_2.parquet",
-                DATA_DIR / data_module / "treasury_10y_1.parquet",
-                DATA_DIR / data_module / "treasury_10y_2.parquet",
-                DATA_DIR / data_module / "treasury_20y_1.parquet",
-                DATA_DIR / data_module / "treasury_20y_2.parquet",
-                DATA_DIR / data_module / "treasury_30y_1.parquet",
-                DATA_DIR / data_module / "treasury_30y_2.parquet",
-                DATA_DIR / data_module / "ois.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/pull_bbg_basis_treas_sf.py",
-            ],
-            "clean": [],
-        }
     if module_requirements.get(data_module, False) and not use_cache:
         yield {
             "name": data_module,
@@ -162,23 +99,6 @@ def task_pull():
             ],
             "file_dep": [
                 f"./src/{data_module}/format_bbg_basis_treas_sf.py",
-            ],
-            "clean": [],
-        }
-
-    data_module = "basis_treas_swap"
-    if module_requirements.get(data_module, False) and not use_cache and not bbg_skip:
-        yield {
-            "name": f"bbg:{data_module}",
-            "actions": [
-                f"python ./src/{data_module}/pull_bbg_treas_swap.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "raw_tyields.parquet",
-                DATA_DIR / data_module / "raw_syields.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/pull_bbg_treas_swap.py",
             ],
             "clean": [],
         }
@@ -230,44 +150,6 @@ def task_pull():
             "clean": [],
         }
 
-    data_module = "commodities"
-    if module_requirements[data_module] and not use_cache and not bbg_skip:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/pull_bbg_commodities_basis.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/pull_bbg_active_commodities.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "commodity_futures.parquet",
-                DATA_DIR / data_module / "lme_metals.parquet",
-                DATA_DIR / data_module / "gsci_indices.parquet",
-                DATA_DIR / data_module / "commodity_futures_active.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/pull_bbg_commodities_basis.py",
-                f"./src/{data_module}/pull_bbg_active_commodities.py",
-            ],
-        }
-
-    data_module = "cip"
-    if module_requirements[data_module] and not use_cache and not bbg_skip:
-        yield {
-            "name": data_module,
-            "actions": [
-                f"python ./src/{data_module}/pull_bbg_foreign_exchange.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "fx_spot_rates.parquet",
-                DATA_DIR / data_module / "fx_forward_points.parquet",
-                DATA_DIR / data_module / "fx_interest_rates.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/pull_bbg_foreign_exchange.py",
-            ],
-            "clean": [],
-        }
-
     # fmt: off
     data_module = "corp_bond_returns"
     if module_requirements[data_module] and not use_cache:
@@ -301,22 +183,6 @@ def task_pull():
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_wrds_fx.py",
-            ],
-        }
-
-    if module_requirements[data_module] and not use_cache and not bbg_skip:
-        yield {
-            "name": f"bbg:{data_module}",
-            "actions": [
-                f"python ./src/{data_module}/pull_bbg_foreign_exchange.py --DATA_DIR={DATA_DIR / data_module}",
-            ],
-            "targets": [
-                DATA_DIR / data_module / "fx_spot_rates.parquet",
-                DATA_DIR / data_module / "fx_forward_points.parquet",
-                DATA_DIR / data_module / "fx_interest_rates.parquet",
-            ],
-            "file_dep": [
-                f"./src/{data_module}/pull_bbg_foreign_exchange.py",
             ],
         }
 
