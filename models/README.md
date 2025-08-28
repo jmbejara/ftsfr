@@ -508,7 +508,15 @@ FS_FOLDER="utah-fs"
 ssh -i ~/.ssh/${SSH_KEY} ubuntu@${NODE_IP} "mkdir -p ~/${FS_FOLDER}/ftsfr"
 if [ "$(basename "$PWD")" = "ftsfr" ]; then
   echo "Correct directory"
-  rsync -avzh --progress --delete --exclude='_docs/' --exclude='docs/' --exclude='_output/' --exclude='.pixi/' --exclude="./models/lightning_logs/" -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
+  rsync -avzh --progress --delete \
+    --exclude='_docs/' \
+    --exclude='docs/' \
+    --exclude='_output/' \
+    --exclude='.pixi/' \
+    --exclude='./models/lightning_logs/' \
+    --exclude='.doit-db.sqlite' \
+    --exclude='.doit.db.db' \
+    -e "ssh -i ~/.ssh/${SSH_KEY}" ./ ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/
 else
   echo "Error: Current directory is not 'ftsfr'. Please 'cd' into the 'ftsfr' directory before running rsync."
 fi

@@ -365,3 +365,17 @@ To format all files and fix linting errors:
 ```bash
 ruff format . && ruff check --fix --show-fixes .
 ```
+
+## Restoring Doit Database
+
+If you accidentally delete your `.doit.db` files and want to avoid re-running completed tasks:
+
+```bash
+# Scan completed tasks and generate ignore commands
+python restore_dodo_helper.py
+
+# Run the generated commands
+bash restore_dodo_commands.sh
+```
+
+The script identifies completed tasks by checking for valid MASE values in error metrics files and generates appropriate `doit ignore` commands.
