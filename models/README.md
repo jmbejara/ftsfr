@@ -529,9 +529,23 @@ cd ~/${FS_FOLDER}/ftsfr
 ./setup_lambdalabs.sh  # Run setup on first connection
 ```
 
-To sync back to local machine:
+To sync forecasting error metrics back to local machine:
 ```bash
-rsync -avzh --progress --exclude='.pixi/' --exclude='.git/' --exclude='_data/' -e "ssh -i ~/.ssh/${SSH_KEY}" ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/ ./
+rsync -avzh --progress \
+  --exclude='.pixi/' \
+  --exclude='.git/' \
+  --exclude='_data/' \
+  --exclude='lightning_logs/' \
+  --exclude='_data/' \
+  --exclude='_output/' \
+  --exclude='.git/' \
+  --exclude='.pixi/' \
+  --exclude='.doit-db.sqlite' \
+  --exclude='.doit.db.db' \
+  --exclude='lightning_logs/' \
+  --exclude='model_logs/' \
+  -e "ssh -i ~/.ssh/${SSH_KEY}" ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/_output/forecasting/error_metrics/ \
+  /Users/jbejarano/GitRepositories/ftsfr/lambda_results/
 ```
 
 ## Technical Details

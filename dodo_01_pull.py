@@ -791,6 +791,33 @@ def task_determine_available_datasets():
     }
 
 
+def task_organize_ftsfr_datasets():
+    """Organize ftsfr datasets into formatted structure"""
+    # Get all Python files in src directory as dependencies
+    src_files = list(Path("./src").rglob("*.py"))
+    
+    # Find all existing ftsfr files to generate targets
+    formatted_targets = []
+    if DATA_DIR.exists():
+        for module_dir in DATA_DIR.iterdir():
+            if module_dir.is_dir():
+                module_name = module_dir.name
+                # Find ftsfr files in this module
+                for ftsfr_file in module_dir.glob("ftsfr_*.parquet"):
+                    # Create corresponding target path in formatted structure
+                    formatted_path = DATA_DIR / "formatted" / module_name / ftsfr_file.name
+                    formatted_targets.append(formatted_path)
+    
+    return {
+        "actions": [(debug_action, ["python ./src/organize_ftsfr_datasets.py"])],
+        "file_dep": [
+            "./src/organize_ftsfr_datasets.py",
+            *[str(f) for f in src_files],
+        ],
+        "targets": formatted_targets,
+        "verbosity": 0,
+    }
+
 def task_determine_cutoff_dates():
     """Determine cutoff dates for each dataset"""
     return {
