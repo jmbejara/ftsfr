@@ -371,11 +371,31 @@ ruff format . && ruff check --fix --show-fixes .
 If you accidentally delete your `.doit.db` files and want to avoid re-running completed tasks:
 
 ```bash
-# Scan completed tasks and generate ignore commands
+# Scan completed tasks for all forecasting dodo files (default behavior)
 python restore_dodo_helper.py
 
+# Or scan for a specific dodo file
+python restore_dodo_helper.py -f dodo_02_darts_local.py
+
 # Run the generated commands
-bash restore_dodo_commands.sh
+bash _output/restore_dodo_commands.sh
 ```
 
-The script identifies completed tasks by checking for valid MASE values in error metrics files and generates appropriate `doit ignore` commands.
+The script identifies completed tasks by checking for valid MASE values in error metrics files and generates appropriate `doit ignore` commands. By default, it processes all forecasting dodo files (dodo_02 through dodo_06).
+
+## Merging Lambda Results
+
+When running forecasting on LambdaLabs and copying results back locally:
+
+```bash
+# Compare files between lambda results and local error metrics
+python src/compare_error_metrics.py
+
+# Generate rsync command to merge lambda results with local files
+python src/merge_lambda_results.py
+
+# Run the generated merge command
+bash _output/merge_lambda_results.sh
+```
+
+The merge operation will overwrite local files if they exist in lambda results, but keep local files that don't exist in lambda results (no deletion).

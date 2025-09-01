@@ -67,6 +67,17 @@ def get_darts_global_models() -> Dict[str, dict]:
     }
 
 
+def get_forecasting_dodo_files() -> List[str]:
+    """Get all forecasting dodo files."""
+    return [
+        'dodo_02_darts_local.py',
+        'dodo_03_darts_global.py', 
+        'dodo_04_nixtla.py',
+        'dodo_05_gluonts.py',
+        'dodo_06_timesfm.py'
+    ]
+
+
 def get_dodo_task_info(dodo_file: str) -> Tuple[str, str]:
     """
     Determine the task prefix and model class filter from dodo filename.
@@ -83,8 +94,9 @@ def get_dodo_task_info(dodo_file: str) -> Tuple[str, str]:
     dodo_mappings = {
         'dodo_02_darts_local': ('forecast_darts_local', 'DartsLocal'),
         'dodo_03_darts_global': ('forecast_darts_global', 'DartsGlobal'),
+        'dodo_04_nixtla': ('forecast_nixtla', 'Nixtla'),
         'dodo_05_gluonts': ('forecast_gluonts', 'GluontsMain'),
-        # Add more mappings as needed
+        'dodo_06_timesfm': ('forecast_timesfm', 'TimesFM'),
     }
     
     if filename in dodo_mappings:
@@ -95,8 +107,12 @@ def get_dodo_task_info(dodo_file: str) -> Tuple[str, str]:
         return ('forecast_darts_local', 'DartsLocal')
     elif 'darts_global' in filename:
         return ('forecast_darts_global', 'DartsGlobal')
+    elif 'nixtla' in filename:
+        return ('forecast_nixtla', 'Nixtla')
     elif 'gluonts' in filename:
         return ('forecast_gluonts', 'GluontsMain')
+    elif 'timesfm' in filename:
+        return ('forecast_timesfm', 'TimesFM')
     
     raise ValueError(f"Cannot determine task info for dodo file: {dodo_file}")
 
@@ -211,8 +227,8 @@ def print_summary(completed_tasks: Set[str], completion_status: Dict[str, List[s
 
 def main():
     parser = argparse.ArgumentParser(description="Identify completed dodo tasks and generate ignore commands")
-    parser.add_argument("-f", "--file", required=True,
-                       help="Dodo file to generate ignore commands for (e.g., dodo_02_darts_local.py)")
+    parser.add_argument("-f", "--file", 
+                       help="Specific dodo file to generate ignore commands for (e.g., dodo_02_darts_local.py). If not specified, processes all forecasting dodo files.")
     parser.add_argument("--commands-only", action="store_true", 
                        help="Output only the ignore commands (no summary)")
     parser.add_argument("--dry-run", action="store_true",
@@ -220,26 +236,51 @@ def main():
     
     args = parser.parse_args()
     
-    # Get task info from dodo file
-    try:
-        task_prefix, model_class_filter = get_dodo_task_info(args.file)
-    except ValueError as e:
-        print(f"Error: {e}")
-        return 1
+    # Determine which dodo files to process
+    if args.file:
+        dodo_files = [args.file]
+    else:
+        dodo_files = get_forecasting_dodo_files()
+        if not args.commands_only:
+            print(f"Processing {len(dodo_files)} forecasting dodo files: {', '.join(dodo_files)}")
     
-    # Scan for completed tasks
-    completed_tasks, completion_status = scan_completed_tasks(model_class_filter)
+    all_completed_tasks = set()
+    all_commands = []
     
-    if not args.commands_only:
-        print_summary(completed_tasks, completion_status)
-    
-    if not args.dry_run:
-        # Generate ignore commands
-        ignore_commands = generate_ignore_commands(completed_tasks, args.file, task_prefix)
+    for dodo_file in dodo_files:
+        try:
+            task_prefix, model_class_filter = get_dodo_task_info(dodo_file)
+        except ValueError as e:
+            print(f"Error processing {dodo_file}: {e}")
+            continue
         
+        if not args.commands_only and len(dodo_files) > 1:
+            print(f"\n{'='*60}")
+            print(f"PROCESSING: {dodo_file}")
+            print(f"{'='*60}")
+        
+        # Scan for completed tasks
+        completed_tasks, completion_status = scan_completed_tasks(model_class_filter)
+        all_completed_tasks.update(completed_tasks)
+        
+        if not args.commands_only:
+            if len(dodo_files) == 1:
+                print_summary(completed_tasks, completion_status)
+            else:
+                # Brief summary for multiple files
+                total_completed = len(completed_tasks)
+                total_possible = sum(len(statuses) for statuses in completion_status.values())
+                print(f"Found {total_completed}/{total_possible} completed tasks")
+        
+        if not args.dry_run:
+            # Generate ignore commands for this file
+            ignore_commands = generate_ignore_commands(completed_tasks, dodo_file, task_prefix)
+            all_commands.extend(ignore_commands)
+    
+    if not args.dry_run and all_commands:
         if args.commands_only:
             # Just print the commands
-            for cmd in ignore_commands:
+            for cmd in all_commands:
                 print(cmd)
         else:
             # Print commands with header
@@ -248,21 +289,22 @@ def main():
             print("="*60)
             print("Copy and paste these commands:")
             print()
-            for cmd in ignore_commands:
+            for cmd in all_commands:
                 print(cmd)
             
             # Save to file as well
-            output_file = Path("restore_dodo_commands.sh")
+            output_file = Path("_output") / "restore_dodo_commands.sh"
+            output_file.parent.mkdir(exist_ok=True)
             with open(output_file, 'w') as f:
                 f.write("#!/bin/bash\n")
                 f.write("# Generated doit ignore commands\n")
                 f.write("# Run with: bash restore_dodo_commands.sh\n\n")
-                for cmd in ignore_commands:
+                for cmd in all_commands:
                     f.write(f"{cmd}\n")
             
             print(f"\nCommands also saved to: {output_file}")
     
-    return 0 if completed_tasks else 1
+    return 0 if all_completed_tasks else 1
 
 
 if __name__ == "__main__":
