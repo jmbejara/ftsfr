@@ -67,9 +67,56 @@ def get_darts_global_models() -> Dict[str, dict]:
     }
 
 
-def scan_completed_tasks() -> Tuple[Set[str], Dict[str, List[str]]]:
+def get_dodo_task_info(dodo_file: str) -> Tuple[str, str]:
+    """
+    Determine the task prefix and model class filter from dodo filename.
+    
+    Args:
+        dodo_file: Path to the dodo file (e.g., 'dodo_02_darts_local.py')
+        
+    Returns:
+        Tuple of (task_prefix, model_class_filter)
+    """
+    filename = Path(dodo_file).stem  # Remove .py extension
+    
+    # Map dodo files to their task info
+    dodo_mappings = {
+        'dodo_02_darts_local': ('forecast_darts_local', 'DartsLocal'),
+        'dodo_03_darts_global': ('forecast_darts_global', 'DartsGlobal'),
+        'dodo_05_gluonts': ('forecast_gluonts', 'GluontsMain'),
+        # Add more mappings as needed
+    }
+    
+    if filename in dodo_mappings:
+        return dodo_mappings[filename]
+    
+    # Try to infer from filename if not in mappings
+    if 'darts_local' in filename:
+        return ('forecast_darts_local', 'DartsLocal')
+    elif 'darts_global' in filename:
+        return ('forecast_darts_global', 'DartsGlobal')
+    elif 'gluonts' in filename:
+        return ('forecast_gluonts', 'GluontsMain')
+    
+    raise ValueError(f"Cannot determine task info for dodo file: {dodo_file}")
+
+
+def get_models_by_class(model_class: str) -> Dict[str, dict]:
+    """Get all models of a specific class from configuration."""
+    models_config = load_models_config()
+    return {
+        model_name: model_config
+        for model_name, model_config in models_config.items()
+        if model_config.get("class") == model_class
+    }
+
+
+def scan_completed_tasks(model_class_filter: str = None) -> Tuple[Set[str], Dict[str, List[str]]]:
     """
     Scan output directory to find completed tasks.
+    
+    Args:
+        model_class_filter: Optional filter to only include models of specific class
     
     Returns:
         Tuple of (completed_tasks, completion_status_by_model)
@@ -85,9 +132,21 @@ def scan_completed_tasks() -> Tuple[Set[str], Dict[str, List[str]]]:
     
     # Get all model directories that actually exist
     existing_model_dirs = [d for d in error_metrics_dir.iterdir() if d.is_dir()]
+    
+    # Filter model directories by class if specified
+    if model_class_filter:
+        models_config = load_models_config()
+        valid_model_names = {
+            model_name for model_name, model_config in models_config.items()
+            if model_config.get("class") == model_class_filter
+        }
+        existing_model_dirs = [d for d in existing_model_dirs if d.name in valid_model_names]
+    
     model_names_with_output = [d.name for d in existing_model_dirs]
     
     print(f"Found {len(existing_model_dirs)} model directories: {model_names_with_output}")
+    if model_class_filter:
+        print(f"  (filtered for {model_class_filter} models)")
     
     # Check each model directory
     for model_dir in existing_model_dirs:
@@ -117,20 +176,12 @@ def scan_completed_tasks() -> Tuple[Set[str], Dict[str, List[str]]]:
     return completed_tasks, completion_status
 
 
-def generate_ignore_commands(completed_tasks: Set[str]) -> List[str]:
+def generate_ignore_commands(completed_tasks: Set[str], dodo_file: str, task_prefix: str) -> List[str]:
     """Generate doit ignore commands for completed tasks."""
     commands = []
-    darts_global_models = get_darts_global_models()
     
     for task_name in sorted(completed_tasks):
-        model_name = task_name.split(':')[0]
-        
-        # Check if this is a DartsGlobal model
-        if model_name in darts_global_models:
-            commands.append(f"doit -f dodo_03_darts_global.py ignore 'forecast_darts_global:{task_name}'")
-        else:
-            # Assume it's a DartsLocal model
-            commands.append(f"doit -f dodo_02_darts_local.py ignore 'forecast_darts_local:{task_name}'")
+        commands.append(f"doit -f {dodo_file} ignore '{task_prefix}:{task_name}'")
     
     return commands
 
@@ -160,6 +211,8 @@ def print_summary(completed_tasks: Set[str], completion_status: Dict[str, List[s
 
 def main():
     parser = argparse.ArgumentParser(description="Identify completed dodo tasks and generate ignore commands")
+    parser.add_argument("-f", "--file", required=True,
+                       help="Dodo file to generate ignore commands for (e.g., dodo_02_darts_local.py)")
     parser.add_argument("--commands-only", action="store_true", 
                        help="Output only the ignore commands (no summary)")
     parser.add_argument("--dry-run", action="store_true",
@@ -167,15 +220,22 @@ def main():
     
     args = parser.parse_args()
     
+    # Get task info from dodo file
+    try:
+        task_prefix, model_class_filter = get_dodo_task_info(args.file)
+    except ValueError as e:
+        print(f"Error: {e}")
+        return 1
+    
     # Scan for completed tasks
-    completed_tasks, completion_status = scan_completed_tasks()
+    completed_tasks, completion_status = scan_completed_tasks(model_class_filter)
     
     if not args.commands_only:
         print_summary(completed_tasks, completion_status)
     
     if not args.dry_run:
         # Generate ignore commands
-        ignore_commands = generate_ignore_commands(completed_tasks)
+        ignore_commands = generate_ignore_commands(completed_tasks, args.file, task_prefix)
         
         if args.commands_only:
             # Just print the commands
