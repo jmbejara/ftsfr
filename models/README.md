@@ -545,7 +545,7 @@ rsync -avzh --progress \
   --exclude='lightning_logs/' \
   --exclude='model_logs/' \
   -e "ssh -i ~/.ssh/${SSH_KEY}" ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/_output/forecasting/error_metrics/ \
-  /Users/jbejarano/GitRepositories/ftsfr/lambda_results/
+  /Users/jbejarano/GitRepositories/ftsfr/_output/forecasting/error_metrics/
 ```
 
 ## Technical Details
