@@ -111,8 +111,8 @@ _notebook_build/summary_cds_bond_basis_ipynb.ipynb
 _notebook_build/summary_cds_returns_ipynb.ipynb
 _notebook_build/summary_cip_ipynb.ipynb
 _notebook_build/summary_corp_bond_returns_ipynb.ipynb
-cleaning_options.md
 spx_options_description.md
+cleaning_options.md
 _notebook_build/summary_treasury_bond_returns_ipynb.ipynb
 ```
 
