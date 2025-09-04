@@ -1233,7 +1233,7 @@ date: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ## ftsfr_CDS_bond_basis_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/ftsfr_CDS_bond_basis_aggregated.parquet`
-**Size:** 2726 bytes | **Type:** Parquet | **Shape:** 3 rows × 3 columns
+**Size:** 7441 bytes | **Type:** Parquet | **Shape:** 346 rows × 3 columns
 
 ### Columns
 ```
@@ -1244,19 +1244,19 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=1.1816992084125153, max=2.442321441593389, mean=1.95, median=2.237723829667863
+y: min=-5.751113076375435, max=9.081822277149262, mean=1.81, median=2.002582027998724
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2011-09-22 11:50:47, max=2014-01-19 07:45:18
+ds: min=2002-09-30 00:00:00, max=2022-09-30 00:00:00
 ```
 
 ---
 
 ## ftsfr_CDS_bond_basis_non_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet`
-**Size:** 7.1 MB | **Type:** Parquet | **Shape:** 552,410 rows × 4 columns
+**Size:** 1.5 MB | **Type:** Parquet | **Shape:** 91,742 rows × 4 columns
 
 ### Columns
 ```
@@ -1268,8 +1268,8 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-y: min=-99.98623956278941, max=99.84502978149779, mean=2.23, median=2.5577267376755635
-__index_level_0__: min=0, max=585506, mean=291580.04, median=292526.5
+y: min=-99.98623956278941, max=99.84502978149779, mean=2.32, median=3.127317613581347
+__index_level_0__: min=0, max=99043, mean=49131.58, median=48894.5
 ```
 
 ### Date/Datetime Column Statistics
@@ -1534,7 +1534,7 @@ y                                        Float64         (69.3% null)
 
 ### Numeric Column Statistics
 ```
-y: min=-1.8053032776257123, max=1.225852266658337, mean=0.00, median=0.001656363893105306
+y: min=-1.8013845320771744, max=1.2258522666583382, mean=0.00, median=0.0016566237829834796
 ```
 
 ### Date/Datetime Column Statistics
@@ -1546,18 +1546,18 @@ ds: min=2001-01-01 00:00:00, max=2023-12-01 00:00:00
 
 ## ftsfr_CDS_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/ftsfr_CDS_portfolio_returns.parquet`
-**Size:** 59070 bytes | **Type:** Parquet | **Shape:** 5,520 rows × 3 columns
+**Size:** 59071 bytes | **Type:** Parquet | **Shape:** 5,520 rows × 3 columns
 
 ### Columns
 ```
-ds                                       Datetime(time_unit='ns', time_zone=None)
 unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.2% null)
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=5.3679566790914244e-05, max=0.019324400742117755, mean=0.00, median=0.000844062896609395
+y: min=5.366442292512657e-05, max=0.01932381300560798, mean=0.00, median=0.0008410436482493664
 ```
 
 ### Date/Datetime Column Statistics
@@ -1627,7 +1627,7 @@ monthly_return                           Float64
 ### Numeric Column Statistics
 ```
 credit_quantile: min=1, max=5, mean=2.99, median=3.0
-monthly_return: min=-1.8053032776257123, max=1.225852266658337, mean=nan, median=nan
+monthly_return: min=-1.8013845320771744, max=1.2258522666583382, mean=nan, median=nan
 ```
 
 ### Date/Datetime Column Statistics
@@ -1639,7 +1639,7 @@ Month: min=2001-01-01 00:00:00, max=2023-12-01 00:00:00
 
 ## markit_cds_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_returns/markit_cds_returns.parquet`
-**Size:** 50642 bytes | **Type:** Parquet | **Shape:** 276 rows × 21 columns
+**Size:** 50140 bytes | **Type:** Parquet | **Shape:** 276 rows × 21 columns
 
 ### Columns
 ```
@@ -1668,26 +1668,26 @@ Month                                    Datetime(time_unit='ns', time_zone=None
 
 ### Numeric Column Statistics
 ```
-3Y_Q1: min=5.3679566790914244e-05, max=0.0012979328096256253, mean=0.00, median=0.0001779897534219545
-3Y_Q2: min=9.76629738778774e-05, max=0.0017578566221958748, mean=0.00, median=0.0003009968308691817
-3Y_Q3: min=0.00016926236811734733, max=0.0028162769252556394, mean=0.00, median=0.0004869968276447002
-3Y_Q4: min=0.0003527565727831507, max=0.008638109805309319, mean=0.00, median=0.0008246946319114292
-3Y_Q5: min=0.0010271239445425622, max=0.017029833862145637, mean=0.00, median=0.003302419782150684
-5Y_Q1: min=8.235355528118936e-05, max=0.0013420012384308675, mean=0.00, median=0.00027892664659445726
-5Y_Q2: min=0.00016524345019641729, max=0.0015301593893626286, mean=0.00, median=0.0005002319921015852
-5Y_Q3: min=0.0002442534777740147, max=0.0029644327929516665, mean=0.00, median=0.0007586496862632688
-5Y_Q4: min=0.0006704490162541266, max=0.008650813007283542, mean=0.00, median=0.001356027784475522
-5Y_Q5: min=0.0018230444667404195, max=0.01829662469333759, mean=0.01, median=0.004622658857203365
-7Y_Q1: min=0.00010968195434010872, max=0.0013950893531677118, mean=0.00, median=0.00036144411217562875
-7Y_Q2: min=8.178703302021549e-05, max=0.0015299949408828619, mean=0.00, median=0.0006682448072711323
-7Y_Q3: min=0.00012352251688612167, max=0.0030560995892706814, mean=0.00, median=0.0010011398071442155
-7Y_Q4: min=0.0010986731325046794, max=0.007199530170044171, mean=0.00, median=0.0020585004505935933
-7Y_Q5: min=0.0024331505184995122, max=0.018987263504676014, mean=0.01, median=0.00542289629834712
-10Y_Q1: min=0.0001349426072983671, max=0.0009062811982701584, mean=0.00, median=0.00048256272778544104
-10Y_Q2: min=7.050985719027129e-05, max=0.001498983848630739, mean=0.00, median=0.0007513917330968592
-10Y_Q3: min=0.0001406887997748563, max=0.0031267857349320167, mean=0.00, median=0.0011685359594848389
-10Y_Q4: min=0.0013789079786558156, max=0.00745655577860734, mean=0.00, median=0.002317594885396361
-10Y_Q5: min=0.0030344491326779973, max=0.019324400742117755, mean=0.01, median=0.006156191116590556
+3Y_Q1: min=5.366442292512657e-05, max=0.0012975666419859542, mean=0.00, median=0.0001774862670435751
+3Y_Q2: min=9.875817493908628e-05, max=0.0017561193198135851, mean=0.00, median=0.0003017551808651557
+3Y_Q3: min=0.0001686679463571192, max=0.002827660649804403, mean=0.00, median=0.0004850012858018642
+3Y_Q4: min=0.0003527395436448479, max=0.008637692805094728, mean=0.00, median=0.0008260284988494747
+3Y_Q5: min=0.0010272437507752414, max=0.017031820263347767, mean=0.00, median=0.0033280936866318727
+5Y_Q1: min=8.235355528118939e-05, max=0.001342001238430868, mean=0.00, median=0.0002797061315038541
+5Y_Q2: min=0.00016720397901170972, max=0.001530159389362629, mean=0.00, median=0.0005017130566181694
+5Y_Q3: min=0.0002442534777740146, max=0.002975172581779928, mean=0.00, median=0.000755465681070655
+5Y_Q4: min=0.0006704490162541267, max=0.008650813007283544, mean=0.00, median=0.0013640820881911655
+5Y_Q5: min=0.00182304446674042, max=0.018296624693337593, mean=0.01, median=0.004602824682470086
+7Y_Q1: min=0.00010966004215142221, max=0.0013948106431344609, mean=0.00, median=0.000361818552501483
+7Y_Q2: min=8.183479034873943e-05, max=0.0015324918772370091, mean=0.00, median=0.0006678735071080846
+7Y_Q3: min=0.00012351158527820237, max=0.0030668837935419234, mean=0.00, median=0.0009947831361775278
+7Y_Q4: min=0.0010985674302986682, max=0.00719883751069108, mean=0.00, median=0.0020645184195602997
+7Y_Q5: min=0.0024330613821017515, max=0.018986567922442497, mean=0.01, median=0.005437239179529434
+10Y_Q1: min=0.00013489233865574958, max=0.0009059435915899638, mean=0.00, median=0.0004829386428422174
+10Y_Q2: min=7.058662146791708e-05, max=0.0015021402472620623, mean=0.00, median=0.0007518499770924935
+10Y_Q3: min=0.00014068104954194434, max=0.0031376358666586426, mean=0.00, median=0.0011669171671421993
+10Y_Q4: min=0.001370130255307961, max=0.007456498674260043, mean=0.00, median=0.0023091265132015515
+10Y_Q5: min=0.0030343568422848246, max=0.01932381300560798, mean=0.01, median=0.006136637607574422
 ```
 
 ### Date/Datetime Column Statistics
@@ -2454,7 +2454,7 @@ ds: min=2001-12-20 00:00:00, max=2025-08-11 00:00:00
 
 ## ftsfr_CDS_bond_basis_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_aggregated.parquet`
-**Size:** 2726 bytes | **Type:** Parquet | **Shape:** 3 rows × 3 columns
+**Size:** 7441 bytes | **Type:** Parquet | **Shape:** 346 rows × 3 columns
 
 ### Columns
 ```
@@ -2465,19 +2465,19 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=1.1816992084125153, max=2.442321441593389, mean=1.95, median=2.237723829667863
+y: min=-5.751113076375435, max=9.081822277149262, mean=1.81, median=2.002582027998724
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2011-09-22 11:50:47, max=2014-01-19 07:45:18
+ds: min=2002-09-30 00:00:00, max=2022-09-30 00:00:00
 ```
 
 ---
 
 ## ftsfr_CDS_bond_basis_non_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet`
-**Size:** 7.1 MB | **Type:** Parquet | **Shape:** 552,410 rows × 4 columns
+**Size:** 1.5 MB | **Type:** Parquet | **Shape:** 91,742 rows × 4 columns
 
 ### Columns
 ```
@@ -2489,8 +2489,8 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-y: min=-99.98623956278941, max=99.84502978149779, mean=2.23, median=2.5577267376755635
-__index_level_0__: min=0, max=585506, mean=291580.04, median=292526.5
+y: min=-99.98623956278941, max=99.84502978149779, mean=2.32, median=3.127317613581347
+__index_level_0__: min=0, max=99043, mean=49131.58, median=48894.5
 ```
 
 ### Date/Datetime Column Statistics
@@ -2513,7 +2513,7 @@ y                                        Float64         (69.3% null)
 
 ### Numeric Column Statistics
 ```
-y: min=-1.8053032776257123, max=1.225852266658337, mean=0.00, median=0.001656363893105306
+y: min=-1.8013845320771744, max=1.2258522666583382, mean=0.00, median=0.0016566237829834796
 ```
 
 ### Date/Datetime Column Statistics
@@ -2525,18 +2525,18 @@ ds: min=2001-01-01 00:00:00, max=2023-12-01 00:00:00
 
 ## ftsfr_CDS_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_returns/ftsfr_CDS_portfolio_returns.parquet`
-**Size:** 59070 bytes | **Type:** Parquet | **Shape:** 5,520 rows × 3 columns
+**Size:** 59071 bytes | **Type:** Parquet | **Shape:** 5,520 rows × 3 columns
 
 ### Columns
 ```
-ds                                       Datetime(time_unit='ns', time_zone=None)
 unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64         (0.2% null)
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=5.3679566790914244e-05, max=0.019324400742117755, mean=0.00, median=0.000844062896609395
+y: min=5.366442292512657e-05, max=0.01932381300560798, mean=0.00, median=0.0008410436482493664
 ```
 
 ### Date/Datetime Column Statistics
