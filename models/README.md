@@ -551,7 +551,7 @@ and consolidate locally:
 ```bash
 rsync -avzh --progress \
     /Users/jbejarano/GitRepositories/ftsfr/_output/forecasting/error_metrics/ \
-    /Users/jbejarano/GitRepositories/ftsfr/lambda_results/
+    /Users/jbejarano/GitRepositories/ftsfr/archived_output/
 ```
 
 ## Technical Details
