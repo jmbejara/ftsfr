@@ -135,6 +135,11 @@ seasonality = 12
 [commodities]
 required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
 
+[commodities.ftsfr_commodities_returns]
+description = """Long format of commodities returns"""
+frequency = "ME"
+seasonality = 12
+
 ################################################################################
 [corp_bond_returns]
 required_data_sources = ["open_source_bond"]

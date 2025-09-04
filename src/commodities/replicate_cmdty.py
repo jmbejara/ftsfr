@@ -32,4 +32,4 @@ def decide_optimal_pairs(corr_matrix):
 
     optimal_pairs_df = optimal_pairs_df.sort_values(by="Correlation", ascending=False)
 
-    return optimal_pairs_df.reset_index(drop=True)
+    return optimal_pairs_df.reset_index(drop=True), row_ind, col_ind

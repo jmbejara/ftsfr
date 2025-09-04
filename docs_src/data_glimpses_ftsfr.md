@@ -1,5 +1,5 @@
 # Data Glimpses Report: FTSFR only
-Total FTSFR datasets: 58
+Total FTSFR datasets: 60
 
 This report provides enhanced analysis specifically for FTSFR (Financial Time Series Forecasting Repository) datasets, including:
 - Detailed null value analysis for all columns
@@ -23,6 +23,8 @@ This report provides enhanced analysis specifically for FTSFR (Financial Time Se
 - [`ftsfr_CDS_portfolio_returns.parquet`](#ftsfr-cds-portfolio-returns-parquet)
 #### Format: Cip
 - [`ftsfr_CIP_spreads.parquet`](#ftsfr-cip-spreads-parquet)
+#### Format: Commodities
+- [`ftsfr_commodities_returns.parquet`](#ftsfr-commodities-returns-parquet)
 #### Format: Corp Bond Returns
 - [`ftsfr_corp_bond_portfolio_returns.parquet`](#ftsfr-corp-bond-portfolio-returns-parquet)
 - [`ftsfr_corp_bond_returns.parquet`](#ftsfr-corp-bond-returns-parquet)
@@ -64,6 +66,7 @@ This report provides enhanced analysis specifically for FTSFR (Financial Time Se
 - [`ftsfr_CDS_contract_returns.parquet`](#ftsfr-cds-contract-returns-parquet)
 - [`ftsfr_CDS_portfolio_returns.parquet`](#ftsfr-cds-portfolio-returns-parquet)
 - [`ftsfr_CIP_spreads.parquet`](#ftsfr-cip-spreads-parquet)
+- [`ftsfr_commodities_returns.parquet`](#ftsfr-commodities-returns-parquet)
 - [`ftsfr_corp_bond_portfolio_returns.parquet`](#ftsfr-corp-bond-portfolio-returns-parquet)
 - [`ftsfr_corp_bond_returns.parquet`](#ftsfr-corp-bond-returns-parquet)
 - [`ftsfr_treas_yield_curve_zero_coupon.parquet`](#ftsfr-treas-yield-curve-zero-coupon-parquet)
@@ -283,6 +286,31 @@ y: min=-75.02010739148606, max=439.59367390435733, mean=18.90, median=12.6606122
 ### Date/Datetime Column Statistics
 ```
 ds: min=2001-12-04 00:00:00, max=2025-02-28 00:00:00
+```
+
+---
+
+## ftsfr_commodities_returns.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/commodities/ftsfr_commodities_returns.parquet`
+**Size:** 126310 bytes | **Type:** Parquet | **Shape:** 11,553 rows × 3 columns
+
+**All rows unique:** ✅ Yes
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.6026668174158621, max=0.6741843598832211, mean=0.00, median=-5.1923181702440147e-05
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1970-01-30 00:00:00, max=2025-08-12 00:00:00
 ```
 
 ---
@@ -634,6 +662,31 @@ y: min=-75.02010739148606, max=439.59367390435733, mean=18.90, median=12.6606122
 ### Date/Datetime Column Statistics
 ```
 ds: min=2001-12-04 00:00:00, max=2025-02-28 00:00:00
+```
+
+---
+
+## ftsfr_commodities_returns.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/commodities/ftsfr_commodities_returns.parquet`
+**Size:** 126310 bytes | **Type:** Parquet | **Shape:** 11,553 rows × 3 columns
+
+**All rows unique:** ✅ Yes
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.6026668174158621, max=0.6741843598832211, mean=0.00, median=-5.1923181702440147e-05
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1970-01-30 00:00:00, max=2025-08-12 00:00:00
 ```
 
 ---

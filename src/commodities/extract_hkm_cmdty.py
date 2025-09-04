@@ -1,10 +1,10 @@
 import sys
 from pathlib import Path
 
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 from he_kelly_manela.pull_he_kelly_manela import load_he_kelly_manela_all
 from settings import config
 
-sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 DATA_DIR = Path(config("DATA_DIR"))
 
