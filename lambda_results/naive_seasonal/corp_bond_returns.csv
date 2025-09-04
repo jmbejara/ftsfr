@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,naive_seasonal,corp_bond_returns,10067,12,45.61901,5.522507,8.287166,0.37252885,12.769676,0.52563465

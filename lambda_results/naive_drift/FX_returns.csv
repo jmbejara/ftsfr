@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,naive_drift,FX_returns,9,12,0.31620145,0.20533094,0.024864819,0.022089776,0.043279324,0.040238094

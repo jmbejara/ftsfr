@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,naive_drift,CIP_spreads,8,12,0.529042,0.49676538,0.04109672,0.031394277,0.058489583,0.04130878
