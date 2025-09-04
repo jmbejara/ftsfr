@@ -1,3 +1,4 @@
+% !TeX root = draft_ftsfr.tex
 \documentclass{article}
 
 % Language setting
@@ -20,6 +21,9 @@
 \usepackage{placeins}
 \usepackage{subfig} % For subfigures (modern replacement for subfigure)
 \usepackage[page]{appendix}
+
+\usepackage{float} % For forcing figure placement with [H]
+\usepackage[table]{xcolor} % For coloring table cells
 
 % \title{An Open-Source Financial Time Series Forecasting Benchmark}
 \title{Benchmarking Forecasting Methods for Financial Stability}
@@ -221,87 +225,30 @@ We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP)
 % S\&P credit ratings.
 
 
-\paragraph{Options}
+\paragraph{Options} The volume of SPX options traded has grown dramatically over time (along with the options asset class as a whole). Our monthly SPX options portfolio returns series follows the data cleaning and portfolio construction methodology of \citet{Constantinides2013} (``CJS'') which has become the canonical approach for constructing option-based portfolios. This framework forms the foundation for numerous studies in derivatives pricing and risk management. We then transform these portfolios into the option portfolios utilized in \citet{He2017} (``HKM''), in accordance with the procedure outlined in their paper. 
 
-
-TODO: Viren: Please review this paragraph in depth. Perhaps just replace it with your own. Put in a description of the economic significance of the options data (maybe the increasing volume in SPX options). Only high level of detail about the cleaning procedure. Focus is on the economic significance of the options data and the economic significance of the cleaning procedure.
-
-The volume of SPX options traded has grown dramatically over time (along with the options asset class as a whole). Our options dataset and code module provides data filtration and portfolio construction functions following the procedures outlined in \cite{Constantinides2013} ("CJS"), and the aggregation of these portfolio returns into the 18 SPX option portfolios utilized in \cite{He2017} ("HKM").
-
-\begin{figure}[h!]
+\begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/spx_options_over_time.png}
+    \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
   \end{tabular}
-  \caption{Volume of Options in the Raw SPX Data}
-  \label{fig:spx_options_volume}
+  \caption{Growth of SPX Options Market Over Time}
+  \label{fig:spx_options_over_time}
 \end{figure}
 
-Our options dataset provides monthly leverage-adjusted portfolio returns for SPX option portfolios, spanning 23 years from January 1996 to December 2019. The monthly returns were constructed from the daily data of 18.9 million individual SPX option contracts. 
 
-The leverage adjustments and dynamic portfolio rebalancing process outlined in CJS had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and acknowledge areas where we made educated guesses about the authors' intent, if a particular process was not sufficiently detailed in the original paper. We provide the user with generalized functions that operate on **any set** of options data that is structured the same as the dataset we utilized (WRDS OptionMetrics). This should hopefully require no more than a few simple data transformations of standardized financial metrics if the user is utilizing a source of option pricing data other than WRDS OptionMetrics.
+The \citet{Constantinides2013} portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to $2 \times 9 \times 3 = 54$ distinct portfolios. The 18 portfolios in \citet{He2017} were constructed by taking an equal weight average across the 3 maturities for CJS portfolios with the same moneyness, adding $2 \times 9 = 18$ distinct portfolios to the dataset, for a total of 72 distinct SPX option portfolios. \emph{We have provided a simple coding system to identify individual portfolios and access these returns series.}
 
+Our dataset is comprised of monthly leverage-adjusted portfolio returns for \textbf{all 72 SPX option portfolios, spanning 23 years from January 1996 to December 2019}. The 72 portfolio returns series were constructed from a raw daily dataset of 18.9 million individual SPX option contracts. These portfolios are constructed using leverage-adjustments and daily dynamic rebalancing to maintain constant risk exposures over time.
+
+
+The leverage adjustments and dynamic portfolio rebalancing process outlined in \citet{Constantinides2013} had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and if a particular process was not sufficiently detailed in the original paper, we acknowledge these areas and made educated guesses about the authors' intent. For convenience, we provide the user with generalized functions that operate on \emph{any set} of options data that is structured the same as the dataset we utilized (WRDS OptionMetrics). 
 
 We also provide a comprehensive overview of the data cleaning and preprocessing steps we undertook to prepare the raw SPX options data for analysis and portfolio construction, which includes technical and mathematical details on volatility estimation, kernel methods, and other relevant techniques.
 
-The CJS portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to $2 \times 9 \times 3 = 54$ distinct portfolios. The 18 HKM portfolios were constructed by taking an equal weight average across the 3 maturities of the CJS portfolios, so we have $2 \times 9 = 18$ distinct portfolios in the HKM framework. We have provided a simple coding system to access and identify these portfolios.
+Additionally, we found it helpful to create some "flat time" visualizations of the entire dataset we utilized in the data filtration process, in order to see the data filters in action. These visualizations are integrated into the filtration code, so will be generated when our filtration functions are utilized.
 
-Additionally, CJS utilized a 3-level data filtration system to clean the raw option quotes. In replicating their work, we found it helpful to create some "flat time" visualizations of the entire dataset, in order to see the data filters in action. These visualizations are integrated into the filtration code, so will be generated when our filtration functions are utilized.
-
-For our SPX options data, this is what each level of filter did to the raw set of options (each dot / point on these charts represents a single option in the raw data):
-
-\begin{figure}[h!]
-  \centering
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/RAW_1996-01_2019-12_iv_summary.png}
-  \end{tabular}
-  \caption{Some visualizations of the raw SPX options data}
-  \label{fig:raw_spx_options_data}
-\end{figure}
-
-
-\begin{figure}[h!]
-  \centering
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L1_1996-01_2019-12_iv_summary.png}
-  \end{tabular}
-  \caption{SPX options remaining after Level 1 filters}
-  \label{fig:l1_spx_options_data}
-\end{figure}
-
-
-
-\begin{figure}[h!]
-  \centering
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L2_1996-01_2019-12_iv_summary.png}
-  \end{tabular}
-  \caption{SPX options remaining after Level 2 filters}
-  \label{fig:l2_spx_options_data}
-\end{figure}
-
-
-\begin{figure}[h!]
-  \centering
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L3_IV_1996-01_2019-12_iv_summary.png}
-  \end{tabular}
-  \caption{SPX options remaining after the Level 3 Implied Volatility filter (only)}
-  \label{fig:l3_iv_only_spx_options_data}
-\end{figure}
-
-
-\begin{figure}[h!]
-  \centering
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L3_IV_PCP_1996-01_2019-12_iv_summary.png}
-  \end{tabular}
-  \caption{SPX options remaining after the Level 3 Implied Volatility and Put-Call Parity filters}
-  \label{fig:l3_iv_pcp_spx_options_data}
-\end{figure}
-
-
-
+Our options dataset and code module are designed to be user-friendly and easily adaptable for researchers interested in exploring the SPX options market or applying similar portfolio construction techniques to other options datasets. 
 
 
 \paragraph{Foreign Exchange}
@@ -700,9 +647,6 @@ TODO
 We would like to thank the following individuals. With their permission, we have adapted and used pieces of their code in this repository: Om Mehta and Kunj Shah for their replication of the Covered Interest Rate Parity (CIP) arbitrage spreads; Kyle Parran and Duncan Park for their replication of commodity futures returns; Haoshu Wang and Guanyu Chen for their replication of the Treasury Spot-Futures basis; Arsh Kumar and Raiden Egbert for their replication of the Treasury Swap basis; and Bailey Meche and Raul Renteria for their replication of the TIPS-Treasury basis.
 
 
-\bibliographystyle{jpe}
-\bibliography{bibliography}
-
 % TODO: Add additional acknowledgments
 
 \begin{appendices}
@@ -836,9 +780,269 @@ The final output is a dataset containing monthly corporate bond portfolio return
 \subsubsection{Options}
 \label{sec:options}
 % Constantinides, Jackwerth and Savov (2013) S&P 500 portfolios
-% Pull in notes from notebooks 
 
-TODO: Viren
+Our monthly SPX options portfolio returns series follows the data cleaning and portfolio construction methodology of \citet{Constantinides2013} (``CJS''), which has become the canonical approach for constructing option-based portfolios. This framework forms the foundation for numerous studies in derivatives pricing and risk management. \citet{He2017} (``HKM'') later adapted the CJS methodology to create a set of 18 option portfolios from the 54 portfolios in CJS. Our dataset includes both the original 54 CJS portfolios and the 18 HKM portfolios, for a total of 72 unique SPX option portfolios.
+
+The original CJS paper used data from 1986 through 2012 (26 years of data). As of the time of writing, due to the unavailability of SPX option data from 1985 to 1995, we replicated the \textbf{54 CJS portfolios} using data from \textbf{January 1996 to December 2019 (23 years of data)}. As shown in Figure~\ref{fig:spx_options_over_time}, the number of SPX option observations has increased significantly over time, and since the volume of SPX options traded prior to 1996 was very low, we believe that our dataset from 1996 to 2019, while 3 years shorter is far richer in content and more relevant for current and future research.
+
+The process to construct our returns series involved two major phases: (1) Replicating with the highest practical fidelity the raw daily data filtration and monthly portfolio construction procedures outlined in \citet{Constantinides2013}, and (2) Transforming these returns series into the 18 portfolios outlined in \citet{He2017}.
+
+\paragraph{Options Data Series Access}
+
+The final FTFSR data series comprise the monthly leverage-adjusted returns for call and put portfolios for both CJS 2013 (54 portfolios) and HKM 2017 (18 portfolios) for the period from Jan 1996--Dec 2019. Each portfolio is identified by a unique string of the form: 
+
+\begin{center}
+{\texttt{\{option type 'C' or 'P'\}\_\{moneyness $\times$ 1000\}\_\{maturity in days\}}}
+\end{center}
+
+Where ``C'' indicates a call option portfolio, ``P'' indicates a put option portfolio, ``moneyness'' is the strike price divided by the index price (e.g. 0.95, 1.00, 1.05), and ``maturity in days'' is the number of days to expiration (e.g. 30, 60, 90, 120, 150, 180). For example, the portfolio string ``C\_950\_30'' indicates a call option portfolio with moneyness of 0.95 and maturity of 30 days.
+
+
+
+\paragraph{Phase 1a: Data Filtration in \citet{Constantinides2013}}
+
+In order to minimize possible quoting errors, CJS filtered the raw options data through three levels of filters. The filters are applied to the trade-in (buy) side to ensure the portfolios are buying into reliable quotes. When positions are exited, if there is no quote in the filtered data, the raw data is searched. These filters are detailed in \textit{Appendix B} of CJS.
+
+
+
+
+\paragraph{\textit{Level 1 Filters}}
+\begin{itemize}
+  \item \textbf{Identical Filter:} Retain only one instance of quotes with the same \textit{option type}, \textit{strike price}, \textit{expiration date/maturity}, and \textit{price}.
+  \item \textbf{Identical Except Price Filter:} For sets of quotes with identical terms (\textit{type}, \textit{strike}, and \textit{maturity}) but different prices, keep the quote whose \textit{T-bill-based implied volatility} is closest to that of its \textit{moneyness neighbors}, and delete the others.
+  \item \textbf{Bid = 0 Filter:} Drop quotes with a \textit{bid price} of zero, thereby avoiding low-valued options. Also, a zero bid may indicate censoring as negative bids cannot be recorded.
+  \item \textbf{Volume = 0 Filter:} Drop quotes with zero volume. Appendix B of CJS does not explicitly detail this filter, but we list it here for completeness since it is included in Table B.1 (Filters) of CJS. However, given that \textit{Appendix B} of \citet{Constantinides2013} did not describe this filter, we assume its inclusion in Table B.1 (Filter) of CJS was an error, and we have not implemented this filter in our replication.
+\end{itemize}
+
+
+\paragraph{\textit{Level 2 Filters}}
+\begin{itemize}
+  \item \textbf{Days to Maturity Filter:} Drop options with fewer than seven or more than 180 calendar days to expiration.
+  \item \textbf{Implied Volatility Filter:} Remove all option quotes with implied volatilities lower than 5\% or higher than 100\%, computed using T-bill interest rates.
+  \item \textbf{Moneyness Filter:} Remove all option quotes with moneyness (the ratio of strike price to index price) below 0.8 or above 1.2. These options have little value beyond their intrinsic value and are also very thinly traded.
+  \item \textbf{Implied Interest Rate Filter:} Compute implied volatilities using T-bill interest rates from the Federal Reserve’s H.15 release, assigning the closest available rate to each observation. Since T-bill rates may not be relevant for short maturities, we also compute a put-call parity-implied interest rate by imposing put-call parity on put-call pairs and adjusting the interest rate. We remove pairs with negative implied interest rates and assign the median-implied rate to all quotes of the same maturity and moneyness between 0.95 and 1.05, interpolating as needed.
+  \item \textbf{Unable to Compute IV Filter:} Remove quotes that imply negative time value.
+\end{itemize}
+
+\paragraph{\textit{Level 3 Filters}}
+\begin{itemize}
+  \item \textbf{IV Filter:} The IV filter removes volatility outliers to reduce the prevalence of apparent butterfly arbitrage. This involves dropping calls and puts that have the same expiration date and strike price, but have anomalous prices due to extreme implied volatility values. For each date and maturity, we fit a quadratic curve to the implied volatility of puts and calls (separately) through the observed log implied volatilities.
+  \item \textbf{Put-Call Parity Filter:} The puts and calls need to be matched up based on trading date, expiry date, and option type. We then calculate the put-call parity implied interest rate, and filter out outliers based on the standard deviation of the relative distance between the interest rate implied by put-call parity, and the calculated daily median 3-month T-bill rate from the pulled data.
+\end{itemize}
+
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/RAW_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{Some visualizations of the raw SPX options data, prior to application of any filters. Each dot / point on these charts represents a single option in the raw data. Note that the time dimension is not shown, so this is a cross-sectional view of all options in the dataset.}
+  \label{fig:raw_spx_options_data}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L1_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{SPX options remaining after application of Level 1 filters. Notice reduction in outliers and cleaner distribution of volatility vs moneyness.}
+  \label{fig:l1_spx_options_data}
+\end{figure}
+
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L2_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{SPX options remaining after Level 2 filters.}
+  \label{fig:l2_spx_options_data}
+\end{figure}
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_1996-01_2019-12_iv_summary.png}
+  \caption{SPX options remaining after the Level 3 Implied Volatility filter (only).}
+  \label{fig:l3_iv_only_spx_options_data}
+\end{figure}
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_PCP_1996-01_2019-12_iv_summary.png}
+  \caption{SPX options remaining after the Level 3 Implied Volatility and Put-Call Parity filters.}
+  \label{fig:l3_iv_pcp_spx_options_data}
+\end{figure}
+
+
+\paragraph{\textit{Phase 1b: Portfolio Construction in \citet{Constantinides2013}}}
+\subsubsection*{Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS}
+
+\paragraph{Process}
+The construction of the 27 call and 27 put portfolios in CJS is a multi-step process, with the objective of developing portfolio returns series that are stationary and only moderately skewed. The discrete bucketing of moneyness and days to maturity leads to multiple candidate options for each portfolio on each trading day. These options are given weights according to a \textbf{bivariate Gaussian weighting kernel} in moneyness and maturity (bandwidths: 0.0125 in moneyness and 10 days to maturity).
+
+Each portfolio's daily returns are initially calculated as simple arithmetic returns, assuming the option is bought and sold at its bid-ask midpoint at each rebalancing. The one-day arithmetic return is then converted to a \textbf{leverage-adjusted return}. This procedure is achieved by calculating the one-day return of a hypothetical portfolio with $\omega_{BSM}^{-1}$ dollars invested in the option, and $(1 - \omega_{BSM}^{-1})$ dollars invested in the risk-free rate, where $\omega_{BSM}$ is the Black-Scholes-Merton elasticity based on the implied volatility of the option.
+
+\begin{align}
+\omega_{\text{BSM, Call}} &= \frac{\partial C_{\text{BSM}}}{\partial S} \cdot \frac{S}{C_{\text{BSM}}} > 1 \\
+\omega_{\text{BSM, Put}}  &= \frac{\partial P_{\text{BSM}}}{\partial S} \cdot \frac{S}{P_{\text{BSM}}} < -1
+\end{align}
+
+Each \textbf{leverage-adjusted call portfolio} comprises a long position in a fraction of a call, and some investment in the risk-free rate.
+
+Each \textbf{leverage-adjusted put portfolio} comprises a short position in a fraction of a put, and more than 100\% investment in the risk-free rate.
+
+\textcolor{blue}{
+Below, we formalize the CJS portfolio construction process for a single trading day $t$ and a set of candidate call or put options. Each portfolio is defined by \textbf{option type} (call or put), \textbf{target moneyness} (specifically $0.90$, $0.925$, $0.95$, $0.975$, $1.00$, $1.025$, $1.05$, $1.075$, $1.10$), and \textbf{target maturity} (specifically $30$, $60$, or $90$ days). On any given day, available options rarely match the targets exactly; instead, multiple candidate options may be close in moneyness and maturity. Each candidate option has its own price and sensitivity to the underlying index. \\ To aggregate these candidates, CJS applies a \textbf{Gaussian kernel in moneyness and maturity}, assigning weights to each option based on proximity to the targets. The \textbf{kernel-weighted average price} is used as the portfolio's option component. Portfolio returns are \textbf{leverage-adjusted using Black-Scholes-Merton elasticity} to standardize sensitivity across moneyness levels. \\ The \textbf{daily portfolio return} from $t$ to $t+1$ is computed as the kernel-weighted average return of the candidate options, using weights from day $t$. This approach ensures that each portfolio reflects the closest available options to the target characteristics, with appropriate adjustment for \textbf{leverage} and \textbf{sensitivity}.}
+
+\subsubsection*{1. Gaussian Kernel Weighting}
+
+Let:
+\begin{itemize}
+  \item $m_{i}$ = moneyness of option $i$
+  \item $\tau_{i}$ = days to maturity of option $i$
+  \item $k_{s}$ = target moneyness
+  \item $\tau$ = target maturity
+  \item $h_{m}$, $h_{\tau}$ = bandwidths for moneyness and maturity
+  \item $d_{i}^2 = \left( \frac{m_{i} - k_{s}}{h_{m}} \right)^2 + \left( \frac{\tau_{i} - \tau}{h_{\tau}} \right)^2$
+\end{itemize}
+
+Then the unnormalized Gaussian weight for option $i$ is:
+\[
+w_{i}^* = \exp\left( -\frac{1}{2} d_{i}^2 \right)
+\]
+
+The normalized kernel weight:
+\[
+w_{i} = \frac{w_{i}^*}{\sum_j w_j^*}
+\]
+
+\subsubsection*{2. Option Elasticity}
+
+Let:
+\begin{itemize}
+  \item $S_{t}$ = underlying index level at time $t$
+  \item $P_{i}$ = price of option $i$
+  \item $\Delta_{i}$ = option delta
+\end{itemize}
+
+Then:
+\[
+\varepsilon_{i} = \frac{S_t \cdot \Delta_{i}}{P_{i}}
+\]
+
+\subsubsection*{3. Arithmetic Return of Option $i$}
+
+Let:
+\begin{itemize}
+  \item $P_{i,t-1}$ = price of option $i$ at time $t-1$
+  \item $P_{i,t}$ = price of option $i$ at time $t$
+\end{itemize}
+
+Then:
+\[
+r_{i} = \frac{P_{i,t} - P_{i,t-1}}{P_{i,t-1}}
+\]
+
+\subsubsection*{4. Leverage-Adjusted Portfolio Construction}
+
+Let:
+\begin{itemize}
+  \item $r_{f}$ = risk-free rate on day $t$
+\end{itemize}
+
+The leverage-adjusted return of the call portfolio is:
+\[
+R_t^{call} = \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 - \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+\]
+
+The leverage-adjusted return of the put portfolio is:
+\[
+R_t^{put} = -\sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 + \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+\]
+
+
+
+\subsubsection*{5. Handling Missing Data (NaN Filling)}
+
+CJS implement a multi-step process to address options with missing prices, as detailed in Section 1.3 ``Portfolio Formation'' of their paper. We reserve the implementation of this NaN-filling procedure for a future version of this dataset. For the current version, we compound the daily portfolio returns into monthly returns, which matches the final form of the data utilized in the paper.
+
+
+\textit{Returns Series Transformation (HKM)}
+\subsubsection*{Construction of 18 Portfolio Return Series in \citet{He2017}}
+
+\citet{He2017} reduce the 54 portfolios constructed in \citet{Constantinides2013} to 18 portfolios by taking an equal-weight average across the three maturities (30, 60, 90 days) for all CJS portfolios with the same moneyness. We implement that procedure to obtain the final return series for the FTSFR.
+
+Let \( R_{m,j,t} \) be the return for moneyness \( m \), maturity \( j \), at time \( t \).
+The HKM portfolio return for moneyness \( m \) at time \( t \) is:
+\[
+R_{m,t}^{\mathrm{HKM}} = \frac{1}{3} \sum_{j=1}^{3} R_{m,j,t}
+\]
+For each moneyness group, the HKM portfolio return is the simple average of the three corresponding CJS portfolio returns (one for each maturity) at each time point.
+
+This averaging is done separately for calls and puts, resulting in 9 call portfolios and 9 put portfolios (total 18 portfolios).
+
+
+
+\subsubsection*{Portfolio Returns Analysis}
+
+The objective of the data filtration process was to construct portfolios whose returns are approximately normal and only moderately skewed. We analyzed the distributional properties of the 54 CJS portfolios and the 18 HKM portfolios using standard statistical tests and summary statistics.
+
+\paragraph{Statistical Normality Tests}
+To assess the normality of portfolio returns, we applied several standard tests:
+\begin{itemize}
+  \item \textbf{Shapiro-Wilk Test:} Tests the null hypothesis that the data are drawn from a normal distribution. The test statistic is
+  \[
+  W = \frac{\left( \sum_{i=1}^n a_i x_{(i)} \right)^2}{\sum_{i=1}^n (x_i - \bar{x})^2}
+  \]
+  where $x_{(i)}$ are ordered sample values and $a_i$ are constants.
+  \item \textbf{Jarque-Bera Test:} Tests whether sample skewness and kurtosis match a normal distribution. The test statistic is
+  \[
+  JB = \frac{n}{6} \left( S^2 + \frac{(K-3)^2}{4} \right)
+  \]
+  where $S$ is sample skewness and $K$ is sample kurtosis.
+  \item \textbf{D'Agostino and Pearson's Normality Test (Normaltest):} Combines skewness and kurtosis to test for normality.
+\end{itemize}
+Low $p$-values (typically $<0.05$) indicate rejection of normality.
+
+\paragraph{Summary Statistics}
+Table~\ref{tab:portfolio_stats} presents descriptive statistics for the returns of the CJS and HKM portfolios. The statistics include count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum, following the convention of \texttt{pd.DataFrame.describe()}.
+
+\begin{table}[H]
+  \centering
+  \caption{Descriptive Statistics of Portfolio Returns}
+  \label{tab:portfolio_stats}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Statistic} & \textbf{CJS Portfolios} & \textbf{HKM Portfolios} \\
+    \midrule
+    Count   & 54                          & 18                          \\
+    Mean    & 1.64 (skew), 14.5 (kurtosis)  & 1.87 (skew), 16.8 (kurtosis) \\
+    Std     & 2.26 (skew), 23.8 (kurtosis)  & 2.64 (skew), 30.3 (kurtosis) \\
+    Min     & -0.91 (skew), 0.7 (kurtosis)  & -0.91 (skew), 0.7 (kurtosis) \\
+    25\%    & 0.12 (skew), 2.1 (kurtosis)   & 0.12 (skew), 2.1 (kurtosis) \\
+    \rowcolor{blue!20}
+    Median  & 0.77 (skew), 4.6 (kurtosis)   & 0.78 (skew), 3.1 (kurtosis) \\
+    75\%    & 2.41 (skew), 12.3 (kurtosis)  & 2.41 (skew), 12.3 (kurtosis) \\
+    Max     & 11.1 (skew), 152.7 (kurtosis) & 9.8 (skew), 129.3 (kurtosis) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Note:} We did not implement the NaN-filling logic described in the original CJS paper. As a result, missing data may affect the distributional properties of the portfolio returns, and these results and conclusions may change in future versions once NaN handling is incorporated.
+
+\paragraph{Results for CJS Portfolios}
+
+Nearly all CJS portfolios reject normality based on the Shapiro-Wilk, Jarque-Bera, and Normaltest $p$-values, which are close to zero. The mean skewness is 1.64 and the median is 0.77, indicating distributions are generally right-skewed with long right tails. The mean kurtosis is 14.5 and the median is 4.6, suggesting many portfolios are leptokurtic (fat-tailed), with some experiencing rare but large return shocks. However, the median skewness and kurtosis are much closer to the normal values (skewness $=0$, kurtosis $=3$), implying that most portfolios are only moderately skewed and not excessively heavy-tailed. These results confirm that the filtration and leverage-adjustment procedures substantially mitigate extreme non-normality, achieving the authors' objective of constructing portfolios with returns that are approximately normal and only moderately skewed.
+
+\paragraph{Results for HKM Portfolios}
+Most HKM portfolios also reject normality, although a few have higher $p$-values and may plausibly be normal. The mean skewness is 1.87 and the median is 0.78, again showing generally positive skewness. The mean kurtosis is 16.8 and the median is 3.1, which is very close to the normal value of 3. This suggests that, while some portfolios have extreme outliers, the median HKM portfolio is only moderately skewed and has kurtosis similar to a normal distribution. These findings further validate that the aggregation and transformation steps in HKM produce portfolio returns with moderate skewness and near-normal kurtosis.
+
+\paragraph{Overall Findings}
+In summary, the data filtration and portfolio construction procedures yield return series that are not perfectly normal, but the median portfolio for both CJS and HKM is much closer to normal and only moderately skewed. This demonstrates that the authors' objectives were largely met: the median portfolio is well-suited for empirical asset pricing tests that assume approximate normality, even though some portfolios remain highly non-normal due to outliers. The successful replication of these distributional properties confirms the effectiveness of the canonical cleaning and construction methods.
+
+
 
 \subsubsection{Foreign Exchange}
 \label{sec:fx}
@@ -850,7 +1054,7 @@ We are replicating a process where we convert our USD into the foreign currency 
 invest it in the repo market, then switch the currency back to USD on day $t$. 
 
 \begin{equation}
-  ret_{t, i} \;=\; \frac{spot_{t - 1, i}}{spot_{t, i}}  \times fret_{t, i}
+  ret_{t, i} \;=\; \frac{spot_{t - 1, i}}{spot_{t, i}} \times fret_{t, i}
 \end{equation}
 
 where
@@ -1172,5 +1376,8 @@ In all the above cases, the central theme is that poor data quality --- whether 
 
 \end{appendices}
 
+% bibliography needs to be at the end to capture all citations
+\bibliographystyle{jpe}
+\bibliography{bibliography}
 
 \end{document}
