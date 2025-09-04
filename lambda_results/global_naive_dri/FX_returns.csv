@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_dri,FX_returns,9,0.2910767,0.02314311,0.039920434

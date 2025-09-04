@@ -1,0 +1,2 @@
+,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,ffnn,french_portfolios_25_daily_size_and_inv,D,252,1.3874177989989513,0.05657761850917749,0.079834170722681

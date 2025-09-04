@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,auto_tbats,french_portfolios_25_daily_size_and_inv,0,252,0.0,,0.0,,0.0,

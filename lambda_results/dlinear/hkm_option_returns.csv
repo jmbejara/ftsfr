@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,hkm_option_returns,18,D,252,0.026008643,0.0024466189,0.0036880905

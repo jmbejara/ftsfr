@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_dri,CDS_contract_returns,6603,15.735291,2.9855309,3.7562094

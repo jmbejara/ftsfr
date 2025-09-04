@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,corp_bond_portfolio_returns,10,ME,12,1.1408955,0.12608548,0.16781072

@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,cjs_option_returns,54,D,252,0.038531296,0.0029899266,0.0039218585

@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,catboost,tips_treasury_basis,4,0.7373021538653957,0.07277756572160132,0.08851412760298519

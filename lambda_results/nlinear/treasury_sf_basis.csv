@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,nlinear,treasury_sf_basis,5,ME,12,1.0017456,0.070256904,0.10136076

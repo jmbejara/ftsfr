@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_dri,he_kelly_manela_factors_daily,4,0.32388532,0.017791077,0.02508415

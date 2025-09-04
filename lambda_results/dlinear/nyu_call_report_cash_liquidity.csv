@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,nyu_call_report_cash_liquidity,24038,QE,4,10.462501,1.6655086,2.5044687

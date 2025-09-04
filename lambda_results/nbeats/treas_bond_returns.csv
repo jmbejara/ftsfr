@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,nbeats,treas_bond_returns,2044,ME,12,17.191969,2.1924512,2.930599

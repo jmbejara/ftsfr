@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,he_kelly_manela_factors_daily,4,B,252,0.30392855,0.017248165,0.023332713

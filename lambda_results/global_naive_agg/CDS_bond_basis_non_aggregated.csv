@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_agg,CDS_bond_basis_non_aggregated,13174,11352.632,2077.2598,2202.5242

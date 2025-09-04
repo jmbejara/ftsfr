@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,CDS_contract_returns,6603,ME,12,9.373989,1.3803982,2.0621037

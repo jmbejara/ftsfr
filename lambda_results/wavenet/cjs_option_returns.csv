@@ -1,0 +1,2 @@
+,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,wavenet,cjs_option_returns,D,252,0.08547466675594363,0.007700595576753232,0.027542617846189454

@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,CRSP_monthly_stock_ret,26760,ME,12,46.84867,5.4496136,7.866241

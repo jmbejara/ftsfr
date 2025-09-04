@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_agg,treas_bond_returns,2044,25.649952,3.7211156,4.906012

@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_agg,CDS_portfolio_returns,20,0.73863953,0.09562522,0.14133577

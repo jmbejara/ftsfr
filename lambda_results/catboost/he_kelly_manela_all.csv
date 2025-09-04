@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,catboost,he_kelly_manela_all,4,0.7001641882348094,0.07710578965158832,0.11579870546499763
