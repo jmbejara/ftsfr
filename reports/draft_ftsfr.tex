@@ -23,7 +23,19 @@
 
 % \title{An Open-Source Financial Time Series Forecasting Benchmark}
 \title{Benchmarking Forecasting Methods for Financial Stability}
-\author{Jeremiah Bejarano\thanks{[Affiliation and contact information]} \and [Coauthor Names]\thanks{[Affiliations]}}
+\author{
+        Jeremiah Bejarano\thanks{Office of Financial Research, U.S. Department of the Treasury} \footnote{All mistakes are my own. Views and opinions expressed are those of the authors and do not necessarily represent official positions or policy of the Office of Financial Research (OFR) or the U.S. Department of the Treasury. Please address correspondence to \href{mailto:jeremiah.bejarano@ofr.treasury.gov}{jeremiah.bejarano@ofr.treasury.gov}.} 
+        \and
+        Viren Desai\footnotemark[3]
+        \and 
+        Kausthub Keshava\footnotemark[3]
+        \and
+        Arsh Kumar\footnotemark[3]
+        \and
+        Alex Zixiao Wang\thanks{Independent. A significant portion of this work was completed as students in the Financial Mathematics program at the University of Chicago}
+        \and
+        Vincent Hanyang Xu\footnotemark[3]
+    }
 \date{\today}
 
 \begin{document}
@@ -232,7 +244,7 @@ The leverage adjustments and dynamic portfolio rebalancing process outlined in C
 
 We also provide a comprehensive overview of the data cleaning and preprocessing steps we undertook to prepare the raw SPX options data for analysis and portfolio construction, which includes technical and mathematical details on volatility estimation, kernel methods, and other relevant techniques.
 
-The CJS portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to 2 \times 9 \times 3 = 54 distinct portfolios. The 18 HKM portfolios were constructed by taking an equal weight average across the 3 maturities of the CJS portfolios, so we have 2 \times 9 = 18 distinct portfolios in the HKM framework. We have provided a simple coding system to access and identify these portfolios.
+The CJS portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to $2 \times 9 \times 3 = 54$ distinct portfolios. The 18 HKM portfolios were constructed by taking an equal weight average across the 3 maturities of the CJS portfolios, so we have $2 \times 9 = 18$ distinct portfolios in the HKM framework. We have provided a simple coding system to access and identify these portfolios.
 
 Additionally, CJS utilized a 3-level data filtration system to clean the raw option quotes. In replicating their work, we found it helpful to create some "flat time" visualizations of the entire dataset, in order to see the data filters in action. These visualizations are integrated into the filtration code, so will be generated when our filtration functions are utilized.
 
@@ -754,7 +766,7 @@ the dataset is more diverse, leading to lower average returns and lower volatili
     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/daily_avg_returns_CRSP_COMPU.png}
   \end{tabular}
   \caption{Average returns of all stocks for a given date}
-  \label{fig:treasury_swap_basis}
+  \label{fig:avg_returns_crsp}
 \end{figure}
 
 \begin{figure}[h!]
@@ -763,7 +775,7 @@ the dataset is more diverse, leading to lower average returns and lower volatili
     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/Average_three_month_rolling_std.png}
   \end{tabular}
   \caption{Average three month rolling standard deviation for a given date}
-  \label{fig:treasury_swap_basis}
+  \label{fig:avg_rolling_std_crsp}
 \end{figure}
 
 \FloatBarrier
@@ -857,7 +869,7 @@ where
   \end{tabular}
 
   \caption{Foreign Currency Returns}
-  \label{fig:CIP_replicate}
+  \label{fig:fx_returns}
 \end{figure}
 
 \FloatBarrier
@@ -932,7 +944,7 @@ arbitrage spreads versus those reported in their paper.
   \end{tabular}
 
   \caption{Comparison of CIP Arbitrage spreads}
-  \label{fig:CIP_replicate}
+  \label{fig:cip_comparison}
 \end{figure}
 
 \FloatBarrier
