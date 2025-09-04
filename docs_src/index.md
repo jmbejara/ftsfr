@@ -101,6 +101,7 @@ While some datasets require paid subscriptions, they are commonly available thro
 data_sources_and_modules
 ftsfr_datasets_info
 data_glimpses
+data_glimpses_ftsfr
 ```
 
 ```{toctree}
