@@ -18,6 +18,7 @@ from settings import config
 import calc_cds_returns
 
 DATA_DIR = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "cds_returns"
 
 ## ftsfr_CDS_portfolio_returns - Portfolio level returns
 # Load the portfolio returns calculated by calc_cds_returns.py
@@ -42,6 +43,19 @@ df_portfolio_long = df_portfolio_long.rename(columns={"Month": "ds"})
 df_portfolio_long = df_portfolio_long.sort_values(by=["unique_id", "ds"]).reset_index(
     drop=True
 )
+df_portfolio_long = df_portfolio_long[["unique_id", "ds", "y"]]
+# df_portfolio_long.pivot(index="ds", columns="unique_id", values="y").plot()
+# df_portfolio_long.describe()
+
+# Check for duplicates
+duplicates = df_portfolio_long.duplicated(subset=["unique_id", "ds"])
+num_duplicates = duplicates.sum()
+if num_duplicates > 0:
+    print(f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_portfolio_long.")
+    print(df_portfolio_long[duplicates][["unique_id", "ds"]].head())
+    df_portfolio_long.drop_duplicates(subset=["unique_id", "ds"], inplace=True)
+else:
+    print("No duplicate (unique_id, ds) pairs found in df_portfolio_long.")
 
 # Save as ftsfr dataset
 df_portfolio_long.to_parquet(DATA_DIR / "ftsfr_CDS_portfolio_returns.parquet")
@@ -66,5 +80,18 @@ df_contract_long = df_contract_long.sort_values(by=["unique_id", "ds"]).reset_in
     drop=True
 )
 
+# Check for duplicates
+duplicates = df_contract_long.duplicated(subset=["unique_id", "ds"])
+num_duplicates = duplicates.sum()
+if num_duplicates > 0:
+    print(f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_contract_long.")
+    print(df_contract_long[duplicates][["unique_id", "ds"]].head())
+    df_contract_long.drop_duplicates(subset=["unique_id", "ds"], inplace=True)
+else:
+    print("No duplicate (unique_id, ds) pairs found in df_contract_long.")
+
+# df_contract_long["unique_id"].nunique()
+
 # Save as ftsfr dataset
 df_contract_long.to_parquet(DATA_DIR / "ftsfr_CDS_contract_returns.parquet")
+

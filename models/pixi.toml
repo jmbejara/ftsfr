@@ -23,6 +23,7 @@ lightning = { version = ">=2.3.0" }
 gluonts = "*"
 darts = "*"
 neuralforecast = "*"
+statsforecast = "*"
 catboost = "*"
 prophet = "*"
 
@@ -35,6 +36,7 @@ lightning = { version = ">=2.3.0" }
 gluonts = "*"
 darts = "*"
 neuralforecast = "*"
+statsforecast = "*"
 catboost = "*"
 prophet = "*"
 

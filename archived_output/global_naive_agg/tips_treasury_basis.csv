@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_agg,tips_treasury_basis,4,1.5336767,0.14452729,0.14452729

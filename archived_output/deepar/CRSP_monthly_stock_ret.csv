@@ -1,0 +1,2 @@
+,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,deepar,CRSP_monthly_stock_ret,ME,12,,,

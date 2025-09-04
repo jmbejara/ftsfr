@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,naive_seasonal,treas_bond_portfolio_returns,10,12,0.56957775,0.61322004,0.044400044,0.040788263,0.060090937,0.055466026

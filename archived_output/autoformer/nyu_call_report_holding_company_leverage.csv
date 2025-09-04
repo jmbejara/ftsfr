@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,autoformer,nyu_call_report_holding_company_leverage,13763,QE,4,198.8035,41.62332,53.26298

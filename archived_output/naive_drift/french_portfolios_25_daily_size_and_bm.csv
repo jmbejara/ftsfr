@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,naive_drift,french_portfolios_25_daily_size_and_bm,25,252,1.3947792,1.4333774,0.036365453,0.036317516,0.05381503,0.052743215

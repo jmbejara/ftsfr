@@ -168,6 +168,69 @@ def perform_one_step_ahead_nixtla(nf_model, train_data, test_data, raw_data):
         return predictions
 
 
+def perform_one_step_ahead_statsforecast(sf_model, train_data, test_data, raw_data):
+    """
+    Performs one-step-ahead forecasting for StatsForecast models.
+
+    Args:
+        sf_model: StatsForecast model instance (already fitted)
+        train_data: Training DataFrame with columns ['ds', 'unique_id', 'y']
+        test_data: Test DataFrame with columns ['ds', 'unique_id', 'y']
+        raw_data: Full DataFrame (train + test)
+
+    Returns:
+        pd.DataFrame: One-step-ahead predictions with columns ['ds', 'unique_id', 'y']
+    """
+    Uni_logger.info("Starting StatsForecast one-step-ahead forecasting")
+
+    try:
+        # Similar approach to Nixtla but using StatsForecast API
+        # Predict 1 step ahead using the training data
+        pred_data = sf_model.forecast(df=train_data, h=1)
+        
+        # Get first test date
+        first_date = test_data["ds"].unique()[0]
+        pred_data["ds"] = first_date
+        
+        df = raw_data
+        
+        # Sliding window forecasts - predict one step at a time using actual values
+        Uni_logger.info("Starting sliding window forecasts for StatsForecast")
+        for i in test_data["ds"].unique()[1:]:
+            # Get data up to current point
+            current_data = df[df.ds < i]
+            # Refit the model with current data
+            sf_model.fit(current_data)
+            # Predict next step
+            temp_pred_data = sf_model.forecast(df=current_data, h=1)
+            temp_pred_data["ds"] = i
+            pred_data = pd.concat([pred_data, temp_pred_data], ignore_index=True)
+        
+        return pred_data
+
+    except Exception as e:
+        Uni_logger.error(f"Error in StatsForecast prediction: {e}")
+        # Fallback: simpler approach
+        Uni_logger.info("Trying fallback approach for StatsForecast")
+        
+        # Use full test horizon forecast and take only first predictions
+        h = len(test_data["ds"].unique())
+        predictions = sf_model.forecast(df=train_data, h=h)
+        
+        # Align with test dates
+        test_dates = sorted(test_data["ds"].unique())
+        predictions_list = []
+        
+        for i, date in enumerate(test_dates):
+            temp_pred = predictions.iloc[:, i:i+1].copy()  # Select column i
+            temp_pred["ds"] = date
+            predictions_list.append(temp_pred)
+        
+        final_predictions = pd.concat(predictions_list, ignore_index=True)
+        Uni_logger.info(f"Fallback generated {len(final_predictions)} predictions")
+        return final_predictions
+
+
 def perform_one_step_ahead_gluonts(model, train_data, test_data):
     """
     Performs one-step-ahead forecasting for GluonTS models.
@@ -302,6 +365,25 @@ def verify_one_step_ahead(predictions, test_data, model_type="generic"):
                 return False
         else:
             Uni_logger.warning("⚠ Nixtla predictions not in DataFrame format")
+            return False
+
+    elif model_type == "statsforecast":
+        # For StatsForecast DataFrame predictions
+        if isinstance(predictions, pd.DataFrame):
+            pred_count = len(predictions)
+            test_count = len(test_data)
+
+            # Check that we have one prediction per test point
+            if pred_count == test_count:
+                Uni_logger.info("✓ StatsForecast predictions count matches test data count")
+                return True
+            else:
+                Uni_logger.warning(
+                    f"⚠ StatsForecast predictions count ({pred_count}) != test data count ({test_count})"
+                )
+                return False
+        else:
+            Uni_logger.warning("⚠ StatsForecast predictions not in DataFrame format")
             return False
 
     elif model_type == "gluonts":

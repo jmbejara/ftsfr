@@ -45,21 +45,20 @@ tenors = [
 # %%
 df_mine = load_treasury_sf_output(data_dir=DATA_DIR).sort_values("Date")
 tenors_plot_mine = [c for c in tenors if c in df_mine.columns]
-ax = df_mine.set_index("Date")[tenors_plot_mine].plot(figsize=(12, 6))
-ax.set_title("Treasury Spot-Futures Basis (FTSFR Replication)")
+fig, ax = plt.subplots(figsize=(12, 6))
+
+for col in tenors_plot_mine:
+    data = df_mine.set_index("Date")[col]
+    ax.plot(data.index, data.values, label=col.replace("Treasury_SF_", "").replace("Y", "Y"))
+
+ax.set_title("Treasury Spot-Futures Basis")
+ax.set_xlabel("Date")
 ax.set_ylabel("Basis (bps)")
-ax.set_xlabel("")
 ax.grid(True)
-fig = ax.get_figure()
-plot_path = DATA_DIR / "treasury_sf_basis_ftsfr.png"
-fig.savefig(plot_path, dpi=300, bbox_inches="tight")
-# Provide accessible alt text for the rendered figure
-display(
-    fig,
-    metadata={
-        "image/alt": "Treasury Spot-Futures Basis (FTSFR Replication) time series for 2Y, 5Y, 10Y, 20Y, 30Y tenors in basis points."
-    },
-)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), frameon=False, ncol=5)
+
+plt.tight_layout()
+plt.show()
 
 # %%
 df_ref = load_bases_data.load_combined_spreads_wide(

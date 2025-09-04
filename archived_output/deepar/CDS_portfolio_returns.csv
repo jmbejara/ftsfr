@@ -1,0 +1,2 @@
+,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,deepar,CDS_portfolio_returns,ME,12,1.0698865080950024,0.13669448874329895,0.19531609597820637

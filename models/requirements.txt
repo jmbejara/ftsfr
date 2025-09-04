@@ -6,6 +6,7 @@ lightning
 gluonts
 darts
 neuralforecast
+statsforecast
 catboost
 prophet
 numpy

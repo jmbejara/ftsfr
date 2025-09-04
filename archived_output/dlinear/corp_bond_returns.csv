@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,corp_bond_returns,23473,ME,12,35.509808,6.279831,9.341661

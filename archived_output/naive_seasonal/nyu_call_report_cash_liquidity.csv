@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,naive_seasonal,nyu_call_report_cash_liquidity,7792,4,9.555112,1.4144199,1.7202963,0.13272712,2.9203358,0.17785454

@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,transformer,french_portfolios_25_daily_size_and_op,25,0.783426,0.032575153,0.040453553

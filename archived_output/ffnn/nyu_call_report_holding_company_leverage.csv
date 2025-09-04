@@ -1,0 +1,2 @@
+,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,ffnn,nyu_call_report_holding_company_leverage,QE,4,,,

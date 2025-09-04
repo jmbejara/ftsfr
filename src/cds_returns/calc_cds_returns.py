@@ -62,8 +62,6 @@ END_DATE = pull_markit_cds.END_DATE
 # START_DATE = pd.Timestamp("2015-01-01")
 # END_DATE = pd.Timestamp("2020-01-01")
 
-swap_rates = pull_fred.load_fred(data_dir=DATA_DIR)
-
 
 def _format_elapsed_time(seconds):
     """Format elapsed time in a human-readable format."""
@@ -75,7 +73,7 @@ def _format_elapsed_time(seconds):
         return f"{seconds / 3600:.1f} hours"
 
 
-def process_rates(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
+def process_rates(raw_rates=None, start_date=START_DATE, end_date=END_DATE, data_dir=DATA_DIR):
     """
     Processes raw interest rate data by filtering within a specified date range
     and converting column names to numerical maturity values.
@@ -89,6 +87,7 @@ def process_rates(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
     - DataFrame: Processed interest rate data with maturity values as column names and rates in decimal form.
     """
     raw_rates = raw_rates.copy().dropna()
+    swap_rates = pull_fred.load_fred(data_dir=data_dir)
     short_tenor_rates = swap_rates[["DGS3MO", "DGS6MO"]]
     short_tenor_rates_renamed = short_tenor_rates.rename(
         columns={"DGS3MO": 0.25, "DGS6MO": 0.5}
@@ -148,7 +147,7 @@ def extrapolate_rates(rates=None):
     return df_quarterly
 
 
-def calc_discount(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
+def calc_discount(raw_rates=None, start_date=START_DATE, end_date=END_DATE, data_dir=DATA_DIR):
     """
     Calculates discount factors from interest rates for risky duration computation.
 
@@ -166,7 +165,7 @@ def calc_discount(raw_rates=None, start_date=START_DATE, end_date=END_DATE):
                  representing quarters (0.25, 0.5, ..., 30).
     """
     # Call the function to get rates
-    rates_data = process_rates(raw_rates, start_date, end_date)
+    rates_data = process_rates(raw_rates, start_date, end_date, data_dir=data_dir)
     if rates_data is None:
         print("No data available for the given date range.")
         return None
@@ -359,7 +358,7 @@ def get_portfolio_dict(start_date=START_DATE, end_date=END_DATE, cds_spreads=Non
 
 
 def _get_quarterly_discount_polars(
-    raw_rates=None, start_date=START_DATE, end_date=END_DATE
+    raw_rates=None, start_date=START_DATE, end_date=END_DATE, data_dir=DATA_DIR
 ):
     """
     Helper function to compute quarterly discount rates and convert to Polars format.
@@ -373,7 +372,7 @@ def _get_quarterly_discount_polars(
     - pl.DataFrame: Quarterly discount rates in Polars format.
     """
     quarterly_discount_pd = calc_discount(
-        raw_rates, start_date, end_date
+        raw_rates, start_date, end_date, data_dir=data_dir
     )  # Output is Pandas
     quarterly_discount_pd = quarterly_discount_pd.iloc[:-1]  # Remove last row
 
@@ -382,7 +381,7 @@ def _get_quarterly_discount_polars(
 
 
 def calc_cds_return_for_contracts(
-    contract_data=None, raw_rates=None, start_date=START_DATE, end_date=END_DATE
+    contract_data=None, raw_rates=None, start_date=START_DATE, end_date=END_DATE, data_dir=DATA_DIR
 ):
     """
     Calculates CDS returns for individual contracts using the He-Kelly formula.
@@ -565,7 +564,7 @@ def calc_cds_return_for_contracts(
 
 
 def calc_cds_return_for_portfolios(
-    portfolio_dict=None, raw_rates=None, start_date=START_DATE, end_date=END_DATE
+    portfolio_dict=None, raw_rates=None, start_date=START_DATE, end_date=END_DATE, data_dir=DATA_DIR
 ):
     """
     Calculates CDS returns for each portfolio in the portfolio_dict using the He-Kelly formula.
@@ -580,7 +579,7 @@ def calc_cds_return_for_portfolios(
     - dict: Dictionary where keys are tenor-quantile pairs and values are Polars DataFrames of CDS returns.
     """
     # Step 1: Compute discount rates
-    quarterly_discount = _get_quarterly_discount_polars(raw_rates, start_date, end_date)
+    quarterly_discount = _get_quarterly_discount_polars(raw_rates, start_date, end_date, data_dir=data_dir)
 
     # Storage for results
     cds_return_dict = {}
@@ -870,7 +869,7 @@ def calculate_monthly_returns(daily_returns_dict=None):
 
 
 def run_cds_calculation(
-    raw_rates=None, cds_spreads=None, start_date=START_DATE, end_date=END_DATE
+    raw_rates=None, cds_spreads=None, start_date=START_DATE, end_date=END_DATE, data_dir=DATA_DIR
 ):
     """
     Main entry point for CDS return calculation following He-Kelly-Manela methodology.
@@ -913,7 +912,7 @@ def run_cds_calculation(
     print("\n2. Calculating daily contract-level returns...")
     step_start = time.time()
     daily_contract_returns = calc_cds_return_for_contracts(
-        contract_data, raw_rates, start_date, end_date
+        contract_data, raw_rates, start_date, end_date, data_dir=data_dir
     )
     print(f"   Generated {len(daily_contract_returns):,} daily returns")
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
@@ -936,7 +935,7 @@ def run_cds_calculation(
     print("\n5. Calculating daily portfolio returns...")
     step_start = time.time()
     daily_returns_dict = calc_cds_return_for_portfolios(
-        portfolio_dict, raw_rates, start_date, end_date
+        portfolio_dict, raw_rates, start_date, end_date, data_dir=data_dir
     )
     print(f"   Time: {_format_elapsed_time(time.time() - step_start)}")
 

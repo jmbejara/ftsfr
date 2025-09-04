@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,naive_seasonal,CDS_portfolio_returns,20,12,1.0332279,0.9819158,0.13405676,0.13847853,0.19310758,0.20220119

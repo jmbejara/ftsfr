@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,auto_arima,nyu_call_report_holding_company_leverage,5481,4,623.9684653345709,0.9532079462576609,162.28884629816164,0.06402276600528696,182.97324062764278,0.08635393374347722

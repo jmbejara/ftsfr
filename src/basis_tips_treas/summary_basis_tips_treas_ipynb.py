@@ -48,7 +48,7 @@ DATA_DIR = config("DATA_DIR")
 DATA_DIR = DATA_DIR / "basis_tips_treas"
 
 warnings.filterwarnings("ignore")
-sns.set_theme(style="dark")
+#sns.set_theme(style="dark")
 
 # %%
 """
@@ -131,8 +131,21 @@ The following cell plots the arbitrage spreads for various maturities (2Y, 5Y, 1
 """
 
 # %%
-fig = generate_figures.plot_tips_treasury_spreads(test, "2004-07-21", "2025-05-30")
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(12, 6))
+
+for year in [2, 5, 10, 20]:
+    data = test[f"arb_{year}"].dropna()
+    ax.plot(data.index, data.values, label=f"{year}Y")
+
+ax.set_title("TIPS Treasury Arbitrage Spreads")
+ax.set_xlabel("Date")
+ax.set_ylabel("Arbitrage Spread (bps)")
+ax.grid(True)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), frameon=False, ncol=4)
 plt.show()
+
 
 # %%
 """

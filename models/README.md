@@ -547,6 +547,12 @@ rsync -avzh --progress \
   -e "ssh -i ~/.ssh/${SSH_KEY}" ubuntu@${NODE_IP}:~/${FS_FOLDER}/ftsfr/_output/forecasting/error_metrics/ \
   /Users/jbejarano/GitRepositories/ftsfr/_output/forecasting/error_metrics/
 ```
+and consolidate locally:
+```bash
+rsync -avzh --progress \
+    /Users/jbejarano/GitRepositories/ftsfr/_output/forecasting/error_metrics/ \
+    /Users/jbejarano/GitRepositories/ftsfr/archived_output/
+```
 
 ## Technical Details
 

@@ -12,8 +12,8 @@
 # estimator_params = { p = 1, d = 1, q = 1 }
 
 [auto_arima]
-class = "DartsLocal"
-estimator_class = "darts.models.AutoARIMA"
+class = "StatsForecastMain"
+estimator_class = "statsforecast.models.AutoARIMA"
 display_name = "AutoARIMA"
 # season_length will be set from dataset config
 

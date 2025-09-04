@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,transformer,CIP_spreads,8,1.0186129,0.07125485,0.073379904

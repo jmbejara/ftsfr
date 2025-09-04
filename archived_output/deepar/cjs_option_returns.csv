@@ -1,0 +1,2 @@
+,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,deepar,cjs_option_returns,D,252,0.1090651028985615,0.008910246138546572,0.03134250331390477

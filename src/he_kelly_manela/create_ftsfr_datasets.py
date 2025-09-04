@@ -13,7 +13,7 @@ import pull_he_kelly_manela
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-DATA_DIR = DATA_DIR
+# DATA_DIR = DATA_DIR / "he_kelly_manela"
 
 he_kelly_manela_factors_monthly = (
     pull_he_kelly_manela.load_he_kelly_manela_factors_monthly(data_dir=DATA_DIR)
@@ -76,10 +76,13 @@ he_kelly_manela_all = convert_intermediary_to_long_format(he_kelly_manela_all)
 
 
 # Save the datasets
+he_kelly_manela_factors_monthly.reset_index(drop=True, inplace=True)
 he_kelly_manela_factors_monthly.to_parquet(
     DATA_DIR / "ftsfr_he_kelly_manela_factors_monthly.parquet"
 )
+he_kelly_manela_factors_daily.reset_index(drop=True, inplace=True)
 he_kelly_manela_factors_daily.to_parquet(
     DATA_DIR / "ftsfr_he_kelly_manela_factors_daily.parquet"
 )
+he_kelly_manela_all.reset_index(drop=True, inplace=True)
 he_kelly_manela_all.to_parquet(DATA_DIR / "ftsfr_he_kelly_manela_all.parquet")

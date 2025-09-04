@@ -106,6 +106,7 @@ def get_dataset_report(
     file_num=None,
     total_files=None,
     max_columns=None,
+    ftsfr_enhanced=False,
 ):
     """Return a dict with file metadata, shape, columns, sample values, numeric stats, and glimpse."""
     if verbose and file_num is not None and total_files is not None:
@@ -289,6 +290,40 @@ def get_dataset_report(
             glimpse_df.glimpse(max_items_per_column=0)
         report["glimpse"] = output.getvalue()
 
+        # Enhanced FTSFR analysis - null fractions and row uniqueness
+        if ftsfr_enhanced:
+            # Calculate null fractions for all columns (not just processed ones)
+            null_fraction_exprs = [
+                (pl.col(col).null_count() / pl.len()).alias(f"{col}_null_fraction") 
+                for col in all_columns
+            ]
+            null_fractions_df = lf.select(null_fraction_exprs).collect()
+            null_fractions_dict = null_fractions_df.to_dicts()[0]
+            
+            # Store null fractions for each column
+            null_fractions = []
+            for col in all_columns:
+                fraction = null_fractions_dict.get(f"{col}_null_fraction", 0.0)
+                null_fractions.append({
+                    "name": col,
+                    "null_fraction": fraction,
+                    "null_percentage": fraction * 100
+                })
+            report["null_fractions"] = null_fractions
+            
+            # Check row uniqueness - compare total rows to unique rows
+            unique_row_count_df = lf.unique().select(pl.len().alias("unique_count")).collect()
+            unique_row_count = unique_row_count_df["unique_count"][0]
+            total_rows = report["n_rows"]
+            
+            report["row_uniqueness"] = {
+                "total_rows": total_rows,
+                "unique_rows": unique_row_count,
+                "all_rows_unique": unique_row_count == total_rows,
+                "duplicate_rows": total_rows - unique_row_count,
+                "uniqueness_percentage": (unique_row_count / total_rows * 100) if total_rows > 0 else 100.0
+            }
+
     except Exception as e:
         report["error"] = f"ERROR: Could not read file - {str(e)}"
     return report
@@ -315,6 +350,16 @@ def get_task_category(task_name):
         return task_name.split(":", 1)[0]
     else:
         return task_name
+
+
+def filter_ftsfr_files(existing_files):
+    """Filter existing files to only include ftsfr_ prefixed parquet files."""
+    ftsfr_files = set()
+    for filepath in existing_files:
+        filename = Path(filepath).name
+        if filename.startswith("ftsfr_") and filename.endswith(".parquet"):
+            ftsfr_files.add(filepath)
+    return ftsfr_files
 
 
 def format_file_size(size_bytes):
@@ -440,6 +485,187 @@ def create_txt_report(
             f"**Size:** {format_file_size(report['file_size_bytes'])} | **Type:** {report['file_type'].capitalize()} | **Shape:** {report['n_rows']:,} rows × {cols_info}"
         )
         output_lines.append("")
+
+        # Columns section
+        output_lines.append("### Columns")
+        if report.get("columns_truncated", False):
+            output_lines.append(
+                f"*Note: Showing first {report['n_cols_shown']} of {report['n_cols']} columns*"
+            )
+            output_lines.append("")
+        output_lines.append("```")
+        for col in report["columns"]:
+            null_info = f" ({col['pct_null']:.1f}% null)" if col["pct_null"] > 0 else ""
+            output_lines.append(f"{col['name']:<40} {col['dtype']:<15}{null_info}")
+        output_lines.append("```")
+        output_lines.append("")
+
+        # Sample values section (conditional)
+        if include_samples:
+            output_lines.append("### Sample Values (first 5 rows)")
+            output_lines.append("```")
+            output_lines.append(report["sample_text"].rstrip())
+            output_lines.append("```")
+            output_lines.append("")
+
+        # Numeric statistics section (conditional)
+        if include_stats and report["numeric_stats"]:
+            output_lines.append("### Numeric Column Statistics")
+            output_lines.append("```")
+            for stat in report["numeric_stats"]:
+                # Format values, handling None values
+                min_val = f"{stat['min']}" if stat["min"] is not None else "N/A"
+                max_val = f"{stat['max']}" if stat["max"] is not None else "N/A"
+                mean_val = f"{stat['mean']:.2f}" if stat["mean"] is not None else "N/A"
+                median_val = (
+                    f"{stat['median']}" if stat["median"] is not None else "N/A"
+                )
+
+                output_lines.append(
+                    f"{stat['name']}: min={min_val}, max={max_val}, "
+                    f"mean={mean_val}, median={median_val}"
+                )
+            output_lines.append("```")
+            output_lines.append("")
+
+        # Date/Datetime statistics section (conditional)
+        if include_stats and report["date_stats"]:
+            output_lines.append("### Date/Datetime Column Statistics")
+            output_lines.append("```")
+            for stat in report["date_stats"]:
+                min_val = stat["min"] if stat["min"] is not None else "N/A"
+                max_val = stat["max"] if stat["max"] is not None else "N/A"
+                output_lines.append(f"{stat['name']}: min={min_val}, max={max_val}")
+            output_lines.append("```")
+            output_lines.append("")
+
+        # Add separator between datasets
+        output_lines.append("---")
+
+    # Remove the final separator so document doesn't end with a transition
+    if output_lines and output_lines[-1] == "---":
+        output_lines.pop()
+        # Also remove the empty line before it if it exists
+        if output_lines and output_lines[-1] == "":
+            output_lines.pop()
+
+    return "\n".join(output_lines)
+
+
+def create_ftsfr_enhanced_report(
+    existing_files,
+    include_samples=True,
+    include_stats=True,
+    verbose=False,
+    max_columns=None,
+):
+    """Create an enhanced TXT format Data Glimpses Report specifically for FTSFR datasets."""
+    output_lines = []
+
+    # Parse dodo tasks to group files
+    task_files = parse_dodo_tasks()
+
+    # Filter for FTSFR files only
+    ftsfr_files = filter_ftsfr_files(existing_files)
+
+    # Create a mapping of files to tasks
+    file_to_tasks = {}
+    for task, files in task_files.items():
+        for f in files:
+            if f in ftsfr_files:
+                if f not in file_to_tasks:
+                    file_to_tasks[f] = []
+                file_to_tasks[f].append(task)
+
+    # Header
+    output_lines.append("# Data Glimpses Report: FTSFR only")
+    output_lines.append(f"Total FTSFR datasets: {len(ftsfr_files)}")
+    output_lines.append("")
+    output_lines.append("This report provides enhanced analysis specifically for FTSFR (Financial Time Series Forecasting Repository) datasets, including:")
+    output_lines.append("- Detailed null value analysis for all columns")
+    output_lines.append("- Row uniqueness verification")
+    output_lines.append("- Standard dataset metadata and glimpses")
+    output_lines.append("")
+
+    # Summary section grouped by task categories and subtasks
+    output_lines.append("## Summary of FTSFR Datasets by Task")
+    output_lines.append("")
+
+    # Group files by their task categories
+    task_grouped = {}
+    for f in sorted(ftsfr_files):
+        tasks = file_to_tasks.get(f, ["Unknown"])
+        for task in tasks:
+            category = get_task_category(task)
+            if category not in task_grouped:
+                task_grouped[category] = {}
+            if task not in task_grouped[category]:
+                task_grouped[category][task] = []
+            task_grouped[category][task].append(f)
+
+    # Output the summary
+    for category in sorted(task_grouped.keys()):
+        category_formatted = format_task_name(category)
+        output_lines.append(f"### {category_formatted}")
+
+        for task in sorted(task_grouped[category].keys()):
+            if ":" in task:
+                # This is a subtask, show it as a subheading
+                task_formatted = format_task_name(task)
+                output_lines.append(f"#### {task_formatted}")
+                for f in sorted(task_grouped[category][task]):
+                    filename = Path(f).name
+                    anchor = filename_to_anchor(filename)
+                    output_lines.append(f"- [`{filename}`](#{anchor})")
+            else:
+                # This is a main task without subtasks
+                for f in sorted(task_grouped[category][task]):
+                    filename = Path(f).name
+                    anchor = filename_to_anchor(filename)
+                    output_lines.append(f"- [`{filename}`](#{anchor})")
+        output_lines.append("")
+
+    output_lines.append("---")
+
+    # Process each file with enhanced analysis
+    total_files = len(ftsfr_files)
+    for i, f in enumerate(sorted(ftsfr_files), 1):
+        filename = Path(f).name
+        report = get_dataset_report(
+            f,
+            include_stats=include_stats,
+            verbose=verbose,
+            file_num=i,
+            total_files=total_files,
+            max_columns=max_columns,
+            ftsfr_enhanced=True,
+        )
+
+        output_lines.append("")
+        output_lines.append(f"## {filename}")
+        output_lines.append(f"**Path:** `{f}`")
+
+        if "error" in report:
+            output_lines.append(f"**ERROR:** {report['error']}")
+            output_lines.append("---")
+            continue
+
+        # File metadata
+        cols_info = f"{report['n_cols']} columns"
+        if report.get("columns_truncated", False):
+            cols_info = (
+                f"{report['n_cols']} columns (showing first {report['n_cols_shown']})"
+            )
+        output_lines.append(
+            f"**Size:** {format_file_size(report['file_size_bytes'])} | **Type:** {report['file_type'].capitalize()} | **Shape:** {report['n_rows']:,} rows × {cols_info}"
+        )
+        output_lines.append("")
+
+        # Enhanced FTSFR Analysis Section
+        if "row_uniqueness" in report:
+            uniqueness = report["row_uniqueness"]
+            output_lines.append(f"**All rows unique:** {'✅ Yes' if uniqueness['all_rows_unique'] else '❌ No'}")
+            output_lines.append("")
 
         # Columns section
         output_lines.append("### Columns")
@@ -641,6 +867,11 @@ def main():
         default=None,
         help="Maximum number of columns to show in glimpses (default: no limit)",
     )
+    parser.add_argument(
+        "--ftsfr-only",
+        action="store_true",
+        help="Generate only the FTSFR enhanced report (ftsfr_ prefixed parquet files)",
+    )
     args = parser.parse_args()
 
     print("Parsing dodo.py for tasks and data files...")
@@ -660,8 +891,6 @@ def main():
     # Create output directory if it doesn't exist
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Generate and save TXT report
-    print("\nGenerating TXT report...")
     include_samples = not args.no_samples
     include_stats = not args.no_stats
     verbose = args.verbose
@@ -671,33 +900,69 @@ def main():
     if args.no_stats:
         print("  - Excluding numeric statistics sections")
 
-    if verbose:
-        print(f"\nPreparing to create glimpses for {len(existing_files)} data files...")
+    if args.ftsfr_only:
+        # Generate only FTSFR enhanced report
+        print("\nGenerating FTSFR enhanced report only...")
+        ftsfr_files = filter_ftsfr_files(existing_files)
+        print(f"Found {len(ftsfr_files)} FTSFR datasets to analyze")
+        
+        if verbose:
+            print(f"\nPreparing to create FTSFR enhanced glimpses for {len(ftsfr_files)} data files...")
 
-    txt_content = create_txt_report(
-        existing_files,
-        include_samples=include_samples,
-        include_stats=include_stats,
-        verbose=verbose,
-        max_columns=args.max_columns,
-    )
-    # txt_output_file = OUTPUT_DIR / "data_glimpses.txt"
-    txt_output_file = BASE_DIR / "docs_src" / "data_glimpses.md"
-    with open(txt_output_file, "w", encoding="utf-8") as f:
-        f.write(txt_content)
-    print(f"Human-readable TXT report saved to: {txt_output_file}")
+        ftsfr_content = create_ftsfr_enhanced_report(
+            existing_files,
+            include_samples=include_samples,
+            include_stats=include_stats,
+            verbose=verbose,
+            max_columns=args.max_columns,
+        )
+        ftsfr_output_file = BASE_DIR / "docs_src" / "data_glimpses_ftsfr.md"
+        with open(ftsfr_output_file, "w", encoding="utf-8") as f:
+            f.write(ftsfr_content)
+        print(f"FTSFR enhanced report saved to: {ftsfr_output_file}")
+        
+        print(f"\nProcessed {len(ftsfr_files)} FTSFR files from {len(task_files)} tasks")
+    else:
+        # Generate both reports
+        print("\nGenerating all-datasets report...")
+        if verbose:
+            print(f"\nPreparing to create glimpses for {len(existing_files)} data files...")
 
-    # Generate and save XML report
-    # print("\nGenerating XML report...")
-    # xml_content = create_xml_report(existing_files)
-    # # xml_output_file = OUTPUT_DIR / "data_glimpses.xml"
-    # # xml_output_file = BASE_DIR / "docs_src" / "data_glimpses.xml"
-    # with open(xml_output_file, "w", encoding="utf-8") as f:
-    #     f.write(xml_content)
-    # print(f"Machine-readable XML report saved to: {xml_output_file}")
+        txt_content = create_txt_report(
+            existing_files,
+            include_samples=include_samples,
+            include_stats=include_stats,
+            verbose=verbose,
+            max_columns=args.max_columns,
+        )
+        txt_output_file = BASE_DIR / "docs_src" / "data_glimpses.md"
+        with open(txt_output_file, "w", encoding="utf-8") as f:
+            f.write(txt_content)
+        print(f"All-datasets report saved to: {txt_output_file}")
 
-    print(f"\nProcessed {len(existing_files)} files from {len(task_files)} tasks")
-    print("Report generated successfully!")
+        # Generate FTSFR enhanced report
+        print("\nGenerating FTSFR enhanced report...")
+        ftsfr_files = filter_ftsfr_files(existing_files)
+        print(f"Found {len(ftsfr_files)} FTSFR datasets for enhanced analysis")
+        
+        if len(ftsfr_files) > 0:
+            ftsfr_content = create_ftsfr_enhanced_report(
+                existing_files,
+                include_samples=include_samples,
+                include_stats=include_stats,
+                verbose=verbose,
+                max_columns=args.max_columns,
+            )
+            ftsfr_output_file = BASE_DIR / "docs_src" / "data_glimpses_ftsfr.md"
+            with open(ftsfr_output_file, "w", encoding="utf-8") as f:
+                f.write(ftsfr_content)
+            print(f"FTSFR enhanced report saved to: {ftsfr_output_file}")
+        else:
+            print("No FTSFR datasets found - skipping FTSFR enhanced report")
+
+        print(f"\nProcessed {len(existing_files)} files ({len(ftsfr_files)} FTSFR) from {len(task_files)} tasks")
+
+    print("Report(s) generated successfully!")
 
 
 if __name__ == "__main__":

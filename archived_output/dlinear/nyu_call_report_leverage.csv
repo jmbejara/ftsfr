@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
+0,dlinear,nyu_call_report_leverage,23915,QE,4,54.77225,9.485784,11.542944

@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,transformer,CDS_contract_returns,6603,5.5601726,0.6807011,0.6807011

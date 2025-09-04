@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,catboost,FX_returns,9,4.0504373531632965,0.32453926119853294,0.40407119887661785

@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
+0,auto_ets,nyu_call_report_holding_company_leverage,4750,4,531.9719645448292,0.829112983340401,127.45509371398167,0.057003635111771186,146.24523484770452,0.07555946115703632

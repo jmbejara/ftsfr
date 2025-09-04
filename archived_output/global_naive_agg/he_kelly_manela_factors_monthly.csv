@@ -1,0 +1,2 @@
+,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
+0,global_naive_agg,he_kelly_manela_factors_monthly,4,0.80442464,0.07573169,0.09970914
