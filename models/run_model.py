@@ -441,6 +441,10 @@ def run_model(
         from model_classes.nixtla_main_class import NixtlaMain
 
         object_class = NixtlaMain
+    elif model_class == "StatsForecastMain":
+        from model_classes.statsforecast_main_class import StatsForecastMain
+
+        object_class = StatsForecastMain
     elif model_class == "GluontsMain":
         from model_classes.gluonts_main_class import GluontsMain
 
