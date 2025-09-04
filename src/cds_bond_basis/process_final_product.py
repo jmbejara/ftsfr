@@ -80,9 +80,9 @@ def output_cb_final_products(df):
         0 if it contains Junk
         1 if it contains IG
     c_rating: IG, Junk, or combo
-        0 if it only contains Junk
-        1 if it only contains IG
-        2 if it contains both
+        "High Yield" if it only contains Junk
+        "Investment Grade" if it only contains IG
+        "IG + HY" if it contains both
 
     output:
         agg_df: aggregated dataframe where data is combined
@@ -100,8 +100,12 @@ def output_cb_final_products(df):
                 desired value from stat arbitrage
 
     """
+
+    # filter out for combination of IG and HY
+    df = df.loc[df["c_rating"] != "IG + HY"]
+    
     # outliers were removed so aggregation should be ok
-    agg_df = df[["c_rating", "date", "rfr"]].groupby("c_rating").mean().reset_index()
+    agg_df = df[["c_rating", "date", "rfr"]].groupby(["c_rating", "date"]).mean().reset_index()
 
     # no grouping or aggregation here
     non_agg_df = df[["cusip", "date", "rfr"]]

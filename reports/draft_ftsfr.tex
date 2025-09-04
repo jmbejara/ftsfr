@@ -211,10 +211,86 @@ We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP)
 
 \paragraph{Options}
 
+
 TODO: Viren: Please review this paragraph in depth. Perhaps just replace it with your own. Put in a description of the economic significance of the options data (maybe the increasing volume in SPX options). Only high level of detail about the cleaning procedure. Focus is on the economic significance of the options data and the economic significance of the cleaning procedure.
 
-Our options dataset follows \cite{Constantinides2013}. In addition to replicating
-their portfolio construction, we make public the full cleaning pipeline that transforms the raw SPX option tape into research-grade data.  This procedures (i) deletes duplicate or contradictory quotes and any observation with a zero bid, (ii) keeps only contracts with 7--180 days to expiration and moneyness between 0.8 and 1.2 to remove stale deep in/out-of-the-money options, (iii) derives a put--call-parity-implied funding curve and drop quotes that imply negative risk-free rates, (iv) discards prices whose implied volatilities fall outside the 5--100\% band or lie more than one standard error from a smoothed volatility surface, and (v) enforces arbitrage by excluding records that violate put--call parity.  These steps eliminate typographical errors, illiquidity noise, and expiry-week quirks that would otherwise distort higher-moment estimates.  We then scale option returns to unit market beta, converting the inherently fat-tailed pay-offs into near-Gaussian series that linear factor models can handle.  Open-sourcing this end-to-end workflow allows others to reproduce the ``clean" option universe that underpins modern option-pricing research and to audit every assumption embedded in the data.
+The volume of SPX options traded has grown dramatically over time (along with the options asset class as a whole). Our options dataset and code module provides data filtration and portfolio construction functions following the procedures outlined in \cite{Constantinides2013} ("CJS"), and the aggregation of these portfolio returns into the 18 SPX option portfolios utilized in \cite{He2017} ("HKM").
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/spx_options_over_time.png}
+  \end{tabular}
+  \caption{Volume of Options in the Raw SPX Data}
+  \label{fig:spx_options_volume}
+\end{figure}
+
+Our options dataset provides monthly leverage-adjusted portfolio returns for SPX option portfolios, spanning 23 years from January 1996 to December 2019. The monthly returns were constructed from the daily data of 18.9 million individual SPX option contracts. 
+
+The leverage adjustments and dynamic portfolio rebalancing process outlined in CJS had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and acknowledge areas where we made educated guesses about the authors' intent, if a particular process was not sufficiently detailed in the original paper. We provide the user with generalized functions that operate on **any set** of options data that is structured the same as the dataset we utilized (WRDS OptionMetrics). This should hopefully require no more than a few simple data transformations of standardized financial metrics if the user is utilizing a source of option pricing data other than WRDS OptionMetrics.
+
+
+We also provide a comprehensive overview of the data cleaning and preprocessing steps we undertook to prepare the raw SPX options data for analysis and portfolio construction, which includes technical and mathematical details on volatility estimation, kernel methods, and other relevant techniques.
+
+The CJS portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to 2 \times 9 \times 3 = 54 distinct portfolios. The 18 HKM portfolios were constructed by taking an equal weight average across the 3 maturities of the CJS portfolios, so we have 2 \times 9 = 18 distinct portfolios in the HKM framework. We have provided a simple coding system to access and identify these portfolios.
+
+Additionally, CJS utilized a 3-level data filtration system to clean the raw option quotes. In replicating their work, we found it helpful to create some "flat time" visualizations of the entire dataset, in order to see the data filters in action. These visualizations are integrated into the filtration code, so will be generated when our filtration functions are utilized.
+
+For our SPX options data, this is what each level of filter did to the raw set of options (each dot / point on these charts represents a single option in the raw data):
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/RAW_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{Some visualizations of the raw SPX options data}
+  \label{fig:raw_spx_options_data}
+\end{figure}
+
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L1_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{SPX options remaining after Level 1 filters}
+  \label{fig:l1_spx_options_data}
+\end{figure}
+
+
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L2_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{SPX options remaining after Level 2 filters}
+  \label{fig:l2_spx_options_data}
+\end{figure}
+
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L3_IV_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{SPX options remaining after the Level 3 Implied Volatility filter (only)}
+  \label{fig:l3_iv_only_spx_options_data}
+\end{figure}
+
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/L3_IV_PCP_1996-01_2019-12_iv_summary.png}
+  \end{tabular}
+  \caption{SPX options remaining after the Level 3 Implied Volatility and Put-Call Parity filters}
+  \label{fig:l3_iv_pcp_spx_options_data}
+\end{figure}
+
+
+
+
 
 \paragraph{Foreign Exchange}
 For foreign exchange, we provide daily returns from the individual foreign currencies, against the US dollar. 
@@ -284,20 +360,22 @@ resulting series replicates the persistently negative swap spreads documented by
 \begin{figure}[h!]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_sf_basis_ftsfr.png}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_spot_futures_arbitrage.png}
   \end{tabular}
   \caption{Treasury Spot-Futures Basis (FTSFR Replication)}
   \label{fig:treasury_sf_basis}
 \end{figure}
 
+
 \begin{figure}[h!]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_swap_replication.png}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_swap_arbitrage_spreads.png}
   \end{tabular}
   \caption{Treasury Swap Arbitrage spreads.}
   \label{fig:treasury_swap_arbitrage}
 \end{figure}
+
 
 \paragraph{TIPS-Treasury Arbitrage}
 Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we splice Federal Reserve zero-coupon TIPS yields with Bloomberg constant-maturity inflation-swap rates to create synthetic nominal yields, then difference these against equal-maturity zero-coupon Treasury yields for the 2-, 5-, 10- and 20-year tenors.  We exclude days with missing swap quotes or illiquid TIPS issues, drop outliers beyond the extreme 1\%, and harmonise all series to 17:00 ET closes to obtain a clean daily TIPS-Treasury basis series.
@@ -305,7 +383,7 @@ Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, 
 \begin{figure}[h!]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/tips_treasury_arbitrage.png}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/tips_treasury_arbitrage_spreads.png}
   \end{tabular}
   \caption{TIPS-Treasury Arbitrage spreads.}
   \label{fig:tips_treasury_basis}

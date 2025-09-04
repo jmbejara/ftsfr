@@ -4,6 +4,8 @@ import os
 import sys
 import asyncio
 import pandas as pd
+import sys
+sys.path.append("..")
 
 from settings import config
 import pull_bbg_treas_swap
@@ -87,13 +89,22 @@ Once we have the spreads, we plot the replicated and updated figures and save th
 
 # %%
 output_dir = Path(config("OUTPUT_DIR"))
+import matplotlib.pyplot as plt
 
-plot_figure(
-    calc_df,
-    os.path.join(output_dir, "replicated_swap_spread_arb_figure.png"),
-    start_date=DEFAULT_START_DATE,
-    end_date=REPLICATION_END_DATE,
-)
+fig, ax = plt.subplots(figsize=(12, 6))
+
+for year in [1, 20, 2, 30, 3, 5, 10]:
+    data = calc_df[f"Arb_Swap_{year}"].dropna()
+    ax.plot(data.index, data.values, label=f"{year}Y")
+
+ax.set_title("Treasury-Swap Arbitrage Spreads")
+ax.set_xlabel("Date")
+ax.set_ylabel("Arbitrage Spread (bps)")
+ax.grid(True)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), frameon=False, ncol=7)
+
+plt.savefig(os.path.join(output_dir, "treasury_swap_arbitrage_spreads.png"))
+plt.show()
 
 # %%
 """
@@ -101,15 +112,6 @@ plot_figure(
 
 Ever since the paper's publishing, more data has been added to Bloomberg which can be used to extend the plot recreated.
 """
-
-# %%
-plot_figure(
-    calc_df,
-    os.path.join(output_dir, "updated_swap_spread_arb_figure.png"),
-    start_date=DEFAULT_START_DATE,
-    end_date=None,
-)
-
 # %%
 """
 ### Supplementary
