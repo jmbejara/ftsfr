@@ -13,6 +13,7 @@ import pull_open_source_bond
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
+# DATA_DIR = DATA_DIR / "corp_bond_returns"
 
 df_individual_bonds = pull_open_source_bond.load_corporate_bond_returns(
     data_dir=DATA_DIR
@@ -26,6 +27,7 @@ df_individual_bonds_returns.columns = ["unique_id", "ds", "y"]
 df_individual_bonds_returns = df_individual_bonds_returns.dropna(subset=["y"])
 
 # Save the long format bond returns
+df_individual_bonds_returns.reset_index(drop=True, inplace=True)
 df_individual_bonds_returns.to_parquet(DATA_DIR / "ftsfr_corp_bond_returns.parquet")
 
 # Also save the portfolio returns in the original format
@@ -35,4 +37,5 @@ df_portfolio_melted = df_portfolio.reset_index().melt(
 )
 df_portfolio_melted = df_portfolio_melted[["unique_id", "date", "y"]]
 df_portfolio_melted.columns = ["unique_id", "ds", "y"]
+df_portfolio_melted.reset_index(drop=True, inplace=True)
 df_portfolio_melted.to_parquet(DATA_DIR / "ftsfr_corp_bond_portfolio_returns.parquet")

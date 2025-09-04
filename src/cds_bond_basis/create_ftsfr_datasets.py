@@ -58,6 +58,7 @@ df_stacked2 = df_stacked2[["unique_id", "date", "value"]].rename(
     columns={"date": "ds", "value": "y"}
 )
 
+df_stacked.reset_index(drop=True, inplace=True)
 df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_aggregated.parquet")
 # df_stacked.pivot(index="ds", columns="unique_id", values="y").plot()
 
@@ -71,6 +72,6 @@ if num_duplicates > 0:
 else:
     print("No duplicate (unique_id, ds) pairs found in df_stacked2.")
 
-
+df_stacked2.reset_index(drop=True, inplace=True)
 df_stacked2.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_non_aggregated.parquet")
 # df_stacked2["unique_id"].nunique()

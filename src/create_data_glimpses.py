@@ -662,34 +662,9 @@ def create_ftsfr_enhanced_report(
         output_lines.append("")
 
         # Enhanced FTSFR Analysis Section
-        output_lines.append("### FTSFR Enhanced Analysis")
-        
-        # Row uniqueness analysis
         if "row_uniqueness" in report:
             uniqueness = report["row_uniqueness"]
-            output_lines.append("#### Row Uniqueness")
-            output_lines.append(f"- **Total rows:** {uniqueness['total_rows']:,}")
-            output_lines.append(f"- **Unique rows:** {uniqueness['unique_rows']:,}")
-            output_lines.append(f"- **All rows unique:** {'✅ Yes' if uniqueness['all_rows_unique'] else '❌ No'}")
-            if not uniqueness['all_rows_unique']:
-                output_lines.append(f"- **Duplicate rows:** {uniqueness['duplicate_rows']:,}")
-            output_lines.append(f"- **Uniqueness percentage:** {uniqueness['uniqueness_percentage']:.2f}%")
-            output_lines.append("")
-
-        # Null fraction analysis
-        if "null_fractions" in report:
-            output_lines.append("#### Null Value Analysis (All Columns)")
-            output_lines.append("```")
-            for null_info in report["null_fractions"]:
-                pct = null_info["null_percentage"]
-                if pct == 0:
-                    status = "✅ No nulls"
-                elif pct < 5:
-                    status = f"⚠️  {pct:.2f}%"
-                else:
-                    status = f"🚨 {pct:.2f}%"
-                output_lines.append(f"{null_info['name']:<40} {status}")
-            output_lines.append("```")
+            output_lines.append(f"**All rows unique:** {'✅ Yes' if uniqueness['all_rows_unique'] else '❌ No'}")
             output_lines.append("")
 
         # Columns section
