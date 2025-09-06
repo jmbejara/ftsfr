@@ -105,13 +105,13 @@ def calc_return_manual(df):
 
 
 def generate_replication_gsci(data_dir=DATA_DIR):
-    df_return1 = load_futures_data.load_gsci_data()
+    df_return1 = load_futures_data.load_gsci_data(data_dir=data_dir)
     hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(
         data_dir=BASE_DIR / "_data" / "he_kelly_manela"
     )
     corr_matrix1 = generate_corr_matrix(df_return1, hkm_df)
     corr_matrix_float1 = corr_matrix1.astype(float)
-    optimal_pairs_df1 = decide_optimal_pairs(corr_matrix_float1)
+    optimal_pairs_df1, _, _ = decide_optimal_pairs(corr_matrix_float1)
     optimal_pairs_df1["GSCI Index"] = optimal_pairs_df1["Commodity_1"].str.replace(
         "_PX_LAST_Return", "", regex=False
     )
@@ -192,12 +192,12 @@ def compute_second_contract_return(commodity_futures_df, date_col="index"):
     return ret_df
 
 
-def generate_replication_future_ticker():
+def generate_replication_future_ticker(data_dir=DATA_DIR):
     hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(
         data_dir=BASE_DIR / "_data" / "he_kelly_manela"
     )
-    commodity_futures_df = load_futures_data.load_commodities_future()
-    lme_df = load_futures_data.load_lme_metals()
+    commodity_futures_df = load_futures_data.load_commodities_future(data_dir=data_dir)
+    lme_df = load_futures_data.load_lme_metals(data_dir=data_dir)
     monthly_1mprice = calc_lme_monthly_1mprice(lme_df, metal_map, date_col="index")
     lme_monthly_return = calc_lme_monthly_return(monthly_1mprice)
 
@@ -214,7 +214,7 @@ def generate_replication_future_ticker():
     carry_sub = combined_df.loc[common_idx]
     corr_matrix2 = generate_corr_matrix(he_kelly_sub, carry_sub)
     corr_matrix_float2 = corr_matrix2.astype(float)
-    optimal_pairs_df2 = decide_optimal_pairs(corr_matrix_float2)
+    optimal_pairs_df2, _, _ = decide_optimal_pairs(corr_matrix_float2)
 
     optimal_pairs_df2["Commodity_Name"] = optimal_pairs_df2["Commodity_2"].map(
         ticker_to_commodity
@@ -224,45 +224,129 @@ def generate_replication_future_ticker():
     return gsci_replication_df
 
 
-def generate_replication_manual():
-    hkm_df = extract_hkm_cmdty.extract_hkm_cmdty(
-        data_dir=BASE_DIR / "_data" / "he_kelly_manela"
-    )
-    df = load_futures_data.load_commodities_manual()
-    monthly_return = calc_return_manual(df)
-    monthly_return["yyyymm"] = monthly_return["Month"].dt.strftime("%Y%m")
-    monthly_return = monthly_return.set_index("yyyymm")
-    corr_matrix3 = generate_corr_matrix(monthly_return, hkm_df)
-    corr_matrix_float3 = corr_matrix3.astype(float)
-    optimal_pairs_df3 = decide_optimal_pairs(corr_matrix_float3)
-    optimal_pairs_df3["Commodity_Name"] = optimal_pairs_df3["Commodity_2"].map(
-        ticker_to_commodity
-    )
-    list_of_return_ticker = optimal_pairs_df3["Commodity_2"].to_list()
-    gsci_replication_df = wide_to_long_returns(monthly_return, list_of_return_ticker)
-    return gsci_replication_df
+def monthly_returns_mixed_prices(
+    df_in: pd.DataFrame,
+    date_col: str = "index",
+    suffixes: tuple = ("Comdty_PX_LAST", "Curncy_PX_LAST"),
+) -> pd.DataFrame:
+    """
+    Compute end-of-month simple returns for columns ending with the given suffixes,
+    e.g. "... Comdty_PX_LAST" and/or "... Curncy_PX_LAST". Works with both
+    single-level and MultiIndex columns. Returns are based on month-end prices.
 
+    Output index: 'yyyymm' (string), with a 'Date' month-end timestamp column.
+
+    Parameters
+    ----------
+    df_in : pd.DataFrame
+        Source DataFrame containing a date column and price columns.
+    date_col : str, default "index"
+        Name of the date-like column to parse.
+    suffixes : tuple, default ("Comdty_PX_LAST", "Curncy_PX_LAST")
+        Column suffixes to include when extracting price series.
+
+    Returns
+    -------
+    pd.DataFrame
+        ["yyyymm", "Date", <one column per selected instrument>],
+        where each instrument column is the monthly simple return.
+    """
+    df = df_in.copy()
+
+    # 1) Parse and sort by date to ensure month-end selection is correct
+    df["Date"] = pd.to_datetime(df[date_col], errors="coerce")
+    df = df.sort_values("Date")
+
+    # 2) Extract price columns for the requested suffixes
+    if isinstance(df.columns, pd.MultiIndex):
+        # Collect sub-frames for each suffix level and merge them
+        collected = []
+        for sfx in suffixes:
+            if sfx in df.columns.get_level_values(-1):
+                sub = df.xs(sfx, axis=1, level=-1)  # remaining levels become columns
+                # Avoid name collisions by appending a short tag when needed
+                short_tag = "curncy" if "Curncy" in sfx else "comdty"
+                new_cols = []
+                seen = set()
+                for c in sub.columns.astype(str):
+                    name = c
+                    if name in seen:
+                        name = f"{name}_{short_tag}"
+                    seen.add(name)
+                    new_cols.append(name)
+                sub.columns = new_cols
+                collected.append(sub)
+
+        if not collected:
+            raise ValueError(f"No MultiIndex columns with last level in {suffixes} found.")
+        price_df = pd.concat(collected, axis=1)
+
+    else:
+        # Single-level columns: keep those that end with any of the suffixes
+        sel_cols = [c for c in df.columns if any(str(c).endswith(sfx) for sfx in suffixes)]
+        if not sel_cols:
+            raise ValueError(f"No columns ending with any of {suffixes} were found.")
+        price_df = df[sel_cols].copy()
+
+        # Normalize names by stripping the matched suffix; if collision, append a tag
+        normalized = []
+        seen = set()
+        for c in price_df.columns:
+            s = str(c)
+            matched = None
+            for sfx in suffixes:
+                if s.endswith(sfx):
+                    matched = sfx
+                    break
+            base = s[: -len(matched)].rstrip() if matched else s
+            name = base
+            if name in seen:
+                tag = "curncy" if matched and "Curncy" in matched else "comdty"
+                name = f"{base}_{tag}"
+            seen.add(name)
+            normalized.append(name)
+        price_df.columns = normalized
+
+    # Convert to numeric in case of object dtypes
+    price_df = price_df.apply(pd.to_numeric, errors="coerce")
+
+    # 3) Month-end prices = last available obs in each calendar month
+    price_df["Month"] = df["Date"].dt.to_period("M")
+    monthly_px = price_df.groupby("Month").last()
+
+    # 4) Simple monthly returns; for log returns use: np.log(monthly_px).diff()
+    rets = monthly_px.pct_change()
+
+    # 5) Package output: 'yyyymm' index + month-end 'Date' column
+    out = rets.copy()
+    out["yyyymm"] = out.index.strftime("%Y%m")
+    out["Date"] = out.index.to_timestamp("M")
+
+    cols = ["yyyymm", "Date"] + [c for c in rets.columns]
+    out = out.reset_index(drop=True)[cols]
+    out = out.set_index("yyyymm")
+    return out
+
+def load_commodities_returns(data_dir=DATA_DIR):
+    df_gsci = generate_replication_gsci(data_dir=data_dir)
+    return df_gsci
 
 if __name__ == "__main__":
     # Output paths
-    path_gsci = DATA_DIR / "futures_returns_gsci.pkl"
-    path_ticker = DATA_DIR / "futures_returns_future_ticker.pkl"
-    path_manual = DATA_DIR / "futures_returns_manual.pkl"
+    path_gsci = DATA_DIR / "futures_returns_gsci.parquet"
+    path_ticker = DATA_DIR / "futures_returns_future_ticker.parquet"
 
     # Create directory if needed
     path_gsci.parent.mkdir(parents=True, exist_ok=True)
 
     # Generate and save replication data
-    df_gsci = generate_replication_gsci()
-    df_gsci.to_pickle(path_gsci)
+    df_gsci = generate_replication_gsci(data_dir=DATA_DIR)
+    df_gsci.to_parquet(path_gsci)
 
-    df_ticker = generate_replication_future_ticker()
-    df_ticker.to_pickle(path_ticker)
+    df_ticker = generate_replication_future_ticker(data_dir=DATA_DIR)
+    df_ticker.to_parquet(path_ticker)
 
-    df_manual = generate_replication_manual()
-    df_manual.to_pickle(path_manual)
 
     print("Replication outputs saved as pickle files:")
     print(f" - GSCI-based: {path_gsci}")
     print(f" - Futures ticker-based: {path_ticker}")
-    print(f" - Manual portfolio-based: {path_manual}")

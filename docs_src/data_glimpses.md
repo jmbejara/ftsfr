@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Total files: 123
+Total files: 127
 
 ## Summary of Datasets by Task
 
@@ -37,6 +37,10 @@ Total files: 123
 #### Format: Cip
 - [`cip_spreads.parquet`](#cip-spreads-parquet)
 - [`ftsfr_CIP_spreads.parquet`](#ftsfr-cip-spreads-parquet)
+#### Format: Commodities
+- [`ftsfr_commodities_returns.parquet`](#ftsfr-commodities-returns-parquet)
+- [`futures_returns_future_ticker.parquet`](#futures-returns-future-ticker-parquet)
+- [`futures_returns_gsci.parquet`](#futures-returns-gsci-parquet)
 #### Format: Corp Bond Returns
 - [`corp_bond_portfolio_returns.parquet`](#corp-bond-portfolio-returns-parquet)
 - [`ftsfr_corp_bond_portfolio_returns.parquet`](#ftsfr-corp-bond-portfolio-returns-parquet)
@@ -88,6 +92,7 @@ Total files: 123
 - [`ftsfr_CDS_contract_returns.parquet`](#ftsfr-cds-contract-returns-parquet)
 - [`ftsfr_CDS_portfolio_returns.parquet`](#ftsfr-cds-portfolio-returns-parquet)
 - [`ftsfr_CIP_spreads.parquet`](#ftsfr-cip-spreads-parquet)
+- [`ftsfr_commodities_returns.parquet`](#ftsfr-commodities-returns-parquet)
 - [`ftsfr_corp_bond_portfolio_returns.parquet`](#ftsfr-corp-bond-portfolio-returns-parquet)
 - [`ftsfr_corp_bond_returns.parquet`](#ftsfr-corp-bond-returns-parquet)
 - [`ftsfr_treas_yield_curve_zero_coupon.parquet`](#ftsfr-treas-yield-curve-zero-coupon-parquet)
@@ -1754,6 +1759,75 @@ ds: min=2001-12-04 00:00:00, max=2025-02-28 00:00:00
 
 ---
 
+## ftsfr_commodities_returns.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/commodities/ftsfr_commodities_returns.parquet`
+**Size:** 126310 bytes | **Type:** Parquet | **Shape:** 11,553 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.6026668174158621, max=0.6741843598832211, mean=0.00, median=-5.1923181702440147e-05
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1970-01-30 00:00:00, max=2025-08-12 00:00:00
+```
+
+---
+
+## futures_returns_future_ticker.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/commodities/futures_returns_future_ticker.parquet`
+**Size:** 110708 bytes | **Type:** Parquet | **Shape:** 10,429 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.4694986913629957, max=0.9060402684563758, mean=0.01, median=0.003466666666666729
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1987-09-30 00:00:00, max=2025-08-31 00:00:00
+```
+
+---
+
+## futures_returns_gsci.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/commodities/futures_returns_gsci.parquet`
+**Size:** 126310 bytes | **Type:** Parquet | **Shape:** 11,553 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.6026668174158621, max=0.6741843598832211, mean=0.00, median=-5.1923181702440147e-05
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1970-01-30 00:00:00, max=2025-08-12 00:00:00
+```
+
+---
+
 ## corp_bond_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/corp_bond_portfolio_returns.parquet`
 **Size:** 30784 bytes | **Type:** Parquet | **Shape:** 242 rows × 11 columns
@@ -2559,6 +2633,29 @@ y: min=-75.02010739148606, max=439.59367390435733, mean=18.90, median=12.6606122
 ### Date/Datetime Column Statistics
 ```
 ds: min=2001-12-04 00:00:00, max=2025-02-28 00:00:00
+```
+
+---
+
+## ftsfr_commodities_returns.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/commodities/ftsfr_commodities_returns.parquet`
+**Size:** 126310 bytes | **Type:** Parquet | **Shape:** 11,553 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.6026668174158621, max=0.6741843598832211, mean=0.00, median=-5.1923181702440147e-05
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1970-01-30 00:00:00, max=2025-08-12 00:00:00
 ```
 
 ---

@@ -111,6 +111,7 @@ data_glimpses_ftsfr
 _notebook_build/summary_cds_bond_basis_ipynb.ipynb
 _notebook_build/summary_cds_returns_ipynb.ipynb
 _notebook_build/summary_cip_ipynb.ipynb
+_notebook_build/summary_commodities.ipynb
 _notebook_build/summary_corp_bond_returns_ipynb.ipynb
 spx_options_description.md
 cleaning_options.md

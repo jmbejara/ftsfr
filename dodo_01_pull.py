@@ -532,21 +532,39 @@ def task_format():
             }
         )
 
-    # data_module = "commodities"
-    # if module_requirements[data_module] and not use_cache:
-    #     yield {
-    #         "name": data_module,
-    #         "actions": [
-    #             f"python ./src/{data_module}/calc_commodities_returns.py --DATA_DIR={DATA_DIR / data_module}"
-    #         ],
-    #         "targets": [
-    #             DATA_DIR / data_module / "commodities_returns.parquet",
-    #         ],
-    #         "file_dep": [
-    #             f"./src/{data_module}/calc_commodities_returns.py",
-    #             f"./src/{data_module}/replicate_cmdty.py",
-    #         ],
-    #     }
+    data_module = "commodities"
+    if module_requirements[data_module] and not use_cache:
+        yield {
+            "name": data_module,
+            "actions": [
+                f"python ./src/{data_module}/calc_commodities_returns.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+            ],
+            "targets": [
+                DATA_DIR / data_module / "futures_returns_gsci.parquet",
+                DATA_DIR / data_module / "futures_returns_future_ticker.parquet",
+                # DATA_DIR / data_module / "futures_returns_manual.parquet",
+                DATA_DIR / data_module / "ftsfr_commodities_returns.parquet",
+            ],
+            "file_dep": [
+                f"./src/{data_module}/load_futures_data.py",
+                f"./src/{data_module}/calc_commodities_returns.py",
+                f"./src/{data_module}/replicate_cmdty.py",
+                f"./src/{data_module}/create_ftsfr_datasets.py",
+            ],
+        }
+        yield from notebook_subtask(
+            {
+                "name": "summary_commodities",
+                "notebook_path": "./src/commodities/summary_commodities.ipynb",
+                "file_dep": [
+                    "./src/commodities/load_futures_data.py",
+                    "./src/commodities/calc_commodities_returns.py",
+                    "./src/commodities/replicate_cmdty.py",
+                ],
+                "targets": [],
+            }
+        )
 
     data_module = "corp_bond_returns"
     if module_requirements[data_module]:
@@ -890,6 +908,7 @@ def task_compile_sphinx_docs():
             "./docs_src/data_sources_and_modules.md",
             "./docs_src/myst_markdown_demos.md",
             "./docs_src/data_glimpses.md",
+            "./docs_src/data_glimpses_ftsfr.md",
             *src_files,
         ],
         "task_dep": task_deps,
