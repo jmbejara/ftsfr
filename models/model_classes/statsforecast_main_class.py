@@ -6,7 +6,6 @@ Supports traditional statistical models like AutoARIMA, ETS, etc.
 """
 
 import os
-from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
@@ -34,6 +33,7 @@ class StatsForecastMain(forecasting_model):
         seasonality,
         data_path,
         output_path,
+        winsorization=None,
     ):
         StatsForecastMain_logger.info("StatsForecastMain __init__ called.")
 
@@ -78,7 +78,7 @@ class StatsForecastMain(forecasting_model):
         # Data pre-processing
         df = pd.read_parquet(data_path).rename(columns={"id": "unique_id"})
         train_data, test_data, test_split = process_df(
-            df, frequency, seasonality, test_split
+            df, frequency, seasonality, test_split, winsorization
         )
 
         StatsForecastMain_logger.info(
@@ -104,13 +104,14 @@ class StatsForecastMain(forecasting_model):
         # Important variables
         self.seasonality = seasonality
         self.frequency = frequency
+        self.winsorization = winsorization
 
         self.estimator = estimator
 
         # Stores the sf object
         self.sf = None  # Initialize to None, will be set in train()
         # Error metrics
-        self.errors = defaultdict(float)
+        self.errors = {}
 
         StatsForecastMain_logger.info("Internal variables set up.")
 
@@ -133,10 +134,15 @@ class StatsForecastMain(forecasting_model):
         from statsforecast import StatsForecast
 
         # StatsForecast expects frequency as string
+        # Use all available cores for parallel processing (or user-specified number)
+        import os
+        n_jobs = int(os.getenv("STATSFORECAST_N_JOBS", os.cpu_count() or 1))
+        StatsForecastMain_logger.info(f"Using {n_jobs} cores for parallel processing")
+        
         self.sf = StatsForecast(
             models=[self.estimator], 
             freq=self.frequency,
-            n_jobs=1
+            n_jobs=n_jobs
         )
         self.sf.fit(df=self.train_data)
         StatsForecastMain_logger.info("Model trained.")
@@ -239,7 +245,7 @@ class StatsForecastMain(forecasting_model):
             StatsForecastMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
         except (ImportError, ValueError, TypeError) as e:
             StatsForecastMain_logger.warning(f"⚠ Cannot calculate MASE: {e}")
-            self.errors["MASE"] = 0.0
+            self.errors["MASE"] = None
 
         # Calculate MAE and RMSE using the Darts conversion helper
         try:
@@ -259,8 +265,8 @@ class StatsForecastMain(forecasting_model):
 
         except (ImportError, ValueError, TypeError) as e:
             StatsForecastMain_logger.warning(f"⚠ Cannot calculate MAE/RMSE: {e}")
-            self.errors["MAE"] = 0.0
-            self.errors["RMSE"] = 0.0
+            self.errors["MAE"] = None
+            self.errors["RMSE"] = None
 
         return self.errors
 

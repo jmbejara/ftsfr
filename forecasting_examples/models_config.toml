@@ -1,0 +1,104 @@
+# Simplified Models Configuration for forecast.py
+# This file defines all available forecasting models for the CLI script
+
+# StatsForecast Models
+# [auto_arima]
+# library = "statsforecast"
+# class = "AutoARIMA"
+# display_name = "AutoARIMA"
+# # season_length will be set dynamically from dataset config
+
+[ses_optimized]
+library = "statsforecast"
+class = "SimpleExponentialSmoothingOptimized"
+display_name = "SES Optimized"
+
+
+# [seasonal_es_optimized]
+# library = "statsforecast"
+# class = "SeasonalExponentialSmoothingOptimized"
+# display_name = "Seasonal ES Optimized"
+
+
+[auto_theta]
+library = "statsforecast"
+class = "AutoTheta"
+display_name = "AutoTheta"
+[auto_theta.params]
+decomposition_type = "additive"
+
+#TBATS not in nixtlaverse
+
+[auto_ets]
+library = "statsforecast"
+class = "AutoETS"
+display_name = "AutoETS"
+[auto_ets.params]
+model = "ZZZ"
+
+# DHR-ARIMA not in nixtlaverse
+# (Dynamic Harmonic Regression - ARIMA)
+
+[auto_arima_fast]
+library = "statsforecast"
+class = "AutoARIMA"
+display_name = "AutoARIMA Fast"
+[auto_arima_fast.params]
+approximation = true
+stepwise = true
+max_p = 2
+max_q = 2
+max_P = 1
+max_Q = 1
+nmodels = 10
+
+
+[auto_deepar]
+library = "neuralforecast"
+class = "AutoDeepAR"
+display_name = "AutoDeepAR"
+[auto_deepar.params]
+h = 1
+loss = "DistributionLoss"
+[auto_deepar.params.config]
+max_steps = 100
+val_check_steps = 10
+early_stop_patience_steps = 3
+
+
+[AutoNBEATS]
+library = "neuralforecast"
+class = "NBEATS"
+display_name = "NBEATS"
+[nbeats.params]
+h = 1
+loss = "MAE"
+max_steps = 100
+stack_types = ["identity"]
+
+[nhits]
+library = "neuralforecast"
+class = "NHITS"
+display_name = "NHITS"
+[nhits.params]
+h = 1
+loss = "MAE"
+max_steps = 100
+
+[dlinear]
+library = "neuralforecast"
+class = "DLinear"
+display_name = "DLinear"
+[dlinear.params]
+h = 1
+loss = "MAE"
+max_steps = 100
+
+[nlinear]
+library = "neuralforecast"
+class = "NLinear"
+display_name = "NLinear"
+[nlinear.params]
+h = 1
+loss = "MAE"
+max_steps = 100

@@ -182,6 +182,23 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
     ):
         if "season_length" not in params:
             params["season_length"] = seasonality
+    
+    # StatsForecast AutoARIMA speed optimizations
+    if "AutoARIMA" in model_name and model_config.get("class") == "StatsForecastMain":
+        # Speed optimizations for StatsForecast AutoARIMA
+        if "approximation" not in params:
+            params["approximation"] = True  # Use approximation for faster search
+        if "stepwise" not in params:
+            params["stepwise"] = True  # Use stepwise search instead of grid search
+        if "max_p" not in params:
+            params["max_p"] = 3  # Limit maximum AR order for speed
+        if "max_q" not in params:
+            params["max_q"] = 3  # Limit maximum MA order for speed
+        if "max_P" not in params:
+            params["max_P"] = 2  # Limit seasonal AR order for speed
+        if "max_Q" not in params:
+            params["max_Q"] = 2  # Limit seasonal MA order for speed
+        print(f"Applied speed optimizations for StatsForecast AutoARIMA: approximation={params['approximation']}, stepwise={params['stepwise']}")
 
     # Models that need input_chunk_length (typically seasonality * 4)
     if any(
@@ -333,6 +350,7 @@ def run_model(
     workflow="main",
     log_path=None,
     n_epochs=None,
+    winsorization=None,
 ):
     """
     Run a specific model based on its configuration.
@@ -470,7 +488,7 @@ def run_model(
         raise ValueError(f"Unknown model class: {model_class}")
 
     model_obj = object_class(
-        estimator, model_name, test_split, frequency, seasonality, data_path, output_dir
+        estimator, model_name, test_split, frequency, seasonality, data_path, output_dir, winsorization
     )
 
     # Run the selected workflow
@@ -542,6 +560,10 @@ def main():
         type=int,
         help="Number of training epochs (overrides N_EPOCHS env var, e.g. 5 for quick testing)",
     )
+    parser.add_argument(
+        "--winsorize",
+        help="Override winsorization settings (e.g. '[1.0,99.0]' for 1%%-99%% winsorization, 'none' to disable)",
+    )
     # Additional useful CLI arguments
     parser.add_argument(
         "--parallel",
@@ -576,15 +598,24 @@ def main():
 
     # Read configuration (dataset config + environment overrides)
     dataset_config = get_model_config(modified_env)
-    # Unpack for backward compatibility
-    env_vars = dataset_config[
-        :5
-    ]  # (test_split, frequency, seasonality, dataset_path, output_dir)
-    test_split = env_vars[0]
-    frequency = env_vars[1]
-    seasonality = env_vars[2]
-    data_path = env_vars[3]
-    output_dir = env_vars[4]
+    # Unpack the full configuration tuple
+    (test_split, frequency, seasonality, data_path, output_dir, dataset_name, winsorization) = dataset_config
+    
+    # Handle winsorization CLI override
+    if args.winsorize is not None:
+        if args.winsorize.lower() == 'none':
+            winsorization = None
+            print("DEBUG: Disabled winsorization via --winsorize none")
+        else:
+            # Parse format like '[1.0,99.0]'
+            try:
+                winsorize_str = args.winsorize.strip('[]')
+                winsorization = [float(x.strip()) for x in winsorize_str.split(',')]
+                if len(winsorization) != 2:
+                    raise ValueError("Expected exactly 2 values")
+                print(f"DEBUG: Override winsorization to {winsorization} via --winsorize")
+            except Exception as e:
+                raise ValueError(f"Invalid winsorization format '{args.winsorize}'. Expected format: '[1.0,99.0]' or 'none'") from e
 
     # Handle N_EPOCHS environment variable for debugging
     n_epochs = None
@@ -603,6 +634,7 @@ def main():
         args.config,
         args.workflow,
         n_epochs=n_epochs,
+        winsorization=winsorization,
     )
 
 

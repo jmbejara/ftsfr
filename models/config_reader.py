@@ -67,7 +67,7 @@ def get_model_config(environment_dict=None):
         environment_dict: Dictionary of environment variables (defaults to os.environ)
 
     Returns:
-        tuple: (test_split, frequency, seasonality, dataset_path, output_dir, dataset_name)
+        tuple: (test_split, frequency, seasonality, dataset_path, output_dir, dataset_name, winsorization)
     """
     if environment_dict is None:
         environment_dict = os.environ
@@ -102,12 +102,17 @@ def get_model_config(environment_dict=None):
     else:
         output_dir = Path(__file__).resolve().parent.parent / "_output"
 
+    # Get winsorization settings (no environment override, config only)
+    winsorization = dataset_config.get("winsorization", None)
+
     # Print configuration being used
     print(f"\nConfiguration for dataset: {dataset_name}")
     print(f"  Frequency: {frequency}")
     print(f"  Seasonality: {seasonality}")
+    if winsorization is not None:
+        print(f"  Winsorization: {winsorization}%")
     if "description" in dataset_config:
         print(f"  Description: {dataset_config['description']}")
     print()
 
-    return (test_split, frequency, seasonality, dataset_path, output_dir, dataset_name)
+    return (test_split, frequency, seasonality, dataset_path, output_dir, dataset_name, winsorization)

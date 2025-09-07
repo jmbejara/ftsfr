@@ -59,6 +59,7 @@ required_data_sources = ["bloomberg_terminal"]
 description = """Long format of Treasury-SF basis"""
 frequency = "ME"
 seasonality = 12
+winsorization = [1.0, 99.0]
 
 
 ################################################################################
@@ -74,6 +75,7 @@ required_data_sources = ["bloomberg_terminal"]
 description = """Long format of Treasury-Swap basis"""
 frequency = "ME"
 seasonality = 12
+winsorization = [0.5, 99.5]
 
 ################################################################################
 [cds_bond_basis]
@@ -92,6 +94,7 @@ required_data_sources = ["open_source_bond", "wrds_markit"]
 description = """Long format of CDS bond basis, non-aggregated"""
 frequency = "ME"
 seasonality = 12
+winsorization = [1.0, 99.0]
 
 
 ################################################################################
@@ -148,6 +151,7 @@ required_data_sources = ["open_source_bond"]
 description = """This data module contains the returns of individual corporate bonds sourced from the TRACE database."""
 frequency = "ME"
 seasonality = 12
+winsorization = [0.5, 99.5]
 
 [corp_bond_returns.ftsfr_corp_bond_portfolio_returns]
 description = """This data module contains the returns of the corporate bond portfolios formed as per the methodology of Nozawa (2017)."""
@@ -162,6 +166,7 @@ required_data_sources = ["wrds_crsp", "he_kelly_manela"]
 description = """This data module contains the returns of individual treasury bonds sourced from the CRSP database."""
 frequency = "ME"
 seasonality = 12
+winsorization = [0.5, 99.5]
 
 [us_treasury_returns.ftsfr_treas_bond_portfolio_returns]
 description = """This data module contains the returns of the treasury bond portfolios formed as per the methodology of Gurkaynak, Sack, and Wright (2011)."""
@@ -208,16 +213,19 @@ required_data_sources = ["he_kelly_manela"]
 description = """Monthly factors from He, Kelly, and Manela (2017)"""
 frequency = "MS"
 seasonality = 12
+winsorization = [1.0, 99.0]
 
 [he_kelly_manela.ftsfr_he_kelly_manela_factors_daily]
 description = """Daily factors from He, Kelly, and Manela (2017)"""
 frequency = "B"
 seasonality = 252
+winsorization = [1.0, 99.0]
 
 [he_kelly_manela.ftsfr_he_kelly_manela_all]
 description = """All factors from He, Kelly, and Manela (2017)"""
 frequency = "MS"
 seasonality = 12
+winsorization = [1.0, 99.0]
 
 
 ################################################################################
@@ -248,21 +256,25 @@ required_data_sources = ["nyu_call_report"]
 description = """From call report data, leverage for each rssdid, 1976-2020"""
 frequency = "QE"
 seasonality = 4  # Quarters per year
+winsorization = [5.0, 95.0]
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_leverage]
 description = """From call report data, leverage for each bhcid, 1976-2020"""
 frequency = "QE"
 seasonality = 4
+winsorization = [5.0, 95.0]
 
 [nyu_call_report.ftsfr_nyu_call_report_cash_liquidity]
 description = """From call report data, cash liquidity for each rssdid, 1976-2020"""
 frequency = "QE"
 seasonality = 4
+winsorization = [5.0, 95.0]
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_cash_liquidity]
 description = """From call report data, cash liquidity for each bhcid, 1976-2020"""
 frequency = "QE"
 seasonality = 4
+winsorization = [5.0, 95.0]
 
 ################################################################################
 [options]

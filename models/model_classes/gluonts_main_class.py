@@ -4,7 +4,6 @@ forecasting with GluonTS models. Some code adapted from Monash.
 """
 
 import os
-from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
@@ -154,7 +153,7 @@ class GluontsMain(forecasting_model):
         # Stores the actual model
         self.model = estimator
         # Error metrics
-        self.errors = defaultdict(float)
+        self.errors = {}
 
         GluontsMain_logger.info("Internal variables set.")
 
@@ -251,7 +250,7 @@ class GluontsMain(forecasting_model):
             GluontsMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
         except Exception as e:
             GluontsMain_logger.error(f"MASE calculation failed: {e}")
-            self.errors["MASE"] = 0.0
+            self.errors["MASE"] = None
 
         # Calculate MAE and RMSE
         try:
@@ -265,8 +264,8 @@ class GluontsMain(forecasting_model):
 
         except Exception as e:
             GluontsMain_logger.error(f"MAE/RMSE calculation failed: {e}")
-            self.errors["MAE"] = 0.0
-            self.errors["RMSE"] = 0.0
+            self.errors["MAE"] = None
+            self.errors["RMSE"] = None
 
         return self.errors
 

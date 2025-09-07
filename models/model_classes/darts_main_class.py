@@ -6,7 +6,6 @@ and data pair.
 """
 
 import os
-from collections import defaultdict
 from pathlib import Path
 
 import logging
@@ -139,7 +138,7 @@ class DartsMain(forecasting_model):
         self.model = estimator
 
         # Error metrics
-        self.errors = defaultdict(float)
+        self.errors = {}
 
         DartsMain_logger.info("Set up internal variables.")
 
@@ -271,7 +270,7 @@ class DartsMain(forecasting_model):
             )
 
             if mase_value == np.nan:
-                mase_value = 0.0
+                mase_value = None
 
             self.errors["MASE"] = mase_value
             DartsMain_logger.info("MASE = " + str(mase_value) + ".")
@@ -279,12 +278,12 @@ class DartsMain(forecasting_model):
         except ValueError as e:
             if "cannot use MASE with periodical signals" in str(e):
                 DartsMain_logger.warning(
-                    "MASE failed due to periodical signals, setting to 0.0"
+                    "MASE failed due to periodical signals, setting to None"
                 )
-                self.errors["MASE"] = 0.0
+                self.errors["MASE"] = None
             else:
                 DartsMain_logger.error(f"MASE calculation failed: {e}")
-                self.errors["MASE"] = 0.0
+                self.errors["MASE"] = None
 
         # Calculate MAE (always calculated)
         try:
@@ -293,7 +292,7 @@ class DartsMain(forecasting_model):
             DartsMain_logger.info("MAE = " + str(mae_value) + ".")
         except Exception as e:
             DartsMain_logger.error(f"MAE calculation failed: {e}")
-            self.errors["MAE"] = 0.0
+            self.errors["MAE"] = None
 
         # Calculate RMSE
         try:
@@ -302,6 +301,6 @@ class DartsMain(forecasting_model):
             DartsMain_logger.info("RMSE = " + str(rmse_value) + ".")
         except Exception as e:
             DartsMain_logger.error(f"RMSE calculation failed: {e}")
-            self.errors["RMSE"] = 0.0
+            self.errors["RMSE"] = None
 
         return self.errors

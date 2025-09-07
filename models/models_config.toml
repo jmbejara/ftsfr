@@ -16,6 +16,15 @@ class = "StatsForecastMain"
 estimator_class = "statsforecast.models.AutoARIMA"
 display_name = "AutoARIMA"
 # season_length will be set from dataset config
+# Speed optimizations will be applied automatically in run_model.py
+
+[auto_arima_fast]
+class = "StatsForecastMain"
+estimator_class = "statsforecast.models.AutoARIMA"
+display_name = "AutoARIMA Fast"
+# Explicit fast configuration for maximum speed
+estimator_params = { approximation = true, stepwise = true, max_p = 2, max_q = 2, max_P = 1, max_Q = 1 , nmodels=5}
+# season_length will be set from dataset config
 
 [auto_ces]
 class = "DartsLocal"
