@@ -18,7 +18,7 @@ import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-
+# DATA_DIR = DATA_DIR / "ken_french_data_library"
 
 def convert_wide_to_long_format(df):
     """
