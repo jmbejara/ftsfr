@@ -58,6 +58,7 @@ else:
     print("No duplicate (unique_id, ds) pairs found in df_portfolio_long.")
 
 # Save as ftsfr dataset
+df_portfolio_long = df_portfolio_long.dropna()
 df_portfolio_long.to_parquet(DATA_DIR / "ftsfr_CDS_portfolio_returns.parquet")
 
 
@@ -93,5 +94,6 @@ else:
 # df_contract_long["unique_id"].nunique()
 
 # Save as ftsfr dataset
+df_contract_long = df_contract_long.dropna()
 df_contract_long.to_parquet(DATA_DIR / "ftsfr_CDS_contract_returns.parquet")
 

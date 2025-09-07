@@ -21,4 +21,5 @@ df_all.columns = ["unique_id", "ds", "y"]
 df_all["ds"] = pd.to_datetime(df_all["ds"])
 # df_all.info()
 
+df_all = df_all.dropna()
 df_all.to_parquet(DATA_DIR / "ftsfr_FX_returns.parquet")

@@ -25,5 +25,7 @@ df_cjs = df_cjs.select(["unique_id", "ds", "y"])
 # df_cjs = df_cjs.with_columns(pl.col('ds').cast(pl.Date))
 
 # save to data directory
+df_hkm = df_hkm.drop_nulls()
 df_hkm.write_parquet(DATA_DIR / "ftsfr_hkm_option_returns.parquet")
+df_cjs = df_cjs.drop_nulls()
 df_cjs.write_parquet(DATA_DIR / "ftsfr_cjs_option_returns.parquet")

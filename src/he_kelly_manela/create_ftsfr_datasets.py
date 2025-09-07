@@ -77,12 +77,15 @@ he_kelly_manela_all = convert_intermediary_to_long_format(he_kelly_manela_all)
 
 # Save the datasets
 he_kelly_manela_factors_monthly.reset_index(drop=True, inplace=True)
+he_kelly_manela_factors_monthly = he_kelly_manela_factors_monthly.dropna()
 he_kelly_manela_factors_monthly.to_parquet(
     DATA_DIR / "ftsfr_he_kelly_manela_factors_monthly.parquet"
 )
 he_kelly_manela_factors_daily.reset_index(drop=True, inplace=True)
+he_kelly_manela_factors_daily = he_kelly_manela_factors_daily.dropna()
 he_kelly_manela_factors_daily.to_parquet(
     DATA_DIR / "ftsfr_he_kelly_manela_factors_daily.parquet"
 )
 he_kelly_manela_all.reset_index(drop=True, inplace=True)
+he_kelly_manela_all = he_kelly_manela_all.dropna()
 he_kelly_manela_all.to_parquet(DATA_DIR / "ftsfr_he_kelly_manela_all.parquet")

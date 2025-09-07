@@ -22,4 +22,5 @@ df_stacked = df_stacked[["unique_id", "ds", "y"]]
 df_stacked["ds"] = pd.to_datetime(df_stacked["ds"])
 # df_stacked.info()
 
+df_stacked = df_stacked.dropna()
 df_stacked.to_parquet(DATA_DIR / "ftsfr_CIP_spreads.parquet")
