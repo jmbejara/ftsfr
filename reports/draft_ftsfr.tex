@@ -232,14 +232,14 @@ We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP)
   \begin{tabular}{@{}c@{}}
     \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
   \end{tabular}
-  \caption{Growth of SPX Options Market Over Time}
+  \caption{The SPX options market has grown dramatically over time, particularly since the Global Financial Crisis.}
   \label{fig:spx_options_over_time}
 \end{figure}
 
 
 The \citet{Constantinides2013} portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to $2 \times 9 \times 3 = 54$ distinct portfolios. The 18 portfolios in \citet{He2017} were constructed by taking an equal weight average across the 3 maturities for CJS portfolios with the same moneyness, adding $2 \times 9 = 18$ distinct portfolios to the dataset, for a total of 72 distinct SPX option portfolios. \emph{We have provided a simple coding system to identify individual portfolios and access these returns series.}
 
-Our dataset is comprised of monthly leverage-adjusted portfolio returns for \textbf{all 72 SPX option portfolios, spanning 23 years from January 1996 to December 2019}. The 72 portfolio returns series were constructed from a raw daily dataset of 18.9 million individual SPX option contracts. These portfolios are constructed using leverage-adjustments and daily dynamic rebalancing to maintain constant risk exposures over time.
+Our dataset is comprised of monthly leverage-adjusted portfolio returns for \textbf{all 72 SPX option portfolios, spanning 23 years from January 1996 to December 2019}. The 72 portfolio returns series were constructed from a raw daily dataset of approximately 19 million individual SPX option contracts. These portfolios are constructed using leverage-adjustments and daily dynamic rebalancing to maintain constant risk exposures over time.
 
 
 The leverage adjustments and dynamic portfolio rebalancing process outlined in \citet{Constantinides2013} had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and if a particular process was not sufficiently detailed in the original paper, we acknowledge these areas and made educated guesses about the authors' intent. For convenience, we provide the user with generalized functions that operate on \emph{any set} of options data that is structured the same as the dataset we utilized (WRDS OptionMetrics). 
@@ -834,7 +834,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/RAW_1996-01_2019-12_iv_summary.png}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/RAW_1996-01_2019-12_iv.png}
   \end{tabular}
   \caption{Some visualizations of the raw SPX options data, prior to application of any filters. Each dot / point on these charts represents a single option in the raw data. Note that the time dimension is not shown, so this is a cross-sectional view of all options in the dataset.}
   \label{fig:raw_spx_options_data}
@@ -843,7 +843,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L1_1996-01_2019-12_iv_summary.png}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L1_1996-01_2019-12_iv.png}
   \end{tabular}
   \caption{SPX options remaining after application of Level 1 filters. Notice reduction in outliers and cleaner distribution of volatility vs moneyness.}
   \label{fig:l1_spx_options_data}
@@ -853,7 +853,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L2_1996-01_2019-12_iv_summary.png}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L2_1996-01_2019-12_iv.png}
   \end{tabular}
   \caption{SPX options remaining after Level 2 filters.}
   \label{fig:l2_spx_options_data}
@@ -862,7 +862,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_1996-01_2019-12_iv_summary.png}
+  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_1996-01_2019-12_iv.png}
   \caption{SPX options remaining after the Level 3 Implied Volatility filter (only).}
   \label{fig:l3_iv_only_spx_options_data}
 \end{figure}
@@ -870,8 +870,8 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_PCP_1996-01_2019-12_iv_summary.png}
-  \caption{SPX options remaining after the Level 3 Implied Volatility and Put-Call Parity filters.}
+  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_PCP_1996-01_2019-12_iv.png}
+  \caption{SPX options remaining after the Level 3 Implied Volatility and Put-Call Parity filters. Note how we observe the emergence of a volatility smile after the application of these filters.}
   \label{fig:l3_iv_pcp_spx_options_data}
 \end{figure}
 
