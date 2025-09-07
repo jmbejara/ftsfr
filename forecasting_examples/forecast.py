@@ -116,7 +116,7 @@ def load_model_config():
         return tomli.load(f)
 
 
-def create_model(model_name, seasonality, model_configs, forecast_horizon=None):
+def create_model(model_name, seasonality, model_configs, dataset_name=None, forecast_horizon=None):
     """Create a model instance based on TOML configuration."""
     if model_name not in model_configs:
         available = ", ".join(model_configs.keys())
@@ -143,6 +143,10 @@ def create_model(model_name, seasonality, model_configs, forecast_horizon=None):
     # Adjust horizon for NeuralForecast models at instantiation
     if library == "neuralforecast" and forecast_horizon is not None:
         params["h"] = int(forecast_horizon)
+    
+    # Add trainer args for NeuralForecast models to redirect logs
+    if library == "neuralforecast" and dataset_name is not None:
+        params["default_root_dir"] = f"./_output/forecasting2/logs/{dataset_name}/{model_name}"
 
     if library == "statsforecast":
         from statsforecast import models as sf_models
@@ -463,6 +467,7 @@ def main():
         args.model,
         dataset_config["seasonality"],
         model_configs,
+        dataset_name=args.dataset,
         forecast_horizon=test_size,
     )
     library = model_configs[args.model]["library"]
