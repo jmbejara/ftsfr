@@ -1,18 +1,15 @@
 # Simplified Models Configuration for forecast.py
 # This file defines all available forecasting models for the CLI script
 
-# StatsForecast Models
-# [auto_arima]
-# library = "statsforecast"
-# class = "AutoARIMA"
-# display_name = "AutoARIMA"
-# # season_length will be set dynamically from dataset config
-
-[ses_optimized]
+[naive]
 library = "statsforecast"
-class = "SimpleExponentialSmoothingOptimized"
-display_name = "SES Optimized"
+class = "Naive"
+display_name = "Naive"
 
+[seasonal_naive]
+library = "statsforecast"
+class = "SeasonalNaive"
+display_name = "Seasonal Naive"
 
 # [seasonal_es_optimized]
 # library = "statsforecast"
@@ -29,6 +26,7 @@ decomposition_type = "additive"
 
 #TBATS not in nixtlaverse
 
+
 [auto_ets]
 library = "statsforecast"
 class = "AutoETS"
@@ -38,6 +36,14 @@ model = "ZZZ"
 
 # DHR-ARIMA not in nixtlaverse
 # (Dynamic Harmonic Regression - ARIMA)
+
+# StatsForecast Models
+# [auto_arima]
+# library = "statsforecast"
+# class = "AutoARIMA"
+# display_name = "AutoARIMA"
+# # season_length will be set dynamically from dataset config
+
 
 [auto_arima_fast]
 library = "statsforecast"
@@ -53,28 +59,57 @@ max_Q = 1
 nmodels = 10
 
 
-[auto_deepar]
+[deepar]
 library = "neuralforecast"
-class = "AutoDeepAR"
-display_name = "AutoDeepAR"
-[auto_deepar.params]
+class = "DeepAR"
+display_name = "DeepAR"
+[deepar.params]
 h = 1
 loss = "DistributionLoss"
-[auto_deepar.params.config]
+input_size = 12
+lstm_hidden_size = 32
 max_steps = 100
-val_check_steps = 10
-early_stop_patience_steps = 3
+
+## This model is having difficulty
+# [auto_deepar]
+# library = "neuralforecast"
+# class = "AutoDeepAR"
+# display_name = "AutoDeepAR"
+# [auto_deepar.params]
+# h = 1
+# loss = "DistributionLoss"
+# [auto_deepar.params.config]
+# max_steps = 50
+# input_size = 12
+# lstm_hidden_size = 32
 
 
-[AutoNBEATS]
+[nbeats]
 library = "neuralforecast"
 class = "NBEATS"
 display_name = "NBEATS"
 [nbeats.params]
 h = 1
 loss = "MAE"
+input_size = 12
 max_steps = 100
-stack_types = ["identity"]
+mlp_units = [[32, 32], [32, 32], [32, 32]]
+stack_types = ["identity", "identity"]
+
+## This model is having difficulty
+# [auto_nbeats]
+# library = "neuralforecast"
+# class = "AutoNBEATS"
+# display_name = "AutoNBEATS"
+# [auto_nbeats.params]
+# h = 1
+# loss = "MAE"
+# [auto_nbeats.params.config]
+# max_steps = 50
+# val_check_steps = 10
+# input_size = 12
+# mlp_units = [[32, 32], [32, 32], [32, 32]]
+
 
 [nhits]
 library = "neuralforecast"
@@ -83,7 +118,24 @@ display_name = "NHITS"
 [nhits.params]
 h = 1
 loss = "MAE"
+input_size = 12
 max_steps = 100
+mlp_units = [[16, 16], [16, 16], [16, 16]]
+
+## This model is having difficulty
+# [auto_nhits]
+# library = "neuralforecast"
+# class = "AutoNHITS"
+# display_name = "AutoNHITS"
+# [auto_nhits.params]
+# h = 1
+# loss = "MAE"
+# [auto_nhits.params.config]
+# max_steps = 50
+# val_check_steps = 10
+# input_size = 12
+# mlp_units = [[16, 16], [16, 16], [16, 16]]
+
 
 [dlinear]
 library = "neuralforecast"
@@ -92,7 +144,22 @@ display_name = "DLinear"
 [dlinear.params]
 h = 1
 loss = "MAE"
+input_size = 12
 max_steps = 100
+
+## This model is having difficulty
+# [auto_dlinear]
+# library = "neuralforecast"
+# class = "AutoDLinear"
+# display_name = "AutoDLinear"
+# [auto_dlinear.params]
+# h = 1
+# loss = "MAE"
+# [auto_dlinear.params.config]
+# max_steps = 50
+# val_check_steps = 10
+# input_size = 12
+
 
 [nlinear]
 library = "neuralforecast"
@@ -101,4 +168,91 @@ display_name = "NLinear"
 [nlinear.params]
 h = 1
 loss = "MAE"
+input_size = 12
 max_steps = 100
+
+## This model is having difficulty
+# [auto_nlinear]
+# library = "neuralforecast"
+# class = "AutoNLinear"
+# display_name = "AutoNLinear"
+# [auto_nlinear.params]
+# h = 1
+# loss = "MAE"
+# [auto_nlinear.params.config]
+# max_steps = 50
+# val_check_steps = 10
+# input_size = 12
+
+
+[vanilla_transformer]
+library = "neuralforecast"
+class = "VanillaTransformer"
+display_name = "VanillaTransformer"
+[vanilla_transformer.params]
+h = 1
+loss = "MAE"
+input_size = 12
+max_steps = 100
+hidden_size = 32
+
+## This model is having difficulty
+# [auto_vanilla_transformer]
+# library = "neuralforecast"
+# class = "AutoVanillaTransformer"
+# display_name = "AutoVanillaTransformer"
+# [auto_vanilla_transformer.params]
+# h = 1
+# loss = "MAE"
+# [auto_vanilla_transformer.params.config]
+# max_steps = 50
+# val_check_steps = 10
+# input_size = 12
+# hidden_size = 32
+
+
+[tide]
+library = "neuralforecast"
+class = "TiDE"
+display_name = "TiDE"
+[tide.params]
+h = 1
+loss = "MAE"
+input_size = 12
+hidden_size = 512
+decoder_output_dim = 32
+temporal_decoder_dim = 128
+dropout = 0.3
+max_steps = 100
+
+
+[kan]
+library = "neuralforecast"
+class = "KAN"
+display_name = "KAN"
+[kan.params]
+h = 1
+loss = "MAE"
+input_size = 12
+grid_size = 5
+spline_order = 3
+n_hidden_layers = 1
+hidden_size = 512
+max_steps = 100
+
+
+# Very slow
+# [timesnet]
+# library = "neuralforecast"
+# class = "TimesNet"
+# display_name = "TimesNet"
+# [timesnet.params]
+# h = 1
+# loss = "MAE"
+# input_size = 12
+# hidden_size = 64
+# dropout = 0.1
+# conv_hidden_size = 64
+# top_k = 5
+# num_kernels = 6
+# max_steps = 100
