@@ -418,6 +418,19 @@ def calculate_global_metrics(train_data, test_data, forecasts, seasonality, mode
     global_smape = get_metric("smape")
 
     vals = [global_mase, global_smape, global_mae, global_rmse]
+    val_names = ["MASE", "sMAPE", "MAE", "RMSE"]
+    
+    # Handle infinite MASE by setting to a large but finite value
+    if global_mase is not None and np.isinf(global_mase):
+        print("WARNING: MASE is infinite (perfect seasonal naive forecast), setting to 999.0")
+        global_mase = 999.0
+    
+    # Check for remaining invalid values
+    vals = [global_mase, global_smape, global_mae, global_rmse]
+    for i, (v, name) in enumerate(zip(vals, val_names)):
+        if v is None or (isinstance(v, float) and (np.isnan(v) or np.isinf(v))):
+            print(f"ERROR: {name} metric is invalid: {v}")
+    
     if any(
         v is None or (isinstance(v, float) and (np.isnan(v) or np.isinf(v)))
         for v in vals

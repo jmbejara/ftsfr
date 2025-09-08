@@ -2861,20 +2861,18 @@ ds: min=1963-07-01 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_nyu_call_report_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_cash_liquidity.parquet`
-**Size:** 23.3 MB | **Type:** Parquet | **Shape:** 1,907,787 rows × 4 columns
+**Size:** 15.5 MB | **Type:** Parquet | **Shape:** 1,906,765 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-0.004637848248033172, max=1.0230938416422288, mean=0.08, median=0.05778000501127537
-__index_level_0__: min=0, max=1919807, mean=960164.61, median=959908.0
+y: min=0.0, max=1.0230938416422288, mean=0.08, median=0.05780420579828501
 ```
 
 ### Date/Datetime Column Statistics
@@ -2886,20 +2884,18 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`
-**Size:** 10.3 MB | **Type:** Parquet | **Shape:** 832,932 rows × 4 columns
+**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 832,902 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-0.0024056979902961173, max=0.9987931814753357, mean=0.07, median=0.051772243080015184
-__index_level_0__: min=0, max=833009, mean=416491.05, median=416474.5
+y: min=0.0, max=0.9987931814753357, mean=0.07, median=0.05177395811931505
 ```
 
 ### Date/Datetime Column Statistics
@@ -2911,20 +2907,18 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_holding_company_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet`
-**Size:** 10.3 MB | **Type:** Parquet | **Shape:** 832,603 rows × 4 columns
+**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 831,858 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-61371.42307692308, max=14698.6, mean=11.29, median=10.97832010425305
-__index_level_0__: min=0, max=832641, mean=416317.15, median=416309.0
+y: min=1.0, max=14698.6, mean=11.62, median=10.981269862683128
 ```
 
 ### Date/Datetime Column Statistics
@@ -2936,20 +2930,18 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_leverage.parquet`
-**Size:** 22.7 MB | **Type:** Parquet | **Shape:** 1,852,190 rows × 4 columns
+**Size:** 15.1 MB | **Type:** Parquet | **Shape:** 1,849,957 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-61371.42307692308, max=36527.066666666666, mean=11.51, median=11.116404014942502
-__index_level_0__: min=0, max=1915410, mean=963560.88, median=964297.5
+y: min=0.952712100139082, max=36527.066666666666, mean=11.86, median=11.121173104434908
 ```
 
 ### Date/Datetime Column Statistics
@@ -4106,20 +4098,18 @@ ds: min=1963-07-01 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_nyu_call_report_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_cash_liquidity.parquet`
-**Size:** 23.3 MB | **Type:** Parquet | **Shape:** 1,907,787 rows × 4 columns
+**Size:** 15.5 MB | **Type:** Parquet | **Shape:** 1,906,765 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-0.004637848248033172, max=1.0230938416422288, mean=0.08, median=0.05778000501127537
-__index_level_0__: min=0, max=1919807, mean=960164.61, median=959908.0
+y: min=0.0, max=1.0230938416422288, mean=0.08, median=0.05780420579828501
 ```
 
 ### Date/Datetime Column Statistics
@@ -4131,20 +4121,18 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`
-**Size:** 10.3 MB | **Type:** Parquet | **Shape:** 832,932 rows × 4 columns
+**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 832,902 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-0.0024056979902961173, max=0.9987931814753357, mean=0.07, median=0.051772243080015184
-__index_level_0__: min=0, max=833009, mean=416491.05, median=416474.5
+y: min=0.0, max=0.9987931814753357, mean=0.07, median=0.05177395811931505
 ```
 
 ### Date/Datetime Column Statistics
@@ -4156,20 +4144,18 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_holding_company_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet`
-**Size:** 10.3 MB | **Type:** Parquet | **Shape:** 832,603 rows × 4 columns
+**Size:** 6.8 MB | **Type:** Parquet | **Shape:** 831,858 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-61371.42307692308, max=14698.6, mean=11.29, median=10.97832010425305
-__index_level_0__: min=0, max=832641, mean=416317.15, median=416309.0
+y: min=1.0, max=14698.6, mean=11.62, median=10.981269862683128
 ```
 
 ### Date/Datetime Column Statistics
@@ -4181,20 +4167,18 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/nyu_call_report/ftsfr_nyu_call_report_leverage.parquet`
-**Size:** 22.7 MB | **Type:** Parquet | **Shape:** 1,852,190 rows × 4 columns
+**Size:** 15.1 MB | **Type:** Parquet | **Shape:** 1,849,957 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-61371.42307692308, max=36527.066666666666, mean=11.51, median=11.116404014942502
-__index_level_0__: min=0, max=1915410, mean=963560.88, median=964297.5
+y: min=0.952712100139082, max=36527.066666666666, mean=11.86, median=11.121173104434908
 ```
 
 ### Date/Datetime Column Statistics
