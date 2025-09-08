@@ -180,6 +180,35 @@ This script will:
 
 **Note**: The script handles the shell restart requirement automatically. You'll need to run it twice - once for the initial setup, and once after restarting your shell (the script will guide you through this process).
 
+### Running Large-Scale Forecasting with SLURM
+
+For running all combinations of models and datasets on a SLURM cluster, we provide an array job script:
+
+```bash
+# Submit all 364 forecasting jobs (28 datasets × 13 models)
+sbatch submit_forecasting_jobs.sh
+```
+
+This will:
+- Run up to 20 concurrent jobs on exclusive nodes
+- Automatically use all CPUs on each node for parallel processing
+- Skip already completed jobs (idempotent execution)
+- Continue processing even if individual jobs fail
+- Save outputs to `./_output/forecast2/error_metrics/{dataset}/{model}.csv`
+- Log SLURM output to `./_output/forecasting2/logs/`
+
+To check job status:
+```bash
+squeue -u $USER  # View your running jobs
+tail -f ./_output/forecasting2/logs/successful_jobs.txt  # Monitor completed jobs
+tail -f ./_output/forecasting2/logs/failed_jobs.txt      # Check failed jobs
+```
+
+To assemble results after jobs complete:
+```bash
+python src/assemble_results2.py  # Assembles results from forecast2 directory
+```
+
 ## Data Format
 Final, cleaned and formatted datasets have the following format: `ftsfr_<dataset_name>.parquet`
 and have the following columns:
