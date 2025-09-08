@@ -1,12 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=forecast_array
-#SBATCH --array=1-364%20           # 364 jobs total, max 20 concurrent
+#SBATCH --array=1-364%9            # 364 jobs total, max 9 concurrent
 #SBATCH --exclusive                 # Exclusive node access
 #SBATCH --time=7-00:00:00          # 7 days time limit
 #SBATCH --output=./_output/forecasting2/logs/slurm-%A_%a.out
 #SBATCH --error=./_output/forecasting2/logs/slurm-%A_%a.err
-#SBATCH --mail-type=FAIL           # Email on failure
-#SBATCH --partition=standard       # Adjust partition as needed
+
 
 # Print job information
 echo "Job started at: $(date)"
@@ -24,8 +23,8 @@ export STATSFORECAST_N_JOBS=${SLURM_CPUS_ON_NODE}
 echo "Using ${STATSFORECAST_N_JOBS} CPUs for parallel processing"
 
 # Load required modules (adjust as needed for your cluster)
-# module load python/3.9
-# module load cuda/11.8  # If using GPU models
+module use -a /opt/aws_ofropt/Ubuntu_Modulefiles
+module load anaconda3/3.11.4 TeXLive/2023 R/4.4.0 stata/17
 
 # Activate conda/virtual environment if needed
 # source /path/to/your/venv/bin/activate
@@ -41,7 +40,7 @@ if [ -z "$JOB_CMD" ]; then
 fi
 
 # Extract dataset and model names from the command
-# Format: python ./forecasting_examples/forecast.py --dataset DATASET --model MODEL
+# Format: python ./forecasting/forecast.py --dataset DATASET --model MODEL
 DATASET=$(echo $JOB_CMD | sed -n 's/.*--dataset \([^ ]*\).*/\1/p')
 MODEL=$(echo $JOB_CMD | sed -n 's/.*--model \([^ ]*\).*/\1/p')
 

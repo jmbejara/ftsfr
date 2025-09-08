@@ -42,13 +42,16 @@ def task_forecast_new():
                 # Remove ftsfr_ prefix from dataset name for cleaner output paths
                 clean_dataset_name = dataset_name.replace("ftsfr_", "")
 
+                # The get_available_datasets function strips ftsfr_ prefix, but forecast.py expects it
+                full_dataset_name = f"ftsfr_{dataset_name}" if not dataset_name.startswith("ftsfr_") else dataset_name
+                
                 yield {
                     "name": f"{model_name}:{clean_dataset_name}",
                     "actions": [
                         (
                             debug_action,
                             [
-                                f"python ./forecasting/forecast.py --dataset {dataset_name} --model {model_name}"
+                                f"python ./forecasting/forecast.py --dataset {full_dataset_name} --model {model_name}"
                             ],
                         )
                     ],
@@ -60,7 +63,7 @@ def task_forecast_new():
                         OUTPUT_DIR / "available_datasets.csv",
                     ],
                     "targets": [
-                        OUTPUT_DIR / "forecast2" / "error_metrics" / dataset_name / f"{model_name}.csv",
+                        OUTPUT_DIR / "forecast2" / "error_metrics" / full_dataset_name / f"{model_name}.csv",
                     ],
                     "clean": True,
                     "verbosity": 2,
