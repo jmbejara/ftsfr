@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from pandas.tseries.frequencies import to_offset
 from utilsforecast.preprocessing import fill_gaps
+from scipy.stats.mstats import winsorize
 import traceback
 
 import logging
@@ -314,16 +315,82 @@ def custom_interpolate(df):
     return proc_df
 
 
-def process_df(df, frequency, seasonality, test_split):
+def winsorize_data(df, winsorization_limits, value_column="y"):
+    """
+    Apply winsorization to the target variable in a long-format DataFrame.
+    
+    Args:
+        df: DataFrame in long format with 'unique_id', 'ds', and target column
+        winsorization_limits: List [lower_percentile, upper_percentile] e.g. [1.0, 99.0]
+        value_column: Name of the column to winsorize (default: 'y')
+        
+    Returns:
+        DataFrame with winsorized values
+        
+    Logs:
+        Original and winsorized value ranges for monitoring
+    """
+    if winsorization_limits is None:
+        return df
+    
+    hf_logger = logging.getLogger("hf.winsorize_data")
+    
+    # Convert percentiles to winsorization limits 
+    # For [1.0, 99.0] percentiles, we winsorize 1% from each tail -> (0.01, 0.01)
+    lower_perc, upper_perc = winsorization_limits
+    lower_limit = lower_perc / 100.0  # 1.0 -> 0.01
+    upper_limit = (100.0 - upper_perc) / 100.0  # 99.0 -> 0.01
+    
+    # Store original statistics
+    original_min = df[value_column].min()
+    original_max = df[value_column].max()
+    original_count = df[value_column].count()
+    
+    df_winsorized = df.copy()
+    
+    # Apply winsorization globally across all entities
+    # This is more appropriate for financial data where extreme values are often data errors
+    non_null_mask = df_winsorized[value_column].notna()
+    if non_null_mask.sum() > 0:
+        df_winsorized.loc[non_null_mask, value_column] = winsorize(
+            df_winsorized.loc[non_null_mask, value_column], 
+            limits=(lower_limit, upper_limit)
+        )
+    
+    # Log winsorization statistics
+    winsorized_min = df_winsorized[value_column].min()
+    winsorized_max = df_winsorized[value_column].max()
+    
+    # Count how many values were changed
+    values_changed = (df[value_column] != df_winsorized[value_column]).sum()
+    
+    hf_logger.info(
+        f"Applied winsorization [{lower_perc}%, {upper_perc}%]: "
+        f"range [{original_min:.4f}, {original_max:.4f}] -> [{winsorized_min:.4f}, {winsorized_max:.4f}], "
+        f"{values_changed}/{original_count} values changed ({100*values_changed/original_count:.1f}%)"
+    )
+    
+    return df_winsorized
+
+
+def process_df(df, frequency, seasonality, test_split, winsorization=None):
     """
     This function performs the following:
         1. Fill in missing dates based on the frequency provided
-        2. Handles 'seasonal' test_split
-        3. Extends the DataFrame backwards if training data is small
-        4. Splits DataFrame into train and test using cutoff date method
-        5. Interpolates train data based on custom strategy
-        6. Scales both train and test using Min-Max scaling
-        7. Converts both to np.float32
+        2. Applies winsorization if specified
+        3. Handles 'seasonal' test_split
+        4. Extends the DataFrame backwards if training data is small
+        5. Splits DataFrame into train and test using cutoff date method
+        6. Interpolates train data based on custom strategy
+        7. Scales both train and test using Min-Max scaling
+        8. Converts both to np.float32
+        
+    Args:
+        df: Long-format DataFrame with 'unique_id', 'ds', 'y' columns
+        frequency: Frequency string (e.g. 'ME', 'D', 'Q')  
+        seasonality: Seasonal period length
+        test_split: Float fraction or 'seasonal'
+        winsorization: Optional list [lower_perc, upper_perc] for winsorization
     """
     hf_logger = logging.getLogger("hf.process_df")
 
@@ -337,6 +404,11 @@ def process_df(df, frequency, seasonality, test_split):
     df = fill_gaps(df, freq=frequency, start="global", end="global")
 
     hf_logger.info("Missing dates added.")
+    
+    # Apply winsorization if specified
+    if winsorization is not None:
+        df = winsorize_data(df, winsorization)
+        hf_logger.info("Applied winsorization to data.")
 
     unique_dates = df["ds"].unique()
     len_ud = len(unique_dates)

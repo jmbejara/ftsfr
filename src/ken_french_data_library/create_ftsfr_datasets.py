@@ -18,7 +18,7 @@ import pandas as pd
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-
+# DATA_DIR = DATA_DIR / "ken_french_data_library"
 
 def convert_wide_to_long_format(df):
     """
@@ -97,12 +97,15 @@ french_portfolios_25_daily_size_and_inv = convert_wide_to_long_format(
 )
 
 # Save the datasets
+french_portfolios_25_daily_size_and_bm = french_portfolios_25_daily_size_and_bm.dropna()
 french_portfolios_25_daily_size_and_bm.to_parquet(
     DATA_DIR / "ftsfr_french_portfolios_25_daily_size_and_bm.parquet"
 )
+french_portfolios_25_daily_size_and_op = french_portfolios_25_daily_size_and_op.dropna()
 french_portfolios_25_daily_size_and_op.to_parquet(
     DATA_DIR / "ftsfr_french_portfolios_25_daily_size_and_op.parquet"
 )
+french_portfolios_25_daily_size_and_inv = french_portfolios_25_daily_size_and_inv.dropna()
 french_portfolios_25_daily_size_and_inv.to_parquet(
     DATA_DIR / "ftsfr_french_portfolios_25_daily_size_and_inv.parquet"
 )

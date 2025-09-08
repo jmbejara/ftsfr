@@ -41,19 +41,15 @@ def task_forecast_nixtla():
             if dataset_info["path"].exists():
                 # Remove ftsfr_ prefix from dataset name for cleaner output paths
                 clean_dataset_name = dataset_name.replace("ftsfr_", "")
-                
-                # # Print the command immediately for debugging
-                # cmd = f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
-                # print(f"\n🔍 DEBUG: Task {model_name}:{clean_dataset_name}")
-                # print(f"Command: {cmd}")
-                # print("=" * 60)
 
                 yield {
                     "name": f"{model_name}:{clean_dataset_name}",
                     "actions": [
                         (
                             debug_action,
-                            f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
+                            [
+                                f"python models/run_model.py --model {model_name} --dataset-path {dataset_info['path']}"
+                            ],
                         )
                     ],
                     "file_dep": [
@@ -81,4 +77,5 @@ def task_forecast_nixtla():
                         / f"{clean_dataset_name}_timing.csv",
                     ],
                     "clean": True,
+                    "verbosity": 2,
                 }

@@ -119,6 +119,7 @@ python run_model.py --model transformer --output-dir "../_output/custom"
 | `--test-split` | `TEST_SPLIT` | Test data fraction | `0.2` (20%), `seasonal` (seasonal split) |
 | `--output-dir` | `OUTPUT_DIR` | Output directory | `../_output/custom` |
 | `--n-epochs` | `N_EPOCHS` | Training epochs | `5` (for quick testing) |
+| `--winsorize` | N/A | Winsorization override | `[1.0,99.0]`, `none` |
 | `--workflow` | N/A | Workflow type | `main`, `train`, `inference`, `evaluate` |
 | `--config` | N/A | Config file path | `models_config.toml` |
 
@@ -153,6 +154,11 @@ python run_model.py --model deepar --dataset-path "../_data/cds_returns/ftsfr_CD
 # Parameter tuning
 python run_model.py --model arima --seasonality 12 --test-split 0.3
 python run_model.py --model transformer --output-dir "../_output/experiment_1"
+
+# Winsorization control (data outlier handling)
+python run_model.py --model auto_arima_fast --winsorize [1.0,99.0]  # 1%-99% winsorization
+python run_model.py --model auto_arima_fast --winsorize [5.0,95.0]  # More aggressive 5%-95%
+python run_model.py --model auto_arima_fast --winsorize none        # Disable winsorization
 
 # Model comparison (same settings)
 python run_model.py --model arima --dataset-path "../_data/test.parquet" --frequency "D" --seasonality 7
@@ -354,6 +360,59 @@ pip install darts "gluonts[torch]" neuralforecast timesfm catboost tabulate toml
 - **GluontsMain**: DeepAR, SimpleFeedForward (probabilistic forecasting)
 - **NixtlaMain**: Various neural forecasting models
 - **Special**: TimesFM (Google), Chronos (Amazon), CatBoost
+
+## Data Quality and Winsorization
+
+The system includes automatic winsorization to handle extreme outliers that can distort forecasting metrics like MASE.
+
+### Dataset-Specific Winsorization
+
+Winsorization settings are configured per dataset in `datasets.toml`:
+
+```toml
+[cds_bond_basis.ftsfr_CDS_bond_basis_non_aggregated]
+description = """Long format of CDS bond basis, non-aggregated"""
+frequency = "ME"
+seasonality = 12
+winsorization = [1.0, 99.0]  # Winsorize at 1% and 99% percentiles
+```
+
+### Winsorization Levels
+
+The system uses different winsorization levels based on data characteristics:
+
+- **Conservative** `[0.5, 99.5]`: For most financial returns (corp bonds, treasuries)
+- **Moderate** `[1.0, 99.0]`: For basis spreads and yield data (CDS, treasury-SF basis)  
+- **Aggressive** `[5.0, 95.0]`: For datasets with clear outlier contamination (leverage ratios)
+- **None**: No winsorization (parameter omitted)
+
+### CLI Winsorization Control
+
+Override winsorization settings at runtime:
+
+```bash
+# Use custom winsorization levels
+python run_model.py --model auto_arima_fast --winsorize [1.0,99.0]
+python run_model.py --model auto_arima_fast --winsorize [5.0,95.0]
+
+# Disable winsorization completely  
+python run_model.py --model auto_arima_fast --winsorize none
+
+# Test effect of winsorization (compare MASE results)
+python run_model.py --model auto_arima_fast --dataset-path="../_data/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet" --winsorize none
+python run_model.py --model auto_arima_fast --dataset-path="../_data/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet" --winsorize [1.0,99.0]
+```
+
+### Why Winsorization Matters
+
+Extreme outliers (±99.99) can inflate MASE calculations by thousands of percentage points. For example:
+- **Before winsorization**: MASE = 45,381 (unusably high)
+- **After [1.0,99.0] winsorization**: MASE ≈ 10-100 (reasonable evaluation metric)
+
+The system logs all winsorization effects for transparency:
+```
+Applied winsorization [1.0%, 99.0%]: range [-99.9862, 99.8450] -> [-39.0687, 22.6707], 729974/91742 values changed (795.7%)
+```
 
 ## Configuration
 

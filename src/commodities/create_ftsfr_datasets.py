@@ -22,4 +22,5 @@ df = calc_commodities_returns.load_commodities_returns(data_dir=DATA_DIR)
 # df.pivot(index="ds", columns="unique_id", values="y")["SPGCBRP Index_PX_LAST_Return"].plot()
 
 df.reset_index(inplace=True, drop=True)
+df = df.dropna()
 df.to_parquet(DATA_DIR / "ftsfr_commodities_returns.parquet")

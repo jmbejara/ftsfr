@@ -13,13 +13,17 @@ from dodo_common import (
     OUTPUT_DIR,
     load_subscriptions,
     load_all_module_requirements,
+    load_models_config,
 )
 from dependency_tracker import get_available_datasets
+import glob
 
 # Load configuration
 subscriptions_toml = load_subscriptions()
-models = subscriptions_toml["models"]
-models_activated = [model for model in models if models[model]]
+
+# Load models configuration to get available models
+models_config = load_models_config()
+models_activated = list(models_config.keys())
 
 # Load module requirements to determine available datasets
 module_requirements_dict = load_all_module_requirements()
@@ -32,32 +36,37 @@ for module_name, required_sources in module_requirements_dict.items():
 
 
 def check_forecast_results():
-    """Check if forecast result files exist"""
-    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
-    results_dir = OUTPUT_DIR / "raw_results"
-
-    if not results_dir.exists():
-        print("\nWarning: No results directory found at:", results_dir)
-        print(
-            "Please run 'doit -f dodo_02_forecast.py' first to generate forecast results."
-        )
+    """Check if forecast result files exist in the new structure"""
+    error_metrics_dir = OUTPUT_DIR / "forecasting" / "error_metrics"
+    
+    if not error_metrics_dir.exists():
+        print(f"\nWarning: No forecasting error metrics directory found at {error_metrics_dir}")
+        print("Please run forecasting tasks first (e.g., 'doit -f dodo_02_darts_local.py')")
         return False
-
-    expected_files = []
+    
+    available_datasets = get_available_datasets(module_requirements, DATA_DIR)
+    
+    # Count available vs expected results
+    total_expected = len(models_activated) * len(available_datasets)
+    results_found = 0
+    
     for model in models_activated:
-        for dataset_name in available_datasets:
-            expected_files.append(results_dir / f"{model}_{dataset_name}_results.csv")
-
-    missing_files = [f for f in expected_files if not f.exists()]
-
-    if missing_files:
-        print(f"\nWarning: {len(missing_files)} result files are missing.")
-        print(
-            "Some expected result files not found. You may want to run forecasting first."
-        )
-        print("Continuing with available results...\n")
-
-    return len(missing_files) == 0
+        model_dir = error_metrics_dir / model
+        if model_dir.exists():
+            for dataset_name in available_datasets:
+                clean_dataset_name = dataset_name.replace("ftsfr_", "")
+                result_file = model_dir / f"{clean_dataset_name}.csv"
+                if result_file.exists():
+                    results_found += 1
+    
+    if results_found < total_expected:
+        missing_count = total_expected - results_found
+        print(f"\nWarning: {missing_count} of {total_expected} expected result files are missing.")
+        print("Some models may have failed to run. Continuing with available results...\n")
+    else:
+        print(f"\nAll {total_expected} expected result files found.\n")
+    
+    return results_found > 0  # Return True if we have any results at all
 
 
 def task_assemble_results():
@@ -66,8 +75,9 @@ def task_assemble_results():
     # Check for result files at task generation time
     check_forecast_results()
 
-    # Simplified file dependencies - only depend on the assemble script
-    # The script itself will handle missing files gracefully
+    # Get all CSV files in the forecasting error metrics directory
+    error_metrics_csv_files = glob.glob(str(OUTPUT_DIR / "forecasting" / "error_metrics" / "**" / "*.csv"), recursive=True)
+
     return {
         "actions": [
             "python ./src/assemble_results.py",
@@ -78,8 +88,30 @@ def task_assemble_results():
         ],
         "file_dep": [
             "./src/assemble_results.py",
+            *error_metrics_csv_files,
         ],
-        "clean": [],
+        "clean": True,
+    }
+
+
+def task_create_results_tables():
+    """Create analytical tables from assembled results"""
+    return {
+        "actions": [
+            "python ./src/create_results_tables.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "mase_pivot_table.csv",
+            OUTPUT_DIR / "mase_pivot_table.tex",
+            OUTPUT_DIR / "model_summary_statistics.csv", 
+            OUTPUT_DIR / "model_summary_statistics.tex",
+        ],
+        "file_dep": [
+            "./src/assemble_results.py",
+            "./src/create_results_tables.py",
+            OUTPUT_DIR / "results_all.csv",
+        ],
+        "clean": True,
     }
 
 
@@ -95,8 +127,10 @@ def task_compile_latex_docs():
             "./reports/draft_ftsfr.pdf",
         ],
         "file_dep": [
+            "./src/create_results_tables.py",
             "./reports/draft_ftsfr.tex",
-            "./src/assemble_results.py",
+            OUTPUT_DIR / "mase_pivot_table.tex",
+            OUTPUT_DIR / "model_summary_statistics.tex",
         ],
         "clean": True,
     }

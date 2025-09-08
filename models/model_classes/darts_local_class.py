@@ -124,22 +124,22 @@ class DartsLocal(DartsMain):
             self.errors["MASE"] = sum(self.mase_list) / len(self.mase_list)
             self.median_mase = statistics.median(self.mase_list)
         else:
-            self.errors["MASE"] = 0.0
-            self.median_mase = 0.0
+            self.errors["MASE"] = None
+            self.median_mase = None
 
         if self.mae_list:
             self.errors["MAE"] = sum(self.mae_list) / len(self.mae_list)
             self.median_mae = statistics.median(self.mae_list)
         else:
-            self.errors["MAE"] = 0.0
-            self.median_mae = 0.0
+            self.errors["MAE"] = None
+            self.median_mae = None
 
         if self.rmse_list:
             self.errors["RMSE"] = sum(self.rmse_list) / len(self.rmse_list)
             self.median_rmse = statistics.median(self.rmse_list)
         else:
-            self.errors["RMSE"] = 0.0
-            self.median_rmse = 0.0
+            self.errors["RMSE"] = None
+            self.median_rmse = None
 
         DartsLocal_logger.info(
             f"Mean MASE: {self.errors['MASE']} | Median MASE: {self.median_mase} | "

@@ -6,7 +6,6 @@ Supports training on Apple Silicon (MPS), CUDA GPU, and CPU.
 """
 
 import os
-from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
@@ -110,7 +109,7 @@ class NixtlaMain(forecasting_model):
         # Stores the nf object
         self.nf = None  # Initialize to None, will be set in train()
         # Error metrics
-        self.errors = defaultdict(float)
+        self.errors = {}
 
         NixtlaMain_logger.info("Internal variables set up.")
 
@@ -238,7 +237,7 @@ class NixtlaMain(forecasting_model):
             NixtlaMain_logger.info("MASE: " + str(self.errors["MASE"]) + ".")
         except (ImportError, ValueError, TypeError) as e:
             NixtlaMain_logger.warning(f"⚠ Cannot calculate MASE: {e}")
-            self.errors["MASE"] = 0.0
+            self.errors["MASE"] = None
 
         # Calculate MAE and RMSE using the Darts conversion helper
         try:
@@ -258,8 +257,8 @@ class NixtlaMain(forecasting_model):
 
         except (ImportError, ValueError, TypeError) as e:
             NixtlaMain_logger.warning(f"⚠ Cannot calculate MAE/RMSE: {e}")
-            self.errors["MAE"] = 0.0
-            self.errors["RMSE"] = 0.0
+            self.errors["MAE"] = None
+            self.errors["RMSE"] = None
 
         return self.errors
 

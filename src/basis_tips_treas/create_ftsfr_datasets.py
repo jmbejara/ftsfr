@@ -26,4 +26,5 @@ df_long = (
     .select(["unique_id", "ds", "y"])
 )
 
+df_long = df_long.drop_nulls()
 df_long.write_parquet(Path(DATA_DIR) / "ftsfr_tips_treasury_basis.parquet")
