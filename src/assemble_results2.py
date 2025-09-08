@@ -134,50 +134,71 @@ def assemble_forecast_results():
     metric_columns = ['Global_MASE', 'Global_sMAPE', 'Global_MAE', 'Global_RMSE']
     for col in metric_columns:
         if col in results_df.columns:
+            # Check for 'Error' strings
+            error_count = (results_df[col] == 'Error').sum()
+            if error_count > 0:
+                print(f"Warning: {col} has {error_count} 'Error' values")
+            
+            # Convert to numeric for other checks
+            numeric_col = pd.to_numeric(results_df[col], errors='coerce')
+            
             # Check for negative values
-            negative_count = (results_df[col] < 0).sum()
+            negative_count = (numeric_col < 0).sum()
             if negative_count > 0:
                 print(f"Warning: {col} has {negative_count} negative values")
             
             # Check for infinite values
-            inf_count = np.isinf(results_df[col]).sum()
+            inf_count = np.isinf(numeric_col).sum()
             if inf_count > 0:
                 print(f"Warning: {col} has {inf_count} infinite values")
             
             # Check for zero values (might indicate issues)
-            zero_count = (results_df[col] == 0).sum()
+            zero_count = (numeric_col == 0).sum()
             if zero_count > 0:
                 print(f"Warning: {col} has {zero_count} zero values")
     
     # Show top and bottom performers by MASE
     if 'Global_MASE' in results_df.columns:
-        print("\n" + "="*60)
-        print("TOP 5 BEST PERFORMERS (by MASE)")
-        print("="*60)
-        top_5 = results_df.nsmallest(5, 'Global_MASE')[['Model', 'Dataset', 'Global_MASE']]
-        print(top_5.to_string(index=False))
+        # Convert to numeric and filter out errors
+        mase_numeric = pd.to_numeric(results_df['Global_MASE'], errors='coerce')
+        valid_mase_df = results_df[mase_numeric.notna()].copy()
+        valid_mase_df['Global_MASE'] = mase_numeric[mase_numeric.notna()]
         
-        print("\n" + "="*60)
-        print("TOP 5 WORST PERFORMERS (by MASE)")
-        print("="*60)
-        bottom_5 = results_df.nlargest(5, 'Global_MASE')[['Model', 'Dataset', 'Global_MASE']]
-        print(bottom_5.to_string(index=False))
+        if len(valid_mase_df) > 0:
+            print("\n" + "="*60)
+            print("TOP 5 BEST PERFORMERS (by MASE)")
+            print("="*60)
+            top_5 = valid_mase_df.nsmallest(5, 'Global_MASE')[['Model', 'Dataset', 'Global_MASE']]
+            print(top_5.to_string(index=False))
+            
+            print("\n" + "="*60)
+            print("TOP 5 WORST PERFORMERS (by MASE)")
+            print("="*60)
+            bottom_5 = valid_mase_df.nlargest(5, 'Global_MASE')[['Model', 'Dataset', 'Global_MASE']]
+            print(bottom_5.to_string(index=False))
     
     # Show timing statistics
     if 'Forecast_Time_seconds' in results_df.columns:
-        print("\n" + "="*60)
-        print("TIMING STATISTICS")
-        print("="*60)
-        print(f"Total computation time: {results_df['Forecast_Time_seconds'].sum():.2f} seconds")
-        print(f"Average time per model-dataset: {results_df['Forecast_Time_seconds'].mean():.2f} seconds")
-        print(f"Median time: {results_df['Forecast_Time_seconds'].median():.2f} seconds")
-        print(f"Min time: {results_df['Forecast_Time_seconds'].min():.2f} seconds")
-        print(f"Max time: {results_df['Forecast_Time_seconds'].max():.2f} seconds")
+        # Convert to numeric to handle any potential errors
+        time_numeric = pd.to_numeric(results_df['Forecast_Time_seconds'], errors='coerce')
+        valid_times = time_numeric[time_numeric.notna()]
         
-        # Top 5 slowest
-        print("\nTop 5 slowest computations:")
-        slowest = results_df.nlargest(5, 'Forecast_Time_seconds')[['Model', 'Dataset', 'Forecast_Time_seconds']]
-        print(slowest.to_string(index=False))
+        if len(valid_times) > 0:
+            print("\n" + "="*60)
+            print("TIMING STATISTICS")
+            print("="*60)
+            print(f"Total computation time: {valid_times.sum():.2f} seconds")
+            print(f"Average time per model-dataset: {valid_times.mean():.2f} seconds")
+            print(f"Median time: {valid_times.median():.2f} seconds")
+            print(f"Min time: {valid_times.min():.2f} seconds")
+            print(f"Max time: {valid_times.max():.2f} seconds")
+            
+            # Top 5 slowest
+            print("\nTop 5 slowest computations:")
+            valid_time_df = results_df[time_numeric.notna()].copy()
+            valid_time_df['Forecast_Time_seconds'] = time_numeric[time_numeric.notna()]
+            slowest = valid_time_df.nlargest(5, 'Forecast_Time_seconds')[['Model', 'Dataset', 'Forecast_Time_seconds']]
+            print(slowest.to_string(index=False))
     
     return results_df
 
@@ -186,7 +207,14 @@ def create_latex_summary(df):
     
     # Create a summary by model
     if 'Global_MASE' in df.columns:
-        summary = df.groupby('Model').agg({
+        # Convert 'Error' strings to NaN for numeric operations
+        df_numeric = df.copy()
+        metric_cols = ['Global_MASE', 'Global_sMAPE', 'Global_MAE', 'Global_RMSE']
+        for col in metric_cols:
+            if col in df_numeric.columns:
+                df_numeric[col] = pd.to_numeric(df_numeric[col], errors='coerce')
+        
+        summary = df_numeric.groupby('Model').agg({
             'Global_MASE': ['count', 'mean', 'std', 'min', 'max'],
             'Dataset': 'nunique'
         }).round(3)

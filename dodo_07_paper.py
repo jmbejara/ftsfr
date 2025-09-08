@@ -38,18 +38,22 @@ for module_name, required_sources in module_requirements_dict.items():
 def check_forecast_results():
     """Check if forecast result files exist in the new structure"""
     error_metrics_dir = OUTPUT_DIR / "forecasting" / "error_metrics"
-    
+
     if not error_metrics_dir.exists():
-        print(f"\nWarning: No forecasting error metrics directory found at {error_metrics_dir}")
-        print("Please run forecasting tasks first (e.g., 'doit -f dodo_02_darts_local.py')")
+        print(
+            f"\nWarning: No forecasting error metrics directory found at {error_metrics_dir}"
+        )
+        print(
+            "Please run forecasting tasks first (e.g., 'doit -f dodo_02_darts_local.py')"
+        )
         return False
-    
+
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
-    
+
     # Count available vs expected results
     total_expected = len(models_activated) * len(available_datasets)
     results_found = 0
-    
+
     for model in models_activated:
         model_dir = error_metrics_dir / model
         if model_dir.exists():
@@ -58,14 +62,18 @@ def check_forecast_results():
                 result_file = model_dir / f"{clean_dataset_name}.csv"
                 if result_file.exists():
                     results_found += 1
-    
+
     if results_found < total_expected:
         missing_count = total_expected - results_found
-        print(f"\nWarning: {missing_count} of {total_expected} expected result files are missing.")
-        print("Some models may have failed to run. Continuing with available results...\n")
+        print(
+            f"\nWarning: {missing_count} of {total_expected} expected result files are missing."
+        )
+        print(
+            "Some models may have failed to run. Continuing with available results...\n"
+        )
     else:
         print(f"\nAll {total_expected} expected result files found.\n")
-    
+
     return results_found > 0  # Return True if we have any results at all
 
 
@@ -76,7 +84,10 @@ def task_assemble_results():
     check_forecast_results()
 
     # Get all CSV files in the forecasting error metrics directory
-    error_metrics_csv_files = glob.glob(str(OUTPUT_DIR / "forecasting" / "error_metrics" / "**" / "*.csv"), recursive=True)
+    error_metrics_csv_files = glob.glob(
+        str(OUTPUT_DIR / "forecasting" / "error_metrics" / "**" / "*.csv"),
+        recursive=True,
+    )
 
     return {
         "actions": [
@@ -103,7 +114,7 @@ def task_create_results_tables():
         "targets": [
             OUTPUT_DIR / "mase_pivot_table.csv",
             OUTPUT_DIR / "mase_pivot_table.tex",
-            OUTPUT_DIR / "model_summary_statistics.csv", 
+            OUTPUT_DIR / "model_summary_statistics.csv",
             OUTPUT_DIR / "model_summary_statistics.tex",
         ],
         "file_dep": [
