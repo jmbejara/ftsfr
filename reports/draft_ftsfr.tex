@@ -588,6 +588,16 @@ TODO
 \subsection{Overall Performance}
 % Summary tables across all datasets
 
+We present comprehensive forecasting results across all datasets and models using two primary error metrics: Mean Absolute Scaled Error (MASE) and Root Mean Square Error (RMSE). MASE provides scale-free comparison across different time series, while RMSE captures the magnitude of forecasting errors in original units.
+
+Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinations. The table is organized with datasets as rows and forecasting models as columns, allowing for easy comparison of model performance within each dataset and identification of datasets that present particular challenges for forecasting.
+
+\input{../_output/forecasting2/mase_pivot_table.tex}
+
+Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the same organization. While MASE provides scale-free comparisons, RMSE offers insights into the actual magnitude of forecasting errors, which can be particularly relevant for risk management applications.
+
+\input{../_output/forecasting2/rmse_pivot_table.tex}
+
 \subsection{Results by Asset Class}
 % Detailed analysis for each asset class
 
@@ -1311,6 +1321,20 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
 \subsection{Additional Results}
 \label{app:additional_results}
 % Extended results tables and robustness checks
+
+This section presents supplementary error metrics to provide a comprehensive view of model performance across all datasets. While the main text focuses on MASE and RMSE as primary metrics, we also report Symmetric Mean Absolute Percentage Error (sMAPE) and Mean Absolute Error (MAE) for completeness.
+
+\subsubsection{Symmetric Mean Absolute Percentage Error (sMAPE)}
+
+Table~\ref{tab:smape_results} presents sMAPE results across all model-dataset combinations. sMAPE provides percentage-based error measures that are symmetric and bounded, making them particularly useful for comparing performance across datasets with different scales and volatility patterns.
+
+\input{../_output/forecasting2/smape_pivot_table.tex}
+
+\subsubsection{Mean Absolute Error (MAE)}
+
+Table~\ref{tab:mae_results} shows MAE results for all combinations. MAE measures the average magnitude of errors in the original units, providing a straightforward interpretation of forecasting accuracy in terms of the actual data scale.
+
+\input{../_output/forecasting2/mae_pivot_table.tex}
 
 \section{Recyling Bin}
 % Temporary holding area for text that might not make it into the main text

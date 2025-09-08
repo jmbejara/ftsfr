@@ -43,6 +43,9 @@ required_data_sources = ["fed_yield_curve", "bloomberg_terminal"]
 
 [basis_tips_treas.ftsfr_tips_treasury_basis]
 description = """Long format of TIPS-Treasury basis"""
+short_name = "TIPS-Treasury Basis"
+table_name = "TIPS-Treasury"
+group = "basis_spreads"
 frequency = "ME"
 seasonality = 12
 
@@ -57,6 +60,9 @@ required_data_sources = ["bloomberg_terminal"]
 
 [basis_treas_sf.ftsfr_treasury_sf_basis]
 description = """Long format of Treasury-SF basis"""
+short_name = "Treasury-SF Basis"
+table_name = "Treasury-SF"
+group = "basis_spreads"
 frequency = "ME"
 seasonality = 12
 winsorization = [1.0, 99.0]
@@ -73,6 +79,9 @@ required_data_sources = ["bloomberg_terminal"]
 
 [basis_treas_swap.ftsfr_treasury_swap_basis]
 description = """Long format of Treasury-Swap basis"""
+short_name = "Treasury-Swap Basis"
+table_name = "Treasury-Swap"
+group = "basis_spreads"
 frequency = "ME"
 seasonality = 12
 winsorization = [0.5, 99.5]
@@ -92,6 +101,9 @@ required_data_sources = ["open_source_bond", "wrds_markit"]
 
 [cds_bond_basis.ftsfr_CDS_bond_basis_non_aggregated]
 description = """Long format of CDS bond basis, non-aggregated"""
+short_name = "CDS-Bond Basis"
+table_name = "CDS-Bond"
+group = "basis_spreads"
 frequency = "ME"
 seasonality = 12
 winsorization = [1.0, 99.0]
@@ -111,6 +123,9 @@ required_data_sources = ["fed_yield_curve", "wrds_markit"]
 description = """Monthly returns for individual CDS contracts. Each contract is identified 
 by ticker and tenor (3Y, 5Y, 7Y, 10Y). Returns are calculated using the He-Kelly formula 
 with risky duration adjustment."""
+short_name = "CDS Contract Returns"
+table_name = "CDS Contract"
+group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -119,6 +134,9 @@ seasonality = 1 # No seasonality for returns
 description = """Monthly returns for 20 CDS portfolios formed by sorting contracts into 
 4 tenors (3Y, 5Y, 7Y, 10Y) and 5 credit quality quintiles based on 5Y spreads. 
 Portfolio IDs follow the format 'TENOR_QUINTILE' (e.g., '5Y_Q3')."""
+short_name = "CDS Portfolio Returns"
+table_name = "CDS Portfolio"
+group = "returns_portfolios"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -133,6 +151,9 @@ required_data_sources = ["bloomberg_terminal"]
 
 [cip.ftsfr_CIP_spreads]
 description = """Long format of CIP spreads"""
+short_name = "CIP Spreads"
+table_name = "CIP"
+group = "basis_spreads"
 frequency = "ME"
 seasonality = 12
 
@@ -142,6 +163,9 @@ required_data_sources = ["bloomberg_terminal", "wrds_datastream"]
 
 [commodities.ftsfr_commodities_returns]
 description = """Long format of commodities returns"""
+short_name = "Commodity Returns"
+table_name = "Commodity"
+group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -152,6 +176,9 @@ required_data_sources = ["open_source_bond"]
 
 [corp_bond_returns.ftsfr_corp_bond_returns]
 description = """This data module contains the returns of individual corporate bonds sourced from the TRACE database."""
+short_name = "Corporate Bond Returns"
+table_name = "Corporate Bond"
+group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -159,6 +186,9 @@ winsorization = [0.5, 99.5]
 
 [corp_bond_returns.ftsfr_corp_bond_portfolio_returns]
 description = """This data module contains the returns of the corporate bond portfolios formed as per the methodology of Nozawa (2017)."""
+short_name = "Corporate Portfolio Returns"
+table_name = "Corporate Portfolio"
+group = "returns_portfolios"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -169,6 +199,9 @@ required_data_sources = ["wrds_crsp", "he_kelly_manela"]
 
 [us_treasury_returns.ftsfr_treas_bond_returns]
 description = """This data module contains the returns of individual treasury bonds sourced from the CRSP database."""
+short_name = "Treasury Bond Returns"
+table_name = "Treasury Bond"
+group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -176,6 +209,9 @@ winsorization = [0.5, 99.5]
 
 [us_treasury_returns.ftsfr_treas_bond_portfolio_returns]
 description = """This data module contains the returns of the treasury bond portfolios formed as per the methodology of Gurkaynak, Sack, and Wright (2011)."""
+short_name = "Treasury Portfolio Returns"
+table_name = "Treasury Portfolio"
+group = "returns_portfolios"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -194,6 +230,9 @@ required_data_sources = ["fed_yield_curve"]
 [fed_yield_curve.ftsfr_treas_yield_curve_zero_coupon]
 description = """Nelson-Seigel-Svensson zero-coupon yield curve, 
 tenors 1-30 years, 1961-present"""
+short_name = "Treasury Yield Curve"
+table_name = "Treasury Yield Curve"
+group = "other"
 frequency = "B"
 seasonality = 5 # Calendar days per year (or 252 for business days)
 
@@ -209,6 +248,9 @@ required_data_sources = ["bloomberg_terminal"]
 
 [foreign_exchange.ftsfr_FX_returns]
 description = """Long format of FX returns"""
+short_name = "FX Returns"
+table_name = "FX"
+group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -219,6 +261,9 @@ required_data_sources = ["he_kelly_manela"]
 
 [he_kelly_manela.ftsfr_he_kelly_manela_factors_monthly]
 description = """Monthly factors from He, Kelly, and Manela (2017)"""
+short_name = "HKM Monthly Factor Returns"
+table_name = "HKM Monthly Factor"
+group = "returns_portfolios"
 frequency = "MS"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -226,6 +271,9 @@ winsorization = [1.0, 99.0]
 
 [he_kelly_manela.ftsfr_he_kelly_manela_factors_daily]
 description = """Daily factors from He, Kelly, and Manela (2017)"""
+short_name = "HKM Daily Factor Returns"
+table_name = "HKM Daily Factor"
+group = "returns_portfolios"
 frequency = "B"
 # seasonality = 252
 seasonality = 1 # No seasonality for returns
@@ -233,6 +281,9 @@ winsorization = [1.0, 99.0]
 
 [he_kelly_manela.ftsfr_he_kelly_manela_all]
 description = """All factors from He, Kelly, and Manela (2017)"""
+short_name = "HKM All Factor Returns"
+table_name = "HKM All Factor"
+group = "returns_portfolios"
 frequency = "MS"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -245,18 +296,27 @@ required_data_sources = ["ken_french_data_library"]
 
 [ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_bm]
 description = """Daily Fama-French 25 portfolios based on size and book-to-market"""
+short_name = "FF25 Size-BM Returns"
+table_name = "FF25 Size-BM"
+group = "returns_portfolios"
 frequency = "D"
 # seasonality = 252
 seasonality = 1 # No seasonality for returns
 
 [ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_op]
 description = """Daily Fama-French 25 portfolios based on size and operating profitability"""
+short_name = "FF25 Size-Op Returns"
+table_name = "FF25 Size-Op"
+group = "returns_portfolios"
 frequency = "D"
 # seasonality = 252
 seasonality = 1 # No seasonality for returns
 
 [ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_inv]
 description = """Daily Fama-French 25 portfolios based on size and investment"""
+short_name = "FF25 Size-Inv Returns"
+table_name = "FF25 Size-Inv"
+group = "returns_portfolios"
 frequency = "D"
 # seasonality = 252
 seasonality = 1 # No seasonality for returns
@@ -268,24 +328,36 @@ required_data_sources = ["nyu_call_report"]
 
 [nyu_call_report.ftsfr_nyu_call_report_leverage]
 description = """From call report data, leverage for each rssdid, 1976-2020"""
+short_name = "Bank Leverage"
+table_name = "Bank Leverage"
+group = "other"
 frequency = "QE"
 seasonality = 4  # Quarters per year
 winsorization = [5.0, 95.0]
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_leverage]
 description = """From call report data, leverage for each bhcid, 1976-2020"""
+short_name = "BHC Leverage"
+table_name = "BHC Leverage"
+group = "other"
 frequency = "QE"
 seasonality = 4
 winsorization = [5.0, 95.0]
 
 [nyu_call_report.ftsfr_nyu_call_report_cash_liquidity]
 description = """From call report data, cash liquidity for each rssdid, 1976-2020"""
+short_name = "Bank Cash Liquidity"
+table_name = "Bank Cash Liquidity"
+group = "other"
 frequency = "QE"
 seasonality = 4
 winsorization = [5.0, 95.0]
 
 [nyu_call_report.ftsfr_nyu_call_report_holding_company_cash_liquidity]
 description = """From call report data, cash liquidity for each bhcid, 1976-2020"""
+short_name = "BHC Cash Liquidity"
+table_name = "BHC Cash Liquidity"
+group = "other"
 frequency = "QE"
 seasonality = 4
 winsorization = [5.0, 95.0]
@@ -296,12 +368,18 @@ required_data_sources = ["wrds_optionmetrics"]
 
 [options.ftsfr_hkm_option_returns]
 description = """From optionmetrics data, option returns, 1996-Present"""
+short_name = "HKM Option Returns"
+table_name = "HKM Option"
+group = "returns_disaggregated"
 frequency = "D"
 # seasonality = 252 # Business days per year
 seasonality = 1 # No seasonality for returns
 
 [options.ftsfr_cjs_option_returns]
 description = """From optionmetrics data, option returns, 1996-Present"""
+short_name = "CJS Option Returns"
+table_name = "CJS Option"
+group = "returns_disaggregated"
 frequency = "D"
 # seasonality = 252 # Business days per year
 seasonality = 1 # No seasonality for returns
@@ -320,12 +398,18 @@ required_data_sources = ["wrds_compustat", "wrds_crsp", "wrds_crsp_compustat"]
 
 [wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_ret]
 description = """CRSP monthly stock returns, 1926-present"""
+short_name = "CRSP Stock Returns"
+table_name = "CRSP Stock"
+group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12  # Months per year
 seasonality = 1 # No seasonality for returns
 
 [wrds_crsp_compustat.ftsfr_CRSP_monthly_stock_retx]
 description = """CRSP monthly stock returns (without dividends), 1926-present"""
+short_name = "CRSP Stock Returns (ex-div)"
+table_name = "CRSP Stock (ex-div)"
+group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns

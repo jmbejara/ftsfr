@@ -16,7 +16,7 @@ from dodo_common import (
     load_models_config,
 )
 from dependency_tracker import get_available_datasets
-import glob
+from pathlib import Path
 
 # Load configuration
 subscriptions_toml = load_subscriptions()
@@ -36,30 +36,29 @@ for module_name, required_sources in module_requirements_dict.items():
 
 
 def check_forecast_results():
-    """Check if forecast result files exist in the new structure"""
-    error_metrics_dir = OUTPUT_DIR / "forecasting" / "error_metrics"
+    """Check if forecast result files exist in the new forecasting2 structure"""
+    error_metrics_dir = OUTPUT_DIR / "forecasting2" / "error_metrics"
 
-    if not error_metrics_dir.exists():
-        print(
-            f"\nWarning: No forecasting error metrics directory found at {error_metrics_dir}"
-        )
-        print(
-            "Please run forecasting tasks first (e.g., 'doit -f dodo_02_darts_local.py')"
-        )
-        return False
+    # if not error_metrics_dir.exists():
+    #     print(
+    #         f"\nWarning: No forecasting2 error metrics directory found at {error_metrics_dir}"
+    #     )
+    #     print(
+    #         "Please run forecasting tasks first using the new forecast.py system"
+    #     )
+    #     return False
 
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
 
-    # Count available vs expected results
+    # Count available vs expected results in the new structure: {dataset}/{model}.csv
     total_expected = len(models_activated) * len(available_datasets)
     results_found = 0
 
-    for model in models_activated:
-        model_dir = error_metrics_dir / model
-        if model_dir.exists():
-            for dataset_name in available_datasets:
-                clean_dataset_name = dataset_name.replace("ftsfr_", "")
-                result_file = model_dir / f"{clean_dataset_name}.csv"
+    for dataset_name in available_datasets:
+        dataset_dir = error_metrics_dir / dataset_name
+        if dataset_dir.exists():
+            for model in models_activated:
+                result_file = dataset_dir / f"{model}.csv"
                 if result_file.exists():
                     results_found += 1
 
@@ -77,57 +76,76 @@ def check_forecast_results():
     return results_found > 0  # Return True if we have any results at all
 
 
-def task_assemble_results():
-    """Assemble results from all model-dataset combinations."""
+# def task_assemble_results():
+#     """Assemble results from all model-dataset combinations using the new forecasting2 system."""
 
-    # Check for result files at task generation time
-    check_forecast_results()
+#     # Check for result files at task generation time
+#     check_forecast_results()
 
-    # Get all CSV files in the forecasting error metrics directory
-    error_metrics_csv_files = glob.glob(
-        str(OUTPUT_DIR / "forecasting" / "error_metrics" / "**" / "*.csv"),
-        recursive=True,
-    )
+#     # Get all CSV files in the forecasting2 error metrics directory
+#     error_metrics_csv_files = glob.glob(
+#         str(OUTPUT_DIR / "forecasting2" / "error_metrics" / "**" / "*.csv"),
+#         recursive=True,
+#     )
 
-    return {
-        "actions": [
-            "python ./src/assemble_results.py",
-        ],
-        "targets": [
-            OUTPUT_DIR / "results_all.csv",
-            OUTPUT_DIR / "results_all.tex",
-        ],
-        "file_dep": [
-            "./src/assemble_results.py",
-            *error_metrics_csv_files,
-        ],
-        "clean": True,
-    }
+#     return {
+#         "actions": [
+#             "python ./src/assemble_results2.py",
+#         ],
+#         "targets": [
+#             OUTPUT_DIR / "forecasting2" / "results_all.csv",
+#             OUTPUT_DIR / "forecasting2" / "results_all.tex",
+#         ],
+#         "file_dep": [
+#             "./src/assemble_results2.py",
+#             *error_metrics_csv_files,
+#         ],
+#         "clean": True,
+#     }
 
 
 def task_create_results_tables():
-    """Create analytical tables from assembled results"""
+    """Create analytical tables from assembled results using forecasting2 system"""
     return {
         "actions": [
-            "python ./src/create_results_tables.py",
+            "python ./src/create_results_tables2.py",
         ],
         "targets": [
-            OUTPUT_DIR / "mase_pivot_table.csv",
-            OUTPUT_DIR / "mase_pivot_table.tex",
-            OUTPUT_DIR / "model_summary_statistics.csv",
-            OUTPUT_DIR / "model_summary_statistics.tex",
+            # MASE pivot table files
+            Path("./docs_src") / "mase_pivot_table.csv",
+            Path("./docs_src") / "mase_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "mase_pivot_table.csv",
+            OUTPUT_DIR / "forecasting2" / "mase_pivot_table.tex",
+            # RMSE pivot table files
+            Path("./docs_src") / "rmse_pivot_table.csv",
+            Path("./docs_src") / "rmse_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "rmse_pivot_table.csv",
+            OUTPUT_DIR / "forecasting2" / "rmse_pivot_table.tex",
+            # sMAPE pivot table files (conditional on data availability)
+            Path("./docs_src") / "smape_pivot_table.csv",
+            Path("./docs_src") / "smape_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "smape_pivot_table.csv",
+            OUTPUT_DIR / "forecasting2" / "smape_pivot_table.tex",
+            # MAE pivot table files (conditional on data availability)
+            Path("./docs_src") / "mae_pivot_table.csv",
+            Path("./docs_src") / "mae_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "mae_pivot_table.csv",
+            OUTPUT_DIR / "forecasting2" / "mae_pivot_table.tex",
+            # Summary statistics
+            OUTPUT_DIR / "forecasting2" / "model_summary_statistics.csv",
+            OUTPUT_DIR / "forecasting2" / "model_summary_statistics.tex",
         ],
         "file_dep": [
-            "./src/assemble_results.py",
-            "./src/create_results_tables.py",
-            OUTPUT_DIR / "results_all.csv",
+            # "./src/assemble_results2.py",
+            "./src/create_results_tables2.py",
+            OUTPUT_DIR / "forecasting2" / "results_all.csv",
         ],
         "clean": True,
     }
 
 
 def task_compile_latex_docs():
-    """Compile the LaTeX documents to PDFs"""
+    """Compile the LaTeX documents to PDFs using forecasting2 outputs"""
 
     return {
         "actions": [
@@ -138,10 +156,14 @@ def task_compile_latex_docs():
             "./reports/draft_ftsfr.pdf",
         ],
         "file_dep": [
-            "./src/create_results_tables.py",
+            "./src/create_results_tables2.py",
             "./reports/draft_ftsfr.tex",
-            OUTPUT_DIR / "mase_pivot_table.tex",
-            OUTPUT_DIR / "model_summary_statistics.tex",
+            # LaTeX table dependencies (from _output/forecasting2/ as these are referenced in the paper)
+            OUTPUT_DIR / "forecasting2" / "mase_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "rmse_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "smape_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "mae_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "model_summary_statistics.tex",
         ],
         "clean": True,
     }

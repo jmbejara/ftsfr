@@ -1,0 +1,54 @@
+% RMSE Results by Dataset and Model
+% Generated automatically by create_results_tables2.py
+
+\begin{table}[htbp]
+\centering
+\caption{RMSE Results by Dataset and Model}
+\label{tab:rmse_results}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{0.85}
+\begin{tabular}{@{}l@{\hspace{2pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{}}
+\toprule
+ & ARIMA & ETS & Theta & DLinear & DeepAR & KAN & NBEATS & NHITS & NLinear & Naive & SN & TiDE & Transformer \\
+\midrule
+\multicolumn{14}{l}{\textbf{Basis Spreads}} \\
+CDS-Bond & 4.12 & 3.97 & 3.97 & 4.80 & 3.83 & 3.05 & 3.52 & 3.77 & 4.25 & 3.97 & 4.13 & 3.52 & 3.06 \\
+CIP & 16.55 & 14.67 & 14.67 & 27.77 & 24.12 & 14.33 & 14.49 & 14.51 & 16.11 & 14.67 & 16.32 & 17.85 & 22.95 \\
+TIPS-Treasury & 18.23 & 13.48 & 13.48 & 20.86 & 18.68 & 11.62 & 13.11 & 13.76 & 13.49 & 13.48 & 11.19 & 13.96 & 17.35 \\
+Treasury-SF & 57.98 & 57.98 & 57.98 & 67.76 & 68.36 & 68.51 & 64.54 & 60.87 & 60.54 & 57.98 & 69.93 & 67.44 & 68.84 \\
+Treasury-Swap & 27.44 & 20.91 & 20.91 & 36.06 & 38.40 & 31.92 & 23.54 & 23.26 & 20.84 & 20.91 & 21.01 & 28.44 & 36.39 \\
+\midrule
+\multicolumn{14}{l}{\textbf{Returns (Portfolios)}} \\
+CDS Portfolio & 0.00 & 0.00 & 0.00 & 0.23 & 0.00 & 0.00 & 0.01 & 0.08 & 0.16 & 0.00 & 0.00 & 0.09 & 0.10 \\
+Corporate Portfolio & 0.03 & 0.03 & 0.02 & 0.23 & 0.03 & 0.03 & 0.03 & 0.06 & 0.15 & 0.03 & 0.03 & 0.08 & 0.09 \\
+FF25 Size-BM & 0.02 & 0.02 & 0.02 & 0.22 & 0.02 & 0.02 & 0.02 & 0.08 & 0.16 & 0.02 & 0.02 & 0.09 & -- \\
+FF25 Size-Inv & 0.01 & 0.02 & 0.02 & 0.22 & 0.01 & 0.01 & 0.02 & 0.07 & 0.16 & 0.02 & 0.02 & 0.09 & -- \\
+FF25 Size-Op & 0.01 & 0.02 & 0.02 & 0.22 & 0.01 & 0.01 & 0.02 & 0.07 & 0.16 & 0.02 & 0.02 & 0.09 & -- \\
+HKM All Factor & 107.54 & 84.66 & 109.34 & 133.30 & 132.38 & 117.73 & 116.10 & 115.52 & 108.27 & 108.24 & 108.24 & 118.47 & 131.85 \\
+HKM Daily Factor & 21.95 & 21.95 & 21.95 & 65.92 & 59.44 & 18.81 & 17.80 & 18.48 & 22.06 & 21.95 & 21.95 & 27.65 & 58.75 \\
+HKM Monthly Factor & 319.80 & 385.96 & 313.98 & 167.82 & 111.90 & 149.40 & 218.04 & 248.64 & 326.50 & 314.32 & 314.32 & 86.06 & 111.44 \\
+Treasury Portfolio & 0.01 & 0.01 & 0.01 & 0.22 & 0.01 & 0.01 & 0.01 & 0.07 & 0.15 & 0.01 & 0.01 & 0.09 & 0.16 \\
+\midrule
+\multicolumn{14}{l}{\textbf{Returns (Disaggregated)}} \\
+CDS Contract & 0.02 & 0.02 & 0.02 & 0.20 & 0.02 & 0.02 & 0.02 & 0.08 & 0.17 & 0.02 & 0.02 & 0.09 & 0.10 \\
+CJS Option & 0.04 & 0.04 & 0.04 & 0.23 & 0.04 & 0.03 & 0.04 & 0.09 & 0.17 & 0.04 & 0.04 & 0.10 & 0.21 \\
+CRSP Stock & 0.15 & 0.18 & 0.19 & 0.29 & 0.15 & 0.15 & 0.17 & 0.18 & 0.25 & 0.18 & 0.18 & 0.19 & 0.21 \\
+CRSP Stock (ex-div) & 0.15 & 0.18 & 0.19 & 0.29 & 0.15 & 0.15 & 0.17 & 0.18 & 0.25 & 0.18 & 0.18 & 0.19 & 0.21 \\
+Commodity & 0.07 & 0.08 & 0.08 & 0.23 & 0.07 & 0.07 & 0.08 & 0.09 & 0.14 & 0.08 & 0.08 & 0.10 & 0.18 \\
+Corporate Bond & 0.03 & 0.03 & 0.03 & 0.19 & 0.03 & 0.03 & 0.03 & 0.05 & 0.16 & 0.03 & 0.03 & 0.10 & 0.10 \\
+FX & 2.32 & 2.32 & 2.32 & 2.33 & 2.24 & 2.47 & 2.39 & 2.46 & 2.33 & 2.32 & 2.32 & 2.23 & 2.19 \\
+HKM Option & 0.04 & 0.03 & 0.03 & 0.23 & 0.04 & 0.03 & 0.04 & 0.08 & 0.17 & 0.03 & 0.03 & 0.10 & 0.21 \\
+Treasury Bond & 0.01 & 0.01 & 0.01 & 0.24 & 0.01 & 0.01 & 0.01 & 0.04 & 0.13 & 0.01 & 0.01 & 0.09 & 0.12 \\
+\midrule
+\multicolumn{14}{l}{\textbf{Other}} \\
+BHC Cash Liquidity & 0.07 & 0.05 & 0.05 & 0.29 & 0.06 & 0.05 & 0.05 & 0.07 & 0.19 & 0.05 & 0.05 & 0.10 & 0.10 \\
+BHC Leverage & 4.35 & 3.00 & 3.04 & 10.97 & 10.34 & 2.86 & 2.78 & 2.79 & 3.06 & 2.84 & 3.17 & 5.63 & 8.67 \\
+Bank Cash Liquidity & 0.07 & 0.06 & 0.06 & 0.30 & 0.08 & 0.06 & 0.06 & 0.08 & 0.20 & 0.06 & 0.06 & 0.12 & 0.13 \\
+Bank Leverage & 3.96 & 3.27 & 3.27 & 10.61 & 10.16 & 3.02 & 2.94 & 2.95 & 3.23 & 3.00 & 3.34 & 5.52 & 8.42 \\
+Treasury Yield Curve & 1.26 & 1.26 & 1.26 & 3.03 & 1.78 & 1.16 & 1.50 & 1.57 & 1.28 & 1.26 & 1.29 & 1.66 & -- \\
+\bottomrule
+\end{tabular}
+\vspace{0.05cm}
+\noindent {\scriptsize \textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.}
+\end{table}

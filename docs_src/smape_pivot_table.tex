@@ -1,0 +1,54 @@
+% sMAPE Results by Dataset and Model
+% Generated automatically by create_results_tables2.py
+
+\begin{table}[htbp]
+\centering
+\caption{sMAPE Results by Dataset and Model}
+\label{tab:smape_results}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{0.85}
+\begin{tabular}{@{}l@{\hspace{2pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{}}
+\toprule
+ & ARIMA & ETS & Theta & DLinear & DeepAR & KAN & NBEATS & NHITS & NLinear & Naive & SN & TiDE & Transformer \\
+\midrule
+\multicolumn{14}{l}{\textbf{Basis Spreads}} \\
+CDS-Bond & 0.83 & 46.90 & 46.90 & 0.80 & 0.65 & 0.99 & 0.56 & 0.70 & 0.67 & 46.90 & 2.82 & 0.46 & 0.49 \\
+CIP & 0.45 & 0.28 & 0.28 & 0.64 & 0.88 & 0.30 & 0.42 & 0.29 & 0.32 & 0.28 & 0.34 & 0.50 & 0.71 \\
+TIPS-Treasury & 0.85 & 0.48 & 0.48 & 1.36 & 0.94 & 0.91 & 0.49 & 0.50 & 0.97 & 0.48 & 0.37 & 3.10 & 1.09 \\
+Treasury-SF & 1.01 & 1.01 & 1.01 & 1.51 & 1.00 & 1.44 & 1.02 & 1.01 & 167.63 & 1.01 & 2.22 & 1.26 & 1.63 \\
+Treasury-Swap & 1.56 & 1.56 & 1.56 & 1.19 & 1.00 & 1.00 & 1.33 & 1.20 & 1.36 & 1.56 & 1.40 & 1.11 & 1.00 \\
+\midrule
+\multicolumn{14}{l}{\textbf{Returns (Portfolios)}} \\
+CDS Portfolio & 0.56 & 0.15 & 0.15 & 0.95 & 0.98 & 0.37 & 0.27 & 0.53 & 0.96 & 0.17 & 0.17 & 0.82 & 0.94 \\
+Corporate Portfolio & 2.04 & 1.71 & 1.94 & 0.95 & 2.91 & 2.43 & 2.82 & 1.84 & 0.97 & 1.58 & 1.58 & 1.19 & 4.40 \\
+FF25 Size-BM & 0.99 & 3.44 & 3.44 & 1.34 & 1.00 & 2.69 & 10.13 & 4.73 & 1.35 & 3.44 & 3.44 & 2.02 & -- \\
+FF25 Size-Inv & 0.99 & 3.92 & 3.92 & 1.69 & 1.00 & 2.51 & 10.06 & 5.23 & 1.36 & 3.92 & 3.92 & 2.15 & -- \\
+FF25 Size-Op & 0.99 & 3.93 & 3.93 & 1.29 & 1.00 & 2.45 & 8.66 & 12.38 & 1.39 & 3.93 & 3.93 & 2.95 & -- \\
+HKM All Factor & 0.72 & 0.69 & 0.94 & 1.63 & 1.00 & 1.64 & 0.86 & 1.51 & 1.00 & 0.77 & 0.77 & 1.26 & 1.36 \\
+HKM Daily Factor & 0.56 & 0.62 & 0.62 & 0.94 & 1.00 & 3.02 & 0.95 & 1.65 & 0.84 & 0.62 & 0.62 & 1.15 & 0.96 \\
+HKM Monthly Factor & 0.87 & 0.88 & 0.75 & 1.03 & 1.00 & 0.66 & 0.73 & 0.81 & 1.08 & 0.75 & 0.75 & 0.92 & 0.98 \\
+Treasury Portfolio & 2.35 & 2.96 & 2.10 & 1.24 & 3.02 & 15.08 & 3.16 & 2.47 & 1.17 & 2.83 & 2.83 & 1.37 & 1.10 \\
+\midrule
+\multicolumn{14}{l}{\textbf{Returns (Disaggregated)}} \\
+CDS Contract & 1.12 & 1.40 & 1.40 & 0.99 & 1.62 & 1.32 & 1.66 & 2.12 & 1.05 & 1.40 & 1.40 & 1.67 & 1.02 \\
+CJS Option & 0.93 & 1.05 & 1.05 & 1.61 & 5.87 & 1.02 & 1.11 & 1.38 & 1.20 & 1.05 & 1.05 & 1.31 & 1.04 \\
+CRSP Stock & 1.02 & 3.64 & 3.63 & 2.83 & 2.70 & 1.40 & 3.92 & 4.07 & 13.55 & 3.64 & 3.64 & 3.24 & 2.38 \\
+CRSP Stock (ex-div) & 1.04 & 3.75 & 3.74 & 14.06 & 1.95 & 1.45 & 5.15 & 3.42 & 2.91 & 3.75 & 3.75 & 3.06 & 2.50 \\
+Commodity & 1.08 & 1.95 & 1.95 & 1.72 & 1.00 & 1.02 & 1.35 & 1.64 & 4.31 & 1.95 & 1.95 & 1.59 & 1.52 \\
+Corporate Bond & 1.39 & 1.97 & 1.79 & 1.75 & 2.11 & 3.27 & 36.86 & 1.86 & 1.96 & 1.85 & 1.85 & 5.40 & 6.31 \\
+FX & 0.82 & 0.82 & 0.82 & 1.50 & 1.40 & 0.95 & 1.09 & 0.99 & 1.09 & 0.82 & 0.82 & 1.01 & 0.83 \\
+HKM Option & 1.00 & 0.70 & 0.70 & 1.16 & 5.00 & 0.82 & 0.79 & 0.91 & 1.69 & 0.70 & 0.70 & 1.11 & 0.98 \\
+Treasury Bond & 1.57 & 1.96 & 1.91 & 1.20 & 1.76 & 3.02 & 1.27 & 1.45 & 1.08 & 2.07 & 2.07 & 1.41 & 1.08 \\
+\midrule
+\multicolumn{14}{l}{\textbf{Other}} \\
+BHC Cash Liquidity & 0.41 & 0.24 & 0.25 & 0.78 & 0.31 & 0.23 & 0.25 & 0.31 & 0.70 & 0.24 & 0.25 & 0.50 & 0.54 \\
+BHC Leverage & 0.19 & 0.07 & 0.07 & 0.63 & 0.77 & 0.06 & 0.06 & 0.06 & 0.07 & 0.06 & 0.07 & 0.21 & 0.53 \\
+Bank Cash Liquidity & 0.36 & 0.25 & 0.27 & 0.78 & 0.34 & 0.25 & 0.27 & 0.33 & 0.69 & 0.25 & 0.26 & 0.51 & 0.61 \\
+Bank Leverage & 0.14 & 0.07 & 0.08 & 0.64 & 0.77 & 0.07 & 0.07 & 0.07 & 0.08 & 0.07 & 0.08 & 0.20 & 0.51 \\
+Treasury Yield Curve & 0.22 & 0.22 & 0.22 & 0.71 & 0.34 & 0.27 & 0.27 & 0.30 & 0.23 & 0.22 & 0.23 & 0.30 & -- \\
+\bottomrule
+\end{tabular}
+\vspace{0.05cm}
+\noindent {\scriptsize \textbf{Note:} Values show Symmetric Mean Absolute Percentage Error (sMAPE). Lower values indicate better performance. -- indicates missing results.}
+\end{table}

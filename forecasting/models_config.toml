@@ -5,11 +5,13 @@
 library = "statsforecast"
 class = "Naive"
 display_name = "Naive"
+table_name = "Naive"
 
 [seasonal_naive]
 library = "statsforecast"
 class = "SeasonalNaive"
 display_name = "Seasonal Naive"
+table_name = "SN"
 
 # [seasonal_es_optimized]
 # library = "statsforecast"
@@ -21,6 +23,7 @@ display_name = "Seasonal Naive"
 library = "statsforecast"
 class = "AutoTheta"
 display_name = "AutoTheta"
+table_name = "Theta"
 [auto_theta.params]
 decomposition_type = "additive"
 
@@ -31,6 +34,7 @@ decomposition_type = "additive"
 library = "statsforecast"
 class = "AutoETS"
 display_name = "AutoETS"
+table_name = "ETS"
 [auto_ets.params]
 model = "ZZZ"
 
@@ -48,7 +52,8 @@ model = "ZZZ"
 [auto_arima_fast]
 library = "statsforecast"
 class = "AutoARIMA"
-display_name = "AutoARIMA Fast"
+display_name = "AutoARIMA"
+table_name = "ARIMA"
 [auto_arima_fast.params]
 approximation = true
 stepwise = true
@@ -63,6 +68,7 @@ nmodels = 10
 library = "neuralforecast"
 class = "DeepAR"
 display_name = "DeepAR"
+table_name = "DeepAR"
 [deepar.params]
 h = 1
 loss = "DistributionLoss"
@@ -88,6 +94,7 @@ max_steps = 100
 library = "neuralforecast"
 class = "NBEATS"
 display_name = "NBEATS"
+table_name = "NBEATS"
 [nbeats.params]
 h = 1
 loss = "MAE"
@@ -115,6 +122,7 @@ stack_types = ["identity", "identity"]
 library = "neuralforecast"
 class = "NHITS"
 display_name = "NHITS"
+table_name = "NHITS"
 [nhits.params]
 h = 1
 loss = "MAE"
@@ -141,6 +149,7 @@ mlp_units = [[16, 16], [16, 16], [16, 16]]
 library = "neuralforecast"
 class = "DLinear"
 display_name = "DLinear"
+table_name = "DLinear"
 [dlinear.params]
 h = 1
 loss = "MAE"
@@ -165,6 +174,7 @@ max_steps = 100
 library = "neuralforecast"
 class = "NLinear"
 display_name = "NLinear"
+table_name = "NLinear"
 [nlinear.params]
 h = 1
 loss = "MAE"
@@ -189,6 +199,7 @@ max_steps = 100
 library = "neuralforecast"
 class = "VanillaTransformer"
 display_name = "VanillaTransformer"
+table_name = "Transformer"
 [vanilla_transformer.params]
 h = 1
 loss = "MAE"
@@ -215,6 +226,7 @@ hidden_size = 32
 library = "neuralforecast"
 class = "TiDE"
 display_name = "TiDE"
+table_name = "TiDE"
 [tide.params]
 h = 1
 loss = "MAE"
@@ -230,6 +242,7 @@ max_steps = 100
 library = "neuralforecast"
 class = "KAN"
 display_name = "KAN"
+table_name = "KAN"
 [kan.params]
 h = 1
 loss = "MAE"
