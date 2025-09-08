@@ -194,7 +194,7 @@ This will:
 - Automatically use all CPUs on each node for parallel processing
 - Skip already completed jobs (idempotent execution)
 - Continue processing even if individual jobs fail
-- Save outputs to `./_output/forecast2/error_metrics/{dataset}/{model}.csv`
+- Save outputs to `./_output/forecasting2/error_metrics/{dataset}/{model}.csv`
 - Log SLURM output to `./_output/forecasting2/logs/`
 
 To check job status:
@@ -206,7 +206,7 @@ tail -f ./_output/forecasting2/logs/failed_jobs.txt      # Check failed jobs
 
 To assemble results after jobs complete:
 ```bash
-python src/assemble_results2.py  # Assembles results from forecast2 directory
+python src/assemble_results2.py  # Assembles results from forecasting2 directory
 ```
 
 ## Data Format

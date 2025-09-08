@@ -53,7 +53,7 @@ echo "Dataset: $DATASET"
 echo "Model: $MODEL"
 
 # Check if output already exists (idempotent execution)
-OUTPUT_FILE="./_output/forecast2/error_metrics/${DATASET}/${MODEL}.csv"
+OUTPUT_FILE="./_output/forecasting2/error_metrics/${DATASET}/${MODEL}.csv"
 if [ -f "$OUTPUT_FILE" ]; then
     echo "Output already exists: $OUTPUT_FILE"
     echo "Skipping job for ${DATASET}/${MODEL} as it has already been completed"
@@ -62,7 +62,7 @@ if [ -f "$OUTPUT_FILE" ]; then
 fi
 
 # Create output directories
-mkdir -p "./_output/forecast2/error_metrics/${DATASET}"
+mkdir -p "./_output/forecasting2/error_metrics/${DATASET}"
 mkdir -p "./_output/forecasting2/logs/${DATASET}/${MODEL}"
 
 # Log start of actual computation

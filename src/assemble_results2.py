@@ -1,7 +1,7 @@
 """
 Assemble results from the new forecasting system output structure.
 
-This script reads all CSV files from ./_output/forecast2/error_metrics/{dataset}/{model}.csv
+This script reads all CSV files from ./_output/forecasting2/error_metrics/{dataset}/{model}.csv
 and assembles them into a single consolidated CSV file.
 """
 
@@ -15,14 +15,14 @@ import numpy as np
 from settings import config
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
-FORECAST2_DIR = OUTPUT_DIR / "forecast2"
+FORECAST2_DIR = OUTPUT_DIR / "forecasting2"
 
 def assemble_forecast_results():
     """
     Assemble all forecasting results from the new directory structure.
     
     Directory structure:
-    ./_output/forecast2/error_metrics/{dataset_name}/{model_name}.csv
+    ./_output/forecasting2/error_metrics/{dataset_name}/{model_name}.csv
     
     Each CSV contains columns:
     - Model: Display name of the model

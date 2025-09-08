@@ -10,7 +10,7 @@ import tomli
 from settings import config
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
-FORECAST2_DIR = OUTPUT_DIR / "forecast2"  # New forecasting output directory
+FORECAST2_DIR = OUTPUT_DIR / "forecasting2"  # New forecasting output directory
 
 def filter_quality_results(results_df):
     """Filter out results with quality issues (NaN values or zero error metrics)"""

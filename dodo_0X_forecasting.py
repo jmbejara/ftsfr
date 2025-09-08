@@ -63,7 +63,7 @@ def task_forecast_new():
                         OUTPUT_DIR / "available_datasets.csv",
                     ],
                     "targets": [
-                        OUTPUT_DIR / "forecast2" / "error_metrics" / full_dataset_name / f"{model_name}.csv",
+                        OUTPUT_DIR / "forecasting2" / "error_metrics" / full_dataset_name / f"{model_name}.csv",
                     ],
                     "clean": True,
                     "verbosity": 2,

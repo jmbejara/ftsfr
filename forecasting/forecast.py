@@ -322,7 +322,7 @@ def train_and_forecast_neuralforecast(model, train_data, test_data, frequency):
 
 def save_metrics_csv(metrics_dict, dataset_name, model_name):
     """Save error metrics to CSV file in the specified directory structure."""
-    output_dir = Path("./_output/forecast2/error_metrics") / dataset_name
+    output_dir = Path("./_output/forecasting2/error_metrics") / dataset_name
     output_dir.mkdir(parents=True, exist_ok=True)
     csv_path = output_dir / f"{model_name}.csv"
     pl.DataFrame([metrics_dict]).write_csv(csv_path)
