@@ -969,8 +969,8 @@ R_t^{put} = -\sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(
 CJS implement a multi-step process to address options with missing prices, as detailed in Section 1.3 ``Portfolio Formation'' of their paper. We reserve the implementation of this NaN-filling procedure for a future version of this dataset. For the current version, we compound the daily portfolio returns into monthly returns, which matches the final form of the data utilized in the paper.
 
 
-\textit{Returns Series Transformation (HKM)}
-\subsubsection*{Construction of 18 Portfolio Return Series in \citet{He2017}}
+\paragraph{\textit{Phase 2: Returns Series Transformation in \citet{He2017}}}
+\subsubsection*{Construction of 18 Portfolio Return Series in HKM}
 
 \citet{He2017} reduce the 54 portfolios constructed in \citet{Constantinides2013} to 18 portfolios by taking an equal-weight average across the three maturities (30, 60, 90 days) for all CJS portfolios with the same moneyness. We implement that procedure to obtain the final return series for the FTSFR.
 
