@@ -452,7 +452,53 @@ TODO
 % - Define evaluation methodology
 
 \subsection{Error Metrics}
-% MASE, sMAPE, RMSE, etc.
+
+\subsection{Error Metrics}\label{subsec:error_metrics}
+We report four complementary error measures: MAE, RMSE, sMAPE, and MASE. Each answers a slightly different question and, taken together, they balance interpretability, robustness, and cross-series comparability.
+
+\paragraph{Notation.} Let $\{y_t\}_{t=1}^T$ be targets in the test window and $\{\hat y_t\}_{t=1}^T$ the corresponding forecasts.
+
+\medskip
+\noindent\textbf{Mean Absolute Error (MAE).}
+\[
+\mathrm{MAE} = \frac{1}{T}\sum_{t=1}^T |y_t-\hat y_t|
+\]
+MAE is in the original units, is robust to outliers relative to RMSE, and is optimal for median forecasts. Its drawback is that it is \emph{not} scale-free, so MAE values are not comparable across series with different units or scales.
+
+\medskip
+\noindent\textbf{Root Mean Square Error (RMSE).}
+\[
+\mathrm{RMSE} = \Big(\frac{1}{T}\sum_{t=1}^T (y_t-\hat y_t)^2\Big)^{1/2}
+\]
+RMSE emphasizes large errors (quadratic loss). It is useful when tail mistakes are costly, but it is also not scale-free and is sensitive to outliers.
+
+\medskip
+\noindent\textbf{Symmetric MAPE (sMAPE).}
+\[
+\mathrm{sMAPE} = \frac{1}{T}\sum_{t=1}^T \frac{2\,|y_t-\hat y_t|}{|y_t|+|\hat y_t|}
+\]
+sMAPE is unitless and bounded in $[0,2]$ (or $[0,200]\%$ if multiplied by $100$), which aids cross-series comparison. Caution: when $y_t$ or $\hat y_t$ are near zero, the denominator can amplify noise; when both are zero we define the term as $0$.
+
+\medskip
+\noindent\textbf{Mean Absolute Scaled Error (MASE).}
+\[
+\mathrm{MASE}=\frac{\frac{1}{T}\sum_{t=1}^T |y_t-\hat y_t|}
+{\displaystyle \frac{1}{N-s}\sum_{t=s+1}^{N} |y_t - y_{t-s}|}
+\]
+The denominator is the in-sample MAE of a (seasonal) naïve forecast on the training window of length $N$ (with seasonal period $s$; $s{=}1$ for nonseasonal data). MASE is \emph{scale-free} and interpretable: values $<1$ mean the model's out-of-sample MAE improves on the in-sample naïve benchmark; values $>1$ mean it does worse. Unlike percentage errors, MASE is well-defined when $y_t{=}0$ and works across heterogeneous financial series (returns, spreads, levels).
+
+\medskip
+\noindent\textbf{Why multiple metrics?} RMSE reflects penalty for large misses in original units (risk relevance). MAE provides a robust, unit-level summary. sMAPE and MASE enable fair comparisons across datasets with different scales. We therefore use MASE (primary, scale-free) and RMSE (units) in the main text and report MAE/sMAPE in the appendix.
+
+\medskip
+\noindent\textbf{Relative MASE (rMASE).}
+To compare directly against the naïve model's \emph{out-of-sample} performance, we report a relative MASE:
+\[
+\mathrm{rMASE} = \frac{\mathrm{MASE}_{\text{model}}}{\mathrm{MASE}_{\text{naive}}}
+= \frac{\mathrm{MAE}^{\text{oos}}_{\text{model}}}{\mathrm{MAE}^{\text{oos}}_{\text{naive}}}.
+\]
+Because both MASE values share the same in-sample scaling, the ratio simplifies to the ratio of out-of-sample MAEs. Interpretation is direct: $\mathrm{rMASE}=0.80$ means the model's average absolute error is $20\%$ lower than the naïve benchmark on the test set; $\mathrm{rMASE}>1$ indicates underperformance. We omit the naïve column in the rMASE table (it equals $1$ by construction).
+
 
 \subsection{Baseline Models}
 % Traditional, ML, and Deep Learning models
@@ -606,6 +652,15 @@ Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE resul
 To better understand the relative performance of sophisticated models compared to the simple Naive benchmark, Table~\ref{tab:relative_mase_results} presents MASE ratios where each model's MASE is divided by the Naive model's MASE for the same dataset. Values less than 1.0 indicate that the model outperforms the Naive baseline, while values greater than 1.0 indicate underperformance. This normalization allows for clear interpretation of whether the additional complexity of advanced forecasting models provides meaningful improvements over the simple baseline.
 
 \input{../_output/forecasting2/relative_mase_pivot_table.tex}
+
+Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the relative MASE results using a diverging color scheme where blue indicates better performance than Naive (values < 1.0), white represents performance equal to Naive, and red shows worse performance than Naive (values > 1.0). This visualization makes it easy to identify which models consistently outperform the simple baseline and which datasets benefit most from sophisticated forecasting approaches.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../_output/forecasting2/relative_mase_heatmap.png}
+\caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Naive baseline, with blue indicating better performance than Naive ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*).}
+\label{fig:relative_mase_heatmap}
+\end{figure}
 
 Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the same organization. While MASE provides scale-free comparisons, RMSE offers insights into the actual magnitude of forecasting errors, which can be particularly relevant for risk management applications.
 
@@ -852,7 +907,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
   \item \textbf{Days to Maturity Filter:} Drop options with fewer than seven or more than 180 calendar days to expiration.
   \item \textbf{Implied Volatility Filter:} Remove all option quotes with implied volatilities lower than 5\% or higher than 100\%, computed using T-bill interest rates.
   \item \textbf{Moneyness Filter:} Remove all option quotes with moneyness (the ratio of strike price to index price) below 0.8 or above 1.2. These options have little value beyond their intrinsic value and are also very thinly traded.
-  \item \textbf{Implied Interest Rate Filter:} Compute implied volatilities using T-bill interest rates from the Federal Reserve’s H.15 release, assigning the closest available rate to each observation. Since T-bill rates may not be relevant for short maturities, we also compute a put-call parity-implied interest rate by imposing put-call parity on put-call pairs and adjusting the interest rate. We remove pairs with negative implied interest rates and assign the median-implied rate to all quotes of the same maturity and moneyness between 0.95 and 1.05, interpolating as needed.
+  \item \textbf{Implied Interest Rate Filter:} Compute implied volatilities using T-bill interest rates from the Federal Reserve's H.15 release, assigning the closest available rate to each observation. Since T-bill rates may not be relevant for short maturities, we also compute a put-call parity-implied interest rate by imposing put-call parity on put-call pairs and adjusting the interest rate. We remove pairs with negative implied interest rates and assign the median-implied rate to all quotes of the same maturity and moneyness between 0.95 and 1.05, interpolating as needed.
   \item \textbf{Unable to Compute IV Filter:} Remove quotes that imply negative time value.
 \end{itemize}
 

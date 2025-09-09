@@ -1048,7 +1048,7 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
     
     if "Relative MASE" in caption:
         metric_name = "MASE relative to Naive baseline"
-        note_text = "Values show MASE ratios relative to the Naive baseline. Values < 1.0 indicate better performance than Naive."
+        note_text = "Values show MASE ratios relative to the Naive baseline. Values $<$ 1.0 indicate better performance than Naive."
     elif "MASE" in caption:
         metric_name = "Mean Absolute Scaled Error (MASE)"
     elif "RMSE" in caption:
@@ -1165,29 +1165,65 @@ def create_heatmap_plots():
         ('Global_MASE', 'MASE', 'mase_heatmap.png', 'Mean Absolute Scaled Error (MASE)'),
         ('Global_RMSE', 'RMSE', 'rmse_heatmap.png', 'Root Mean Square Error (RMSE)'),
         ('Global_sMAPE', 'sMAPE', 'smape_heatmap.png', 'Symmetric Mean Absolute Percentage Error (sMAPE)'),
-        ('Global_MAE', 'MAE', 'mae_heatmap.png', 'Mean Absolute Error (MAE)')
+        ('Global_MAE', 'MAE', 'mae_heatmap.png', 'Mean Absolute Error (MAE)'),
+        ('Relative_MASE', 'Relative MASE', 'relative_mase_heatmap.png', 'Relative MASE (vs Naive Baseline)')
     ]
     
     for metric_col, metric_short, filename, metric_long in error_metrics:
-        if metric_col not in results.columns:
+        # Special handling for Relative MASE
+        if metric_col == 'Relative_MASE':
+            if 'Global_MASE' not in results.columns:
+                print(f"Skipping {metric_short} heatmap - Global_MASE column not found")
+                continue
+            if 'Naive' not in results['Model'].values:
+                print(f"Skipping {metric_short} heatmap - Naive model not found")
+                continue
+        elif metric_col not in results.columns:
             print(f"Skipping {metric_short} heatmap - column {metric_col} not found")
             continue
             
         print(f"Creating {metric_short} heatmap...")
         
         # Create pivot table (same structure as LaTeX tables)
-        pivot_data = results.pivot_table(
-            index='Dataset_Short',
-            columns='Model',
-            values=metric_col,
-            aggfunc='mean'
-        )
+        if metric_col == 'Relative_MASE':
+            # For relative MASE, use Global_MASE and calculate relative values
+            pivot_data = results.pivot_table(
+                index='Dataset_Short',
+                columns='Model',
+                values='Global_MASE',
+                aggfunc='mean'
+            )
+            
+            # Check if Naive column exists in the pivot table
+            if 'Naive' not in pivot_data.columns:
+                print(f"Skipping {metric_short} heatmap - Naive column not found in pivot table")
+                continue
+            
+            # Calculate relative MASE by dividing each model by Naive
+            naive_values = pivot_data['Naive']
+            for col in pivot_data.columns:
+                if col != 'Naive':  # Don't divide Naive by itself
+                    pivot_data[col] = pivot_data[col] / naive_values
+            
+            # Remove the Naive column since it would always be 1.0
+            pivot_data = pivot_data.drop(columns=['Naive'])
+        else:
+            pivot_data = results.pivot_table(
+                index='Dataset_Short',
+                columns='Model',
+                values=metric_col,
+                aggfunc='mean'
+            )
         
         # Apply model ordering based on models_config.toml (before name abbreviation)
         model_order = load_model_order()
         if model_order:
             # Create ordered list of display names that exist in the data
-            ordered_display_names = [model['display_name'] for model in model_order]
+            if metric_col == 'Relative_MASE':
+                # Exclude Naive for relative MASE since it was removed
+                ordered_display_names = [model['display_name'] for model in model_order if model['display_name'] != 'Naive']
+            else:
+                ordered_display_names = [model['display_name'] for model in model_order]
             # Filter to only include columns that actually exist in the pivot table
             existing_ordered_columns = [col for col in ordered_display_names if col in pivot_data.columns]
             # Add any columns not in the config (shouldn't happen, but safety check)
@@ -1217,32 +1253,66 @@ def create_heatmap_plots():
         # Mask missing values and extreme outliers (999.0)
         mask = (heatmap_data.isna()) | (heatmap_data >= 999.0)
         
-        # Use a color scheme where lower values (better performance) are lighter/cooler
-        # RdYlBu_r gives red for high (bad), yellow for medium, blue for low (good)
-        colormap = 'RdYlBu_r'
-        
-        # Calculate robust color scale limits to handle outliers
-        if not heatmap_data.empty:
-            # Use 90th percentile for upper limit to better handle extreme outliers
-            vmin_val = heatmap_data.min().min()
-            vmax_val = heatmap_data.quantile(0.90).max()  # Changed from 0.95 to 0.90
+        # Color scheme and scaling depends on metric type
+        if metric_col == 'Relative_MASE':
+            # For relative MASE, use diverging colormap centered at 1.0 (equal to naive)
+            # RdBu_r: Red for worse than naive (>1), White near 1, Blue for better than naive (<1)
+            colormap = 'RdBu_r'
             
-            # As a fallback, use median + 3*IQR if 90th percentile is still too extreme
-            q25 = heatmap_data.quantile(0.25).median()
-            q75 = heatmap_data.quantile(0.75).median()
-            iqr = q75 - q25
-            median_val = heatmap_data.median().median()
-            iqr_based_max = median_val + 3 * iqr
-            
-            # Use the more conservative (smaller) of the two approaches
-            vmax_val = min(vmax_val, iqr_based_max)
-            
-            # Ensure we have a reasonable minimum range
-            if vmax_val - vmin_val < 1:
-                vmax_val = vmin_val + 1
+            # Calculate color scale limits centered around 1.0
+            if not heatmap_data.empty:
+                # Get min and max values
+                data_min = heatmap_data.min().min()
+                data_max = heatmap_data.quantile(0.95).max()  # Use 95th percentile to handle outliers
+                
+                # For diverging colormap, we need to ensure 1.0 is at the center
+                # Calculate deviations from 1.0
+                min_deviation = abs(1.0 - data_min)
+                max_deviation = abs(data_max - 1.0)
+                
+                # Use the larger deviation to create symmetric bounds around 1.0
+                max_dev = max(min_deviation, max_deviation)
+                
+                # Cap extreme deviations to keep the scale reasonable
+                max_dev = min(max_dev, 4.0)  # Don't go beyond 4x deviation from 1.0
+                
+                vmin_val = 1.0 - max_dev
+                vmax_val = 1.0 + max_dev
+                
+                # Ensure we don't go below 0 for relative values
+                if vmin_val < 0:
+                    vmin_val = 0.0
+                    vmax_val = 2.0  # Keep 1.0 as center between 0 and 2
+            else:
+                vmin_val = 0.5
+                vmax_val = 1.5
         else:
-            vmin_val = 0
-            vmax_val = 1
+            # Use a color scheme where lower values (better performance) are lighter/cooler
+            # RdYlBu_r gives red for high (bad), yellow for medium, blue for low (good)
+            colormap = 'RdYlBu_r'
+            
+            # Calculate robust color scale limits to handle outliers
+            if not heatmap_data.empty:
+                # Use 90th percentile for upper limit to better handle extreme outliers
+                vmin_val = heatmap_data.min().min()
+                vmax_val = heatmap_data.quantile(0.90).max()  # Changed from 0.95 to 0.90
+                
+                # As a fallback, use median + 3*IQR if 90th percentile is still too extreme
+                q25 = heatmap_data.quantile(0.25).median()
+                q75 = heatmap_data.quantile(0.75).median()
+                iqr = q75 - q25
+                median_val = heatmap_data.median().median()
+                iqr_based_max = median_val + 3 * iqr
+                
+                # Use the more conservative (smaller) of the two approaches
+                vmax_val = min(vmax_val, iqr_based_max)
+                
+                # Ensure we have a reasonable minimum range
+                if vmax_val - vmin_val < 1:
+                    vmax_val = vmin_val + 1
+            else:
+                vmin_val = 0
+                vmax_val = 1
         
         # Identify outliers for special annotation formatting
         outlier_threshold = vmax_val
@@ -1267,6 +1337,14 @@ def create_heatmap_plots():
                 else:
                     annot_data.iloc[i, j] = ""
         
+        # Create colorbar label and title based on metric type
+        if metric_col == 'Relative_MASE':
+            cbar_label = f'{metric_long} (1.0 = Equal to Naive, <1.0 = Better, >1.0 = Worse)'
+            title_subtitle = '(Blue = Better than Naive, White ≈ Equal, Red = Worse than Naive)'
+        else:
+            cbar_label = f'{metric_long} (colors capped at 90th percentile)'
+            title_subtitle = '(Lower values indicate better performance)'
+        
         # Create the heatmap with improved scaling and larger fonts
         sns.heatmap(
             heatmap_data,
@@ -1274,7 +1352,7 @@ def create_heatmap_plots():
             annot=annot_data,
             fmt='',  # Use empty format since we're providing pre-formatted annotations
             cmap=colormap,
-            cbar_kws={'label': f'{metric_long} (colors capped at 90th percentile)', 'shrink': 0.8},
+            cbar_kws={'label': cbar_label, 'shrink': 0.8},
             square=False,
             linewidths=0.5,
             annot_kws={'size': 10, 'weight': 'bold'},  # Increased font size and made bold
@@ -1282,7 +1360,7 @@ def create_heatmap_plots():
             vmax=vmax_val
         )
         
-        plt.title(f'{metric_long} by Dataset and Model\n(Lower values indicate better performance)', 
+        plt.title(f'{metric_long} by Dataset and Model\n{title_subtitle}', 
                  fontsize=20, fontweight='bold', pad=25)
         plt.xlabel('Forecasting Models', fontsize=16, fontweight='bold')
         plt.ylabel('Datasets', fontsize=16, fontweight='bold')
