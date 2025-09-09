@@ -84,29 +84,29 @@ print(f"After filtering zero/negative assets or negative cash: {len(df_cash_clea
 
 df_cash_clean["cash_liquidity"] = df_cash_clean["cash"] / df_cash_clean["assets"]
 
-df = (
+df_bank = (
     df_cash_clean[["rssdid", "date", "cash_liquidity"]]
     .sort_values(by=["rssdid", "date"])
     .reset_index(drop=True)
 )
 
 # Additional validation - drop any remaining infinite or NaN values
-df = df.dropna()
-df = df[~df["cash_liquidity"].isin([float("inf"), float("-inf")])]
-print(f"After basic cleaning: {len(df)}")
+df_bank = df_bank.dropna()
+df_bank = df_bank[~df_bank["cash_liquidity"].isin([float("inf"), float("-inf")])]
+print(f"After basic cleaning: {len(df_bank)}")
 
 # Remove time series with constant values (zero variance) to prevent MASE calculation issues
-df_grouped = df.groupby("rssdid")["cash_liquidity"]
+df_grouped = df_bank.groupby("rssdid")["cash_liquidity"]
 constant_series = df_grouped.std() == 0
 constant_rssdids = constant_series[constant_series].index.tolist()
 print(f"Found {len(constant_rssdids)} constant series, removing them...")
 
-df = df[~df["rssdid"].isin(constant_rssdids)]
-print(f"Final cash liquidity dataset rows: {len(df)}")
+df_bank = df_bank[~df_bank["rssdid"].isin(constant_rssdids)]
+print(f"Final cash liquidity dataset rows: {len(df_bank)}")
 
-df = df.rename(columns={"rssdid": "unique_id", "date": "ds", "cash_liquidity": "y"})
-df.reset_index(drop=True, inplace=True)
-df.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
+df_bank = df_bank.rename(columns={"rssdid": "unique_id", "date": "ds", "cash_liquidity": "y"})
+df_bank.reset_index(drop=True, inplace=True)
+df_bank.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
 # df_wide = df.pivot(index="date", columns="rssdid", values="cash_liquidity")
 # df_wide.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
 
