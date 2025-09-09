@@ -313,15 +313,24 @@ in the foreign currencies overnight repo rate (we use the interest rate).
 We also provide the portfolios constructed in \cite{Lettau2014} and \cite{Menkhoff2012}, as they appear in \cite{He2017}.
 
 \paragraph{Commodity Futures}
-Commodity futures follow the \cite{Yang2013} protocol but the raw quotes now
-come from Bloomberg's futures chain (queried with \texttt{xbbg}) because the
-legacy Commodity Research Bureau feed is no longer maintained.  Following their procedure, but substituting in Bloomberg data, we pull the
-first, second, and third nearby contracts for each of 19 energy, agriculture, livestock, and
-metal futures, restrict the sample to maturities of 1-12 months, roll to the
-next contract just before delivery, compute collateral-adjusted excess returns,
-and drop obvious bad ticks (zero/negative bids, thin series, extreme 0.5\% tail 
-moves).  This Bloomberg-based pipeline mirrors Yang's original CRB procedure
-while leveraging a live, well-documented data source.
+Commodity futures follow the protocol of \cite{Yang2013}, but the raw CRB feed
+is no longer available. Our replication therefore adopts the approach of
+\cite{Koijen2018}, who provide Bloomberg tickers for the Goldman Sachs
+Commodity Index (GSCI) with directly computed monthly returns for 24 commodities.
+These GSCI-based return series constitute the entirety of our dataset, ensuring
+transparency and consistency with a well-documented and externally validated
+source. Because the GSCI returns are directly provided by Bloomberg, no further
+futures-chain construction or interpolation is required in our baseline analysis.
+
+
+\begin{figure}[h!]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/commod_gsci_return.png}
+  \end{tabular}
+  \caption{GSCI Commodity Returns}
+  \label{fig:gsci_commodity_returns}
+\end{figure}
 
 \paragraph{Credit Default Swaps}
 Our CDS data originate from the Markit corporate CDS database available via
@@ -1229,6 +1238,55 @@ where
 \subsubsection{Commodities}
 \label{sec:commodities}
 % Yang (2013) methodology
+The commodity dataset follows \cite{Yang2013}, but in practice we adopt the 
+implementation of \cite{Koijen2018}, who provide Bloomberg tickers for the 
+Goldman Sachs Commodity Index (GSCI). These GSCI indices have become the 
+standard source for replication in commodity asset pricing, as they embed the 
+official methodology for contract selection, roll schedules, and weighting 
+across major futures markets. By relying on these pre-constructed Bloomberg 
+series, we avoid the pitfalls of ad hoc roll choices or inconsistent maturity 
+definitions that can bias commodity return factors.
+
+Our processing of the GSCI data proceeds in several steps. First, we retrieve the 
+designated Bloomberg excess return indices via the \texttt{xbbg} interface and 
+store them as standardized parquet files. Second, we align all series to a 
+monthly frequency by selecting the last observation in each calendar month and 
+computing simple percentage returns. Third, we harmonize naming conventions and 
+drop missing values, ensuring that each commodity return series is complete and 
+comparable across the sample period. Finally, we reshape the wide-format panel 
+into a long-format dataset of identifiers, dates, and returns, enabling seamless 
+integration with the replication of \cite{He2017} factors.
+
+The following figures illustrate the outcome of this replication exercise. 
+Figure~\ref{fig:commod_return_comparison} reports the pairwise correlations between our 
+Bloomberg GSCI-based returns and the corresponding series in \cite{Yang2013}. 
+While many commodities show very high alignment, several pairs exhibit unusually 
+low correlations. We interpret these discrepancies as arising from ticker 
+mismatches: the lists provided by \cite{Koijen2018} and \cite{Yang2013} do not 
+perfectly overlap, and it is unclear which exact subset was ultimately adopted 
+in \cite{He2017}. In other words, low-correlation pairs likely reflect incorrect 
+matches rather than genuine return differences. The accompanying heatmap in 
+Figure~\ref{fig:heatmap_gsci} highlights this heterogeneity visually, with 
+clusters of high-correlation matches alongside a handful of clear mismatches.
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/commod_return_comparison.png} \\[\abovecaptionskip]
+  \end{tabular}
+  \caption{Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
+  \label{fig:commod_return_comparison}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/commod_heatmap.png} \\[\abovecaptionskip]
+  \end{tabular}
+  \caption{Heatmap of Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
+  \label{fig:commod_heatmap}
+\end{figure}
+
 
 \subsubsection{Credit Default Swaps}
 \label{sec:cds}

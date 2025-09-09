@@ -2507,7 +2507,7 @@ ds: min=2002-09-30 00:00:00, max=2022-09-30 00:00:00
 
 ## ftsfr_CDS_bond_basis_non_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet`
-**Size:** 692289 bytes | **Type:** Parquet | **Shape:** 85,053 rows × 3 columns
+**Size:** 759958 bytes | **Type:** Parquet | **Shape:** 91,742 rows × 3 columns
 
 ### Columns
 ```
@@ -2518,7 +2518,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-99.83806147690046, max=99.84502978149779, mean=2.24, median=3.0997572925498686
+y: min=-99.98623956278941, max=99.84502978149779, mean=2.32, median=3.127317613581347
 ```
 
 ### Date/Datetime Column Statistics
@@ -2530,7 +2530,7 @@ ds: min=2002-09-30 00:00:00, max=2022-09-30 00:00:00
 
 ## ftsfr_CDS_contract_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_returns/ftsfr_CDS_contract_returns.parquet`
-**Size:** 1.6 MB | **Type:** Parquet | **Shape:** 191,767 rows × 4 columns
+**Size:** 1.7 MB | **Type:** Parquet | **Shape:** 201,830 rows × 4 columns
 
 ### Columns
 ```
@@ -2542,8 +2542,8 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-y: min=-1.805303277625713, max=1.2258522666583378, mean=0.00, median=0.0016977127627173516
-__index_level_0__: min=0, max=657740, mean=329724.44, median=330858.0
+y: min=-1.805303277625713, max=1.2258522666583378, mean=0.00, median=0.0016596077365234052
+__index_level_0__: min=0, max=657848, mean=330612.87, median=331160.0
 ```
 
 ### Date/Datetime Column Statistics
@@ -2650,7 +2650,7 @@ ds: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ## ftsfr_corp_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_returns.parquet`
-**Size:** 7.8 MB | **Type:** Parquet | **Shape:** 1,021,668 rows × 3 columns
+**Size:** 8.0 MB | **Type:** Parquet | **Shape:** 1,046,059 rows × 3 columns
 
 ### Columns
 ```
@@ -2661,7 +2661,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.9753107633155358, max=3.68351, mean=0.00, median=0.0033425506488945498
+y: min=-0.9753107633155358, max=3.68351, mean=0.00, median=0.0033377041526085
 ```
 
 ### Date/Datetime Column Statistics
@@ -2861,7 +2861,7 @@ ds: min=1963-07-01 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_nyu_call_report_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_cash_liquidity.parquet`
-**Size:** 13.8 MB | **Type:** Parquet | **Shape:** 1,897,498 rows × 3 columns
+**Size:** 13.9 MB | **Type:** Parquet | **Shape:** 1,906,765 rows × 3 columns
 
 ### Columns
 ```
@@ -2872,7 +2872,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=0.0, max=1.0230938416422288, mean=0.08, median=0.05776173285198556
+y: min=0.0, max=1.0230938416422288, mean=0.08, median=0.05780420579828501
 ```
 
 ### Date/Datetime Column Statistics
@@ -2884,7 +2884,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet`
-**Size:** 6.0 MB | **Type:** Parquet | **Shape:** 822,060 rows × 3 columns
+**Size:** 6.1 MB | **Type:** Parquet | **Shape:** 832,902 rows × 3 columns
 
 ### Columns
 ```
@@ -2895,7 +2895,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=0.0, max=0.9987931814753357, mean=0.07, median=0.05163724901432782
+y: min=0.0, max=0.9987931814753357, mean=0.07, median=0.05177395811931505
 ```
 
 ### Date/Datetime Column Statistics
@@ -2907,7 +2907,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_holding_company_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet`
-**Size:** 5.9 MB | **Type:** Parquet | **Shape:** 820,994 rows × 3 columns
+**Size:** 6.0 MB | **Type:** Parquet | **Shape:** 831,858 rows × 3 columns
 
 ### Columns
 ```
@@ -2918,7 +2918,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=1.0, max=14698.6, mean=11.59, median=10.977172663392402
+y: min=1.0, max=14698.6, mean=11.62, median=10.981269862683128
 ```
 
 ### Date/Datetime Column Statistics
@@ -2930,7 +2930,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_nyu_call_report_leverage.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_leverage.parquet`
-**Size:** 13.3 MB | **Type:** Parquet | **Shape:** 1,841,219 rows × 3 columns
+**Size:** 13.4 MB | **Type:** Parquet | **Shape:** 1,849,957 rows × 3 columns
 
 ### Columns
 ```
@@ -2941,7 +2941,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=1.0, max=21336.0, mean=11.71, median=11.123089983022071
+y: min=0.952712100139082, max=36527.066666666666, mean=11.86, median=11.121173104434908
 ```
 
 ### Date/Datetime Column Statistics
@@ -3022,7 +3022,7 @@ ds: min=1970-01-31 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_treas_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_bond_returns.parquet`
-**Size:** 910878 bytes | **Type:** Parquet | **Shape:** 120,746 rows × 3 columns
+**Size:** 913924 bytes | **Type:** Parquet | **Shape:** 121,123 rows × 3 columns
 
 ### Columns
 ```
@@ -3033,8 +3033,8 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-unique_id: min=200711.0, max=208259.0, mean=204517.53, median=204052.0
-y: min=-0.15135394584216577, max=0.1751899693786838, mean=0.00, median=0.003010643901150689
+unique_id: min=200636.0, max=208417.0, mean=204526.79, median=204053.0
+y: min=-0.15135394584216577, max=0.1751899693786838, mean=0.00, median=0.0030176055730861684
 ```
 
 ### Date/Datetime Column Statistics
@@ -3046,21 +3046,19 @@ ds: min=1970-01-31 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_CRSP_monthly_stock_ret.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_ret.parquet`
-**Size:** 19.4 MB | **Type:** Parquet | **Shape:** 3,804,080 rows × 4 columns
+**Size:** 15.7 MB | **Type:** Parquet | **Shape:** 3,810,519 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                Int64          
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-unique_id: min=10000, max=93436, mean=49673.06, median=48207.0
+unique_id: min=10000, max=93436, mean=49672.81, median=48195.0
 y: min=-1.0, max=26.583827, mean=0.01, median=0.0
-__index_level_0__: min=0, max=3826456, mean=1913203.42, median=1912777.5
 ```
 
 ### Date/Datetime Column Statistics
@@ -3072,21 +3070,19 @@ ds: min=1926-01-30 00:00:00, max=2024-12-31 00:00:00
 
 ## ftsfr_CRSP_monthly_stock_retx.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_retx.parquet`
-**Size:** 18.1 MB | **Type:** Parquet | **Shape:** 3,804,080 rows × 4 columns
+**Size:** 14.4 MB | **Type:** Parquet | **Shape:** 3,810,519 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                Int64          
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-unique_id: min=10000, max=93436, mean=49673.06, median=48207.0
+unique_id: min=10000, max=93436, mean=49672.81, median=48195.0
 y: min=-1.0, max=26.583827, mean=0.01, median=0.0
-__index_level_0__: min=0, max=3826456, mean=1913203.42, median=1912777.5
 ```
 
 ### Date/Datetime Column Statistics
@@ -6303,21 +6299,19 @@ date: min=1926-07-31 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_CRSP_monthly_stock_ret.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_ret.parquet`
-**Size:** 37.3 MB | **Type:** Parquet | **Shape:** 3,810,519 rows × 4 columns
+**Size:** 21.7 MB | **Type:** Parquet | **Shape:** 3,810,519 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                Int64          
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
 unique_id: min=10000, max=93436, mean=49672.81, median=48195.0
 y: min=-1.0, max=26.583827, mean=0.01, median=0.0
-__index_level_0__: min=0, max=3826456, mean=1913243.22, median=1912631.0
 ```
 
 ### Date/Datetime Column Statistics
@@ -6329,21 +6323,19 @@ ds: min=1926-01-30 00:00:00, max=2024-12-31 00:00:00
 
 ## ftsfr_CRSP_monthly_stock_retx.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_retx.parquet`
-**Size:** 34.0 MB | **Type:** Parquet | **Shape:** 3,810,519 rows × 4 columns
+**Size:** 18.4 MB | **Type:** Parquet | **Shape:** 3,810,519 rows × 3 columns
 
 ### Columns
 ```
 unique_id                                Int64          
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
-__index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
 unique_id: min=10000, max=93436, mean=49672.81, median=48195.0
 y: min=-1.0, max=26.583827, mean=0.01, median=0.0
-__index_level_0__: min=0, max=3826456, mean=1913243.22, median=1912631.0
 ```
 
 ### Date/Datetime Column Statistics
