@@ -242,29 +242,55 @@ def standardize_data_cleaning(data, fill_strategy="forward_only"):
 
 
 def filter_series_for_forecasting(data, forecast_horizon, seasonality, min_buffer=6):
-    """Apply consistent series filtering for all models."""
+    """Apply consistent series filtering for all models with protection for small datasets."""
     series_lengths = (
         data.group_by("unique_id")
         .agg(pl.len().alias("n"))
     )
     
-    # Calculate minimum required length for fair comparison
-    # Need enough for: seasonality calculation + forecast horizon + buffer
-    min_required_length = max(seasonality + 1, forecast_horizon + min_buffer, 24)
+    original_count = len(data["unique_id"].unique())
+    
+    # For very small datasets (≤ 10 entities), skip filtering entirely
+    if original_count <= 10:
+        print(f"  Very small dataset detected ({original_count} entities), skipping filtering to preserve all data...")
+        # Return all data without filtering
+        final_count = original_count
+        return data, original_count, final_count, 0
+    else:
+        # Calculate adaptive minimum length based on data characteristics
+        # For monthly data with no seasonality (seasonality=1), be more lenient
+        if seasonality <= 1:
+            # Monthly returns data - use lighter minimum requirements
+            base_min = max(forecast_horizon + min_buffer, 18)
+        else:
+            # Data with seasonality - need more observations
+            base_min = max(seasonality + 1, forecast_horizon + min_buffer)
+        
+        # Cap at reasonable maximum, but be more flexible than before
+        min_required_length = max(base_min, 18)  # Reduced from 24 to 18
     
     valid_series = series_lengths.filter(pl.col("n") >= min_required_length).get_column("unique_id")
     
+    # Enhanced fallback logic
     if len(valid_series) == 0:
-        # Fallback to minimal requirements
+        print(f"  No series meet minimum length {min_required_length}, applying fallback...")
+        # First fallback: more lenient requirements
         min_required_length = max(forecast_horizon + 2, 12)
         valid_series = series_lengths.filter(pl.col("n") >= min_required_length).get_column("unique_id")
         
         if len(valid_series) == 0:
+            # No small dataset case here since they're handled earlier
             raise ValueError("No series meet the minimum length requirement for forecasting")
     
-    original_count = len(data["unique_id"].unique())
     filtered_data = data.filter(pl.col("unique_id").is_in(valid_series.to_list()))
     final_count = len(filtered_data["unique_id"].unique())
+    
+    # Log filtering results
+    removed_count = original_count - final_count
+    if removed_count > 0:
+        removal_pct = (removed_count / original_count) * 100
+        print(f"  Filtered: {original_count} → {final_count} entities ({removed_count} removed, {removal_pct:.1f}%)")
+        print(f"  Minimum length requirement: {min_required_length}")
     
     return filtered_data, original_count, final_count, min_required_length
 
@@ -294,15 +320,35 @@ def load_and_preprocess_data(data_path, frequency="D", test_split=0.2, seasonali
         .alias("y")
     )
 
+    # Calculate forecast horizon based on ORIGINAL entity lengths before fill_gaps
+    # This prevents fill_gaps from artificially inflating entity lengths
+    original_entity_lengths = df.group_by("unique_id").agg(pl.len().alias("length"))
+    median_entity_length = original_entity_lengths["length"].median()
+    
     # Fill date grid: avoid padding leading nulls (start='per_serie'); keep aligned tail
     polars_freq = convert_frequency_to_statsforecast(frequency)
     df = fill_gaps(df, freq=polars_freq, start="per_serie", end="global")
-
-    # Train/test split on global timeline
-    unique_dates = df["ds"].unique().sort()
-    split_idx = int(len(unique_dates) * (1 - test_split))
-    train_cutoff = unique_dates[split_idx - 1]
-    forecast_horizon = len(unique_dates) - split_idx
+    
+    # Use entity-based forecast horizon calculation
+    if median_entity_length < 100:  # Short-lived entities (< 100 observations)
+        # Use a reasonable fraction of median entity length for forecast horizon
+        forecast_horizon = max(int(median_entity_length * test_split), 6)
+        print(f"Using entity-based forecast horizon: {forecast_horizon} (median entity length: {int(median_entity_length)})")
+    else:
+        # For long series, use global timeline approach
+        unique_dates = df["ds"].unique().sort()
+        split_idx = int(len(unique_dates) * (1 - test_split))
+        train_cutoff = unique_dates[split_idx - 1]
+        forecast_horizon = len(unique_dates) - split_idx
+        print(f"Using global forecast horizon: {forecast_horizon}")
+    
+    # For entity-based approach, we still need a train_cutoff for data splitting
+    if median_entity_length < 100:
+        # Use a more recent cutoff based on the last portion of data
+        unique_dates = df["ds"].unique().sort()
+        # Take the last portion for testing, but cap it reasonably
+        test_dates_count = min(forecast_horizon, len(unique_dates) // 5)  # Max 20% of global dates
+        train_cutoff = unique_dates[len(unique_dates) - test_dates_count - 1]
 
     train_data = df.filter(pl.col("ds") <= train_cutoff)
     test_data = df.filter(pl.col("ds") > train_cutoff)

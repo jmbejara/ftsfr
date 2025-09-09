@@ -117,15 +117,35 @@ def apply_forecasting_preprocessing(df, frequency, seasonality, test_split=0.2):
         .alias("y")
     )
 
+    # Calculate forecast horizon based on ORIGINAL entity lengths before fill_gaps
+    # This prevents fill_gaps from artificially inflating entity lengths
+    original_entity_lengths = df.group_by("unique_id").agg(pl.len().alias("length"))
+    median_entity_length = original_entity_lengths["length"].median()
+    
     # Fill date grid: avoid padding leading nulls (start='per_serie'); keep aligned tail
     polars_freq = convert_frequency_to_statsforecast(frequency)
     df = fill_gaps(df, freq=polars_freq, start="per_serie", end="global")
-
-    # Train/test split on global timeline
-    unique_dates = df["ds"].unique().sort()
-    split_idx = int(len(unique_dates) * (1 - test_split))
-    train_cutoff = unique_dates[split_idx - 1]
-    forecast_horizon = len(unique_dates) - split_idx
+    
+    # Use entity-based forecast horizon calculation
+    if median_entity_length < 100:  # Short-lived entities (< 100 observations)
+        # Use a reasonable fraction of median entity length for forecast horizon
+        forecast_horizon = max(int(median_entity_length * test_split), 6)
+        print(f"  Using entity-based forecast horizon: {forecast_horizon} (median entity length: {int(median_entity_length)})")
+    else:
+        # For long series, use global timeline approach
+        unique_dates = df["ds"].unique().sort()
+        split_idx = int(len(unique_dates) * (1 - test_split))
+        train_cutoff = unique_dates[split_idx - 1]
+        forecast_horizon = len(unique_dates) - split_idx
+        print(f"  Using global forecast horizon: {forecast_horizon}")
+    
+    # For entity-based approach, we still need a train_cutoff for data splitting
+    if median_entity_length < 100:
+        # Use a more recent cutoff based on the last portion of data
+        unique_dates = df["ds"].unique().sort()
+        # Take the last portion for testing, but cap it reasonably
+        test_dates_count = min(forecast_horizon, len(unique_dates) // 5)  # Max 20% of global dates
+        train_cutoff = unique_dates[len(unique_dates) - test_dates_count - 1]
 
     train_data = df.filter(pl.col("ds") <= train_cutoff)
     test_data = df.filter(pl.col("ds") > train_cutoff)
