@@ -6,6 +6,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import pandas as pd
 import numpy as np
 import tomli
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import seaborn as sns
 
 from settings import config
 
@@ -91,6 +94,34 @@ def load_model_table_names():
     
     print(f"Loaded {len(name_mapping)} model table names")
     return name_mapping
+
+def load_model_order():
+    """Load ordered list of model names from models_config.toml to preserve column order"""
+    models_config_path = Path(__file__).parent.parent / "forecasting" / "models_config.toml"
+    
+    if not models_config_path.exists():
+        print(f"Warning: models_config.toml not found at {models_config_path}")
+        return []
+    
+    with open(models_config_path, 'rb') as f:
+        models_config = tomli.load(f)
+    
+    # Get ordered list of models as they appear in the config file
+    ordered_models = []
+    
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get('display_name', model_key)
+            # Also get table_name for potential use
+            table_name = model_config.get('table_name', display_name)
+            ordered_models.append({
+                'key': model_key,
+                'display_name': display_name,
+                'table_name': table_name
+            })
+    
+    print(f"Loaded model order with {len(ordered_models)} models from config")
+    return ordered_models
 
 def filter_quality_results(results_df):
     """Filter out results with quality issues (NaN values or zero error metrics)"""
@@ -399,11 +430,22 @@ def create_mase_pivot_table():
     
     print(f"Created pivot table with {len(mase_pivot)} datasets and {len(mase_pivot.columns)} models")
     
+    # Apply model ordering based on models_config.toml
+    model_order = load_model_order()
+    if model_order:
+        # Create ordered list of display names that exist in the data
+        ordered_display_names = [model['display_name'] for model in model_order]
+        # Filter to only include columns that actually exist in the pivot table
+        existing_ordered_columns = [col for col in ordered_display_names if col in mase_pivot.columns]
+        # Add any columns not in the config (shouldn't happen, but safety check)
+        remaining_columns = [col for col in mase_pivot.columns if col not in existing_ordered_columns]
+        final_column_order = existing_ordered_columns + remaining_columns
+        # Reorder the columns
+        mase_pivot = mase_pivot.reindex(columns=final_column_order)
+        print(f"Reordered model columns according to models_config.toml")
+    
     # Sort datasets alphabetically for consistent output
     mase_pivot = mase_pivot.sort_index()
-    
-    # Sort models alphabetically for consistent output
-    mase_pivot = mase_pivot.reindex(sorted(mase_pivot.columns), axis=1)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "mase_pivot_table.csv"
@@ -491,11 +533,22 @@ def create_rmse_pivot_table():
     
     print(f"Created pivot table with {len(rmse_pivot)} datasets and {len(rmse_pivot.columns)} models")
     
+    # Apply model ordering based on models_config.toml
+    model_order = load_model_order()
+    if model_order:
+        # Create ordered list of display names that exist in the data
+        ordered_display_names = [model['display_name'] for model in model_order]
+        # Filter to only include columns that actually exist in the pivot table
+        existing_ordered_columns = [col for col in ordered_display_names if col in rmse_pivot.columns]
+        # Add any columns not in the config (shouldn't happen, but safety check)
+        remaining_columns = [col for col in rmse_pivot.columns if col not in existing_ordered_columns]
+        final_column_order = existing_ordered_columns + remaining_columns
+        # Reorder the columns
+        rmse_pivot = rmse_pivot.reindex(columns=final_column_order)
+        print(f"Reordered model columns according to models_config.toml")
+    
     # Sort datasets alphabetically for consistent output
     rmse_pivot = rmse_pivot.sort_index()
-    
-    # Sort models alphabetically for consistent output
-    rmse_pivot = rmse_pivot.reindex(sorted(rmse_pivot.columns), axis=1)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "rmse_pivot_table.csv"
@@ -582,11 +635,22 @@ def create_smape_pivot_table():
     
     print(f"Created pivot table with {len(smape_pivot)} datasets and {len(smape_pivot.columns)} models")
     
+    # Apply model ordering based on models_config.toml
+    model_order = load_model_order()
+    if model_order:
+        # Create ordered list of display names that exist in the data
+        ordered_display_names = [model['display_name'] for model in model_order]
+        # Filter to only include columns that actually exist in the pivot table
+        existing_ordered_columns = [col for col in ordered_display_names if col in smape_pivot.columns]
+        # Add any columns not in the config (shouldn't happen, but safety check)
+        remaining_columns = [col for col in smape_pivot.columns if col not in existing_ordered_columns]
+        final_column_order = existing_ordered_columns + remaining_columns
+        # Reorder the columns
+        smape_pivot = smape_pivot.reindex(columns=final_column_order)
+        print(f"Reordered model columns according to models_config.toml")
+    
     # Sort datasets alphabetically for consistent output
     smape_pivot = smape_pivot.sort_index()
-    
-    # Sort models alphabetically for consistent output
-    smape_pivot = smape_pivot.reindex(sorted(smape_pivot.columns), axis=1)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "smape_pivot_table.csv"
@@ -656,11 +720,22 @@ def create_mae_pivot_table():
     
     print(f"Created pivot table with {len(mae_pivot)} datasets and {len(mae_pivot.columns)} models")
     
+    # Apply model ordering based on models_config.toml
+    model_order = load_model_order()
+    if model_order:
+        # Create ordered list of display names that exist in the data
+        ordered_display_names = [model['display_name'] for model in model_order]
+        # Filter to only include columns that actually exist in the pivot table
+        existing_ordered_columns = [col for col in ordered_display_names if col in mae_pivot.columns]
+        # Add any columns not in the config (shouldn't happen, but safety check)
+        remaining_columns = [col for col in mae_pivot.columns if col not in existing_ordered_columns]
+        final_column_order = existing_ordered_columns + remaining_columns
+        # Reorder the columns
+        mae_pivot = mae_pivot.reindex(columns=final_column_order)
+        print(f"Reordered model columns according to models_config.toml")
+    
     # Sort datasets alphabetically for consistent output
     mae_pivot = mae_pivot.sort_index()
-    
-    # Sort models alphabetically for consistent output
-    mae_pivot = mae_pivot.reindex(sorted(mae_pivot.columns), axis=1)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "mae_pivot_table.csv"
@@ -698,7 +773,23 @@ def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
     
     # Handle missing values by replacing NaN with --
     df_formatted = df.copy()
+    df_original = df.copy()  # Keep original for comparison
     df_formatted = df_formatted.fillna('--')
+    
+    # Identify best performing models for each dataset (before formatting)
+    best_models = {}
+    for dataset in df_original.index:
+        # Get numeric values only (exclude NaN values)  
+        row_values = df_original.loc[dataset]
+        numeric_values = pd.to_numeric(row_values, errors='coerce')
+        
+        if not numeric_values.isna().all():  # If we have any valid numbers
+            min_value = numeric_values.min()
+            # Find which model(s) achieved this minimum (handle ties)
+            best_model_cols = numeric_values[numeric_values == min_value].index.tolist()
+            best_models[dataset] = best_model_cols
+        else:
+            best_models[dataset] = []  # No valid values, no bolding
     
     # Format numbers to 2 decimal places (except for -- values)
     for col in df_formatted.columns:
@@ -778,7 +869,20 @@ def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
         # Add datasets in this group
         for dataset in datasets:
             table_name = dataset_table_names[dataset].replace('_', '\\_')
-            row_data = " & ".join([str(df_formatted.loc[dataset, col]) for col in df_formatted.columns])
+            
+            # Create row data with bold formatting for best performers
+            row_data_formatted = []
+            original_cols = list(df_original.columns)  # Use original column names for comparison
+            
+            for i, col in enumerate(df_formatted.columns):
+                value_str = str(df_formatted.loc[dataset, col])
+                # Check if this model was best for this dataset (using original column names)
+                original_col = original_cols[i] if i < len(original_cols) else col
+                if original_col in best_models.get(dataset, []):
+                    value_str = f"\\textbf{{{value_str}}}"
+                row_data_formatted.append(value_str)
+            
+            row_data = " & ".join(row_data_formatted)
             tabular_content += f"{table_name} & {row_data} \\\\\n"
         
         first_group = False
@@ -827,6 +931,200 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
 """
     
     return latex_formatted
+
+def create_heatmap_plots():
+    """Create heatmap plots for all error metrics using the same data structure as tables"""
+    
+    print("\nCreating heatmap plots for error metrics...")
+    
+    # Read the assembled results
+    results_file = FORECAST2_DIR / "results_all.csv"
+    if not results_file.exists():
+        print(f"Error: Results file not found at {results_file}")
+        return
+    
+    results = pd.read_csv(results_file)
+    print(f"Loaded {len(results)} result rows for heatmap generation")
+    
+    # Load dataset groups and names for sectioning
+    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
+    results['Dataset_Short'] = results['Dataset'].map(dataset_table_names).fillna(results['Dataset'])
+    
+    # Load model table names for abbreviations
+    model_names = load_model_table_names()
+    results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
+    
+    # Apply quality filtering
+    results = filter_quality_results(results)
+    
+    # Define error metrics to create heatmaps for
+    error_metrics = [
+        ('Global_MASE', 'MASE', 'mase_heatmap.png', 'Mean Absolute Scaled Error (MASE)'),
+        ('Global_RMSE', 'RMSE', 'rmse_heatmap.png', 'Root Mean Square Error (RMSE)'),
+        ('Global_sMAPE', 'sMAPE', 'smape_heatmap.png', 'Symmetric Mean Absolute Percentage Error (sMAPE)'),
+        ('Global_MAE', 'MAE', 'mae_heatmap.png', 'Mean Absolute Error (MAE)')
+    ]
+    
+    for metric_col, metric_short, filename, metric_long in error_metrics:
+        if metric_col not in results.columns:
+            print(f"Skipping {metric_short} heatmap - column {metric_col} not found")
+            continue
+            
+        print(f"Creating {metric_short} heatmap...")
+        
+        # Create pivot table (same structure as LaTeX tables)
+        pivot_data = results.pivot_table(
+            index='Dataset_Short',
+            columns='Model',
+            values=metric_col,
+            aggfunc='mean'
+        )
+        
+        # Apply model ordering based on models_config.toml (before name abbreviation)
+        model_order = load_model_order()
+        if model_order:
+            # Create ordered list of display names that exist in the data
+            ordered_display_names = [model['display_name'] for model in model_order]
+            # Filter to only include columns that actually exist in the pivot table
+            existing_ordered_columns = [col for col in ordered_display_names if col in pivot_data.columns]
+            # Add any columns not in the config (shouldn't happen, but safety check)
+            remaining_columns = [col for col in pivot_data.columns if col not in existing_ordered_columns]
+            final_column_order = existing_ordered_columns + remaining_columns
+            # Reorder the columns
+            pivot_data = pivot_data.reindex(columns=final_column_order)
+        
+        # Apply model name abbreviations
+        new_columns = []
+        for col in pivot_data.columns:
+            if col in model_names:
+                new_columns.append(model_names[col])
+            else:
+                new_columns.append(col)
+        pivot_data.columns = new_columns
+        
+        # Create the heatmap
+        plt.figure(figsize=(14, 10))
+        
+        # Prepare data for heatmap (handle missing values)
+        heatmap_data = pivot_data.copy()
+        
+        # Mask missing values and extreme outliers (999.0)
+        mask = (heatmap_data.isna()) | (heatmap_data >= 999.0)
+        
+        # Use a color scheme where lower values (better performance) are lighter/cooler
+        # RdYlBu_r gives red for high (bad), yellow for medium, blue for low (good)
+        colormap = 'RdYlBu_r'
+        
+        # Calculate robust color scale limits to handle outliers
+        if not heatmap_data.empty:
+            # Use 90th percentile for upper limit to better handle extreme outliers
+            vmin_val = heatmap_data.min().min()
+            vmax_val = heatmap_data.quantile(0.90).max()  # Changed from 0.95 to 0.90
+            
+            # As a fallback, use median + 3*IQR if 90th percentile is still too extreme
+            q25 = heatmap_data.quantile(0.25).median()
+            q75 = heatmap_data.quantile(0.75).median()
+            iqr = q75 - q25
+            median_val = heatmap_data.median().median()
+            iqr_based_max = median_val + 3 * iqr
+            
+            # Use the more conservative (smaller) of the two approaches
+            vmax_val = min(vmax_val, iqr_based_max)
+            
+            # Ensure we have a reasonable minimum range
+            if vmax_val - vmin_val < 1:
+                vmax_val = vmin_val + 1
+        else:
+            vmin_val = 0
+            vmax_val = 1
+        
+        # Identify outliers for special annotation formatting
+        outlier_threshold = vmax_val
+        
+        # Create custom annotations with special formatting for outliers
+        annot_data = heatmap_data.copy()
+        for i in range(len(heatmap_data.index)):
+            for j in range(len(heatmap_data.columns)):
+                if not mask.iloc[i, j]:  # Only process non-masked values
+                    val = heatmap_data.iloc[i, j]
+                    if pd.notna(val):
+                        if val > outlier_threshold:
+                            # Format outliers differently - keep precision but mark them
+                            annot_data.iloc[i, j] = f"{val:.1f}*"
+                        else:
+                            # Normal formatting for non-outliers
+                            annot_data.iloc[i, j] = f"{val:.2f}"
+        
+        # Create the heatmap with improved scaling
+        sns.heatmap(
+            heatmap_data,
+            mask=mask,
+            annot=annot_data,
+            fmt='',  # Use empty format since we're providing pre-formatted annotations
+            cmap=colormap,
+            cbar_kws={'label': f'{metric_long} (colors capped at 90th percentile)'},
+            square=False,
+            linewidths=0.5,
+            annot_kws={'size': 8},
+            vmin=vmin_val,
+            vmax=vmax_val
+        )
+        
+        plt.title(f'{metric_long} by Dataset and Model\n(Lower values indicate better performance)', 
+                 fontsize=16, fontweight='bold', pad=20)
+        plt.xlabel('Forecasting Models', fontsize=12, fontweight='bold')
+        plt.ylabel('Datasets', fontsize=12, fontweight='bold')
+        
+        # Rotate x-axis labels for better readability
+        plt.xticks(rotation=45, ha='right')
+        plt.yticks(rotation=0)
+        
+        # Add dataset group separators (visual sections)
+        ax = plt.gca()
+        
+        # Group datasets by their categories for visual separation
+        dataset_indices = {}
+        for i, dataset in enumerate(pivot_data.index):
+            # Find the group for this dataset
+            original_dataset = None
+            for orig_name, table_name in dataset_table_names.items():
+                if table_name == dataset:
+                    original_dataset = orig_name
+                    break
+            
+            if original_dataset and original_dataset in dataset_groups:
+                group = dataset_groups[original_dataset]
+                if group not in dataset_indices:
+                    dataset_indices[group] = []
+                dataset_indices[group].append(i)
+        
+        # Add horizontal lines to separate groups
+        y_positions = []
+        prev_end = 0
+        for group in ['basis_spreads', 'returns_portfolios', 'returns_disaggregated', 'other']:
+            if group in dataset_indices:
+                group_indices = sorted(dataset_indices[group])
+                if group_indices:
+                    start_idx = min(group_indices)
+                    end_idx = max(group_indices) + 1
+                    if start_idx > prev_end:
+                        y_positions.append(start_idx)
+                    prev_end = end_idx
+        
+        # Draw separator lines
+        for y_pos in y_positions[1:]:  # Skip first line (top border)
+            ax.axhline(y=y_pos, color='black', linewidth=2, alpha=0.8)
+        
+        plt.tight_layout()
+        
+        # Save the heatmap
+        output_file = FORECAST2_DIR / filename
+        plt.savefig(output_file, dpi=300, bbox_inches='tight', facecolor='white')
+        print(f"Saved heatmap to: {output_file}")
+        
+        plt.close()  # Close the figure to free memory
+    
+    print("Heatmap creation completed!")
 
 def create_summary_statistics():
     """Create summary statistics table"""
@@ -960,6 +1258,9 @@ if __name__ == "__main__":
     
     # Create SLURM job summary if applicable
     slurm_summary = create_slurm_job_summary()
+    
+    # Create heatmap plots for all error metrics
+    create_heatmap_plots()
     
     print("\nResults table creation completed!")
     print("\nFiles created:")

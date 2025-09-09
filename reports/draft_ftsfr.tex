@@ -594,9 +594,27 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 
 \input{../_output/forecasting2/mase_pivot_table.tex}
 
+Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE results from Table~\ref{tab:mase_results}. The color-coded heatmap makes it easy to identify patterns in model performance across different dataset types, with cooler colors (blues) indicating better performance and warmer colors (reds) indicating poorer performance.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../_output/forecasting2/mase_heatmap.png}
+\caption{MASE Results Heatmap by Dataset and Model. Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.}
+\label{fig:mase_heatmap}
+\end{figure}
+
 Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the same organization. While MASE provides scale-free comparisons, RMSE offers insights into the actual magnitude of forecasting errors, which can be particularly relevant for risk management applications.
 
 \input{../_output/forecasting2/rmse_pivot_table.tex}
+
+Figure~\ref{fig:rmse_heatmap} visualizes the RMSE results, complementing the numerical table with a clear color-coded representation of relative model performance across all datasets.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../_output/forecasting2/rmse_heatmap.png}
+\caption{RMSE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile to highlight performance differences across the majority of datasets, with extreme outliers marked with asterisks (*). The visualization reveals models that consistently perform well and datasets that pose particular forecasting challenges.}
+\label{fig:rmse_heatmap}
+\end{figure}
 
 \subsection{Results by Asset Class}
 % Detailed analysis for each asset class
@@ -1330,11 +1348,29 @@ Table~\ref{tab:smape_results} presents sMAPE results across all model-dataset co
 
 \input{../_output/forecasting2/smape_pivot_table.tex}
 
+Figure~\ref{fig:smape_heatmap} provides the corresponding visual representation of sMAPE results, making it easier to identify performance patterns and model consistency across different datasets.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../_output/forecasting2/smape_heatmap.png}
+\caption{sMAPE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile with extreme outliers marked by asterisks (*). The heatmap reveals percentage-based performance patterns, with cooler colors indicating better forecasting accuracy.}
+\label{fig:smape_heatmap}
+\end{figure}
+
 \subsubsection{Mean Absolute Error (MAE)}
 
 Table~\ref{tab:mae_results} shows MAE results for all combinations. MAE measures the average magnitude of errors in the original units, providing a straightforward interpretation of forecasting accuracy in terms of the actual data scale.
 
 \input{../_output/forecasting2/mae_pivot_table.tex}
+
+Figure~\ref{fig:mae_heatmap} visualizes the MAE results, complementing the numerical table with clear visual patterns of absolute error magnitudes across all model-dataset combinations.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../_output/forecasting2/mae_heatmap.png}
+\caption{MAE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile with extreme values marked by asterisks (*). This visualization shows absolute error patterns in original data units, highlighting both model performance and relative dataset difficulty.}
+\label{fig:mae_heatmap}
+\end{figure}
 
 \section{Recyling Bin}
 % Temporary holding area for text that might not make it into the main text

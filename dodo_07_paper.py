@@ -134,11 +134,17 @@ def task_create_results_tables():
             # Summary statistics
             OUTPUT_DIR / "forecasting2" / "model_summary_statistics.csv",
             OUTPUT_DIR / "forecasting2" / "model_summary_statistics.tex",
+            # Heatmap plots
+            OUTPUT_DIR / "forecasting2" / "mase_heatmap.png",
+            OUTPUT_DIR / "forecasting2" / "rmse_heatmap.png",
+            OUTPUT_DIR / "forecasting2" / "smape_heatmap.png",
+            OUTPUT_DIR / "forecasting2" / "mae_heatmap.png",
         ],
         "file_dep": [
             # "./src/assemble_results2.py",
             "./src/create_results_tables2.py",
             OUTPUT_DIR / "forecasting2" / "results_all.csv",
+            "./forecasting/models_config.toml",  # Add dependency on models config for column ordering
         ],
         "clean": True,
     }
@@ -164,6 +170,11 @@ def task_compile_latex_docs():
             OUTPUT_DIR / "forecasting2" / "smape_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "mae_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "model_summary_statistics.tex",
+            # Heatmap plot dependencies
+            OUTPUT_DIR / "forecasting2" / "mase_heatmap.png",
+            OUTPUT_DIR / "forecasting2" / "rmse_heatmap.png",
+            OUTPUT_DIR / "forecasting2" / "smape_heatmap.png",
+            OUTPUT_DIR / "forecasting2" / "mae_heatmap.png",
         ],
         "clean": True,
     }
