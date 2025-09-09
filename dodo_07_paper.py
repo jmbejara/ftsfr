@@ -104,6 +104,37 @@ def check_forecast_results():
 #     }
 
 
+def task_create_dataset_statistics():
+    """Create dataset statistics table from active datasets in datasets.toml"""
+    import glob
+    
+    # Get all parquet files that could be dataset files
+    dataset_parquet_files = glob.glob(
+        str(DATA_DIR / "**" / "ftsfr_*.parquet"),
+        recursive=True,
+    )
+    
+    return {
+        "actions": [
+            "python ./src/create_dataset_statistics.py",
+        ],
+        "targets": [
+            # Dataset statistics table files
+            Path("./docs_src") / "dataset_statistics.csv",
+            Path("./docs_src") / "dataset_statistics.tex",
+            OUTPUT_DIR / "forecasting2" / "dataset_statistics.csv",
+            OUTPUT_DIR / "forecasting2" / "dataset_statistics.tex",
+        ],
+        "file_dep": [
+            "./src/create_dataset_statistics.py",
+            "./datasets.toml",  # Primary dependency - drives which datasets to include
+            "./models/cutoff_calc.py",  # For cutoff date calculations
+            *dataset_parquet_files,  # Secondary dependencies - actual data files
+        ],
+        "clean": True,
+    }
+
+
 def task_create_results_tables():
     """Create analytical tables from assembled results using forecasting2 system"""
     return {
@@ -150,6 +181,7 @@ def task_create_results_tables():
             "./src/create_results_tables2.py",
             OUTPUT_DIR / "forecasting2" / "results_all.csv",
             "./forecasting/models_config.toml",  # Add dependency on models config for column ordering
+            "./datasets.toml",  # Add dependency on datasets config for column ordering
         ],
         "clean": True,
     }
@@ -168,8 +200,10 @@ def task_compile_latex_docs():
         ],
         "file_dep": [
             "./src/create_results_tables2.py",
+            "./src/create_dataset_statistics.py",
             "./reports/draft_ftsfr.tex",
             # LaTeX table dependencies (from _output/forecasting2/ as these are referenced in the paper)
+            OUTPUT_DIR / "forecasting2" / "dataset_statistics.tex",
             OUTPUT_DIR / "forecasting2" / "mase_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "rmse_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "smape_pivot_table.tex",

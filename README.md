@@ -182,10 +182,17 @@ This script will:
 
 ### Running Large-Scale Forecasting with SLURM
 
-For running all combinations of models and datasets on a SLURM cluster, we provide an array job script:
+For running all combinations of models and datasets on a SLURM cluster, we provide an array job script. First, generate the job list automatically:
 
 ```bash
-# Submit all 364 forecasting jobs (28 datasets × 13 models)
+# Generate forecasting_jobs.txt from current dataset and model configurations
+python generate_forecasting_jobs.py
+```
+
+Then submit all forecasting jobs:
+
+```bash
+# Submit all forecasting jobs (number varies based on active datasets and models)
 sbatch submit_forecasting_jobs.sh
 ```
 
@@ -208,6 +215,24 @@ To assemble results after jobs complete:
 ```bash
 python src/assemble_results2.py  # Assembles results from forecasting2 directory
 ```
+
+#### Automatic Job List Generation
+
+The `forecasting_jobs.txt` file is automatically generated based on the active datasets and models in your configuration files:
+
+```bash
+# Generate job list from current configurations
+python generate_forecasting_jobs.py
+```
+
+This script:
+- Reads all active datasets from `datasets.toml` 
+- Reads all active models from `forecasting/models_config.toml`
+- Generates all combinations in the format expected by the SLURM script
+- Updates `forecasting_jobs.txt` with the complete job list
+- Displays a summary of datasets, models, and total job count
+
+**Note**: Run this script whenever you modify `datasets.toml` or `forecasting/models_config.toml` to ensure your job list stays synchronized with your configuration.
 
 ## Data Format
 Final, cleaned and formatted datasets have the following format: `ftsfr_<dataset_name>.parquet`

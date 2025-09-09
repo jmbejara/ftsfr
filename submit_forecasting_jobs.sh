@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=forecast_array
-#SBATCH --array=1-364%9            # 364 jobs total, max 9 concurrent
+#SBATCH --array=1-286%9            # 286 jobs total, max 9 concurrent
 #SBATCH --exclusive                 # Exclusive node access
 #SBATCH --time=7-00:00:00          # 7 days time limit
 #SBATCH --output=./_output/forecasting2/logs/slurm-%A_%a.out
