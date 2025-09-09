@@ -8,43 +8,43 @@
 \scriptsize
 \setlength{\tabcolsep}{1.5pt}
 \renewcommand{\arraystretch}{0.9}
-\begin{tabular}{@{}lrrrrrrrrrrr@{}}
+\begin{tabular}{@{}lrrrrrrrrrr@{}}
 \toprule
- & Naive & SN & ARIMA & DeepAR & NBEATS & NHITS & DLinear & NLinear & Transformer & TiDE & KAN \\
+ & Naive & ARIMA & DeepAR & NBEATS & NHITS & DLinear & NLinear & Transformer & TiDE & KAN \\
 \midrule
-\multicolumn{12}{l}{\textbf{Basis Spreads}} \\
-CDS-Bond & 3.97 & 4.13 & 4.12 & 3.83 & 3.52 & 3.77 & 4.80 & 4.25 & 3.06 & 3.52 & \textbf{3.05} \\
-CIP & 14.67 & 16.32 & 16.55 & 24.12 & 14.49 & 14.51 & 27.77 & 16.11 & 22.95 & 17.85 & \textbf{14.33} \\
-TIPS-Treasury & 13.48 & \textbf{11.19} & 18.23 & 18.68 & 13.11 & 13.76 & 20.86 & 13.49 & 17.35 & 13.96 & 11.62 \\
-Treasury-SF & \textbf{57.98} & 69.93 & \textbf{57.98} & 68.36 & 64.54 & 60.87 & 67.76 & 60.54 & 68.84 & 67.44 & 68.51 \\
-Treasury-Swap & 20.91 & 21.01 & 27.44 & 38.40 & 23.54 & 23.26 & 36.06 & \textbf{20.84} & 36.39 & 28.44 & 31.92 \\
+\multicolumn{11}{l}{\textbf{Basis Spreads}} \\
+CDS-Bond & 3.97 & 4.12 & 3.83 & 3.52 & 3.77 & 4.80 & 4.25 & 3.06 & 3.52 & \textbf{3.05} \\
+CIP & 14.67 & 16.55 & 24.12 & 14.49 & 14.51 & 27.77 & 16.11 & 22.95 & 17.85 & \textbf{14.33} \\
+TIPS-Treasury & 13.48 & 18.23 & 18.68 & 13.11 & 13.76 & 20.86 & 13.49 & 17.35 & 13.96 & \textbf{11.62} \\
+Treasury-SF & \textbf{57.98} & \textbf{57.98} & 68.36 & 64.54 & 60.87 & 67.76 & 60.54 & 68.84 & 67.44 & 68.51 \\
+Treasury-Swap & 20.91 & 27.44 & 38.40 & 23.54 & 23.26 & 36.06 & \textbf{20.84} & 36.39 & 28.44 & 31.92 \\
 \midrule
-\multicolumn{12}{l}{\textbf{Returns (Portfolios)}} \\
-CDS Portfolio & \textbf{0.00} & \textbf{0.00} & 0.00 & 0.00 & 0.01 & 0.08 & 0.23 & 0.16 & 0.10 & 0.09 & 0.00 \\
-Corporate Portfolio & 0.03 & 0.03 & 0.03 & \textbf{0.03} & 0.03 & 0.06 & 0.23 & 0.15 & 0.09 & 0.08 & 0.03 \\
-FF25 Size-BM & 0.02 & 0.02 & \textbf{0.02} & 0.02 & 0.02 & 0.08 & 0.22 & 0.16 & -- & 0.09 & 0.02 \\
-HKM All Factor & 108.24 & 108.24 & \textbf{107.54} & 132.38 & 116.10 & 115.52 & 133.30 & 108.27 & 131.85 & 118.47 & 117.73 \\
-HKM Daily Factor & 21.95 & 21.95 & 21.95 & 59.44 & \textbf{17.80} & 18.48 & 65.92 & 22.06 & 58.75 & 27.65 & 18.81 \\
-HKM Monthly Factor & 314.32 & 314.32 & 319.80 & 111.90 & 218.04 & 248.64 & 167.82 & 326.50 & 111.44 & \textbf{86.06} & 149.40 \\
-SPX Options Portfolios & 0.03 & 0.03 & 0.04 & 0.04 & 0.04 & 0.08 & 0.23 & 0.17 & 0.21 & 0.10 & \textbf{0.03} \\
-Treasury Portfolio & 0.01 & 0.01 & 0.01 & \textbf{0.01} & 0.01 & 0.07 & 0.22 & 0.15 & 0.16 & 0.09 & 0.01 \\
+\multicolumn{11}{l}{\textbf{Returns (Portfolios)}} \\
+CDS Portfolio & \textbf{0.00} & 0.00 & 0.00 & 0.01 & 0.08 & 0.23 & 0.16 & 0.10 & 0.09 & 0.00 \\
+Corporate Portfolio & 0.03 & 0.03 & \textbf{0.03} & 0.03 & 0.06 & 0.23 & 0.15 & 0.09 & 0.08 & 0.03 \\
+FF25 Size-BM & 0.02 & \textbf{0.02} & 0.02 & 0.02 & 0.08 & 0.22 & 0.16 & -- & 0.09 & 0.02 \\
+HKM All Factor & 108.24 & \textbf{107.54} & 132.38 & 116.10 & 115.52 & 133.30 & 108.27 & 131.85 & 118.47 & 117.73 \\
+HKM Daily Factor & 21.95 & 21.95 & 59.44 & \textbf{17.80} & 18.48 & 65.92 & 22.06 & 58.75 & 27.65 & 18.81 \\
+HKM Monthly Factor & 314.32 & 319.80 & 111.90 & 218.04 & 248.64 & 167.82 & 326.50 & 111.44 & \textbf{86.06} & 149.40 \\
+SPX Options Portfolios & 0.03 & 0.04 & 0.04 & 0.04 & 0.08 & 0.23 & 0.17 & 0.21 & 0.10 & \textbf{0.03} \\
+Treasury Portfolio & 0.01 & 0.01 & \textbf{0.01} & 0.01 & 0.07 & 0.22 & 0.15 & 0.16 & 0.09 & 0.01 \\
 \midrule
-\multicolumn{12}{l}{\textbf{Returns (Disaggregated)}} \\
-CDS Contract & \textbf{0.02} & \textbf{0.02} & 0.02 & 0.02 & 0.02 & 0.08 & 0.20 & 0.17 & 0.10 & 0.09 & 0.02 \\
-SPX Options Contracts & 0.04 & 0.04 & 0.04 & 0.04 & 0.04 & 0.09 & 0.23 & 0.17 & 0.21 & 0.10 & \textbf{0.03} \\
-CRSP Stock & 0.18 & 0.18 & 0.15 & \textbf{0.15} & 0.17 & 0.18 & 0.29 & 0.25 & 0.21 & 0.19 & 0.15 \\
-CRSP Stock (ex-div) & 0.18 & 0.18 & 0.15 & \textbf{0.15} & 0.17 & 0.18 & 0.29 & 0.25 & 0.21 & 0.19 & 0.15 \\
-Commodity & 0.08 & 0.08 & \textbf{0.07} & 0.07 & 0.08 & 0.09 & 0.23 & 0.14 & 0.18 & 0.10 & 0.07 \\
-Corporate Bond & 0.03 & 0.03 & 0.03 & 0.03 & 0.03 & 0.05 & 0.19 & 0.16 & 0.10 & 0.10 & \textbf{0.03} \\
-FX & 2.32 & 2.32 & 2.32 & 2.24 & 2.39 & 2.46 & 2.33 & 2.33 & \textbf{2.19} & 2.23 & 2.47 \\
-Treasury Bond & 0.01 & 0.01 & 0.01 & \textbf{0.01} & 0.01 & 0.04 & 0.24 & 0.13 & 0.12 & 0.09 & 0.01 \\
+\multicolumn{11}{l}{\textbf{Returns (Disaggregated)}} \\
+CDS Contract & \textbf{0.02} & 0.02 & 0.02 & 0.02 & 0.08 & 0.20 & 0.17 & 0.10 & 0.09 & 0.02 \\
+SPX Options Contracts & 0.04 & 0.04 & 0.04 & 0.04 & 0.09 & 0.23 & 0.17 & 0.21 & 0.10 & \textbf{0.03} \\
+CRSP Stock & 0.18 & 0.15 & \textbf{0.15} & 0.17 & 0.18 & 0.29 & 0.25 & 0.21 & 0.19 & 0.15 \\
+CRSP Stock (ex-div) & 0.18 & 0.15 & \textbf{0.15} & 0.17 & 0.18 & 0.29 & 0.25 & 0.21 & 0.19 & 0.15 \\
+Commodity & 0.08 & \textbf{0.07} & 0.07 & 0.08 & 0.09 & 0.23 & 0.14 & 0.18 & 0.10 & 0.07 \\
+Corporate Bond & 0.03 & 0.03 & 0.03 & 0.03 & 0.05 & 0.19 & 0.16 & 0.10 & 0.10 & \textbf{0.03} \\
+FX & 2.32 & 2.32 & 2.24 & 2.39 & 2.46 & 2.33 & 2.33 & \textbf{2.19} & 2.23 & 2.47 \\
+Treasury Bond & 0.01 & 0.01 & \textbf{0.01} & 0.01 & 0.04 & 0.24 & 0.13 & 0.12 & 0.09 & 0.01 \\
 \midrule
-\multicolumn{12}{l}{\textbf{Other}} \\
-BHC Cash Liquidity & \textbf{0.05} & 0.05 & 0.07 & 0.06 & 0.05 & 0.07 & 0.29 & 0.19 & 0.10 & 0.10 & 0.05 \\
-BHC Leverage & 2.84 & 3.17 & 4.35 & 10.34 & \textbf{2.78} & 2.79 & 10.97 & 3.06 & 8.67 & 5.63 & 2.86 \\
-Bank Cash Liquidity & \textbf{0.06} & 0.06 & 0.07 & 0.08 & 0.06 & 0.08 & 0.30 & 0.20 & 0.13 & 0.12 & 0.06 \\
-Bank Leverage & 3.00 & 3.34 & 3.96 & 10.16 & \textbf{2.94} & 2.95 & 10.61 & 3.23 & 8.42 & 5.52 & 3.02 \\
-Treasury Yield Curve & 1.26 & 1.29 & 1.26 & 1.78 & 1.50 & 1.57 & 3.03 & 1.28 & -- & 1.66 & \textbf{1.16} \\
+\multicolumn{11}{l}{\textbf{Other}} \\
+BHC Cash Liquidity & \textbf{0.05} & 0.07 & 0.06 & 0.05 & 0.07 & 0.29 & 0.19 & 0.10 & 0.10 & 0.05 \\
+BHC Leverage & 2.84 & 4.35 & 10.34 & \textbf{2.78} & 2.79 & 10.97 & 3.06 & 8.67 & 5.63 & 2.86 \\
+Bank Cash Liquidity & \textbf{0.06} & 0.07 & 0.08 & 0.06 & 0.08 & 0.30 & 0.20 & 0.13 & 0.12 & 0.06 \\
+Bank Leverage & 3.00 & 3.96 & 10.16 & \textbf{2.94} & 2.95 & 10.61 & 3.23 & 8.42 & 5.52 & 3.02 \\
+Treasury Yield Curve & 1.26 & 1.26 & 1.78 & 1.50 & 1.57 & 3.03 & 1.28 & -- & 1.66 & \textbf{1.16} \\
 \bottomrule
 \end{tabular}
 \vspace{0.1cm}

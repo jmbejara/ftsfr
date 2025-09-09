@@ -16,7 +16,7 @@ import argparse
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-MIN_OBSERVATIONS = 12
+MIN_OBSERVATIONS = 1
 
 def find_ftsfr_files(data_dir: Path) -> Dict[str, List[Path]]:
     """

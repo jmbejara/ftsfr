@@ -128,7 +128,37 @@ def task_create_dataset_statistics():
         "file_dep": [
             "./src/create_dataset_statistics.py",
             "./datasets.toml",  # Primary dependency - drives which datasets to include
-            "./models/cutoff_calc.py",  # For cutoff date calculations
+            *dataset_parquet_files,  # Secondary dependencies - actual data files
+        ],
+        "clean": True,
+    }
+
+
+def task_create_filtered_dataset_statistics():
+    """Create filtered dataset statistics table showing effects of forecasting system filtering"""
+    import glob
+    
+    # Get all parquet files from formatted directory only
+    dataset_parquet_files = glob.glob(
+        str(DATA_DIR / "formatted" / "**" / "ftsfr_*.parquet"),
+        recursive=True,
+    )
+    
+    return {
+        "actions": [
+            "python ./src/create_filtered_dataset_statistics.py",
+        ],
+        "targets": [
+            # Filtered dataset statistics table files
+            Path("./docs_src") / "filtered_dataset_statistics.csv",
+            Path("./docs_src") / "filtered_dataset_statistics.tex",
+            OUTPUT_DIR / "forecasting2" / "filtered_dataset_statistics.csv",
+            OUTPUT_DIR / "forecasting2" / "filtered_dataset_statistics.tex",
+        ],
+        "file_dep": [
+            "./src/create_filtered_dataset_statistics.py",
+            "./forecasting/forecast.py",  # Contains filtering logic we're applying
+            "./datasets.toml",  # Primary dependency - drives which datasets to include
             *dataset_parquet_files,  # Secondary dependencies - actual data files
         ],
         "clean": True,

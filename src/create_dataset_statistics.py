@@ -3,7 +3,7 @@ create_dataset_statistics.py
 
 This script creates comprehensive dataset statistics tables for all active datasets
 defined in datasets.toml. It calculates entity counts, time series lengths, 
-unique timestamps, and date ranges including train/test split cutoff dates.
+unique timestamps, and date ranges.
 
 The output includes both CSV and LaTeX table formats grouped by dataset category.
 """
@@ -87,29 +87,6 @@ def simplify_frequency(freq_code):
     return freq_mapping.get(freq_code, freq_code)  # Return original if not found
 
 
-def calculate_train_test_split_cutoff(df, test_split=0.2):
-    """
-    Calculate the cutoff date for train/test split using Polars
-    
-    Args:
-        df: Polars DataFrame with 'ds' (date) and 'unique_id' columns
-        test_split: Fraction of data to use for testing (default 0.2)
-        
-    Returns:
-        cutoff_date: The date that separates train and test data
-    """
-    # Get unique dates and sort them
-    unique_dates = df.select('ds').unique().sort('ds')
-    total_dates = len(unique_dates)
-    
-    # Calculate split point (80% train, 20% test)
-    split_index = int(total_dates * (1 - test_split))
-    
-    # Get the cutoff date (first date in test set)
-    cutoff_date = unique_dates.row(split_index)[0]
-    
-    return cutoff_date
-
 
 def calculate_dataset_statistics(dataset_info):
     """
@@ -138,7 +115,6 @@ def calculate_dataset_statistics(dataset_info):
             'median_length': 'N/A',
             'max_length': 'N/A',
             'min_date': 'N/A',
-            'cutoff_date': 'N/A',
             'max_date': 'N/A',
             'error': f'File not found: {dataset_path}'
         }
@@ -196,8 +172,6 @@ def calculate_dataset_statistics(dataset_info):
         min_date = df[date_col].min()
         max_date = df[date_col].max()
         
-        # Calculate cutoff date for train/test split
-        cutoff_date = calculate_train_test_split_cutoff(df.select([date_col, id_col]).rename({date_col: 'ds', id_col: 'unique_id'}))
         
         # Calculate entity and time series statistics
         unique_entities = df[id_col].n_unique()
@@ -222,7 +196,6 @@ def calculate_dataset_statistics(dataset_info):
             'median_length': int(median_length),
             'max_length': int(max_length),
             'min_date': min_date.strftime('%Y-%m-%d') if min_date else 'N/A',
-            'cutoff_date': cutoff_date.strftime('%Y-%m-%d') if cutoff_date else 'N/A',
             'max_date': max_date.strftime('%Y-%m-%d') if max_date else 'N/A',
             'error': None
         }
@@ -238,7 +211,6 @@ def calculate_dataset_statistics(dataset_info):
             'median_length': 'Error',
             'max_length': 'Error',
             'min_date': 'Error',
-            'cutoff_date': 'Error',
             'max_date': 'Error',
             'error': str(e)
         }
@@ -283,15 +255,15 @@ def create_latex_table(grouped_stats, output_path):
         "\\footnotesize",
         "\\setlength{\\tabcolsep}{1.2pt}",
         "\\renewcommand{\\arraystretch}{0.9}",
-        "\\begin{tabular}{@{}llrrrrlll@{}}",
+        "\\begin{tabular}{@{}llrrrrll@{}}",
         "\\toprule",
-        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Unique\\\\Entities\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min\\\\Length\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median\\\\Length\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Max\\\\Length\\end{tabular} & Min Date & Cutoff Date & Max Date \\\\",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Unique\\\\Entities\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min\\\\Length\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median\\\\Length\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Max\\\\Length\\end{tabular} & Min Date & Max Date \\\\",
         "\\midrule"
     ]
     
     for group_name, datasets in grouped_stats.items():
         # Add group header
-        latex_content.append(f"\\multicolumn{{9}}{{l}}{{\\textbf{{{group_name}}}}} \\\\")
+        latex_content.append(f"\\multicolumn{{8}}{{l}}{{\\textbf{{{group_name}}}}} \\\\")
         
         # Add datasets in this group
         for stats in datasets:
@@ -303,7 +275,6 @@ def create_latex_table(grouped_stats, output_path):
                 str(stats['median_length']),
                 str(stats['max_length']),
                 stats['min_date'],
-                stats['cutoff_date'],
                 stats['max_date']
             ]
             latex_content.append(" & ".join(row_data) + " \\\\")
@@ -318,7 +289,7 @@ def create_latex_table(grouped_stats, output_path):
         "\\vspace{0.1cm}",
         "\\begin{minipage}{\\textwidth}",
         "\\scriptsize",
-        "\\textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity; Cutoff Date = train/test split date (80\\%/20\\% split).",
+        "\\textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.",
         "\\end{minipage}",
         "\\end{table}"
     ])
@@ -338,7 +309,7 @@ def create_csv_table(stats_list, output_path):
     # Reorder columns
     column_order = [
         'table_name', 'group', 'frequency', 'unique_entities', 'min_length', 'median_length',
-        'max_length', 'min_date', 'cutoff_date', 'max_date'
+        'max_length', 'min_date', 'max_date'
     ]
     
     if 'error' in df.columns:
