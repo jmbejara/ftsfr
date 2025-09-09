@@ -194,6 +194,61 @@ Our benchmark thus serves to improve the infrastructure for developing the next 
 
 In this section, we describe the datasets included in the benchmark. The datasets are organized into three main groups: asset class datasets, basis spread datasets, and other financial data. We provide brief description of each dataset below. Each datasets is constructed based off of a cleaning procedure from a well-known paper in the academic literature. To validate our cleaning and transformations, we replicate a key plot or table from each paper. We give brief details of this process below. Full details of the cleaning and replications are provided in the appendix.
 
+Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. Each dataset follows the data cleaning and construction procedures established in the referenced academic literature, ensuring consistency with existing finance research standards.
+
+\begin{table}[htbp]
+\centering
+\caption{Overview of Datasets in the FTSFR Benchmark}
+\label{tab:datasets}
+\footnotesize
+\begin{tabular}{p{3cm}p{6cm}p{3.5cm}}
+\toprule
+Dataset Name & Description & Citation \\ 
+\midrule
+\multicolumn{3}{c}{\textbf{Returns Data}} \\
+\midrule
+CDS Contract & Monthly returns for individual CDS contracts & \cite{He2017} \\
+CDS Portfolio & Monthly returns for 20 CDS portfolios by tenor and credit quality & \cite{He2017} \\
+Corporate Bond & Monthly returns for individual corporate bonds from TRACE & \cite{Dickerson2024} \\
+Corporate Portfolio & Monthly returns for corporate bond portfolios by credit spread & \cite{Nozawa2017} \\
+Treasury Bond & Monthly returns for individual Treasury bonds from CRSP & \cite{Gurkaynak2007} \\
+Treasury Portfolio & Monthly returns for Treasury bond portfolios by maturity & \cite{Gurkaynak2007} \\
+CRSP Stock & Monthly stock returns from CRSP database & \cite{Fama1993} \\
+FF25 Size-BM & Daily Fama-French 25 portfolios: size and book-to-market & \cite{Fama1993} \\
+SPX Options Contracts & Daily returns for individual SPX option contracts & \cite{Constantinides2013} \\
+SPX Options Portfolios & Monthly returns for SPX option portfolios by moneyness & \cite{He2017} \\
+HKM Monthly Factor & Monthly factor returns from He, Kelly, and Manela & \cite{He2017} \\
+HKM Daily Factor & Daily factor returns from He, Kelly, and Manela & \cite{He2017} \\
+Commodity & Monthly returns for commodity futures & \cite{Yang2013} \\
+FX & Daily foreign exchange returns vs USD & \cite{Lettau2014} \\
+\midrule
+\multicolumn{3}{c}{\textbf{Basis Spread Data}} \\
+\midrule
+TIPS-Treasury & Monthly TIPS-Treasury basis spreads & Fed Yield Curve \\
+Treasury-SF & Monthly Treasury-SF arbitrage spreads & Segmented Arbitrage \\
+Treasury-Swap & Monthly Treasury-Swap arbitrage spreads & Segmented Arbitrage \\
+CDS-Bond & Monthly CDS-bond basis spreads & Segmented Arbitrage \\
+CIP & Monthly covered interest parity deviations & \cite{Du2018} \\
+\midrule
+\multicolumn{3}{c}{\textbf{Other Financial Data}} \\
+\midrule
+Treasury Yield Curve & Daily Nelson-Siegel-Svensson zero-coupon yields, 1-30 years & \cite{Gurkaynak2007} \\
+Bank Leverage & Quarterly leverage ratios from call report data & NYU Call Report \\
+BHC Leverage & Quarterly bank holding company leverage ratios & NYU Call Report \\
+Bank Cash Liquidity & Quarterly cash liquidity from call report data & NYU Call Report \\
+BHC Cash Liquidity & Quarterly bank holding company cash liquidity & NYU Call Report \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in our benchmark, including entity counts, time series characteristics, and temporal coverage. The table shows substantial variation across datasets, with disaggregated series (individual bonds, stocks, options contracts) containing thousands of entities, while portfolio-level datasets typically contain 10-50 series. The cutoff dates indicate the train/test split boundary used in our forecasting evaluation, with most datasets providing substantial out-of-sample periods for robust model comparison.
+
+\input{../_output/forecasting2/dataset_statistics.tex}
+
+To ensure fair model comparisons, our forecasting system applies consistent filtering and data preprocessing across all models and datasets. Table~\ref{tab:filtered_dataset_stats} shows the impact of this filtering, displaying entity counts and median time series lengths before and after preprocessing. The filtering removes time series that are too short for reliable seasonal pattern detection and forecasting evaluation, while standardized data cleaning procedures handle missing values uniformly across all models. This preprocessing is essential for fair comparison between statistical and machine learning methods, as it ensures all models train and are evaluated on identical datasets. The filtering has varying impact across asset classes: portfolio-level datasets (which are typically well-maintained) show minimal changes, while disaggregated datasets show substantial filtering due to the presence of shorter-lived securities or incomplete data coverage.
+
+\input{../_output/forecasting2/filtered_dataset_statistics.tex}
+
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
 
 % A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
@@ -735,6 +790,12 @@ We would like to thank the following individuals. With their permission, we have
 
 
 % TODO: Add additional acknowledgments
+
+
+% bibliography needs to be at the end to capture all citations
+\bibliographystyle{jpe}
+\bibliography{bibliography}
+
 
 \begin{appendices}
 
@@ -1494,9 +1555,5 @@ In all the above cases, the central theme is that poor data quality --- whether 
 
 
 \end{appendices}
-
-% bibliography needs to be at the end to capture all citations
-\bibliographystyle{jpe}
-\bibliography{bibliography}
 
 \end{document}
