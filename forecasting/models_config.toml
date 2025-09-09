@@ -19,24 +19,36 @@ table_name = "SN"
 # display_name = "Seasonal ES Optimized"
 
 
-[auto_theta]
-library = "statsforecast"
-class = "AutoTheta"
-display_name = "AutoTheta"
-table_name = "Theta"
-[auto_theta.params]
-decomposition_type = "additive"
+# [theta]
+# library = "statsforecast"
+# class = "Theta"
+# display_name = "Theta"
+# table_name = "Theta"
 
-#TBATS not in nixtlaverse
+# [auto_theta]
+# library = "statsforecast"
+# class = "AutoTheta"
+# display_name = "AutoTheta"
+# table_name = "Theta"
+# [auto_theta.params]
+# decomposition_type = "additive"
+
+# #TBATS not in nixtlaverse
 
 
-[auto_ets]
-library = "statsforecast"
-class = "AutoETS"
-display_name = "AutoETS"
-table_name = "ETS"
-[auto_ets.params]
-model = "ZZZ"
+# [simple_exponential_smoothing]
+# library = "statsforecast"
+# class = "SimpleExponentialSmoothing"
+# display_name = "Simple Exponential Smoothing"
+# table_name = "SES"
+
+# [auto_ets]
+# library = "statsforecast"
+# class = "AutoETS"
+# display_name = "AutoETS"
+# table_name = "ETS"
+# [auto_ets.params]
+# model = "ZZZ"
 
 # DHR-ARIMA not in nixtlaverse
 # (Dynamic Harmonic Regression - ARIMA)

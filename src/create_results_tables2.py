@@ -11,6 +11,7 @@ import matplotlib.patches as patches
 import seaborn as sns
 
 from settings import config
+from dodo_common import load_models_config
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 FORECAST2_DIR = OUTPUT_DIR / "forecasting2"  # New forecasting output directory
@@ -74,14 +75,7 @@ def load_dataset_groups_and_names():
 
 def load_model_table_names():
     """Load model table names from models_config.toml"""
-    models_config_path = Path(__file__).parent.parent / "forecasting" / "models_config.toml"
-    
-    if not models_config_path.exists():
-        print(f"Warning: models_config.toml not found at {models_config_path}")
-        return {}
-    
-    with open(models_config_path, 'rb') as f:
-        models_config = tomli.load(f)
+    models_config = load_models_config()
     
     # Create mapping from display_name to table_name
     name_mapping = {}
@@ -97,14 +91,7 @@ def load_model_table_names():
 
 def load_model_order():
     """Load ordered list of model names from models_config.toml to preserve column order"""
-    models_config_path = Path(__file__).parent.parent / "forecasting" / "models_config.toml"
-    
-    if not models_config_path.exists():
-        print(f"Warning: models_config.toml not found at {models_config_path}")
-        return []
-    
-    with open(models_config_path, 'rb') as f:
-        models_config = tomli.load(f)
+    models_config = load_models_config()
     
     # Get ordered list of models as they appear in the config file
     ordered_models = []
@@ -122,6 +109,36 @@ def load_model_order():
     
     print(f"Loaded model order with {len(ordered_models)} models from config")
     return ordered_models
+
+def get_active_model_display_names():
+    """Get list of active model display names from models_config.toml (excluding commented out models)"""
+    models_config = load_models_config()
+    
+    active_models = []
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get('display_name', model_key)
+            active_models.append(display_name)
+    
+    print(f"Found {len(active_models)} active models: {active_models}")
+    return active_models
+
+def filter_results_by_active_models(results_df):
+    """Filter results DataFrame to only include active models from config"""
+    active_models = get_active_model_display_names()
+    
+    # Filter results to only include active models
+    initial_count = len(results_df)
+    filtered_results = results_df[results_df['Model'].isin(active_models)].copy()
+    filtered_count = len(filtered_results)
+    
+    if filtered_count < initial_count:
+        removed_count = initial_count - filtered_count
+        removed_models = set(results_df['Model'].unique()) - set(active_models)
+        print(f"Filtered out {removed_count} results from inactive models: {sorted(removed_models)}")
+    
+    print(f"Using {filtered_count} results from active models")
+    return filtered_results
 
 def filter_quality_results(results_df):
     """Filter out results with quality issues (NaN values or zero error metrics)"""
@@ -161,15 +178,8 @@ def create_quality_summary():
     
     print("Creating quality summary...")
     
-    # Load models config from new location
-    models_config_path = Path(__file__).parent.parent / "forecasting" / "models_config.toml"
-    if not models_config_path.exists():
-        print(f"Warning: Models config not found at {models_config_path}")
-        return None
-        
-    with open(models_config_path, 'rb') as f:
-        models_config = tomli.load(f)
-    
+    # Load models config using centralized function
+    models_config = load_models_config()
     all_models = list(models_config.keys())
     print(f"Found {len(all_models)} models in config")
     
@@ -410,6 +420,9 @@ def create_mase_pivot_table():
     # Rename model names for consistency
     results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
     
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -515,6 +528,9 @@ def create_rmse_pivot_table():
     # Rename model names for consistency
     results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
     
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -619,6 +635,9 @@ def create_smape_pivot_table():
     # Rename model names for consistency
     results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
     
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -705,6 +724,9 @@ def create_mae_pivot_table():
     # Rename model names for consistency
     results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
     
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -790,6 +812,9 @@ def create_relative_mase_pivot_table():
     
     # Rename model names for consistency
     results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
+    
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
     
     # Apply quality filtering
     results = filter_quality_results(results)
@@ -1157,6 +1182,9 @@ def create_heatmap_plots():
     model_names = load_model_table_names()
     results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
     
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -1424,6 +1452,9 @@ def create_summary_statistics():
     
     results_file = FORECAST2_DIR / "results_all.csv"
     results = pd.read_csv(results_file)
+    
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
     
     # Apply quality filtering
     results = filter_quality_results(results)
