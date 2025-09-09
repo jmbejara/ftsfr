@@ -97,8 +97,8 @@ def calculate_dataset_statistics(dataset_info):
     dataset_name = dataset_info['dataset_name']
     module_name = dataset_info['module_name']
     
-    # Construct path to parquet file
-    dataset_path = DATA_DIR / module_name / f"{dataset_name}.parquet"
+    # Construct path to parquet file in formatted directory
+    dataset_path = DATA_DIR / "formatted" / module_name / f"{dataset_name}.parquet"
     
     if not dataset_path.exists():
         print(f"  Warning: Parquet file not found for {dataset_name} at {dataset_path}")

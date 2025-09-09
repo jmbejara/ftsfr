@@ -108,9 +108,9 @@ def task_create_dataset_statistics():
     """Create dataset statistics table from active datasets in datasets.toml"""
     import glob
     
-    # Get all parquet files that could be dataset files
+    # Get all parquet files from formatted directory only
     dataset_parquet_files = glob.glob(
-        str(DATA_DIR / "**" / "ftsfr_*.parquet"),
+        str(DATA_DIR / "formatted" / "**" / "ftsfr_*.parquet"),
         recursive=True,
     )
     

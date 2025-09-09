@@ -842,10 +842,14 @@ def task_determine_cutoff_dates():
         "actions": [(debug_action, ["python models/cutoff_calc.py"])],
         "file_dep": [
             "./models/cutoff_calc.py",
+            "./src/organize_ftsfr_datasets.py",
             OUTPUT_DIR / "available_datasets.csv",
         ],
         "targets": [
             OUTPUT_DIR / "cutoff_dates.csv",
+        ],
+        "task_dep": [
+            "organize_ftsfr_datasets",
         ],
         "verbosity": 0,
     }

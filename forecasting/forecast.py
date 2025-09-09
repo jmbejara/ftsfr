@@ -77,7 +77,7 @@ def read_dataset_config(dataset_name):
                 if dataset_key == dataset_name and isinstance(dataset_info, dict):
                     dataset_config = dataset_info
                     data_path = (
-                        REPO_ROOT / "_data" / module_name / f"{dataset_name}.parquet"
+                        REPO_ROOT / "_data" / "formatted" / module_name / f"{dataset_name}.parquet"
                     )
                     break
             if dataset_config:

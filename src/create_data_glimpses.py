@@ -353,12 +353,30 @@ def get_task_category(task_name):
 
 
 def filter_ftsfr_files(existing_files):
-    """Filter existing files to only include ftsfr_ prefixed parquet files."""
+    """Filter existing files to only include ftsfr_ prefixed parquet files from formatted directory."""
     ftsfr_files = set()
     for filepath in existing_files:
-        filename = Path(filepath).name
-        if filename.startswith("ftsfr_") and filename.endswith(".parquet"):
+        filepath_obj = Path(filepath)
+        filename = filepath_obj.name
+        # Only include ftsfr files that are in the formatted directory structure
+        if (filename.startswith("ftsfr_") and 
+            filename.endswith(".parquet") and 
+            "formatted" in filepath_obj.parts):
             ftsfr_files.add(filepath)
+    return ftsfr_files
+
+
+def find_formatted_ftsfr_files():
+    """Find all ftsfr parquet files in the formatted directory structure."""
+    formatted_dir = DATA_DIR / "formatted"
+    ftsfr_files = set()
+    
+    if formatted_dir.exists():
+        # Recursively search for ftsfr_*.parquet files in formatted directory
+        for parquet_file in formatted_dir.rglob("ftsfr_*.parquet"):
+            if parquet_file.is_file():
+                ftsfr_files.add(str(parquet_file))
+    
     return ftsfr_files
 
 
@@ -901,16 +919,16 @@ def main():
         print("  - Excluding numeric statistics sections")
 
     if args.ftsfr_only:
-        # Generate only FTSFR enhanced report
+        # Generate only FTSFR enhanced report using formatted files
         print("\nGenerating FTSFR enhanced report only...")
-        ftsfr_files = filter_ftsfr_files(existing_files)
-        print(f"Found {len(ftsfr_files)} FTSFR datasets to analyze")
+        ftsfr_files = find_formatted_ftsfr_files()
+        print(f"Found {len(ftsfr_files)} FTSFR datasets in formatted directory")
         
         if verbose:
             print(f"\nPreparing to create FTSFR enhanced glimpses for {len(ftsfr_files)} data files...")
 
         ftsfr_content = create_ftsfr_enhanced_report(
-            existing_files,
+            ftsfr_files,
             include_samples=include_samples,
             include_stats=include_stats,
             verbose=verbose,
@@ -940,14 +958,14 @@ def main():
             f.write(txt_content)
         print(f"All-datasets report saved to: {txt_output_file}")
 
-        # Generate FTSFR enhanced report
+        # Generate FTSFR enhanced report using formatted files
         print("\nGenerating FTSFR enhanced report...")
-        ftsfr_files = filter_ftsfr_files(existing_files)
-        print(f"Found {len(ftsfr_files)} FTSFR datasets for enhanced analysis")
+        ftsfr_files = find_formatted_ftsfr_files()
+        print(f"Found {len(ftsfr_files)} FTSFR datasets in formatted directory")
         
         if len(ftsfr_files) > 0:
             ftsfr_content = create_ftsfr_enhanced_report(
-                existing_files,
+                ftsfr_files,
                 include_samples=include_samples,
                 include_stats=include_stats,
                 verbose=verbose,

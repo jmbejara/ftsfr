@@ -119,7 +119,7 @@ def get_available_datasets(
                     dataset_name = key.replace("ftsfr_", "")
 
                     available_datasets[dataset_name] = {
-                        "path": Path(data_dir) / module_name / f"{key}.parquet",
+                        "path": Path(data_dir) / "formatted" / module_name / f"{key}.parquet",
                         "module": module_name,
                         "frequency": value.get("frequency", "D"),
                         "seasonality": value.get("seasonality"),
