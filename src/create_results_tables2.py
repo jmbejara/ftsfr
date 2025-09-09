@@ -444,8 +444,9 @@ def create_mase_pivot_table():
         mase_pivot = mase_pivot.reindex(columns=final_column_order)
         print(f"Reordered model columns according to models_config.toml")
     
-    # Sort datasets alphabetically for consistent output
-    mase_pivot = mase_pivot.sort_index()
+    # Apply grouped dataset ordering (same as LaTeX tables)
+    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
+    mase_pivot = apply_grouped_dataset_ordering(mase_pivot, dataset_groups, dataset_table_names)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "mase_pivot_table.csv"
@@ -547,8 +548,9 @@ def create_rmse_pivot_table():
         rmse_pivot = rmse_pivot.reindex(columns=final_column_order)
         print(f"Reordered model columns according to models_config.toml")
     
-    # Sort datasets alphabetically for consistent output
-    rmse_pivot = rmse_pivot.sort_index()
+    # Apply grouped dataset ordering (same as LaTeX tables)
+    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
+    rmse_pivot = apply_grouped_dataset_ordering(rmse_pivot, dataset_groups, dataset_table_names)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "rmse_pivot_table.csv"
@@ -649,8 +651,9 @@ def create_smape_pivot_table():
         smape_pivot = smape_pivot.reindex(columns=final_column_order)
         print(f"Reordered model columns according to models_config.toml")
     
-    # Sort datasets alphabetically for consistent output
-    smape_pivot = smape_pivot.sort_index()
+    # Apply grouped dataset ordering (same as LaTeX tables)
+    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
+    smape_pivot = apply_grouped_dataset_ordering(smape_pivot, dataset_groups, dataset_table_names)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "smape_pivot_table.csv"
@@ -734,8 +737,9 @@ def create_mae_pivot_table():
         mae_pivot = mae_pivot.reindex(columns=final_column_order)
         print(f"Reordered model columns according to models_config.toml")
     
-    # Sort datasets alphabetically for consistent output
-    mae_pivot = mae_pivot.sort_index()
+    # Apply grouped dataset ordering (same as LaTeX tables)
+    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
+    mae_pivot = apply_grouped_dataset_ordering(mae_pivot, dataset_groups, dataset_table_names)
     
     # Save as CSV for inspection
     csv_file = FORECAST2_DIR / "mae_pivot_table.csv"
@@ -932,6 +936,51 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
     
     return latex_formatted
 
+def apply_grouped_dataset_ordering(pivot_data, dataset_groups, dataset_table_names):
+    """Apply the same grouped dataset ordering used in LaTeX tables to the pivot data"""
+    
+    # Create reverse mapping from table names back to full dataset names
+    table_to_full_name = {}
+    for full_name, table_name in dataset_table_names.items():
+        table_to_full_name[table_name] = full_name
+    
+    # Map dataset table names (used in pivot_data index) to groups
+    dataset_index_groups = {}
+    for dataset_table_name in pivot_data.index:
+        # Find the corresponding full dataset name
+        full_dataset = table_to_full_name.get(dataset_table_name)
+        if full_dataset and full_dataset in dataset_groups:
+            group = dataset_groups[full_dataset]
+        else:
+            group = 'other'
+        dataset_index_groups[dataset_table_name] = group
+    
+    # Define group order (same as LaTeX tables)
+    group_order = ['basis_spreads', 'returns_portfolios', 'returns_disaggregated', 'other']
+    
+    # Group datasets by their categories
+    grouped_datasets = {}
+    for group in group_order:
+        grouped_datasets[group] = []
+    
+    for dataset in pivot_data.index:
+        group = dataset_index_groups[dataset]
+        if group in grouped_datasets:
+            grouped_datasets[group].append(dataset)
+    
+    # Create ordered list of datasets (same order as LaTeX tables)
+    ordered_datasets = []
+    for group in group_order:
+        datasets = grouped_datasets[group]
+        if datasets:
+            # Keep datasets in the order they appear within each group
+            ordered_datasets.extend(datasets)
+    
+    # Reorder the pivot data to match the grouped ordering
+    pivot_data = pivot_data.reindex(index=ordered_datasets)
+    
+    return pivot_data
+
 def create_heatmap_plots():
     """Create heatmap plots for all error metrics using the same data structure as tables"""
     
@@ -1002,6 +1051,9 @@ def create_heatmap_plots():
                 new_columns.append(col)
         pivot_data.columns = new_columns
         
+        # Apply grouped dataset ordering (same as LaTeX tables)
+        pivot_data = apply_grouped_dataset_ordering(pivot_data, dataset_groups, dataset_table_names)
+        
         # Create the heatmap
         plt.figure(figsize=(14, 10))
         
@@ -1042,7 +1094,9 @@ def create_heatmap_plots():
         outlier_threshold = vmax_val
         
         # Create custom annotations with special formatting for outliers
-        annot_data = heatmap_data.copy()
+        # Initialize annotation data as object dtype to avoid dtype warnings
+        annot_data = pd.DataFrame(index=heatmap_data.index, columns=heatmap_data.columns, dtype=object)
+        
         for i in range(len(heatmap_data.index)):
             for j in range(len(heatmap_data.columns)):
                 if not mask.iloc[i, j]:  # Only process non-masked values
@@ -1054,6 +1108,10 @@ def create_heatmap_plots():
                         else:
                             # Normal formatting for non-outliers
                             annot_data.iloc[i, j] = f"{val:.2f}"
+                    else:
+                        annot_data.iloc[i, j] = ""
+                else:
+                    annot_data.iloc[i, j] = ""
         
         # Create the heatmap with improved scaling
         sns.heatmap(
@@ -1209,7 +1267,7 @@ def create_slurm_job_summary():
         with open(warnings_file, 'r') as f:
             warnings = f.readlines()
     
-    print(f"SLURM Job Summary:")
+    print("SLURM Job Summary:")
     print(f"  Successful jobs: {len(successful_jobs)}")
     print(f"  Failed jobs: {len(failed_jobs)}")
     print(f"  Warnings: {len(warnings)}")
