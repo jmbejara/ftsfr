@@ -6,9 +6,9 @@
 \caption{sMAPE Results by Dataset and Model}
 \label{tab:smape_results}
 \scriptsize
-\setlength{\tabcolsep}{2pt}
-\renewcommand{\arraystretch}{0.85}
-\begin{tabular}{@{}l@{\hspace{2pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{}}
+\setlength{\tabcolsep}{1.5pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}lrrrrrrrrrrrrr@{}}
 \toprule
  & Naive & SN & Theta & ETS & ARIMA & DeepAR & NBEATS & NHITS & DLinear & NLinear & Transformer & TiDE & KAN \\
 \midrule
@@ -49,6 +49,7 @@ Bank Leverage & 0.07 & 0.08 & 0.08 & 0.07 & 0.14 & 0.77 & \textbf{0.07} & 0.07 &
 Treasury Yield Curve & \textbf{0.22} & 0.23 & \textbf{0.22} & \textbf{0.22} & \textbf{0.22} & 0.34 & 0.27 & 0.30 & 0.71 & 0.23 & -- & 0.30 & 0.27 \\
 \bottomrule
 \end{tabular}
-\vspace{0.05cm}
+\vspace{0.1cm}
+
 \noindent {\scriptsize \textbf{Note:} Values show Symmetric Mean Absolute Percentage Error (sMAPE). Lower values indicate better performance. -- indicates missing results.}
 \end{table}

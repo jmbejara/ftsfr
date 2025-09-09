@@ -769,6 +769,149 @@ def create_mae_pivot_table():
     
     return mae_pivot
 
+def create_relative_mase_pivot_table():
+    """Create a pivot table with MASE values relative to Naive predictor: datasets as rows, models as columns"""
+    
+    print("Creating Relative MASE pivot table...")
+    
+    # Read the assembled results from new location
+    results_file = FORECAST2_DIR / "results_all.csv"
+    if not results_file.exists():
+        print(f"Error: Results file not found at {results_file}")
+        print("Please run the assemble_results2 task first")
+        sys.exit(1)
+    
+    results = pd.read_csv(results_file)
+    print(f"Loaded {len(results)} result rows")
+    
+    # Load dataset short names and apply to results
+    dataset_short_names = load_dataset_short_names()
+    results['Dataset_Short'] = results['Dataset'].map(dataset_short_names).fillna(results['Dataset'])
+    
+    # Rename model names for consistency
+    results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
+    
+    # Apply quality filtering
+    results = filter_quality_results(results)
+    
+    # Check if we have the required columns and Naive model
+    if 'Global_MASE' not in results.columns:
+        print("Error: Global_MASE column not found in results")
+        print(f"Available columns: {list(results.columns)}")
+        sys.exit(1)
+    
+    if 'Naive' not in results['Model'].values:
+        print("Error: Naive model not found in results")
+        print(f"Available models: {sorted(results['Model'].unique())}")
+        sys.exit(1)
+    
+    # Create pivot table: datasets as rows, models as columns, values as Global_MASE
+    mase_pivot = results.pivot_table(
+        index='Dataset_Short',  # Short dataset names as rows
+        columns='Model',  # Models as columns (display name)
+        values='Global_MASE',
+        aggfunc='first'  # In case of duplicates, take the first value
+    )
+    
+    print(f"Created initial pivot table with {len(mase_pivot)} datasets and {len(mase_pivot.columns)} models")
+    
+    # Check if Naive column exists in the pivot table
+    if 'Naive' not in mase_pivot.columns:
+        print("Error: Naive column not found in pivot table")
+        print(f"Available columns: {list(mase_pivot.columns)}")
+        sys.exit(1)
+    
+    # Create relative MASE table by dividing each model by Naive
+    relative_mase_pivot = mase_pivot.copy()
+    naive_values = mase_pivot['Naive']
+    
+    for col in mase_pivot.columns:
+        if col != 'Naive':  # Don't divide Naive by itself
+            relative_mase_pivot[col] = mase_pivot[col] / naive_values
+    
+    # Remove the Naive column since it would always be 1.0
+    relative_mase_pivot = relative_mase_pivot.drop(columns=['Naive'])
+    
+    print(f"Created relative MASE table with {len(relative_mase_pivot)} datasets and {len(relative_mase_pivot.columns)} models")
+    
+    # Apply model ordering based on models_config.toml
+    model_order = load_model_order()
+    if model_order:
+        # Create ordered list of display names that exist in the data (excluding Naive)
+        ordered_display_names = [model['display_name'] for model in model_order if model['display_name'] != 'Naive']
+        # Filter to only include columns that actually exist in the pivot table
+        existing_ordered_columns = [col for col in ordered_display_names if col in relative_mase_pivot.columns]
+        # Add any columns not in the config (shouldn't happen, but safety check)
+        remaining_columns = [col for col in relative_mase_pivot.columns if col not in existing_ordered_columns]
+        final_column_order = existing_ordered_columns + remaining_columns
+        # Reorder the columns
+        relative_mase_pivot = relative_mase_pivot.reindex(columns=final_column_order)
+        print("Reordered model columns according to models_config.toml")
+    
+    # Apply grouped dataset ordering (same as LaTeX tables)
+    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
+    relative_mase_pivot = apply_grouped_dataset_ordering(relative_mase_pivot, dataset_groups, dataset_table_names)
+    
+    # Save as CSV for inspection
+    csv_file = FORECAST2_DIR / "relative_mase_pivot_table.csv"
+    relative_mase_pivot.to_csv(csv_file)
+    print(f"Saved Relative MASE pivot table (CSV) to: {csv_file}")
+    
+    # Save also to docs_src for easier access
+    docs_csv_file = Path(__file__).parent.parent / "docs_src" / "relative_mase_pivot_table.csv"
+    docs_csv_file.parent.mkdir(parents=True, exist_ok=True)
+    relative_mase_pivot.to_csv(docs_csv_file)
+    print(f"Saved Relative MASE pivot table (CSV) to: {docs_csv_file}")
+    
+    # Convert to LaTeX table
+    latex_output = create_latex_table(relative_mase_pivot, "Relative MASE Results by Dataset and Model", "tab:relative_mase_results")
+    
+    # Save LaTeX version to docs_src as well
+    docs_tex_file = Path(__file__).parent.parent / "docs_src" / "relative_mase_pivot_table.tex"
+    with open(docs_tex_file, 'w') as f:
+        f.write(latex_output)
+    print(f"Saved Relative MASE pivot table (LaTeX) to: {docs_tex_file}")
+    
+    # Save as .tex file
+    tex_file = FORECAST2_DIR / "relative_mase_pivot_table.tex"
+    with open(tex_file, 'w') as f:
+        f.write(latex_output)
+    print(f"Saved Relative MASE pivot table (LaTeX) to: {tex_file}")
+    
+    # Print summary statistics
+    print("\nSummary Statistics:")
+    print(f"Number of datasets: {len(relative_mase_pivot)}")
+    print(f"Number of models: {len(relative_mase_pivot.columns)}")
+    
+    # Count missing values
+    total_cells = len(relative_mase_pivot) * len(relative_mase_pivot.columns)
+    missing_cells = relative_mase_pivot.isna().sum().sum()
+    print(f"Missing values: {missing_cells} out of {total_cells} ({missing_cells/total_cells*100:.1f}%)")
+    
+    # Performance statistics relative to Naive
+    valid_data = relative_mase_pivot.dropna(how='all', axis=0)  # Remove rows with all NaN
+    if not valid_data.empty:
+        print("\nRelative Performance Statistics (compared to Naive baseline):")
+        # Count how many models beat Naive (< 1.0) for each dataset
+        better_than_naive_count = (valid_data < 1.0).sum(axis=1)
+        print(f"Average models beating Naive per dataset: {better_than_naive_count.mean():.1f}")
+        
+        # Show best and worst performing models overall
+        overall_performance = valid_data.mean()  # Average relative performance across datasets
+        best_model = overall_performance.idxmin()
+        worst_model = overall_performance.idxmax()
+        print(f"Best overall model: {best_model} (avg ratio: {overall_performance[best_model]:.3f})")
+        print(f"Worst overall model: {worst_model} (avg ratio: {overall_performance[worst_model]:.3f})")
+    
+    if missing_cells > 0:
+        print("\nDatasets with missing results:")
+        for dataset in relative_mase_pivot.index:
+            missing_count = relative_mase_pivot.loc[dataset].isna().sum()
+            if missing_count > 0:
+                print(f"  {dataset}: {missing_count} missing models")
+    
+    return relative_mase_pivot
+
 def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
     """Create a LaTeX table with dataset grouping sections"""
     
@@ -901,7 +1044,12 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
     
     # Add some additional LaTeX formatting
     metric_name = "error metric"
-    if "MASE" in caption:
+    note_text = "Values show {metric_name}. Lower values indicate better performance. -- indicates missing results."
+    
+    if "Relative MASE" in caption:
+        metric_name = "MASE relative to Naive baseline"
+        note_text = "Values show MASE ratios relative to the Naive baseline. Values < 1.0 indicate better performance than Naive."
+    elif "MASE" in caption:
         metric_name = "Mean Absolute Scaled Error (MASE)"
     elif "RMSE" in caption:
         metric_name = "Root Mean Square Error (RMSE)"
@@ -910,8 +1058,13 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
     elif "MAE" in caption:
         metric_name = "Mean Absolute Error (MAE)"
     
+    # Format note_text with metric_name if not already formatted
+    if "Relative MASE" not in caption:
+        note_text = note_text.format(metric_name=metric_name)
+    
     # Build complete tabular environment
-    column_format = '@{}l@{\\hspace{2pt}}' + '@{\\hspace{1pt}}r@{\\hspace{1pt}}' * num_cols + '@{}'
+    # Reduce spacing between columns for better fit
+    column_format = '@{}l' + 'r' * num_cols + '@{}'
     full_tabular = f"""\\begin{{tabular}}{{{column_format}}}
 \\toprule
 {header}\\midrule
@@ -926,11 +1079,12 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
 \\caption{{{caption}}}
 \\label{{{label}}}
 \\scriptsize
-\\setlength{{\\tabcolsep}}{{2pt}}
-\\renewcommand{{\\arraystretch}}{{0.85}}
+\\setlength{{\\tabcolsep}}{{1.5pt}}
+\\renewcommand{{\\arraystretch}}{{0.9}}
 {full_tabular}
-\\vspace{{0.05cm}}
-\\noindent {{\\scriptsize \\textbf{{Note:}} Values show {metric_name}. Lower values indicate better performance. -- indicates missing results.}}
+\\vspace{{0.1cm}}
+
+\\noindent {{\\scriptsize \\textbf{{Note:}} {note_text}}}
 \\end{{table}}
 """
     
@@ -1054,8 +1208,8 @@ def create_heatmap_plots():
         # Apply grouped dataset ordering (same as LaTeX tables)
         pivot_data = apply_grouped_dataset_ordering(pivot_data, dataset_groups, dataset_table_names)
         
-        # Create the heatmap
-        plt.figure(figsize=(14, 10))
+        # Create the heatmap with increased size for better readability
+        plt.figure(figsize=(18, 12))
         
         # Prepare data for heatmap (handle missing values)
         heatmap_data = pivot_data.copy()
@@ -1113,29 +1267,29 @@ def create_heatmap_plots():
                 else:
                     annot_data.iloc[i, j] = ""
         
-        # Create the heatmap with improved scaling
+        # Create the heatmap with improved scaling and larger fonts
         sns.heatmap(
             heatmap_data,
             mask=mask,
             annot=annot_data,
             fmt='',  # Use empty format since we're providing pre-formatted annotations
             cmap=colormap,
-            cbar_kws={'label': f'{metric_long} (colors capped at 90th percentile)'},
+            cbar_kws={'label': f'{metric_long} (colors capped at 90th percentile)', 'shrink': 0.8},
             square=False,
             linewidths=0.5,
-            annot_kws={'size': 8},
+            annot_kws={'size': 10, 'weight': 'bold'},  # Increased font size and made bold
             vmin=vmin_val,
             vmax=vmax_val
         )
         
         plt.title(f'{metric_long} by Dataset and Model\n(Lower values indicate better performance)', 
-                 fontsize=16, fontweight='bold', pad=20)
-        plt.xlabel('Forecasting Models', fontsize=12, fontweight='bold')
-        plt.ylabel('Datasets', fontsize=12, fontweight='bold')
+                 fontsize=20, fontweight='bold', pad=25)
+        plt.xlabel('Forecasting Models', fontsize=16, fontweight='bold')
+        plt.ylabel('Datasets', fontsize=16, fontweight='bold')
         
-        # Rotate x-axis labels for better readability
-        plt.xticks(rotation=45, ha='right')
-        plt.yticks(rotation=0)
+        # Rotate x-axis labels for better readability with larger fonts
+        plt.xticks(rotation=45, ha='right', fontsize=12)
+        plt.yticks(rotation=0, fontsize=12)
         
         # Add dataset group separators (visual sections)
         ax = plt.gca()
@@ -1175,9 +1329,10 @@ def create_heatmap_plots():
         
         plt.tight_layout()
         
-        # Save the heatmap
+        # Save the heatmap with higher resolution
         output_file = FORECAST2_DIR / filename
-        plt.savefig(output_file, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.savefig(output_file, dpi=600, bbox_inches='tight', facecolor='white', 
+                   edgecolor='none', pad_inches=0.1)
         print(f"Saved heatmap to: {output_file}")
         
         plt.close()  # Close the figure to free memory
@@ -1311,6 +1466,9 @@ if __name__ == "__main__":
     # Create MAE pivot table (may return None if column doesn't exist)
     mae_table = create_mae_pivot_table()
     
+    # Create relative MASE pivot table (comparing to Naive baseline)
+    relative_mase_table = create_relative_mase_pivot_table()
+    
     # Create summary statistics (now with quality filtering)
     summary_stats = create_summary_statistics()
     
@@ -1341,6 +1499,8 @@ if __name__ == "__main__":
     if mae_table is not None:
         print(f"  - {FORECAST2_DIR / 'mae_pivot_table.csv'}")
         print(f"  - {FORECAST2_DIR / 'mae_pivot_table.tex'}")
+    print(f"  - {FORECAST2_DIR / 'relative_mase_pivot_table.csv'}")
+    print(f"  - {FORECAST2_DIR / 'relative_mase_pivot_table.tex'}")
     print(f"  - {FORECAST2_DIR / 'model_summary_statistics.csv'}")
     print(f"  - {FORECAST2_DIR / 'model_summary_statistics.tex'}")
     if slurm_summary is not None:
@@ -1357,3 +1517,5 @@ if __name__ == "__main__":
     if mae_table is not None:
         print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'mae_pivot_table.csv'}")
         print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'mae_pivot_table.tex'}")
+    print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'relative_mase_pivot_table.csv'}")
+    print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'relative_mase_pivot_table.tex'}")

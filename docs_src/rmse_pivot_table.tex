@@ -6,9 +6,9 @@
 \caption{RMSE Results by Dataset and Model}
 \label{tab:rmse_results}
 \scriptsize
-\setlength{\tabcolsep}{2pt}
-\renewcommand{\arraystretch}{0.85}
-\begin{tabular}{@{}l@{\hspace{2pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{}}
+\setlength{\tabcolsep}{1.5pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}lrrrrrrrrrrrrr@{}}
 \toprule
  & Naive & SN & Theta & ETS & ARIMA & DeepAR & NBEATS & NHITS & DLinear & NLinear & Transformer & TiDE & KAN \\
 \midrule
@@ -49,6 +49,7 @@ Bank Leverage & 3.00 & 3.34 & 3.27 & 3.27 & 3.96 & 10.16 & \textbf{2.94} & 2.95 
 Treasury Yield Curve & 1.26 & 1.29 & 1.26 & 1.26 & 1.26 & 1.78 & 1.50 & 1.57 & 3.03 & 1.28 & -- & 1.66 & \textbf{1.16} \\
 \bottomrule
 \end{tabular}
-\vspace{0.05cm}
+\vspace{0.1cm}
+
 \noindent {\scriptsize \textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.}
 \end{table}

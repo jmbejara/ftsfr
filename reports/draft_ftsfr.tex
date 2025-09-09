@@ -36,7 +36,7 @@
         \and
         Arsh Kumar\footnotemark[3]
         \and
-        Zixiao Wang\thanks{Most of this work was completed as a student in the Financial Mathematics program at the University of Chicago}
+        Zixiao Wang\thanks{Independent. Most of this work was completed as a student in the Financial Mathematics program at the University of Chicago}
         \and
         Vincent Hanyang Xu\footnotemark[3]
     }
@@ -602,6 +602,10 @@ Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE resul
 \caption{MASE Results Heatmap by Dataset and Model. Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.}
 \label{fig:mase_heatmap}
 \end{figure}
+
+To better understand the relative performance of sophisticated models compared to the simple Naive benchmark, Table~\ref{tab:relative_mase_results} presents MASE ratios where each model's MASE is divided by the Naive model's MASE for the same dataset. Values less than 1.0 indicate that the model outperforms the Naive baseline, while values greater than 1.0 indicate underperformance. This normalization allows for clear interpretation of whether the additional complexity of advanced forecasting models provides meaningful improvements over the simple baseline.
+
+\input{../_output/forecasting2/relative_mase_pivot_table.tex}
 
 Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the same organization. While MASE provides scale-free comparisons, RMSE offers insights into the actual magnitude of forecasting errors, which can be particularly relevant for risk management applications.
 

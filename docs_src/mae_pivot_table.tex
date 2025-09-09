@@ -6,9 +6,9 @@
 \caption{MAE Results by Dataset and Model}
 \label{tab:mae_results}
 \scriptsize
-\setlength{\tabcolsep}{2pt}
-\renewcommand{\arraystretch}{0.85}
-\begin{tabular}{@{}l@{\hspace{2pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{\hspace{1pt}}r@{\hspace{1pt}}@{}}
+\setlength{\tabcolsep}{1.5pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}lrrrrrrrrrrrrr@{}}
 \toprule
  & Naive & SN & Theta & ETS & ARIMA & DeepAR & NBEATS & NHITS & DLinear & NLinear & Transformer & TiDE & KAN \\
 \midrule
@@ -49,6 +49,7 @@ Bank Leverage & 2.17 & 2.48 & 2.42 & 2.42 & 3.08 & 9.51 & \textbf{2.11} & 2.13 &
 Treasury Yield Curve & \textbf{0.96} & 0.99 & \textbf{0.96} & \textbf{0.96} & \textbf{0.96} & 1.51 & 1.11 & 1.18 & 2.57 & 0.98 & -- & 1.25 & 0.97 \\
 \bottomrule
 \end{tabular}
-\vspace{0.05cm}
+\vspace{0.1cm}
+
 \noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Error (MAE). Lower values indicate better performance. -- indicates missing results.}
 \end{table}

@@ -131,6 +131,11 @@ def task_create_results_tables():
             Path("./docs_src") / "mae_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "mae_pivot_table.csv",
             OUTPUT_DIR / "forecasting2" / "mae_pivot_table.tex",
+            # Relative MASE pivot table files (comparing to Naive baseline)
+            Path("./docs_src") / "relative_mase_pivot_table.csv",
+            Path("./docs_src") / "relative_mase_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "relative_mase_pivot_table.csv",
+            OUTPUT_DIR / "forecasting2" / "relative_mase_pivot_table.tex",
             # Summary statistics
             OUTPUT_DIR / "forecasting2" / "model_summary_statistics.csv",
             OUTPUT_DIR / "forecasting2" / "model_summary_statistics.tex",
@@ -169,6 +174,7 @@ def task_compile_latex_docs():
             OUTPUT_DIR / "forecasting2" / "rmse_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "smape_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "mae_pivot_table.tex",
+            OUTPUT_DIR / "forecasting2" / "relative_mase_pivot_table.tex",
             OUTPUT_DIR / "forecasting2" / "model_summary_statistics.tex",
             # Heatmap plot dependencies
             OUTPUT_DIR / "forecasting2" / "mase_heatmap.png",
