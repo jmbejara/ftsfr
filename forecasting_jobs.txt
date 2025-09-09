@@ -6,7 +6,8 @@ python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated -
 python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model theta
 python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model tide
 python ./forecasting/forecast.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model auto_arima_fast
@@ -17,7 +18,8 @@ python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model na
 python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_CDS_contract_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model auto_arima_fast
@@ -28,7 +30,8 @@ python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model n
 python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_CDS_portfolio_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model auto_arima_fast
@@ -39,7 +42,8 @@ python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model naive
 python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model theta
 python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model tide
 python ./forecasting/forecast.py --dataset ftsfr_CIP_spreads --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_arima_fast
@@ -50,7 +54,8 @@ python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model 
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model theta
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model tide
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_ret --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_arima_fast
@@ -61,7 +66,8 @@ python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model theta
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model tide
 python ./forecasting/forecast.py --dataset ftsfr_CRSP_monthly_stock_retx --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model auto_arima_fast
@@ -72,7 +78,8 @@ python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model naive
 python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_FX_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model auto_arima_fast
@@ -83,7 +90,8 @@ python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model naiv
 python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_cjs_option_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model auto_arima_fast
@@ -94,7 +102,8 @@ python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model nai
 python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_commodities_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_arima_fast
@@ -105,7 +114,8 @@ python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --m
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_portfolio_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model auto_arima_fast
@@ -116,7 +126,8 @@ python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model naive
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_corp_bond_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_arima_fast
@@ -127,7 +138,8 @@ python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size
 python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model theta
 python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model tide
 python ./forecasting/forecast.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model auto_arima_fast
@@ -138,7 +150,8 @@ python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model nai
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model theta
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model tide
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_all --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_arima_fast
@@ -149,7 +162,8 @@ python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily -
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model theta
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model tide
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_daily --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_arima_fast
@@ -160,7 +174,8 @@ python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model theta
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model tide
 python ./forecasting/forecast.py --dataset ftsfr_he_kelly_manela_factors_monthly --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model auto_arima_fast
@@ -171,7 +186,8 @@ python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model naiv
 python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_hkm_option_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_arima_fast
@@ -182,7 +198,8 @@ python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity 
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model theta
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model tide
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_cash_liquidity --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_arima_fast
@@ -193,7 +210,8 @@ python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model theta
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model tide
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_arima_fast
@@ -204,7 +222,8 @@ python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model theta
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model tide
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model auto_arima_fast
@@ -215,7 +234,8 @@ python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --mode
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model theta
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model tide
 python ./forecasting/forecast.py --dataset ftsfr_nyu_call_report_leverage --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model auto_arima_fast
@@ -226,7 +246,8 @@ python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model nai
 python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model theta
 python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model tide
 python ./forecasting/forecast.py --dataset ftsfr_tips_treasury_basis --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_arima_fast
@@ -237,7 +258,8 @@ python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_portfolio_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model auto_arima_fast
@@ -248,7 +270,8 @@ python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model naiv
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model theta
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model tide
 python ./forecasting/forecast.py --dataset ftsfr_treas_bond_returns --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_arima_fast
@@ -259,7 +282,8 @@ python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon -
 python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model theta
 python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model tide
 python ./forecasting/forecast.py --dataset ftsfr_treas_yield_curve_zero_coupon --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model auto_arima_fast
@@ -270,7 +294,8 @@ python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model naive
 python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model theta
 python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model tide
 python ./forecasting/forecast.py --dataset ftsfr_treasury_sf_basis --model vanilla_transformer
 python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model auto_arima_fast
@@ -281,6 +306,7 @@ python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model nai
 python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model nbeats
 python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model nhits
 python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model nlinear
-python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model seasonal_naive
+python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model simple_exponential_smoothing
+python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model theta
 python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model tide
 python ./forecasting/forecast.py --dataset ftsfr_treasury_swap_basis --model vanilla_transformer

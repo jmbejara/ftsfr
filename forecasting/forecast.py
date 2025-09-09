@@ -144,6 +144,15 @@ def create_model(model_name, seasonality, model_configs, dataset_name=None, fore
     if library == "neuralforecast" and forecast_horizon is not None:
         params["h"] = int(forecast_horizon)
     
+    # Set intelligent input_size for NeuralForecast models
+    if library == "neuralforecast" and "input_size" in params:
+        if seasonality <= 1:
+            # For non-seasonal data (like returns), use shorter lookback
+            params["input_size"] = max(24, min(48, seasonality * 24))
+        else:
+            # For seasonal data, use multiple seasons
+            params["input_size"] = max(seasonality * 2, min(seasonality * 6, 144))
+    
     # Add trainer args for NeuralForecast models to redirect logs
     if library == "neuralforecast" and dataset_name is not None:
         params["default_root_dir"] = f"./_output/forecasting2/logs/{dataset_name}/{model_name}"
@@ -256,7 +265,7 @@ def train_and_forecast_statsforecast(model, train_data, test_data, frequency):
     statsforecast_freq = convert_frequency_to_statsforecast(frequency)
     print(f"Train data shape: {train_data.shape}")
 
-    # Trim trailing nulls per id so last train point is valid
+    # Trim trailing nulls per id so last train point is valid, then forward fill
     train_data_clean = []
     for entity in train_data["unique_id"].unique():
         entity_data = train_data.filter(pl.col("unique_id") == entity)
@@ -264,7 +273,11 @@ def train_and_forecast_statsforecast(model, train_data, test_data, frequency):
         if len(non_null_data) > 0:
             last_non_null_date = non_null_data["ds"].max()
             entity_data_trimmed = entity_data.filter(pl.col("ds") <= last_non_null_date)
-            train_data_clean.append(entity_data_trimmed)
+            # Forward fill to handle gaps that cause SimpleExponentialSmoothing to fail
+            entity_data_filled = entity_data_trimmed.with_columns(
+                pl.col("y").fill_null(strategy="forward")
+            )
+            train_data_clean.append(entity_data_filled)
 
     train_data_filtered = (
         pl.concat(train_data_clean) if train_data_clean else train_data
@@ -312,8 +325,12 @@ def train_and_forecast_neuralforecast(model, train_data, test_data, frequency):
         )
     )
 
+    # Set validation size to be larger than forecast horizon
+    forecast_horizon = int(test_data["ds"].n_unique())
+    val_size = max(forecast_horizon + 12, 100)  # At least horizon + 12, minimum 100
+    
     nf = NeuralForecast(models=[model], freq=polars_freq)
-    nf.fit(df=train_data_filtered)
+    nf.fit(df=train_data_filtered, val_size=val_size)
 
     forecasts = nf.predict()
     print(f"Generated {len(forecasts)} forecasts")
@@ -380,8 +397,8 @@ def calculate_global_metrics(train_data, test_data, forecasts, seasonality, mode
         .filter(pl.col("n") >= seasonality + 1)
         .get_column("unique_id")
     )
-    train_clean = train_clean.filter(pl.col("unique_id").is_in(ok_ids))
-    eval_df = eval_df.filter(pl.col("unique_id").is_in(ok_ids))
+    train_clean = train_clean.filter(pl.col("unique_id").is_in(ok_ids.to_list()))
+    eval_df = eval_df.filter(pl.col("unique_id").is_in(ok_ids.to_list()))
 
     if len(eval_df) == 0:
         raise ValueError("No series with sufficient history for evaluation.")

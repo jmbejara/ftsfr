@@ -7,11 +7,11 @@ class = "Naive"
 display_name = "Naive"
 table_name = "Naive"
 
-[seasonal_naive]
-library = "statsforecast"
-class = "SeasonalNaive"
-display_name = "Seasonal Naive"
-table_name = "SN"
+# [seasonal_naive]
+# library = "statsforecast"
+# class = "SeasonalNaive"
+# display_name = "Seasonal Naive"
+# table_name = "SN"
 
 # [seasonal_es_optimized]
 # library = "statsforecast"
@@ -19,11 +19,11 @@ table_name = "SN"
 # display_name = "Seasonal ES Optimized"
 
 
-# [theta]
-# library = "statsforecast"
-# class = "Theta"
-# display_name = "Theta"
-# table_name = "Theta"
+[theta]
+library = "statsforecast"
+class = "Theta"
+display_name = "Theta"
+table_name = "Theta"
 
 # [auto_theta]
 # library = "statsforecast"
@@ -36,11 +36,11 @@ table_name = "SN"
 # #TBATS not in nixtlaverse
 
 
-# [simple_exponential_smoothing]
-# library = "statsforecast"
-# class = "SimpleExponentialSmoothing"
-# display_name = "Simple Exponential Smoothing"
-# table_name = "SES"
+[simple_exponential_smoothing]
+library = "statsforecast"
+class = "SimpleExponentialSmoothingOptimized"
+display_name = "Simple Exponential Smoothing"
+table_name = "SES"
 
 # [auto_ets]
 # library = "statsforecast"
@@ -48,7 +48,7 @@ table_name = "SN"
 # display_name = "AutoETS"
 # table_name = "ETS"
 # [auto_ets.params]
-# model = "ZZZ"
+# model = "ANN"
 
 # DHR-ARIMA not in nixtlaverse
 # (Dynamic Harmonic Regression - ARIMA)
@@ -85,8 +85,13 @@ table_name = "DeepAR"
 h = 1
 loss = "DistributionLoss"
 input_size = 12
-lstm_hidden_size = 32
-max_steps = 100
+lstm_hidden_size = 128
+max_steps = 500
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 ## This model is having difficulty
 # [auto_deepar]
@@ -111,9 +116,14 @@ table_name = "NBEATS"
 h = 1
 loss = "MAE"
 input_size = 12
-max_steps = 100
-mlp_units = [[32, 32], [32, 32], [32, 32]]
+max_steps = 500
+mlp_units = [[64, 64], [64, 64], [64, 64]]
 stack_types = ["identity", "identity"]
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 ## This model is having difficulty
 # [auto_nbeats]
@@ -139,8 +149,13 @@ table_name = "NHITS"
 h = 1
 loss = "MAE"
 input_size = 12
-max_steps = 100
-mlp_units = [[16, 16], [16, 16], [16, 16]]
+max_steps = 500
+mlp_units = [[64, 64], [64, 64], [64, 64]]
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 ## This model is having difficulty
 # [auto_nhits]
@@ -166,7 +181,12 @@ table_name = "DLinear"
 h = 1
 loss = "MAE"
 input_size = 12
-max_steps = 100
+max_steps = 500
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 ## This model is having difficulty
 # [auto_dlinear]
@@ -191,7 +211,12 @@ table_name = "NLinear"
 h = 1
 loss = "MAE"
 input_size = 12
-max_steps = 100
+max_steps = 500
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 ## This model is having difficulty
 # [auto_nlinear]
@@ -216,8 +241,13 @@ table_name = "Transformer"
 h = 1
 loss = "MAE"
 input_size = 12
-max_steps = 100
-hidden_size = 32
+max_steps = 500
+hidden_size = 128
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 ## This model is having difficulty
 # [auto_vanilla_transformer]
@@ -247,7 +277,12 @@ hidden_size = 512
 decoder_output_dim = 32
 temporal_decoder_dim = 128
 dropout = 0.3
-max_steps = 100
+max_steps = 500
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 
 [kan]
@@ -263,7 +298,12 @@ grid_size = 5
 spline_order = 3
 n_hidden_layers = 1
 hidden_size = 512
-max_steps = 100
+max_steps = 500
+learning_rate = 1e-3
+batch_size = 32
+val_check_steps = 50
+early_stop_patience_steps = 3
+scaler_type = "robust"
 
 
 # Very slow
