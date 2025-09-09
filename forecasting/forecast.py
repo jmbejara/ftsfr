@@ -116,7 +116,7 @@ def load_model_config():
         return tomli.load(f)
 
 
-def create_model(model_name, seasonality, model_configs, dataset_name=None, forecast_horizon=None):
+def create_model(model_name, seasonality, model_configs, dataset_name=None, forecast_horizon=None, disable_early_stopping=False):
     """Create a model instance based on TOML configuration."""
     if model_name not in model_configs:
         available = ", ".join(model_configs.keys())
@@ -152,6 +152,11 @@ def create_model(model_name, seasonality, model_configs, dataset_name=None, fore
         else:
             # For seasonal data, use multiple seasons
             params["input_size"] = max(seasonality * 2, min(seasonality * 6, 144))
+    
+    # Disable early stopping if validation is not available
+    if library == "neuralforecast" and disable_early_stopping:
+        if "early_stop_patience_steps" in params:
+            del params["early_stop_patience_steps"]
     
     # Add trainer args for NeuralForecast models to redirect logs
     if library == "neuralforecast" and dataset_name is not None:
@@ -209,8 +214,63 @@ def create_model(model_name, seasonality, model_configs, dataset_name=None, fore
         raise ValueError(f"Unsupported library: {library}")
 
 
-def load_and_preprocess_data(data_path, frequency="D", test_split=0.2):
-    """Load and preprocess the dataset using Polars throughout (full dataset)."""
+def standardize_data_cleaning(data, fill_strategy="forward_only"):
+    """Apply consistent data cleaning across all models."""
+    cleaned_series = []
+    for entity in data["unique_id"].unique():
+        entity_data = data.filter(pl.col("unique_id") == entity)
+        non_null_data = entity_data.filter(pl.col("y").is_not_null())
+        if len(non_null_data) > 0:
+            last_non_null_date = non_null_data["ds"].max()
+            entity_data_trimmed = entity_data.filter(pl.col("ds") <= last_non_null_date)
+            
+            # Apply consistent filling strategy
+            if fill_strategy == "forward_only":
+                entity_data_filled = entity_data_trimmed.with_columns(
+                    pl.col("y").fill_null(strategy="forward")
+                )
+            elif fill_strategy == "forward_and_backward":
+                entity_data_filled = entity_data_trimmed.with_columns(
+                    pl.col("y").fill_null(strategy="forward").fill_null(strategy="backward")
+                )
+            else:
+                entity_data_filled = entity_data_trimmed
+            
+            cleaned_series.append(entity_data_filled)
+    
+    return pl.concat(cleaned_series) if cleaned_series else data
+
+
+def filter_series_for_forecasting(data, forecast_horizon, seasonality, min_buffer=6):
+    """Apply consistent series filtering for all models."""
+    series_lengths = (
+        data.group_by("unique_id")
+        .agg(pl.len().alias("n"))
+    )
+    
+    # Calculate minimum required length for fair comparison
+    # Need enough for: seasonality calculation + forecast horizon + buffer
+    min_required_length = max(seasonality + 1, forecast_horizon + min_buffer, 24)
+    
+    valid_series = series_lengths.filter(pl.col("n") >= min_required_length).get_column("unique_id")
+    
+    if len(valid_series) == 0:
+        # Fallback to minimal requirements
+        min_required_length = max(forecast_horizon + 2, 12)
+        valid_series = series_lengths.filter(pl.col("n") >= min_required_length).get_column("unique_id")
+        
+        if len(valid_series) == 0:
+            raise ValueError("No series meet the minimum length requirement for forecasting")
+    
+    original_count = len(data["unique_id"].unique())
+    filtered_data = data.filter(pl.col("unique_id").is_in(valid_series.to_list()))
+    final_count = len(filtered_data["unique_id"].unique())
+    
+    return filtered_data, original_count, final_count, min_required_length
+
+
+def load_and_preprocess_data(data_path, frequency="D", test_split=0.2, seasonality=252):
+    """Load and preprocess the dataset using Polars throughout with consistent filtering."""
     print("Loading and preprocessing data...")
 
     df = pl.read_parquet(data_path)
@@ -219,11 +279,11 @@ def load_and_preprocess_data(data_path, frequency="D", test_split=0.2):
         df = df.rename({"id": "unique_id"})
 
     drop_cols = [c for c in df.columns if c.startswith("__index_level_")]
-    if drop_cols: df = df.drop(drop_cols)
+    if drop_cols:
+        df = df.drop(drop_cols)
     df = df.select(["unique_id", "ds", "y"])
 
-
-    print(f"Using full dataset: {len(df['unique_id'].unique())} entities")
+    print(f"Initial dataset: {len(df['unique_id'].unique())} entities")
 
     # Ensure proper dtypes & guard against inf/nan
     df = df.with_columns(pl.col("y").cast(pl.Float32))
@@ -242,15 +302,26 @@ def load_and_preprocess_data(data_path, frequency="D", test_split=0.2):
     unique_dates = df["ds"].unique().sort()
     split_idx = int(len(unique_dates) * (1 - test_split))
     train_cutoff = unique_dates[split_idx - 1]
+    forecast_horizon = len(unique_dates) - split_idx
 
     train_data = df.filter(pl.col("ds") <= train_cutoff)
     test_data = df.filter(pl.col("ds") > train_cutoff)
 
-    print(
-        f"Data split: {len(train_data)} training samples, {len(test_data)} test samples"
+    # Apply consistent filtering BEFORE any model-specific processing
+    train_data_filtered, original_count, final_count, min_length = filter_series_for_forecasting(
+        train_data, forecast_horizon, seasonality
     )
-    print(f"Total entities: {len(df['unique_id'].unique())}")
-    return train_data, test_data, df
+    
+    # Filter test data to match training series
+    valid_series = train_data_filtered["unique_id"].unique().to_list()
+    test_data_filtered = test_data.filter(pl.col("unique_id").is_in(valid_series))
+    full_data_filtered = df.filter(pl.col("unique_id").is_in(valid_series))
+    
+    print(f"Filtered out {original_count - final_count} series shorter than {min_length} periods")
+    print(f"Final dataset: {final_count} entities for fair model comparison")
+    print(f"Data split: {len(train_data_filtered)} training samples, {len(test_data_filtered)} test samples")
+    
+    return train_data_filtered, test_data_filtered, full_data_filtered
 
 
 def train_and_forecast_statsforecast(model, train_data, test_data, frequency):
@@ -265,26 +336,9 @@ def train_and_forecast_statsforecast(model, train_data, test_data, frequency):
     statsforecast_freq = convert_frequency_to_statsforecast(frequency)
     print(f"Train data shape: {train_data.shape}")
 
-    # Trim trailing nulls per id so last train point is valid, then forward fill
-    train_data_clean = []
-    for entity in train_data["unique_id"].unique():
-        entity_data = train_data.filter(pl.col("unique_id") == entity)
-        non_null_data = entity_data.filter(pl.col("y").is_not_null())
-        if len(non_null_data) > 0:
-            last_non_null_date = non_null_data["ds"].max()
-            entity_data_trimmed = entity_data.filter(pl.col("ds") <= last_non_null_date)
-            # Forward fill to handle gaps that cause SimpleExponentialSmoothing to fail
-            entity_data_filled = entity_data_trimmed.with_columns(
-                pl.col("y").fill_null(strategy="forward")
-            )
-            train_data_clean.append(entity_data_filled)
-
-    train_data_filtered = (
-        pl.concat(train_data_clean) if train_data_clean else train_data
-    )
-    print(
-        f"Trimmed training data to remove trailing nulls: {train_data_filtered.shape}"
-    )
+    # Use standardized data cleaning
+    train_data_clean = standardize_data_cleaning(train_data, fill_strategy="forward_only")
+    print(f"Applied standardized data cleaning: {train_data_clean.shape}")
 
     fallback = Naive()
     sf = StatsForecast(
@@ -292,45 +346,48 @@ def train_and_forecast_statsforecast(model, train_data, test_data, frequency):
     )
 
     forecast_horizon = int(test_data["ds"].n_unique())
-    forecasts = sf.forecast(df=train_data_filtered, h=forecast_horizon)
+    forecasts = sf.forecast(df=train_data_clean, h=forecast_horizon)
     print(f"Generated {len(forecasts)} forecasts")
     return forecasts
 
 
-def train_and_forecast_neuralforecast(model, train_data, test_data, frequency):
+def train_and_forecast_neuralforecast(model, train_data, test_data, frequency, val_size=None):
     """Train and forecast using NeuralForecast."""
     print("Training model and generating forecasts using NeuralForecast...")
     from neuralforecast import NeuralForecast
 
     polars_freq = convert_frequency_to_statsforecast(frequency)
-
-    # Clean train: trim to last non-null, then ffill/bfill internals
-    train_data_clean = []
-    for entity in train_data["unique_id"].unique():
-        entity_data = train_data.filter(pl.col("unique_id") == entity)
-        non_null_data = entity_data.filter(pl.col("y").is_not_null())
-        if len(non_null_data) > 0:
-            last_non_null_date = non_null_data["ds"].max()
-            entity_data_trimmed = entity_data.filter(pl.col("ds") <= last_non_null_date)
-            entity_data_filled = entity_data_trimmed.with_columns(
-                pl.col("y").fill_null(strategy="forward").fill_null(strategy="backward")
-            )
-            train_data_clean.append(entity_data_filled)
-
-    train_data_filtered = (
-        pl.concat(train_data_clean)
-        if train_data_clean
-        else train_data.with_columns(
-            pl.col("y").fill_null(strategy="forward").fill_null(strategy="backward")
-        )
-    )
-
-    # Set validation size to be larger than forecast horizon
     forecast_horizon = int(test_data["ds"].n_unique())
-    val_size = max(forecast_horizon + 12, 100)  # At least horizon + 12, minimum 100
+
+    # Use standardized data cleaning (same as StatsForecast)
+    train_data_clean = standardize_data_cleaning(train_data, fill_strategy="forward_only")
+    print(f"Applied standardized data cleaning: {train_data_clean.shape}")
+
+    # Calculate validation size if not provided
+    if val_size is None:
+        min_series_length = (
+            train_data_clean.group_by("unique_id")
+            .agg(pl.len().alias("n"))
+            .select("n")
+            .min()
+            .item()
+        )
+        
+        # NeuralForecast requires val_size to be either 0 or >= forecast_horizon
+        # Set conservative validation size
+        if min_series_length < (forecast_horizon * 3):
+            # For short series, use minimal validation or no validation
+            val_size = 0  # Use 0 to disable validation for short series
+            print(f"Short series detected (min length: {min_series_length}), disabling validation")
+        else:
+            val_size = forecast_horizon  # Use same size as forecast horizon
+            print(f"Using validation size equal to forecast horizon: {val_size}")
     
+    print(f"Using validation size: {val_size}")
+    
+    # Note: model was created with disable_early_stopping=True if val_size=0
     nf = NeuralForecast(models=[model], freq=polars_freq)
-    nf.fit(df=train_data_filtered, val_size=val_size)
+    nf.fit(df=train_data_clean, val_size=val_size)
 
     forecasts = nf.predict()
     print(f"Generated {len(forecasts)} forecasts")
@@ -347,7 +404,7 @@ def save_metrics_csv(metrics_dict, dataset_name, model_name):
     return csv_path
 
 
-def calculate_global_metrics(train_data, test_data, forecasts, seasonality, model_name):
+def calculate_global_metrics(train_data, test_data, forecasts, seasonality, _):
     """Compute global MASE, sMAPE, MAE, RMSE using utilsforecast.evaluation.evaluate."""
     print("Calculating global metrics (MASE, sMAPE, MAE, RMSE)...")
 
@@ -390,22 +447,19 @@ def calculate_global_metrics(train_data, test_data, forecasts, seasonality, mode
         .sort(["unique_id", "ds"])
     )
 
-    # Keep ids with enough non-null history for seasonal differencing
-    ok_ids = (
-        train_clean.group_by("unique_id")
-        .agg(pl.len().alias("n"))
-        .filter(pl.col("n") >= seasonality + 1)
-        .get_column("unique_id")
-    )
-    train_clean = train_clean.filter(pl.col("unique_id").is_in(ok_ids.to_list()))
-    eval_df = eval_df.filter(pl.col("unique_id").is_in(ok_ids.to_list()))
+    # Ensure we have the same series in both train and eval
+    # Since we've already filtered series upfront, we can use all available data
+    train_series = set(train_clean["unique_id"].unique().to_list())
+    eval_series = set(eval_df["unique_id"].unique().to_list())
+    common_series = list(train_series & eval_series)
+    
+    if not common_series:
+        raise ValueError("No common series between training and evaluation data.")
+    
+    train_clean = train_clean.filter(pl.col("unique_id").is_in(common_series))
+    eval_df = eval_df.filter(pl.col("unique_id").is_in(common_series))
 
-    if len(eval_df) == 0:
-        raise ValueError("No series with sufficient history for evaluation.")
-
-    print(
-        f"Evaluating {len(eval_df['unique_id'].unique())} series with sufficient history"
-    )
+    print(f"Evaluating {len(common_series)} series (fair comparison across all models)")
 
     # seasonality-aware MASE metric
     seasonality_mase = partial(mase, seasonality=seasonality)
@@ -444,7 +498,7 @@ def calculate_global_metrics(train_data, test_data, forecasts, seasonality, mode
     
     # Check for remaining invalid values
     vals = [global_mase, global_smape, global_mae, global_rmse]
-    for i, (v, name) in enumerate(zip(vals, val_names)):
+    for v, name in zip(vals, val_names):
         if v is None or (isinstance(v, float) and (np.isnan(v) or np.isinf(v))):
             print(f"ERROR: {name} metric is invalid: {v}")
     
@@ -484,14 +538,27 @@ def main():
     print(f"Frequency: {dataset_config['frequency']}")
     print(f"Seasonality: {dataset_config['seasonality']}")
 
-    # Load & preprocess
+    # Load & preprocess with consistent filtering
     train_data, test_data, full_data = load_and_preprocess_data(
-        dataset_config["data_path"], dataset_config["frequency"], args.test_split
+        dataset_config["data_path"], dataset_config["frequency"], args.test_split, dataset_config["seasonality"]
     )
 
     # Compute test horizon BEFORE model creation (needed for NeuralForecast)
     test_size = int(test_data["ds"].n_unique())
 
+    # Determine if we need to disable early stopping (for short series)
+    disable_early_stopping = False
+    if model_configs[args.model]["library"] == "neuralforecast":
+        min_series_length = (
+            train_data.group_by("unique_id")
+            .agg(pl.len().alias("n"))
+            .select("n")
+            .min()
+            .item()
+        )
+        if min_series_length < (test_size * 3):
+            disable_early_stopping = True
+    
     # Create model
     model = create_model(
         args.model,
@@ -499,6 +566,7 @@ def main():
         model_configs,
         dataset_name=args.dataset,
         forecast_horizon=test_size,
+        disable_early_stopping=disable_early_stopping,
     )
     library = model_configs[args.model]["library"]
 
@@ -527,10 +595,12 @@ def main():
         ["Model", model_configs[args.model]["display_name"]],
         ["Library", library.title()],
         ["Dataset", args.dataset],
-        ["Entities", len(full_data["unique_id"].unique())],
+        ["Total Entities (Filtered)", len(full_data["unique_id"].unique())],
         ["Frequency", dataset_config["frequency"]],
         ["Seasonality", dataset_config["seasonality"]],
         ["Test Size (h)", test_size],
+        ["Data Processing", "Standardized across all models"],
+        ["Series Filtering", "Applied consistently to all models"],
         ["Global MASE", f"{global_mase:.4f}"],
         ["Global sMAPE", f"{global_smape:.4f}"],
         ["Global MAE", f"{global_mae:.4f}"],
