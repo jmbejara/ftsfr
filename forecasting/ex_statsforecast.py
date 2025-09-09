@@ -638,7 +638,7 @@ if __name__ == "__main__":
     axes[0].grid(True, alpha=0.3)
     
     # Plot 2: Number of forecasts per portfolio (should be equal)
-    forecasts_per_portfolio = forecast_df.group_by('unique_id').agg(pl.count('ds').alias('count'))
+    forecasts_per_portfolio = forecast_df.group_by('unique_id').agg(pl.len('ds').alias('count'))
     axes[1].bar(range(len(forecasts_per_portfolio)), forecasts_per_portfolio['count'], alpha=0.7, color='green')
     axes[1].set_title('Number of Forecasts per Portfolio')
     axes[1].set_xlabel('Portfolio Index')

@@ -140,6 +140,46 @@ def filter_results_by_active_models(results_df):
     print(f"Using {filtered_count} results from active models")
     return filtered_results
 
+def get_active_dataset_names():
+    """Get list of active dataset names from datasets.toml (excluding commented out datasets)"""
+    datasets_toml_path = Path(__file__).parent.parent / "datasets.toml"
+    
+    if not datasets_toml_path.exists():
+        print(f"Warning: datasets.toml not found at {datasets_toml_path}")
+        return []
+    
+    with open(datasets_toml_path, 'rb') as f:
+        datasets_config = tomli.load(f)
+    
+    active_datasets = []
+    for module_name, module_config in datasets_config.items():
+        if isinstance(module_config, dict):
+            # Look for dataset entries within each module
+            for key, value in module_config.items():
+                if isinstance(value, dict) and key.startswith('ftsfr_'):
+                    # This is a dataset entry
+                    active_datasets.append(key)
+    
+    print(f"Found {len(active_datasets)} active datasets: {sorted(active_datasets)}")
+    return active_datasets
+
+def filter_results_by_active_datasets(results_df):
+    """Filter results DataFrame to only include active datasets from config"""
+    active_datasets = get_active_dataset_names()
+    
+    # Filter results to only include active datasets
+    initial_count = len(results_df)
+    filtered_results = results_df[results_df['Dataset'].isin(active_datasets)].copy()
+    filtered_count = len(filtered_results)
+    
+    if filtered_count < initial_count:
+        removed_count = initial_count - filtered_count
+        removed_datasets = set(results_df['Dataset'].unique()) - set(active_datasets)
+        print(f"Filtered out {removed_count} results from inactive datasets: {sorted(removed_datasets)}")
+    
+    print(f"Using {filtered_count} results from active datasets")
+    return filtered_results
+
 def filter_quality_results(results_df):
     """Filter out results with quality issues (NaN values or zero error metrics)"""
     
@@ -183,20 +223,14 @@ def create_quality_summary():
     all_models = list(models_config.keys())
     print(f"Found {len(all_models)} models in config")
     
-    # Get datasets from new error_metrics directory structure
+    # Get datasets from active datasets in config (not filesystem)
+    all_datasets = get_active_dataset_names()
+    print(f"Found {len(all_datasets)} active datasets in config")
+    
     error_metrics_dir = FORECAST2_DIR / "error_metrics"
     if not error_metrics_dir.exists():
         print(f"Error: Error metrics directory not found at {error_metrics_dir}")
         return None
-    
-    # Scan for all datasets (they are now subdirectories)
-    all_datasets = set()
-    for dataset_dir in error_metrics_dir.iterdir():
-        if dataset_dir.is_dir():
-            all_datasets.add(dataset_dir.name)
-    
-    all_datasets = sorted(list(all_datasets))
-    print(f"Found {len(all_datasets)} unique datasets")
     
     # Load the assembled results for comparison
     results_file = FORECAST2_DIR / "results_all.csv"
@@ -423,6 +457,9 @@ def create_mase_pivot_table():
     # Filter to only include active models from config
     results = filter_results_by_active_models(results)
     
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -531,6 +568,9 @@ def create_rmse_pivot_table():
     # Filter to only include active models from config
     results = filter_results_by_active_models(results)
     
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -638,6 +678,9 @@ def create_smape_pivot_table():
     # Filter to only include active models from config
     results = filter_results_by_active_models(results)
     
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -727,6 +770,9 @@ def create_mae_pivot_table():
     # Filter to only include active models from config
     results = filter_results_by_active_models(results)
     
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
+    
     # Apply quality filtering
     results = filter_quality_results(results)
     
@@ -815,6 +861,9 @@ def create_relative_mase_pivot_table():
     
     # Filter to only include active models from config
     results = filter_results_by_active_models(results)
+    
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
     
     # Apply quality filtering
     results = filter_quality_results(results)
@@ -1147,13 +1196,13 @@ def apply_grouped_dataset_ordering(pivot_data, dataset_groups, dataset_table_nam
         if group in grouped_datasets:
             grouped_datasets[group].append(dataset)
     
-    # Create ordered list of datasets (same order as LaTeX tables)
+    # Create ordered list of datasets (alphabetically sorted within each group)
     ordered_datasets = []
     for group in group_order:
         datasets = grouped_datasets[group]
         if datasets:
-            # Keep datasets in the order they appear within each group
-            ordered_datasets.extend(datasets)
+            # Sort datasets alphabetically within each group
+            ordered_datasets.extend(sorted(datasets))
     
     # Reorder the pivot data to match the grouped ordering
     pivot_data = pivot_data.reindex(index=ordered_datasets)
@@ -1184,6 +1233,9 @@ def create_heatmap_plots():
     
     # Filter to only include active models from config
     results = filter_results_by_active_models(results)
+    
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
     
     # Apply quality filtering
     results = filter_quality_results(results)
@@ -1455,6 +1507,9 @@ def create_summary_statistics():
     
     # Filter to only include active models from config
     results = filter_results_by_active_models(results)
+    
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
     
     # Apply quality filtering
     results = filter_quality_results(results)

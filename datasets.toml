@@ -303,23 +303,23 @@ frequency = "D"
 # seasonality = 252
 seasonality = 1 # No seasonality for returns
 
-[ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_op]
-description = """Daily Fama-French 25 portfolios based on size and operating profitability"""
-short_name = "FF25 Size-Op Returns"
-table_name = "FF25 Size-Op"
-group = "returns_portfolios"
-frequency = "D"
-# seasonality = 252
-seasonality = 1 # No seasonality for returns
+# [ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_op]
+# description = """Daily Fama-French 25 portfolios based on size and operating profitability"""
+# short_name = "FF25 Size-Op Returns"
+# table_name = "FF25 Size-Op"
+# group = "returns_portfolios"
+# frequency = "D"
+# # seasonality = 252
+# seasonality = 1 # No seasonality for returns
 
-[ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_inv]
-description = """Daily Fama-French 25 portfolios based on size and investment"""
-short_name = "FF25 Size-Inv Returns"
-table_name = "FF25 Size-Inv"
-group = "returns_portfolios"
-frequency = "D"
-# seasonality = 252
-seasonality = 1 # No seasonality for returns
+# [ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_inv]
+# description = """Daily Fama-French 25 portfolios based on size and investment"""
+# short_name = "FF25 Size-Inv Returns"
+# table_name = "FF25 Size-Inv"
+# group = "returns_portfolios"
+# frequency = "D"
+# # seasonality = 252
+# seasonality = 1 # No seasonality for returns
 
 
 ################################################################################
@@ -367,18 +367,18 @@ winsorization = [5.0, 95.0]
 required_data_sources = ["wrds_optionmetrics"]
 
 [options.ftsfr_hkm_option_returns]
-description = """From optionmetrics data, option returns, 1996-Present"""
+description = """SPX Options returns portfolios, taken from He, Kelly, and Manela (2017), 1996-Present"""
 short_name = "HKM Option Returns"
-table_name = "HKM Option"
-group = "returns_disaggregated"
+table_name = "SPX Options Portfolios"
+group = "returns_portfolios"
 frequency = "D"
 # seasonality = 252 # Business days per year
 seasonality = 1 # No seasonality for returns
 
 [options.ftsfr_cjs_option_returns]
-description = """From optionmetrics data, option returns, 1996-Present"""
+description = """From optionmetrics data, SPX Options returns on a contract level, 1996-Present"""
 short_name = "CJS Option Returns"
-table_name = "CJS Option"
+table_name = "SPX Options Contracts"
 group = "returns_disaggregated"
 frequency = "D"
 # seasonality = 252 # Business days per year

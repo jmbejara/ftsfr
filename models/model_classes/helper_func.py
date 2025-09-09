@@ -398,7 +398,7 @@ def process_df(df, frequency, seasonality, test_split, winsorization=None):
 
     df["y"] = df["y"].astype(np.float32)
 
-    df["y"].loc[(df["y"] == float("inf")) | (df["y"] == float("-inf"))] = np.nan
+    df.loc[(df["y"] == float("inf")) | (df["y"] == float("-inf")), "y"] = np.nan
 
     # This only adds NaNs as values for missing dates.
     df = fill_gaps(df, freq=frequency, start="global", end="global")
