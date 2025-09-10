@@ -441,6 +441,22 @@ def train_and_forecast_neuralforecast(model, train_data, test_data, frequency, v
                 model.early_stop_patience_steps = 0
             if hasattr(model, 'val_check_steps'):
                 model.val_check_steps = 999999  # Set to a very large value to effectively disable
+            
+            # Disable PyTorch Lightning early stopping callbacks if they exist
+            # This ensures that PyTorch Lightning doesn't try to use validation-dependent callbacks
+            for attr_name in ['trainer_kwargs', 'trainer_params']:
+                if hasattr(model, attr_name):
+                    trainer_config = getattr(model, attr_name)
+                    if isinstance(trainer_config, dict):
+                        # Remove or disable callbacks that require validation
+                        if 'callbacks' in trainer_config:
+                            from pytorch_lightning.callbacks import EarlyStopping
+                            trainer_config['callbacks'] = [
+                                cb for cb in trainer_config['callbacks'] 
+                                if not isinstance(cb, EarlyStopping)
+                            ]
+                        # Ensure enable_checkpointing is False  
+                        trainer_config['enable_checkpointing'] = False
         else:
             val_size = forecast_horizon  # Use same size as forecast horizon
             print(f"Using validation size equal to forecast horizon: {val_size}")
