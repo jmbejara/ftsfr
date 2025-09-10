@@ -338,6 +338,19 @@ def create_quality_summary():
         f.write(latex_summary)
     print(f"Saved quality summary (LaTeX) to: {quality_tex}")
     
+    # Create tabular-only version for quality summary
+    quality_tabular_full = summary_stats.to_latex(
+        index=False,
+        float_format="%.1f",
+        escape=False
+    )
+    quality_tabular = extract_tabular_content(quality_tabular_full)
+    
+    quality_tabular_tex = FORECAST2_DIR / "quality_summary_tabular.tex"
+    with open(quality_tabular_tex, 'w') as f:
+        f.write(f"% Quality Summary - tabular content only\n% Generated automatically by create_results_tables2.py\n{quality_tabular}")
+    print(f"Saved quality summary tabular (LaTeX) to: {quality_tabular_tex}")
+    
     return quality_df
 
 def create_failure_analysis(quality_df):
@@ -386,6 +399,19 @@ def create_failure_analysis(quality_df):
         f.write(model_latex)
     print(f"Saved model failure analysis (LaTeX) to: {model_tex}")
     
+    # Create tabular-only version for model analysis
+    model_tabular_full = model_analysis.to_latex(
+        float_format="%.1f",
+        column_format='l' + 'r' * len(model_analysis.columns),
+        escape=False
+    )
+    model_tabular = extract_tabular_content(model_tabular_full)
+    
+    model_tabular_tex = FORECAST2_DIR / "model_failure_analysis_tabular.tex"
+    with open(model_tabular_tex, 'w') as f:
+        f.write(f"% Model Failure Analysis - tabular content only\n% Generated automatically by create_results_tables2.py\n{model_tabular}")
+    print(f"Saved model failure analysis tabular (LaTeX) to: {model_tabular_tex}")
+    
     # Dataset failure analysis
     dataset_analysis = quality_df.groupby('Dataset').agg({
         'Status': ['count', lambda x: (x == 'Success').sum(), 
@@ -422,6 +448,19 @@ def create_failure_analysis(quality_df):
     with open(dataset_tex, 'w') as f:
         f.write(dataset_latex)
     print(f"Saved dataset failure analysis (LaTeX) to: {dataset_tex}")
+    
+    # Create tabular-only version for dataset analysis
+    dataset_tabular_full = dataset_analysis.to_latex(
+        float_format="%.1f",
+        column_format='l' + 'r' * len(dataset_analysis.columns),
+        escape=False
+    )
+    dataset_tabular = extract_tabular_content(dataset_tabular_full)
+    
+    dataset_tabular_tex = FORECAST2_DIR / "dataset_failure_analysis_tabular.tex"
+    with open(dataset_tabular_tex, 'w') as f:
+        f.write(f"% Dataset Failure Analysis - tabular content only\n% Generated automatically by create_results_tables2.py\n{dataset_tabular}")
+    print(f"Saved dataset failure analysis tabular (LaTeX) to: {dataset_tabular_tex}")
     
     # Print top failures
     print("\nTop 5 Worst Performing Models:")
@@ -511,6 +550,7 @@ def create_mase_pivot_table():
     
     # Convert to LaTeX table
     latex_output = create_latex_table(mase_pivot, "MASE Results by Dataset and Model", "tab:mase_results")
+    latex_tabular_output = create_latex_tabular_only(mase_pivot, "MASE Results by Dataset and Model", "tab:mase_results")
     
     # Save LaTeX version to docs_src as well
     docs_tex_file = Path(__file__).parent.parent / "docs_src" / "mase_pivot_table.tex"
@@ -518,11 +558,23 @@ def create_mase_pivot_table():
         f.write(latex_output)
     print(f"Saved MASE pivot table (LaTeX) to: {docs_tex_file}")
     
+    # Save tabular-only version to docs_src
+    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "mase_pivot_tabular.tex"
+    with open(docs_tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved MASE pivot tabular (LaTeX) to: {docs_tabular_file}")
+    
     # Save as .tex file
     tex_file = FORECAST2_DIR / "mase_pivot_table.tex"
     with open(tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved MASE pivot table (LaTeX) to: {tex_file}")
+    
+    # Save tabular-only version
+    tabular_file = FORECAST2_DIR / "mase_pivot_tabular.tex"
+    with open(tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved MASE pivot tabular (LaTeX) to: {tabular_file}")
     
     # Print summary statistics
     print("\nSummary Statistics:")
@@ -621,6 +673,7 @@ def create_rmse_pivot_table():
     
     # Convert to LaTeX table
     latex_output = create_latex_table(rmse_pivot, "RMSE Results by Dataset and Model", "tab:rmse_results")
+    latex_tabular_output = create_latex_tabular_only(rmse_pivot, "RMSE Results by Dataset and Model", "tab:rmse_results")
     
     # Save as .tex file
     tex_file = FORECAST2_DIR / "rmse_pivot_table.tex"
@@ -628,11 +681,23 @@ def create_rmse_pivot_table():
         f.write(latex_output)
     print(f"Saved RMSE pivot table (LaTeX) to: {tex_file}")
     
+    # Save tabular-only version
+    tabular_file = FORECAST2_DIR / "rmse_pivot_tabular.tex"
+    with open(tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved RMSE pivot tabular (LaTeX) to: {tabular_file}")
+    
     # Save LaTeX version to docs_src as well
     docs_tex_file = Path(__file__).parent.parent / "docs_src" / "rmse_pivot_table.tex"
     with open(docs_tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved RMSE pivot table (LaTeX) to: {docs_tex_file}")
+    
+    # Save tabular-only version to docs_src
+    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "rmse_pivot_tabular.tex"
+    with open(docs_tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved RMSE pivot tabular (LaTeX) to: {docs_tabular_file}")
     
     # Print summary statistics
     print("\nSummary Statistics:")
@@ -730,6 +795,7 @@ def create_smape_pivot_table():
     
     # Convert to LaTeX table
     latex_output = create_latex_table(smape_pivot, "sMAPE Results by Dataset and Model", "tab:smape_results")
+    latex_tabular_output = create_latex_tabular_only(smape_pivot, "sMAPE Results by Dataset and Model", "tab:smape_results")
     
     # Save as .tex file
     tex_file = FORECAST2_DIR / "smape_pivot_table.tex"
@@ -737,11 +803,23 @@ def create_smape_pivot_table():
         f.write(latex_output)
     print(f"Saved sMAPE pivot table (LaTeX) to: {tex_file}")
     
+    # Save tabular-only version
+    tabular_file = FORECAST2_DIR / "smape_pivot_tabular.tex"
+    with open(tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved sMAPE pivot tabular (LaTeX) to: {tabular_file}")
+    
     # Save LaTeX version to docs_src as well
     docs_tex_file = Path(__file__).parent.parent / "docs_src" / "smape_pivot_table.tex"
     with open(docs_tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved sMAPE pivot table (LaTeX) to: {docs_tex_file}")
+    
+    # Save tabular-only version to docs_src
+    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "smape_pivot_tabular.tex"
+    with open(docs_tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved sMAPE pivot tabular (LaTeX) to: {docs_tabular_file}")
     
     return smape_pivot
 
@@ -822,6 +900,7 @@ def create_mae_pivot_table():
     
     # Convert to LaTeX table
     latex_output = create_latex_table(mae_pivot, "MAE Results by Dataset and Model", "tab:mae_results")
+    latex_tabular_output = create_latex_tabular_only(mae_pivot, "MAE Results by Dataset and Model", "tab:mae_results")
     
     # Save as .tex file
     tex_file = FORECAST2_DIR / "mae_pivot_table.tex"
@@ -829,11 +908,23 @@ def create_mae_pivot_table():
         f.write(latex_output)
     print(f"Saved MAE pivot table (LaTeX) to: {tex_file}")
     
+    # Save tabular-only version
+    tabular_file = FORECAST2_DIR / "mae_pivot_tabular.tex"
+    with open(tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved MAE pivot tabular (LaTeX) to: {tabular_file}")
+    
     # Save LaTeX version to docs_src as well
     docs_tex_file = Path(__file__).parent.parent / "docs_src" / "mae_pivot_table.tex"
     with open(docs_tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved MAE pivot table (LaTeX) to: {docs_tex_file}")
+    
+    # Save tabular-only version to docs_src
+    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "mae_pivot_tabular.tex"
+    with open(docs_tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved MAE pivot tabular (LaTeX) to: {docs_tabular_file}")
     
     return mae_pivot
 
@@ -939,6 +1030,7 @@ def create_relative_mase_pivot_table():
     
     # Convert to LaTeX table
     latex_output = create_latex_table(relative_mase_pivot, "Relative MASE Results by Dataset and Model", "tab:relative_mase_results")
+    latex_tabular_output = create_latex_tabular_only(relative_mase_pivot, "Relative MASE Results by Dataset and Model", "tab:relative_mase_results")
     
     # Save LaTeX version to docs_src as well
     docs_tex_file = Path(__file__).parent.parent / "docs_src" / "relative_mase_pivot_table.tex"
@@ -946,11 +1038,23 @@ def create_relative_mase_pivot_table():
         f.write(latex_output)
     print(f"Saved Relative MASE pivot table (LaTeX) to: {docs_tex_file}")
     
+    # Save tabular-only version to docs_src
+    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "relative_mase_pivot_tabular.tex"
+    with open(docs_tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved Relative MASE pivot tabular (LaTeX) to: {docs_tabular_file}")
+    
     # Save as .tex file
     tex_file = FORECAST2_DIR / "relative_mase_pivot_table.tex"
     with open(tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved Relative MASE pivot table (LaTeX) to: {tex_file}")
+    
+    # Save tabular-only version
+    tabular_file = FORECAST2_DIR / "relative_mase_pivot_tabular.tex"
+    with open(tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved Relative MASE pivot tabular (LaTeX) to: {tabular_file}")
     
     # Print summary statistics
     print("\nSummary Statistics:")
@@ -1163,6 +1267,38 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
 """
     
     return latex_formatted
+
+def extract_tabular_content(latex_output):
+    """Extract just the tabular content from a full LaTeX table"""
+    import re
+    
+    # Find the tabular environment content
+    tabular_match = re.search(r'\\begin\{tabular\}.*?\\end\{tabular\}', latex_output, re.DOTALL)
+    if tabular_match:
+        return tabular_match.group(0)
+    else:
+        return latex_output
+
+def create_latex_tabular_only(df, caption, label="tab:mase_results", use_table_names=True):
+    """Create only the tabular content without table environment for embedding in LaTeX documents"""
+    
+    # Create sectioned table
+    tabular_content, header, num_cols = create_sectioned_latex_table(df, caption, label)
+    
+    # Build only tabular environment
+    column_format = '@{}l' + 'r' * num_cols + '@{}'
+    tabular_only = f"""% {caption} - tabular content only
+% Generated automatically by create_results_tables2.py
+\\scriptsize
+\\setlength{{\\tabcolsep}}{{1.5pt}}
+\\renewcommand{{\\arraystretch}}{{0.9}}
+\\begin{{tabular}}{{{column_format}}}
+\\toprule
+{header}\\midrule
+{tabular_content}\\bottomrule
+\\end{{tabular}}"""
+    
+    return tabular_only
 
 def apply_grouped_dataset_ordering(pivot_data, dataset_groups, dataset_table_names):
     """Apply the same grouped dataset ordering used in LaTeX tables to the pivot data"""
@@ -1552,6 +1688,19 @@ def create_summary_statistics():
     with open(summary_tex_file, 'w') as f:
         f.write(summary_latex)
     print(f"Saved model summary statistics (LaTeX) to: {summary_tex_file}")
+    
+    # Create tabular-only version
+    summary_tabular_full = model_summary.to_latex(
+        float_format="%.3f",
+        column_format='l' + 'r' * len(model_summary.columns),
+        escape=False
+    )
+    summary_tabular = extract_tabular_content(summary_tabular_full)
+    
+    summary_tabular_tex_file = FORECAST2_DIR / "model_summary_statistics_tabular.tex"
+    with open(summary_tabular_tex_file, 'w') as f:
+        f.write(f"% Model Summary Statistics - tabular content only\n% Generated automatically by create_results_tables2.py\n{summary_tabular}")
+    print(f"Saved model summary statistics tabular (LaTeX) to: {summary_tabular_tex_file}")
     
     return model_summary
 

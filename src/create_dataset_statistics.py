@@ -299,6 +299,53 @@ def create_latex_table(grouped_stats, output_path):
     
     print(f"LaTeX table saved to: {output_path}")
 
+def create_latex_tabular_only(grouped_stats, output_path):
+    """Create only the tabular content without table environment for embedding in LaTeX documents"""
+    
+    latex_content = [
+        "% Dataset Statistics Summary - tabular content only",
+        "% Generated automatically by create_dataset_statistics.py",
+        "\\footnotesize",
+        "\\setlength{\\tabcolsep}{1.2pt}",
+        "\\renewcommand{\\arraystretch}{0.9}",
+        "\\begin{tabular}{@{}llrrrrll@{}}",
+        "\\toprule",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Unique\\\\Entities\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min\\\\Length\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median\\\\Length\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Max\\\\Length\\end{tabular} & Min Date & Max Date \\\\",
+        "\\midrule"
+    ]
+    
+    for group_name, datasets in grouped_stats.items():
+        # Add group header
+        latex_content.append(f"\\multicolumn{{8}}{{l}}{{\\textbf{{{group_name}}}}} \\\\")
+        
+        # Add datasets in this group
+        for stats in datasets:
+            row_data = [
+                stats['table_name'],
+                stats['frequency'],
+                str(stats['unique_entities']),
+                str(stats['min_length']),
+                str(stats['median_length']),
+                str(stats['max_length']),
+                stats['min_date'],
+                stats['max_date']
+            ]
+            latex_content.append(" & ".join(row_data) + " \\\\")
+        
+        # Add midrule between groups (except after last group)
+        if group_name != list(grouped_stats.keys())[-1]:
+            latex_content.append("\\midrule")
+    
+    latex_content.extend([
+        "\\bottomrule",
+        "\\end{tabular}"
+    ])
+    
+    with open(output_path, 'w') as f:
+        f.write('\n'.join(latex_content))
+    
+    print(f"LaTeX tabular saved to: {output_path}")
+
 
 def create_csv_table(stats_list, output_path):
     """Create CSV table from statistics using Polars"""
@@ -387,14 +434,22 @@ def main():
     # LaTeX files
     latex_forecast_path = FORECAST2_DIR / f"{base_filename}.tex"
     latex_docs_path = DOCS_SRC_DIR / f"{base_filename}.tex"
+    latex_tabular_forecast_path = FORECAST2_DIR / f"{base_filename}_tabular.tex"
+    latex_tabular_docs_path = DOCS_SRC_DIR / f"{base_filename}_tabular.tex"
     
     create_latex_table(grouped_stats, latex_forecast_path)
+    create_latex_tabular_only(grouped_stats, latex_tabular_forecast_path)
     
-    # Copy LaTeX file to docs_src
+    # Copy LaTeX files to docs_src
     with open(latex_forecast_path, 'r') as f:
         latex_content = f.read()
     with open(latex_docs_path, 'w') as f:
         f.write(latex_content)
+    
+    with open(latex_tabular_forecast_path, 'r') as f:
+        latex_tabular_content = f.read()
+    with open(latex_tabular_docs_path, 'w') as f:
+        f.write(latex_tabular_content)
     
     print(f"\nDataset statistics tables created successfully!")
     print(f"Files saved to:")
@@ -402,6 +457,8 @@ def main():
     print(f"  - {csv_docs_path}")
     print(f"  - {latex_forecast_path}")
     print(f"  - {latex_docs_path}")
+    print(f"  - {latex_tabular_forecast_path}")
+    print(f"  - {latex_tabular_docs_path}")
     
     # Display summary
     print(f"\nSummary by group:")

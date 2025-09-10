@@ -244,17 +244,16 @@ Treasury Yield Curve & Daily Nelson-Siegel-Svensson zero-coupon yields, 1-30 yea
 
 Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in our benchmark, including entity counts, time series characteristics, and temporal coverage. The table shows substantial variation across datasets, with disaggregated series (individual bonds, stocks, options contracts) containing thousands of entities, while portfolio-level datasets typically contain 10-50 series. The cutoff dates indicate the train/test split boundary used in our forecasting evaluation, with most datasets providing substantial out-of-sample periods for robust model comparison.
 
-\input{../_output/forecasting2/dataset_statistics.tex}
-
-To ensure fair model comparisons, our forecasting system applies consistent filtering and data preprocessing across all models and datasets. Table~\ref{tab:filtered_dataset_stats} shows the impact of this filtering, displaying entity counts and median time series lengths before and after preprocessing. 
-
-\textbf{Filtering Methodology and Fairness Guarantees.} Our filtering procedure addresses fundamental differences between statistical forecasting methods (which can handle very short or irregular time series) and neural forecasting methods (which require sufficient data for training and validation). To ensure fairness, we implement entity-based forecast horizon calculation that adapts to each dataset's characteristics rather than using a global threshold. For datasets with median entity lengths below 100 observations, we calculate the forecast horizon as a percentage of the median entity length with a minimum buffer of 6 observations. For longer time series, we use seasonality-aware thresholds (e.g., 24 observations for monthly data to capture two full seasonal cycles). Crucially, we protect small datasets by implementing a hard cap: any dataset beginning with 10 or fewer entities is exempt from length-based filtering to prevent complete elimination of entire asset classes.
-
-\textbf{Technical Implementation.} The filtering system operates in two stages. First, we apply standardized data cleaning using forward-only fill strategies to handle missing values consistently across all models, avoiding the artificial length inflation that backward-filling can create when combined with our gap-filling procedures. Second, we filter time series based on minimum length requirements calculated per entity rather than globally, ensuring that the diverse time series characteristics within each dataset (e.g., securities with different listing dates) are handled appropriately. All models—whether StatsForecast implementations like Naive, Seasonal Naive, or Theta, or NeuralForecast implementations like NBEATs, NHiTS, or Transformer variants—receive identical filtered datasets for training and evaluation.
-
-\textbf{Impact and Necessity.} This preprocessing is essential because neural methods require sufficient observations for training, validation splits, and convergence, while statistical methods can theoretically operate on very short series but may produce unreliable forecasts without adequate historical context. The filtering has varying impact across asset classes: portfolio-level datasets (which are typically well-maintained) show minimal changes, while disaggregated datasets show substantial filtering due to the presence of shorter-lived securities or incomplete data coverage. For instance, individual CDS contracts are filtered from 6,508 to 6,388 entities (98\% retention), while the commodities dataset requires more aggressive filtering from 23 to 4 entities due to data availability constraints. This systematic approach ensures that performance comparisons reflect true forecasting capability rather than artifacts of inconsistent data preprocessing.
-
-\input{../_output/forecasting2/filtered_dataset_statistics.tex}
+\begin{table}[htbp]
+\centering
+\caption{Dataset Statistics Summary}
+\label{tab:dataset_stats}
+\input{../_output/forecasting2/dataset_statistics_tabular.tex}
+\vspace{0.1cm}
+\scriptsize
+% \textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.
+\caption*{\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}}
+\end{table}
 
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
 
@@ -291,10 +290,11 @@ We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP)
 
 \begin{figure}[H]
   \centering
+  \caption{The SPX options market has grown dramatically over time}
   \begin{tabular}{@{}c@{}}
     \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
   \end{tabular}
-  \caption{The SPX options market has grown dramatically over time, particularly since the Global Financial Crisis.}
+  \caption*{\emph{Sources: OptionMetrics, Wharton Research Data Services, Authors' creation}}
   \label{fig:spx_options_over_time}
 \end{figure}
 
@@ -331,11 +331,12 @@ futures-chain construction or interpolation is required in our baseline analysis
 
 
 \begin{figure}[h!]
-  \centering
+    \centering
+    \caption{GSCI Commodity Returns}
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/commod_gsci_return.png}
   \end{tabular}
-  \caption{GSCI Commodity Returns}
+  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:gsci_commodity_returns}
 \end{figure}
 
@@ -388,21 +389,23 @@ resulting series replicates the persistently negative swap spreads documented by
 \citet{Jermann2020}, \citet{Du2023}, and \citet{Hanson2023}.
 
 \begin{figure}[h!]
-  \centering
+    \centering
+    \caption{Treasury Spot-Futures Basis (FTSFR Replication)}
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_spot_futures_arbitrage.png}
   \end{tabular}
-  \caption{Treasury Spot-Futures Basis (FTSFR Replication)}
+  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:treasury_sf_basis}
 \end{figure}
 
 
 \begin{figure}[h!]
   \centering
+  \caption{Treasury Swap Arbitrage spreads}
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_swap_arbitrage_spreads.png}
   \end{tabular}
-  \caption{Treasury Swap Arbitrage spreads.}
+  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:treasury_swap_arbitrage}
 \end{figure}
 
@@ -411,11 +414,12 @@ resulting series replicates the persistently negative swap spreads documented by
 Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we splice Federal Reserve zero-coupon TIPS yields with Bloomberg constant-maturity inflation-swap rates to create synthetic nominal yields, then difference these against equal-maturity zero-coupon Treasury yields for the 2-, 5-, 10- and 20-year tenors.  We exclude days with missing swap quotes or illiquid TIPS issues, drop outliers beyond the extreme 1\%, and harmonise all series to 17:00 ET closes to obtain a clean daily TIPS-Treasury basis series.
 
 \begin{figure}[h!]
+    \caption{TIPS-Treasury Arbitrage spreads.}
   \centering
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/tips_treasury_arbitrage_spreads.png}
   \end{tabular}
-  \caption{TIPS-Treasury Arbitrage spreads.}
+  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:tips_treasury_basis}
 \end{figure}
 
@@ -433,11 +437,12 @@ Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we li
 % 3. Get rid of Rating "2", since Rating 2 is the weird hybrid one.
 % 4. Rename rating 0 to "High Yield" and rating 1 to "Investment Grade"
 \begin{figure}[h!]
-  \centering
+    \centering
+    \caption{CDS Arbitrage spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png}
+    \includegraphics[width=.7\linewidth]{../docs_src/CDS_replicate.png}
   \end{tabular}
-  \caption{CDS Arbitrage spreads.}
+  \caption*{\emph{Sources: LSEG Mergent, S\&P Global, Authors' creation}}
   \label{fig:cds_basis}
 \end{figure}
 
@@ -445,11 +450,12 @@ Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we li
 For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for spot rates, 3-month forwards, and maturity-matched OIS curves.  Core filters rescale forward points (and invert USD-quoted pairs), synchronise all legs to the 17:00 ET close while dropping holiday or stale quotes, and winsorise the extreme 1\% of annualised spreads with spline interpolation for any missing OIS tenors to remove scaling, timing, and rate-sourcing distortions.
 
 \begin{figure}[h!]
-  \centering
+    \centering
+    \caption{CIP Arbitrage spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CIP_replicate.png}
+    \includegraphics[width=.7\linewidth]{../docs_src/CIP_replicate.png}
   \end{tabular}
-  \caption{CIP Arbitrage spreads.}
+  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:cip_basis}
 \end{figure}
 
@@ -468,52 +474,6 @@ TODO
 \paragraph{Call Report}
 TODO
 
-\paragraph{Compustat Panel Data}
-TODO
-
-
-
-
-\section{Data Repository Overview}
-\label{sec:repository_overview}
-
-% TODO: Provide high-level description of the repository structure and contents
-% - Describe the automated data pulling framework
-% - List the major categories of data
-% - Explain the dual purpose: both for forecasting benchmarks AND for replicating important finance papers
-% - Note that replication code for many of these papers was not previously publicly available
-
-\subsection{Repository Architecture}
-% Technical structure and automation framework
-
-\subsection{Data Categories}
-% Major categories of financial and economic data
-
-\subsection{Data Sources and Access Requirements}
-% WRDS, Bloomberg, and other data sources
-
-[Repository overview content to be filled in...]
-
-\section{Replication Results and Validation}
-\label{sec:replication}
-
-% TODO: Demonstrate successful replication of all source papers
-% - Create comprehensive replication tables
-% - Include specific sections for key papers
-% - Document any data quality issues discovered
-% - Explain any necessary deviations from original methodologies
-
-\subsection{He, Kelly, Manela (2017) Replication}
-% Factor loadings and test portfolio returns
-
-\subsection{Siriwardane et al. (2022) Replication}
-% Arbitrage spread statistics
-
-\subsection{Individual Dataset Replications}
-% Nozawa, Borri & Verdelhan, etc.
-
-[Replication results to be filled in...]
-
 \section{Baseline Forecasting Methodology}
 \label{sec:methodology}
 
@@ -521,6 +481,197 @@ TODO
 % - Justify choice of error metrics
 % - Select baseline forecasting models
 % - Define evaluation methodology
+
+
+\subsection{Baseline Models}
+% Traditional, ML, and Deep Learning models
+% TODO: Arsh: Add bullet points provide a short 2-3 sentence description of each model. What is the basic idea behind each model? Who developed it? What package are we using to implement it? 
+
+% \begin{itemize}
+%     \item ARIMA: Standard Autoregressive Integrated Moving Average model based on the statsmodel implementation.\cite{Box2013}
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Local
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.arima.html}{darts}}
+%     \end{itemize}
+%     \item ETS: We use the Holt-Winter's exponential smoothing model\cite{Winters1960}. % Please add this citation from the URL: https://www.sciencedirect.com/science/article/abs/pii/S0169207003001134
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Local
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
+%     \end{itemize}
+%     \item Simple Exponential Smoothing: simple exponential moving average on a time-series\cite{Brown2004}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Local
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
+%     \end{itemize}
+%     \item TBATS: Uses Box-Cox transformations, ARMA error corrections and Fourier representations\cite{DeLivera2011a}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Local
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sf_tbats.html}{darts}}
+%     \end{itemize}
+%     \item Theta: Splits a time-series into multiple Theta lines which are extrpolated separately and their combination is taken as the forecast\cite{Assimakopoulos2000}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Local
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.theta.html\#darts.models.forecasting.theta.Theta}{darts}}
+%     \end{itemize}
+%     \item Prophet: decomposable time-series model similar to Generalized Additive Model(GAM) developed by Facebook\cite{Taylor2018}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Local
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.prophet_model.html}{darts}}
+%     \end{itemize}
+%     \item PR (Pooled Regression): Generic gaussian linear model\cite{Trapero2015}
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sklearn_model.html\#darts.models.forecasting.sklearn_model.SKLearnModel}{darts}} and \texttt{\href{https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TweedieRegressor.html\#sklearn.linear_model.TweedieRegressor}{scikit-learn}}
+%     \end{itemize}
+%     \item CatBoost: Gradient boosting algorithm for dealing with categorical data and a leaf value calculation trick which reduces overfitting\cite{Prokhorenkova}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.catboost_model.html}{darts}}
+%     \end{itemize}
+%     \item FFNN (Feed-Forward Neural Network): Simple neural network which is a collection of weight tensors with activation functions in between\cite{Goodfellow2016}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.simple_feedforward.html}{gluonts}} with \texttt{torch} backend
+%     \end{itemize}
+%     \item Transformer: A deep network architecture utilising attention mechanisms for deducing dependencies in the input and the output\cite{Vaswani2017}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.transformer_model.html}{darts}}
+%     \end{itemize}
+%     \item DeepAR: An Autoregressive Recurrent Neural Network(RNN) with Long Short-Term Memory(LSTM).\cite{Salinas2020}
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.deepar.module.html}{gluonts}} with \texttt{torch} backend
+%     \end{itemize}
+%     \item WaveNet: Dilated deep neural network employing convolution layers. Originally made to generate sound waveforms\cite{Oord2016} but adapted to use in forecasting. % PLEASE ADD CITATION FROM URL: https://arxiv.org/abs/1703.04691
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.wavenet.html}{gluonts}} with \texttt{torch} backend
+%     \end{itemize}
+%     \item D-Linear: Transformer-based deep model which is a combination of a decomposition scheme with linear layers\cite{Zeng2022}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.dlinear.html}{darts}}
+%     \end{itemize}
+%     \item N-Linear: Transformer-based deep model which addresses distribution shifts in the dataset by using a normalization trick\cite{Zeng2022}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nlinear.html}{darts}}
+%     \end{itemize}
+%     \item N-BEATS: Deep neural network with fully-connected layers along with residual links\cite{Oreshkin2020}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nbeats.html}{darts}}
+%     \end{itemize}
+%     \item N-HiTS: Enhances N-BEATS by using multi-rate data sampling and multi-scale interpolation\cite{Challu2022}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nhits.html\#darts.models.forecasting.nhits.NHiTSModel}{darts}}
+%     \end{itemize}
+%     \item Autoformer: Transformer-based deep network employing decomposition and Auto-Correlation\cite{Wu2021}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.autoformer.html}{neuralforecast}}
+%     \end{itemize}
+%     \item Informer: Transformer-based architecture using a ProbSparse self-attention mechanism and a generative-style decoder among other techniques\cite{Zhou2020}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.informer.html}{neuralforecast}}
+%     \end{itemize}
+%     \item PatchTST: Transformer-based model breaking a time series into a collection of patches used as tokens and utilises channel independence\cite{Nie2022}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.patch_tst.html}{gluonts}} with \texttt{torch} backend
+%     \end{itemize}
+%     \item Temporal Fusion Transformer: Transformer-based model employing recurrent layers and self-attention layers with a focus on interpretablility\cite{Lim2021}
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.tft.module.html}{gluonts}} with \texttt{torch} backend
+%     \end{itemize}
+%     \item Time-series Dense Encoder(TiDE): Multi-layer perceptron based architecture utilising encoder and decoder blocks\cite{Das2023a}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.tide_model.html}{darts}}
+%     \end{itemize}
+%     \item TimesFM: Pre-trained transformer-based decoder-only deep model utilising patches similar to PatchTST\cite{Das2023}.
+%     \begin{itemize}
+%         \item \textbf{Forecasting Type: }Global
+%         \item \textbf{Package Used: }\texttt{\href{https://github.com/google-research/timesfm}{timesfm}} python package
+%     \end{itemize}
+% \end{itemize}
+
+
+\begin{itemize}
+    \item Theta: Splits a time-series into multiple Theta lines which are extrpolated separately and their combination is taken as the forecast, following \cite{Assimakopoulos2000}.
+    \item Simple Exponential Smoothing: simple exponential moving average on a time-series, following \cite{Brown2004}.
+    \item AutoARIMA: Standard Autoregressive Integrated Moving Average model based on the statsmodel implementation, following \cite{Box2013} and \cite{Hyndman2008}.
+    \item DeepAR: An Autoregressive Recurrent Neural Network(RNN) with Long Short-Term Memory(LSTM), following \cite{Salinas2020}.
+    \item N-BEATS: Deep neural network with fully-connected layers along with residual links, following \cite{Oreshkin2020}.
+    \item N-HiTS: Enhances N-BEATS by using multi-rate data sampling and multi-scale interpolation, following \cite{Challu2022}.
+    \item D-Linear: Transformer-based deep model which is a combination of a decomposition scheme with linear layers, following \cite{Zeng2022}.
+    \item N-Linear: Transformer-based deep model which addresses distribution shifts in the dataset by using a normalization trick, following \cite{Zeng2022}.
+    % \item ETS: We use the Holt-Winter's exponential smoothing model, following \cite{Winters1960}. % Please add this citation from the URL: https://www.sciencedirect.com/science/article/abs/pii/S0169207003001134
+    % \item TBATS: Uses Box-Cox transformations, ARMA error corrections and Fourier representations\cite{DeLivera2011a}.
+    % \begin{itemize}
+    %     \item \textbf{Forecasting Type: }Local
+    %     \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sf_tbats.html}{darts}}
+    % \end{itemize}
+    % \item Prophet: decomposable time-series model similar to Generalized Additive Model(GAM) developed by Facebook\cite{Taylor2018}.
+    % \begin{itemize}
+    %     \item \textbf{Forecasting Type: }Local
+    %     \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.prophet_model.html}{darts}}
+    % \end{itemize}
+    % \item PR (Pooled Regression): Generic gaussian linear model\cite{Trapero2015}
+    % \begin{itemize}
+    %     \item \textbf{Forecasting Type: }Global
+    %     \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sklearn_model.html\#darts.models.forecasting.sklearn_model.SKLearnModel}{darts}} and \texttt{\href{https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TweedieRegressor.html\#sklearn.linear_model.TweedieRegressor}{scikit-learn}}
+    % \end{itemize}
+    % \item CatBoost: Gradient boosting algorithm for dealing with categorical data and a leaf value calculation trick which reduces overfitting\cite{Prokhorenkova}.
+    % \begin{itemize}
+    %     \item \textbf{Forecasting Type: }Global
+    %     \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.catboost_model.html}{darts}}
+    % \end{itemize}
+    % \item FFNN (Feed-Forward Neural Network): Simple neural network which is a collection of weight tensors with activation functions in between\cite{Goodfellow2016}.
+    % \begin{itemize}
+    %     \item \textbf{Forecasting Type: }Global
+    %     \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.simple_feedforward.html}{gluonts}} with \texttt{torch} backend
+    % \end{itemize}
+    \item Transformer: A deep network architecture utilising attention mechanisms for deducing dependencies in the input and the output, following \cite{Vaswani2017}.
+    \begin{itemize}
+        \item \textbf{Forecasting Type: }Global
+        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nhits.html\#darts.models.forecasting.nhits.NHiTSModel}{darts}}
+    \end{itemize}
+    \item Time-series Dense Encoder(TiDE): Multi-layer perceptron based architecture utilising encoder and decoder blocks, following \cite{Das2023a}.
+    \item KAN: Kolmogorov-Arnold Networks replace fixed activations with learnable spline-based functions on edges instead of nodes, inspired by the Kolmogorov-Arnold representation theorem. This design improves both accuracy and interpretability, allowing smaller networks to outperform larger MLPs in regression and PDE tasks, following \cite{Liu2025}.
+
+\end{itemize}
+
+
+\subsection{Data Preprocessing}
+
+To ensure fair model comparisons, our forecasting system applies consistent filtering and data preprocessing across all models and datasets. Table~\ref{tab:filtered_dataset_stats} shows the impact of this filtering, displaying entity counts and median time series lengths before and after preprocessing. 
+
+\paragraph{Filtering Methodology and Fairness Guarantees.} Our filtering procedure addresses fundamental differences between statistical forecasting methods (which can handle very short or irregular time series) and neural forecasting methods (which require sufficient data for training and validation). To ensure fairness, we implement entity-based forecast horizon calculation that adapts to each dataset's characteristics rather than using a global threshold. For datasets with median entity lengths below 100 observations, we calculate the forecast horizon as a percentage of the median entity length with a minimum buffer of 6 observations. For longer time series, we use seasonality-aware thresholds (e.g., 24 observations for monthly data to capture two full seasonal cycles). Crucially, we protect small datasets by implementing a hard cap: any dataset beginning with 10 or fewer entities is exempt from length-based filtering to prevent complete elimination of entire asset classes.
+
+\paragraph{Technical Implementation.} The filtering system operates in two stages. First, we apply standardized data cleaning using forward-only fill strategies to handle missing values consistently across all models, avoiding the artificial length inflation that backward-filling can create when combined with our gap-filling procedures. Second, we filter time series based on minimum length requirements calculated per entity rather than globally, ensuring that the diverse time series characteristics within each dataset (e.g., securities with different listing dates) are handled appropriately. All models—whether StatsForecast implementations like Naive, Seasonal Naive, or Theta, or NeuralForecast implementations like NBEATs, NHiTS, or Transformer variants—receive identical filtered datasets for training and evaluation.
+
+\paragraph{Impact and Necessity.} This preprocessing is essential because neural methods require sufficient observations for training, validation splits, and convergence, while statistical methods can theoretically operate on very short series but may produce unreliable forecasts without adequate historical context. The filtering has varying impact across asset classes: portfolio-level datasets (which are typically well-maintained) show minimal changes, while disaggregated datasets show substantial filtering due to the presence of shorter-lived securities or incomplete data coverage. For instance, individual CDS contracts are filtered from 6,508 to 6,388 entities (98\% retention), while the commodities dataset requires more aggressive filtering from 23 to 4 entities due to data availability constraints. This systematic approach ensures that performance comparisons reflect true forecasting capability rather than artifacts of inconsistent data preprocessing.
+
+\begin{table}[htbp]
+\centering
+\caption{Impact of Filtering on Dataset Statistics}
+\label{tab:filtered_dataset_stats}
+\input{../_output/forecasting2/filtered_dataset_statistics_tabular.tex}
+\vspace{0.1cm}
+\begin{minipage}{\textwidth}
+\scriptsize
+\textbf{Notes:} This table shows the effect of filtering applied in the forecasting system for fair model comparison. 
+Entities Before/After = unique time series counts before and after filtering; 
+Median Length Before/After = median time series lengths per entity before and after filtering. 
+Filtering removes series that are too short for reliable forecasting and applies consistent data cleaning.
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+\end{minipage}
+\end{table}
 
 \subsection{Error Metrics}
 
@@ -571,128 +722,6 @@ To compare directly against the naïve model's \emph{out-of-sample} performance,
 Because both MASE values share the same in-sample scaling, the ratio simplifies to the ratio of out-of-sample MAEs. Interpretation is direct: $\mathrm{rMASE}=0.80$ means the model's average absolute error is $20\%$ lower than the naïve benchmark on the test set; $\mathrm{rMASE}>1$ indicates underperformance. We omit the naïve column in the rMASE table (it equals $1$ by construction).
 
 
-\subsection{Baseline Models}
-% Traditional, ML, and Deep Learning models
-% TODO: Arsh: Add bullet points provide a short 2-3 sentence description of each model. What is the basic idea behind each model? Who developed it? What package are we using to implement it? 
-
-\begin{itemize}
-    \item ARIMA: Standard Autoregressive Integrated Moving Average model based on the statsmodel implementation.\cite{Box2013}
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Local
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.arima.html}{darts}}
-    \end{itemize}
-    \item ETS: We use the Holt-Winter's exponential smoothing model\cite{Winters1960}. % Please add this citation from the URL: https://www.sciencedirect.com/science/article/abs/pii/S0169207003001134
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Local
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
-    \end{itemize}
-    \item Simple Exponential Smoothing: simple exponential moving average on a time-series\cite{Brown2004}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Local
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
-    \end{itemize}
-    \item TBATS: Uses Box-Cox transformations, ARMA error corrections and Fourier representations\cite{DeLivera2011a}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Local
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sf_tbats.html}{darts}}
-    \end{itemize}
-    \item Theta: Splits a time-series into multiple Theta lines which are extrpolated separately and their combination is taken as the forecast\cite{Assimakopoulos2000}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Local
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.theta.html\#darts.models.forecasting.theta.Theta}{darts}}
-    \end{itemize}
-    \item Prophet: decomposable time-series model similar to Generalized Additive Model(GAM) developed by Facebook\cite{Taylor2018}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Local
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.prophet_model.html}{darts}}
-    \end{itemize}
-    \item PR (Pooled Regression): Generic gaussian linear model\cite{Trapero2015}
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sklearn_model.html\#darts.models.forecasting.sklearn_model.SKLearnModel}{darts}} and \texttt{\href{https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TweedieRegressor.html\#sklearn.linear_model.TweedieRegressor}{scikit-learn}}
-    \end{itemize}
-    \item CatBoost: Gradient boosting algorithm for dealing with categorical data and a leaf value calculation trick which reduces overfitting\cite{Prokhorenkova}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.catboost_model.html}{darts}}
-    \end{itemize}
-    \item FFNN (Feed-Forward Neural Network): Simple neural network which is a collection of weight tensors with activation functions in between\cite{Goodfellow2016}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.simple_feedforward.html}{gluonts}} with \texttt{torch} backend
-    \end{itemize}
-    \item Transformer: A deep network architecture utilising attention mechanisms for deducing dependencies in the input and the output\cite{Vaswani2017}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.transformer_model.html}{darts}}
-    \end{itemize}
-    \item DeepAR: An Autoregressive Recurrent Neural Network(RNN) with Long Short-Term Memory(LSTM).\cite{Salinas2020}
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.deepar.module.html}{gluonts}} with \texttt{torch} backend
-    \end{itemize}
-    \item WaveNet: Dilated deep neural network employing convolution layers. Originally made to generate sound waveforms\cite{Oord2016} but adapted to use in forecasting. % PLEASE ADD CITATION FROM URL: https://arxiv.org/abs/1703.04691
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.wavenet.html}{gluonts}} with \texttt{torch} backend
-    \end{itemize}
-    \item D-Linear: Transformer-based deep model which is a combination of a decomposition scheme with linear layers\cite{Zeng2022}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.dlinear.html}{darts}}
-    \end{itemize}
-    \item N-Linear: Transformer-based deep model which addresses distribution shifts in the dataset by using a normalization trick\cite{Zeng2022}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nlinear.html}{darts}}
-    \end{itemize}
-    \item N-BEATS: Deep neural network with fully-connected layers along with residual links\cite{Oreshkin2020}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nbeats.html}{darts}}
-    \end{itemize}
-    \item N-HiTS: Enhances N-BEATS by using multi-rate data sampling and multi-scale interpolation\cite{Challu2022}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.nhits.html\#darts.models.forecasting.nhits.NHiTSModel}{darts}}
-    \end{itemize}
-    \item Autoformer: Transformer-based deep network employing decomposition and Auto-Correlation\cite{Wu2021}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.autoformer.html}{neuralforecast}}
-    \end{itemize}
-    \item Informer: Transformer-based architecture using a ProbSparse self-attention mechanism and a generative-style decoder among other techniques\cite{Zhou2020}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }Nixtla's \texttt{\href{https://nixtlaverse.nixtla.io/neuralforecast/models.informer.html}{neuralforecast}}
-    \end{itemize}
-    \item PatchTST: Transformer-based model breaking a time series into a collection of patches used as tokens and utilises channel independence\cite{Nie2022}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.patch_tst.html}{gluonts}} with \texttt{torch} backend
-    \end{itemize}
-    \item Temporal Fusion Transformer: Transformer-based model employing recurrent layers and self-attention layers with a focus on interpretablility\cite{Lim2021}
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://ts.gluon.ai/stable/api/gluonts/gluonts.torch.model.tft.module.html}{gluonts}} with \texttt{torch} backend
-    \end{itemize}
-    \item Time-series Dense Encoder(TiDE): Multi-layer perceptron based architecture utilising encoder and decoder blocks\cite{Das2023a}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.tide_model.html}{darts}}
-    \end{itemize}
-    \item TimesFM: Pre-trained transformer-based decoder-only deep model utilising patches similar to PatchTST\cite{Das2023}.
-    \begin{itemize}
-        \item \textbf{Forecasting Type: }Global
-        \item \textbf{Package Used: }\texttt{\href{https://github.com/google-research/timesfm}{timesfm}} python package
-    \end{itemize}
-\end{itemize}
-
-\subsection{Evaluation Framework}
-% Train/test splits, structural breaks, etc.
-
-[Methodology content to be filled in...]
-
 \section{Baseline Results and Analysis}
 \label{sec:results}
 
@@ -709,42 +738,79 @@ We present comprehensive forecasting results across all datasets and models usin
 
 Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinations. The table is organized with datasets as rows and forecasting models as columns, allowing for easy comparison of model performance within each dataset and identification of datasets that present particular challenges for forecasting.
 
-\input{../_output/forecasting2/mase_pivot_table.tex}
-
-Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE results from Table~\ref{tab:mase_results}. The color-coded heatmap makes it easy to identify patterns in model performance across different dataset types, with cooler colors (blues) indicating better performance and warmer colors (reds) indicating poorer performance.
-
-\begin{figure}[htbp]
+\begin{table}[htbp]
 \centering
-\includegraphics[width=\textwidth]{../_output/forecasting2/mase_heatmap.png}
-\caption{MASE Results Heatmap by Dataset and Model. Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.}
-\label{fig:mase_heatmap}
-\end{figure}
+\caption{MASE Results by Dataset and Model}
+\label{tab:mase_results}
+\input{../_output/forecasting2/mase_pivot_tabular.tex}
+\caption*{
+\noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
+\scriptsize
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}}
+\end{table}
+
+% Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE results from Table~\ref{tab:mase_results}. The color-coded heatmap makes it easy to identify patterns in model performance across different dataset types, with cooler colors (blues) indicating better performance and warmer colors (reds) indicating poorer performance.
+
+% \begin{figure}[htbp]
+% \centering
+% \caption{MASE Results Heatmap by Dataset and Model}
+% \includegraphics[width=\textwidth]{../_output/forecasting2/mase_heatmap.png}
+% \caption*{\textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.
+
+% \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}}
+% \label{fig:mase_heatmap}
+% \end{figure}
 
 To better understand the relative performance of sophisticated models compared to the simple Naive benchmark, Table~\ref{tab:relative_mase_results} presents MASE ratios where each model's MASE is divided by the Naive model's MASE for the same dataset. Values less than 1.0 indicate that the model outperforms the Naive baseline, while values greater than 1.0 indicate underperformance. This normalization allows for clear interpretation of whether the additional complexity of advanced forecasting models provides meaningful improvements over the simple baseline.
 
-\input{../_output/forecasting2/relative_mase_pivot_table.tex}
+\begin{table}[htbp]
+\centering
+\caption{Relative MASE Results by Dataset and Model}
+\label{tab:relative_mase_results}
+\input{../_output/forecasting2/relative_mase_pivot_tabular.tex}
+\caption*{
+    \scriptsize
+\textbf{Note:} Values show MASE ratios relative to the Naive baseline. Values $<$ 1.0 indicate better performance than Naive. Numbers in bold indicate the best performing model for each dataset.
+
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+}
+\end{table}
 
 Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the relative MASE results using a diverging color scheme where blue indicates better performance than Naive (values < 1.0), white represents performance equal to Naive, and red shows worse performance than Naive (values > 1.0). This visualization makes it easy to identify which models consistently outperform the simple baseline and which datasets benefit most from sophisticated forecasting approaches.
 
 \begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{../_output/forecasting2/relative_mase_heatmap.png}
-\caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Naive baseline, with blue indicating better performance than Naive ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*).}
-\label{fig:relative_mase_heatmap}
+    \centering
+    \includegraphics[width=\textwidth]{../_output/forecasting2/relative_mase_heatmap.png}
+    \caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Naive baseline, with blue indicating better performance than Naive ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*). \\
+    \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+    }
+    \label{fig:relative_mase_heatmap}
 \end{figure}
 
 Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the same organization. While MASE provides scale-free comparisons, RMSE offers insights into the actual magnitude of forecasting errors, which can be particularly relevant for risk management applications.
 
-\input{../_output/forecasting2/rmse_pivot_table.tex}
-
-Figure~\ref{fig:rmse_heatmap} visualizes the RMSE results, complementing the numerical table with a clear color-coded representation of relative model performance across all datasets.
-
-\begin{figure}[htbp]
+\begin{table}[htbp]
 \centering
-\includegraphics[width=\textwidth]{../_output/forecasting2/rmse_heatmap.png}
-\caption{RMSE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile to highlight performance differences across the majority of datasets, with extreme outliers marked with asterisks (*). The visualization reveals models that consistently perform well and datasets that pose particular forecasting challenges.}
-\label{fig:rmse_heatmap}
-\end{figure}
+\caption{RMSE Results by Dataset and Model}
+\label{tab:rmse_results}
+\input{../_output/forecasting2/rmse_pivot_tabular.tex}
+\vspace{0.1cm}
+
+\caption*{\scriptsize 
+\textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.
+
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+}
+\end{table}
+
+% Figure~\ref{fig:rmse_heatmap} visualizes the RMSE results, complementing the numerical table with a clear color-coded representation of relative model performance across all datasets.
+
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics[width=\textwidth]{../_output/forecasting2/rmse_heatmap.png}
+% \caption{RMSE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile to highlight performance differences across the majority of datasets, with extreme outliers marked with asterisks (*). The visualization reveals models that consistently perform well and datasets that pose particular forecasting challenges.}
+% \label{fig:rmse_heatmap}
+% \end{figure}
 
 \subsection{Results by Asset Class}
 % Detailed analysis for each asset class
@@ -897,7 +963,7 @@ The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has beco
 
 The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes—excluding bills and other security types—is fundamental. Callable bonds embed optionality that contaminates pure interest rate risk measurement. For example, a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns, distorting any analysis of term structure dynamics.
 
-Second, the dataset focuses on bonds with remaining maturities between 0 and 5 years. This reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, whereas the 0–5 year segment represents the most actively traded Treasury securities where price discovery is most efficient.
+Second, the dataset focuses on bonds with remaining maturities between 0 and 5 years. This reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, whereas the 0-5 year segment represents the most actively traded Treasury securities where price discovery is most efficient.
 
 Third, the careful handling of accrued interest in return calculations is essential. Unlike equities, bond prices are quoted as clean prices (excluding accrued interest), but return calculations must incorporate coupon payments. Failing to account for this leads to dramatic miscalculations of returns, especially around coupon payment dates.
 
@@ -1531,7 +1597,15 @@ This section presents supplementary error metrics to provide a comprehensive vie
 
 Table~\ref{tab:smape_results} presents sMAPE results across all model-dataset combinations. sMAPE provides percentage-based error measures that are symmetric and bounded, making them particularly useful for comparing performance across datasets with different scales and volatility patterns.
 
-\input{../_output/forecasting2/smape_pivot_table.tex}
+\begin{table}[htbp]
+\centering
+\caption{sMAPE Results by Dataset and Model}
+\label{tab:smape_results}
+\input{../_output/forecasting2/smape_pivot_tabular.tex}
+\vspace{0.1cm}
+
+\noindent {\scriptsize \textbf{Note:} Values show Symmetric Mean Absolute Percentage Error (sMAPE). Lower values indicate better performance. -- indicates missing results.}
+\end{table}
 
 Figure~\ref{fig:smape_heatmap} provides the corresponding visual representation of sMAPE results, making it easier to identify performance patterns and model consistency across different datasets.
 
@@ -1546,7 +1620,15 @@ Figure~\ref{fig:smape_heatmap} provides the corresponding visual representation 
 
 Table~\ref{tab:mae_results} shows MAE results for all combinations. MAE measures the average magnitude of errors in the original units, providing a straightforward interpretation of forecasting accuracy in terms of the actual data scale.
 
-\input{../_output/forecasting2/mae_pivot_table.tex}
+\begin{table}[htbp]
+\centering
+\caption{MAE Results by Dataset and Model}
+\label{tab:mae_results}
+\input{../_output/forecasting2/mae_pivot_tabular.tex}
+\vspace{0.1cm}
+
+\noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Error (MAE). Lower values indicate better performance. -- indicates missing results.}
+\end{table}
 
 Figure~\ref{fig:mae_heatmap} visualizes the MAE results, complementing the numerical table with clear visual patterns of absolute error magnitudes across all model-dataset combinations.
 
