@@ -155,8 +155,18 @@ def create_model(model_name, seasonality, model_configs, dataset_name=None, fore
     
     # Disable early stopping if validation is not available
     if library == "neuralforecast" and disable_early_stopping:
-        if "early_stop_patience_steps" in params:
-            del params["early_stop_patience_steps"]
+        # Remove all early stopping and validation-related parameters
+        early_stopping_params = [
+            "early_stop_patience_steps",
+            "val_check_steps", 
+            "enable_checkpointing",
+            "early_stopping"
+        ]
+        removed_params = []
+        for param in early_stopping_params:
+            if param in params:
+                del params[param]
+                removed_params.append(param)
     
     # Add trainer args for NeuralForecast models to redirect logs
     if library == "neuralforecast" and dataset_name is not None:
@@ -425,13 +435,18 @@ def train_and_forecast_neuralforecast(model, train_data, test_data, frequency, v
             # For short series, use minimal validation or no validation
             val_size = 0  # Use 0 to disable validation for short series
             print(f"Short series detected (min length: {min_series_length}), disabling validation")
+            
+            # Disable early stopping in the model instance if validation is disabled
+            if hasattr(model, 'early_stop_patience_steps'):
+                model.early_stop_patience_steps = 0
+            if hasattr(model, 'val_check_steps'):
+                model.val_check_steps = 999999  # Set to a very large value to effectively disable
         else:
             val_size = forecast_horizon  # Use same size as forecast horizon
             print(f"Using validation size equal to forecast horizon: {val_size}")
     
     print(f"Using validation size: {val_size}")
     
-    # Note: model was created with disable_early_stopping=True if val_size=0
     nf = NeuralForecast(models=[model], freq=polars_freq)
     nf.fit(df=train_data_clean, val_size=val_size)
 
