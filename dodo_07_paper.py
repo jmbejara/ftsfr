@@ -217,6 +217,38 @@ def task_create_results_tables():
     }
 
 
+def task_run_ex_statsforecast():
+    """Run the AutoARIMA tutorial example demonstrating the forecasting pipeline"""
+    import glob
+    
+    # Get parquet files that the tutorial might use
+    dataset_parquet_files = glob.glob(
+        str(DATA_DIR / "formatted" / "**" / "ftsfr_french_portfolios_25_daily_size_and_bm.parquet"),
+        recursive=True,
+    )
+    
+    return {
+        "actions": [
+            "python ./forecasting/ex_statsforecast.py",
+            "echo 'Tutorial completed successfully on $(date)' > " + str(OUTPUT_DIR / "forecasting2" / "ex_statsforecast_completed.txt"),
+        ],
+        "targets": [
+            # No specific output files since this is a tutorial that prints and shows plots
+            # But we can create a simple completion marker
+            OUTPUT_DIR / "forecasting2" / "ex_statsforecast_completed.txt",
+        ],
+        "file_dep": [
+            "./forecasting/ex_statsforecast.py",
+            "./forecasting/forecast.py",  # Main dependency since tutorial imports from it
+            "./forecasting/models_config.toml",
+            "./datasets.toml",
+            *dataset_parquet_files,  # Data dependency
+        ],
+        "clean": True,
+        "verbosity": 2,  # Show output for educational purposes
+    }
+
+
 def task_compile_latex_docs():
     """Compile the LaTeX documents to PDFs using forecasting2 outputs"""
 

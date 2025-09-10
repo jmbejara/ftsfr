@@ -118,7 +118,7 @@ these datasets need to reflect the form of the data as they commonly appear in t
 Our proposed benchmark addresses this limitation by creating a standardized, literature-compliant repository specifically designed for the finance domain. By providing open-source scripts that automate the download and cleaning of data from institutional sources like WRDS and Bloomberg, we enable researchers to reproduce exact datasets used in canonical finance papers. Our aim is to fill a critical gap in quantitative finance research by providing the first comprehensive forecasting benchmark tailored to financial markets. In particular, our paper has the following main contributions:
 
 \begin{itemize}
-    \item We introduce the first comprehensive time series forecasting archive focused specifically on financial markets, available at \url{https://jeremybejarano.com/ftsfr/}. This archive provides standardized datasets across multiple asset classes and market segments:
+    \item We introduce the first comprehensive time series forecasting archive focused specifically on financial markets. This archive provides standardized datasets across multiple asset classes and market segments:
     \begin{itemize}
         \item Asset return series spanning equities, corporate bonds, U.S. Treasuries, sovereign bonds, foreign exchange rates, commodity futures, credit default swaps (CDS), and options
         \item Arbitrage basis spreads including covered interest parity (CIP) deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury spreads, equity spot-futures basis, Treasury spot-futures basis, and box spread arbitrage
@@ -133,7 +133,7 @@ Our proposed benchmark addresses this limitation by creating a standardized, lit
     
     \item We provide novel insights into market-specific predictability by systematically evaluating forecasting performance across different asset classes and market segments. This analysis contributes to our understanding of where predictability exists in financial markets and can inform both academic research and policy decisions related to financial stability monitoring.
     
-    \item All implementations are fully open source on \href{https://github.com/jmbejara/ftsfr}{GitHub} with best practices for reproducibility, including an automated data pipeline that pulls data from the appropriate data sources and cleans it according to the canonical methods established in the literature, and virtual environments ensuring perfect reproducibility across different computing environments.
+    \item All implementations are fully open source on \href{https://github.com/jmbejara/ftsfr}{GitHub}\footnote{All code is open source and available at \url{https://github.com/jmbejara/ftsfr}.} with best practices for reproducibility, including an automated data pipeline that pulls data from the appropriate data sources and cleans it according to the canonical methods established in the literature, and virtual environments ensuring perfect reproducibility across different computing environments.
 \end{itemize}
 
 By providing this resource, we enable the kind of standardized, apples-to-apples comparisons that have been lacking in financial forecasting research, while also contributing replication code for key papers and insights into predictability across financial markets.
@@ -159,6 +159,7 @@ Source & Name & Coverage of Finance Domain & Website \\
 \cite{Aksu2024} & GIFT-EVAL & Anonymous data, unclear & \href{https://github.com/SalesforceAIResearch/gift-eval}{Link}\\
 \bottomrule
 \end{tabular}
+\caption*{\emph{Source: Authors' creation}}
 \end{table}
 
 
@@ -177,7 +178,7 @@ Source & Name & Coverage of Finance Domain & Website \\
 Finance faces an active debate about a potential ``replication crisis.'' \cite{Jensen2023} find that predictors' average strength is only 54\% of the original strength outside the original sample, with 32\% becoming insignificant. While much of the debate centers around data snooping, some of it involves
 coding and similar such bugs. There have been several high profile retractions\footnote{See  \cite{Lee2023} at \href{https://www.bloomberg.com/news/articles/2023-12-01/a-grad-school-number-cruncher-shakes-up-the-world-of-bond-quants}{Bloomberg}, and \cite{Dickerson2024}.}.
 Despite disagreement on the crisis's extent, consensus exists at least on one way to help the situation: standardized, open source data infrastructure. \cite{Chen2022} demonstrate with their ``Open Source Cross-Sectional Asset Pricing'' project that transparent data construction, version control, and community validation can eliminate arbitrary researcher degrees of freedom. Such infrastructure prevents simple errors from invalidating years of research. For policymakers and financial regulators, standardized open source data 
-helps them more effectively monitor systemic financial risks.
+helps them more effectively monitor systemic financial risks. This paper addresses this need by developing an open-source financial time series forecasting repository that standardizes datasets across multiple asset classes and market segments, enabling reproducible research and evidence-based guidance for financial stability monitoring.
 
 \subsection{Global Time Series Forecasting Methods}
 
@@ -207,45 +208,51 @@ Dataset Name & Description & Citation \\
 \midrule
 \multicolumn{3}{c}{\textbf{Returns Data}} \\
 \midrule
-CDS Contract & Monthly returns for individual CDS contracts & \cite{He2017} \\
-CDS Portfolio & Monthly returns for 20 CDS portfolios by tenor and credit quality & \cite{He2017} \\
-Corporate Bond & Monthly returns for individual corporate bonds from TRACE & \cite{Dickerson2024} \\
-Corporate Portfolio & Monthly returns for corporate bond portfolios by credit spread & \cite{Nozawa2017} \\
-Treasury Bond & Monthly returns for individual Treasury bonds from CRSP & \cite{Gurkaynak2007} \\
-Treasury Portfolio & Monthly returns for Treasury bond portfolios by maturity & \cite{Gurkaynak2007} \\
-CRSP Stock & Monthly stock returns from CRSP database & \cite{Fama1993} \\
-FF25 Size-BM & Daily Fama-French 25 portfolios: size and book-to-market & \cite{Fama1993} \\
-SPX Options Contracts & Daily returns for individual SPX option contracts & \cite{Constantinides2013} \\
-SPX Options Portfolios & Monthly returns for SPX option portfolios by moneyness & \cite{He2017} \\
-HKM Monthly Factor & Monthly factor returns from He, Kelly, and Manela & \cite{He2017} \\
-HKM Daily Factor & Daily factor returns from He, Kelly, and Manela & \cite{He2017} \\
+CDS Contract & Monthly returns for individual CDS contracts. The definition of returns for CDS follows Palhares (2012). & \cite{Palhares2012} \\
+CDS Portfolio & Similar to contract-level, but aggregated into 20 CDS portfolios by tenor and credit quality & \cite{He2017} \\
 Commodity & Monthly returns for commodity futures & \cite{Yang2013} \\
+Corporate Bond & Monthly returns for individual corporate bonds from TRACE. Authors cleaning builds on Nozawa (2017). & \cite{Dickerson2024} \\
+Corporate Portfolio & Monthly returns for corporate bond portfolios by credit spread & \cite{Nozawa2017} \\
+CRSP Stock & Monthly stock returns from CRSP database & \cite{Fama1993} \\
+FF25 Size-BM & Daily Fama-French 25 portfolios: size and book-to-market & ibid. \\
 FX & Daily foreign exchange returns vs USD & \cite{Lettau2014} \\
+SPX Options Portfolios & Monthly returns for individual SPX option contracts & \cite{Constantinides2013} \\
+Treasury Bond & Monthly returns for individual Treasury bonds from CRSP & \cite{Gurkaynak2007} \\
+Treasury Portfolio & Monthly returns for Treasury bond portfolios by maturity & ibid. \\
 \midrule
 \multicolumn{3}{c}{\textbf{Basis Spread Data}} \\
 \midrule
-TIPS-Treasury & Monthly TIPS-Treasury basis spreads & Fed Yield Curve \\
-Treasury-SF & Monthly Treasury-SF arbitrage spreads & Segmented Arbitrage \\
-Treasury-Swap & Monthly Treasury-Swap arbitrage spreads & Segmented Arbitrage \\
-CDS-Bond & Monthly CDS-bond basis spreads & Segmented Arbitrage \\
+CDS-Bond & Monthly CDS-bond basis spreads & \cite{Siriwardane2021} \\
 CIP & Monthly covered interest parity deviations & \cite{Du2018} \\
+TIPS-Treasury & Monthly TIPS-Treasury basis spreads & \cite{Fleckenstein2014} \\
+Treasury-SF & Monthly Treasury-SF arbitrage spreads & \cite{Fleckenstein2020} \\
+Treasury-Swap & Monthly Treasury-Swap arbitrage spreads & \cite{Siriwardane2021} \\
 \midrule
 \multicolumn{3}{c}{\textbf{Other Financial Data}} \\
 \midrule
+Bank Cash Liquidity & Quarterly cash liquidity from call report data & \cite{Drechsler2017} \\
+Bank Leverage & Quarterly leverage ratios from call report data & ibid. \\
+BHC Cash Liquidity & Quarterly bank holding company cash liquidity & ibid. \\
+BHC Leverage & Quarterly bank holding company leverage ratios & ibid. \\
+HKM Daily Factor & Intermediary risk factors, including capital ratio, capital risk factor, value-weighted investment return, and leverage ratio squared & \cite{He2017} \\
+HKM Monthly Factor & Same as above, but monthly & ibid. \\
 Treasury Yield Curve & Daily Nelson-Siegel-Svensson zero-coupon yields, 1-30 years & \cite{Gurkaynak2007} \\
-Bank Leverage & Quarterly leverage ratios from call report data & NYU Call Report \\
-BHC Leverage & Quarterly bank holding company leverage ratios & NYU Call Report \\
-Bank Cash Liquidity & Quarterly cash liquidity from call report data & NYU Call Report \\
-BHC Cash Liquidity & Quarterly bank holding company cash liquidity & NYU Call Report \\
 \bottomrule
 \end{tabular}
+\caption*{\emph{Source: Authors' creation}}
 \end{table}
 
 Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in our benchmark, including entity counts, time series characteristics, and temporal coverage. The table shows substantial variation across datasets, with disaggregated series (individual bonds, stocks, options contracts) containing thousands of entities, while portfolio-level datasets typically contain 10-50 series. The cutoff dates indicate the train/test split boundary used in our forecasting evaluation, with most datasets providing substantial out-of-sample periods for robust model comparison.
 
 \input{../_output/forecasting2/dataset_statistics.tex}
 
-To ensure fair model comparisons, our forecasting system applies consistent filtering and data preprocessing across all models and datasets. Table~\ref{tab:filtered_dataset_stats} shows the impact of this filtering, displaying entity counts and median time series lengths before and after preprocessing. The filtering removes time series that are too short for reliable seasonal pattern detection and forecasting evaluation, while standardized data cleaning procedures handle missing values uniformly across all models. This preprocessing is essential for fair comparison between statistical and machine learning methods, as it ensures all models train and are evaluated on identical datasets. The filtering has varying impact across asset classes: portfolio-level datasets (which are typically well-maintained) show minimal changes, while disaggregated datasets show substantial filtering due to the presence of shorter-lived securities or incomplete data coverage.
+To ensure fair model comparisons, our forecasting system applies consistent filtering and data preprocessing across all models and datasets. Table~\ref{tab:filtered_dataset_stats} shows the impact of this filtering, displaying entity counts and median time series lengths before and after preprocessing. 
+
+\textbf{Filtering Methodology and Fairness Guarantees.} Our filtering procedure addresses fundamental differences between statistical forecasting methods (which can handle very short or irregular time series) and neural forecasting methods (which require sufficient data for training and validation). To ensure fairness, we implement entity-based forecast horizon calculation that adapts to each dataset's characteristics rather than using a global threshold. For datasets with median entity lengths below 100 observations, we calculate the forecast horizon as a percentage of the median entity length with a minimum buffer of 6 observations. For longer time series, we use seasonality-aware thresholds (e.g., 24 observations for monthly data to capture two full seasonal cycles). Crucially, we protect small datasets by implementing a hard cap: any dataset beginning with 10 or fewer entities is exempt from length-based filtering to prevent complete elimination of entire asset classes.
+
+\textbf{Technical Implementation.} The filtering system operates in two stages. First, we apply standardized data cleaning using forward-only fill strategies to handle missing values consistently across all models, avoiding the artificial length inflation that backward-filling can create when combined with our gap-filling procedures. Second, we filter time series based on minimum length requirements calculated per entity rather than globally, ensuring that the diverse time series characteristics within each dataset (e.g., securities with different listing dates) are handled appropriately. All models—whether StatsForecast implementations like Naive, Seasonal Naive, or Theta, or NeuralForecast implementations like NBEATs, NHiTS, or Transformer variants—receive identical filtered datasets for training and evaluation.
+
+\textbf{Impact and Necessity.} This preprocessing is essential because neural methods require sufficient observations for training, validation splits, and convergence, while statistical methods can theoretically operate on very short series but may produce unreliable forecasts without adequate historical context. The filtering has varying impact across asset classes: portfolio-level datasets (which are typically well-maintained) show minimal changes, while disaggregated datasets show substantial filtering due to the presence of shorter-lived securities or incomplete data coverage. For instance, individual CDS contracts are filtered from 6,508 to 6,388 entities (98\% retention), while the commodities dataset requires more aggressive filtering from 23 to 4 entities due to data availability constraints. This systematic approach ensures that performance comparisons reflect true forecasting capability rather than artifacts of inconsistent data preprocessing.
 
 \input{../_output/forecasting2/filtered_dataset_statistics.tex}
 
@@ -267,7 +274,7 @@ For equities we adopt the canonical \cite{Fama1993} cleaning procedures. At a hi
 are the gold standard for research in equity markets. Altogether, this data and filtering procedures remove survivorship and look-ahead bias, and utilize the data as it's commonly used in asset pricing research for equities.
 
 
-\paragraph{Treasuries} Our US Treasury bond portfolios utilize the CRSP Treasury database and follow \cite{Gurkaynak2007} procedure that underpins one of the
+\paragraph{Treasuries} Our US Treasury bond portfolios utilize the CRSP Treasury database and the same filters used in the procedure of  \cite{Gurkaynak2007}, which underpins one of the
 various yield curve data publications available on the Federal Reserve Board's website\footnote{See \url{https://www.federalreserve.gov/data/yield-curve-models.htm}}. At a high level, we keep only non-callable notes and bonds, strip out STRIPS/TIPS and other exotic issues, correct returns for accrued interest, and use strictly month-end transaction quotes. These filters remove optionality, stale prices, and auction-cycle noise that otherwise create spurious risk-premia. Open-sourcing the exact code lets anyone replicate this Treasury sample instead of relying on opaque heuristics.
 
 
@@ -584,7 +591,7 @@ Because both MASE values share the same in-sample scaling, the ratio simplifies 
         \item \textbf{Forecasting Type: }Local
         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.exponential_smoothing.html}{darts}}
     \end{itemize}
-    \item TBATS: Uses Box-Cox transformations, ARMA error corrections and Fourier representations\cite{DeLivera2011}.
+    \item TBATS: Uses Box-Cox transformations, ARMA error corrections and Fourier representations\cite{DeLivera2011a}.
     \begin{itemize}
         \item \textbf{Forecasting Type: }Local
         \item \textbf{Package Used: }\texttt{\href{https://unit8co.github.io/darts/generated_api/darts.models.forecasting.sf_tbats.html}{darts}}
@@ -1266,13 +1273,13 @@ mismatches: the lists provided by \cite{Koijen2018} and \cite{Yang2013} do not
 perfectly overlap, and it is unclear which exact subset was ultimately adopted 
 in \cite{He2017}. In other words, low-correlation pairs likely reflect incorrect 
 matches rather than genuine return differences. The accompanying heatmap in 
-Figure~\ref{fig:heatmap_gsci} highlights this heterogeneity visually, with 
+Figure~\ref{fig:commod_heatmap} highlights this heterogeneity visually, with 
 clusters of high-correlation matches alongside a handful of clear mismatches.
 
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/commod_return_comparison.png} \\[\abovecaptionskip]
+    \includegraphics[width=\linewidth]{../docs_src/commod_return_comparison.png} \\[\abovecaptionskip]
   \end{tabular}
   \caption{Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
   \label{fig:commod_return_comparison}
@@ -1281,7 +1288,7 @@ clusters of high-correlation matches alongside a handful of clear mismatches.
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/commod_heatmap.png} \\[\abovecaptionskip]
+    \includegraphics[width=\linewidth]{../docs_src/commod_heatmap.png} \\[\abovecaptionskip]
   \end{tabular}
   \caption{Heatmap of Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
   \label{fig:commod_heatmap}

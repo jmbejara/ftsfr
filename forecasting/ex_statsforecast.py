@@ -171,9 +171,9 @@ Let's load the data and explore its structure. We'll examine:
 
 # %%
 if __name__ == "__main__":
-    # Load and preprocess data
+    # Load and preprocess data using the current forecasting system
     train_data, test_data, full_data = load_and_preprocess_data(
-        dataset_config["data_path"], dataset_config["frequency"], test_split=0.2
+        dataset_config["data_path"], dataset_config["frequency"], test_split=0.2, seasonality=dataset_config["seasonality"]
     )
 
     print(f"Full dataset shape: {full_data.shape}")
@@ -181,6 +181,12 @@ if __name__ == "__main__":
     print(f"Test data shape: {test_data.shape}")
     print(f"Number of portfolios: {len(full_data['unique_id'].unique())}")
     print(f"Date range: {full_data['ds'].min()} to {full_data['ds'].max()}")
+    
+    print(f"\nNote: The data has been processed using the current forecasting system which includes:")
+    print(f"- Consistent series filtering to ensure fair model comparisons")
+    print(f"- Standardized data cleaning with forward-fill strategy")
+    print(f"- Entity-based forecast horizon calculation for short-lived series")
+    print(f"- Protection for small datasets (≤10 entities) to preserve all data")
 
 # %%
 if __name__ == "__main__":
@@ -196,7 +202,142 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 3: Visualizing the Time Series
+## Step 3: Understanding the Modern Forecasting Pipeline
+
+The current forecasting system includes several improvements for better model comparisons:
+
+### A. Series Filtering (`filter_series_for_forecasting`)
+- Ensures all models work with the same set of entities
+- Protects against very short series that could bias results
+- Adapts minimum length requirements based on seasonality and forecast horizon
+- Special handling for small datasets (≤10 entities) to preserve all data
+
+### B. Standardized Data Cleaning (`standardize_data_cleaning`)
+- Consistent missing value handling across all models
+- Forward-fill strategy to handle gaps in financial data
+- Removes infinite/NaN values that could break model fitting
+- Trims series to last non-null observation to avoid trailing nulls
+
+Let's demonstrate these concepts with our data:
+"""
+
+# %%
+if __name__ == "__main__":
+    # Import the preprocessing functions to demonstrate them
+    from forecast import filter_series_for_forecasting, standardize_data_cleaning
+    
+    # Show series length distribution before filtering
+    series_lengths_before = (
+        full_data.group_by("unique_id")
+        .agg(pl.len().alias("length"))
+        .sort("length")
+    )
+    
+    print("Series Length Distribution (Before Filtering):")
+    print(f"  Min length: {series_lengths_before['length'].min()}")
+    print(f"  Max length: {series_lengths_before['length'].max()}")
+    print(f"  Median length: {series_lengths_before['length'].median()}")
+    print(f"  Mean length: {series_lengths_before['length'].mean():.1f}")
+    
+    # Demonstrate what the filtering function would do (it was already applied in load_and_preprocess_data)
+    print(f"\nFiltering was applied during data loading:")
+    print(f"  Dataset: {len(full_data['unique_id'].unique())} entities (post-filtering)")
+    print(f"  Forecast horizon: {int(test_data['ds'].n_unique())} periods")
+    print(f"  Seasonality: {dataset_config['seasonality']}")
+    
+    # Show data cleaning effects on a sample series
+    sample_before_cleaning = train_data.filter(pl.col("unique_id") == sample_portfolio)
+    sample_after_cleaning = standardize_data_cleaning(sample_before_cleaning, fill_strategy="forward_only")
+    
+    null_count_before = sample_before_cleaning.filter(pl.col("y").is_null()).height
+    null_count_after = sample_after_cleaning.filter(pl.col("y").is_null()).height
+    
+    print(f"\nData Cleaning Example ({sample_portfolio}):")
+    print(f"  Null values before cleaning: {null_count_before}")
+    print(f"  Null values after cleaning: {null_count_after}")
+    print(f"  Length before: {len(sample_before_cleaning)}")
+    print(f"  Length after: {len(sample_after_cleaning)}")
+
+# %%
+if __name__ == "__main__":
+    # Create visualization showing preprocessing effects
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+    
+    # Plot 1: Series length distribution
+    ax1 = axes[0, 0]
+    series_lengths = series_lengths_before['length'].to_numpy()
+    ax1.hist(series_lengths, bins=20, alpha=0.7, color='blue', edgecolor='black')
+    ax1.axvline(x=series_lengths_before['length'].median(), color='red', linestyle='--', 
+                label=f'Median: {series_lengths_before["length"].median()}')
+    ax1.set_title('Distribution of Series Lengths\n(After Current Filtering)')
+    ax1.set_xlabel('Series Length (observations)')
+    ax1.set_ylabel('Count')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    
+    # Plot 2: Forecast horizon comparison
+    ax2 = axes[0, 1]
+    forecast_horizon = int(test_data['ds'].n_unique())
+    min_length = series_lengths_before['length'].min()
+    ax2.bar(['Min Series\nLength', 'Forecast\nHorizon', 'Seasonality'], 
+            [min_length, forecast_horizon, dataset_config['seasonality']], 
+            color=['lightcoral', 'lightblue', 'lightgreen'], alpha=0.7)
+    ax2.set_title('Key Length Comparisons')
+    ax2.set_ylabel('Number of Periods')
+    ax2.grid(True, alpha=0.3)
+    
+    # Plot 3: Data cleaning effect (before/after null handling)
+    ax3 = axes[1, 0]
+    sample_series_raw = sample_before_cleaning.to_pandas()
+    sample_series_clean = sample_after_cleaning.to_pandas()
+    
+    # Show recent data where nulls might be more visible
+    recent_start = sample_series_raw['ds'].iloc[-500] if len(sample_series_raw) > 500 else sample_series_raw['ds'].iloc[0]
+    recent_raw = sample_series_raw[sample_series_raw['ds'] >= recent_start].copy()
+    recent_clean = sample_series_clean[sample_series_clean['ds'] >= recent_start].copy()
+    
+    ax3.plot(recent_raw['ds'], recent_raw['y'], alpha=0.6, label='Before cleaning', marker='o', markersize=1)
+    ax3.plot(recent_clean['ds'], recent_clean['y'], alpha=0.8, label='After cleaning', linewidth=2)
+    ax3.set_title(f'Data Cleaning Effect: {sample_portfolio}\n(Recent {len(recent_raw)} observations)')
+    ax3.set_xlabel('Date')
+    ax3.set_ylabel('Returns')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+    
+    # Plot 4: Pipeline summary
+    ax4 = axes[1, 1]
+    pipeline_steps = ['Raw Data', 'Fill Gaps', 'Filter Series', 'Clean Data', 'Ready for\nModeling']
+    pipeline_counts = [len(full_data['unique_id'].unique()), 
+                      len(full_data['unique_id'].unique()),
+                      len(full_data['unique_id'].unique()),
+                      len(full_data['unique_id'].unique()),
+                      len(full_data['unique_id'].unique())]
+    
+    colors = ['lightgray', 'yellow', 'orange', 'lightgreen', 'darkgreen']
+    bars = ax4.bar(pipeline_steps, pipeline_counts, color=colors, alpha=0.7)
+    ax4.set_title('Data Processing Pipeline')
+    ax4.set_ylabel('Number of Entities')
+    ax4.tick_params(axis='x', rotation=45)
+    
+    # Add value labels on bars
+    for bar, count in zip(bars, pipeline_counts):
+        height = bar.get_height()
+        ax4.text(bar.get_x() + bar.get_width()/2., height + 0.5,
+                f'{count}', ha='center', va='bottom')
+    
+    ax4.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.show()
+    
+    print("\nPipeline Summary:")
+    print("- Modern forecasting system ensures consistent preprocessing")
+    print("- All models work with the same filtered and cleaned data")
+    print("- This enables fair performance comparisons across models")
+
+# %%
+"""
+## Step 5: Visualizing the Time Series
 
 Let's visualize the time series to understand its characteristics:
 1. Overall trend and patterns
@@ -248,7 +389,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 4: Autocorrelation Analysis
+## Step 6: Autocorrelation Analysis
 
 Before fitting the ARIMA model, let's analyze the autocorrelation structure of the data.
 This helps us understand:
@@ -287,7 +428,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 5: Seasonal Decomposition
+## Step 7: Seasonal Decomposition
 
 Let's decompose the time series to understand its components:
 - **Trend**: Long-term direction
@@ -328,7 +469,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 6: Implementing AutoARIMA
+## Step 8: Implementing AutoARIMA
 
 Now let's fit the AutoARIMA model. Our configuration uses the "fast" variant with:
 - **approximation=True**: Uses stepwise algorithm for faster computation
@@ -354,7 +495,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 7: Training the Model
+## Step 9: Training the Model
 
 We'll now train the AutoARIMA model on our data. StatsForecast can handle multiple series
 in parallel, making it efficient for our 25 portfolios.
@@ -376,7 +517,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 8: Examining the Fitted Model
+## Step 10: Examining the Fitted Model
 
 Let's examine what AutoARIMA found for our sample portfolio. The arima_string function
 shows us the selected ARIMA order in standard notation: ARIMA(p,d,q)(P,D,Q)[m]
@@ -390,12 +531,12 @@ if __name__ == "__main__":
     print("AutoARIMA automatically selected optimal parameters for each time series")
     
     # Get forecasts for our sample portfolio
-    sample_forecasts = forecasts[forecasts["unique_id"] == sample_portfolio].reset_index(drop=True)
+    sample_forecasts = forecasts.filter(pl.col("unique_id") == sample_portfolio).to_pandas()
     print(f"\nSample forecasts for {sample_portfolio}: {len(sample_forecasts)} periods")
 
 # %%
 """
-## Step 9: Generating Forecasts
+## Step 11: Generating Forecasts
 
 Now let's generate forecasts for the test period and visualize them with confidence intervals.
 """
@@ -411,7 +552,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 10: Visualizing Forecasts
+## Step 12: Visualizing Forecasts
 
 Let's visualize the forecasts against actual values with confidence intervals.
 """
@@ -471,7 +612,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 11: Residual Analysis
+## Step 13: Residual Analysis
 
 Analyzing the residuals helps us validate our model. Good residuals should be:
 1. Normally distributed (or close to it)
@@ -530,7 +671,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 12: Model Evaluation Metrics
+## Step 14: Model Evaluation Metrics
 
 Let's calculate comprehensive evaluation metrics for all portfolios using standard
 forecasting accuracy measures.
@@ -559,7 +700,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 13: Cross-Validation
+## Step 15: Cross-Validation
 
 Cross-validation helps assess model stability across different time periods. We'll use
 a sliding window approach to evaluate performance on multiple forecast horizons.
@@ -605,7 +746,7 @@ if __name__ == "__main__":
 
 # %%
 """
-## Step 14: Performance Across All Portfolios
+## Step 16: Performance Across All Portfolios
 
 Let's analyze how the model performs across different portfolios to understand
 where it works best and where it struggles.
@@ -638,7 +779,7 @@ if __name__ == "__main__":
     axes[0].grid(True, alpha=0.3)
     
     # Plot 2: Number of forecasts per portfolio (should be equal)
-    forecasts_per_portfolio = forecast_df.group_by('unique_id').agg(pl.len('ds').alias('count'))
+    forecasts_per_portfolio = forecast_df.group_by('unique_id').agg(pl.len().alias('count'))
     axes[1].bar(range(len(forecasts_per_portfolio)), forecasts_per_portfolio['count'], alpha=0.7, color='green')
     axes[1].set_title('Number of Forecasts per Portfolio')
     axes[1].set_xlabel('Portfolio Index')

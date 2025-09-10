@@ -263,7 +263,7 @@ required_data_sources = ["he_kelly_manela"]
 description = """Monthly factors from He, Kelly, and Manela (2017)"""
 short_name = "HKM Monthly Factor Returns"
 table_name = "HKM Monthly Factor"
-group = "returns_portfolios"
+group = "other"
 frequency = "MS"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -273,7 +273,7 @@ winsorization = [1.0, 99.0]
 description = """Daily factors from He, Kelly, and Manela (2017)"""
 short_name = "HKM Daily Factor Returns"
 table_name = "HKM Daily Factor"
-group = "returns_portfolios"
+group = "other"
 frequency = "B"
 # seasonality = 252
 seasonality = 1 # No seasonality for returns
@@ -283,7 +283,7 @@ winsorization = [1.0, 99.0]
 description = """All factors from He, Kelly, and Manela (2017)"""
 short_name = "HKM All Factor Returns"
 table_name = "HKM All Factor"
-group = "returns_portfolios"
+group = "other"
 frequency = "MS"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
@@ -371,18 +371,18 @@ description = """SPX Options returns portfolios, taken from He, Kelly, and Manel
 short_name = "HKM Option Returns"
 table_name = "SPX Options Portfolios"
 group = "returns_portfolios"
-frequency = "D"
+frequency = "ME"
 # seasonality = 252 # Business days per year
 seasonality = 1 # No seasonality for returns
 
-[options.ftsfr_cjs_option_returns]
-description = """From optionmetrics data, SPX Options returns on a contract level, 1996-Present"""
-short_name = "CJS Option Returns"
-table_name = "SPX Options Contracts"
-group = "returns_disaggregated"
-frequency = "D"
-# seasonality = 252 # Business days per year
-seasonality = 1 # No seasonality for returns
+# [options.ftsfr_cjs_option_returns]
+# description = """From optionmetrics data, SPX Options returns on a contract level, 1996-Present"""
+# short_name = "CJS Option Returns"
+# table_name = "SPX Options Contracts"
+# group = "returns_disaggregated"
+# frequency = "ME"
+# # seasonality = 252 # Business days per year
+# seasonality = 1 # No seasonality for returns
 
 ################################################################################
 [sovereign_bonds]
