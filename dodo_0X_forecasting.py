@@ -68,3 +68,23 @@ def task_forecast_new():
                     "clean": True,
                     "verbosity": 2,
                 }
+
+
+def task_generate_forecasting_jobs():
+    """Generate the forecasting_jobs.txt file used by SLURM submission"""
+    return {
+        "actions": [
+            (debug_action, ["python generate_forecasting_jobs.py"])
+        ],
+        "file_dep": [
+            "generate_forecasting_jobs.py",
+            "forecasting/models_config.toml",
+            "datasets.toml",
+            OUTPUT_DIR / "available_datasets.csv",
+        ],
+        "targets": [
+            "forecasting_jobs.txt"
+        ],
+        "clean": True,
+        "verbosity": 2,
+    }
