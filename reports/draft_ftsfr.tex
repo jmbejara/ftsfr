@@ -39,6 +39,8 @@
         Zixiao Wang\thanks{Independent. Most of this work was completed as students in the Financial Mathematics program at the University of Chicago}
         \and
         Vincent Hanyang Xu\footnotemark[3]
+        \and
+        Yangge Xu\footnotemark[3]
     }
 \date{\today}
 
@@ -75,7 +77,7 @@
 
 
 \begin{abstract}
-    Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to preemptively address systemic vulnerabilities. This paper benchmarks state-of-the-art global time series forecasting methods, which have proven superior in the time series literature, on a comprehensive suite of financial stability indicators. Benchmarks drive progress, and our systematic evaluation of 24 forecasting methods ranging from classical models to modern deep learning architectures reveals which approaches best capture early warning signals across different market segments. We evaluate these methods on critical financial stability metrics including arbitrage basis spreads that signal funding market stress, banking indicators that reveal institutional vulnerabilities, and asset returns across multiple markets. To enable reproducible research and continuous improvement in financial forecasting, we develop an open-source \emph{financial time series forecasting repository} that standardizes these datasets according to canonical academic methodologies. Our results provide financial stability authorities with evidence-based guidance on which forecasting approaches most reliably detect emerging risks in specific market segments, directly enhancing the toolkit for macroprudential surveillance and systemic risk monitoring.
+    Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to address systemic vulnerabilities. This paper benchmarks state-of-the-art global time series forecasting methods, which have proven superior in the time series literature, on a comprehensive suite of financial variables. Benchmarks drive progress, and our systematic evaluation of 24 forecasting methods ranging from classical models to modern deep learning architectures reveals which approaches best capture early warning signals across different market segments. We evaluate these methods on critical financial stability metrics including arbitrage basis spreads that signal funding market stress, banking indicators that reveal institutional vulnerabilities, and asset returns across multiple markets. To enable reproducible research and continuous improvement in financial forecasting, we develop an open-source \emph{financial time series forecasting repository} that standardizes these datasets according to canonical academic methodologies. Our results provide financial stability authorities with evidence-based guidance on which forecasting approaches most reliably detect emerging risks in specific market segments, directly enhancing the toolkit for macroprudential surveillance and systemic risk monitoring.
     \end{abstract}
 
 \section{Introduction}
@@ -103,31 +105,31 @@ Financial regulators and researchers increasingly emphasize forward-looking risk
 In this context, improving our ability to forecast key financial metrics is not a theoretical exercise. Rather,
 it is critical for early warning signals and timely policy responses. 
 % The Office of Financial Research (OFR) and the Financial Stability Oversight Council (FSOC) were established to identify emerging risks across financial markets. However, their effectiveness hinges on robust data and predictive analytics. 
-By developing an open-source financial time series forecasting benchmark, we directly enhance the toolkit available for financial stability monitoring. This benchmark brings together a wide range of datasets---spanning asset returns, arbitrage (basis) spreads, and banking indicators---that are crucial for assessing vulnerabilities in different corners of the financial system. Importantly, it evaluates state-of-the-art ``global" forecasting methods (which learn across many time series) and compares them to classical models, shedding light on which approaches best capture early signs of stress in these data. In sum, better forecasting of these metrics can help regulators and market participants spot trouble on the horizon, informing pre-emptive measures to safeguard the economy
+By developing an open-source financial time series forecasting benchmark, we directly enhance the toolkit available for financial stability monitoring. This benchmark brings together a wide range of datasets---spanning asset returns, arbitrage (basis) spreads, and banking indicators---that are crucial for assessing vulnerabilities in different corners of the financial system. Importantly, it evaluates state-of-the-art ``global" forecasting methods (which learn across many time series) and compares them to classical models, shedding light on which approaches best capture early signs of stress in these data. In sum, better forecasting can help regulators and market participants spot trouble on the horizon, supporting measures to safeguard the economy
 
 % Why we need a standardized benchmark
 The time-series forecasting community increasingly recognizes the need for standardized evaluation frameworks. 
 Benchmarks drive progress.
 Until recently, the absence of standardized benchmark datasets meant that most studies evaluated their methods on limited, arbitrarily selected time series or domain-specific data, making meaningful comparisons across methods virtually impossible. As \citet{Prater2024} note, this lack of standardization has resulted in ``poor quality evaluations" and irreproducible comparisons across forecasting studies. While several benchmark repositories have emerged to address this gap, they remain limited in their coverage of financial markets. 
-The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it may not leverage CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR Time Series Classification Archive \citep{Dau2019} and UEA Multivariate Time Series Classification Archive \citep{Bagnall2018} and MUU Extrinsic Regression Repository \citep{Tan2020} do not include coverage of the financial domain.
+The FRED-MD database \citep{McCracken2016} provides a valuable collection of 134 U.S. macroeconomic series, but focuses primarily on real economic indicators rather than financial market data. The FinTSB benchmark \citep{Hu2018} includes equity returns, though it does not use CRSP, widely regarded as the gold standard for high-quality equity market data. Meanwhile, the UCR Time Series Classification Archive \citep{Dau2019} and UEA Multivariate Time Series Classification Archive \citep{Bagnall2018} and MUU Extrinsic Regression Repository \citep{Tan2020} do not include coverage of times series from the financial domain.
 The Monash repository \citep{Godahewa2021} and recent efforts like TFB \citep{Qiu2024} have made strides toward broader coverage, yet comprehensive representation of financial asset classes, from corporate bonds to credit derivatives, remains absent. (See Table \ref{tab:benchmarks} for a summary of existing benchmarks.) This gap is particularly problematic given that, according to the ``No Free Lunch" Theorem \citep{Wolpert1997},
-there is no single forecasting method that performs best for all time series. As such, to improve forecasting in the financial domain, we need to evaluate forecasting methods on a suite of datasets from the financial domain and, importantly,
+there is no single forecasting method that performs best for all time series. As such, to improve financial forecasting, we need to evaluate forecasting methods on a suite of datasets from the financial domain and, importantly,
 these datasets need to reflect the form of the data as they commonly appear in the relevant finance literature. That is, they should use the same data sources and the same domain-specific cleaning and normalization procedures established in the literature. 
 
 
-Our proposed benchmark addresses this limitation by creating a standardized, literature-compliant repository specifically designed for the finance domain. By providing open-source scripts that automate the download and cleaning of data from institutional sources like WRDS and Bloomberg, we enable researchers to reproduce exact datasets used in canonical finance papers. Our aim is to fill a critical gap in quantitative finance research by providing the first comprehensive forecasting benchmark tailored to financial markets. In particular, our paper has the following main contributions:
+Our proposed benchmark creates a standardized, literature-compliant repository specifically designed for financial forecasting. By providing open-source scripts that automate the download and cleaning of data from institutional sources like WRDS and Bloomberg, we enable researchers to reproduce exact datasets used in canonical finance papers. Our aim is to fill a gap in quantitative finance research by providing the first comprehensive forecasting benchmark tailored to financial markets. In particular, our paper has the following main contributions:
 
 \begin{itemize}
-    \item We introduce the first comprehensive time series forecasting archive focused specifically on financial markets. This archive provides standardized datasets across multiple asset classes and market segments:
+    \item We introduce the first comprehensive time series forecasting repository focused specifically on financial markets. This archive provides standardized datasets across multiple asset classes and market segments:
     \begin{itemize}
-        \item Asset return series spanning equities, corporate bonds, U.S. Treasuries, sovereign bonds, foreign exchange rates, commodity futures, credit default swaps (CDS), and options
-        \item Arbitrage basis spreads including covered interest parity (CIP) deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury spreads, equity spot-futures basis, Treasury spot-futures basis, and box spread arbitrage
-        \item Specialized datasets critical for financial stability monitoring, including bank Call Report data, Treasury auction statistics, and yield curve dynamics
+        \item Asset return series spanning equities, corporate bonds, U.S. Treasuries, foreign exchange rates, commodity futures, credit default swaps (CDS), and options
+        \item Arbitrage basis spreads including covered interest parity (CIP) deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury spreads, and Treasury spot-futures basis.
+        \item Specialized datasets critical for financial stability monitoring, including bank Call Report data, financial intermediary risk factors, and yield curve dynamics
     \end{itemize}
     
     \item We provide validated implementations of canonical data cleaning procedures from seminal finance papers, each following the exact methodology of the original studies. Crucially, while these foundational papers often lack publicly available replication code, our implementations successfully reproduce their key results, establishing both the correctness of our data processing and creating a reusable framework for future research.
     
-    \item We emphasize domain-specific data curation, recognizing that financial data requires specialized treatment reflecting market microstructure, regulatory requirements, and established academic conventions. Each dataset is processed using the precise subsample definitions, filters, and transformations specified in the corresponding literature, ensuring that forecasting evaluations reflect the actual data as used by domain experts rather than generic time series.
+    \item We emphasize domain-specific data curation, recognizing that financial data requires specialized treatment reflecting market microstructure, regulatory requirements, and established academic conventions. Each dataset is processed using the precise subsample definitions, filters, and transformations specified in the corresponding literature, ensuring that forecasting evaluations reflect the actual data as used by experts rather than generic time series.
     
     \item We present comprehensive baseline forecasting results across all datasets using a suite of 24 methods ranging from classical statistical models (ARIMA, ETS, Theta) to modern machine learning approaches (CatBoost, neural networks) and state-of-the-art deep learning architectures (Transformer variants, N-BEATS, TimesFM). These baseline results enable standardized performance comparisons and establish benchmarks for future research.
     
@@ -182,7 +184,7 @@ Complementing firm-level exercises, broad cyclic risk gauges, such as the ECB's 
     Detken, Fahr, and Lang (2018), ECB Financial Stability Review (May 2018) Special Feature. See \url{https://www.ecb.europa.eu/press/financial-stability-publications/fsr/special/html/ecb.fsrart201805_2.en.html}.
 }
 
-A large literature shows that exploiting many predictors improves forecast performance when common factors drive co-movements across series. In approximate factor models, principal components (diffusion indexes) summarize large panels into a few latent indexes that deliver competitive, often superior, forecasts relative to small VARs and univariate benchmarks \citep{Stock2002,Stock2002a,Stock}. The Office of Financial Research's own Financial Stress Index (FSI) applies a closely related approach: a dynamic factor model that is essentially the first principal component of a broad, daily panel of market indicators (see \citet{Monin2019} and \citep{Bejarano2023}). Another example is the Systemic Assessment of Financial Environment (SAFE) early warning system monitors, by researchers from the Federal Reserve Bank of Cleveland, which integrates supervisory and market data to forecast episodes of systemic stress \citep{Oet2011}. Together, these results motivate evaluating modern, panel-based forecasting methods on financial-stability-relevant datasets.
+A large literature shows that exploiting many predictors improves forecast performance when common factors drive co-movements across series. In approximate factor models, principal components (diffusion indexes) summarize large panels into a few latent indexes that deliver competitive, often superior, forecasts relative to small VARs and univariate benchmarks \citep{Stock2002,Stock2002a,Stock}. The Office of Financial Research's own Financial Stress Index (FSI) applies a closely related approach: a factor model that is essentially uses the first principal component of a broad, daily panel of market indicators (see \citet{Monin2019} and \citep{Bejarano2023}). Another example is the Systemic Assessment of Financial Environment (SAFE) early warning system monitors, by researchers from the Federal Reserve Bank of Cleveland, which integrates supervisory and market data to forecast episodes of systemic stress \citep{Oet2011}. Together, these results motivate evaluating modern, panel-based forecasting methods on financial-stability-relevant datasets.
 
 \subsection{Global Time Series Forecasting Methods}
 
@@ -192,10 +194,10 @@ This insight motivates global time series forecasting methods, which treat the e
 
 The empirical success of this approach is well documented in major forecasting competitions. The M-competition series is one of the most popular time series forecasting competitions in the field \citep{Makridakis1982, Makridakis2000, Makridakis2018, Makridakis2022}. Notably, the winning approaches of recent M-competitions have consistently employed global forecasting strategies that train a single model across all series in the dataset. As \citet{Godahewa2021} observe, this pattern extends beyond the M-competitions: winners of the NN3 and NN5 Neural Network competitions and various Kaggle competitions have similarly leveraged global models to achieve state-of-the-art performance.
 
-The advantages of global methods are particularly pronounced in financial applications. They can handle short series by borrowing strength from longer ones, provide robust parameter estimation through implicit regularization across series, and naturally capture spillover effects between markets. This enables them to learn common patterns while accounting for series-specific variations—especially valuable when forecasting related financial series that share underlying economic drivers. Recent implementations range from pooled regression approaches to sophisticated deep learning architectures, with many demonstrating superior performance over traditional univariate methods \citep{Godahewa2021}.
+The advantages of global methods are particularly pronounced in financial applications. They can handle short series by borrowing strength from longer ones, provide robust parameter estimation through implicit regularization across series, and naturally capture spillover effects between markets. This enables them to learn common patterns while accounting for series-specific variations-especially valuable when forecasting related financial series that share underlying economic drivers. Recent implementations range from pooled regression approaches to sophisticated deep learning architectures, with many demonstrating superior performance over traditional univariate methods \citep{Godahewa2021}.
 
-This paper contributes to the global forecasting literature by providing a comprehensive benchmark specifically designed for financial markets.
-Our benchmark thus serves to improve the infrastructure for developing the next generation of forecasting methods tailored to the complexities of financial markets, potentially improving risk management, asset allocation, and financial stability monitoring.
+This paper contributes to the global forecasting literature by providing a comprehensive dataset that can be used as a bencharmk specifically designed for financial markets.
+Our datasets thus serves to improve the infrastructure for developing the next generation of forecasting methods tailored to the complexities of financial markets, potentially improving risk management, asset allocation, and financial stability monitoring.
 
 
 
@@ -211,10 +213,8 @@ helps them more effectively monitor systemic financial risks. This paper address
 
 \section{Benchmark Datasets}
 
-In this section, we describe the datasets included in the benchmark. The datasets are organized into three main groups: asset class datasets, basis spread datasets, and other financial data. We provide brief description of each dataset below. Each datasets is constructed based off of a cleaning procedure from a well-known paper in the academic literature. To validate our cleaning and transformations, we replicate a key plot or table from each paper. We give brief details of this process below. Full details of the cleaning and replications are provided in the appendix.
-The code the automates the data pull, cleaning, and formatting is available on \href{https://github.com/jmbejara/ftsfr}{GitHub}.
-
-Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. Each dataset follows the data cleaning and construction procedures established in the referenced academic literature, ensuring consistency with existing finance research standards.
+In this section, we describe the datasets included in the benchmark. The datasets are organized into three main groups: asset class datasets, basis spread datasets, and other financial data. We provide brief description of each dataset below. Each dataset is constructed based off of a cleaning procedure from a well-known paper in the academic literature. To validate our cleaning and transformations, we replicate a key plot or table from each paper. We give brief details of this process below. Full details of the cleaning and replications are provided in the appendix.
+The code that automates the data pull, cleaning, and formatting is available on \href{https://github.com/jmbejara/ftsfr}{GitHub}. Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. 
 
 \begin{table}[htbp]
 \centering
@@ -261,7 +261,7 @@ Treasury Yield Curve & Daily Nelson-Siegel-Svensson zero-coupon yields, 1-30 yea
 \caption*{\emph{Source: Authors' creation}}
 \end{table}
 
-Table~\ref{tab:data_sources} shows the specific data sources required for each dataset in our benchmark. The table illustrates the diverse range of financial data providers needed to construct a comprehensive forecasting benchmark, from academic databases like WRDS to commercial providers like Bloomberg Terminal.
+Table~\ref{tab:data_sources} shows the specific data sources required for each dataset in our benchmark. The table illustrates the diverse range of financial data providers needed to construct the datasets.
 
 \begin{table}[htbp]
 \centering
@@ -274,37 +274,37 @@ Dataset Name & Data Sources \\
 \midrule
 \multicolumn{2}{c}{\textbf{Returns Data}} \\
 \midrule
-CDS Contract & Board of Governors of the Federal Reserve System, S\&P Global CDS (formerly Markit) \\
+CDS Contract & S\&P Global CDS (formerly Markit)  \\
 CDS Portfolio & ibid. \\
 Commodity & Bloomberg Terminal \\
-Corporate Bond & FINRA TRACE, via \href{https://openbondassetpricing.com/}{Open Source Bond Asset Pricing}  \\
+Corporate Bond & WRDS TRACE via \href{https://openbondassetpricing.com/}{Open Source Bond Asset Pricing}  \\
 Corporate Portfolio & ibid. \\
 CRSP Stock & Center for Research in Security Prices \\
 CRSP Stock (ex-div) & ibid. \\
 FF25 Size-BM & Ken French Data Library \\
 FX & Bloomberg Terminal \\
-SPX Options Portfolios & WRDS OptionMetrics \\
+SPX Options Portfolios & OptionMetrics IvyDB\\
 Treasury Bond & Center for Research in Security Prices \\
 Treasury Portfolio & ibid. \\
 \midrule
 \multicolumn{2}{c}{\textbf{Basis Spread Data}} \\
 \midrule
-CDS-Bond & FINRA TRACE, via Open Source Bond Asset Pricing, S\&P Global CDS (formerly Markit) \\
+CDS-Bond & WRDS TRACE via Open Source Bond Asset Pricing, S\&P Global CDS and RED Entity (formerly Markit) \\
 CIP & Bloomberg Terminal \\
-TIPS-Treasury & Board of Governors of the Federal Reserve System, Bloomberg Terminal \\
-Treasury-SF & Bloomberg Terminal \\
+TIPS-Treasury & ibid. \\
+Treasury-SF & ibid. \\
 Treasury-Swap & ibid. \\
 \midrule
 \multicolumn{2}{c}{\textbf{Other Financial Data}} \\
 \midrule
-Bank Cash Liquidity & FFIEC Call Reports via \cite{Drechsler2017} \\
+Bank Cash Liquidity & U.S. Call Reports, via Phillip Schnabl's \href{https://pages.stern.nyu.edu/~pschnabl/data/data_callreport.htm}{website}\footnote{See \url{https://pages.stern.nyu.edu/~pschnabl/data/data_callreport.htm}} \\
 Bank Leverage & ibid. \\
 BHC Cash Liquidity & ibid. \\
 BHC Leverage & ibid. \\
-HKM Daily Factor & He Kelly Manela (2017) \href{https://zhiguohe.net/data-and-empirical-patterns/intermediary-capital-ratio-and-risk-factor/}{website}\\
+HKM Daily Factor & Author, Asaf Manela's website \href{https://asafmanela.github.io/data/}{website}\footnote{See \url{https://asafmanela.github.io/data/}}\\
 HKM Monthly Factor & ibid. \\
 HKM All Factor & ibid. \\
-Treasury Yield Curve & Board of Governors of the Federal Reserve System \\
+Treasury Yield Curve & Yield Curve Data from Board of Governors of the Federal Reserve System\footnote{See \url{https://www.federalreserve.gov/data/nominal-yield-curve.htm}} \\
 \bottomrule
 \end{tabular}
 \caption*{\emph{Source: Authors' creation}}
@@ -320,7 +320,7 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 \vspace{0.1cm}
 \scriptsize
 % \textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.
-\caption*{\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}}
+\caption*{\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
 \end{table}
 
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
@@ -362,7 +362,7 @@ We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP)
   \begin{tabular}{@{}c@{}}
     \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
   \end{tabular}
-  \caption*{\emph{Sources: OptionMetrics, Wharton Research Data Services, Authors' creation}}
+  \caption*{\emph{Sources: OptionMetrics,  Authors' creation}}
   \label{fig:spx_options_over_time}
 \end{figure}
 
@@ -372,7 +372,7 @@ The \citet{Constantinides2013} portfolios are organized by option type (call or 
 Our dataset is comprised of monthly leverage-adjusted portfolio returns for \textbf{all 72 SPX option portfolios, spanning 23 years from January 1996 to December 2019}. The 72 portfolio returns series were constructed from a raw daily dataset of approximately 19 million individual SPX option contracts. These portfolios are constructed using leverage-adjustments and daily dynamic rebalancing to maintain constant risk exposures over time.
 
 
-The leverage adjustments and dynamic portfolio rebalancing process outlined in \citet{Constantinides2013} had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and if a particular process was not sufficiently detailed in the original paper, we acknowledge these areas and made educated guesses about the authors' intent. For convenience, we provide the user with generalized functions that operate on \emph{any set} of options data that is structured the same as the dataset we utilized (WRDS OptionMetrics). 
+The leverage adjustments and dynamic portfolio rebalancing process outlined in \citet{Constantinides2013} had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and if a particular process was not sufficiently detailed in the original paper, we acknowledge these areas and made educated guesses about the authors' intent. For convenience, we provide the user with generalized functions that operate on \emph{any set} of options data that is structured the same as the dataset we utilized (OptionMetrics). 
 
 We also provide a comprehensive overview of the data cleaning and preprocessing steps we undertook to prepare the raw SPX options data for analysis and portfolio construction, which includes technical and mathematical details on volatility estimation, kernel methods, and other relevant techniques.
 
@@ -409,8 +409,8 @@ futures-chain construction or interpolation is required in our baseline analysis
 \end{figure}
 
 \paragraph{Credit Default Swaps}
-Our CDS data originate from the Markit corporate CDS database available via
-WRDS, providing daily dealer-contributed curves, reference entity identifiers,
+Our CDS data originate from S\&P Global CDS database (formerly Markit), 
+providing daily dealer-contributed curves, reference entity identifiers,
 and rich quote metadata for all USD-denominated contracts. 
 Our CDS sample follows the constant-risky-duration construction of
 \cite{Palhares2012}, a canonical protocol that neutralises maturity roll-over
@@ -444,7 +444,7 @@ Each of these basis spreads are, themselves, constructed following methodologies
 % A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
 
 \paragraph{Spot-Futures Arbitrage in Treasuries}
-Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we extract implied risk-free rates from the first-deferred 2-, 5-, 10-, 20- and 30-year Treasury futures.  We retain only days with positive volume, drop the delivery month to avoid the option-to-deliver distortions of \citet{Burghardt2005}, align quotes to the 17:00 ET close, and, per \citet{Barth2021}, match each futures-implied rate to a maturity-matched OIS benchmark—yielding a clean daily Treasury basis series.
+Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we extract implied risk-free rates from the first-deferred 2-, 5-, 10-, 20- and 30-year Treasury futures.  We retain only days with positive volume, drop the delivery month to avoid the option-to-deliver distortions of \citet{Burghardt2005}, align quotes to the 17:00 ET close, and, per \citet{Barth2021}, match each futures-implied rate to a maturity-matched OIS benchmark-yielding a clean daily Treasury basis series.
 
 \paragraph{Treasury Swap Arbitrage}
 We follow \citet{Siriwardane2021} in constructing daily OIS-Treasury swap
@@ -496,7 +496,7 @@ Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, 
 % we should be doing duration matching, added that in
 % i am removing RFR when over 1, representing 100%
 % - Vincent
-Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a duration-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorise extreme 100\% bases, and require each bond to appear in TRACE's cleaned WRDS dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
+Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a duration-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorise extreme 100\% bases, and require each bond to appear in our cleaned version of the public FINRA TRACE dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
 
 
 % TODO: Vincent and Alex
@@ -510,7 +510,7 @@ Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we li
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.7\linewidth]{../docs_src/CDS_replicate.png}
   \end{tabular}
-  \caption*{\emph{Sources: LSEG Mergent, S\&P Global, Authors' creation}}
+  \caption*{\emph{Sources: S\&P Global, WRDS TRACE,Authors' creation}}
   \label{fig:cds_basis}
 \end{figure}
 
@@ -725,7 +725,7 @@ To ensure fair model comparisons, our forecasting system applies consistent filt
 
 \paragraph{Filtering Methodology and Fairness Guarantees.} Our filtering procedure addresses fundamental differences between statistical forecasting methods (which can handle very short or irregular time series) and neural forecasting methods (which require sufficient data for training and validation). To ensure fairness, we implement entity-based forecast horizon calculation that adapts to each dataset's characteristics rather than using a global threshold. For datasets with median entity lengths below 100 observations, we calculate the forecast horizon as a percentage of the median entity length with a minimum buffer of 6 observations. For longer time series, we use seasonality-aware thresholds (e.g., 24 observations for monthly data to capture two full seasonal cycles). Crucially, we protect small datasets by implementing a hard cap: any dataset beginning with 10 or fewer entities is exempt from length-based filtering to prevent complete elimination of entire asset classes.
 
-\paragraph{Technical Implementation.} The filtering system operates in two stages. First, we apply standardized data cleaning using forward-only fill strategies to handle missing values consistently across all models, avoiding the artificial length inflation that backward-filling can create when combined with our gap-filling procedures. Second, we filter time series based on minimum length requirements calculated per entity rather than globally, ensuring that the diverse time series characteristics within each dataset (e.g., securities with different listing dates) are handled appropriately. All models—whether StatsForecast implementations like Naive, Seasonal Naive, or Theta, or NeuralForecast implementations like NBEATs, NHiTS, or Transformer variants—receive identical filtered datasets for training and evaluation.
+\paragraph{Technical Implementation.} The filtering system operates in two stages. First, we apply standardized data cleaning using forward-only fill strategies to handle missing values consistently across all models, avoiding the artificial length inflation that backward-filling can create when combined with our gap-filling procedures. Second, we filter time series based on minimum length requirements calculated per entity rather than globally, ensuring that the diverse time series characteristics within each dataset (e.g., securities with different listing dates) are handled appropriately. All models-whether StatsForecast implementations like Naive, Seasonal Naive, or Theta, or NeuralForecast implementations like NBEATs, NHiTS, or Transformer variants-receive identical filtered datasets for training and evaluation.
 
 \paragraph{Impact and Necessity.} This preprocessing is essential because neural methods require sufficient observations for training, validation splits, and convergence, while statistical methods can theoretically operate on very short series but may produce unreliable forecasts without adequate historical context. The filtering has varying impact across asset classes: portfolio-level datasets (which are typically well-maintained) show minimal changes, while disaggregated datasets show substantial filtering due to the presence of shorter-lived securities or incomplete data coverage. For instance, individual CDS contracts are filtered from 6,508 to 6,388 entities (98\% retention), while the commodities dataset requires more aggressive filtering from 23 to 4 entities due to data availability constraints. This systematic approach ensures that performance comparisons reflect true forecasting capability rather than artifacts of inconsistent data preprocessing.
 
@@ -741,14 +741,15 @@ To ensure fair model comparisons, our forecasting system applies consistent filt
 Entities Before/After = unique time series counts before and after filtering; 
 Median Length Before/After = median time series lengths per entity before and after filtering. 
 Filtering removes series that are too short for reliable forecasting and applies consistent data cleaning.
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
 \end{minipage}
 \end{table}
 
 \subsection{Error Metrics}
 
 \subsection{Error Metrics}\label{subsec:error_metrics}
-We report four complementary error measures: MAE, RMSE, sMAPE, and MASE. Each answers a slightly different question and, taken together, they balance interpretability, robustness, and cross-series comparability.
+We report three complementary error measures: root mean squared error (RMSE), mean absolute scaled error (MASE), and relatieve mean absolute scaled error (rMASE). 
+We report the results using mean absolute error (MAE) and  Symmetric Mean Absolute Percentage Error (sMAPE) in the appendix. Each error metrics answers a slightly different question and, taken together, they balance interpretability, robustness, and cross-series comparability. I first define these error metrics and discuss their relative strengths.
 
 \paragraph{Notation.} Let $\{y_t\}_{t=1}^T$ be targets in the test window and $\{\hat y_t\}_{t=1}^T$ the corresponding forecasts.
 
@@ -797,14 +798,6 @@ Because both MASE values share the same in-sample scaling, the ratio simplifies 
 \section{Baseline Results and Analysis}
 \label{sec:results}
 
-% TODO: Present comprehensive forecasting results across all datasets
-% - Create results tables in exact same format as Monash paper
-% - Analyze patterns in results
-% - Compare with Monash findings where applicable
-% - Discuss implications for practitioners
-
-\subsection{Overall Performance}
-% Summary tables across all datasets
 
 We present comprehensive forecasting results across all datasets and models using two primary error metrics: Mean Absolute Scaled Error (MASE) and Root Mean Square Error (RMSE). MASE provides scale-free comparison across different time series, while RMSE captures the magnitude of forecasting errors in original units.
 
@@ -818,7 +811,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 \caption*{
 \noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
 \scriptsize
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
 \end{table}
 
 % Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE results from Table~\ref{tab:mase_results}. The color-coded heatmap makes it easy to identify patterns in model performance across different dataset types, with cooler colors (blues) indicating better performance and warmer colors (reds) indicating poorer performance.
@@ -829,7 +822,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 % \includegraphics[width=\textwidth]{../_output/forecasting2/mase_heatmap.png}
 % \caption*{\textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.
 
-% \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}}
+% \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
 % \label{fig:mase_heatmap}
 % \end{figure}
 
@@ -844,17 +837,17 @@ To better understand the relative performance of sophisticated models compared t
     \scriptsize
 \textbf{Note:} Values show MASE ratios relative to the Naive baseline. Values $<$ 1.0 indicate better performance than Naive. Numbers in bold indicate the best performing model for each dataset.
 
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
 }
 \end{table}
 
-Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the relative MASE results using a diverging color scheme where blue indicates better performance than Naive (values < 1.0), white represents performance equal to Naive, and red shows worse performance than Naive (values > 1.0). This visualization makes it easy to identify which models consistently outperform the simple baseline and which datasets benefit most from sophisticated forecasting approaches.
+Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the relative MASE results using a diverging color scheme where blue indicates better performance than Naive (values $<$ 1.0), white represents performance equal to Naive, and red shows worse performance than Naive (values $>$ 1.0). This visualization makes it easy to identify which models consistently outperform the simple baseline and which datasets benefit most from sophisticated forecasting approaches.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{../_output/forecasting2/relative_mase_heatmap.png}
     \caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Naive baseline, with blue indicating better performance than Naive ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*). \\
-    \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+    \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
     }
     \label{fig:relative_mase_heatmap}
 \end{figure}
@@ -871,7 +864,7 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 \caption*{\scriptsize 
 \textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.
 
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, FFIEC Public Call Reports, LSEG Mergent, OptionMetrics, S\&P Global, Wharton Research Data Services, Authors' creation}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
 }
 \end{table}
 
@@ -884,59 +877,34 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 % \label{fig:rmse_heatmap}
 % \end{figure}
 
-\subsection{Results by Asset Class}
-% Detailed analysis for each asset class
 
-\subsection{Results by Model Type}
-% Comparison of traditional vs ML vs DL approaches
+The results reveal several important patterns in financial time series forecasting. First and most notably, there is no universal best model across all datasets. While deep learning models like Transformers and TiDE show promise in certain contexts, they do not consistently outperform simpler statistical methods. The Naive baseline proves remarkably competitive, particularly for returns data where market efficiency limits predictability.
 
-\subsection{Comparison with Monash Benchmarks}
-% How financial data differs from general time series
+Model performance varies significantly based on data characteristics. Disaggregated datasets with thousands of entities, such as CRSP Stock, Corporate Bond, and Treasury Bond data, tend to benefit more from advanced models that can learn cross-sectional patterns. These models achieve improvements of 10-15\% over the Naive baseline in some cases. In contrast, portfolio-level datasets with fewer entities show limited gains from increased model complexity.
 
-[Results content to be filled in...]
+Different asset classes exhibit distinct forecasting challenges. Basis spreads and yield curves generally show higher predictability with lower MASE values, while returns data, particularly for equities and options, prove more challenging to forecast. Foreign exchange data presents unique difficulties for the MASE metric due to the relative stability of exchange rates, highlighting the importance of using multiple evaluation metrics when assessing model performance.
 
-\section{Implementation and Usage}
-\label{sec:implementation}
+Even when sophisticated models outperform baselines, the improvements typically range from 3-10\%. While these gains may appear modest, they can be economically significant in financial applications where small edges compound over time and across large portfolios. For instance, the Transformer model achieves approximately 3-10\% improvement over Naive forecasts on several datasets, which could translate to meaningful returns when applied at scale.
 
-% TODO: Explain technical architecture and usage
-% - Document the automation framework
-% - Provide clear usage instructions
-% - Explain design decisions
-% - Include code examples
+\subsection{Analysis by Model Type}
 
-\subsection{Installation and Setup}
-% Requirements and installation process
+Traditional statistical models like Theta, SES, and ARIMA remain competitive across many datasets, particularly for univariate series with clear temporal patterns. These models offer computational efficiency and interpretability advantages that may outweigh marginal accuracy gains from more complex alternatives.
 
-\subsection{Data Pipeline Architecture}
-% dodo.py and automation framework
+Among deep learning models, the results are mixed. Transformer-based models demonstrate strong performance on disaggregated datasets but struggle when data is limited. NBEATS and NHITS perform well on certain datasets but fail to consistently justify their additional computational costs. The newer KAN architecture shows promise but requires further investigation to understand its strengths and limitations.
 
-\subsection{Adding New Datasets}
-% Extensibility and contribution guidelines
-
-[Implementation content to be filled in...]
-
-\section{Reproducibility}
-\label{sec:reproducibility}
-
-% TODO: Ensure full reproducibility of all results
-% - Document exact data vintage used
-% - Provide checksums for all processed datasets
-% - Include random seeds
-% - Detail computational environment
-
-[Reproducibility content to be filled in...]
+Interestingly, linear deep models like DLinear and NLinear achieve competitive results on many datasets despite their simplicity. This supports recent findings in the time series literature suggesting that complex architectures may be unnecessary for many forecasting tasks. The performance of these simpler models indicates that the inductive biases of traditional deep learning architectures may not align well with the characteristics of financial time series.
 
 \section{Conclusions and Future Work}
 \label{sec:conclusion}
 
-% TODO: Summarize contributions and outline future extensions
-% - Recap main contributions
-% - Discuss potential additional datasets
-% - Propose enhanced forecasting methods
-% - Suggest infrastructure improvements
-% - Note community contribution guidelines
+This paper introduces an open-source benchmark specifically designed for financial time series forecasting research. By providing standardized datasets across multiple asset classes with reproducible data cleaning procedures, we address a critical gap in the forecasting literature and enable rigorous empirical comparison of forecasting methods on financial data.
 
-[Conclusion content to be filled in...]
+Our work makes three primary contributions to the field. First, we provide a comprehensive financial forecasting benchmark covering seven major asset classes with both aggregated portfolio and disaggregated security-level data. Each dataset follows established academic cleaning procedures, ensuring consistency with canonical finance research while enabling modern forecasting methods that leverage cross-sectional information.
+
+Second, we establish reproducible baselines using twelve forecasting models ranging from classical statistical methods to state-of-the-art deep learning architectures. Our results reveal that sophisticated models provide modest improvements of 3-10\% over simple baselines, with gains concentrated in disaggregated datasets where cross-sectional learning is possible. These findings challenge the notion that complex models automatically yield superior performance in financial forecasting.
+
+Third, we deliver open-source infrastructure that streamlines the entire pipeline from raw data acquisition to model evaluation. By making all code publicly available, we lower barriers to entry for researchers and enable rapid iteration on new forecasting methods. The modular architecture facilitates extension while maintaining compatibility with existing components.
+
 
 \section*{Acknowledgments}
 
@@ -974,14 +942,7 @@ Following \cite{He2017}, we include comprehensive datasets across multiple asset
 % Fama-French 25 portfolios and CRSP universe
 % Explain exclusion of small stocks, ADRs, etc. following Fama-French (1993)
 
-The equity dataset adopts the same filters used in \cite{Fama1993}, whose cleaning methodology has 
-become a common approach in asset pricing research.
-Their exclusion criteria eliminate securities that would 
-contaminate standard equity analysis: ADRs (which reflect foreign market dynamics), 
-REITs and units of beneficial interest (which have fundamentally different 
-cash flow structures), and firms with negative book equity 
-(which represent financial distress and behave differently from normal equity 
-securities). 
+The equity dataset implements the filtering methodology of \cite{Fama1993} using CRSP's current CIZ format, providing a systematic approach to eliminate securities that would contaminate standard equity analysis. Our implementation applies multiple layers of restrictions: first, we filter to common stock universe using \texttt{sharetype=='NS'}, \texttt{securitytype=='EQTY'}, and \texttt{securitysubtype=='COM'}; second, we restrict to U.S. incorporated firms (\texttt{usincflg=='Y'}) with corporate issuer types (\texttt{issuertype} in ['ACOR', 'CORP']) to exclude foreign entities; third, we limit to actively traded stocks on major exchanges (NYSE, AMEX, NASDAQ) using \texttt{primaryexch} in ['N', 'A', 'Q'], \texttt{conditionaltype=='RW'}, and \texttt{tradingstatusflg=='A'}. 
 
 The following figures show summary statistics of the CRSP universe of stocks, 
 including the average returns of all stocks for each given date (Figure 6) 
@@ -1013,9 +974,9 @@ the dataset is more diverse, leading to lower average returns and lower volatili
 \label{sec:treasuries}
 % CRSP maturity-sorted portfolios Treasuries
 
-The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become the canonical approach for constructing Treasury yield curves and returns. This framework forms the foundation for the Federal Reserve's own yield curve estimates and underpins numerous studies in fixed income research.
+The US Treasury dataset follows \cite{Gurkaynak2007}, whose methodology has become a common approach for constructing Treasury yield curves and returns. The results of using this methodology are published on the Federal Reserve Board's own website and underpins many studies in fixed income research.
 
-The essential data transformations address critical issues unique to government bond markets. First, the restriction to noncallable bonds and notes—excluding bills and other security types—is fundamental. Callable bonds embed optionality that contaminates pure interest rate risk measurement. For example, a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns, distorting any analysis of term structure dynamics.
+Before estimating the yield curve, \citet{Gurkaynak2007} filter and clean the data in several steps. First, they restrict the sample to noncallable bonds and notes, excluding bills and other security types. Callable bonds embed optionality that contaminates pure interest rate risk measurement. For example, a bond trading at a premium with an embedded call option will exhibit negative convexity and compressed returns, distorting any analysis of term structure dynamics.
 
 Second, the dataset focuses on bonds with remaining maturities between 0 and 5 years. This reflects market microstructure realities: bonds with longer maturities often suffer from illiquidity and fragmented trading, whereas the 0-5 year segment represents the most actively traded Treasury securities where price discovery is most efficient.
 
@@ -1025,11 +986,7 @@ Fourth, a requirement for complete price and maturity information ensures that b
 
 Fifth, the use of month-end observations for portfolio aggregation avoids substantial day-of-month effects in Treasury markets. These effects arise from auction cycles, end-of-month portfolio rebalancing, and futures contract rolls, all of which can distort return measures if not properly controlled.
 
-These seemingly technical choices have profound implications. Studies that use the full set of Treasury data without these filters often report spurious term premia and unstable factor loadings. In contrast, the Gürkaynak, Sack, and Wright methodology yields stable estimates that closely match dealer quotes and futures-implied yields.
-
-By open-sourcing the exact implementation of these filters, we enable researchers to avoid common errors such as including Treasury STRIPS (which have different tax treatment), century bonds (which have unique clienteles), or inflation-indexed securities (which embed inflation risk) in nominal Treasury analysis.
-
-A comparison of the treasury bond returns dataset with the FTSFR dataset is shown in Figure \ref{fig:us_treasury_returns_comparison}.
+These filters, applied in the Gürkaynak, Sack, and Wright methodology, yield stable estimates that closely match dealer quotes and futures-implied yields. A comparison of the treasury bond returns dataset with the FTSFR dataset is shown in Figure \ref{fig:us_treasury_returns_comparison}.
 
 \begin{figure}[h]
   \centering
@@ -1042,11 +999,11 @@ A comparison of the treasury bond returns dataset with the FTSFR dataset is show
 \label{sec:corporate_bonds}
 
 % Nozawa (2017) yield-spread sorted portfolios
-The corporate bond returns data is sourced from the TRACE (Trade Reporting and Compliance Engine) dataset, available at openbondassetpricing.com, and follows the methodology outlined in Nozawa (2017). This dataset incorporates several key elements to ensure accuracy and relevance. First, it includes market microstructure adjustments to correct for noise and enhance the reliability of bond prices and returns. It also applies stringent data filters, such as including only U.S.-domiciled firms and excluding private placements and convertible bonds. The dataset covers corporate bonds with sufficient outstanding amounts and complete information, and includes essential fields such as MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads.
+The corporate bond returns data is sourced from the TRACE (Trade Reporting and Compliance Engine) dataset, available at \url{openbondassetpricing.com}, and follows the methodology outlined in Nozawa (2017). This dataset incorporates several key elements to ensure accuracy and relevance. First, it includes market microstructure adjustments to correct for noise and enhance the reliability of bond prices and returns. It also applies stringent data filters, such as including only U.S.-domiciled firms and excluding private placements and convertible bonds. The dataset covers corporate bonds with sufficient outstanding amounts and complete information, and includes essential fields such as MMN-adjusted clean prices, amount outstanding, monthly returns, and credit spreads.
 
 The cleaning and standardization procedure adheres to the rigorous framework established by Nozawa (2017) and adopted by He, Kelly, and Manela (HKM). In terms of bond selection, floating rate bonds and those with put or convertible features are excluded, although callable bonds are retained. Bonds are removed if their prices exceed matched Treasury prices or fall below \$0.01 per \$1 face value. For return processing, return reversals are eliminated if the product of adjacent returns is less than -0.04, and monthly returns are computed to avoid assumptions about reinvestment. In synthetic Treasury construction, Treasury bonds with identical cash flow structures are constructed for each corporate bond using Federal Reserve constant-maturity yield data. Excess returns and credit spreads are then calculated in price terms rather than yield spreads.
 
-For portfolio construction, bonds are sorted into deciles based on credit spreads for each date. Value-weighted portfolio returns are computed using bond values—defined as the product of MMN-adjusted clean price and amount outstanding—as weights. To ensure data quality, defaults are verified using Moody's Default Risk Service, while CRSP and Compustat data supplement the equity and accounting information. Callable bonds are also incorporated into regression models using fixed effects.
+For portfolio construction, bonds are sorted into deciles based on credit spreads for each date. Value-weighted portfolio returns are computed using bond values-defined as the product of MMN-adjusted clean price and amount outstanding-as weights. To ensure data quality, defaults are verified using Moody's Default Risk Service, while CRSP and Compustat data supplement the equity and accounting information. Callable bonds are also incorporated into regression models using fixed effects.
 
 The final output is a dataset containing monthly corporate bond portfolio returns sorted by credit spread deciles, making it well-suited for credit risk analysis and for benchmarking against other bond market data. The constructed returns are validated against the dataset by He, Kelly, and Manela (2017), which serves as a benchmark for credit spread deciles. As shown in Figure \ref{fig:corp_bond_returns_comparison}, the time series comparison between the two datasets exhibits strong alignment in return patterns, especially during volatile periods such as the 2008 financial crisis.
 
@@ -1067,7 +1024,7 @@ The final output is a dataset containing monthly corporate bond portfolio return
 
 Our monthly SPX options portfolio returns series follows the data cleaning and portfolio construction methodology of \citet{Constantinides2013} (``CJS''), which has become the canonical approach for constructing option-based portfolios. This framework forms the foundation for numerous studies in derivatives pricing and risk management. \citet{He2017} (``HKM'') later adapted the CJS methodology to create a set of 18 option portfolios from the 54 portfolios in CJS. Our dataset includes both the original 54 CJS portfolios and the 18 HKM portfolios, for a total of 72 unique SPX option portfolios.
 
-The original CJS paper used data from 1986 through 2012 (26 years of data). As of the time of writing, due to the unavailability of SPX option data from 1985 to 1995, we replicated the \textbf{54 CJS portfolios} using data from \textbf{January 1996 to December 2019 (23 years of data)}. As shown in Figure~\ref{fig:spx_options_over_time}, the number of SPX option observations has increased significantly over time, and since the volume of SPX options traded prior to 1996 was very low, we believe that our dataset from 1996 to 2019, while 3 years shorter is far richer in content and more relevant for current and future research.
+The original CJS paper used data from 1986 through 2012 (26 years of data). As of the time of writing, due to the unavailability of SPX option data from 1985 to 1995, we replicated the 54 CJS portfolios using data from January 1996 to December 2019 (23 years of data). As shown in Figure~\ref{fig:spx_options_over_time}, the number of SPX option observations has increased significantly over time, and since the volume of SPX options traded prior to 1996 was very low, we believe that our dataset from 1996 to 2019, while 3 years shorter is far richer in content and more relevant for current and future research.
 
 The process to construct our returns series involved two major phases: (1) Replicating with the highest practical fidelity the raw daily data filtration and monthly portfolio construction procedures outlined in \citet{Constantinides2013}, and (2) Transforming these returns series into the 18 portfolios outlined in \citet{He2017}.
 
@@ -1083,7 +1040,7 @@ Where ``C'' indicates a call option portfolio, ``P'' indicates a put option port
 
 
 
-\paragraph{Phase 1a: Data Filtration in \citet{Constantinides2013}}
+\paragraph{\textit{Phase 1a: Data Filtration in \citet{Constantinides2013}}}
 
 In order to minimize possible quoting errors, CJS filtered the raw options data through three levels of filters. The filters are applied to the trade-in (buy) side to ensure the portfolios are buying into reliable quotes. When positions are exited, if there is no quote in the filtered data, the raw data is searched. These filters are detailed in \textit{Appendix B} of CJS.
 
@@ -1164,21 +1121,27 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 \subsubsection*{Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS}
 
 \paragraph{Process}
-The construction of the 27 call and 27 put portfolios in CJS is a multi-step process, with the objective of developing portfolio returns series that are stationary and only moderately skewed. The discrete bucketing of moneyness and days to maturity leads to multiple candidate options for each portfolio on each trading day. These options are given weights according to a \textbf{bivariate Gaussian weighting kernel} in moneyness and maturity (bandwidths: 0.0125 in moneyness and 10 days to maturity).
+The construction of the 27 call and 27 put portfolios in CJS is a multi-step process, with the objective of developing portfolio returns series that are stationary and only moderately skewed. The discrete bucketing of moneyness and days to maturity leads to multiple candidate options for each portfolio on each trading day. These options are given weights according to a bivariate Gaussian weighting kernel in moneyness and maturity (bandwidths: 0.0125 in moneyness and 10 days to maturity).
 
-Each portfolio's daily returns are initially calculated as simple arithmetic returns, assuming the option is bought and sold at its bid-ask midpoint at each rebalancing. The one-day arithmetic return is then converted to a \textbf{leverage-adjusted return}. This procedure is achieved by calculating the one-day return of a hypothetical portfolio with $\omega_{BSM}^{-1}$ dollars invested in the option, and $(1 - \omega_{BSM}^{-1})$ dollars invested in the risk-free rate, where $\omega_{BSM}$ is the Black-Scholes-Merton elasticity based on the implied volatility of the option.
+Each portfolio's daily returns are initially calculated as simple arithmetic returns, assuming the option is bought and sold at its bid-ask midpoint at each rebalancing. The one-day arithmetic return is then converted to a leverage-adjusted return. This procedure is achieved by calculating the one-day return of a hypothetical portfolio with $\omega_{BSM}^{-1}$ dollars invested in the option, and $(1 - \omega_{BSM}^{-1})$ dollars invested in the risk-free rate, where $\omega_{BSM}$ is the Black-Scholes-Merton elasticity based on the implied volatility of the option.
 
 \begin{align}
 \omega_{\text{BSM, Call}} &= \frac{\partial C_{\text{BSM}}}{\partial S} \cdot \frac{S}{C_{\text{BSM}}} > 1 \\
 \omega_{\text{BSM, Put}}  &= \frac{\partial P_{\text{BSM}}}{\partial S} \cdot \frac{S}{P_{\text{BSM}}} < -1
 \end{align}
 
-Each \textbf{leverage-adjusted call portfolio} comprises a long position in a fraction of a call, and some investment in the risk-free rate.
+Each leverage-adjusted call portfolio comprises a long position in a fraction of a call, and some investment in the risk-free rate.
 
-Each \textbf{leverage-adjusted put portfolio} comprises a short position in a fraction of a put, and more than 100\% investment in the risk-free rate.
+Each leverage-adjusted put portfolio comprises a short position in a fraction of a put, and more than 100\% investment in the risk-free rate.
 
-\textcolor{blue}{
-Below, we formalize the CJS portfolio construction process for a single trading day $t$ and a set of candidate call or put options. Each portfolio is defined by \textbf{option type} (call or put), \textbf{target moneyness} (specifically $0.90$, $0.925$, $0.95$, $0.975$, $1.00$, $1.025$, $1.05$, $1.075$, $1.10$), and \textbf{target maturity} (specifically $30$, $60$, or $90$ days). On any given day, available options rarely match the targets exactly; instead, multiple candidate options may be close in moneyness and maturity. Each candidate option has its own price and sensitivity to the underlying index. \\ To aggregate these candidates, CJS applies a \textbf{Gaussian kernel in moneyness and maturity}, assigning weights to each option based on proximity to the targets. The \textbf{kernel-weighted average price} is used as the portfolio's option component. Portfolio returns are \textbf{leverage-adjusted using Black-Scholes-Merton elasticity} to standardize sensitivity across moneyness levels. \\ The \textbf{daily portfolio return} from $t$ to $t+1$ is computed as the kernel-weighted average return of the candidate options, using weights from day $t$. This approach ensures that each portfolio reflects the closest available options to the target characteristics, with appropriate adjustment for \textbf{leverage} and \textbf{sensitivity}.}
+\paragraph{textit{Option Portfolio Construction Process}}
+
+
+Below, we formalize the CJS portfolio construction process for a single trading day $t$ and a set of candidate call or put options. Each portfolio is defined by option type (call or put), target moneyness (specifically $0.90$, $0.925$, $0.95$, $0.975$, $1.00$, $1.025$, $1.05$, $1.075$, $1.10$), and target maturity (specifically $30$, $60$, or $90$ days). On any given day, available options rarely match the targets exactly; instead, multiple candidate options may be close in moneyness and maturity. Each candidate option has its own price and sensitivity to the underlying index. 
+
+To aggregate these candidates, CJS applies a Gaussian kernel in moneyness and maturity, assigning weights to each option based on proximity to the targets. The kernel-weighted average price is used as the portfolio's option component. Portfolio returns are leverage-adjusted using Black-Scholes-Merton elasticity to standardize sensitivity across moneyness levels. 
+
+The daily portfolio return from $t$ to $t+1$ is computed as the kernel-weighted average return of the candidate options, using weights from day $t$. This approach ensures that each portfolio reflects the closest available options to the target characteristics, with appropriate adjustment for leverage and sensitivity.
 
 \subsubsection*{1. Gaussian Kernel Weighting}
 
@@ -1440,8 +1403,8 @@ Following \cite{Siriwardane2021}, we construct various arbitrage spreads that me
 
 During periods of market stress, such as the 2008 financial crisis and the 2020 COVID-19
 pandemic, covered interest parity (CIP) may no longer hold as the forward---spot differential 
-no longer exactly offsets interest‐rate differentials. Factors contributing to this phenomenon include:
-Heightened Counterparty‐Credit Risk, Liquidity Constraints, or Regulatory Pressures.
+no longer exactly offsets interest-rate differentials. Factors contributing to this phenomenon include:
+Heightened Counterparty-Credit Risk, Liquidity Constraints, or Regulatory Pressures.
 
 In other periods, deviations from CIP typically stem from market inefficiencies and are 
 small in magnitude and are short-lived in timeframe due to arbitrage activities.
@@ -1464,21 +1427,24 @@ using data from 1999 onwards sourced through Bloomberg Terminal.
 \end{itemize}
 
 We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2023),
-as seen in this side by side comparison of our calculated currency respective
-arbitrage spreads versus those reported in their paper.
+as seen in 
+% this side by side comparison of 
+our calculated currency respective
+arbitrage spreads versus those reported in their paper. If you compare
+the spreads in Figure \ref{fig:cip_comparison}, you will see that they are nearly identical
+to those reported in their paper.
 
 \begin{figure}
   \centering
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
-    \small (a) Findings in Siriwardane et al. (2023)
-  \end{tabular}
+%   \begin{tabular}{@{}c@{}}
+%     \includegraphics[width=.7\linewidth]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
+%     \small (a) Findings in Siriwardane et al. (2023)
+%   \end{tabular}
 
-  \vspace{\floatsep}
+%   \vspace{\floatsep}
 
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.99\linewidth]{../docs_src/CIP_replicate.png} \\[\abovecaptionskip]
-    \small (b) Our findings
+    \includegraphics[width=.99\linewidth]{../docs_src/CIP_replicate.png} 
   \end{tabular}
 
   \caption{Comparison of CIP Arbitrage spreads}
@@ -1522,19 +1488,19 @@ The authors define the CDS basis (CB) as
 
 where:
 \begin{itemize}
-  \item $FR_{i,t,\tau}$ = time $t$ floating‐rate spread implied by a fixed‐rate corporate bond issued by firm $i$ at tenor $\tau$,
+  \item $FR_{i,t,\tau}$ = time $t$ floating-rate spread implied by a fixed-rate corporate bond issued by firm $i$ at tenor $\tau$,
   \item $CDS_{i,t,\tau}$ = time $t$ Credit Default Swap (CDS) par spread for firm $i$ with tenor $\tau$.
 \end{itemize}
 
 A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. 
 The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
 
-The value of $FR$ is substituted by the paper with Z‐spread which we also modify in our construction. We address the substitution in detail later.
+The value of $FR$ is substituted by the paper with Z-spread which we also modify in our construction. We address the substitution in detail later.
 
 The value of CDS par spread is interpolated by the authors using a cubic spline function as
 not all necessary tenors are present.
 
-Given the CDS spread from above, traditional construction of a risk‐free rate for implied arbitrage implies the following return:
+Given the CDS spread from above, traditional construction of a risk-free rate for implied arbitrage implies the following return:
 
 \begin{equation}
   rfr^{CDS}_{i,t,\tau} \;=\; y_{t,\tau} \;-\; CB_{i,t,\tau},
@@ -1542,10 +1508,12 @@ Given the CDS spread from above, traditional construction of a risk‐free rate 
 
 where:
 \begin{itemize}
-  \item $y_{t,\tau}$ = maturity‐matched Treasury yield at time $t$.
+  \item $y_{t,\tau}$ = maturity-matched Treasury yield at time $t$.
 \end{itemize}
 
 The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
+
+The CDS-Bond basis is plotted in Figure \ref{fig:cds_replicate}.    
 
 \subsubsection{Z-Spread (Zero-Volatility Spread)}
 
@@ -1566,7 +1534,7 @@ Setting the Z-spread pricing equation equal to the standard YTM equation gives
 \sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
 =\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
 \end{equation}
-where $y$ is the bond's yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution—$y$ or $Z$ must be found numerically.
+where $y$ is the bond's yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution-$y$ or $Z$ must be found numerically.
 
 \paragraph*{Continuous-Compounding Identity}
 Rewrite discounts as $e^{-r t}$. With PV-weights
@@ -1596,24 +1564,34 @@ where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to t
 \paragraph*{Note}
 Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
 
+% \begin{figure}
+%   \centering
+%   \begin{tabular}{@{}c@{}}
+%     \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
+%     \small (a) Findings in Siriwardane et al. (2023)
+%   \end{tabular}
+
+%   \vspace{\floatsep}
+
+%   \begin{tabular}{@{}c@{}}
+%     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
+%     \small (b) Our findings
+%   \end{tabular}
+
+%   \caption{Comparison of CDS Arbitrage spreads}
+%   \label{fig:CDS_replicate}
+% \end{figure}
+
+
 \begin{figure}
-  \centering
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
-    \small (a) Findings in Siriwardane et al. (2023)
-  \end{tabular}
-
-  \vspace{\floatsep}
-
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
-    \small (b) Our findings
-  \end{tabular}
-
-  \caption{Comparison of CDS Arbitrage spreads}
-  \label{fig:CDS_replicate}
+    \centering
+    \begin{tabular}{@{}c@{}}
+      \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png}
+    \end{tabular}
+\caption{Comparison of CDS Arbitrage spreads}
+\label{fig:CDS_replicate}
 \end{figure}
-
+  
 
 \subsection{Additional Results}
 \label{app:additional_results}
@@ -1660,12 +1638,12 @@ Table~\ref{tab:mae_results} shows MAE results for all combinations. MAE measures
 
 Figure~\ref{fig:mae_heatmap} visualizes the MAE results, complementing the numerical table with clear visual patterns of absolute error magnitudes across all model-dataset combinations.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{../_output/forecasting2/mae_heatmap.png}
-\caption{MAE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile with extreme values marked by asterisks (*). This visualization shows absolute error patterns in original data units, highlighting both model performance and relative dataset difficulty.}
-\label{fig:mae_heatmap}
-\end{figure}
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics[width=\textwidth]{../_output/forecasting2/mae_heatmap.png}
+% \caption{MAE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile with extreme values marked by asterisks (*). This visualization shows absolute error patterns in original data units, highlighting both model performance and relative dataset difficulty.}
+% \label{fig:mae_heatmap}
+% \end{figure}
 
 % \section{Recyling Bin}
 % % Temporary holding area for text that might not make it into the main text
