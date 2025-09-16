@@ -24,6 +24,7 @@
 
 \usepackage{float} % For forcing figure placement with [H]
 \usepackage[table]{xcolor} % For coloring table cells
+\usepackage{threeparttable} % For table footnotes
 
 % \title{An Open-Source Financial Time Series Forecasting Benchmark}
 \title{Benchmarking Forecasting Methods for Financial Stability}
@@ -77,7 +78,7 @@
 
 
 \begin{abstract}
-    Financial regulators and researchers increasingly emphasize forward-looking risk monitoring to address systemic vulnerabilities. This paper benchmarks state-of-the-art global time series forecasting methods, which have proven superior in the time series literature, on a comprehensive suite of financial variables. Benchmarks drive progress, and our systematic evaluation of 24 forecasting methods ranging from classical models to modern deep learning architectures reveals which approaches best capture early warning signals across different market segments. We evaluate these methods on critical financial stability metrics including arbitrage basis spreads that signal funding market stress, banking indicators that reveal institutional vulnerabilities, and asset returns across multiple markets. To enable reproducible research and continuous improvement in financial forecasting, we develop an open-source \emph{financial time series forecasting repository} that standardizes these datasets according to canonical academic methodologies. Our results provide financial stability authorities with evidence-based guidance on which forecasting approaches most reliably detect emerging risks in specific market segments, directly enhancing the toolkit for macroprudential surveillance and systemic risk monitoring.
+    Financial regulators and researchers have emphasized forward-looking risk monitoring to address systemic vulnerabilities. This paper benchmarks state-of-the-art global time series forecasting methods, which have proven superior in the time series literature, on a wide-ranging suite of financial datasets. Benchmarks drive progress, and our systematic evaluation of over a dozen forecasting methods ranging from classical models to modern deep learning architectures reveals which approaches best capture early warning signals across different market segments. We evaluate these methods on critical financial stability metrics including arbitrage basis spreads that signal funding market stress, banking indicators that reveal institutional vulnerabilities, and asset returns across multiple markets. To enable reproducible research and continuous improvement in financial forecasting, we develop an open-source \emph{financial time series forecasting repository} that standardizes these datasets according to canonical academic methodologies. Our results provide financial stability authorities with evidence-based guidance on which forecasting approaches most reliably detect emerging risks in specific market segments, directly enhancing the toolkit for macroprudential surveillance and systemic risk monitoring.
     \end{abstract}
 
 \section{Introduction}
@@ -186,6 +187,15 @@ Complementing firm-level exercises, broad cyclic risk gauges, such as the ECB's 
 
 A large literature shows that exploiting many predictors improves forecast performance when common factors drive co-movements across series. In approximate factor models, principal components (diffusion indexes) summarize large panels into a few latent indexes that deliver competitive, often superior, forecasts relative to small VARs and univariate benchmarks \citep{Stock2002,Stock2002a,Stock}. The Office of Financial Research's own Financial Stress Index (FSI) applies a closely related approach: a factor model that is essentially uses the first principal component of a broad, daily panel of market indicators (see \citet{Monin2019} and \citep{Bejarano2023}). Another example is the Systemic Assessment of Financial Environment (SAFE) early warning system monitors, by researchers from the Federal Reserve Bank of Cleveland, which integrates supervisory and market data to forecast episodes of systemic stress \citep{Oet2011}. Together, these results motivate evaluating modern, panel-based forecasting methods on financial-stability-relevant datasets.
 
+\subsection{Return Predictability and Asset Pricing}
+
+Furthermore, financial forecasting as a more broad importance. Return predictability is central to modern asset pricing. Traditional efficient market views held that prices primarily varied with expected dividend growth, implying little scope for forecasting returns. Subsequent evidence overturned this perspective: variation in price-dividend ratios corresponds almost entirely to changes in discount rates—expected returnsa and not to expected cash flows \citep{Cochrane2011}. High valuations reliably precede periods of low subsequent returns across asset classes, including equities, bonds, currencies, credit, and real estate. This common pattern underscores discount-rate variation as the organizing principle of contemporary asset pricing research.
+
+Related to the many-predictor methods discussed previously, \citet{Kelly2013} show that cross-sectional valuation ratios contain even more forecasting power than aggregate predictors. Using a partial least squares framework, they extract latent factors from the cross-section of book-to-market ratios, yielding substantial out-of-sample predictive power for both market returns and dividend growth. Out-of-sample $R^2$ values reach 13\% at the annual horizon, magnitudes rarely achieved in predictive regressions. Their approach demonstrates that cross-sectional information can sharpen aggregate forecasts, highlighting how high-dimensional predictor sets can be distilled into robust factors that capture time-varying risk premia.
+
+Recent survey work extends these insights into the era of financial machine learning. \citet{Kelly2023} argue that asset prices are themselves forecasts, discounted expectations of future payoffs, making return predictability the central empirical task of asset pricing. Because the conditioning information set available to investors is vast and the functional form of return dynamics is ambiguous, machine learning methods are particularly well suited. Penalized linear models, tree-based methods, and neural networks can systematically extract predictive signals from large panels of firm-level and macroeconomic variables, often outperforming traditional specifications. This perspective bridges classical evidence on discount-rate variation with modern global forecasting approaches, emphasizing that return prediction is both statistically feasible and economically important. This paper seeks to aid research in this area by developing a standardized benchmark that enables rigorous comparison of global forecasting methods on financial time series data. 
+
+
 \subsection{Global Time Series Forecasting Methods}
 
 When working with many variables observed across multiple time series, such as returns across hundreds of assets or risk indicators across different market segments, researchers face a natural panel data structure. Traditional time series approaches to such panels typically estimate separate time series models for each cross-sectional unit, potentially missing valuable information embedded in the cross-sectional dimension or estimate multivariate models that don't scale well to high dimensions. An alternative approach recognizes that these many variables often share common underlying drivers and can benefit from joint estimation while managing the high dimensionality of the data.
@@ -214,7 +224,7 @@ helps them more effectively monitor systemic financial risks. This paper address
 \section{Benchmark Datasets}
 
 In this section, we describe the datasets included in the benchmark. The datasets are organized into three main groups: asset class datasets, basis spread datasets, and other financial data. We provide brief description of each dataset below. Each dataset is constructed based off of a cleaning procedure from a well-known paper in the academic literature. To validate our cleaning and transformations, we replicate a key plot or table from each paper. We give brief details of this process below. Full details of the cleaning and replications are provided in the appendix.
-The code that automates the data pull, cleaning, and formatting is available on \href{https://github.com/jmbejara/ftsfr}{GitHub}. Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. 
+The code that automates the data pull, cleaning, and formatting is available on GitHub.\footnote{See \url{https://github.com/jmbejara/ftsfr}} Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. 
 
 \begin{table}[htbp]
 \centering
@@ -268,6 +278,7 @@ Table~\ref{tab:data_sources} shows the specific data sources required for each d
 \caption{Data Sources by Dataset}
 \label{tab:data_sources}
 \footnotesize
+\begin{threeparttable}
 \begin{tabular}{p{4cm}p{8cm}}
 \toprule
 Dataset Name & Data Sources \\ 
@@ -277,11 +288,11 @@ Dataset Name & Data Sources \\
 CDS Contract & S\&P Global CDS (formerly Markit)  \\
 CDS Portfolio & ibid. \\
 Commodity & Bloomberg Terminal \\
-Corporate Bond & WRDS TRACE via \href{https://openbondassetpricing.com/}{Open Source Bond Asset Pricing}  \\
+Corporate Bond & WRDS TRACE, following Open Source Bond Asset Pricing$^{a}$  \\
 Corporate Portfolio & ibid. \\
-CRSP Stock & Center for Research in Security Prices \\
+CRSP Stock & Center for Research in Security Prices (CRSP) \\
 CRSP Stock (ex-div) & ibid. \\
-FF25 Size-BM & Ken French Data Library \\
+FF25 Size-BM & CRSP and Compustat, following \citet{Fama2023}$^{b}$ \\
 FX & Bloomberg Terminal \\
 SPX Options Portfolios & OptionMetrics IvyDB\\
 Treasury Bond & Center for Research in Security Prices \\
@@ -289,7 +300,7 @@ Treasury Portfolio & ibid. \\
 \midrule
 \multicolumn{2}{c}{\textbf{Basis Spread Data}} \\
 \midrule
-CDS-Bond & WRDS TRACE via Open Source Bond Asset Pricing, S\&P Global CDS and RED Entity (formerly Markit) \\
+CDS-Bond & WRDS TRACE, following Open Source Bond Asset Pricing; S\&P Global CDS and RED Entity (formerly Markit) \\
 CIP & Bloomberg Terminal \\
 TIPS-Treasury & ibid. \\
 Treasury-SF & ibid. \\
@@ -297,16 +308,25 @@ Treasury-Swap & ibid. \\
 \midrule
 \multicolumn{2}{c}{\textbf{Other Financial Data}} \\
 \midrule
-Bank Cash Liquidity & U.S. Call Reports, via Phillip Schnabl's \href{https://pages.stern.nyu.edu/~pschnabl/data/data_callreport.htm}{website}\footnote{See \url{https://pages.stern.nyu.edu/~pschnabl/data/data_callreport.htm}} \\
+Bank Cash Liquidity & WRDS Bank Regulatory Call Reports, following \citet{Drechsler2017}$^{c}$ \\
 Bank Leverage & ibid. \\
 BHC Cash Liquidity & ibid. \\
 BHC Leverage & ibid. \\
-HKM Daily Factor & Author, Asaf Manela's website \href{https://asafmanela.github.io/data/}{website}\footnote{See \url{https://asafmanela.github.io/data/}}\\
+HKM Daily Factor & CRSP and Compustat, following \citet{He2017}$^{d}$\\
 HKM Monthly Factor & ibid. \\
 HKM All Factor & ibid. \\
-Treasury Yield Curve & Yield Curve Data from Board of Governors of the Federal Reserve System\footnote{See \url{https://www.federalreserve.gov/data/nominal-yield-curve.htm}} \\
+Treasury Yield Curve & Yield Curve Data from Board of Governors of the Federal Reserve System$^{e}$ \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item[$^{a}$] See \url{https://openbondassetpricing.com/}
+\item[$^{b}$] See the Ken French Data Library, \url{https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html} and the instructions to replicate it with CRSP and Compustat in \citet{Fama2023}.
+\item[$^{c}$] See \url{https://pages.stern.nyu.edu/~pschnabl/data/data_callreport.htm}
+\item[$^{d}$] See \url{https://asafmanela.github.io/data/}
+\item[$^{e}$] See \url{https://www.federalreserve.gov/data/nominal-yield-curve.htm}
+\end{tablenotes}
+\end{threeparttable}
 \caption*{\emph{Source: Authors' creation}}
 \end{table}
 
