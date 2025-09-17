@@ -411,11 +411,62 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Model Deep Dive: Classical \& Machine Learning}
+\begin{itemize}
+    \item \alert{Classical Statistical Methods}
+    \begin{itemize}
+        \item \textbf{Theta Models:} Decompose series by modifying local curvature into short and long-term components, then extrapolate separately
+        \vspace{0.2cm}
+        \item Simple but effective, often outperforming sophisticated methods on short, unrelated, or noisy series
+        \vspace{0.2cm}
+        \item \textbf{ARIMA Models:} Auto-Regressive Integrated Moving Average models for stationary time series; mixed performance but generally outperform simple baselines
+        \vspace{0.2cm}
+        \item \textbf{Simple Exponential Smoothing (SES):} Straightforward baseline with exponential weighting of past observations
+    \end{itemize}
+    \vspace{0.3cm}
+    \item \alert{Machine Learning Models}
+    \begin{itemize}
+        \item \textbf{Linear Models:} Effective baseline but limited for non-linear dependencies between sequences and covariates
+        \vspace{0.2cm}
+        \item \textbf{Gradient Boosting (CatBoost):} Ensemble of decision trees designed to prevent prediction shift and target leakage
+        \vspace{0.2cm}
+        \item Global ML models particularly effective for intermittent datasets where traditional univariate models struggle
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Model Deep Dive: Deep Learning (Global Methods)}
+    \begin{itemize}
+        \item \textbf{Global Models} train single model across all time series, learning cross-series information and controlling overfitting globally
+        \vspace{0.3cm}
+        \item \alert{Transformer-based Models}
+        \begin{itemize}
+            \item \textbf{Transformer:} Self-attention mechanisms without recurrence; effectiveness for long-term forecasting debated
+            \vspace{0.2cm}
+            \item Studies show simple linear models can outperform Transformers on standard benchmarks
+        \end{itemize}
+        \vspace{0.3cm}
+        \item \alert{MLP-based Models}
+        \begin{itemize}
+            \item \textbf{DLinear \& NLinear:} Simple one-layer models; DLinear decomposes trend/seasonal, NLinear normalizes inputs
+            \vspace{0.2cm}
+            \item \textbf{TiDE:} MLP encoder-decoder, 5-10x faster than Transformers, handles covariates and non-linear dependencies
+            \vspace{0.2cm}
+            \item \textbf{N-BEATS:} Deep architecture with residual links; can be interpretable via trend/seasonality decomposition
+            \vspace{0.2cm}
+            \item \textbf{N-HiTS:} Extension of N-BEATS for long horizons using hierarchical interpolation and multi-rate sampling
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
 \begin{frame}
   \frametitle{Evaluation Framework}
   \begin{itemize}
   \item \alert{Consistent data preprocessing:} All models receive identical filtered datasets
   \vspace{0.3cm}
+  \begin{itemize}
+    \item Removes series too short for reliable forecasting
+  \end{itemize}
   \item \alert{Fair comparison methodology:}
   \begin{itemize}
     \item Adaptive filtering based on median entity length
@@ -433,28 +484,14 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Data Preprocessing for Fair Comparison}
-  \begin{itemize}
-  \item Consistent filtering across all models ensures fairness
-  \item Removes series too short for reliable forecasting
-  \item Protects small datasets ($\leq$10 entities) from elimination
-  \item Impact varies by dataset:
-  \begin{itemize}
-    \item Portfolio-level: minimal filtering needed
-    \item Disaggregated: more filtering due to short-lived securities
-  \end{itemize}
-  \item Next slide shows filtering impact statistics
-  \end{itemize}
-\end{frame}
 
-\begin{frame}[plain]
-    \centering
-    \vspace{0.2cm}
-    \scalebox{0.9}{%
-    \input{../output/forecasting2/filtered_dataset_statistics_tabular.tex}
-    }
-  \end{frame}
+% \begin{frame}[plain]
+%     \centering
+%     \vspace{0.2cm}
+%     \scalebox{0.9}{%
+%     \input{../output/forecasting2/filtered_dataset_statistics_tabular.tex}
+%     }
+%   \end{frame}
 
 \begin{frame}
   \frametitle{Error Metrics: Mathematical Definitions}
@@ -486,6 +523,40 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 
 \section{Results}
 
+\begin{frame}
+    \frametitle{Detailed Performance Results}
+    \begin{itemize}
+    \item MASE: Performance compared to Naive baseline
+    \begin{itemize}
+      \item Values $<$ 1.0 = better than Naive
+      \item Values $>$ 1.0 = worse than Naive
+    \end{itemize}
+    \item Out-of-sample $R^2$: Percentage reduction in MSE vs historical average
+    \begin{itemize}
+      \item Positive values = model outperforms benchmark
+      \item Negative values = model underperforms benchmark
+    \end{itemize}
+    \item Following slides show detailed tables for both metrics
+    \end{itemize}
+  \end{frame}
+  
+\begin{frame}[plain]
+    \tiny
+    \vspace{-0.5cm}
+    \centering
+    \textbf{MASE Results by Dataset and Model}\\
+    \vspace{0.2cm}
+    \input{../output/forecasting2/mase_pivot_tabular.tex}
+  \end{frame}
+  
+  \begin{frame}[plain]
+    \tiny
+    \vspace{-0.5cm}
+    \centering
+    \textbf{Relative MASE Results by Dataset and Model}\\
+    \vspace{0.2cm}
+    \input{../output/forecasting2/relative_mase_pivot_tabular.tex}
+  \end{frame}
 
 \begin{frame}
   \frametitle{Key Finding: No Universal Best Model}
@@ -541,40 +612,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Detailed Performance Results}
-  \begin{itemize}
-  \item MASE: Performance compared to Naive baseline
-  \begin{itemize}
-    \item Values $<$ 1.0 = better than Naive
-    \item Values $>$ 1.0 = worse than Naive
-  \end{itemize}
-  \item Out-of-sample $R^2$: Percentage reduction in MSE vs historical average
-  \begin{itemize}
-    \item Positive values = model outperforms benchmark
-    \item Negative values = model underperforms benchmark
-  \end{itemize}
-  \item Following slides show detailed tables for both metrics
-  \end{itemize}
-\end{frame}
 
-\begin{frame}[plain]
-  \tiny
-  \vspace{-0.5cm}
-  \centering
-  \textbf{MASE Results by Dataset and Model}\\
-  \vspace{0.2cm}
-  \input{../output/forecasting2/mase_pivot_tabular.tex}
-\end{frame}
-
-\begin{frame}[plain]
-  \tiny
-  \vspace{-0.5cm}
-  \centering
-  \textbf{Relative MASE Results by Dataset and Model}\\
-  \vspace{0.2cm}
-  \input{../output/forecasting2/relative_mase_pivot_tabular.tex}
-\end{frame}
 
 % \begin{frame}[plain]
 

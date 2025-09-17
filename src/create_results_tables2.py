@@ -14,7 +14,7 @@ from settings import config
 from dodo_common import load_models_config
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
-FORECAST2_DIR = OUTPUT_DIR / "forecasting2"  # New forecasting output directory
+FORECAST3_DIR = OUTPUT_DIR / "forecasting3"  # New forecasting output directory
 
 def load_dataset_short_names():
     """Load dataset short names from datasets.toml"""
@@ -185,12 +185,12 @@ def filter_quality_results(results_df):
     
     print(f"Input results: {len(results_df)} rows")
     
-    # Check the new column names from forecast.py output
-    error_columns = ['Global_MASE', 'Global_RMSE']
+    # Check the new column names from forecast_stats.py and forecast_neural.py output
+    error_columns = ['MASE', 'RMSE']
     available_columns = [col for col in error_columns if col in results_df.columns]
-    
+
     if not available_columns:
-        print("Warning: No Global_MASE or Global_RMSE columns found for quality filtering")
+        print("Warning: No MASE or RMSE columns found for quality filtering")
         return results_df
     
     print(f"Checking quality for columns: {available_columns}")
@@ -227,13 +227,13 @@ def create_quality_summary():
     all_datasets = get_active_dataset_names()
     print(f"Found {len(all_datasets)} active datasets in config")
     
-    error_metrics_dir = FORECAST2_DIR / "error_metrics"
+    error_metrics_dir = FORECAST3_DIR / "error_metrics"
     if not error_metrics_dir.exists():
         print(f"Error: Error metrics directory not found at {error_metrics_dir}")
         return None
     
     # Load the assembled results for comparison
-    results_file = FORECAST2_DIR / "results_all.csv"
+    results_file = FORECAST3_DIR / "results_all.csv"
     if results_file.exists():
         results_df = pd.read_csv(results_file)
         print(f"Loaded {len(results_df)} results from assembled file")
@@ -264,7 +264,7 @@ def create_quality_summary():
                     issue_details = "CSV exists but not in assembled results"
                 else:
                     # Check for quality issues in new column names
-                    error_columns = ['Global_MASE', 'Global_RMSE']
+                    error_columns = ['MASE', 'RMSE']
                     available_columns = [col for col in error_columns if col in result_row.columns]
                     
                     has_nan = result_row[available_columns].isna().any().any() if available_columns else False
@@ -301,7 +301,7 @@ def create_quality_summary():
         print(f"  {status}: {count} ({count/total_combinations*100:.1f}%)")
     
     # Save the detailed quality summary
-    quality_csv = FORECAST2_DIR / "quality_summary_detailed.csv"
+    quality_csv = FORECAST3_DIR / "quality_summary_detailed.csv"
     quality_df.to_csv(quality_csv, index=False)
     print(f"\nSaved detailed quality summary to: {quality_csv}")
     
@@ -315,7 +315,7 @@ def create_quality_summary():
     )
     
     # Save pivot table
-    quality_pivot_csv = FORECAST2_DIR / "quality_summary_pivot.csv"
+    quality_pivot_csv = FORECAST3_DIR / "quality_summary_pivot.csv"
     quality_pivot.to_csv(quality_pivot_csv)
     print(f"Saved quality pivot table to: {quality_pivot_csv}")
     
@@ -333,7 +333,7 @@ def create_quality_summary():
         float_format="%.1f"
     )
     
-    quality_tex = FORECAST2_DIR / "quality_summary.tex"
+    quality_tex = FORECAST3_DIR / "quality_summary.tex"
     with open(quality_tex, 'w') as f:
         f.write(latex_summary)
     print(f"Saved quality summary (LaTeX) to: {quality_tex}")
@@ -346,7 +346,7 @@ def create_quality_summary():
     )
     quality_tabular = extract_tabular_content(quality_tabular_full)
     
-    quality_tabular_tex = FORECAST2_DIR / "quality_summary_tabular.tex"
+    quality_tabular_tex = FORECAST3_DIR / "quality_summary_tabular.tex"
     with open(quality_tabular_tex, 'w') as f:
         f.write(f"% Quality Summary - tabular content only\n% Generated automatically by create_results_tables2.py\n{quality_tabular}")
     print(f"Saved quality summary tabular (LaTeX) to: {quality_tabular_tex}")
@@ -382,7 +382,7 @@ def create_failure_analysis(quality_df):
     model_analysis = model_analysis.sort_values('Success_Rate')
     
     # Save model analysis
-    model_csv = FORECAST2_DIR / "model_failure_analysis.csv"
+    model_csv = FORECAST3_DIR / "model_failure_analysis.csv"
     model_analysis.to_csv(model_csv)
     print(f"Saved model failure analysis to: {model_csv}")
     
@@ -394,7 +394,7 @@ def create_failure_analysis(quality_df):
         column_format='l' + 'r' * len(model_analysis.columns)
     )
     
-    model_tex = FORECAST2_DIR / "model_failure_analysis.tex"
+    model_tex = FORECAST3_DIR / "model_failure_analysis.tex"
     with open(model_tex, 'w') as f:
         f.write(model_latex)
     print(f"Saved model failure analysis (LaTeX) to: {model_tex}")
@@ -407,7 +407,7 @@ def create_failure_analysis(quality_df):
     )
     model_tabular = extract_tabular_content(model_tabular_full)
     
-    model_tabular_tex = FORECAST2_DIR / "model_failure_analysis_tabular.tex"
+    model_tabular_tex = FORECAST3_DIR / "model_failure_analysis_tabular.tex"
     with open(model_tabular_tex, 'w') as f:
         f.write(f"% Model Failure Analysis - tabular content only\n% Generated automatically by create_results_tables2.py\n{model_tabular}")
     print(f"Saved model failure analysis tabular (LaTeX) to: {model_tabular_tex}")
@@ -432,7 +432,7 @@ def create_failure_analysis(quality_df):
     dataset_analysis = dataset_analysis.sort_values('Success_Rate')
     
     # Save dataset analysis
-    dataset_csv = FORECAST2_DIR / "dataset_failure_analysis.csv"
+    dataset_csv = FORECAST3_DIR / "dataset_failure_analysis.csv"
     dataset_analysis.to_csv(dataset_csv)
     print(f"Saved dataset failure analysis to: {dataset_csv}")
     
@@ -444,7 +444,7 @@ def create_failure_analysis(quality_df):
         column_format='l' + 'r' * len(dataset_analysis.columns)
     )
     
-    dataset_tex = FORECAST2_DIR / "dataset_failure_analysis.tex"
+    dataset_tex = FORECAST3_DIR / "dataset_failure_analysis.tex"
     with open(dataset_tex, 'w') as f:
         f.write(dataset_latex)
     print(f"Saved dataset failure analysis (LaTeX) to: {dataset_tex}")
@@ -457,7 +457,7 @@ def create_failure_analysis(quality_df):
     )
     dataset_tabular = extract_tabular_content(dataset_tabular_full)
     
-    dataset_tabular_tex = FORECAST2_DIR / "dataset_failure_analysis_tabular.tex"
+    dataset_tabular_tex = FORECAST3_DIR / "dataset_failure_analysis_tabular.tex"
     with open(dataset_tabular_tex, 'w') as f:
         f.write(f"% Dataset Failure Analysis - tabular content only\n% Generated automatically by create_results_tables2.py\n{dataset_tabular}")
     print(f"Saved dataset failure analysis tabular (LaTeX) to: {dataset_tabular_tex}")
@@ -477,7 +477,7 @@ def create_mase_pivot_table():
     print("Creating MASE pivot table...")
     
     # Read the assembled results from new location
-    results_file = FORECAST2_DIR / "results_all.csv"
+    results_file = FORECAST3_DIR / "results_all.csv"
     if not results_file.exists():
         print(f"Error: Results file not found at {results_file}")
         print("Please run the assemble_results2 task first")
@@ -503,17 +503,16 @@ def create_mase_pivot_table():
     results = filter_quality_results(results)
     
     # Check if we have the required columns (new column names)
-    if 'Global_MASE' not in results.columns:
-        print("Error: Global_MASE column not found in results")
+    if 'MASE' not in results.columns:
+        print("Error: MASE column not found in results")
         print(f"Available columns: {list(results.columns)}")
         sys.exit(1)
-    
-    # Create pivot table: datasets as rows, models as columns, values as Global_MASE
-    # Note: Using 'Model' (display name) and 'Dataset_Short' columns from new format
+
+    # Create pivot table: datasets as rows, models as columns, values as MASE
     mase_pivot = results.pivot_table(
         index='Dataset_Short',  # Short dataset names as rows
         columns='Model',  # Models as columns (display name)
-        values='Global_MASE',  # Changed from 'g_mase' to 'Global_MASE'
+        values='MASE',  # Changed from 'Global_MASE' to 'MASE'
         aggfunc='first'  # In case of duplicates, take the first value
     )
     
@@ -538,7 +537,7 @@ def create_mase_pivot_table():
     mase_pivot = apply_grouped_dataset_ordering(mase_pivot, dataset_groups, dataset_table_names)
     
     # Save as CSV for inspection
-    csv_file = FORECAST2_DIR / "mase_pivot_table.csv"
+    csv_file = FORECAST3_DIR / "mase_pivot_table.csv"
     mase_pivot.to_csv(csv_file)
     print(f"Saved MASE pivot table (CSV) to: {csv_file}")
     
@@ -565,13 +564,13 @@ def create_mase_pivot_table():
     print(f"Saved MASE pivot tabular (LaTeX) to: {docs_tabular_file}")
     
     # Save as .tex file
-    tex_file = FORECAST2_DIR / "mase_pivot_table.tex"
+    tex_file = FORECAST3_DIR / "mase_pivot_table.tex"
     with open(tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved MASE pivot table (LaTeX) to: {tex_file}")
     
     # Save tabular-only version
-    tabular_file = FORECAST2_DIR / "mase_pivot_tabular.tex"
+    tabular_file = FORECAST3_DIR / "mase_pivot_tabular.tex"
     with open(tabular_file, 'w') as f:
         f.write(latex_tabular_output)
     print(f"Saved MASE pivot tabular (LaTeX) to: {tabular_file}")
@@ -601,7 +600,7 @@ def create_rmse_pivot_table():
     print("Creating RMSE pivot table...")
     
     # Read the assembled results from new location
-    results_file = FORECAST2_DIR / "results_all.csv"
+    results_file = FORECAST3_DIR / "results_all.csv"
     if not results_file.exists():
         print(f"Error: Results file not found at {results_file}")
         print("Please run the assemble_results2 task first")
@@ -627,16 +626,16 @@ def create_rmse_pivot_table():
     results = filter_quality_results(results)
     
     # Check if we have the required columns
-    if 'Global_RMSE' not in results.columns:
-        print("Error: Global_RMSE column not found in results")
+    if 'RMSE' not in results.columns:
+        print("Error: RMSE column not found in results")
         print(f"Available columns: {list(results.columns)}")
         sys.exit(1)
-    
-    # Create pivot table: datasets as rows, models as columns, values as Global_RMSE
+
+    # Create pivot table: datasets as rows, models as columns, values as RMSE
     rmse_pivot = results.pivot_table(
         index='Dataset_Short',  # Short dataset names as rows
         columns='Model',  # Models as columns (display name)
-        values='Global_RMSE',
+        values='RMSE',
         aggfunc='first'  # In case of duplicates, take the first value
     )
     
@@ -661,7 +660,7 @@ def create_rmse_pivot_table():
     rmse_pivot = apply_grouped_dataset_ordering(rmse_pivot, dataset_groups, dataset_table_names)
     
     # Save as CSV for inspection
-    csv_file = FORECAST2_DIR / "rmse_pivot_table.csv"
+    csv_file = FORECAST3_DIR / "rmse_pivot_table.csv"
     rmse_pivot.to_csv(csv_file)
     print(f"Saved RMSE pivot table (CSV) to: {csv_file}")
     
@@ -676,13 +675,13 @@ def create_rmse_pivot_table():
     latex_tabular_output = create_latex_tabular_only(rmse_pivot, "RMSE Results by Dataset and Model", "tab:rmse_results")
     
     # Save as .tex file
-    tex_file = FORECAST2_DIR / "rmse_pivot_table.tex"
+    tex_file = FORECAST3_DIR / "rmse_pivot_table.tex"
     with open(tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved RMSE pivot table (LaTeX) to: {tex_file}")
     
     # Save tabular-only version
-    tabular_file = FORECAST2_DIR / "rmse_pivot_tabular.tex"
+    tabular_file = FORECAST3_DIR / "rmse_pivot_tabular.tex"
     with open(tabular_file, 'w') as f:
         f.write(latex_tabular_output)
     print(f"Saved RMSE pivot tabular (LaTeX) to: {tabular_file}")
@@ -718,215 +717,7 @@ def create_rmse_pivot_table():
     
     return rmse_pivot
 
-def create_smape_pivot_table():
-    """Create a pivot table with sMAPE values: datasets as rows, models as columns"""
-    
-    print("Creating sMAPE pivot table...")
-    
-    # Read the assembled results from new location
-    results_file = FORECAST2_DIR / "results_all.csv"
-    if not results_file.exists():
-        print(f"Error: Results file not found at {results_file}")
-        print("Please run the assemble_results2 task first")
-        sys.exit(1)
-    
-    results = pd.read_csv(results_file)
-    print(f"Loaded {len(results)} result rows")
-    
-    # Load dataset short names and apply to results
-    dataset_short_names = load_dataset_short_names()
-    results['Dataset_Short'] = results['Dataset'].map(dataset_short_names).fillna(results['Dataset'])
-    
-    # Rename model names for consistency
-    results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
-    
-    # Filter to only include active models from config
-    results = filter_results_by_active_models(results)
-    
-    # Filter to only include active datasets from config
-    results = filter_results_by_active_datasets(results)
-    
-    # Apply quality filtering
-    results = filter_quality_results(results)
-    
-    # Check if we have the required columns
-    if 'Global_sMAPE' not in results.columns:
-        print("Warning: Global_sMAPE column not found in results, skipping sMAPE table")
-        return None
-    
-    # Create pivot table: datasets as rows, models as columns, values as Global_sMAPE
-    smape_pivot = results.pivot_table(
-        index='Dataset_Short',  # Short dataset names as rows
-        columns='Model',  # Models as columns (display name)
-        values='Global_sMAPE',
-        aggfunc='first'  # In case of duplicates, take the first value
-    )
-    
-    print(f"Created pivot table with {len(smape_pivot)} datasets and {len(smape_pivot.columns)} models")
-    
-    # Apply model ordering based on models_config.toml
-    model_order = load_model_order()
-    if model_order:
-        # Create ordered list of display names that exist in the data
-        ordered_display_names = [model['display_name'] for model in model_order]
-        # Filter to only include columns that actually exist in the pivot table
-        existing_ordered_columns = [col for col in ordered_display_names if col in smape_pivot.columns]
-        # Add any columns not in the config (shouldn't happen, but safety check)
-        remaining_columns = [col for col in smape_pivot.columns if col not in existing_ordered_columns]
-        final_column_order = existing_ordered_columns + remaining_columns
-        # Reorder the columns
-        smape_pivot = smape_pivot.reindex(columns=final_column_order)
-        print(f"Reordered model columns according to models_config.toml")
-    
-    # Apply grouped dataset ordering (same as LaTeX tables)
-    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
-    smape_pivot = apply_grouped_dataset_ordering(smape_pivot, dataset_groups, dataset_table_names)
-    
-    # Save as CSV for inspection
-    csv_file = FORECAST2_DIR / "smape_pivot_table.csv"
-    smape_pivot.to_csv(csv_file)
-    print(f"Saved sMAPE pivot table (CSV) to: {csv_file}")
-    
-    # Save also to docs_src for easier access
-    docs_csv_file = Path(__file__).parent.parent / "docs_src" / "smape_pivot_table.csv"
-    docs_csv_file.parent.mkdir(parents=True, exist_ok=True)
-    smape_pivot.to_csv(docs_csv_file)
-    print(f"Saved sMAPE pivot table (CSV) to: {docs_csv_file}")
-    
-    # Convert to LaTeX table
-    latex_output = create_latex_table(smape_pivot, "sMAPE Results by Dataset and Model", "tab:smape_results")
-    latex_tabular_output = create_latex_tabular_only(smape_pivot, "sMAPE Results by Dataset and Model", "tab:smape_results")
-    
-    # Save as .tex file
-    tex_file = FORECAST2_DIR / "smape_pivot_table.tex"
-    with open(tex_file, 'w') as f:
-        f.write(latex_output)
-    print(f"Saved sMAPE pivot table (LaTeX) to: {tex_file}")
-    
-    # Save tabular-only version
-    tabular_file = FORECAST2_DIR / "smape_pivot_tabular.tex"
-    with open(tabular_file, 'w') as f:
-        f.write(latex_tabular_output)
-    print(f"Saved sMAPE pivot tabular (LaTeX) to: {tabular_file}")
-    
-    # Save LaTeX version to docs_src as well
-    docs_tex_file = Path(__file__).parent.parent / "docs_src" / "smape_pivot_table.tex"
-    with open(docs_tex_file, 'w') as f:
-        f.write(latex_output)
-    print(f"Saved sMAPE pivot table (LaTeX) to: {docs_tex_file}")
-    
-    # Save tabular-only version to docs_src
-    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "smape_pivot_tabular.tex"
-    with open(docs_tabular_file, 'w') as f:
-        f.write(latex_tabular_output)
-    print(f"Saved sMAPE pivot tabular (LaTeX) to: {docs_tabular_file}")
-    
-    return smape_pivot
-
-def create_mae_pivot_table():
-    """Create a pivot table with MAE values: datasets as rows, models as columns"""
-    
-    print("Creating MAE pivot table...")
-    
-    # Read the assembled results from new location
-    results_file = FORECAST2_DIR / "results_all.csv"
-    if not results_file.exists():
-        print(f"Error: Results file not found at {results_file}")
-        print("Please run the assemble_results2 task first")
-        sys.exit(1)
-    
-    results = pd.read_csv(results_file)
-    print(f"Loaded {len(results)} result rows")
-    
-    # Load dataset short names and apply to results
-    dataset_short_names = load_dataset_short_names()
-    results['Dataset_Short'] = results['Dataset'].map(dataset_short_names).fillna(results['Dataset'])
-    
-    # Rename model names for consistency
-    results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
-    
-    # Filter to only include active models from config
-    results = filter_results_by_active_models(results)
-    
-    # Filter to only include active datasets from config
-    results = filter_results_by_active_datasets(results)
-    
-    # Apply quality filtering
-    results = filter_quality_results(results)
-    
-    # Check if we have the required columns
-    if 'Global_MAE' not in results.columns:
-        print("Warning: Global_MAE column not found in results, skipping MAE table")
-        return None
-    
-    # Create pivot table: datasets as rows, models as columns, values as Global_MAE
-    mae_pivot = results.pivot_table(
-        index='Dataset_Short',  # Short dataset names as rows
-        columns='Model',  # Models as columns (display name)
-        values='Global_MAE',
-        aggfunc='first'  # In case of duplicates, take the first value
-    )
-    
-    print(f"Created pivot table with {len(mae_pivot)} datasets and {len(mae_pivot.columns)} models")
-    
-    # Apply model ordering based on models_config.toml
-    model_order = load_model_order()
-    if model_order:
-        # Create ordered list of display names that exist in the data
-        ordered_display_names = [model['display_name'] for model in model_order]
-        # Filter to only include columns that actually exist in the pivot table
-        existing_ordered_columns = [col for col in ordered_display_names if col in mae_pivot.columns]
-        # Add any columns not in the config (shouldn't happen, but safety check)
-        remaining_columns = [col for col in mae_pivot.columns if col not in existing_ordered_columns]
-        final_column_order = existing_ordered_columns + remaining_columns
-        # Reorder the columns
-        mae_pivot = mae_pivot.reindex(columns=final_column_order)
-        print(f"Reordered model columns according to models_config.toml")
-    
-    # Apply grouped dataset ordering (same as LaTeX tables)
-    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
-    mae_pivot = apply_grouped_dataset_ordering(mae_pivot, dataset_groups, dataset_table_names)
-    
-    # Save as CSV for inspection
-    csv_file = FORECAST2_DIR / "mae_pivot_table.csv"
-    mae_pivot.to_csv(csv_file)
-    print(f"Saved MAE pivot table (CSV) to: {csv_file}")
-    
-    # Save also to docs_src for easier access
-    docs_csv_file = Path(__file__).parent.parent / "docs_src" / "mae_pivot_table.csv"
-    docs_csv_file.parent.mkdir(parents=True, exist_ok=True)
-    mae_pivot.to_csv(docs_csv_file)
-    print(f"Saved MAE pivot table (CSV) to: {docs_csv_file}")
-    
-    # Convert to LaTeX table
-    latex_output = create_latex_table(mae_pivot, "MAE Results by Dataset and Model", "tab:mae_results")
-    latex_tabular_output = create_latex_tabular_only(mae_pivot, "MAE Results by Dataset and Model", "tab:mae_results")
-    
-    # Save as .tex file
-    tex_file = FORECAST2_DIR / "mae_pivot_table.tex"
-    with open(tex_file, 'w') as f:
-        f.write(latex_output)
-    print(f"Saved MAE pivot table (LaTeX) to: {tex_file}")
-    
-    # Save tabular-only version
-    tabular_file = FORECAST2_DIR / "mae_pivot_tabular.tex"
-    with open(tabular_file, 'w') as f:
-        f.write(latex_tabular_output)
-    print(f"Saved MAE pivot tabular (LaTeX) to: {tabular_file}")
-    
-    # Save LaTeX version to docs_src as well
-    docs_tex_file = Path(__file__).parent.parent / "docs_src" / "mae_pivot_table.tex"
-    with open(docs_tex_file, 'w') as f:
-        f.write(latex_output)
-    print(f"Saved MAE pivot table (LaTeX) to: {docs_tex_file}")
-    
-    # Save tabular-only version to docs_src
-    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "mae_pivot_tabular.tex"
-    with open(docs_tabular_file, 'w') as f:
-        f.write(latex_tabular_output)
-    print(f"Saved MAE pivot tabular (LaTeX) to: {docs_tabular_file}")
-    
-    return mae_pivot
+# Note: sMAPE and MAE functions removed as they are not available in the new forecasting3 format
 
 def create_relative_mase_pivot_table():
     """Create a pivot table with MASE values relative to Naive predictor: datasets as rows, models as columns"""
@@ -934,7 +725,7 @@ def create_relative_mase_pivot_table():
     print("Creating Relative MASE pivot table...")
     
     # Read the assembled results from new location
-    results_file = FORECAST2_DIR / "results_all.csv"
+    results_file = FORECAST3_DIR / "results_all.csv"
     if not results_file.exists():
         print(f"Error: Results file not found at {results_file}")
         print("Please run the assemble_results2 task first")
@@ -960,8 +751,8 @@ def create_relative_mase_pivot_table():
     results = filter_quality_results(results)
     
     # Check if we have the required columns and Naive model
-    if 'Global_MASE' not in results.columns:
-        print("Error: Global_MASE column not found in results")
+    if 'MASE' not in results.columns:
+        print("Error: MASE column not found in results")
         print(f"Available columns: {list(results.columns)}")
         sys.exit(1)
     
@@ -970,11 +761,11 @@ def create_relative_mase_pivot_table():
         print(f"Available models: {sorted(results['Model'].unique())}")
         sys.exit(1)
     
-    # Create pivot table: datasets as rows, models as columns, values as Global_MASE
+    # Create pivot table: datasets as rows, models as columns, values as MASE
     mase_pivot = results.pivot_table(
         index='Dataset_Short',  # Short dataset names as rows
         columns='Model',  # Models as columns (display name)
-        values='Global_MASE',
+        values='MASE',
         aggfunc='first'  # In case of duplicates, take the first value
     )
     
@@ -1018,7 +809,7 @@ def create_relative_mase_pivot_table():
     relative_mase_pivot = apply_grouped_dataset_ordering(relative_mase_pivot, dataset_groups, dataset_table_names)
     
     # Save as CSV for inspection
-    csv_file = FORECAST2_DIR / "relative_mase_pivot_table.csv"
+    csv_file = FORECAST3_DIR / "relative_mase_pivot_table.csv"
     relative_mase_pivot.to_csv(csv_file)
     print(f"Saved Relative MASE pivot table (CSV) to: {csv_file}")
     
@@ -1045,13 +836,13 @@ def create_relative_mase_pivot_table():
     print(f"Saved Relative MASE pivot tabular (LaTeX) to: {docs_tabular_file}")
     
     # Save as .tex file
-    tex_file = FORECAST2_DIR / "relative_mase_pivot_table.tex"
+    tex_file = FORECAST3_DIR / "relative_mase_pivot_table.tex"
     with open(tex_file, 'w') as f:
         f.write(latex_output)
     print(f"Saved Relative MASE pivot table (LaTeX) to: {tex_file}")
     
     # Save tabular-only version
-    tabular_file = FORECAST2_DIR / "relative_mase_pivot_tabular.tex"
+    tabular_file = FORECAST3_DIR / "relative_mase_pivot_tabular.tex"
     with open(tabular_file, 'w') as f:
         f.write(latex_tabular_output)
     print(f"Saved Relative MASE pivot tabular (LaTeX) to: {tabular_file}")
@@ -1090,6 +881,143 @@ def create_relative_mase_pivot_table():
     
     return relative_mase_pivot
 
+def create_r2oos_pivot_table():
+    """Create a pivot table with R2oos values: datasets as rows, models as columns"""
+
+    print("Creating R2oos pivot table...")
+
+    # Read the assembled results from new location
+    results_file = FORECAST3_DIR / "results_all.csv"
+    if not results_file.exists():
+        print(f"Error: Results file not found at {results_file}")
+        print("Please run the assemble_results3 task first")
+        sys.exit(1)
+
+    results = pd.read_csv(results_file)
+    print(f"Loaded {len(results)} result rows")
+
+    # Load dataset short names and apply to results
+    dataset_short_names = load_dataset_short_names()
+    results['Dataset_Short'] = results['Dataset'].map(dataset_short_names).fillna(results['Dataset'])
+
+    # Rename model names for consistency
+    results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
+
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
+
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
+
+    # Apply quality filtering
+    results = filter_quality_results(results)
+
+    # Check if we have the required columns
+    if 'R2oos' not in results.columns:
+        print("Warning: R2oos column not found in results, skipping R2oos table")
+        return None
+
+    # Create pivot table: datasets as rows, models as columns, values as R2oos
+    r2oos_pivot = results.pivot_table(
+        index='Dataset_Short',  # Short dataset names as rows
+        columns='Model',  # Models as columns (display name)
+        values='R2oos',
+        aggfunc='first'  # In case of duplicates, take the first value
+    )
+
+    print(f"Created pivot table with {len(r2oos_pivot)} datasets and {len(r2oos_pivot.columns)} models")
+
+    # Apply model ordering based on models_config.toml
+    model_order = load_model_order()
+    if model_order:
+        # Create ordered list of display names that exist in the data
+        ordered_display_names = [model['display_name'] for model in model_order]
+        # Filter to only include columns that actually exist in the pivot table
+        existing_ordered_columns = [col for col in ordered_display_names if col in r2oos_pivot.columns]
+        # Add any columns not in the config (shouldn't happen, but safety check)
+        remaining_columns = [col for col in r2oos_pivot.columns if col not in existing_ordered_columns]
+        final_column_order = existing_ordered_columns + remaining_columns
+        # Reorder the columns
+        r2oos_pivot = r2oos_pivot.reindex(columns=final_column_order)
+        print(f"Reordered model columns according to models_config.toml")
+
+    # Apply grouped dataset ordering (same as LaTeX tables)
+    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
+    r2oos_pivot = apply_grouped_dataset_ordering(r2oos_pivot, dataset_groups, dataset_table_names)
+
+    # Save as CSV for inspection
+    csv_file = FORECAST3_DIR / "r2oos_pivot_table.csv"
+    r2oos_pivot.to_csv(csv_file)
+    print(f"Saved R2oos pivot table (CSV) to: {csv_file}")
+
+    # Save also to docs_src for easier access
+    docs_csv_file = Path(__file__).parent.parent / "docs_src" / "r2oos_pivot_table.csv"
+    docs_csv_file.parent.mkdir(parents=True, exist_ok=True)
+    r2oos_pivot.to_csv(docs_csv_file)
+    print(f"Saved R2oos pivot table (CSV) to: {docs_csv_file}")
+
+    # Convert to LaTeX table
+    latex_output = create_latex_table(r2oos_pivot, "R2oos Results by Dataset and Model", "tab:r2oos_results")
+    latex_tabular_output = create_latex_tabular_only(r2oos_pivot, "R2oos Results by Dataset and Model", "tab:r2oos_results")
+
+    # Save as .tex file
+    tex_file = FORECAST3_DIR / "r2oos_pivot_table.tex"
+    with open(tex_file, 'w') as f:
+        f.write(latex_output)
+    print(f"Saved R2oos pivot table (LaTeX) to: {tex_file}")
+
+    # Save tabular-only version
+    tabular_file = FORECAST3_DIR / "r2oos_pivot_tabular.tex"
+    with open(tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved R2oos pivot tabular (LaTeX) to: {tabular_file}")
+
+    # Save LaTeX version to docs_src as well
+    docs_tex_file = Path(__file__).parent.parent / "docs_src" / "r2oos_pivot_table.tex"
+    with open(docs_tex_file, 'w') as f:
+        f.write(latex_output)
+    print(f"Saved R2oos pivot table (LaTeX) to: {docs_tex_file}")
+
+    # Save tabular-only version to docs_src
+    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "r2oos_pivot_tabular.tex"
+    with open(docs_tabular_file, 'w') as f:
+        f.write(latex_tabular_output)
+    print(f"Saved R2oos pivot tabular (LaTeX) to: {docs_tabular_file}")
+
+    # Print summary statistics
+    print("\nSummary Statistics:")
+    print(f"Number of datasets: {len(r2oos_pivot)}")
+    print(f"Number of models: {len(r2oos_pivot.columns)}")
+
+    # Count missing values
+    total_cells = len(r2oos_pivot) * len(r2oos_pivot.columns)
+    missing_cells = r2oos_pivot.isna().sum().sum()
+    print(f"Missing values: {missing_cells} out of {total_cells} ({missing_cells/total_cells*100:.1f}%)")
+
+    # Performance statistics for R2oos (higher is better)
+    valid_data = r2oos_pivot.dropna(how='all', axis=0)  # Remove rows with all NaN
+    if not valid_data.empty:
+        print("\nR2oos Performance Statistics (higher is better):")
+        # Count how many models beat 0 (positive predictive value) for each dataset
+        positive_r2_count = (valid_data > 0).sum(axis=1)
+        print(f"Average models with positive R2oos per dataset: {positive_r2_count.mean():.1f}")
+
+        # Show best and worst performing models overall
+        overall_performance = valid_data.mean()  # Average R2oos across datasets
+        best_model = overall_performance.idxmax()
+        worst_model = overall_performance.idxmin()
+        print(f"Best overall model: {best_model} (avg R2oos: {overall_performance[best_model]:.3f})")
+        print(f"Worst overall model: {worst_model} (avg R2oos: {overall_performance[worst_model]:.3f})")
+
+    if missing_cells > 0:
+        print("\nDatasets with missing results:")
+        for dataset in r2oos_pivot.index:
+            missing_count = r2oos_pivot.loc[dataset].isna().sum()
+            if missing_count > 0:
+                print(f"  {dataset}: {missing_count} missing models")
+
+    return r2oos_pivot
+
 def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
     """Create a LaTeX table with dataset grouping sections"""
     
@@ -1102,16 +1030,24 @@ def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
     df_formatted = df_formatted.fillna('--')
     
     # Identify best performing models for each dataset (before formatting)
+    # For R2oos, higher is better; for other metrics, lower is better
+    is_r2oos = "R2oos" in caption or "R²" in caption
+
     best_models = {}
     for dataset in df_original.index:
-        # Get numeric values only (exclude NaN values)  
+        # Get numeric values only (exclude NaN values)
         row_values = df_original.loc[dataset]
         numeric_values = pd.to_numeric(row_values, errors='coerce')
-        
+
         if not numeric_values.isna().all():  # If we have any valid numbers
-            min_value = numeric_values.min()
-            # Find which model(s) achieved this minimum (handle ties)
-            best_model_cols = numeric_values[numeric_values == min_value].index.tolist()
+            if is_r2oos:
+                # For R2oos, higher is better
+                best_value = numeric_values.max()
+                best_model_cols = numeric_values[numeric_values == best_value].index.tolist()
+            else:
+                # For other metrics, lower is better
+                best_value = numeric_values.min()
+                best_model_cols = numeric_values[numeric_values == best_value].index.tolist()
             best_models[dataset] = best_model_cols
         else:
             best_models[dataset] = []  # No valid values, no bolding
@@ -1227,6 +1163,9 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
     if "Relative MASE" in caption:
         metric_name = "MASE relative to Naive baseline"
         note_text = "Values show MASE ratios relative to the Naive baseline. Values $<$ 1.0 indicate better performance than Naive."
+    elif "R2oos" in caption:
+        metric_name = "Out-of-Sample R-squared (R²oos)"
+        note_text = "Values show out-of-sample R-squared. Higher values indicate better performance. Negative values indicate worse performance than historical mean."
     elif "MASE" in caption:
         metric_name = "Mean Absolute Scaled Error (MASE)"
     elif "RMSE" in caption:
@@ -1237,7 +1176,7 @@ def create_latex_table(df, caption, label="tab:mase_results", use_table_names=Tr
         metric_name = "Mean Absolute Error (MAE)"
     
     # Format note_text with metric_name if not already formatted
-    if "Relative MASE" not in caption:
+    if "Relative MASE" not in caption and "R2oos" not in caption:
         note_text = note_text.format(metric_name=metric_name)
     
     # Build complete tabular environment
@@ -1351,7 +1290,7 @@ def create_heatmap_plots():
     print("\nCreating heatmap plots for error metrics...")
     
     # Read the assembled results
-    results_file = FORECAST2_DIR / "results_all.csv"
+    results_file = FORECAST3_DIR / "results_all.csv"
     if not results_file.exists():
         print(f"Error: Results file not found at {results_file}")
         return
@@ -1378,18 +1317,17 @@ def create_heatmap_plots():
     
     # Define error metrics to create heatmaps for
     error_metrics = [
-        ('Global_MASE', 'MASE', 'mase_heatmap.png', 'Mean Absolute Scaled Error (MASE)'),
-        ('Global_RMSE', 'RMSE', 'rmse_heatmap.png', 'Root Mean Square Error (RMSE)'),
-        ('Global_sMAPE', 'sMAPE', 'smape_heatmap.png', 'Symmetric Mean Absolute Percentage Error (sMAPE)'),
-        ('Global_MAE', 'MAE', 'mae_heatmap.png', 'Mean Absolute Error (MAE)'),
+        ('MASE', 'MASE', 'mase_heatmap.png', 'Mean Absolute Scaled Error (MASE)'),
+        ('RMSE', 'RMSE', 'rmse_heatmap.png', 'Root Mean Square Error (RMSE)'),
+        ('R2oos', 'R2oos', 'r2oos_heatmap.png', 'Out-of-Sample R-squared (R²oos)'),
         ('Relative_MASE', 'Relative MASE', 'relative_mase_heatmap.png', 'Relative MASE (vs Naive Baseline)')
     ]
     
     for metric_col, metric_short, filename, metric_long in error_metrics:
         # Special handling for Relative MASE
         if metric_col == 'Relative_MASE':
-            if 'Global_MASE' not in results.columns:
-                print(f"Skipping {metric_short} heatmap - Global_MASE column not found")
+            if 'MASE' not in results.columns:
+                print(f"Skipping {metric_short} heatmap - MASE column not found")
                 continue
             if 'Naive' not in results['Model'].values:
                 print(f"Skipping {metric_short} heatmap - Naive model not found")
@@ -1402,11 +1340,11 @@ def create_heatmap_plots():
         
         # Create pivot table (same structure as LaTeX tables)
         if metric_col == 'Relative_MASE':
-            # For relative MASE, use Global_MASE and calculate relative values
+            # For relative MASE, use MASE and calculate relative values
             pivot_data = results.pivot_table(
                 index='Dataset_Short',
                 columns='Model',
-                values='Global_MASE',
+                values='MASE',
                 aggfunc='mean'
             )
             
@@ -1474,27 +1412,46 @@ def create_heatmap_plots():
             # For relative MASE, use diverging colormap centered at 1.0 (equal to naive)
             # RdBu_r: Red for worse than naive (>1), White near 1, Blue for better than naive (<1)
             colormap = 'RdBu_r'
-            
+        elif metric_col == 'R2oos':
+            # For R2oos, use diverging colormap centered at 0.0 (no predictive power)
+            # RdBu: Red for negative (worse than mean), White near 0, Blue for positive (better than mean)
+            colormap = 'RdBu'
+
+            # Calculate color scale limits centered around 0.0
+            if not heatmap_data.empty:
+                # Get min and max values
+                data_min = heatmap_data.min().min()
+                data_max = heatmap_data.max().max()
+
+                # For diverging colormap around 0, use symmetric bounds
+                max_abs = max(abs(data_min), abs(data_max))
+
+                # Cap extreme values to keep the scale reasonable
+                max_abs = min(max_abs, 1.0)  # Most R2oos values should be between -1 and 1
+
+                vmin_val = -max_abs
+                vmax_val = max_abs
+        elif metric_col == 'Relative_MASE':
             # Calculate color scale limits centered around 1.0
             if not heatmap_data.empty:
                 # Get min and max values
                 data_min = heatmap_data.min().min()
                 data_max = heatmap_data.quantile(0.95).max()  # Use 95th percentile to handle outliers
-                
+
                 # For diverging colormap, we need to ensure 1.0 is at the center
                 # Calculate deviations from 1.0
                 min_deviation = abs(1.0 - data_min)
                 max_deviation = abs(data_max - 1.0)
-                
+
                 # Use the larger deviation to create symmetric bounds around 1.0
                 max_dev = max(min_deviation, max_deviation)
-                
+
                 # Cap extreme deviations to keep the scale reasonable
                 max_dev = min(max_dev, 4.0)  # Don't go beyond 4x deviation from 1.0
-                
+
                 vmin_val = 1.0 - max_dev
                 vmax_val = 1.0 + max_dev
-                
+
                 # Ensure we don't go below 0 for relative values
                 if vmin_val < 0:
                     vmin_val = 0.0
@@ -1557,6 +1514,9 @@ def create_heatmap_plots():
         if metric_col == 'Relative_MASE':
             cbar_label = f'{metric_long} (1.0 = Equal to Naive, <1.0 = Better, >1.0 = Worse)'
             title_subtitle = '(Blue = Better than Naive, White ≈ Equal, Red = Worse than Naive)'
+        elif metric_col == 'R2oos':
+            cbar_label = f'{metric_long} (0.0 = No predictive power, >0.0 = Better than mean)'
+            title_subtitle = '(Blue = Better than mean, White ≈ No predictive power, Red = Worse than mean)'
         else:
             cbar_label = f'{metric_long} (colors capped at 90th percentile)'
             title_subtitle = '(Lower values indicate better performance)'
@@ -1624,7 +1584,7 @@ def create_heatmap_plots():
         plt.tight_layout()
         
         # Save the heatmap with higher resolution
-        output_file = FORECAST2_DIR / filename
+        output_file = FORECAST3_DIR / filename
         plt.savefig(output_file, dpi=600, bbox_inches='tight', facecolor='white', 
                    edgecolor='none', pad_inches=0.1)
         print(f"Saved heatmap to: {output_file}")
@@ -1638,7 +1598,7 @@ def create_summary_statistics():
     
     print("\nCreating summary statistics...")
     
-    results_file = FORECAST2_DIR / "results_all.csv"
+    results_file = FORECAST3_DIR / "results_all.csv"
     results = pd.read_csv(results_file)
     
     # Filter to only include active models from config
@@ -1652,7 +1612,7 @@ def create_summary_statistics():
     
     # Summary by model (using new column names)
     model_summary = results.groupby('Model').agg({
-        'Global_MASE': ['count', 'mean', 'std', 'min', 'max'],
+        'MASE': ['count', 'mean', 'std', 'min', 'max'],
         'Dataset': 'nunique'
     }).round(3)
     
@@ -1661,10 +1621,10 @@ def create_summary_statistics():
     model_summary = model_summary.drop('N_Datasets_Check', axis=1)
     
     # Add additional metrics if available
-    if 'Global_sMAPE' in results.columns:
-        smape_summary = results.groupby('Model')['Global_sMAPE'].agg(['mean', 'std']).round(3)
-        smape_summary.columns = ['sMAPE_Avg', 'sMAPE_Std']
-        model_summary = model_summary.join(smape_summary)
+    if 'R2oos' in results.columns:
+        r2oos_summary = results.groupby('Model')['R2oos'].agg(['mean', 'std']).round(3)
+        r2oos_summary.columns = ['R2oos_Avg', 'R2oos_Std']
+        model_summary = model_summary.join(r2oos_summary)
     
     if 'Forecast_Time_seconds' in results.columns:
         time_summary = results.groupby('Model')['Forecast_Time_seconds'].agg(['mean', 'sum']).round(2)
@@ -1672,7 +1632,7 @@ def create_summary_statistics():
         model_summary = model_summary.join(time_summary)
     
     # Save summary
-    summary_file = FORECAST2_DIR / "model_summary_statistics.csv"
+    summary_file = FORECAST3_DIR / "model_summary_statistics.csv"
     model_summary.to_csv(summary_file)
     print(f"Saved model summary statistics to: {summary_file}")
     
@@ -1684,7 +1644,7 @@ def create_summary_statistics():
         column_format='l' + 'r' * len(model_summary.columns)
     )
     
-    summary_tex_file = FORECAST2_DIR / "model_summary_statistics.tex"
+    summary_tex_file = FORECAST3_DIR / "model_summary_statistics.tex"
     with open(summary_tex_file, 'w') as f:
         f.write(summary_latex)
     print(f"Saved model summary statistics (LaTeX) to: {summary_tex_file}")
@@ -1697,7 +1657,7 @@ def create_summary_statistics():
     )
     summary_tabular = extract_tabular_content(summary_tabular_full)
     
-    summary_tabular_tex_file = FORECAST2_DIR / "model_summary_statistics_tabular.tex"
+    summary_tabular_tex_file = FORECAST3_DIR / "model_summary_statistics_tabular.tex"
     with open(summary_tabular_tex_file, 'w') as f:
         f.write(f"% Model Summary Statistics - tabular content only\n% Generated automatically by create_results_tables2.py\n{summary_tabular}")
     print(f"Saved model summary statistics tabular (LaTeX) to: {summary_tabular_tex_file}")
@@ -1709,7 +1669,7 @@ def create_slurm_job_summary():
     
     print("\nCreating SLURM job summary...")
     
-    logs_dir = OUTPUT_DIR / "forecasting2" / "logs"
+    logs_dir = OUTPUT_DIR / "forecasting3" / "logs"
     
     if not logs_dir.exists():
         print(f"Warning: No SLURM logs directory found at {logs_dir}")
@@ -1749,7 +1709,7 @@ def create_slurm_job_summary():
     summary_df = pd.DataFrame(summary_data)
     
     # Save summary
-    summary_csv = FORECAST2_DIR / "slurm_job_summary.csv"
+    summary_csv = FORECAST3_DIR / "slurm_job_summary.csv"
     summary_df.to_csv(summary_csv, index=False)
     print(f"Saved SLURM job summary to: {summary_csv}")
     
@@ -1759,7 +1719,7 @@ if __name__ == "__main__":
     print("Creating results tables for new forecasting system...")
     
     # Create output directory if it doesn't exist
-    FORECAST2_DIR.mkdir(parents=True, exist_ok=True)
+    FORECAST3_DIR.mkdir(parents=True, exist_ok=True)
     
     # Create quality summary first
     quality_summary = create_quality_summary()
@@ -1772,13 +1732,10 @@ if __name__ == "__main__":
     
     # Create RMSE pivot table
     rmse_table = create_rmse_pivot_table()
-    
-    # Create sMAPE pivot table (may return None if column doesn't exist)
-    smape_table = create_smape_pivot_table()
-    
-    # Create MAE pivot table (may return None if column doesn't exist)
-    mae_table = create_mae_pivot_table()
-    
+
+    # Create R2oos pivot table (new metric)
+    r2oos_table = create_r2oos_pivot_table()
+
     # Create relative MASE pivot table (comparing to Naive baseline)
     relative_mase_table = create_relative_mase_pivot_table()
     
@@ -1794,41 +1751,35 @@ if __name__ == "__main__":
     print("\nResults table creation completed!")
     print("\nFiles created:")
     print("Quality Analysis:")
-    print(f"  - {FORECAST2_DIR / 'quality_summary_detailed.csv'}")
-    print(f"  - {FORECAST2_DIR / 'quality_summary_pivot.csv'}")
-    print(f"  - {FORECAST2_DIR / 'quality_summary.tex'}")
-    print(f"  - {FORECAST2_DIR / 'model_failure_analysis.csv'}")
-    print(f"  - {FORECAST2_DIR / 'model_failure_analysis.tex'}")
-    print(f"  - {FORECAST2_DIR / 'dataset_failure_analysis.csv'}")
-    print(f"  - {FORECAST2_DIR / 'dataset_failure_analysis.tex'}")
+    print(f"  - {FORECAST3_DIR / 'quality_summary_detailed.csv'}")
+    print(f"  - {FORECAST3_DIR / 'quality_summary_pivot.csv'}")
+    print(f"  - {FORECAST3_DIR / 'quality_summary.tex'}")
+    print(f"  - {FORECAST3_DIR / 'model_failure_analysis.csv'}")
+    print(f"  - {FORECAST3_DIR / 'model_failure_analysis.tex'}")
+    print(f"  - {FORECAST3_DIR / 'dataset_failure_analysis.csv'}")
+    print(f"  - {FORECAST3_DIR / 'dataset_failure_analysis.tex'}")
     print("Main Tables (with quality filtering):")
-    print(f"  - {FORECAST2_DIR / 'mase_pivot_table.csv'}")
-    print(f"  - {FORECAST2_DIR / 'mase_pivot_table.tex'}")
-    print(f"  - {FORECAST2_DIR / 'rmse_pivot_table.csv'}")
-    print(f"  - {FORECAST2_DIR / 'rmse_pivot_table.tex'}")
-    if smape_table is not None:
-        print(f"  - {FORECAST2_DIR / 'smape_pivot_table.csv'}")
-        print(f"  - {FORECAST2_DIR / 'smape_pivot_table.tex'}")
-    if mae_table is not None:
-        print(f"  - {FORECAST2_DIR / 'mae_pivot_table.csv'}")
-        print(f"  - {FORECAST2_DIR / 'mae_pivot_table.tex'}")
-    print(f"  - {FORECAST2_DIR / 'relative_mase_pivot_table.csv'}")
-    print(f"  - {FORECAST2_DIR / 'relative_mase_pivot_table.tex'}")
-    print(f"  - {FORECAST2_DIR / 'model_summary_statistics.csv'}")
-    print(f"  - {FORECAST2_DIR / 'model_summary_statistics.tex'}")
+    print(f"  - {FORECAST3_DIR / 'mase_pivot_table.csv'}")
+    print(f"  - {FORECAST3_DIR / 'mase_pivot_table.tex'}")
+    print(f"  - {FORECAST3_DIR / 'rmse_pivot_table.csv'}")
+    print(f"  - {FORECAST3_DIR / 'rmse_pivot_table.tex'}")
+    if r2oos_table is not None:
+        print(f"  - {FORECAST3_DIR / 'r2oos_pivot_table.csv'}")
+        print(f"  - {FORECAST3_DIR / 'r2oos_pivot_table.tex'}")
+    print(f"  - {FORECAST3_DIR / 'relative_mase_pivot_table.csv'}")
+    print(f"  - {FORECAST3_DIR / 'relative_mase_pivot_table.tex'}")
+    print(f"  - {FORECAST3_DIR / 'model_summary_statistics.csv'}")
+    print(f"  - {FORECAST3_DIR / 'model_summary_statistics.tex'}")
     if slurm_summary is not None:
         print("SLURM Job Analysis:")
-        print(f"  - {FORECAST2_DIR / 'slurm_job_summary.csv'}")
+        print(f"  - {FORECAST3_DIR / 'slurm_job_summary.csv'}")
     print("Additional Output (docs_src):")
     print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'mase_pivot_table.csv'}")
     print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'mase_pivot_table.tex'}")
     print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'rmse_pivot_table.csv'}")
     print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'rmse_pivot_table.tex'}")
-    if smape_table is not None:
-        print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'smape_pivot_table.csv'}")
-        print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'smape_pivot_table.tex'}")
-    if mae_table is not None:
-        print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'mae_pivot_table.csv'}")
-        print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'mae_pivot_table.tex'}")
+    if r2oos_table is not None:
+        print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'r2oos_pivot_table.csv'}")
+        print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'r2oos_pivot_table.tex'}")
     print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'relative_mase_pivot_table.csv'}")
     print(f"  - {Path(__file__).parent.parent / 'docs_src' / 'relative_mase_pivot_table.tex'}")
