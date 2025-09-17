@@ -1,0 +1,13 @@
+Model,Total_Datasets,Success_Count,Quality_Issues_Count,No_CSV_Count,CSV_But_No_Results_Count,Success_Rate,Failure_Rate
+tide,25,0,0,24,1,0.0,100.0
+kan,25,1,0,23,1,4.0,96.0
+nbeats,25,1,0,23,1,4.0,96.0
+nlinear,25,1,0,23,1,4.0,96.0
+simple_exponential_smoothing,25,1,0,23,1,4.0,96.0
+theta,25,1,0,23,1,4.0,96.0
+vanilla_transformer,25,1,0,24,0,4.0,96.0
+auto_arima_fast,25,2,0,22,1,8.0,92.0
+deepar,25,2,0,22,1,8.0,92.0
+nhits,25,2,0,22,1,8.0,92.0
+dlinear,25,3,0,21,1,12.0,88.0
+naive,25,23,0,0,2,92.0,8.0

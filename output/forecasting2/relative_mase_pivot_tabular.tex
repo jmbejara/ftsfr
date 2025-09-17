@@ -1,0 +1,41 @@
+% Relative MASE Results by Dataset and Model - tabular content only
+% Generated automatically by create_results_tables2.py
+\scriptsize
+\setlength{\tabcolsep}{1.5pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}lrrrrrrrrrrr@{}}
+\toprule
+ & Theta & SES & ARIMA & DeepAR & NBEATS & NHITS & DLinear & NLinear & Transformer & TiDE & KAN \\
+\midrule
+\multicolumn{12}{l}{\textbf{Basis Spreads}} \\
+CDS-Bond & 1.14 & 1.07 & 1.27 & 2.43 & \textbf{1.00} & 1.02 & 2.43 & 1.03 & 1.55 & 1.93 & 1.33 \\
+CIP & 0.96 & 0.97 & \textbf{0.88} & 1.83 & 1.83 & 1.45 & 1.37 & 1.32 & 1.49 & 1.42 & 3.65 \\
+TIPS-Treasury & 1.04 & 1.00 & 1.29 & 5.36 & 1.17 & \textbf{0.91} & 1.50 & 2.96 & 1.40 & 1.23 & 1.61 \\
+\midrule
+\multicolumn{12}{l}{\textbf{Returns (Portfolios)}} \\
+CDS Portfolio & 0.68 & 0.64 & 0.64 & \textbf{0.61} & 0.62 & 0.61 & 0.62 & 0.76 & 0.66 & 0.62 & 0.63 \\
+Corporate Portfolio & 0.97 & 0.97 & 0.98 & 1.00 & 1.01 & 1.00 & 0.97 & 0.98 & 1.00 & \textbf{0.96} & 1.01 \\
+FF25 Size-BM & 0.85 & 0.85 & \textbf{0.85} & 0.88 & 0.85 & 0.85 & 0.85 & 0.85 & -- & 0.85 & 0.85 \\
+SPX Options Portfolios & 1.12 & 1.00 & 1.00 & 1.06 & \textbf{0.99} & 1.00 & 1.02 & 1.00 & 1.00 & 1.02 & 1.01 \\
+Treasury Portfolio & 1.06 & 0.99 & 1.01 & 1.03 & 0.98 & \textbf{0.97} & 0.99 & 0.99 & 1.02 & 0.99 & 1.00 \\
+\midrule
+\multicolumn{12}{l}{\textbf{Returns (Disaggregated)}} \\
+CDS Contract & 0.93 & 0.97 & 1.21 & 2.84 & 0.96 & 0.93 & 1.04 & 1.02 & \textbf{0.88} & 1.07 & 0.89 \\
+CRSP Stock & 0.99 & 0.98 & 0.94 & 0.89 & 1.01 & 1.03 & 0.99 & \textbf{0.86} & 0.88 & 0.93 & 0.90 \\
+CRSP Stock (ex-div) & 0.99 & 0.98 & 0.94 & 0.88 & 1.03 & 1.05 & 0.99 & \textbf{0.85} & 0.88 & 0.91 & 0.91 \\
+Commodity & 1.01 & 1.00 & \textbf{0.83} & 6.99 & 0.92 & 1.08 & 1.20 & 1.13 & 1.17 & 1.41 & 1.10 \\
+Corporate Bond & \textbf{0.55} & 0.60 & 0.73 & 0.60 & 0.92 & 0.89 & 0.81 & 0.91 & 0.76 & 0.65 & 0.81 \\
+FX & 1.11 & 1.00 & 1.09 & \textbf{0.97} & 1.10 & 1.18 & 1.05 & 1.06 & 1.06 & 1.02 & 1.15 \\
+Treasury Bond & 0.86 & 0.88 & 1.11 & 1.03 & 0.83 & 0.74 & 1.21 & 1.63 & 0.79 & \textbf{0.39} & 1.12 \\
+\midrule
+\multicolumn{12}{l}{\textbf{Other}} \\
+BHC Cash Liquidity & 0.96 & \textbf{0.95} & 0.98 & 1.18 & 0.96 & 0.97 & 1.21 & 1.04 & 0.98 & 1.12 & 0.97 \\
+BHC Leverage & 1.06 & 1.00 & 1.05 & 2.16 & 0.96 & 0.97 & 1.40 & 1.11 & \textbf{0.92} & 1.07 & 1.00 \\
+Bank Cash Liquidity & 0.96 & \textbf{0.95} & 1.00 & 1.17 & 0.97 & 0.97 & 1.15 & 1.04 & 0.97 & 1.08 & 0.99 \\
+Bank Leverage & 0.96 & 0.98 & 1.04 & 4.14 & 0.95 & \textbf{0.94} & 1.54 & 1.11 & 0.97 & 1.29 & 0.99 \\
+HKM All Factor & 1.08 & 0.99 & 1.00 & 0.97 & 1.19 & \textbf{0.64} & 0.93 & 0.98 & 0.96 & 0.93 & 1.15 \\
+HKM Daily Factor & 1.51 & 1.00 & 1.00 & 1.04 & \textbf{0.99} & 1.04 & 1.02 & 1.00 & 1.22 & 1.01 & 1.05 \\
+HKM Monthly Factor & 0.93 & 0.96 & 0.95 & 0.55 & 1.27 & 1.91 & 0.27 & 0.63 & 1.29 & \textbf{0.24} & 0.93 \\
+Treasury Yield Curve & 1.27 & \textbf{1.00} & 1.90 & 1.02 & 1.81 & 2.05 & 1.03 & 1.01 & -- & -- & 2.02 \\
+\bottomrule
+\end{tabular}

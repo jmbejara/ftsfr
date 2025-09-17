@@ -1,0 +1,301 @@
+Model,Dataset,Status,Issue_Details,CSV_Exists
+naive,ftsfr_tips_treasury_basis,Success,Completed successfully,True
+naive,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+naive,ftsfr_treasury_swap_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+naive,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+naive,ftsfr_CDS_contract_returns,Success,Completed successfully,True
+naive,ftsfr_CDS_portfolio_returns,Success,Completed successfully,True
+naive,ftsfr_CIP_spreads,Success,Completed successfully,True
+naive,ftsfr_commodities_returns,Success,Completed successfully,True
+naive,ftsfr_corp_bond_returns,Success,Completed successfully,True
+naive,ftsfr_corp_bond_portfolio_returns,Success,Completed successfully,True
+naive,ftsfr_treas_bond_returns,Success,Completed successfully,True
+naive,ftsfr_treas_bond_portfolio_returns,Success,Completed successfully,True
+naive,ftsfr_treas_yield_curve_zero_coupon,Success,Completed successfully,True
+naive,ftsfr_FX_returns,Success,Completed successfully,True
+naive,ftsfr_he_kelly_manela_factors_monthly,Success,Completed successfully,True
+naive,ftsfr_he_kelly_manela_factors_daily,Success,Completed successfully,True
+naive,ftsfr_he_kelly_manela_all,Success,Completed successfully,True
+naive,ftsfr_french_portfolios_25_daily_size_and_bm,Success,Completed successfully,True
+naive,ftsfr_nyu_call_report_leverage,Success,Completed successfully,True
+naive,ftsfr_nyu_call_report_holding_company_leverage,Success,Completed successfully,True
+naive,ftsfr_nyu_call_report_cash_liquidity,Success,Completed successfully,True
+naive,ftsfr_nyu_call_report_holding_company_cash_liquidity,Success,Completed successfully,True
+naive,ftsfr_hkm_option_returns,Success,Completed successfully,True
+naive,ftsfr_CRSP_monthly_stock_ret,Success,Completed successfully,True
+naive,ftsfr_CRSP_monthly_stock_retx,Success,Completed successfully,True
+theta,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+theta,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+theta,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+theta,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+theta,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+theta,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+theta,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+theta,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+theta,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+theta,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+theta,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+theta,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+theta,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+theta,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+theta,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+theta,ftsfr_CRSP_monthly_stock_ret,No_CSV,No CSV file generated,False
+theta,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+simple_exponential_smoothing,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_CDS_bond_basis_non_aggregated,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+simple_exponential_smoothing,ftsfr_CRSP_monthly_stock_ret,Success,Completed successfully,True
+simple_exponential_smoothing,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+auto_arima_fast,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+auto_arima_fast,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+auto_arima_fast,ftsfr_CRSP_monthly_stock_ret,Success,Completed successfully,True
+auto_arima_fast,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+deepar,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+deepar,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+deepar,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+deepar,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+deepar,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+deepar,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+deepar,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+deepar,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+deepar,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+deepar,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+deepar,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+deepar,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+deepar,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+deepar,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+deepar,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+deepar,ftsfr_CRSP_monthly_stock_ret,Success,Completed successfully,True
+deepar,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+nbeats,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+nbeats,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+nbeats,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+nbeats,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+nbeats,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+nbeats,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+nbeats,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+nbeats,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+nbeats,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+nbeats,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+nbeats,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+nbeats,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+nbeats,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+nbeats,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+nbeats,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+nbeats,ftsfr_CRSP_monthly_stock_ret,No_CSV,No CSV file generated,False
+nbeats,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+nhits,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+nhits,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+nhits,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+nhits,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+nhits,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+nhits,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+nhits,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+nhits,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+nhits,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+nhits,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+nhits,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+nhits,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+nhits,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+nhits,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+nhits,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+nhits,ftsfr_CRSP_monthly_stock_ret,Success,Completed successfully,True
+nhits,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+dlinear,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+dlinear,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+dlinear,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+dlinear,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+dlinear,ftsfr_CDS_contract_returns,Success,Completed successfully,True
+dlinear,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+dlinear,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+dlinear,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+dlinear,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+dlinear,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+dlinear,ftsfr_french_portfolios_25_daily_size_and_bm,Success,Completed successfully,True
+dlinear,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+dlinear,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+dlinear,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+dlinear,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+dlinear,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+dlinear,ftsfr_CRSP_monthly_stock_ret,No_CSV,No CSV file generated,False
+dlinear,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+nlinear,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+nlinear,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+nlinear,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+nlinear,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+nlinear,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+nlinear,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+nlinear,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+nlinear,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+nlinear,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+nlinear,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+nlinear,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+nlinear,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+nlinear,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+nlinear,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+nlinear,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+nlinear,ftsfr_CRSP_monthly_stock_ret,No_CSV,No CSV file generated,False
+nlinear,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_treasury_sf_basis,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+vanilla_transformer,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_CRSP_monthly_stock_ret,No_CSV,No CSV file generated,False
+vanilla_transformer,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+tide,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+tide,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+tide,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+tide,ftsfr_CDS_bond_basis_non_aggregated,No_CSV,No CSV file generated,False
+tide,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+tide,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+tide,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+tide,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+tide,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+tide,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+tide,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+tide,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+tide,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+tide,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+tide,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+tide,ftsfr_CRSP_monthly_stock_ret,No_CSV,No CSV file generated,False
+tide,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
+kan,ftsfr_tips_treasury_basis,No_CSV,No CSV file generated,False
+kan,ftsfr_treasury_sf_basis,CSV_But_No_Results,CSV exists but not in assembled results,True
+kan,ftsfr_treasury_swap_basis,No_CSV,No CSV file generated,False
+kan,ftsfr_CDS_bond_basis_non_aggregated,Success,Completed successfully,True
+kan,ftsfr_CDS_contract_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_CDS_portfolio_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_CIP_spreads,No_CSV,No CSV file generated,False
+kan,ftsfr_commodities_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_corp_bond_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_corp_bond_portfolio_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_treas_bond_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_treas_bond_portfolio_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_treas_yield_curve_zero_coupon,No_CSV,No CSV file generated,False
+kan,ftsfr_FX_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_he_kelly_manela_factors_monthly,No_CSV,No CSV file generated,False
+kan,ftsfr_he_kelly_manela_factors_daily,No_CSV,No CSV file generated,False
+kan,ftsfr_he_kelly_manela_all,No_CSV,No CSV file generated,False
+kan,ftsfr_french_portfolios_25_daily_size_and_bm,No_CSV,No CSV file generated,False
+kan,ftsfr_nyu_call_report_leverage,No_CSV,No CSV file generated,False
+kan,ftsfr_nyu_call_report_holding_company_leverage,No_CSV,No CSV file generated,False
+kan,ftsfr_nyu_call_report_cash_liquidity,No_CSV,No CSV file generated,False
+kan,ftsfr_nyu_call_report_holding_company_cash_liquidity,No_CSV,No CSV file generated,False
+kan,ftsfr_hkm_option_returns,No_CSV,No CSV file generated,False
+kan,ftsfr_CRSP_monthly_stock_ret,No_CSV,No CSV file generated,False
+kan,ftsfr_CRSP_monthly_stock_retx,No_CSV,No CSV file generated,False
