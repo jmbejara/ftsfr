@@ -361,10 +361,10 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \item Protection for small datasets ($\leq$10 entities)
   \end{itemize}
   \vspace{0.3cm}
-  \item \alert{Multiple error metrics:}
+  \item \alert{Two complementary error metrics:}
   \begin{itemize}
-    \item MASE: Scale-free comparison across datasets
-    \item RMSE: Magnitude of forecasting errors
+    \item MASE: Standard in time series forecasting (robust to outliers)
+    \item Out-of-sample $R^2$: Standard in finance (emphasizes large errors)
   \end{itemize}
   \vspace{0.3cm}
   \item \alert{Focus on baseline performance} with minimal hyperparameter tuning
@@ -393,6 +393,34 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \input{../_output/forecasting2/filtered_dataset_statistics_tabular.tex}
     }
   \end{frame}
+
+\begin{frame}
+  \frametitle{Error Metrics: Mathematical Definitions}
+  \begin{itemize}
+  \item \alert{Mean Absolute Scaled Error (MASE):}
+  \[
+  \mathrm{MASE}=\frac{\frac{1}{T}\sum_{t=1}^T |y_t-\hat y_t|}
+  {\displaystyle \frac{1}{N-s}\sum_{t=s+1}^{N} |y_t - y_{t-s}|}
+  \]
+  \begin{itemize}
+    \item \textbf{Why chosen:} Standard accuracy measure in time series forecasting \textcolor{gray}{(Hyndman \& Koehler 2006)}
+    \item Scale-free comparison across different financial series
+    \item Robust to outliers (uses absolute errors)
+    \item Values $<1$ indicate improvement over naive benchmark
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Out-of-Sample $R^2$:}
+  \[
+  R^2_{\text{oos}} = 1 - \frac{\sum_{t=1}^T (y_t-\hat y_t)^2}{\sum_{t=1}^T (y_t-\bar{y}_{\text{train}})^2}
+  \]
+  \begin{itemize}
+    \item \textbf{Why chosen:} Standard for evaluating predictive models in finance \textcolor{gray}{(Campbell \& Thompson 2008)}
+    \item Measures percentage reduction in MSE vs historical average
+    \item Emphasizes large forecast errors (quadratic loss)
+    \item Positive values indicate outperformance of simple benchmark
+  \end{itemize}
+  \end{itemize}
+\end{frame}
 
 \section{Results}
 
@@ -454,12 +482,16 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \begin{frame}
   \frametitle{Detailed Performance Results}
   \begin{itemize}
-  \item Relative MASE: Performance compared to Naive baseline
+  \item MASE: Performance compared to Naive baseline
   \begin{itemize}
     \item Values $<$ 1.0 = better than Naive
     \item Values $>$ 1.0 = worse than Naive
   \end{itemize}
-  \item RMSE: Actual magnitude of errors in original units
+  \item Out-of-sample $R^2$: Percentage reduction in MSE vs historical average
+  \begin{itemize}
+    \item Positive values = model outperforms benchmark
+    \item Negative values = model underperforms benchmark
+  \end{itemize}
   \item Following slides show detailed tables for both metrics
   \end{itemize}
 \end{frame}
@@ -473,15 +505,15 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \input{../_output/forecasting2/relative_mase_pivot_tabular.tex}
 \end{frame}
 
-\begin{frame}[plain]
+% \begin{frame}[plain]
 
-    \centering
-    \textbf{RMSE Results by Dataset and Model}\\
-    \vspace{0.2cm}
-    \scalebox{0.9}{%
-      \input{../_output/forecasting2/rmse_pivot_tabular.tex}%
-    }
-  \end{frame}
+%     \centering
+%     \textbf{Out-of-Sample $R^2$ Results by Dataset and Model}\\
+%     \vspace{0.2cm}
+%     \scalebox{0.9}{%
+%       \input{../_output/forecasting2/r2_oos_pivot_tabular.tex}%
+%     }
+%   \end{frame}
 
 
 \begin{frame}
@@ -576,7 +608,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \item \alert{Evaluation:}
 \begin{itemize}
   \item Train/test split with substantial out-of-sample periods
-  \item Multiple error metrics for robust comparison
+  \item Two complementary error metrics for robust comparison
   \item Minimal hyperparameter tuning for baseline results
 \end{itemize}
 \end{itemize}

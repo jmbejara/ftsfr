@@ -45,27 +45,33 @@ def extract_datasets(datasets_config: Dict[str, Any]) -> List[str]:
     return sorted(datasets)
 
 
-def extract_models(models_config: Dict[str, Any]) -> List[str]:
-    """Extract active model names from models_config.toml."""
+def extract_models(models_config: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Extract active models with their script information from models_config.toml."""
     models = []
-    
+
     for model_name, model_config in models_config.items():
-        # Only include top-level keys that have configuration dictionaries
-        if isinstance(model_config, dict) and 'library' in model_config:
-            models.append(model_name)
-    
-    return sorted(models)
+        # Only include top-level keys that have configuration dictionaries with script field
+        if isinstance(model_config, dict) and 'script' in model_config:
+            models.append({
+                'name': model_name,
+                'script': model_config['script'],
+                'display_name': model_config.get('display_name', model_name)
+            })
+
+    return sorted(models, key=lambda x: x['name'])
 
 
-def generate_job_commands(datasets: List[str], models: List[str]) -> List[str]:
+def generate_job_commands(datasets: List[str], models: List[Dict[str, str]]) -> List[str]:
     """Generate job commands for all dataset x model combinations."""
     commands = []
-    
+
     for dataset in datasets:
         for model in models:
-            command = f"python ./forecasting/forecast.py --dataset {dataset} --model {model}"
+            model_name = model['name']
+            script_name = model['script']
+            command = f"python ./forecasting/{script_name} --dataset {dataset} --model {model_name}"
             commands.append(command)
-    
+
     return commands
 
 
@@ -107,12 +113,12 @@ def main():
     
     print(f"\nFound {len(models)} models:")
     for model in models:
-        print(f"  - {model}")
-    
+        print(f"  - {model['name']} → {model['script']} ({model['display_name']})")
+
     # Generate job commands
     commands = generate_job_commands(datasets, models)
     total_jobs = len(commands)
-    
+
     print(f"\nGenerating {total_jobs} jobs ({len(datasets)} datasets × {len(models)} models)")
     
     # Write to file

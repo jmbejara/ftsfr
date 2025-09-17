@@ -1,331 +1,123 @@
-# Simplified Models Configuration for forecast.py
-# This file defines all available forecasting models for the CLI script
+# Models Registry Configuration
+# This file serves as a central registry of all available forecasting models
+# for both forecast_stats.py and forecast_neural.py scripts
 
-[naive]
-library = "statsforecast"
-class = "Naive"
-display_name = "Naive"
-table_name = "Naive"
+# Statistical Models (forecast_stats.py)
+
+[historic_average]
+script = "forecast_stats.py"
+display_name = "Historic Average"
+table_name = "HistAvg"
+description = "Simple average of historical values"
 
 # [seasonal_naive]
-# library = "statsforecast"
-# class = "SeasonalNaive"
+# script = "forecast_stats.py"
 # display_name = "Seasonal Naive"
-# table_name = "SN"
+# table_name = "SeasNaive"
+# description = "Last seasonal observation as forecast"
 
-# [seasonal_es_optimized]
-# library = "statsforecast"
-# class = "SeasonalExponentialSmoothingOptimized"
-# display_name = "Seasonal ES Optimized"
+[auto_arima]
+script = "forecast_stats.py"
+display_name = "Auto ARIMA"
+table_name = "ARIMA"
+description = "Automatic ARIMA model selection"
 
-
-[theta]
-library = "statsforecast"
-class = "Theta"
-display_name = "Theta"
-table_name = "Theta"
-
-# [auto_theta]
-# library = "statsforecast"
-# class = "AutoTheta"
-# display_name = "AutoTheta"
-# table_name = "Theta"
-# [auto_theta.params]
-# decomposition_type = "additive"
-
-# #TBATS not in nixtlaverse
-
-
-[simple_exponential_smoothing]
-library = "statsforecast"
-class = "SimpleExponentialSmoothingOptimized"
-display_name = "Simple Exponential Smoothing"
-table_name = "SES"
+# [auto_ces]
+# script = "forecast_stats.py"
+# display_name = "Auto CES"
+# table_name = "CES"
+# description = "Automatic Complex Exponential Smoothing"
 
 # [auto_ets]
-# library = "statsforecast"
-# class = "AutoETS"
-# display_name = "AutoETS"
+# script = "forecast_stats.py"
+# display_name = "Auto ETS"
 # table_name = "ETS"
-# [auto_ets.params]
-# model = "ANN"
+# description = "Automatic Error-Trend-Seasonality model"
 
-# DHR-ARIMA not in nixtlaverse
-# (Dynamic Harmonic Regression - ARIMA)
+# [croston]
+# script = "forecast_stats.py"
+# display_name = "Croston"
+# table_name = "Croston"
+# description = "Croston method for intermittent demand"
 
-# StatsForecast Models
-# [auto_arima]
-# library = "statsforecast"
-# class = "AutoARIMA"
-# display_name = "AutoARIMA"
-# # season_length will be set dynamically from dataset config
+# [dot]
+# script = "forecast_stats.py"
+# display_name = "Dynamic Optimized Theta"
+# table_name = "DOT"
+# description = "Dynamic optimized Theta method"
 
+# [holt_winters]
+# script = "forecast_stats.py"
+# display_name = "Holt-Winters"
+# table_name = "HoltWint"
+# description = "Holt-Winters exponential smoothing"
 
-[auto_arima_fast]
-library = "statsforecast"
-class = "AutoARIMA"
-display_name = "AutoARIMA"
-table_name = "ARIMA"
-[auto_arima_fast.params]
-approximation = true
-stepwise = true
-max_p = 2
-max_q = 2
-max_P = 1
-max_Q = 1
-nmodels = 10
+[ses]
+script = "forecast_stats.py"
+display_name = "Simple Exponential Smoothing"
+table_name = "SES"
+description = "Simple exponential smoothing with alpha=0.1"
 
+[theta]
+script = "forecast_stats.py"
+display_name = "Theta"
+table_name = "Theta"
+description = "Theta method for forecasting"
 
-[deepar]
-library = "neuralforecast"
-class = "DeepAR"
-display_name = "DeepAR"
+# Neural Models (forecast_neural.py)
+# All neural models use automatic hyperparameter optimization with Optuna
+
+[auto_deepar]
+script = "forecast_neural.py"
+display_name = "Auto DeepAR"
 table_name = "DeepAR"
-[deepar.params]
-h = 1
-loss = "DistributionLoss"
-input_size = 12
-lstm_hidden_size = 128
-max_steps = 500
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for DeepAR with LSTM encoder-decoder"
 
-## This model is having difficulty
-# [auto_deepar]
-# library = "neuralforecast"
-# class = "AutoDeepAR"
-# display_name = "AutoDeepAR"
-# [auto_deepar.params]
-# h = 1
-# loss = "DistributionLoss"
-# [auto_deepar.params.config]
-# max_steps = 50
-# input_size = 12
-# lstm_hidden_size = 32
-
-
-[nbeats]
-library = "neuralforecast"
-class = "NBEATS"
-display_name = "NBEATS"
+[auto_nbeats]
+script = "forecast_neural.py"
+display_name = "Auto N-BEATS"
 table_name = "NBEATS"
-[nbeats.params]
-h = 1
-loss = "MAE"
-input_size = 12
-max_steps = 500
-mlp_units = [[64, 64], [64, 64], [64, 64]]
-stack_types = ["identity", "identity"]
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for N-BEATS neural network"
 
-## This model is having difficulty
-# [auto_nbeats]
-# library = "neuralforecast"
-# class = "AutoNBEATS"
-# display_name = "AutoNBEATS"
-# [auto_nbeats.params]
-# h = 1
-# loss = "MAE"
-# [auto_nbeats.params.config]
-# max_steps = 50
-# val_check_steps = 10
-# input_size = 12
-# mlp_units = [[32, 32], [32, 32], [32, 32]]
-
-
-[nhits]
-library = "neuralforecast"
-class = "NHITS"
-display_name = "NHITS"
+[auto_nhits]
+script = "forecast_neural.py"
+display_name = "Auto N-HiTS"
 table_name = "NHITS"
-[nhits.params]
-h = 1
-loss = "MAE"
-input_size = 12
-max_steps = 500
-mlp_units = [[64, 64], [64, 64], [64, 64]]
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for N-HiTS hierarchical interpolation"
 
-## This model is having difficulty
-# [auto_nhits]
-# library = "neuralforecast"
-# class = "AutoNHITS"
-# display_name = "AutoNHITS"
-# [auto_nhits.params]
-# h = 1
-# loss = "MAE"
-# [auto_nhits.params.config]
-# max_steps = 50
-# val_check_steps = 10
-# input_size = 12
-# mlp_units = [[16, 16], [16, 16], [16, 16]]
-
-
-[dlinear]
-library = "neuralforecast"
-class = "DLinear"
-display_name = "DLinear"
+[auto_dlinear]
+script = "forecast_neural.py"
+display_name = "Auto DLinear"
 table_name = "DLinear"
-[dlinear.params]
-h = 1
-loss = "MAE"
-input_size = 12
-max_steps = 500
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for DLinear decomposition model"
 
-## This model is having difficulty
-# [auto_dlinear]
-# library = "neuralforecast"
-# class = "AutoDLinear"
-# display_name = "AutoDLinear"
-# [auto_dlinear.params]
-# h = 1
-# loss = "MAE"
-# [auto_dlinear.params.config]
-# max_steps = 50
-# val_check_steps = 10
-# input_size = 12
-
-
-[nlinear]
-library = "neuralforecast"
-class = "NLinear"
-display_name = "NLinear"
+[auto_nlinear]
+script = "forecast_neural.py"
+display_name = "Auto NLinear"
 table_name = "NLinear"
-[nlinear.params]
-h = 1
-loss = "MAE"
-input_size = 12
-max_steps = 500
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for NLinear normalization model"
 
-## This model is having difficulty
-# [auto_nlinear]
-# library = "neuralforecast"
-# class = "AutoNLinear"
-# display_name = "AutoNLinear"
-# [auto_nlinear.params]
-# h = 1
-# loss = "MAE"
-# [auto_nlinear.params.config]
-# max_steps = 50
-# val_check_steps = 10
-# input_size = 12
-
-
-[vanilla_transformer]
-library = "neuralforecast"
-class = "VanillaTransformer"
-display_name = "VanillaTransformer"
+[auto_vanilla_transformer]
+script = "forecast_neural.py"
+display_name = "Auto Vanilla Transformer"
 table_name = "Transformer"
-[vanilla_transformer.params]
-h = 1
-loss = "MAE"
-input_size = 12
-max_steps = 500
-hidden_size = 128
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for Vanilla Transformer"
 
-## This model is having difficulty
-# [auto_vanilla_transformer]
-# library = "neuralforecast"
-# class = "AutoVanillaTransformer"
-# display_name = "AutoVanillaTransformer"
-# [auto_vanilla_transformer.params]
-# h = 1
-# loss = "MAE"
-# [auto_vanilla_transformer.params.config]
-# max_steps = 50
-# val_check_steps = 10
-# input_size = 12
-# hidden_size = 32
-
-
-[tide]
-library = "neuralforecast"
-class = "TiDE"
-display_name = "TiDE"
+[auto_tide]
+script = "forecast_neural.py"
+display_name = "Auto TiDE"
 table_name = "TiDE"
-[tide.params]
-h = 1
-loss = "MAE"
-input_size = 12
-hidden_size = 512
-decoder_output_dim = 32
-temporal_decoder_dim = 128
-dropout = 0.3
-max_steps = 500
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for TiDE (Time-series Dense Encoder)"
 
-
-[kan]
-library = "neuralforecast"
-class = "KAN"
-display_name = "KAN"
+[auto_kan]
+script = "forecast_neural.py"
+display_name = "Auto KAN"
 table_name = "KAN"
-[kan.params]
-h = 1
-loss = "MAE"
-input_size = 12
-grid_size = 5
-spline_order = 3
-n_hidden_layers = 1
-hidden_size = 512
-max_steps = 500
-learning_rate = 1e-3
-batch_size = 32
-val_check_steps = 50
-early_stop_patience_steps = 3
-scaler_type = "robust"
-start_padding_enabled = true
+description = "Auto hyperparameter optimization for Kolmogorov-Arnold Networks"
 
-
-# Very slow
-# [timesnet]
-# library = "neuralforecast"
-# class = "TimesNet"
-# display_name = "TimesNet"
-# [timesnet.params]
-# h = 1
-# loss = "MAE"
-# input_size = 12
-# hidden_size = 64
-# dropout = 0.1
-# conv_hidden_size = 64
-# top_k = 5
-# num_kernels = 6
-# max_steps = 100
+# Note: auto_lstm temporarily disabled due to tensor dimension mismatch issues
+# [auto_lstm]
+# script = "forecast_neural.py"
+# display_name = "Auto LSTM"
+# table_name = "LSTM"
+# description = "Auto hyperparameter optimization for LSTM encoder-decoder"

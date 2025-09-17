@@ -765,34 +765,10 @@ Filtering removes series that are too short for reliable forecasting and applies
 \end{minipage}
 \end{table}
 
-\subsection{Error Metrics}
-
 \subsection{Error Metrics}\label{subsec:error_metrics}
-We report three complementary error measures: root mean squared error (RMSE), mean absolute scaled error (MASE), and relatieve mean absolute scaled error (rMASE). 
-We report the results using mean absolute error (MAE) and  Symmetric Mean Absolute Percentage Error (sMAPE) in the appendix. Each error metrics answers a slightly different question and, taken together, they balance interpretability, robustness, and cross-series comparability. I first define these error metrics and discuss their relative strengths.
+We evaluate forecasting performance using two complementary error metrics: Mean Absolute Scaled Error (MASE) and out-of-sample $R^2$ ($R^2_{\text{oos}}$). We use MASE because it is the standard accuracy measure in time series forecasting \citep{Hyndman2006}, while $R^2_{\text{oos}}$ is standard in finance for evaluating predictive models \citep{Campbell2008}. Both metrics are scale-free and benchmark model performance against simple baselines, but they differ in their treatment of errors: MASE uses absolute errors (robust to outliers), while $R^2_{\text{oos}}$ uses squared errors (emphasizing large misses).
 
-\paragraph{Notation.} Let $\{y_t\}_{t=1}^T$ be targets in the test window and $\{\hat y_t\}_{t=1}^T$ the corresponding forecasts.
-
-\medskip
-\noindent\textbf{Mean Absolute Error (MAE).}
-\[
-\mathrm{MAE} = \frac{1}{T}\sum_{t=1}^T |y_t-\hat y_t|
-\]
-MAE is in the original units, is robust to outliers relative to RMSE, and is optimal for median forecasts. Its drawback is that it is \emph{not} scale-free, so MAE values are not comparable across series with different units or scales.
-
-\medskip
-\noindent\textbf{Root Mean Square Error (RMSE).}
-\[
-\mathrm{RMSE} = \Big(\frac{1}{T}\sum_{t=1}^T (y_t-\hat y_t)^2\Big)^{1/2}
-\]
-RMSE emphasizes large errors (quadratic loss). It is useful when tail mistakes are costly, but it is also not scale-free and is sensitive to outliers.
-
-\medskip
-\noindent\textbf{Symmetric MAPE (sMAPE).}
-\[
-\mathrm{sMAPE} = \frac{1}{T}\sum_{t=1}^T \frac{2\,|y_t-\hat y_t|}{|y_t|+|\hat y_t|}
-\]
-sMAPE is unitless and bounded in $[0,2]$ (or $[0,200]\%$ if multiplied by $100$), which aids cross-series comparison. Caution: when $y_t$ or $\hat y_t$ are near zero, the denominator can amplify noise; when both are zero we define the term as $0$.
+\paragraph{Notation.} Let $\{y_t\}_{t=1}^T$ be targets in the test window, $\{\hat y_t\}_{t=1}^T$ the corresponding forecasts, and $\bar{y}_{\text{train}}$ the training sample mean.
 
 \medskip
 \noindent\textbf{Mean Absolute Scaled Error (MASE).}
@@ -800,19 +776,14 @@ sMAPE is unitless and bounded in $[0,2]$ (or $[0,200]\%$ if multiplied by $100$)
 \mathrm{MASE}=\frac{\frac{1}{T}\sum_{t=1}^T |y_t-\hat y_t|}
 {\displaystyle \frac{1}{N-s}\sum_{t=s+1}^{N} |y_t - y_{t-s}|}
 \]
-The denominator is the in-sample MAE of a (seasonal) naïve forecast on the training window of length $N$ (with seasonal period $s$; $s{=}1$ for nonseasonal data). MASE is \emph{scale-free} and interpretable: values $<1$ mean the model's out-of-sample MAE improves on the in-sample naïve benchmark; values $>1$ mean it does worse. Unlike percentage errors, MASE is well-defined when $y_t{=}0$ and works across heterogeneous financial series (returns, spreads, levels).
+The denominator is the in-sample MAE of a seasonal naïve forecast on the training window of length $N$ (with seasonal period $s$; $s{=}1$ for nonseasonal data). MASE values $<1$ indicate the model outperforms the naïve benchmark; values $>1$ indicate underperformance.
 
 \medskip
-\noindent\textbf{Why multiple metrics?} RMSE reflects penalty for large misses in original units (risk relevance). MAE provides a robust, unit-level summary. sMAPE and MASE enable fair comparisons across datasets with different scales. We therefore use MASE (primary, scale-free) and RMSE (units) in the main text and report MAE/sMAPE in the appendix.
-
-\medskip
-\noindent\textbf{Relative MASE (rMASE).}
-To compare directly against the naïve model's \emph{out-of-sample} performance, we report a relative MASE:
+\noindent\textbf{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$).}
 \[
-\mathrm{rMASE} = \frac{\mathrm{MASE}_{\text{model}}}{\mathrm{MASE}_{\text{naive}}}
-= \frac{\mathrm{MAE}^{\text{oos}}_{\text{model}}}{\mathrm{MAE}^{\text{oos}}_{\text{naive}}}.
+R^2_{\text{oos}} = 1 - \frac{\sum_{t=1}^T (y_t-\hat y_t)^2}{\sum_{t=1}^T (y_t-\bar{y}_{\text{train}})^2}
 \]
-Because both MASE values share the same in-sample scaling, the ratio simplifies to the ratio of out-of-sample MAEs. Interpretation is direct: $\mathrm{rMASE}=0.80$ means the model's average absolute error is $20\%$ lower than the naïve benchmark on the test set; $\mathrm{rMASE}>1$ indicates underperformance. We omit the naïve column in the rMASE table (it equals $1$ by construction).
+This measures the percentage reduction in MSE achieved by the model relative to predicting the training sample mean. Positive values indicate the model outperforms the historical average benchmark; zero or negative values indicate underperformance.
 
 
 \section{Baseline Results and Analysis}

@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=forecast_array
-#SBATCH --array=1-286%9            # 286 jobs total, max 9 concurrent
+#SBATCH --array=1-300%9            # 300 jobs total, max 9 concurrent
 #SBATCH --exclusive                 # Exclusive node access
 #SBATCH --time=7-00:00:00          # 7 days time limit
-#SBATCH --output=./_output/forecasting2/logs/slurm-%A_%a.out
-#SBATCH --error=./_output/forecasting2/logs/slurm-%A_%a.err
+#SBATCH --output=./_output/forecasting3/logs/slurm-%A_%a.out
+#SBATCH --error=./_output/forecasting3/logs/slurm-%A_%a.err
 
 
 # Print job information
@@ -15,7 +15,7 @@ echo "Node: ${SLURM_NODELIST}"
 echo "CPUs on node: ${SLURM_CPUS_ON_NODE}"
 
 # Create base log directory if it doesn't exist
-mkdir -p ./_output/forecasting2/logs
+mkdir -p ./_output/forecasting3/logs
 
 # Auto-detect and export CPU count for parallel processing
 # This will be used by StatsForecast for parallel model fitting
@@ -53,7 +53,7 @@ echo "Dataset: $DATASET"
 echo "Model: $MODEL"
 
 # Check if output already exists (idempotent execution)
-OUTPUT_FILE="./_output/forecasting2/error_metrics/${DATASET}/${MODEL}.csv"
+OUTPUT_FILE="./_output/forecasting3/error_metrics/${DATASET}/${MODEL}.csv"
 if [ -f "$OUTPUT_FILE" ]; then
     echo "Output already exists: $OUTPUT_FILE"
     echo "Skipping job for ${DATASET}/${MODEL} as it has already been completed"
@@ -62,8 +62,8 @@ if [ -f "$OUTPUT_FILE" ]; then
 fi
 
 # Create output directories
-mkdir -p "./_output/forecasting2/error_metrics/${DATASET}"
-mkdir -p "./_output/forecasting2/logs/${DATASET}/${MODEL}"
+mkdir -p "./_output/forecasting3/error_metrics/${DATASET}"
+mkdir -p "./_output/forecasting3/logs/${DATASET}/${MODEL}"
 
 # Log start of actual computation
 echo "Starting forecast computation at: $(date)"
@@ -71,18 +71,18 @@ echo "Running command: $JOB_CMD"
 
 # Run the forecasting job
 # Redirect model-specific output to dataset/model directory
-$JOB_CMD > "./_output/forecasting2/logs/${DATASET}/${MODEL}/output.log" 2>&1
+$JOB_CMD > "./_output/forecasting3/logs/${DATASET}/${MODEL}/output.log" 2>&1
 EXIT_CODE=$?
 
 # Check exit status
 if [ $EXIT_CODE -ne 0 ]; then
     echo "ERROR: Job failed with exit code $EXIT_CODE for ${DATASET}/${MODEL}"
-    echo "$(date) - Failed: ${DATASET}/${MODEL} (Exit code: $EXIT_CODE)" >> ./_output/forecasting2/logs/failed_jobs.txt
+    echo "$(date) - Failed: ${DATASET}/${MODEL} (Exit code: $EXIT_CODE)" >> ./_output/forecasting3/logs/failed_jobs.txt
     
     # Copy error details to failed jobs directory
-    mkdir -p "./_output/forecasting2/logs/failed/${DATASET}"
-    cp "./_output/forecasting2/logs/${DATASET}/${MODEL}/output.log" \
-       "./_output/forecasting2/logs/failed/${DATASET}/${MODEL}_failed.log" 2>/dev/null || true
+    mkdir -p "./_output/forecasting3/logs/failed/${DATASET}"
+    cp "./_output/forecasting3/logs/${DATASET}/${MODEL}/output.log" \
+       "./_output/forecasting3/logs/failed/${DATASET}/${MODEL}_failed.log" 2>/dev/null || true
     
     # Still exit with 0 to allow array to continue
     echo "Job failed but array continues"
@@ -90,13 +90,13 @@ if [ $EXIT_CODE -ne 0 ]; then
     exit 0
 else
     echo "SUCCESS: Job completed successfully for ${DATASET}/${MODEL}"
-    echo "$(date) - Success: ${DATASET}/${MODEL}" >> ./_output/forecasting2/logs/successful_jobs.txt
+    echo "$(date) - Success: ${DATASET}/${MODEL}" >> ./_output/forecasting3/logs/successful_jobs.txt
 fi
 
 # Check if output was actually created
 if [ ! -f "$OUTPUT_FILE" ]; then
     echo "WARNING: Job reported success but output file not found: $OUTPUT_FILE"
-    echo "$(date) - Warning: ${DATASET}/${MODEL} - No output file created" >> ./_output/forecasting2/logs/warnings.txt
+    echo "$(date) - Warning: ${DATASET}/${MODEL} - No output file created" >> ./_output/forecasting3/logs/warnings.txt
 fi
 
 echo "Job completed at: $(date)"

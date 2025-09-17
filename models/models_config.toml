@@ -1,256 +1,122 @@
-# Models Configuration File V2
-# This file defines all available forecasting models and their parameters
-# Dataset-specific parameters (frequency, seasonality, test_split) are now in datasets_config.toml
+# Models Configuration File
+# This file defines available forecasting models for both forecast_neural.py and forecast_stats.py
 
-# Local Darts Models (univariate, per-series training)
+# Statistical Models (for forecast_stats.py)
 
-# AutoARIMA is good enough
-# [arima]
-# class = "DartsLocal"
-# estimator_class = "darts.models.ARIMA"
-# display_name = "ARIMA"
-# estimator_params = { p = 1, d = 1, q = 1 }
+[historic_average]
+library = "statsforecast"
+class = "HistoricAverage"
+display_name = "Historic Average"
+description = "Simple average of historical values"
+
+[seasonal_naive]
+library = "statsforecast"
+class = "SeasonalNaive"
+display_name = "Seasonal Naive"
+description = "Last seasonal observation as forecast"
 
 [auto_arima]
-class = "StatsForecastMain"
-estimator_class = "statsforecast.models.AutoARIMA"
-display_name = "AutoARIMA"
-# season_length will be set from dataset config
-# Speed optimizations will be applied automatically in run_model.py
-
-[auto_arima_fast]
-class = "StatsForecastMain"
-estimator_class = "statsforecast.models.AutoARIMA"
-display_name = "AutoARIMA Fast"
-# Explicit fast configuration for maximum speed
-estimator_params = { approximation = true, stepwise = true, max_p = 2, max_q = 2, max_P = 1, max_Q = 1 , nmodels=5}
-# season_length will be set from dataset config
+library = "statsforecast"
+class = "AutoARIMA"
+display_name = "Auto ARIMA"
+description = "Automatic ARIMA model selection"
 
 [auto_ces]
-class = "DartsLocal"
-estimator_class = "darts.models.AutoCES"
-display_name = "AutoCES"
-# season_length will be set from dataset config
+library = "statsforecast"
+class = "AutoCES"
+display_name = "Auto CES"
+description = "Automatic Complex Exponential Smoothing"
 
 [auto_ets]
-class = "DartsLocal"
-estimator_class = "darts.models.AutoETS"
-display_name = "AutoETS"
-# season_length will be set from dataset config
+library = "statsforecast"
+class = "AutoETS"
+display_name = "Auto ETS"
+description = "Automatic Error-Trend-Seasonality model"
 
-[auto_mfles]
-class = "DartsLocal"
-estimator_class = "darts.models.AutoMFLES"
-display_name = "AutoMFLES"
-estimator_params = { test_size = 1 }
-# season_length will be set from dataset config
+[croston]
+library = "statsforecast"
+class = "CrostonClassic"
+display_name = "Croston"
+description = "Croston method for intermittent demand"
 
-[auto_tbats]
-class = "DartsLocal"
-estimator_class = "darts.models.AutoTBATS"
-display_name = "AutoTBATS"
-# season_length will be set from dataset config
+[dot]
+library = "statsforecast"
+class = "DynamicOptimizedTheta"
+display_name = "Dynamic Optimized Theta"
+description = "Dynamic optimized Theta method"
 
-[auto_theta]
-class = "DartsLocal"
-estimator_class = "darts.models.AutoTheta"
-display_name = "AutoTheta"
-# season_length will be set from dataset config
-
-[ets]
-class = "DartsLocal"
-estimator_class = "darts.models.ExponentialSmoothing"
-display_name = "Exponential Smoothing"
-imports = ["from darts.utils.utils import ModelMode, SeasonalityMode"]
-estimator_params = { trend = "ModelMode.ADDITIVE", seasonal = "SeasonalityMode.NONE" }
-
-[naive_drift]
-class = "DartsLocal"
-estimator_class = "darts.models.NaiveDrift"
-display_name = "NaiveDrift"
-estimator_params = {}
-
-[naive_mean]
-class = "DartsLocal"
-estimator_class = "darts.models.NaiveMean"
-display_name = "NaiveMean"
-estimator_params = {}
-
-[naive_movav]
-class = "DartsLocal"
-estimator_class = "darts.models.NaiveMovingAverage"
-display_name = "NaiveMovingAverage"
-# input_chunk_length will be set to seasonality * 4
-
-[naive_seasonal]
-class = "DartsLocal"
-estimator_class = "darts.models.NaiveSeasonal"
-display_name = "NaiveSeasonal"
-# K will be set to seasonality
-
-[pr]
-class = "DartsLocal"
-estimator_class = "darts.models.SKLearnModel"
-display_name = "Pooled Regression"
-imports = ["from sklearn.linear_model import TweedieRegressor"]
-estimator_params = { model = "TweedieRegressor(power=0)", output_chunk_length = 1, multi_models = false }
-# lags will be set to seasonality * 4
-
-[prophet]
-class = "DartsLocal"
-estimator_class = "darts.models.Prophet"
-display_name = "Prophet"
-estimator_params = {}
+[holt_winters]
+library = "statsforecast"
+class = "HoltWinters"
+display_name = "Holt-Winters"
+description = "Holt-Winters exponential smoothing"
 
 [ses]
-class = "DartsLocal"
-estimator_class = "darts.models.ExponentialSmoothing"
+library = "statsforecast"
+class = "SimpleExponentialSmoothing"
 display_name = "Simple Exponential Smoothing"
-imports = ["from darts.utils.utils import ModelMode, SeasonalityMode"]
-estimator_params = { trend = "ModelMode.NONE", seasonal = "SeasonalityMode.NONE" }
-
-[tbats]
-class = "DartsLocal"
-estimator_class = "darts.models.TBATS"
-display_name = "TBATS"
-# season_length will be set from dataset config
+description = "Simple exponential smoothing with alpha=0.1"
 
 [theta]
-class = "DartsLocal"
-estimator_class = "darts.models.Theta"
+library = "statsforecast"
+class = "Theta"
 display_name = "Theta"
-imports = ["from darts.utils.utils import SeasonalityMode"]
-estimator_params = { season_mode = "SeasonalityMode.ADDITIVE" }
+description = "Theta method for forecasting"
 
-# Global Darts Models (multivariate, global training)
+# Neural Models (for forecast_neural.py)
+# Models are optimized using Optuna with custom configuration functions
 
-# [dlinear]
-# class = "DartsGlobal"
-# estimator_class = "darts.models.DLinearModel"
-# display_name = "DLinear"
-# estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
+[auto_deepar]
+library = "neuralforecast"
+class = "AutoDeepAR"
+display_name = "Auto DeepAR"
+description = "Automatic hyperparameter optimization for DeepAR with LSTM encoder-decoder"
 
-[global_naive_agg]
-class = "DartsGlobal"
-estimator_class = "darts.models.GlobalNaiveAggregate"
-display_name = "Global Naive Aggregate"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
+[auto_nbeats]
+library = "neuralforecast"
+class = "AutoNBEATS"
+display_name = "Auto N-BEATS"
+description = "Automatic hyperparameter optimization for N-BEATS neural network"
 
-[global_naive_dri]
-class = "DartsGlobal"
-estimator_class = "darts.models.GlobalNaiveDrift"
-display_name = "Global Naive Drift"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
+[auto_nhits]
+library = "neuralforecast"
+class = "AutoNHITS"
+display_name = "Auto N-HiTS"
+description = "Automatic hyperparameter optimization for N-HiTS hierarchical interpolation"
 
-[global_naive_sea]
-class = "DartsGlobal"
-estimator_class = "darts.models.GlobalNaiveSeasonal"
-display_name = "Global Naive Seasonal"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
+[auto_dlinear]
+library = "neuralforecast"
+class = "AutoDLinear"
+display_name = "Auto DLinear"
+description = "Automatic hyperparameter optimization for DLinear decomposition model"
 
-[nhits]
-class = "DartsGlobal"
-estimator_class = "darts.models.NHiTSModel"
-display_name = "NHiTS"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
+[auto_nlinear]
+library = "neuralforecast"
+class = "AutoNLinear"
+display_name = "Auto NLinear"
+description = "Automatic hyperparameter optimization for NLinear normalization model"
 
-[tide]
-class = "DartsGlobal"
-estimator_class = "darts.models.TiDEModel"
-display_name = "TiDE"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
+[auto_vanilla_transformer]
+library = "neuralforecast"
+class = "AutoVanillaTransformer"
+display_name = "Auto Vanilla Transformer"
+description = "Automatic hyperparameter optimization for Vanilla Transformer"
 
-[transformer]
-class = "DartsGlobal"
-estimator_class = "darts.models.TransformerModel"
-display_name = "Transformer"
-estimator_params = { output_chunk_length = 1 }
-# input_chunk_length will be set to seasonality * 4
+[auto_tide]
+library = "neuralforecast"
+class = "AutoTiDE"
+display_name = "Auto TiDE"
+description = "Automatic hyperparameter optimization for TiDE (Time-series Dense Encoder)"
 
-[catboost]
-class = "DartsGlobal"
-estimator_class = "darts.models.CatBoostModel"
-display_name = "CatBoost"
-scaling = false
-interpolation = true
-f32 = false
-special_handler = "catboost"  # For GPU/CPU detection
-estimator_params = { output_chunk_length = 1, multi_models = false }
-# lags will be set to seasonality * 4
+[auto_kan]
+library = "neuralforecast"
+class = "AutoKAN"
+display_name = "Auto KAN"
+description = "Automatic hyperparameter optimization for Kolmogorov-Arnold Networks"
 
-# Nixtla Models
-
-[dlinear]
-class = "NixtlaMain"
-estimator_class = "neuralforecast.models.DLinear"
-display_name = "DLinear"
-estimator_params = { h = 1 }
-
-[nlinear]
-class = "NixtlaMain"
-estimator_class = "neuralforecast.models.NLinear"
-display_name = "NLinear"
-estimator_params = { h = 1 }
-
-[nbeats]
-class = "NixtlaMain"
-estimator_class = "neuralforecast.models.NBEATS"
-display_name = "NBeats"
-estimator_params = { h = 1, stack_types = ['identity'] }
-
-[autoformer]
-class = "NixtlaMain"
-estimator_class = "neuralforecast.models.Autoformer"
-display_name = "Autoformer"
-estimator_params = { h = 1 }
-# input_size will be set to seasonality * 4
-
-[informer]
-class = "NixtlaMain"
-estimator_class = "neuralforecast.models.Informer"
-display_name = "Informer"
-estimator_params = { h = 1 }
-# input_size will be set to seasonality * 4
-
-# GluonTS Models
-
-[deepar]
-class = "GluontsMain"
-estimator_class = "gluonts.torch.DeepAREstimator"
-display_name = "DeepAR"
-estimator_params = { prediction_length = 1 }
-# freq and context_length will be set from dataset config
-
-[ffnn]
-class = "GluontsMain"
-estimator_class = "gluonts.torch.SimpleFeedForwardEstimator"
-display_name = "FFNN"
-estimator_params = { prediction_length = 1 }
-# context_length will be set to seasonality * 4
-
-[patchtst]
-class = "GluontsMain"
-estimator_class = "gluonts.torch.PatchTSTEstimator"
-display_name = "PatchTST"
-estimator_params = { prediction_length = 1, stride = 4 }
-# patch_len and context_length will be set from dataset config
-
-[wavenet]
-class = "GluontsMain"
-estimator_class = "gluonts.torch.WaveNetEstimator"
-display_name = "WaveNet"
-estimator_params = { prediction_length = 1 }
-# freq will be set from dataset config
-
-# Special Models
-
-[timesfm]
-class = "TimesFM"
-display_name = "TimesFM"
-model_version = "500m"  # or "200m"
+# Note: AutoLSTM temporarily disabled due to tensor dimension mismatch issues
+# [auto_lstm]
+# library = "neuralforecast"
+# class = "AutoLSTM"
+# display_name = "Auto LSTM"
+# description = "Automatic hyperparameter optimization for LSTM encoder-decoder"
