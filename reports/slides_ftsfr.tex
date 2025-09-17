@@ -55,7 +55,7 @@ Benchmarking Forecasting Methods for Financial Stability
   \item \alert{Question:}
   Can modern global forecasting methods improve financial stability monitoring beyond traditional approaches?
   \item \alert{Approach:}
-  Systematic benchmarking of 24 forecasting methods (classical to deep learning) on 27 canonical financial datasets with standardized evaluation.
+  Systematic benchmarking of over a dozen forecasting methods (classical to deep learning) on 25 canonical financial datasets with standardized evaluation.
   \item \alert{Main Result:}
   No universal best model; sophisticated methods achieve 3-10\% improvements over naive baselines, but gains are dataset-specific.
   \item \alert{Application:}
@@ -74,7 +74,7 @@ Benchmarking Forecasting Methods for Financial Stability
 \begin{frame}
 \frametitle{Financial Stability Requires Forward-Looking Monitoring}
 \begin{itemize}
-\item Financial regulators increasingly emphasize \alert{forward-looking risk monitoring} to preemptively address systemic vulnerabilities
+\item Financial regulators have emphasized \alert{forward-looking risk monitoring} to address systemic vulnerabilities
 \vspace{0.3cm}
 \item Early warning systems and predictive analytics are critical for timely policy responses
 \vspace{0.3cm}
@@ -89,9 +89,9 @@ Benchmarking Forecasting Methods for Financial Stability
 \begin{itemize}
 \item Time series forecasting is ubiquitous in finance, but lacks standardized evaluation frameworks
 \vspace{0.2cm}
-\item Current problem: Researchers evaluate methods on \alert{arbitrarily selected datasets}, making comparisons impossible
+\item Current problem: Time series forecasting researchers evaluate methods on \alert{arbitrarily selected datasets}, making comparisons of the methods impossible
 \vspace{0.2cm}
-\item \alert{No Free Lunch Theorem}: Need domain-specific evaluation to identify what works in finance
+\item \alert{No Free Lunch Theorem}: Some benchmarks already exist, but need domain-specific evaluation to identify what works in finance (Wolpert and Macready, 1997)
 \end{itemize}
 \end{frame}
 
@@ -131,14 +131,43 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \item Prevention of cherry-picking results
 \end{itemize}
 \vspace{0.3cm}
-\item \alert{Solution}: Create comprehensive, literature-compliant financial forecasting benchmark
+\item \alert{Solution}: Create comprehensive, literature-compliant financial forecasting benchmark repository
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Monash Time Series Forecasting Repository}
+  \begin{itemize}
+    \item I take inspiration from the Monash Time Series Forecasting Repository
+    \item They provide a suite of freely distributable datasets that time series forecasting researchers can use to test global time series forecasting methods on. 
+    \item \url{https://forecastingdata.org/}
+    \end{itemize}
+  \begin{figure}
+      \centering
+      \includegraphics[width=0.8\textwidth]{../docs_src/monash_website_table.png}
+  \end{figure}
+  \end{frame}
+
+\begin{frame}
+  \frametitle{The Importance Of Open Source And Replicability}
+  \begin{itemize}
+\item Since data cannot be redistributed, we provide open source code that enables researchers to download and use the exact datasets and methods used in the paper
+  \item \alert{Open source code packaged with replicable software environments enables}
+  \begin{itemize}
+    \item researchers to download and use the exact datasets and methods used in the paper
+    \item Community validation and improvement of the code
+  \end{itemize}
+  \end{itemize}
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{../docs_src/ftsfr_github.png}
+    \end{figure}
 \end{frame}
 
 \section{Related Literature}
 
 \begin{frame}
-  \frametitle{Three Key Research Streams}
+  \frametitle{Related Research}
   \begin{itemize}
   \item \alert{Financial Stability \& Many-Predictor Methods:}
   Principal components and factor models improve forecasts when exploiting many predictors.
@@ -154,42 +183,36 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{M-Competitions}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../docs_src/m_competitions.png}
+\end{figure}
+\end{frame}
+
 \section{Data \& Contributions}
 
 
 \begin{frame}
   \frametitle{Comprehensive Financial Dataset Coverage}
   \begin{itemize}
-  \item \alert{27 datasets} across multiple asset classes and market segments:
+  \item \alert{25 datasets} across multiple asset classes and market segments:
   \vspace{0.1cm}
   \begin{itemize}
     \item \textbf{Asset Returns:} Equities (CRSP), Corporate \& Treasury bonds, CDS, Options, FX, Commodities
-    \item \textbf{Arbitrage Spreads:} CIP deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury
-    \item \textbf{Financial Stability Data:} Bank call reports, intermediary risk factors, yield curves
+    \item \textbf{Arbitrage Spreads:} CIP deviations, CDS-bond basis, Treasury-swap spreads, TIPS-Treasury, Treasury-Spot-Futures
+    \item \textbf{Other:} Bank call reports, intermediary risk factors, yield curves
   \end{itemize}
   \vspace{0.2cm}
   \item Each dataset follows \alert{canonical cleaning procedures} from seminal finance papers
   \vspace{0.1cm}
   \item Validated by replicating key results from original studies
   \vspace{0.1cm}
-  \item Scale: From 4 commodity series to 6,388 individual CDS contracts
+  \item Scale: From 4 entity panel to panel with over 25,000 individual stocks
+  \item Frequencies vary from daily, monthly, and quarterly, with some series starting as early as 1926
   \end{itemize}
 \label{slide:data_overview}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Dataset Overview}
-  \begin{itemize}
-  \item \alert{27 datasets} across multiple asset classes
-  \item Each follows canonical cleaning procedures from seminal papers
-  \item Three main categories:
-  \begin{itemize}
-    \item Returns data (11 datasets)
-    \item Basis spread data (5 datasets)
-    \item Other financial data (11 datasets)
-  \end{itemize}
-  \item Next slides show detailed dataset listings
-  \end{itemize}
 \end{frame}
 
 \begin{frame}[plain]
@@ -248,13 +271,52 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \end{frame}
 
 \begin{frame}
-  \frametitle{Dataset Statistics}
+  \frametitle{Dataset Selection: Financial Stability \& Intermediary Asset Pricing}
   \begin{itemize}
-  \item Scale varies dramatically across datasets
-  \item From 4 commodity series to 6,388 individual CDS contracts
-  \item Both portfolio-level and security-level data
-  \item Train/test splits provide substantial out-of-sample periods
-  \item Next slide shows detailed statistics
+  \item \alert{Theoretical foundation:} He et al. (2017) intermediary asset pricing framework
+  \vspace{0.2cm}
+  \item \alert{Key insight:} Retail investors access only stocks; intermediaries access exotic assets (CDS, options, bonds, commodities)
+  \vspace{0.2cm}
+  \item \alert{Intermediary budget constraints} create risk factors that drive pricing across asset classes
+  \begin{itemize}
+    \item Risk factor impact stronger for assets only intermediaries can trade
+    \item These assets crucial for financial stability monitoring
+  \end{itemize}
+  \vspace{0.2cm}
+  \item \alert{Basis spreads} gauge stress in financial system
+  \begin{itemize}
+    \item Critical early warning indicators for intermediary distress
+    \item Predicting basis spread changes essential for financial stability
+  \end{itemize}
+  \vspace{0.2cm}
+  \item \alert{Return predictability} fundamental to understanding economic risk across all asset classes
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dataset Selection: Methodological Rigor}
+  \begin{itemize}
+  \item \alert{Canonical data cleaning:} He et al. (2017) identified seminal papers in each asset class
+  \begin{itemize}
+    \item Obtained exact data methodologies from original authors
+    \item No reinvention of cleaning procedures
+    \item Established best practices for each asset class
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Similar approach for basis spreads:} Siriwardane et al. (2021) references canonical methods
+  \begin{itemize}
+    \item CDS-bond basis, Treasury-swap spreads, CIP deviations, etc.
+    \item Each follows established academic procedures
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Additional financial stability data:}
+  \begin{itemize}
+    \item HKM factors: leverage ratios, capital constraints
+    \item Bank regulatory data: liquidity, leverage metrics
+    \item Yield curves: term structure risk factors
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Result:} Comprehensive coverage of assets critical for intermediaries and financial stability
   \end{itemize}
 \end{frame}
 
@@ -266,61 +328,62 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   }
 \end{frame}
 
+ \begin{frame}
+    \frametitle{Key Innovation: Literature-Compliant Data Curation}
+    \begin{itemize}
+    \item \alert{Fully reproducible} data pipeline: automated download, cleaning, formatting
+    \item Available on GitHub: \texttt{github.com/jmbejara/ftsfr}
+    \item Handles data licensing constraints:
+    \begin{itemize}
+        \item Provides scripts rather than redistributing proprietary data
+        \item Works with institutional subscriptions (WRDS, Bloomberg)
+        \item Enables exact dataset reproduction across researchers
+    \end{itemize}
+    \item Both \alert{aggregated portfolios} (for replication) and \alert{disaggregated data} (for global forecasting)
+    \item Virtual environments ensure perfect reproducibility
+    \item Each dataset uses exact methodology from canonical finance papers:
+    \item Code to replicate these datasets was not previously publicly available. This paper makes all of this
+    code freely available on GitHub. The repository contains over 170,000 lines of code at last count.
+    \end{itemize}
+  \end{frame}
+  
+
+
 \begin{frame}
-  \frametitle{Key Innovation: Literature-Compliant Data Curation}
-  \begin{itemize}
-  \item Each dataset uses exact methodology from canonical finance papers:
-  \begin{itemize}
-    \item Equities: Fama \& French (1993) filters
-    \item Treasuries: Gürkaynak et al. (2007) filters
-    \item Corporate bonds: Market microstructure noise correction
-    \item CDS: Palhares (2012) constant-risky-duration construction of returns
-    \item etc.
-  \end{itemize}
-  \vspace{0.2cm}
-  \item Enables \alert{exact replication} of established results for direct comparisons
-  \vspace{0.1cm}
-  \item Addresses finance's potential replication crisis through standardized, open-source data infrastructure
-  \end{itemize}
+    \frametitle{Replications: CIP Arbitrage}
+    \begin{figure}[h!]
+        \centering
+        \caption{CIP Arbitrage spreads}
+      \begin{tabular}{@{}c@{}}
+        \includegraphics[width=.95\linewidth]{../docs_src/CIP_replicate.png}
+      \end{tabular}
+      \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+      \label{fig:cip_basis}
+    \end{figure}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Data Quality: SPX Options Market Growth}
-  \centering
-  \includegraphics[width=0.8\textwidth]{\PathToAssets/spx_options_over_time.png}
-
-  \vspace{0.3cm}
-  Massive growth: 72 option portfolios from 19 million individual contracts (1996-2019)
+    \frametitle{Replications: Treasury Swap Arbitrage}
+    \begin{figure}[h!]
+        \centering
+        \caption{Treasury Swap Arbitrage spreads}
+        \begin{tabular}{@{}c@{}}
+          \includegraphics[width=.95\linewidth]{../docs_src/treasury_swap_arbitrage_spreads.png}
+        \end{tabular}
+        \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+        \label{fig:treasury_swap_arbitrage}
+      \end{figure}      
 \end{frame}
 
 \begin{frame}
-  \frametitle{Data Quality: Treasury Basis Validation}
-  \centering
-  \includegraphics[width=0.8\textwidth]{\PathToAssets/treasury_spot_futures_arbitrage.png}
-
-  \vspace{0.3cm}
-  Successfully replicates Treasury spot-futures basis patterns from literature
-\end{frame}
-
-\begin{frame}
-  \frametitle{Open Source Implementation}
-  \begin{itemize}
-  \item \alert{Fully reproducible} data pipeline: automated download, cleaning, formatting
-  \vspace{0.2cm}
-  \item Available on GitHub: \texttt{github.com/jmbejara/ftsfr}
-  \vspace{0.2cm}
-  \item Handles data licensing constraints:
-  \begin{itemize}
-    \item Provides scripts rather than redistributing proprietary data
-    \item Works with institutional subscriptions (WRDS, Bloomberg)
-    \item Enables exact dataset reproduction across researchers
-  \end{itemize}
-  \vspace{0.2cm}
-  \item Both \alert{aggregated portfolios} (for replication) and \alert{disaggregated data} (for global forecasting)
-  \vspace{0.1cm}
-  \item Virtual environments ensure perfect reproducibility
-  \end{itemize}
-\end{frame}
+    \frametitle{Replications: Treasury Spot-Futures Basis}
+    \centering
+    \includegraphics[width=0.95\textwidth]{\PathToAssets/treasury_spot_futures_arbitrage.png}
+  
+    \vspace{0.3cm}
+    Successfully replicates Treasury spot-futures basis patterns from literature
+  \end{frame}
+  
 
 \section{Methodology}
 
@@ -499,6 +562,15 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \tiny
   \vspace{-0.5cm}
   \centering
+  \textbf{MASE Results by Dataset and Model}\\
+  \vspace{0.2cm}
+  \input{../output/forecasting2/mase_pivot_tabular.tex}
+\end{frame}
+
+\begin{frame}[plain]
+  \tiny
+  \vspace{-0.5cm}
+  \centering
   \textbf{Relative MASE Results by Dataset and Model}\\
   \vspace{0.2cm}
   \input{../output/forecasting2/relative_mase_pivot_tabular.tex}
@@ -538,7 +610,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \item \alert{Main Contributions:}
   \begin{itemize}
     \item First comprehensive financial time series forecasting benchmark
-    \item 27 datasets with canonical academic cleaning procedures
+    \item 25 datasets with canonical academic cleaning procedures
     \item Evidence that model choice depends critically on data characteristics
     \item Open-source implementation enabling reproducible research
   \end{itemize}
