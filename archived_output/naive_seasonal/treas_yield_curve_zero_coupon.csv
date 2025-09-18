@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_seasonal,treas_yield_curve_zero_coupon,30,5,0.5332398,0.5075522,0.0034079507,0.0030376092,0.0045727426,0.004008604

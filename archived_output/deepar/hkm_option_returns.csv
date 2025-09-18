@@ -1,2 +1,0 @@
-,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,deepar,hkm_option_returns,D,252,0.0895326798594281,0.008711117403171384,0.03902853236838865

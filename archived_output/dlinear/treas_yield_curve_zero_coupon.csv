@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,dlinear,treas_yield_curve_zero_coupon,30,B,5,0.59431136,0.0037993141,0.0051289545

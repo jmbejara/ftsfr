@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,dlinear,CDS_portfolio_returns,20,ME,12,0.7510475,0.09569662,0.1455566

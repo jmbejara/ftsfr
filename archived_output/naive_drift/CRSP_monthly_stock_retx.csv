@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_drift,CRSP_monthly_stock_retx,9544,12,63.247726,12.809317,8.095209,0.3236584,11.527309,0.47923028

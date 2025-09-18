@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
-0,catboost,french_portfolios_25_daily_size_and_bm,25,1.321409813691311,0.033829989872978874,0.04637353623727145

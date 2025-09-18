@@ -1,2 +1,0 @@
-,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,ffnn,CDS_contract_returns,ME,12,21.97130706719615,3.283966008443235,4.541820100798464

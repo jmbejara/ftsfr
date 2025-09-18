@@ -1,2 +1,0 @@
-,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,wavenet,CDS_portfolio_returns,ME,12,1.242365319997289,0.15607759316330144,0.2268143434566478

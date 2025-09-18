@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_seasonal,nyu_call_report_holding_company_cash_liquidity,5468,4,13.706574,2.6063528,1.9845716,0.18011126,2.612416,0.23734921

@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Global_MASE,Global_MAE,Global_RMSE
-0,global_naive_sea,CRSP_monthly_stock_ret,26760,71.13767,7.0765963,10.007669

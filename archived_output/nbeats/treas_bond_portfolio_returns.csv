@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,nbeats,treas_bond_portfolio_returns,10,ME,12,0.0,0.0,0.0

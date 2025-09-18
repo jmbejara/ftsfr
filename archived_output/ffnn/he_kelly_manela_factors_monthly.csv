@@ -1,2 +1,0 @@
-,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,ffnn,he_kelly_manela_factors_monthly,MS,12,0.8594958075773503,0.08502550708114082,0.11655323840950212

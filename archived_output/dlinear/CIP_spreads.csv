@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,dlinear,CIP_spreads,8,ME,12,0.4335528,0.0334028,0.047506653

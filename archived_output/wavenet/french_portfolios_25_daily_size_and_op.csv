@@ -1,2 +1,0 @@
-,Model,Dataset,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,wavenet,french_portfolios_25_daily_size_and_op,D,252,1.2815144439802741,0.05393550328757469,0.10567584744654349

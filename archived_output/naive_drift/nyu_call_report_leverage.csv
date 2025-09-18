@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_drift,nyu_call_report_leverage,7555,4,51.492153,0.506555,10.504736,0.0379502,14.369764,0.05137335

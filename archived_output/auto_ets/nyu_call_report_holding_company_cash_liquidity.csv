@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,auto_ets,nyu_call_report_holding_company_cash_liquidity,4750,4,37.41906662914744,2.215921169177479,7.099871029858715,0.15951898107263335,7.674770015440227,0.2077147867282298

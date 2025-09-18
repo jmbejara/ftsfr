@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,autoformer,CDS_contract_returns,6603,ME,12,15.306845,2.63954,3.5049546

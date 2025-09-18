@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,nlinear,FX_returns,9,ME,12,0.20842272,0.016586399,0.028236786

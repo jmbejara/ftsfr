@@ -15,9 +15,6 @@ import pandas as pd
 sys.path.insert(1, str((Path(__file__).parent / "src").resolve()))
 
 from settings import config
-from dependency_tracker import (
-    load_module_requirements,
-)
 
 
 # --------------------------------------------------------------------
@@ -200,6 +197,111 @@ def copy_dir_contents_to_folder(dir_path, destination_folder):
     return _python_copy_tree_command(dir_path, destination_folder)
 
 
+# --------------------------------------------------------------------
+# Dataset dependency tracking utilities
+# --------------------------------------------------------------------
+
+
+def load_module_requirements(datasets_toml_path="datasets.toml"):
+    """Load module requirements from datasets.toml."""
+    with open(datasets_toml_path, "rb") as f:
+        datasets_config = tomli.load(f)
+
+    module_requirements = {}
+
+    for module_name, module_config in datasets_config.items():
+        if isinstance(module_config, dict) and "required_data_sources" in module_config:
+            module_requirements[module_name] = module_config["required_data_sources"]
+
+    return module_requirements
+
+
+def check_module_availability(module_requirements, data_sources):
+    """Return availability map for modules based on available data sources."""
+    module_availability = {}
+
+    for module_name, required_sources in module_requirements.items():
+        module_availability[module_name] = all(
+            data_sources.get(source, False) for source in required_sources
+        )
+
+    return module_availability
+
+
+def get_missing_sources(module_name, module_requirements, data_sources):
+    """Return missing data sources for a given module."""
+    if module_name not in module_requirements:
+        return []
+
+    required = module_requirements[module_name]
+    return [source for source in required if not data_sources.get(source, False)]
+
+
+def get_available_datasets(
+    module_requirements, data_dir, datasets_toml_path="datasets.toml"
+):
+    """Return dataset metadata for modules that have all prerequisites satisfied."""
+    with open(datasets_toml_path, "rb") as f:
+        datasets_config = tomli.load(f)
+
+    available_datasets = {}
+
+    for module_name, is_available in module_requirements.items():
+        if not is_available:
+            continue
+
+        if module_name in datasets_config and isinstance(datasets_config[module_name], dict):
+            module_config = datasets_config[module_name]
+
+            for key, value in module_config.items():
+                if (
+                    key.startswith("ftsfr_")
+                    and isinstance(value, dict)
+                    and "description" in value
+                ):
+                    dataset_name = key.replace("ftsfr_", "")
+
+                    available_datasets[dataset_name] = {
+                        "path": Path(data_dir) / "formatted" / module_name / f"{key}.parquet",
+                        "module": module_name,
+                        "frequency": value.get("frequency", "D"),
+                        "seasonality": value.get("seasonality"),
+                        "is_balanced": value.get("is_balanced", False),
+                        "description": value.get("description", ""),
+                    }
+
+    return available_datasets
+
+
+def get_format_task_name(module_name):
+    """Return the doit task name that formats a given module's dataset."""
+    task_name_mapping = {
+        "cds_returns": "calc_cds_returns",
+    }
+
+    return task_name_mapping.get(module_name, module_name)
+
+
+def get_docs_task_dependencies(module_requirements):
+    """Return documentation task dependencies for available modules."""
+    docs_task_by_module = {
+        "cds_bond_basis": "format:summary_cds_bond_basis_ipynb",
+        "cds_returns": "format:summary_cds_returns_ipynb",
+        "cip": "format:summary_cip_ipynb",
+        "corp_bond_returns": "format:summary_corp_bond_returns_ipynb",
+        "us_treasury_returns": "format:summary_treasury_bond_returns_ipynb",
+        "basis_tips_treas": "format:summary_basis_tips_treas_ipynb",
+        "basis_treas_sf": "format:summary_basis_treas_sf_ipynb",
+        "basis_treas_swap": "format:summary_basis_treas_swap_ipynb",
+    }
+
+    return [
+        task_name
+        for module_name, task_name in docs_task_by_module.items()
+        if module_requirements.get(module_name, False)
+    ]
+
+
 def notebook_subtask(task_config):
     """
     Generate notebook task configuration with unified workflow for .py and .ipynb files.
@@ -344,8 +446,6 @@ def setup_module_requirements():
 
 def check_required_files(module_requirements):
     """Check if required data files exist before running forecasts"""
-    from dependency_tracker import get_available_datasets
-
     available_datasets = get_available_datasets(module_requirements, DATA_DIR)
 
     missing_files = []

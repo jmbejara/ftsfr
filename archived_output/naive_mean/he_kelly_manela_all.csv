@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_mean,he_kelly_manela_all,4,12,1.2394643,1.2327102,0.13031974,0.13308579,0.17469035,0.15985802

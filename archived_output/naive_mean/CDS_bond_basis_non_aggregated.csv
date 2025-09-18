@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_mean,CDS_bond_basis_non_aggregated,3762,12,11075.198,5.232358,2628.6191,0.40831012,2778.6616,0.43295467

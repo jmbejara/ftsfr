@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,autoformer,nyu_call_report_holding_company_cash_liquidity,13775,QE,4,13.233448,1.8319387,2.3941445

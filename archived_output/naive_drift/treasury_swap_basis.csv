@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_drift,treasury_swap_basis,7,12,1.8322119,0.34608814,0.07279467,0.046321347,0.09620856,0.06059562

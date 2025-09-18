@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,nbeats,CDS_bond_basis_non_aggregated,13174,ME,12,5239.694,1052.1841,1269.2166

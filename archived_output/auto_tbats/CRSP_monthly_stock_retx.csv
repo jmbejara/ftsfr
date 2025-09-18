@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,auto_tbats,CRSP_monthly_stock_retx,0,12,0.0,,0.0,,0.0,

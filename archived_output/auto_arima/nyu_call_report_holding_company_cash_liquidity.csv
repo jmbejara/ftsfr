@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,auto_arima,nyu_call_report_holding_company_cash_liquidity,5481,4,34.953757023089096,2.738535957629057,5.138175197490156,0.1907428362077968,5.589806900286487,0.24910626862888618

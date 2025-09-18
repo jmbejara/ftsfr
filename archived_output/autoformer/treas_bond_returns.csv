@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,autoformer,treas_bond_returns,2044,ME,12,19.212736,2.941123,3.9041095

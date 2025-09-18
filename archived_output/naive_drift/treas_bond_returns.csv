@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_drift,treas_bond_returns,907,12,23.946463,5.082455,3.270825,0.41073146,4.4096003,0.5996386

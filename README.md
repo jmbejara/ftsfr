@@ -28,7 +28,7 @@ This repository is organized around three key concepts:
    - Contain standardized columns: `id` (entity), `ds` (date/timestamp), `y` (value)
    - Metadata (frequency, balance status, etc.) is stored in `datasets.toml`
 
-The dependency relationships between data modules and data sources are defined in `datasets.toml` and tracked by `dependency_tracker.py`. This allows the system to automatically determine which modules can be run based on the user's available data sources.
+The dependency relationships between data modules and data sources are defined in `datasets.toml` and tracked by the helper utilities in `dodo_common.py`. This allows the system to automatically determine which modules can be run based on the user's available data sources.
 
 ## Agenda
 

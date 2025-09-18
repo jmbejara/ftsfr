@@ -20,9 +20,8 @@ from dodo_common import (
     load_subscriptions,
     load_all_module_requirements,
     debug_action,
+    get_docs_task_dependencies,
 )
-
-from dependency_tracker import get_docs_task_dependencies
 
 DOIT_CONFIG = {
     "backend": "sqlite3",
@@ -798,9 +797,9 @@ def task_format():
 def task_determine_available_datasets():
     """Determine available datasets"""
     return {
-        "actions": [(debug_action, ["python models/determine_available_datasets.py"])],
+        "actions": [(debug_action, ["python src/determine_available_datasets.py"])],
         "file_dep": [
-            "./models/determine_available_datasets.py",
+            "./src/determine_available_datasets.py",
         ],
         "targets": [
             OUTPUT_DIR / "available_datasets.csv",
@@ -833,24 +832,6 @@ def task_organize_ftsfr_datasets():
             *[str(f) for f in src_files],
         ],
         "targets": formatted_targets,
-        "verbosity": 0,
-    }
-
-def task_determine_cutoff_dates():
-    """Determine cutoff dates for each dataset"""
-    return {
-        "actions": [(debug_action, ["python models/cutoff_calc.py"])],
-        "file_dep": [
-            "./models/cutoff_calc.py",
-            "./src/organize_ftsfr_datasets.py",
-            OUTPUT_DIR / "available_datasets.csv",
-        ],
-        "targets": [
-            OUTPUT_DIR / "cutoff_dates.csv",
-        ],
-        "task_dep": [
-            "organize_ftsfr_datasets",
-        ],
         "verbosity": 0,
     }
 

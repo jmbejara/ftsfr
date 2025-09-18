@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Frequency,Seasonality,Global_MASE,Global_MAE,Global_RMSE
-0,nbeats,tips_treasury_basis,4,ME,12,0.3643576,0.034819327,0.047902003

@@ -1,2 +1,0 @@
-,Model,Dataset,Entities,Seasonality,Mean_MASE,Median_MASE,Mean_MAE,Median_MAE,Mean_RMSE,Median_RMSE
-0,naive_drift,he_kelly_manela_factors_daily,4,252,0.32375216,0.32114565,0.017783633,0.017539928,0.025076069,0.025343593
