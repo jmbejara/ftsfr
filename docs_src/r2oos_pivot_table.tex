@@ -1,0 +1,29 @@
+% R2oos Results by Dataset and Model
+% Generated automatically by create_results_tables2.py
+
+\begin{table}[htbp]
+\centering
+\caption{R2oos Results by Dataset and Model}
+\label{tab:r2oos_results}
+\scriptsize
+\setlength{\tabcolsep}{1.5pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}lrrrrrrrrrr@{}}
+\toprule
+ & HistAvg & ARIMA & Theta & DeepAR & NBEATS & NHITS & DLinear & NLinear & TiDE & KAN \\
+\midrule
+\multicolumn{11}{l}{\textbf{Returns (Portfolios)}} \\
+CDS Portfolio & -- & -4.33 & \textbf{-0.31} & -- & -- & -- & -- & -- & -- & -- \\
+Corporate Portfolio & -0.00 & -0.00 & -0.05 & -0.49 & 0.03 & 0.04 & 0.03 & 0.06 & \textbf{0.06} & 0.03 \\
+SPX Options Portfolios & \textbf{0.00} & -0.80 & -1.06 & -0.83 & -0.52 & -0.33 & -0.49 & -0.49 & -0.58 & -0.47 \\
+Treasury Portfolio & -- & \textbf{-2.05} & -2.22 & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\multicolumn{11}{l}{\textbf{Other}} \\
+HKM All Factor & -0.00 & \textbf{0.26} & 0.20 & -1.30 & -0.21 & -0.25 & -0.58 & -0.68 & -0.59 & -1.06 \\
+HKM Monthly Factor & 0.00 & 0.14 & \textbf{0.18} & -0.71 & -173.72 & -7.06 & -3.08 & -4.17 & -2.29 & -10.15 \\
+\bottomrule
+\end{tabular}
+\vspace{0.1cm}
+
+\noindent {\scriptsize \textbf{Note:} Values show out-of-sample R-squared. Higher values indicate better performance. Negative values indicate worse performance than historical mean.}
+\end{table}

@@ -205,6 +205,11 @@ def task_create_results_tables():
             # Summary statistics
             OUTPUT_DIR / "forecasting3" / "model_summary_statistics.csv",
             OUTPUT_DIR / "forecasting3" / "model_summary_statistics.tex",
+            # Median MASE summary table files
+            Path("./docs_src") / "median_mase_summary.csv",
+            Path("./docs_src") / "median_mase_summary.tex",
+            OUTPUT_DIR / "forecasting3" / "median_mase_summary.csv",
+            OUTPUT_DIR / "forecasting3" / "median_mase_summary.tex",
             # Heatmap plots
             OUTPUT_DIR / "forecasting3" / "mase_heatmap.png",
             OUTPUT_DIR / "forecasting3" / "rmse_heatmap.png",
@@ -278,6 +283,7 @@ def task_compile_latex_docs():
             OUTPUT_DIR / "forecasting3" / "relative_mase_pivot_table.tex",
             OUTPUT_DIR / "forecasting3" / "r2oos_pivot_table.tex",
             OUTPUT_DIR / "forecasting3" / "model_summary_statistics.tex",
+            OUTPUT_DIR / "forecasting3" / "median_mase_summary.tex",
             # Heatmap plot dependencies
             OUTPUT_DIR / "forecasting3" / "mase_heatmap.png",
             OUTPUT_DIR / "forecasting3" / "rmse_heatmap.png",

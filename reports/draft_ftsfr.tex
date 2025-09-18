@@ -341,7 +341,7 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 \centering
 \caption{Dataset Statistics Summary}
 \label{tab:dataset_stats}
-\input{../_output/forecasting2/dataset_statistics_tabular.tex}
+\input{../_output/forecasting3/dataset_statistics_tabular.tex}
 \vspace{0.1cm}
 \scriptsize
 % \textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.
@@ -758,7 +758,7 @@ To ensure fair model comparisons, our forecasting system applies consistent filt
 \centering
 \caption{Impact of Filtering on Dataset Statistics}
 \label{tab:filtered_dataset_stats}
-\input{../_output/forecasting2/filtered_dataset_statistics_tabular.tex}
+\input{../_output/forecasting3/filtered_dataset_statistics_tabular.tex}
 \vspace{0.1cm}
 \begin{minipage}{\textwidth}
 \scriptsize
@@ -803,7 +803,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 \centering
 \caption{MASE Results by Dataset and Model}
 \label{tab:mase_results}
-\input{../_output/forecasting2/mase_pivot_tabular.tex}
+\input{../_output/forecasting3/mase_pivot_tabular.tex}
 \caption*{
 \noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
 \scriptsize
@@ -815,7 +815,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 % \begin{figure}[htbp]
 % \centering
 % \caption{MASE Results Heatmap by Dataset and Model}
-% \includegraphics[width=\textwidth]{../_output/forecasting2/mase_heatmap.png}
+% \includegraphics[width=\textwidth]{../_output/forecasting3/mase_heatmap.png}
 % \caption*{\textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.
 
 % \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
@@ -828,10 +828,25 @@ To better understand the relative performance of sophisticated models compared t
 \centering
 \caption{Relative MASE Results by Dataset and Model}
 \label{tab:relative_mase_results}
-\input{../_output/forecasting2/relative_mase_pivot_tabular.tex}
+\input{../_output/forecasting3/relative_mase_pivot_tabular.tex}
 \caption*{
     \scriptsize
 \textbf{Note:} Values show MASE ratios relative to the Naive baseline. Values $<$ 1.0 indicate better performance than Naive. Numbers in bold indicate the best performing model for each dataset.
+
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
+}
+\end{table}
+
+To provide an overall assessment of model performance across all datasets, Table~\ref{tab:median_mase_summary} presents summary statistics for each model's MASE values aggregated across all datasets. The table shows the median, mean, standard deviation, minimum, and maximum MASE values for each model, with models sorted by their median MASE performance. This summary allows identification of models that consistently perform well across the diverse range of financial time series in our benchmark, providing guidance for practitioners seeking robust forecasting approaches.
+
+\begin{table}[htbp]
+\centering
+\caption{Overall Model Performance Summary: Median MASE Across All Datasets}
+\label{tab:median_mase_summary}
+\input{../_output/forecasting3/median_mase_summary_tabular.tex}
+\caption*{
+    \scriptsize
+\textbf{Note:} Summary statistics of MASE values across all datasets for each model. Models are sorted by median MASE (lower is better). This provides an overall ranking of model performance across the entire benchmark.
 
 \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
 }
@@ -841,7 +856,7 @@ Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the r
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{../_output/forecasting2/relative_mase_heatmap.png}
+    \includegraphics[width=\textwidth]{../_output/forecasting3/relative_mase_heatmap.png}
     \caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Naive baseline, with blue indicating better performance than Naive ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*). \\
     \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
     }
@@ -854,7 +869,7 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 \centering
 \caption{RMSE Results by Dataset and Model}
 \label{tab:rmse_results}
-\input{../_output/forecasting2/rmse_pivot_tabular.tex}
+\input{../_output/forecasting3/rmse_pivot_tabular.tex}
 \vspace{0.1cm}
 
 \caption*{\scriptsize 
@@ -868,7 +883,7 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 
 % \begin{figure}[htbp]
 % \centering
-% \includegraphics[width=\textwidth]{../_output/forecasting2/rmse_heatmap.png}
+% \includegraphics[width=\textwidth]{../_output/forecasting3/rmse_heatmap.png}
 % \caption{RMSE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile to highlight performance differences across the majority of datasets, with extreme outliers marked with asterisks (*). The visualization reveals models that consistently perform well and datasets that pose particular forecasting challenges.}
 % \label{fig:rmse_heatmap}
 % \end{figure}
@@ -1603,7 +1618,7 @@ Table~\ref{tab:smape_results} presents sMAPE results across all model-dataset co
 \centering
 \caption{sMAPE Results by Dataset and Model}
 \label{tab:smape_results}
-\input{../_output/forecasting2/smape_pivot_tabular.tex}
+\input{../_output/forecasting3/smape_pivot_tabular.tex}
 \vspace{0.1cm}
 
 \noindent {\scriptsize \textbf{Note:} Values show Symmetric Mean Absolute Percentage Error (sMAPE). Lower values indicate better performance. -- indicates missing results.}
@@ -1613,7 +1628,7 @@ Figure~\ref{fig:smape_heatmap} provides the corresponding visual representation 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{../_output/forecasting2/smape_heatmap.png}
+\includegraphics[width=\textwidth]{../_output/forecasting3/smape_heatmap.png}
 \caption{sMAPE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile with extreme outliers marked by asterisks (*). The heatmap reveals percentage-based performance patterns, with cooler colors indicating better forecasting accuracy.}
 \label{fig:smape_heatmap}
 \end{figure}
@@ -1626,7 +1641,7 @@ Table~\ref{tab:mae_results} shows MAE results for all combinations. MAE measures
 \centering
 \caption{MAE Results by Dataset and Model}
 \label{tab:mae_results}
-\input{../_output/forecasting2/mae_pivot_tabular.tex}
+\input{../_output/forecasting3/mae_pivot_tabular.tex}
 \vspace{0.1cm}
 
 \noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Error (MAE). Lower values indicate better performance. -- indicates missing results.}
@@ -1636,7 +1651,7 @@ Figure~\ref{fig:mae_heatmap} visualizes the MAE results, complementing the numer
 
 % \begin{figure}[htbp]
 % \centering
-% \includegraphics[width=\textwidth]{../_output/forecasting2/mae_heatmap.png}
+% \includegraphics[width=\textwidth]{../_output/forecasting3/mae_heatmap.png}
 % \caption{MAE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile with extreme values marked by asterisks (*). This visualization shows absolute error patterns in original data units, highlighting both model performance and relative dataset difficulty.}
 % \label{fig:mae_heatmap}
 % \end{figure}

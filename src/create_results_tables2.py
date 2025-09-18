@@ -1018,6 +1018,144 @@ def create_r2oos_pivot_table():
 
     return r2oos_pivot
 
+def create_median_mase_summary_table():
+    """Create a summary table showing median MASE across all datasets for each model"""
+
+    print("Creating median MASE summary table...")
+
+    # Read the assembled results from new location
+    results_file = FORECAST3_DIR / "results_all.csv"
+    if not results_file.exists():
+        print(f"Error: Results file not found at {results_file}")
+        print("Please run the assemble_results3 task first")
+        sys.exit(1)
+
+    results = pd.read_csv(results_file)
+    print(f"Loaded {len(results)} result rows")
+
+    # Rename model names for consistency
+    results['Model'] = results['Model'].replace('AutoARIMA Fast', 'AutoARIMA')
+
+    # Filter to only include active models from config
+    results = filter_results_by_active_models(results)
+
+    # Filter to only include active datasets from config
+    results = filter_results_by_active_datasets(results)
+
+    # Apply quality filtering
+    results = filter_quality_results(results)
+
+    # Check if we have the required columns
+    if 'MASE' not in results.columns:
+        print("Error: MASE column not found in results")
+        print(f"Available columns: {list(results.columns)}")
+        sys.exit(1)
+
+    # Convert MASE to numeric (in case there are any string values)
+    results['MASE_numeric'] = pd.to_numeric(results['MASE'], errors='coerce')
+
+    # Calculate summary statistics by model
+    model_summary = results.groupby('Model')['MASE_numeric'].agg([
+        'count',
+        'median',
+        'mean',
+        'std',
+        'min',
+        'max'
+    ]).round(4)
+
+    model_summary.columns = ['N_Datasets', 'Median_MASE', 'Mean_MASE', 'Std_MASE', 'Min_MASE', 'Max_MASE']
+
+    # Sort by median MASE (ascending - lower is better)
+    model_summary = model_summary.sort_values('Median_MASE')
+
+    # Apply model ordering based on models_config.toml for consistent display
+    model_order = load_model_order()
+    if model_order:
+        # Create mapping from display name to order
+        display_name_order = {model['display_name']: i for i, model in enumerate(model_order)}
+
+        # Add ordering column, defaulting to 999 for models not in config
+        model_summary['Order'] = model_summary.index.map(lambda x: display_name_order.get(x, 999))
+
+        # Sort by order first, then by median MASE within each group
+        model_summary = model_summary.sort_values(['Order', 'Median_MASE']).drop('Order', axis=1)
+
+    print(f"Created summary for {len(model_summary)} models")
+
+    # Save as CSV for inspection
+    csv_file = FORECAST3_DIR / "median_mase_summary.csv"
+    model_summary.to_csv(csv_file)
+    print(f"Saved median MASE summary (CSV) to: {csv_file}")
+
+    # Save also to docs_src for easier access
+    docs_csv_file = Path(__file__).parent.parent / "docs_src" / "median_mase_summary.csv"
+    docs_csv_file.parent.mkdir(parents=True, exist_ok=True)
+    model_summary.to_csv(docs_csv_file)
+    print(f"Saved median MASE summary (CSV) to: {docs_csv_file}")
+
+    # Apply model table names for LaTeX
+    model_table_names = load_model_table_names()
+
+    # Create version with table names for LaTeX
+    model_summary_latex = model_summary.copy()
+    model_summary_latex.index = model_summary_latex.index.map(lambda x: model_table_names.get(x, x))
+
+    # Create LaTeX table - show only the most important columns for readability
+    summary_display = model_summary_latex[['N_Datasets', 'Median_MASE', 'Mean_MASE']].copy()
+
+    latex_output = summary_display.to_latex(
+        caption="Model Performance Summary: Median MASE Across All Datasets",
+        label="tab:median_mase_summary",
+        float_format="%.3f",
+        column_format='lrrr',
+        escape=False
+    )
+
+    # Save as .tex file
+    tex_file = FORECAST3_DIR / "median_mase_summary.tex"
+    with open(tex_file, 'w') as f:
+        f.write(latex_output)
+    print(f"Saved median MASE summary (LaTeX) to: {tex_file}")
+
+    # Create tabular-only version for embedding
+    tabular_output = summary_display.to_latex(
+        float_format="%.3f",
+        column_format='lrrr',
+        escape=False
+    )
+    tabular_only = extract_tabular_content(tabular_output)
+
+    tabular_file = FORECAST3_DIR / "median_mase_summary_tabular.tex"
+    with open(tabular_file, 'w') as f:
+        f.write(f"% Median MASE Summary - tabular content only\n% Generated automatically by create_results_tables2.py\n{tabular_only}")
+    print(f"Saved median MASE summary tabular (LaTeX) to: {tabular_file}")
+
+    # Save LaTeX version to docs_src as well
+    docs_tex_file = Path(__file__).parent.parent / "docs_src" / "median_mase_summary.tex"
+    with open(docs_tex_file, 'w') as f:
+        f.write(latex_output)
+    print(f"Saved median MASE summary (LaTeX) to: {docs_tex_file}")
+
+    # Save tabular-only version to docs_src
+    docs_tabular_file = Path(__file__).parent.parent / "docs_src" / "median_mase_summary_tabular.tex"
+    with open(docs_tabular_file, 'w') as f:
+        f.write(f"% Median MASE Summary - tabular content only\n% Generated automatically by create_results_tables2.py\n{tabular_only}")
+    print(f"Saved median MASE summary tabular (LaTeX) to: {docs_tabular_file}")
+
+    # Print summary statistics
+    print("\nMedian MASE Summary Statistics:")
+    print(f"Number of models: {len(model_summary)}")
+    print(f"Best performing model (lowest median MASE): {model_summary.index[0]} ({model_summary['Median_MASE'].iloc[0]:.3f})")
+    print(f"Worst performing model (highest median MASE): {model_summary.index[-1]} ({model_summary['Median_MASE'].iloc[-1]:.3f})")
+
+    # Show top 5 performers
+    print("\nTop 5 Best Performing Models (by median MASE):")
+    for i, (model, row) in enumerate(model_summary.head().iterrows()):
+        print(f"  {i+1}. {model}: {row['Median_MASE']:.3f} (across {int(row['N_Datasets'])} datasets)")
+
+    return model_summary
+
 def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
     """Create a LaTeX table with dataset grouping sections"""
     
@@ -1738,7 +1876,10 @@ if __name__ == "__main__":
 
     # Create relative MASE pivot table (comparing to Naive baseline)
     relative_mase_table = create_relative_mase_pivot_table()
-    
+
+    # Create median MASE summary table (overall model ranking)
+    median_mase_summary = create_median_mase_summary_table()
+
     # Create summary statistics (now with quality filtering)
     summary_stats = create_summary_statistics()
     
