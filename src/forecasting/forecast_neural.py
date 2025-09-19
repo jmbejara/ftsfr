@@ -543,6 +543,35 @@ def main():
             f"  Removed {removed_series} series shorter than {min_cv_length} observations to satisfy cross-validation horizon"
         )
 
+    # Additional filter: Remove series that would have insufficient data in test period
+    # Require at least 30% non-null values in the test period for meaningful metrics
+    min_test_coverage = 0.3  # Require at least 30% non-null values
+    min_test_points = max(int(test_size * min_test_coverage), 3)  # At least 3 points
+
+    series_with_sufficient_test_data = []
+    for unique_id in df['unique_id'].unique():
+        series_data = df.filter(pl.col('unique_id') == unique_id).sort('ds')
+        # Get the last test_size observations
+        test_period_data = series_data.tail(test_size)
+        # Count non-null values in what would be the test period
+        non_null_count = test_period_data['y'].drop_nulls().len()
+        if non_null_count >= min_test_points:
+            series_with_sufficient_test_data.append(unique_id)
+
+    if len(series_with_sufficient_test_data) == 0:
+        raise ValueError(
+            f"No series have at least {min_test_points} non-null values in their last {test_size} observations (test period). "
+            f"Data quality issue: all series have insufficient test data for reliable metrics."
+        )
+
+    initial_count = len(df['unique_id'].unique())
+    df = df.filter(pl.col('unique_id').is_in(series_with_sufficient_test_data))
+    removed_for_sparse = initial_count - len(series_with_sufficient_test_data)
+    if removed_for_sparse > 0:
+        print(
+            f"  Removed {removed_for_sparse} series with <{min_test_points} non-null values in test period"
+        )
+
     print(f"Total samples: {len(df):,}")
     print(f"Number of series: {df['unique_id'].n_unique()}")
 
@@ -660,6 +689,22 @@ def main():
     # Calculate average metrics across all series
     avg_metrics = {}
     for model_col in actual_model_cols:
+        # Count how many series have valid (non-null) metrics
+        valid_mase = mase_scores[model_col].drop_nulls().len()
+        valid_mse = mse_scores[model_col].drop_nulls().len()
+        total_series = len(mase_scores)
+
+        # Check if we have enough valid metrics
+        if valid_mase == 0 or valid_mse == 0:
+            raise ValueError(
+                f"No valid metrics could be calculated for model {model_col}. "
+                f"All series have null test periods or invalid predictions. "
+                f"Valid MASE: {valid_mase}/{total_series}, Valid MSE: {valid_mse}/{total_series}"
+            )
+
+        if valid_mase < total_series * 0.1:  # Less than 10% valid
+            print(f"  Warning: Only {valid_mase}/{total_series} series have valid MASE scores")
+
         avg_metrics[model_col] = {
             'MASE': mase_scores[model_col].mean(),
             'MSE': mse_scores[model_col].mean(),
@@ -717,13 +762,37 @@ def main():
     # Get the neural model's metrics (exclude baseline models for now)
     neural_model_name = neural_model_names[0]  # Should be only one model
     if neural_model_name in avg_metrics:
+        # Validate metrics before saving
+        mase_val = avg_metrics[neural_model_name]['MASE']
+        mse_val = avg_metrics[neural_model_name]['MSE']
+        rmse_val = avg_metrics[neural_model_name]['RMSE']
+        r2oos_val = avg_metrics[neural_model_name]['R2oos']
+
+        # Check for invalid metric values
+        import numpy as np
+        if mase_val == 0.0:
+            raise ValueError(
+                f"MASE is exactly 0.0 for model {neural_model_name}. "
+                f"This indicates a calculation error, possibly due to data quality issues."
+            )
+
+        if np.isnan(mase_val) or np.isnan(mse_val) or np.isnan(rmse_val) or np.isnan(r2oos_val):
+            raise ValueError(
+                f"NaN values detected in metrics for model {neural_model_name}:\n"
+                f"  MASE: {mase_val}\n"
+                f"  MSE: {mse_val}\n"
+                f"  RMSE: {rmse_val}\n"
+                f"  R2oos: {r2oos_val}\n"
+                f"This typically indicates insufficient valid data for metric calculation."
+            )
+
         metrics_data = {
             "model_name": [MODEL_NAME],
             "dataset_name": [DATASET_NAME],
-            "MASE": [avg_metrics[neural_model_name]['MASE']],
-            "MSE": [avg_metrics[neural_model_name]['MSE']],
-            "RMSE": [avg_metrics[neural_model_name]['RMSE']],
-            "R2oos": [avg_metrics[neural_model_name]['R2oos']],
+            "MASE": [mase_val],
+            "MSE": [mse_val],
+            "RMSE": [rmse_val],
+            "R2oos": [r2oos_val],
             "time_taken": [neural_time]
         }
 
