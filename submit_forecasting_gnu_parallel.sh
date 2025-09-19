@@ -40,7 +40,14 @@ module load anaconda3/3.11.4 R/4.4.0 parallel
 
 echo "[$(date)] Launching GNU parallel with ${SLURM_NNODES:-19} parallel jobs (one per node)"
 
-# Run parallel with one job per node, letting GNU parallel handle all the complexity
+# Define srun command to distribute jobs across nodes
+# --exclusive: Use node exclusively
+# -N1: One node per job
+# -n1: One task per job (each forecasting script handles its own parallelization)
+srun="srun --exclusive -N1 -n1"
+
+# Run parallel with srun wrapper to distribute jobs across all allocated nodes
+# GNU parallel manages the job queue, srun distributes jobs to nodes
 parallel --joblog "${PARALLEL_JOBLOG}" \
          --resume \
          --resume-failed \
@@ -49,7 +56,7 @@ parallel --joblog "${PARALLEL_JOBLOG}" \
          --line-buffer \
          --will-cite \
          --env STATSFORECAST_N_JOBS \
-         :::: "${JOBS_FILE}"
+         "$srun bash -c {}" :::: "${JOBS_FILE}"
 
 PARALLEL_EXIT_CODE=$?
 
