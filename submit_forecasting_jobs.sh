@@ -97,9 +97,15 @@ run_forecasting_job() {
         mkdir -p "${LOG_ROOT}/failed/${DATASET}"
         cp "${MODEL_LOG_DIR}/output.log" "${LOG_ROOT}/failed/${DATASET}/${MODEL}_failed.log" 2>/dev/null || true
     else
-        echo "[$(date)] SUCCESS: ${DATASET}/${MODEL}" | tee -a "${LOG_ROOT}/successful_jobs.txt"
-        if [ ! -f "${OUTPUT_FILE}" ]; then
-            echo "[$(date)] WARNING: ${DATASET}/${MODEL} completed but output missing (${OUTPUT_FILE})" | tee -a "${LOG_ROOT}/warnings.txt"
+        if [ -f "${OUTPUT_FILE}" ]; then
+            echo "[$(date)] SUCCESS: ${DATASET}/${MODEL}" | tee -a "${LOG_ROOT}/successful_jobs.txt"
+        else
+            local WARN_MSG="[$(date)] WARNING: ${DATASET}/${MODEL} completed but output missing (${OUTPUT_FILE})"
+            echo "${WARN_MSG}" | tee -a "${LOG_ROOT}/warnings.txt"
+            echo "${WARN_MSG}" >> "${LOG_ROOT}/failed_jobs.txt"
+            mkdir -p "${LOG_ROOT}/failed/${DATASET}"
+            cp "${MODEL_LOG_DIR}/output.log" "${LOG_ROOT}/failed/${DATASET}/${MODEL}_failed.log" 2>/dev/null || true
+            EXIT_CODE=20
         fi
     fi
 

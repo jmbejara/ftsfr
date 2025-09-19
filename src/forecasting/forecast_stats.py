@@ -191,8 +191,22 @@ def main():
         seasonality=seasonality
     )
 
-    # Keep data in Polars format - StatsForecast supports Polars directly
-    df = full_data
+    # Enforce a minimum series length compatible with the cross-validation horizon
+    min_cv_length = test_size + 1
+    series_lengths = full_data.group_by('unique_id').agg(pl.len().alias('length'))
+    valid_ids = series_lengths.filter(pl.col('length') >= min_cv_length)['unique_id']
+    if len(valid_ids) == 0:
+        raise ValueError(
+            f"No series have at least {min_cv_length} observations required for cross-validation horizon {test_size}."
+        )
+
+    initial_series = full_data['unique_id'].n_unique()
+    df = full_data.filter(pl.col('unique_id').is_in(valid_ids))
+    removed_series = initial_series - len(valid_ids)
+    if removed_series > 0:
+        print(
+            f"  Removed {removed_series} series shorter than {min_cv_length} observations to satisfy cross-validation horizon"
+        )
 
     print(f"Total samples: {len(df):,}")
     print(f"Number of series: {df['unique_id'].n_unique()}")
@@ -224,7 +238,7 @@ def main():
     # Initialize StatsForecast
     sf = StatsForecast(
         models=models,
-        freq=polars_frequency,  # Use Polars-compatible frequency
+        freq=polars_frequency,
         n_jobs=-1,
         fallback_model=SeasonalNaive(season_length=seasonality),
         verbose=True
