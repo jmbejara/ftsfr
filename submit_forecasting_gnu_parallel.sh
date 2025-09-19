@@ -6,7 +6,6 @@
 #SBATCH --output=./_output/forecasting/logs/slurm-%j.out
 #SBATCH --error=./_output/forecasting/logs/slurm-%j.err
 
-
 SECONDS=0
 
 echo "Job started at: $(date)"
@@ -19,114 +18,43 @@ LOG_ROOT="${OUTPUT_ROOT}/logs"
 JOBS_FILE="./src/forecasting/forecasting_jobs.txt"
 PARALLEL_JOBLOG="${LOG_ROOT}/parallel_joblog.txt"
 
-mkdir -p "${LOG_ROOT}/failed" "${OUTPUT_ROOT}/error_metrics"
-touch "${LOG_ROOT}/successful_jobs.txt" "${LOG_ROOT}/failed_jobs.txt" "${LOG_ROOT}/warnings.txt" "${PARALLEL_JOBLOG}"
+mkdir -p "${LOG_ROOT}" "${OUTPUT_ROOT}/error_metrics"
 
 if [ ! -f "${JOBS_FILE}" ]; then
     echo "ERROR: Jobs file not found: ${JOBS_FILE}"
     exit 1
 fi
 
-# Read job definitions into memory for GNU parallel consumption
-mapfile -t JOB_COMMANDS < "${JOBS_FILE}"
-if [ ${#JOB_COMMANDS[@]} -eq 0 ]; then
-    echo "No jobs found in ${JOBS_FILE}. Nothing to do."
-    exit 0
-fi
-
-# Auto-detect and export CPU count for StatsForecast parallelism
-if [ -n "${SLURM_CPUS_ON_NODE:-}" ]; then
-    export STATSFORECAST_N_JOBS=${SLURM_CPUS_ON_NODE}
-else
-    export STATSFORECAST_N_JOBS=$(nproc --all 2>/dev/null || echo 1)
-fi
+# Export CPU count for StatsForecast to use all cores on the node
+export STATSFORECAST_N_JOBS=${SLURM_CPUS_ON_NODE:-$(nproc --all 2>/dev/null || echo 1)}
 echo "Using ${STATSFORECAST_N_JOBS} CPUs per node for StatsForecast"
 
-# Determine GNU parallel worker count (fallback to auto-detect)
-if [ -n "${SLURM_CPUS_ON_NODE:-}" ] && [ -n "${SLURM_NNODES:-}" ]; then
-    PARALLEL_MAX_JOBS=$((SLURM_CPUS_ON_NODE * SLURM_NNODES))
-else
-    PARALLEL_MAX_JOBS=0
-fi
-echo "Configuring GNU parallel with max jobs: ${PARALLEL_MAX_JOBS:-auto}"
-
-# Load required modules (adjust as needed for your cluster)
+# Load required modules
 module use -a /opt/aws_ofropt/Ubuntu_Modulefiles
-module load anaconda3/3.11.4 TeXLive/2023 R/4.4.0 stata/17 parallel
+module load anaconda3/3.11.4 R/4.4.0 parallel
 
 # Activate conda/virtual environment if needed
 # source /path/to/your/venv/bin/activate
 # conda activate forecasting_env
 
-export OUTPUT_ROOT LOG_ROOT
-export SHELL=/bin/bash
+echo "[$(date)] Launching GNU parallel with ${SLURM_NNODES:-19} parallel jobs (one per node)"
 
-run_forecasting_job() {
-    local JOB_CMD="$1"
+# Run parallel with one job per node, letting GNU parallel handle all the complexity
+parallel --joblog "${PARALLEL_JOBLOG}" \
+         --resume \
+         --resume-failed \
+         --jobs ${SLURM_NNODES:-19} \
+         --results "${LOG_ROOT}/results/{#}/" \
+         --line-buffer \
+         --will-cite \
+         --env STATSFORECAST_N_JOBS \
+         :::: "${JOBS_FILE}"
 
-    # Skip empty lines gracefully
-    if [ -z "${JOB_CMD}" ]; then
-        echo "[$(date)] Skipping empty job definition"
-        return 0
-    fi
-
-    local DATASET
-    local MODEL
-    DATASET=$(echo "${JOB_CMD}" | sed -n 's/.*--dataset \([^ ]*\).*/\1/p')
-    MODEL=$(echo "${JOB_CMD}" | sed -n 's/.*--model \([^ ]*\).*/\1/p')
-
-    if [ -z "${DATASET}" ] || [ -z "${MODEL}" ]; then
-        echo "[$(date)] ERROR: Could not parse dataset/model from command: ${JOB_CMD}" | tee -a "${LOG_ROOT}/warnings.txt"
-        return 0
-    fi
-
-    local DATASET_DIR="${OUTPUT_ROOT}/error_metrics/${DATASET}"
-    local MODEL_LOG_DIR="${LOG_ROOT}/${DATASET}/${MODEL}"
-    local OUTPUT_FILE="${DATASET_DIR}/${MODEL}.csv"
-
-    if [ -f "${OUTPUT_FILE}" ]; then
-        echo "[$(date)] Output already exists for ${DATASET}/${MODEL}; skipping"
-        return 0
-    fi
-
-    mkdir -p "${DATASET_DIR}" "${MODEL_LOG_DIR}"
-
-    echo "[$(date)] Starting ${DATASET}/${MODEL}"
-    echo "[$(date)] Command: ${JOB_CMD}" > "${MODEL_LOG_DIR}/output.log"
-    eval "${JOB_CMD}" >> "${MODEL_LOG_DIR}/output.log" 2>&1
-    local EXIT_CODE=$?
-
-    if [ ${EXIT_CODE} -ne 0 ]; then
-        echo "[$(date)] ERROR: ${DATASET}/${MODEL} failed with exit code ${EXIT_CODE}" | tee -a "${LOG_ROOT}/failed_jobs.txt"
-        mkdir -p "${LOG_ROOT}/failed/${DATASET}"
-        cp "${MODEL_LOG_DIR}/output.log" "${LOG_ROOT}/failed/${DATASET}/${MODEL}_failed.log" 2>/dev/null || true
-    else
-        echo "[$(date)] SUCCESS: ${DATASET}/${MODEL}" | tee -a "${LOG_ROOT}/successful_jobs.txt"
-        if [ ! -f "${OUTPUT_FILE}" ]; then
-            echo "[$(date)] WARNING: ${DATASET}/${MODEL} completed but output missing (${OUTPUT_FILE})" | tee -a "${LOG_ROOT}/warnings.txt"
-        fi
-    fi
-
-    echo "[$(date)] Finished ${DATASET}/${MODEL}"
-    return 0
-}
-export -f run_forecasting_job
-
-echo "[$(date)] Launching GNU parallel"
-
-PARALLEL_CMD=(parallel --will-cite --line-buffer --tag --keep-order --joblog "${PARALLEL_JOBLOG}" --resume --env run_forecasting_job --env OUTPUT_ROOT --env LOG_ROOT --env STATSFORECAST_N_JOBS)
-if [ "${PARALLEL_MAX_JOBS}" -gt 0 ]; then
-    PARALLEL_CMD+=(--jobs "${PARALLEL_MAX_JOBS}")
-else
-    PARALLEL_CMD+=(--jobs 0)
-fi
-
-printf '%s\0' "${JOB_COMMANDS[@]}" | "${PARALLEL_CMD[@]}" --null run_forecasting_job
 PARALLEL_EXIT_CODE=$?
 
 if [ ${PARALLEL_EXIT_CODE} -ne 0 ]; then
     echo "[$(date)] GNU parallel reported non-zero exit code: ${PARALLEL_EXIT_CODE}"
-    echo "[$(date)] Review ${PARALLEL_JOBLOG} and failed_jobs.txt for details"
+    echo "[$(date)] Review ${PARALLEL_JOBLOG} for details"
 else
     echo "[$(date)] GNU parallel completed successfully"
 fi
@@ -134,9 +62,10 @@ fi
 echo "Job completed at: $(date)"
 echo "Total runtime: ${SECONDS} seconds"
 
-if command -v sstat &> /dev/null; then
+# Use sacct for post-job memory statistics
+if command -v sacct &> /dev/null; then
     echo "Memory usage statistics:"
-    sstat -j ${SLURM_JOB_ID} --format=JobID,MaxRSS,MaxVMSize,AveRSS 2>/dev/null || true
+    sacct -j ${SLURM_JOB_ID} --format=JobID,MaxRSS,MaxVMSize,AveRSS 2>/dev/null || true
 fi
 
 exit 0
