@@ -69,7 +69,7 @@ def generate_job_commands(datasets: List[str], models: List[Dict[str, str]]) -> 
         for model in models:
             model_name = model['name']
             script_name = model['script']
-            command = f"python ./forecasting/{script_name} --dataset {dataset} --model {model_name}"
+            command = f"python ./src/forecasting/{script_name} --dataset {dataset} --model {model_name}"
             commands.append(command)
 
     return commands
@@ -90,9 +90,11 @@ def write_jobs_file(commands: List[str], output_file: Path) -> None:
 def main():
     """Main function to generate forecasting jobs."""
     # Define file paths
-    script_dir = Path(__file__).parent
-    datasets_file = script_dir / "datasets.toml"
-    models_file = script_dir / "forecasting" / "models_config.toml"
+    script_dir = Path(__file__).resolve().parent
+    repo_root = script_dir.parent.parent  # src/forecasting -> src -> repo root
+
+    datasets_file = repo_root / "datasets.toml"
+    models_file = script_dir / "models_config.toml"
     output_file = script_dir / "forecasting_jobs.txt"
     
     print("Generating forecasting_jobs.txt...")
