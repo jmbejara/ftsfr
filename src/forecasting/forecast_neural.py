@@ -543,7 +543,7 @@ def main():
     ]
 
     # Create output directories early
-    lightning_logs_dir = f"./_output/forecasting3/logs/{DATASET_NAME}/{MODEL_NAME}"
+    lightning_logs_dir = f"./_output/forecasting/logs/{DATASET_NAME}/{MODEL_NAME}"
     os.makedirs(lightning_logs_dir, exist_ok=True)
 
     # Create the selected neural model with custom configuration and lightning logs path
@@ -697,7 +697,7 @@ def main():
     print("-" * 40)
 
     # Create error metrics directory
-    error_metrics_dir = f"./_output/forecasting3/error_metrics/{DATASET_NAME}"
+    error_metrics_dir = f"./_output/forecasting/error_metrics/{DATASET_NAME}"
     os.makedirs(error_metrics_dir, exist_ok=True)
 
     # Get the neural model's metrics (exclude baseline models for now)

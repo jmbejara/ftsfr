@@ -289,7 +289,7 @@ def main():
     print("-" * 40)
 
     # Create error metrics directory
-    error_metrics_dir = f"./_output/forecasting3/error_metrics/{DATASET_NAME}"
+    error_metrics_dir = f"./_output/forecasting/error_metrics/{DATASET_NAME}"
     os.makedirs(error_metrics_dir, exist_ok=True)
 
     # Get the selected model's metrics

@@ -36,12 +36,12 @@ for module_name, required_sources in module_requirements_dict.items():
 
 
 def check_forecast_results():
-    """Check if forecast result files exist in the new forecasting3 structure"""
-    error_metrics_dir = OUTPUT_DIR / "forecasting3" / "error_metrics"
+    """Check if forecast result files exist in the new forecasting structure"""
+    error_metrics_dir = OUTPUT_DIR / "forecasting" / "error_metrics"
 
     # if not error_metrics_dir.exists():
     #     print(
-    #         f"\nWarning: No forecasting3 error metrics directory found at {error_metrics_dir}"
+    #         f"\nWarning: No forecasting error metrics directory found at {error_metrics_dir}"
     #     )
     #     print(
     #         "Please run forecasting tasks first using the new forecast_stats.py and forecast_neural.py system"
@@ -77,15 +77,15 @@ def check_forecast_results():
 
 
 def task_assemble_results():
-    """Assemble results from all model-dataset combinations using the new forecasting3 system."""
+    """Assemble results from all model-dataset combinations using the new forecasting system."""
     import glob
 
     # Check for result files at task generation time
     check_forecast_results()
 
-    # Get all CSV files in the forecasting3 error metrics directory
+    # Get all CSV files in the forecasting error metrics directory
     error_metrics_csv_files = glob.glob(
-        str(OUTPUT_DIR / "forecasting3" / "error_metrics" / "**" / "*.csv"),
+        str(OUTPUT_DIR / "forecasting" / "error_metrics" / "**" / "*.csv"),
         recursive=True,
     )
 
@@ -94,7 +94,7 @@ def task_assemble_results():
             "python ./src/assemble_results3.py",
         ],
         "targets": [
-            OUTPUT_DIR / "forecasting3" / "results_all.csv",
+            OUTPUT_DIR / "forecasting" / "results_all.csv",
         ],
         "file_dep": [
             "./src/assemble_results3.py",
@@ -122,8 +122,8 @@ def task_create_dataset_statistics():
             # Dataset statistics table files
             Path("./docs_src") / "dataset_statistics.csv",
             Path("./docs_src") / "dataset_statistics.tex",
-            OUTPUT_DIR / "forecasting3" / "dataset_statistics.csv",
-            OUTPUT_DIR / "forecasting3" / "dataset_statistics.tex",
+            OUTPUT_DIR / "forecasting" / "dataset_statistics.csv",
+            OUTPUT_DIR / "forecasting" / "dataset_statistics.tex",
         ],
         "file_dep": [
             "./src/create_dataset_statistics.py",
@@ -152,8 +152,8 @@ def task_create_filtered_dataset_statistics():
             # Filtered dataset statistics table files
             Path("./docs_src") / "filtered_dataset_statistics.csv",
             Path("./docs_src") / "filtered_dataset_statistics.tex",
-            OUTPUT_DIR / "forecasting3" / "filtered_dataset_statistics.csv",
-            OUTPUT_DIR / "forecasting3" / "filtered_dataset_statistics.tex",
+            OUTPUT_DIR / "forecasting" / "filtered_dataset_statistics.csv",
+            OUTPUT_DIR / "forecasting" / "filtered_dataset_statistics.tex",
         ],
         "file_dep": [
             "./src/create_filtered_dataset_statistics.py",
@@ -166,7 +166,7 @@ def task_create_filtered_dataset_statistics():
 
 
 def task_create_results_tables():
-    """Create analytical tables from assembled results using forecasting3 system"""
+    """Create analytical tables from assembled results using forecasting system"""
     return {
         "actions": [
             "python ./src/create_results_tables2.py",
@@ -175,51 +175,51 @@ def task_create_results_tables():
             # MASE pivot table files
             Path("./docs_src") / "mase_pivot_table.csv",
             Path("./docs_src") / "mase_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "mase_pivot_table.csv",
-            OUTPUT_DIR / "forecasting3" / "mase_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "mase_pivot_table.csv",
+            OUTPUT_DIR / "forecasting" / "mase_pivot_table.tex",
             # RMSE pivot table files
             Path("./docs_src") / "rmse_pivot_table.csv",
             Path("./docs_src") / "rmse_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "rmse_pivot_table.csv",
-            OUTPUT_DIR / "forecasting3" / "rmse_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "rmse_pivot_table.csv",
+            OUTPUT_DIR / "forecasting" / "rmse_pivot_table.tex",
             # sMAPE pivot table files (conditional on data availability)
             Path("./docs_src") / "smape_pivot_table.csv",
             Path("./docs_src") / "smape_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "smape_pivot_table.csv",
-            OUTPUT_DIR / "forecasting3" / "smape_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "smape_pivot_table.csv",
+            OUTPUT_DIR / "forecasting" / "smape_pivot_table.tex",
             # MAE pivot table files (conditional on data availability)
             Path("./docs_src") / "mae_pivot_table.csv",
             Path("./docs_src") / "mae_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "mae_pivot_table.csv",
-            OUTPUT_DIR / "forecasting3" / "mae_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "mae_pivot_table.csv",
+            OUTPUT_DIR / "forecasting" / "mae_pivot_table.tex",
             # Relative MASE pivot table files (comparing to Naive baseline)
             Path("./docs_src") / "relative_mase_pivot_table.csv",
             Path("./docs_src") / "relative_mase_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "relative_mase_pivot_table.csv",
-            OUTPUT_DIR / "forecasting3" / "relative_mase_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "relative_mase_pivot_table.csv",
+            OUTPUT_DIR / "forecasting" / "relative_mase_pivot_table.tex",
             # R2oos pivot table files (out-of-sample R-squared)
             Path("./docs_src") / "r2oos_pivot_table.csv",
             Path("./docs_src") / "r2oos_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "r2oos_pivot_table.csv",
-            OUTPUT_DIR / "forecasting3" / "r2oos_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "r2oos_pivot_table.csv",
+            OUTPUT_DIR / "forecasting" / "r2oos_pivot_table.tex",
             # Summary statistics
-            OUTPUT_DIR / "forecasting3" / "model_summary_statistics.csv",
-            OUTPUT_DIR / "forecasting3" / "model_summary_statistics.tex",
+            OUTPUT_DIR / "forecasting" / "model_summary_statistics.csv",
+            OUTPUT_DIR / "forecasting" / "model_summary_statistics.tex",
             # Median MASE summary table files
             Path("./docs_src") / "median_mase_summary.csv",
             Path("./docs_src") / "median_mase_summary.tex",
-            OUTPUT_DIR / "forecasting3" / "median_mase_summary.csv",
-            OUTPUT_DIR / "forecasting3" / "median_mase_summary.tex",
+            OUTPUT_DIR / "forecasting" / "median_mase_summary.csv",
+            OUTPUT_DIR / "forecasting" / "median_mase_summary.tex",
             # Heatmap plots
-            OUTPUT_DIR / "forecasting3" / "mase_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "rmse_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "smape_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "mae_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "r2oos_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "mase_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "rmse_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "smape_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "mae_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "r2oos_heatmap.png",
         ],
         "file_dep": [
             "./src/create_results_tables2.py",
-            OUTPUT_DIR / "forecasting3" / "results_all.csv",
+            OUTPUT_DIR / "forecasting" / "results_all.csv",
             "./forecasting/models_config.toml",  # Add dependency on models config for column ordering
             "./datasets.toml",  # Add dependency on datasets config for column ordering
         ],
@@ -240,12 +240,12 @@ def task_run_ex_statsforecast():
     return {
         "actions": [
             "python ./forecasting/ex_statsforecast.py",
-            "echo 'Tutorial completed successfully on $(date)' > " + str(OUTPUT_DIR / "forecasting3" / "ex_statsforecast_completed.txt"),
+            "echo 'Tutorial completed successfully on $(date)' > " + str(OUTPUT_DIR / "forecasting" / "ex_statsforecast_completed.txt"),
         ],
         "targets": [
             # No specific output files since this is a tutorial that prints and shows plots
             # But we can create a simple completion marker
-            OUTPUT_DIR / "forecasting3" / "ex_statsforecast_completed.txt",
+            OUTPUT_DIR / "forecasting" / "ex_statsforecast_completed.txt",
         ],
         "file_dep": [
             "./forecasting/ex_statsforecast.py",
@@ -260,7 +260,7 @@ def task_run_ex_statsforecast():
 
 
 def task_compile_latex_docs():
-    """Compile the LaTeX documents to PDFs using forecasting3 outputs"""
+    """Compile the LaTeX documents to PDFs using forecasting outputs"""
 
     return {
         "actions": [
@@ -274,22 +274,22 @@ def task_compile_latex_docs():
             "./src/create_results_tables2.py",
             "./src/create_dataset_statistics.py",
             "./reports/draft_ftsfr.tex",
-            # LaTeX table dependencies (from _output/forecasting3/ as these are referenced in the paper)
-            OUTPUT_DIR / "forecasting3" / "dataset_statistics.tex",
-            OUTPUT_DIR / "forecasting3" / "mase_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "rmse_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "smape_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "mae_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "relative_mase_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "r2oos_pivot_table.tex",
-            OUTPUT_DIR / "forecasting3" / "model_summary_statistics.tex",
-            OUTPUT_DIR / "forecasting3" / "median_mase_summary.tex",
+            # LaTeX table dependencies (from _output/forecasting/ as these are referenced in the paper)
+            OUTPUT_DIR / "forecasting" / "dataset_statistics.tex",
+            OUTPUT_DIR / "forecasting" / "mase_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "rmse_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "smape_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "mae_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "relative_mase_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "r2oos_pivot_table.tex",
+            OUTPUT_DIR / "forecasting" / "model_summary_statistics.tex",
+            OUTPUT_DIR / "forecasting" / "median_mase_summary.tex",
             # Heatmap plot dependencies
-            OUTPUT_DIR / "forecasting3" / "mase_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "rmse_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "smape_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "mae_heatmap.png",
-            OUTPUT_DIR / "forecasting3" / "r2oos_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "mase_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "rmse_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "smape_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "mae_heatmap.png",
+            OUTPUT_DIR / "forecasting" / "r2oos_heatmap.png",
         ],
         "clean": True,
     }

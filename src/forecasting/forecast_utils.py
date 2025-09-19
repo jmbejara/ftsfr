@@ -10,8 +10,8 @@ import polars as pl
 from pathlib import Path
 from utilsforecast.preprocessing import fill_gaps
 
-FILE_DIR = Path(__file__).parent
-REPO_ROOT = FILE_DIR.parent
+FILE_DIR = Path(__file__).resolve().parent
+REPO_ROOT = FILE_DIR.parent.parent
 
 
 def convert_frequency_to_statsforecast(frequency):

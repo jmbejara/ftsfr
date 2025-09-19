@@ -57,7 +57,7 @@ def task_run_forecasting_jobs():
 
         targets = []
         if dataset and model:
-            targets.append(OUTPUT_DIR / "forecasting3" / "error_metrics" / dataset / f"{model}.csv")
+            targets.append(OUTPUT_DIR / "forecasting" / "error_metrics" / dataset / f"{model}.csv")
 
         yield {
             "name": task_name,

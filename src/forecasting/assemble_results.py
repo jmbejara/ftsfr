@@ -1,7 +1,7 @@
 """
-Assemble results from the new forecasting3 system output structure.
+Assemble results from the new forecasting system output structure.
 
-This script reads all CSV files from ./_output/forecasting3/error_metrics/{dataset}/{model}.csv
+This script reads all CSV files from ./_output/forecasting/error_metrics/{dataset}/{model}.csv
 and assembles them into a single consolidated CSV file.
 
 New format from forecast_stats.py and forecast_neural.py:
@@ -26,7 +26,7 @@ from settings import config
 from dodo_common import load_models_config
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
-FORECAST3_DIR = OUTPUT_DIR / "forecasting3"
+FORECAST3_DIR = OUTPUT_DIR / "forecasting"
 
 def load_display_names():
     """Load model display names and dataset short names for enrichment."""
@@ -65,7 +65,7 @@ def assemble_forecast_results():
     Assemble all forecasting results from the new directory structure.
 
     Directory structure:
-    ./_output/forecasting3/error_metrics/{dataset_name}/{model_name}.csv
+    ./_output/forecasting/error_metrics/{dataset_name}/{model_name}.csv
 
     Each CSV contains columns:
     - model_name: Model key (e.g., 'auto_arima', 'auto_deepar')
@@ -281,7 +281,7 @@ def assemble_forecast_results():
     return results_df
 
 if __name__ == "__main__":
-    print("Assembling forecasting results from new forecasting3 directory structure...")
+    print("Assembling forecasting results from new forecasting directory structure...")
     print(f"Reading from: {FORECAST3_DIR / 'error_metrics'}/")
     print("="*60)
 

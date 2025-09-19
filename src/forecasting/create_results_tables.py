@@ -14,7 +14,7 @@ from settings import config
 from dodo_common import load_models_config
 
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
-FORECAST3_DIR = OUTPUT_DIR / "forecasting3"  # New forecasting output directory
+FORECAST3_DIR = OUTPUT_DIR / "forecasting"  # New forecasting output directory
 
 def load_dataset_short_names():
     """Load dataset short names from datasets.toml"""
@@ -717,7 +717,7 @@ def create_rmse_pivot_table():
     
     return rmse_pivot
 
-# Note: sMAPE and MAE functions removed as they are not available in the new forecasting3 format
+# Note: sMAPE and MAE functions removed as they are not available in the new forecasting format
 
 def create_relative_mase_pivot_table():
     """Create a pivot table with MASE values relative to Naive predictor: datasets as rows, models as columns"""
@@ -1807,7 +1807,7 @@ def create_slurm_job_summary():
     
     print("\nCreating SLURM job summary...")
     
-    logs_dir = OUTPUT_DIR / "forecasting3" / "logs"
+    logs_dir = OUTPUT_DIR / "forecasting" / "logs"
     
     if not logs_dir.exists():
         print(f"Warning: No SLURM logs directory found at {logs_dir}")

@@ -3,8 +3,8 @@
 #SBATCH --nodes=19
 #SBATCH --exclusive
 #SBATCH --time=7-00:00:00
-#SBATCH --output=./_output/forecasting3/logs/slurm-%j.out
-#SBATCH --error=./_output/forecasting3/logs/slurm-%j.err
+#SBATCH --output=./_output/forecasting/logs/slurm-%j.out
+#SBATCH --error=./_output/forecasting/logs/slurm-%j.err
 
 
 SECONDS=0
@@ -14,7 +14,7 @@ echo "Job ID: ${SLURM_JOB_ID}"
 echo "Nodes allocated: ${SLURM_NODELIST}"
 echo "CPUs per node: ${SLURM_CPUS_ON_NODE}"
 
-OUTPUT_ROOT="./_output/forecasting3"
+OUTPUT_ROOT="./_output/forecasting"
 LOG_ROOT="${OUTPUT_ROOT}/logs"
 JOBS_FILE="./src/forecasting/forecasting_jobs.txt"
 PARALLEL_JOBLOG="${LOG_ROOT}/parallel_joblog.txt"
