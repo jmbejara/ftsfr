@@ -18,6 +18,8 @@ import numpy as np
 from pathlib import Path
 from tabulate import tabulate
 import os
+import multiprocessing
+import torch
 
 import sys
 sys.path.append(str(Path(__file__).parent))
@@ -56,8 +58,60 @@ warnings.filterwarnings("ignore")
 # Default NUM_SAMPLES - overridden by debug mode
 NUM_SAMPLES = 20
 
+# Hardware detection functions
+def detect_hardware():
+    """Detect available hardware and configure optimal settings."""
+    cpu_count = os.cpu_count() or multiprocessing.cpu_count()
+    gpu_available = torch.cuda.is_available()
+    gpu_count = torch.cuda.device_count() if gpu_available else 0
 
-def create_auto_config_nhits(seasonality, lightning_logs_dir=None, debug=False):
+    print(f"Hardware detected:")
+    print(f"  CPUs: {cpu_count}")
+    print(f"  GPUs: {gpu_count}")
+
+    # Configure Lightning accelerator and devices
+    if gpu_count > 1:
+        accelerator = "gpu"
+        devices = gpu_count
+        strategy = "ddp"
+        print(f"  Using multi-GPU training with {gpu_count} GPUs")
+    elif gpu_count == 1:
+        accelerator = "gpu"
+        devices = 1
+        strategy = "auto"
+        print(f"  Using single GPU training")
+    else:
+        accelerator = "cpu"
+        devices = 1
+        strategy = "auto"
+        print(f"  Using CPU training")
+
+    # Configure workers and parallel jobs based on CPU count
+    # Conservative estimates to avoid overwhelming the system
+    num_workers = max(1, min(cpu_count // 4, 16))
+    optuna_jobs = max(1, min(cpu_count // 8, 8))
+
+    # For high-core systems, be more aggressive with Optuna parallelization
+    if cpu_count >= 32:
+        optuna_jobs = min(cpu_count // 4, 16)
+    elif cpu_count >= 16:
+        optuna_jobs = min(cpu_count // 4, 8)
+
+    print(f"  Data loading workers: {num_workers}")
+    print(f"  Optuna parallel jobs: {optuna_jobs}")
+
+    return {
+        'cpu_count': cpu_count,
+        'gpu_count': gpu_count,
+        'accelerator': accelerator,
+        'devices': devices,
+        'strategy': strategy,
+        'num_workers': num_workers,
+        'optuna_jobs': optuna_jobs
+    }
+
+
+def create_auto_config_nhits(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
     """Create configuration for AutoNHITS with optuna backend."""
     def config(trial):
         config_dict = {
@@ -101,14 +155,22 @@ def create_auto_config_nhits(seasonality, lightning_logs_dir=None, debug=False):
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
         return config_dict
     return config
 
 
-def create_auto_config_lstm(seasonality, debug=False):
+def create_auto_config_lstm(seasonality, debug=False, hardware_config=None):
     """Create configuration for AutoLSTM with optuna backend."""
     def config(trial):
-        return {
+        config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
             ),
@@ -148,10 +210,19 @@ def create_auto_config_lstm(seasonality, debug=False):
                 "decoder_hidden_size", (64, 128)  # Match encoder hidden size
             ),
         }
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
+        return config_dict
     return config
 
 
-def create_auto_config_simple(seasonality, lightning_logs_dir=None, debug=False):
+def create_auto_config_simple(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
     """Create simple configuration for linear models with optuna backend."""
     def config(trial):
         config_dict = {
@@ -182,11 +253,19 @@ def create_auto_config_simple(seasonality, lightning_logs_dir=None, debug=False)
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
         return config_dict
     return config
 
 
-def create_auto_config_deepar(seasonality, lightning_logs_dir=None, debug=False):
+def create_auto_config_deepar(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
     """Create configuration for AutoDeepAR with optuna backend with robust scaling."""
     def config(trial):
         config_dict = {
@@ -222,11 +301,19 @@ def create_auto_config_deepar(seasonality, lightning_logs_dir=None, debug=False)
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
         return config_dict
     return config
 
 
-def create_auto_config_nbeats(seasonality, lightning_logs_dir=None, debug=False):
+def create_auto_config_nbeats(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
     """Create configuration for AutoNBEATS with optuna backend."""
     def config(trial):
         config_dict = {
@@ -259,11 +346,19 @@ def create_auto_config_nbeats(seasonality, lightning_logs_dir=None, debug=False)
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
         return config_dict
     return config
 
 
-def create_auto_config_transformer(seasonality, lightning_logs_dir=None, debug=False):
+def create_auto_config_transformer(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
     """Create configuration for AutoVanillaTransformer with optuna backend."""
     def config(trial):
         config_dict = {
@@ -293,11 +388,19 @@ def create_auto_config_transformer(seasonality, lightning_logs_dir=None, debug=F
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
         return config_dict
     return config
 
 
-def create_auto_config_tide(seasonality, lightning_logs_dir=None, debug=False):
+def create_auto_config_tide(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
     """Create configuration for AutoTiDE with optuna backend."""
     def config(trial):
         config_dict = {
@@ -333,11 +436,19 @@ def create_auto_config_tide(seasonality, lightning_logs_dir=None, debug=False):
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
         return config_dict
     return config
 
 
-def create_auto_config_kan(seasonality, lightning_logs_dir=None, debug=False):
+def create_auto_config_kan(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
     """Create configuration for AutoKAN with optuna backend."""
     def config(trial):
         config_dict = {
@@ -373,6 +484,14 @@ def create_auto_config_kan(seasonality, lightning_logs_dir=None, debug=False):
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
         return config_dict
     return config
 
@@ -409,6 +528,11 @@ def main():
     print(f"Dataset: {DATASET_NAME}")
     print(f"Model: {MODEL_NAME}")
     print(f"Hyperparameter samples: {NUM_SAMPLES}")
+
+    # Detect hardware and configure settings
+    print("\n0. Hardware Detection")
+    print("-" * 40)
+    hardware_config = detect_hardware()
 
     print(f"\n1. Loading Dataset: {DATASET_NAME}")
     print("-" * 40)
@@ -647,22 +771,22 @@ def main():
 
     # Create the selected neural model with custom configuration and lightning logs path
     model_mapping = {
-        "auto_deepar": AutoDeepAR(h=test_size, config=create_auto_config_deepar(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_deepar": AutoDeepAR(h=test_size, config=create_auto_config_deepar(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                                   loss=DistributionLoss(distribution='Normal'),
                                   backend='optuna', num_samples=NUM_SAMPLES),
-        "auto_nbeats": AutoNBEATS(h=test_size, config=create_auto_config_nbeats(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_nbeats": AutoNBEATS(h=test_size, config=create_auto_config_nbeats(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                                   loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
-        "auto_nhits": AutoNHITS(h=test_size, config=create_auto_config_nhits(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_nhits": AutoNHITS(h=test_size, config=create_auto_config_nhits(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                                 loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
-        "auto_dlinear": AutoDLinear(h=test_size, config=create_auto_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_dlinear": AutoDLinear(h=test_size, config=create_auto_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                                     loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
-        "auto_nlinear": AutoNLinear(h=test_size, config=create_auto_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_nlinear": AutoNLinear(h=test_size, config=create_auto_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                                     loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
-        "auto_vanilla_transformer": AutoVanillaTransformer(h=test_size, config=create_auto_config_transformer(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_vanilla_transformer": AutoVanillaTransformer(h=test_size, config=create_auto_config_transformer(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                                                            loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
-        "auto_tide": AutoTiDE(h=test_size, config=create_auto_config_tide(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_tide": AutoTiDE(h=test_size, config=create_auto_config_tide(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                               loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
-        "auto_kan": AutoKAN(h=test_size, config=create_auto_config_kan(seasonality, lightning_logs_dir, debug=DEBUG_MODE),
+        "auto_kan": AutoKAN(h=test_size, config=create_auto_config_kan(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
                             loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
     }
 

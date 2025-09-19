@@ -2,6 +2,7 @@
 #SBATCH --job-name=forecast_parallel
 #SBATCH --nodes=19
 #SBATCH --exclusive
+#SBATCH --mem=64G
 #SBATCH --time=7-00:00:00
 #SBATCH --output=./_output/forecasting/logs/slurm-%j.out
 #SBATCH --error=./_output/forecasting/logs/slurm-%j.err
