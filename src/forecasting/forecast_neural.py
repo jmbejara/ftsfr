@@ -62,24 +62,34 @@ NUM_SAMPLES = 20
 def detect_hardware():
     """Detect available hardware and configure optimal settings."""
     cpu_count = os.cpu_count() or multiprocessing.cpu_count()
-    gpu_available = torch.cuda.is_available()
-    gpu_count = torch.cuda.device_count() if gpu_available else 0
+
+    # Check for different GPU backends
+    cuda_available = torch.cuda.is_available()
+    cuda_count = torch.cuda.device_count() if cuda_available else 0
+
+    mps_available = hasattr(torch.backends, 'mps') and torch.backends.mps.is_available()
 
     print(f"Hardware detected:")
     print(f"  CPUs: {cpu_count}")
-    print(f"  GPUs: {gpu_count}")
+    print(f"  CUDA GPUs: {cuda_count}")
+    print(f"  MPS available: {mps_available}")
 
-    # Configure Lightning accelerator and devices
-    if gpu_count > 1:
-        accelerator = "gpu"
-        devices = gpu_count
+    # Configure Lightning accelerator and devices (prioritize CUDA > MPS > CPU)
+    if cuda_count > 1:
+        accelerator = "gpu"  # CUDA
+        devices = cuda_count
         strategy = "ddp"
-        print(f"  Using multi-GPU training with {gpu_count} GPUs")
-    elif gpu_count == 1:
-        accelerator = "gpu"
+        print(f"  Using multi-CUDA GPU training with {cuda_count} GPUs")
+    elif cuda_count == 1:
+        accelerator = "gpu"  # CUDA
         devices = 1
         strategy = "auto"
-        print(f"  Using single GPU training")
+        print(f"  Using single CUDA GPU training")
+    elif mps_available:
+        accelerator = "mps"  # Apple Silicon
+        devices = 1
+        strategy = "auto"
+        print(f"  Using Apple MPS GPU training")
     else:
         accelerator = "cpu"
         devices = 1
@@ -102,7 +112,8 @@ def detect_hardware():
 
     return {
         'cpu_count': cpu_count,
-        'gpu_count': gpu_count,
+        'cuda_count': cuda_count,
+        'mps_available': mps_available,
         'accelerator': accelerator,
         'devices': devices,
         'strategy': strategy,
