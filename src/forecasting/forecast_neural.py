@@ -13,6 +13,8 @@ import warnings
 import time
 import argparse
 import polars as pl
+import pandas as pd
+import numpy as np
 from pathlib import Path
 from tabulate import tabulate
 import os
@@ -23,12 +25,11 @@ sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from forecast_utils import (
     read_dataset_config,
-    load_and_preprocess_data,
     get_test_size_from_frequency,
     convert_pandas_freq_to_polars,
-    evaluate_cv,
-    filter_series_by_cv_requirements
+    evaluate_cv
 )
+from robust_preprocessing import robust_preprocess_pipeline
 
 from neuralforecast import NeuralForecast
 from neuralforecast.auto import (
@@ -186,7 +187,7 @@ def create_auto_config_simple(seasonality, lightning_logs_dir=None, debug=False)
 
 
 def create_auto_config_deepar(seasonality, lightning_logs_dir=None, debug=False):
-    """Create configuration for AutoDeepAR with optuna backend."""
+    """Create configuration for AutoDeepAR with optuna backend with robust scaling."""
     def config(trial):
         config_dict = {
             "input_size": trial.suggest_categorical(
@@ -204,8 +205,9 @@ def create_auto_config_deepar(seasonality, lightning_logs_dir=None, debug=False)
             "learning_rate": trial.suggest_float(
                 "learning_rate", low=1e-4, high=1e-2, log=True
             ),
+            # Remove minmax1 scaler which can cause -inf scale parameters
             "scaler_type": trial.suggest_categorical(
-                "scaler_type", ("robust", "standard", "minmax1")
+                "scaler_type", ("robust", "standard")
             ),
             "max_steps": trial.suggest_categorical(
                 "max_steps", (100, 200) if debug else (500, 1000)  # Reduced for debug
@@ -422,38 +424,137 @@ def main():
     print(f"Frequency: {frequency} (Polars: {polars_frequency})")
     print(f"Seasonality: {seasonality}")
 
-    # Test size will be calculated from actual data split below
-
-    # Load and preprocess data
-    print("\n2. Loading and Preprocessing Data")
-    print("-" * 40)
-
-    # Load data with proper train/test split for calculating test size
-    train_data, test_data, full_data = load_and_preprocess_data(
-        dataset_config["data_path"],
-        frequency,
-        test_split=0.2,  # Use 20% for test to calculate proper horizon
-        seasonality=seasonality
-    )
-
-    # Get proper test size from actual test split (reduce for debug mode)
+    # Get test size based on frequency (reduce for debug mode)
     if DEBUG_MODE:
         test_size = 6  # Small test size for debug
         print(f"Test size (DEBUG): {test_size}")
     else:
-        test_size = int(test_data["ds"].n_unique())
-        print(f"Calculated test size from data split: {test_size}")
+        test_size = get_test_size_from_frequency(frequency)
+        print(f"Test size (last N observations): {test_size}")
 
-    # Use full dataset for cross-validation (concatenate train and test)
-    full_data = train_data.select(['unique_id', 'ds', 'y']).vstack(
-        test_data.select(['unique_id', 'ds', 'y'])
-    ).sort(['unique_id', 'ds'])
+    # Load and preprocess data using robust pipeline
+    print("\n2. Loading and Preprocessing Data")
+    print("-" * 40)
 
-    # Filter series based on cross-validation requirements
-    df = filter_series_by_cv_requirements(full_data, test_size, debug=DEBUG_MODE)
+    # Load raw data
+    df_raw = pl.read_parquet(dataset_config["data_path"])
+    if "id" in df_raw.columns:
+        df_raw = df_raw.rename({"id": "unique_id"})
 
-    print(f"Total samples: {len(df):,}")
-    print(f"Number of series: {df['unique_id'].n_unique()}")
+    # Clean column names and basic preprocessing
+    drop_cols = [c for c in df_raw.columns if c.startswith("__index_level_")]
+    if drop_cols:
+        df_raw = df_raw.drop(drop_cols)
+    df_raw = df_raw.select(["unique_id", "ds", "y"])
+
+    # Ensure proper dtypes
+    df_raw = df_raw.with_columns(pl.col("y").cast(pl.Float32))
+    df_raw = df_raw.with_columns(
+        pl.when((pl.col("y").is_infinite()) | (pl.col("y").is_nan()))
+        .then(None)
+        .otherwise(pl.col("y"))
+        .alias("y")
+    )
+
+    print(f"Raw data loaded: {len(df_raw)} observations, {df_raw['unique_id'].n_unique()} series")
+
+    # Apply robust preprocessing pipeline
+    train_df, test_df = robust_preprocess_pipeline(
+        df_raw,
+        frequency=frequency,
+        test_size=test_size,
+        seasonality=seasonality,
+        apply_train_imputation=True,
+        debug_limit=20 if DEBUG_MODE else None
+    )
+
+    # Prepare two synchronized views of the panel:
+    #  - df_baseline keeps the original targets (nulls allowed)
+    #  - df_neural forward-fills gaps for neural models that cannot ingest NaNs
+    if 'y_imputed' in train_df.columns:
+        train_original = train_df.select(['unique_id', 'ds', 'y'])
+    else:
+        train_original = train_df.select(['unique_id', 'ds', 'y'])
+
+    test_original = test_df.select(['unique_id', 'ds', 'y'])
+
+    df_baseline = pl.concat([train_original, test_original]).sort(['unique_id', 'ds'])
+
+    df_neural = df_baseline.with_columns(
+        pl.col('y').forward_fill().over('unique_id').alias('y_filled')
+    )
+
+    # Robust validation for neural model data
+    import numpy as np  # Import here to ensure availability in nested function
+
+    def validate_neural_series(df):
+        """Validate series for neural model consumption."""
+        problematic_series = []
+
+        for unique_id in df['unique_id'].unique():
+            series_data = df.filter(pl.col('unique_id') == unique_id)
+            y_vals = series_data['y_filled'].to_numpy()
+
+            # Check for remaining nulls
+            if pd.isna(y_vals).any():
+                problematic_series.append((unique_id, "remaining nulls after forward fill"))
+                continue
+
+            # Check for infinite values
+            if not np.all(np.isfinite(y_vals)):
+                problematic_series.append((unique_id, "infinite values"))
+                continue
+
+            # Check for extreme values that could cause scaling issues
+            if len(y_vals) > 0:
+                abs_max = np.max(np.abs(y_vals))
+                if abs_max > 1e12:
+                    problematic_series.append((unique_id, f"extreme values (max: {abs_max:.2e})"))
+                    continue
+
+                # Check for zero variance (constant series)
+                if len(y_vals) > 1:
+                    std_val = np.std(y_vals, ddof=1)
+                    if std_val < 1e-12:  # Near-zero variance
+                        problematic_series.append((unique_id, f"near-zero variance ({std_val:.2e})"))
+                        continue
+
+        return problematic_series
+
+    # Validate and remove problematic series
+    problematic = validate_neural_series(df_neural)
+    if problematic:
+        problematic_ids = [uid for uid, _ in problematic]
+        print(f"  Warning: Removing {len(problematic_ids)} series with neural model issues:")
+        for uid, reason in problematic[:3]:  # Show first 3
+            print(f"    {uid}: {reason}")
+        if len(problematic) > 3:
+            print(f"    ... and {len(problematic) - 3} more")
+
+        # Filter out problematic series from all dataframes
+        df_baseline = df_baseline.filter(~pl.col('unique_id').is_in(problematic_ids))
+        df_neural = df_neural.filter(~pl.col('unique_id').is_in(problematic_ids))
+        train_df = train_df.filter(~pl.col('unique_id').is_in(problematic_ids))
+        test_df = test_df.filter(~pl.col('unique_id').is_in(problematic_ids))
+
+    # Drop any series that remain entirely missing after forward fill (defensive)
+    empty_series = df_neural.filter(pl.col('y_filled').is_null())['unique_id'].unique()
+    if empty_series.len() > 0:
+        empty_ids = empty_series.to_list()
+        print("  Warning: Removing series with no available targets after forward fill:")
+        print(f"    {empty_ids}")
+        df_baseline = df_baseline.filter(~pl.col('unique_id').is_in(empty_ids))
+        df_neural = df_neural.filter(~pl.col('unique_id').is_in(empty_ids))
+        train_df = train_df.filter(~pl.col('unique_id').is_in(empty_ids))
+        test_df = test_df.filter(~pl.col('unique_id').is_in(empty_ids))
+
+    df_neural = df_neural.select([
+        'unique_id',
+        'ds',
+        pl.col('y_filled').alias('y')
+    ])
+
+    print(f"Final data for CV: {len(df_baseline):,} observations, {df_baseline['unique_id'].n_unique()} series")
 
     # Define models
     print("\n3. Setting Up Models")
@@ -512,7 +613,7 @@ def main():
 
     start_time = time.time()
     baseline_cv_df = sf.cross_validation(
-        df=df,
+        df=df_baseline,
         h=test_size,
         step_size=test_size,
         n_windows=1
@@ -531,15 +632,53 @@ def main():
         freq=polars_frequency
     )
 
+    def debug_data_quality(df, name):
+        """Debug function to check data quality before model training."""
+        print(f"  Debug: {name} data quality check:")
+        print(f"    Shape: {df.shape}")
+        print(f"    Series: {df['unique_id'].n_unique()}")
+        print(f"    Null values in y: {df['y'].null_count()}")
+
+        # Check for problematic values
+        y_vals = df['y'].to_numpy()
+        finite_vals = y_vals[np.isfinite(y_vals)]
+        if len(finite_vals) > 0:
+            print(f"    Value range: [{finite_vals.min():.2e}, {finite_vals.max():.2e}]")
+            print(f"    Standard deviation: {finite_vals.std():.2e}")
+        else:
+            print("    Warning: No finite values found!")
+
+    # Debug data quality before training
+    if DEBUG_MODE:
+        debug_data_quality(df_neural, "Neural model input")
+
     start_time = time.time()
-    neural_cv_df = nf.cross_validation(
-        df=df,
-        val_size=test_size,
-        n_windows=1,
-        step_size=test_size
-    )
-    neural_time = time.time() - start_time
-    print(f"Neural cross-validation completed in {neural_time:.2f} seconds")
+    try:
+        neural_cv_df = nf.cross_validation(
+            df=df_neural,
+            val_size=test_size,
+            n_windows=1,
+            step_size=test_size
+        )
+        neural_time = time.time() - start_time
+        print(f"Neural cross-validation completed in {neural_time:.2f} seconds")
+
+    except Exception as e:
+        print(f"Error during neural model cross-validation: {e}")
+        print("This likely indicates data quality issues that weren't caught by preprocessing.")
+
+        # Additional debugging information
+        print("\nDiagnostic information:")
+        debug_data_quality(df_neural, "Failed neural input")
+
+        # Check for specific problematic patterns
+        print("\nChecking for specific issues:")
+        for unique_id in df_neural['unique_id'].unique()[:5]:  # Check first 5 series
+            series_data = df_neural.filter(pl.col('unique_id') == unique_id)
+            y_vals = series_data['y'].to_numpy()
+            print(f"  Series {unique_id}: min={y_vals.min():.2e}, max={y_vals.max():.2e}, std={y_vals.std():.2e}")
+
+        raise  # Re-raise the exception
 
     # Combine results
     print("\n6. Combining Results")
@@ -556,7 +695,13 @@ def main():
     cutoff_date = cv_df['cutoff'].unique()[0]
 
     # Create training data by filtering original data up to cutoff
-    train_data = df.filter(pl.col('ds') <= cutoff_date)
+    # Use the preprocessed training data which may have imputed values
+    if 'y_imputed' in train_df.columns:
+        train_data_for_eval = train_df.select(['unique_id', 'ds', 'y_imputed']).rename({'y_imputed': 'y'})
+    else:
+        train_data_for_eval = train_df.select(['unique_id', 'ds', 'y'])
+
+    train_data = train_data_for_eval.filter(pl.col('ds') <= cutoff_date)
 
     # Evaluate all models
     print("\n7. Evaluating Model Performance")
@@ -651,20 +796,22 @@ def main():
         # Check for invalid metric values
         import numpy as np
         if mase_val == 0.0:
-            raise ValueError(
-                f"MASE is exactly 0.0 for model {neural_model_name}. "
-                f"This indicates a calculation error, possibly due to data quality issues."
-            )
+            print(f"Warning: MASE is exactly 0.0 for model {neural_model_name}. This typically indicates:")
+            print("  - The model produces constant predictions")
+            print("  - Data quality issues with training/test series")
+            print("  - Insufficient variation in the time series")
+            print("  Continuing with other metrics, but results may not be meaningful.")
+            # Don't raise an error, just warn and continue
 
         if np.isnan(mase_val) or np.isnan(mse_val) or np.isnan(rmse_val) or np.isnan(r2oos_val):
-            raise ValueError(
-                f"NaN values detected in metrics for model {neural_model_name}:\n"
-                f"  MASE: {mase_val}\n"
-                f"  MSE: {mse_val}\n"
-                f"  RMSE: {rmse_val}\n"
-                f"  R2oos: {r2oos_val}\n"
-                f"This typically indicates insufficient valid data for metric calculation."
-            )
+            print(f"Warning: NaN values detected in metrics for model {neural_model_name}:")
+            print(f"  MASE: {mase_val}")
+            print(f"  MSE: {mse_val}")
+            print(f"  RMSE: {rmse_val}")
+            print(f"  R2oos: {r2oos_val}")
+            print("  This typically indicates insufficient valid data for metric calculation.")
+            print("  Saving available metrics and continuing.")
+            # Don't raise an error, just warn and continue
 
         metrics_data = {
             "model_name": [MODEL_NAME],

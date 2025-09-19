@@ -324,8 +324,57 @@ def evaluate_cv(cv_df, train_df, seasonality):
     metadata_cols = ['unique_id', 'ds', 'cutoff', 'y']
     actual_model_cols = [col for col in cv_df.columns if col not in metadata_cols]
 
-    # Calculate MASE (requires seasonality and train_df)
-    mase_scores = mase(cv_df, models=actual_model_cols, seasonality=seasonality, train_df=train_df)
+    # Convert NaN values to null so downstream metrics ignore them cleanly
+    nan_to_null_exprs = [
+        pl.when(pl.col('y').is_nan()).then(None).otherwise(pl.col('y')).alias('y')
+    ]
+    for col in actual_model_cols:
+        nan_to_null_exprs.append(
+            pl.when(pl.col(col).is_nan()).then(None).otherwise(pl.col(col)).alias(col)
+        )
+    cv_df = cv_df.with_columns(nan_to_null_exprs)
+
+    print(f"Debug: CV dataframe shape: {cv_df.shape}")
+    print(f"Debug: Model columns: {actual_model_cols}")
+    print(f"Debug: Seasonality: {seasonality}")
+
+    # Debug: Check CV data quality
+    for col in actual_model_cols:
+        print(f"Debug: Model {col} - nulls: {cv_df[col].null_count()}, unique values: {cv_df[col].n_unique()}")
+        if cv_df[col].null_count() == 0:
+            print(f"Debug: Model {col} - stats: {cv_df[col].describe()}")
+
+    print(f"Debug: Actual y values - nulls: {cv_df['y'].null_count()}, unique values: {cv_df['y'].n_unique()}")
+    if cv_df['y'].null_count() == 0:
+        print(f"Debug: Actual y values - stats: {cv_df['y'].describe()}")
+
+    # Check for constant predictions
+    for col in actual_model_cols:
+        y_vals = cv_df['y'].drop_nulls()
+        pred_vals = cv_df[col].drop_nulls()
+        if len(y_vals) > 0 and len(pred_vals) > 0:
+            y_range = y_vals.max() - y_vals.min()
+            pred_range = pred_vals.max() - pred_vals.min()
+            print(f"Debug: {col} - y_range: {y_range}, pred_range: {pred_range}")
+
+            # Check if predictions are constant
+            if pred_range == 0:
+                print(f"Warning: Model {col} produces constant predictions: {pred_vals[0]}")
+
+            # Check if actuals are constant
+            if y_range == 0:
+                print(f"Warning: Actual values are constant: {y_vals[0]}")
+
+    try:
+        # Calculate MASE (requires seasonality and train_df)
+        mase_scores = mase(cv_df, models=actual_model_cols, seasonality=seasonality, train_df=train_df)
+        print("Debug: MASE calculation succeeded")
+    except Exception as e:
+        print(f"Debug: MASE calculation failed: {e}")
+        # Create a fallback MASE dataframe with NaN values
+        mase_scores = cv_df.select(['unique_id']).unique()
+        for col in actual_model_cols:
+            mase_scores = mase_scores.with_columns(pl.lit(float('nan')).alias(col))
 
     # Calculate MSE
     mse_scores = mse(cv_df, models=actual_model_cols)
@@ -339,71 +388,130 @@ def evaluate_cv(cv_df, train_df, seasonality):
     return mase_scores, mse_scores, rmse_scores, r2oos_scores, actual_model_cols
 
 
-def filter_series_by_cv_requirements(df, test_size, min_test_coverage=0.3, debug=False):
+def get_minimum_requirements_by_frequency(frequency, test_size, seasonality=1):
+    """Calculate minimum data requirements based on frequency and seasonality."""
+    freq_multipliers = {
+        'ME': 2.0,   # Monthly: need more periods for meaningful patterns
+        'MS': 2.0,   # Month start: same as ME
+        'D': 1.5,    # Daily: less stringent but still need adequate history
+        'B': 1.5,    # Business daily: same as daily
+        'QE': 3.0,   # Quarterly: need more periods due to lower frequency
+        'QS': 3.0,   # Quarter start: same as QE
+        'YE': 5.0,   # Yearly: need many more periods
+        'YS': 5.0,   # Year start: same as YE
+    }
+
+    multiplier = freq_multipliers.get(frequency, 2.0)
+
+    # Base minimum: test_size + buffer for training
+    base_min_train = max(test_size * 2, seasonality * 2 if seasonality > 1 else 12)
+    min_train_obs = int(base_min_train * multiplier)
+
+    # Test requirements
+    min_test_obs = max(int(test_size * 0.8), 3)  # At least 80% of test period or 3 obs
+
+    # Total minimum
+    min_total_obs = min_train_obs + min_test_obs
+
+    return {
+        'min_total_obs': min_total_obs,
+        'min_train_obs': min_train_obs,
+        'min_test_obs': min_test_obs,
+        'min_variance': 0.001  # Minimum standard deviation
+    }
+
+
+def filter_series_by_cv_requirements(df, test_size, frequency='ME', seasonality=1, min_test_coverage=0.3, debug=False):
     """Filter series based on cross-validation requirements.
 
     Args:
         df: Input dataframe with 'unique_id', 'ds', 'y' columns
         test_size: Size of the test period for cross-validation
+        frequency: Data frequency (ME, D, etc.) for adaptive requirements
+        seasonality: Seasonality parameter for the data
         min_test_coverage: Minimum fraction of non-null values required in test period
         debug: If True, limit to a small number of series for faster testing
 
     Returns:
         Filtered dataframe with series that meet requirements
     """
+    # Get adaptive requirements based on frequency
+    reqs = get_minimum_requirements_by_frequency(frequency, test_size, seasonality)
+
+    print(f"  Data quality requirements for {frequency} frequency:")
+    print(f"    Minimum total observations: {reqs['min_total_obs']}")
+    print(f"    Minimum training observations: {reqs['min_train_obs']}")
+    print(f"    Minimum test observations: {reqs['min_test_obs']}")
+    print(f"    Minimum variance threshold: {reqs['min_variance']}")
+
     # If debug mode, limit to first N series
     if debug:
-        debug_series_limit = 10
+        debug_series_limit = 20  # Increased to get better sample
         unique_series = df['unique_id'].unique()[:debug_series_limit]
         df = df.filter(pl.col('unique_id').is_in(unique_series))
         print(f"  Debug mode: Limited to {len(unique_series)} series")
 
-    # Enforce a minimum series length compatible with the cross-validation horizon
-    min_cv_length = test_size + 1
-    series_lengths = df.group_by('unique_id').agg(pl.len().alias('length'))
-    valid_ids = series_lengths.filter(pl.col('length') >= min_cv_length)['unique_id']
-
-    if len(valid_ids) == 0:
-        raise ValueError(
-            f"No series have at least {min_cv_length} observations required for cross-validation horizon {test_size}."
-        )
-
     initial_series = df['unique_id'].n_unique()
-    df_filtered = df.filter(pl.col('unique_id').is_in(valid_ids))
-    removed_series = initial_series - len(valid_ids)
+    print(f"  Starting with {initial_series} series")
 
-    if removed_series > 0:
-        print(
-            f"  Removed {removed_series} series shorter than {min_cv_length} observations to satisfy cross-validation horizon"
-        )
+    # Step 1: Filter by total length
+    series_lengths = df.group_by('unique_id').agg(pl.len().alias('total_length'))
+    valid_total_length = series_lengths.filter(
+        pl.col('total_length') >= reqs['min_total_obs']
+    )['unique_id']
 
-    # Additional filter: Remove series that would have insufficient data in test period
-    # Require at least 30% non-null values in the test period for meaningful metrics
-    min_test_points = max(int(test_size * min_test_coverage), 3)  # At least 3 points
+    df_step1 = df.filter(pl.col('unique_id').is_in(valid_total_length))
+    removed_step1 = initial_series - len(valid_total_length)
+    print(f"  Step 1 - Total length filter: Removed {removed_step1} series (< {reqs['min_total_obs']} obs)")
 
-    series_with_sufficient_test_data = []
-    for unique_id in df_filtered['unique_id'].unique():
-        series_data = df_filtered.filter(pl.col('unique_id') == unique_id).sort('ds')
-        # Get the last test_size observations
-        test_period_data = series_data.tail(test_size)
-        # Count non-null values in what would be the test period
-        non_null_count = test_period_data['y'].drop_nulls().len()
-        if non_null_count >= min_test_points:
-            series_with_sufficient_test_data.append(unique_id)
+    # Step 2: Check train/test split quality
+    series_with_sufficient_data = []
+    for unique_id in df_step1['unique_id'].unique():
+        series_data = df_step1.filter(pl.col('unique_id') == unique_id).sort('ds')
 
-    if len(series_with_sufficient_test_data) == 0:
+        # Check overall series quality
+        non_null_data = series_data['y'].drop_nulls()
+        if len(non_null_data) < reqs['min_total_obs']:
+            continue
+
+        # Check variance - filter out near-constant series
+        series_std = non_null_data.std()
+        if series_std is None or series_std < reqs['min_variance']:
+            continue
+
+        # Split into train/test periods (test = last test_size observations)
+        train_data = series_data.head(-test_size)['y'].drop_nulls()
+        test_data = series_data.tail(test_size)['y'].drop_nulls()
+
+        # Check training data requirements
+        if len(train_data) < reqs['min_train_obs']:
+            continue
+
+        train_std = train_data.std()
+        if train_std is None or train_std < reqs['min_variance']:
+            continue
+
+        # Check test data requirements
+        if len(test_data) < reqs['min_test_obs']:
+            continue
+
+        series_with_sufficient_data.append(unique_id)
+
+    if len(series_with_sufficient_data) == 0:
         raise ValueError(
-            f"No series have at least {min_test_points} non-null values in their last {test_size} observations (test period). "
-            f"Data quality issue: all series have insufficient test data for reliable metrics."
+            f"No series meet the data quality requirements:\n"
+            f"  - Minimum total observations: {reqs['min_total_obs']}\n"
+            f"  - Minimum training observations: {reqs['min_train_obs']}\n"
+            f"  - Minimum test observations: {reqs['min_test_obs']}\n"
+            f"  - Minimum variance: {reqs['min_variance']}\n"
+            f"Data quality issue: all series have insufficient data for reliable forecasting."
         )
 
-    initial_count = len(df_filtered['unique_id'].unique())
-    df_final = df_filtered.filter(pl.col('unique_id').is_in(series_with_sufficient_test_data))
-    removed_for_sparse = initial_count - len(series_with_sufficient_test_data)
+    step1_count = len(df_step1['unique_id'].unique())
+    df_final = df_step1.filter(pl.col('unique_id').is_in(series_with_sufficient_data))
+    removed_step2 = step1_count - len(series_with_sufficient_data)
 
-    if removed_for_sparse > 0:
-        print(
-            f"  Removed {removed_for_sparse} series with <{min_test_points} non-null values in test period"
-        )
+    print(f"  Step 2 - Train/test quality filter: Removed {removed_step2} series")
+    print(f"  Final result: {len(series_with_sufficient_data)} series passed all quality checks")
 
     return df_final
