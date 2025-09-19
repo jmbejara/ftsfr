@@ -469,26 +469,27 @@ def main():
     )
 
     # Prepare two synchronized views of the panel:
-    #  - df_baseline keeps the original targets (nulls allowed)
+    #  - df_baseline uses imputed values for baseline models (StatsForecast models need complete data)
     #  - df_neural forward-fills gaps for neural models that cannot ingest NaNs
     if 'y_imputed' in train_df.columns:
-        train_original = train_df.select(['unique_id', 'ds', 'y'])
+        # Use imputed values for training portion to ensure baseline models work properly
+        train_for_baseline = train_df.select(['unique_id', 'ds', 'y_imputed']).rename({'y_imputed': 'y'})
     else:
-        train_original = train_df.select(['unique_id', 'ds', 'y'])
+        train_for_baseline = train_df.select(['unique_id', 'ds', 'y'])
 
-    test_original = test_df.select(['unique_id', 'ds', 'y'])
+    test_for_baseline = test_df.select(['unique_id', 'ds', 'y'])
 
-    df_baseline = pl.concat([train_original, test_original]).sort(['unique_id', 'ds'])
+    df_baseline = pl.concat([train_for_baseline, test_for_baseline]).sort(['unique_id', 'ds'])
 
     df_neural = df_baseline.with_columns(
         pl.col('y').forward_fill().over('unique_id').alias('y_filled')
     )
 
     # Robust validation for neural model data
-    import numpy as np  # Import here to ensure availability in nested function
 
     def validate_neural_series(df):
         """Validate series for neural model consumption."""
+        import numpy as np
         problematic_series = []
 
         for unique_id in df['unique_id'].unique():
@@ -537,6 +538,60 @@ def main():
         train_df = train_df.filter(~pl.col('unique_id').is_in(problematic_ids))
         test_df = test_df.filter(~pl.col('unique_id').is_in(problematic_ids))
 
+    # Additional baseline data validation and cleaning
+    def validate_baseline_series(df):
+        """Validate and clean baseline data for StatsForecast models."""
+        import numpy as np
+        print("  Validating baseline data for StatsForecast models...")
+
+        # Check for series with insufficient non-null values
+        series_to_remove = []
+        for unique_id in df['unique_id'].unique():
+            series_data = df.filter(pl.col('unique_id') == unique_id)
+            y_vals = series_data['y'].to_numpy()
+
+            # Count non-null values
+            non_null_count = np.sum(~pd.isna(y_vals))
+            total_count = len(y_vals)
+
+            # Remove series with too many nulls (>50% null)
+            if non_null_count < total_count * 0.5:
+                series_to_remove.append((unique_id, f"too many nulls: {non_null_count}/{total_count}"))
+                continue
+
+            # Remove series with insufficient non-null values for forecasting
+            if non_null_count < 10:  # Need at least 10 non-null points
+                series_to_remove.append((unique_id, f"insufficient data: {non_null_count} non-null values"))
+                continue
+
+            # Check for problematic patterns
+            finite_vals = y_vals[np.isfinite(y_vals)]
+            if len(finite_vals) > 1:
+                std_val = np.std(finite_vals, ddof=1)
+                if std_val < 1e-12:  # Near-zero variance
+                    series_to_remove.append((unique_id, f"near-zero variance ({std_val:.2e})"))
+                    continue
+
+        if series_to_remove:
+            removed_ids = [uid for uid, _ in series_to_remove]
+            print(f"    Removing {len(removed_ids)} series with baseline model issues:")
+            for uid, reason in series_to_remove[:3]:  # Show first 3
+                print(f"      {uid}: {reason}")
+            if len(series_to_remove) > 3:
+                print(f"      ... and {len(series_to_remove) - 3} more")
+
+            return removed_ids
+        return []
+
+    # Validate baseline data and remove additional problematic series
+    baseline_problematic_ids = validate_baseline_series(df_baseline)
+    if baseline_problematic_ids:
+        # Remove from all dataframes to maintain synchronization
+        df_baseline = df_baseline.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
+        df_neural = df_neural.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
+        train_df = train_df.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
+        test_df = test_df.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
+
     # Drop any series that remain entirely missing after forward fill (defensive)
     empty_series = df_neural.filter(pl.col('y_filled').is_null())['unique_id'].unique()
     if empty_series.len() > 0:
@@ -554,7 +609,27 @@ def main():
         pl.col('y_filled').alias('y')
     ])
 
-    print(f"Final data for CV: {len(df_baseline):,} observations, {df_baseline['unique_id'].n_unique()} series")
+    # Final validation: ensure baseline and neural datasets are synchronized
+    baseline_series = set(df_baseline['unique_id'].unique().to_list())
+    neural_series = set(df_neural['unique_id'].unique().to_list())
+
+    if baseline_series != neural_series:
+        print("  Warning: Baseline and neural datasets have different series counts.")
+        print(f"    Baseline: {len(baseline_series)} series")
+        print(f"    Neural: {len(neural_series)} series")
+
+        # Use intersection to ensure both datasets have exactly the same series
+        common_series = list(baseline_series.intersection(neural_series))
+        if len(common_series) < len(baseline_series) or len(common_series) < len(neural_series):
+            print(f"    Synchronizing to common {len(common_series)} series")
+            df_baseline = df_baseline.filter(pl.col('unique_id').is_in(common_series))
+            df_neural = df_neural.filter(pl.col('unique_id').is_in(common_series))
+            train_df = train_df.filter(pl.col('unique_id').is_in(common_series))
+            test_df = test_df.filter(pl.col('unique_id').is_in(common_series))
+
+    print("Final synchronized data for CV:")
+    print(f"  Baseline: {len(df_baseline):,} observations, {df_baseline['unique_id'].n_unique()} series")
+    print(f"  Neural: {len(df_neural):,} observations, {df_neural['unique_id'].n_unique()} series")
 
     # Define models
     print("\n3. Setting Up Models")
@@ -604,6 +679,39 @@ def main():
     print("\n4. Performing Cross-Validation with Baseline Models")
     print("-" * 40)
 
+    # Defensive validation before baseline model training
+    def validate_data_for_training(df, model_type="baseline"):
+        """Final validation to ensure data is ready for model training."""
+        print(f"  Performing final validation for {model_type} models...")
+
+        if len(df) == 0:
+            raise ValueError(f"Empty dataset for {model_type} models after preprocessing")
+
+        series_count = df['unique_id'].n_unique()
+        if series_count == 0:
+            raise ValueError(f"No series remaining for {model_type} models after preprocessing")
+
+        # Check for minimum series requirement
+        if series_count < 5:
+            print(f"    Warning: Only {series_count} series remaining for {model_type} models")
+
+        # Validate each series has minimum data
+        min_length_per_series = 5  # Minimum observations per series
+        short_series = []
+        for unique_id in df['unique_id'].unique():
+            series_data = df.filter(pl.col('unique_id') == unique_id)
+            if len(series_data) < min_length_per_series:
+                short_series.append(unique_id)
+
+        if short_series:
+            print(f"    Warning: {len(short_series)} series have less than {min_length_per_series} observations")
+
+        print(f"    {model_type.capitalize()} data validation passed: {series_count} series, {len(df)} observations")
+        return True
+
+    # Validate baseline data
+    validate_data_for_training(df_baseline, "baseline")
+
     sf = StatsForecast(
         models=baseline_models,
         freq=polars_frequency,
@@ -634,19 +742,30 @@ def main():
 
     def debug_data_quality(df, name):
         """Debug function to check data quality before model training."""
+        import numpy as np
         print(f"  Debug: {name} data quality check:")
         print(f"    Shape: {df.shape}")
         print(f"    Series: {df['unique_id'].n_unique()}")
-        print(f"    Null values in y: {df['y'].null_count()}")
+
+        # Use the correct column based on the dataframe
+        if 'y_filled' in df.columns:
+            y_col = 'y_filled'
+        else:
+            y_col = 'y'
+
+        print(f"    Null values in {y_col}: {df[y_col].null_count()}")
 
         # Check for problematic values
-        y_vals = df['y'].to_numpy()
+        y_vals = df[y_col].to_numpy()
         finite_vals = y_vals[np.isfinite(y_vals)]
         if len(finite_vals) > 0:
             print(f"    Value range: [{finite_vals.min():.2e}, {finite_vals.max():.2e}]")
             print(f"    Standard deviation: {finite_vals.std():.2e}")
         else:
             print("    Warning: No finite values found!")
+
+    # Validate neural data before training
+    validate_data_for_training(df_neural, "neural")
 
     # Debug data quality before training
     if DEBUG_MODE:

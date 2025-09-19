@@ -142,7 +142,61 @@ def main():
         test_for_cv = test_df.select(['unique_id', 'ds', 'y'])
         df = pl.concat([train_for_cv, test_for_cv])
 
-    print(f"Final data for CV: {len(df):,} observations, {df['unique_id'].n_unique()} series")
+    # Additional data validation for StatsForecast models
+    def validate_statistical_series(df):
+        """Validate and clean data for StatsForecast models."""
+        print("  Validating data for StatsForecast models...")
+        import pandas as pd
+        import numpy as np
+
+        # Check for series with insufficient non-null values
+        series_to_remove = []
+        for unique_id in df['unique_id'].unique():
+            series_data = df.filter(pl.col('unique_id') == unique_id)
+            y_vals = series_data['y'].to_numpy()
+
+            # Count non-null values
+            non_null_count = np.sum(~pd.isna(y_vals))
+            total_count = len(y_vals)
+
+            # Remove series with too many nulls (>50% null)
+            if non_null_count < total_count * 0.5:
+                series_to_remove.append((unique_id, f"too many nulls: {non_null_count}/{total_count}"))
+                continue
+
+            # Remove series with insufficient non-null values for forecasting
+            if non_null_count < 10:  # Need at least 10 non-null points
+                series_to_remove.append((unique_id, f"insufficient data: {non_null_count} non-null values"))
+                continue
+
+            # Check for problematic patterns
+            finite_vals = y_vals[np.isfinite(y_vals)]
+            if len(finite_vals) > 1:
+                std_val = np.std(finite_vals, ddof=1)
+                if std_val < 1e-12:  # Near-zero variance
+                    series_to_remove.append((unique_id, f"near-zero variance ({std_val:.2e})"))
+                    continue
+
+        if series_to_remove:
+            removed_ids = [uid for uid, _ in series_to_remove]
+            print(f"    Removing {len(removed_ids)} series with statistical model issues:")
+            for uid, reason in series_to_remove[:3]:  # Show first 3
+                print(f"      {uid}: {reason}")
+            if len(series_to_remove) > 3:
+                print(f"      ... and {len(series_to_remove) - 3} more")
+
+            return removed_ids
+        return []
+
+    # Validate and clean data
+    problematic_ids = validate_statistical_series(df)
+    if problematic_ids:
+        df = df.filter(~pl.col('unique_id').is_in(problematic_ids))
+        # Also filter train and test data to maintain consistency
+        train_df = train_df.filter(~pl.col('unique_id').is_in(problematic_ids))
+        test_df = test_df.filter(~pl.col('unique_id').is_in(problematic_ids))
+
+    print(f"Final validated data for CV: {len(df):,} observations, {df['unique_id'].n_unique()} series")
 
     # Define models
     print("\n3. Setting Up Models")
@@ -167,6 +221,39 @@ def main():
 
     model_names = [type(model).__name__ for model in models]
     print(f"Model: {', '.join(model_names)}")
+
+    # Defensive validation before model training
+    def validate_data_for_training(df, model_type="statistical"):
+        """Final validation to ensure data is ready for model training."""
+        print(f"  Performing final validation for {model_type} models...")
+
+        if len(df) == 0:
+            raise ValueError(f"Empty dataset for {model_type} models after preprocessing")
+
+        series_count = df['unique_id'].n_unique()
+        if series_count == 0:
+            raise ValueError(f"No series remaining for {model_type} models after preprocessing")
+
+        # Check for minimum series requirement
+        if series_count < 5:
+            print(f"    Warning: Only {series_count} series remaining for {model_type} models")
+
+        # Validate each series has minimum data
+        min_length_per_series = 5  # Minimum observations per series
+        short_series = []
+        for unique_id in df['unique_id'].unique():
+            series_data = df.filter(pl.col('unique_id') == unique_id)
+            if len(series_data) < min_length_per_series:
+                short_series.append(unique_id)
+
+        if short_series:
+            print(f"    Warning: {len(short_series)} series have less than {min_length_per_series} observations")
+
+        print(f"    {model_type.capitalize()} data validation passed: {series_count} series, {len(df)} observations")
+        return True
+
+    # Validate data before training
+    validate_data_for_training(df, "statistical")
 
     # Initialize StatsForecast
     sf = StatsForecast(
