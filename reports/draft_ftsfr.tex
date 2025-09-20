@@ -227,7 +227,7 @@ In this section, we describe the datasets included in the benchmark. The dataset
 The code that automates the data pull, cleaning, and formatting is available on GitHub.\footnote{See \url{https://github.com/jmbejara/ftsfr}}
 
 \subsection{Dataset Selection Rationale}
-Our dataset selection is grounded in the intermediary asset pricing literature, which provides both theoretical justification and practical relevance for financial stability monitoring. Following \citet{He2017}, we focus on assets that are primarily accessible to financial intermediaries rather than retail investors, who typically invest only in equities. This distinction is crucial because intermediary budget constraints create risk factors that drive pricing across asset classes, with stronger effects for assets that only intermediaries can trade—such as credit default swaps, options, corporate bonds, and commodity futures. These assets are therefore essential indicators for monitoring financial stability, as distress in intermediary balance sheets manifests first and most strongly in these markets.
+Our dataset selection is grounded in the intermediary asset pricing literature, which provides both theoretical justification and practical relevance for financial stability monitoring. Following \citet{He2017} (HKM), we focus on assets that are primarily accessible to financial intermediaries rather than retail investors, who typically invest only in equities. This distinction is crucial because intermediary budget constraints create risk factors that drive pricing across asset classes, with stronger effects for assets that only intermediaries can trade—such as credit default swaps, options, corporate bonds, and commodity futures. These assets are therefore essential indicators for monitoring financial stability, as distress in intermediary balance sheets manifests first and most strongly in these markets.
 
 Beyond the asset returns themselves, we include a comprehensive set of basis spreads following \citet{Siriwardane2021}, as these spreads serve as critical early warning indicators of stress in the financial system. When intermediaries face funding constraints or balance sheet pressures, arbitrage opportunities persist and basis spreads widen, signaling potential systemic stress. Our methodological approach follows the principle established by \citet{He2017} of using canonical cleaning procedures from seminal papers in each asset class, ensuring that our datasets reflect established best practices without reinventing data processing methods. This approach, combined with additional financial stability indicators such as the HKM intermediary factors and bank regulatory data, provides comprehensive coverage of the assets and indicators most critical for understanding and predicting financial stability risks. Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. 
 
@@ -354,7 +354,8 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 
 \subsection{Asset Class Datasets}
 Our repository provides comprehensive datasets across seven major asset classes, each cleaned according to canonical methods established in the academic literature. We replicate each of the asset classes examined in \cite{He2017}, which are equities, US government and corporate bonds, foreign sovereign bonds, options, credit default swaps (CDS), commodities, and foreign exchange markets. 
-This paper references a canonical paper in each asset class and uses the data cleaning procedures from that paper to construct test portfolios within that asset class.
+This paper references a seminal paper in each asset class 
+and uses the data cleaning procedures from that paper to construct test portfolios within that asset class.
 For each asset class, we provide both aggregated portfolio returns (matching the test portfolios used in \cite{He2017}) and disaggregated security-level data. The disaggregated datasets apply identical filtering criteria, subsampling, and transformations as specified in the original papers, but preserve individual security information rather than aggregating into portfolios. 
 To validate our data cleaning procedures, we replicate key summary statistics and cross-sectional patterns from each source paper cited within \cite{He2017}. For instance, our corporate bond portfolios match the credit spread patterns in \cite{Nozawa2017} and our options portfolios reproduce the volatility risk premium patterns found in \cite{Constantinides2013}. These validation exercises ensure that our standardized datasets faithfully represent the canonical cleaning methods established in the literature while providing a unified framework for cross-asset forecasting research. This approach allows researchers to both replicate existing studies (which typically use the aggregated portfolios) as well as to use the disaggregated data for richer analysis using the global time
 series forecasting methods.
@@ -362,16 +363,16 @@ series forecasting methods.
 
 
 \paragraph{Equities}
-For equities we adopt the canonical \cite{Fama1993} cleaning procedures. At a high level, this exclude ADRs, REITs, and firms with negative book equity, lag book-equity data by one fiscal year. We use data from the Center for Research in Security Prices (CRSP) and Compustat by Standard \& Poor's. These data sets
-are the gold standard for research in equity markets. Altogether, this data and filtering procedures remove survivorship and look-ahead bias, and utilize the data as it's commonly used in asset pricing research for equities.
+For equities we adopt the same filters applied in \cite{Fama1993}. We begin with data from the Center for Research in Security Prices (CRSP) and Compustat by Standard \& Poor's. These data sets are the gold standard for research in equity markets. The filtering methodology applies multiple layers of restrictions to ensure data quality and consistency with canonical equity research. We filter to the common stock universe restrict to U.S. incorporated firms with corporate issuer types, and limit to actively traded stocks on major exchanges (NYSE, AMEX, NASDAQ).
 
 
-\paragraph{Treasuries} Our US Treasury bond portfolios utilize the CRSP Treasury database and the same filters used in the procedure of  \cite{Gurkaynak2007}, which underpins one of the
-various yield curve data publications available on the Federal Reserve Board's website\footnote{See \url{https://www.federalreserve.gov/data/yield-curve-models.htm}}. At a high level, we keep only non-callable notes and bonds, strip out STRIPS/TIPS and other exotic issues, correct returns for accrued interest, and use strictly month-end transaction quotes. These filters remove optionality, stale prices, and auction-cycle noise that otherwise create spurious risk-premia. Open-sourcing the exact code lets anyone replicate this Treasury sample instead of relying on opaque heuristics.
+\paragraph{Treasuries} 
+Our US Treasury bond portfolios utilize the CRSP Treasury database and the same filters used in the procedure of  \cite{Gurkaynak2007}, which underpins one of the
+various yield curve data publications available on the Federal Reserve Board's website\footnote{See \url{https://www.federalreserve.gov/data/yield-curve-models.htm}}. At a high level, we keep only non-callable notes and bonds, strip out STRIPS/TIPS and other exotic issues, correct returns for accrued interest, and use strictly month-end transaction quotes. These filters remove optionality, stale prices, and auction-cycle noise that otherwise create spurious risk-premia. 
 
 
 \paragraph{Corporate Bonds}
-We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP) project\footnote{See \url{https://openbondassetpricing.com/}}, which begins with the full TRACE transaction tape and then applies the market--microstructure--noise (MMN) correction procedure of \citet{Dickerson2024}.  Using MMN--adjusted ``clean'' prices is essential: the bid--ask--averaged quotes in raw TRACE embed a mechanical reversal that can be mis-interpreted as illiquidity and lead researchers to overstate corporate bond excess returns.  With the cleaned data we replicate and extend the ten value-weighted credit-spread deciles of \citet{Nozawa2017}, sorting on option-adjusted spreads each month.  Relative to unadjusted TRACE figures, the MMN correction eliminates roughly half of the apparent return spread and aligns liquidity estimates with quote-based ICE data, illustrating that much of the perceived illiquidity premium is an artefact of noise rather than compensation for trading frictions.  OSBAP also furnishes auxiliary fields such as modified duration, amount outstanding, coupon rate, and matched-Treasury yields, which we exploit later for duration-matched excess-return calculations. We validate our cleaning procedure by matching the construction of corporate bond portfolios in \cite{He2017}.
+We obtain corporate bond returns, we use data from the TRACE dataset, available via WRDS. We use the same cleaning procedure from the Open Source Bond Asset Pricing (OSBAP) project\footnote{See \url{https://openbondassetpricing.com/}}, which begins with the full TRACE transaction tape and then applies the market--microstructure--noise (MMN) correction procedure of \citet{Dickerson2024}.  Using MMN--adjusted ``clean'' prices is essential: the bid--ask--averaged quotes in raw TRACE embed a mechanical reversal that can be mis-interpreted as illiquidity and lead researchers to overstate corporate bond excess returns.  With the cleaned data we replicate and extend the ten value-weighted credit-spread deciles of \citet{Nozawa2017}, sorting on option-adjusted spreads each month.  Relative to unadjusted TRACE figures, the MMN correction eliminates roughly half of the apparent return spread and aligns liquidity estimates with quote-based ICE data, illustrating that much of the perceived illiquidity premium is an artefact of noise rather than compensation for trading frictions. The OSBAP procedure also furnishes auxiliary fields such as modified duration, amount outstanding, coupon rate, and matched-Treasury yields, which we exploit later for duration-matched excess-return calculations. We validate our cleaning procedure by matching the construction of corporate bond portfolios in \cite{He2017}.
 
 % \paragraph{Foreign Sovereign Bonds}
 % For sovereign bonds, we implement the methodology of \cite{Borri2011}, creating 
@@ -379,66 +380,59 @@ We obtain corporate bond returns from the Open Source Bond Asset Pricing (OSBAP)
 % S\&P credit ratings.
 
 
-\paragraph{Options} The volume of SPX options traded has grown dramatically over time (along with the options asset class as a whole). Our monthly SPX options portfolio returns series follows the data cleaning and portfolio construction methodology of \citet{Constantinides2013} (``CJS'') which has become the canonical approach for constructing option-based portfolios. This framework forms the foundation for numerous studies in derivatives pricing and risk management. We then transform these portfolios into the option portfolios utilized in \citet{He2017} (``HKM''), in accordance with the procedure outlined in their paper. 
-
-\begin{figure}[H]
-  \centering
-  \caption{The SPX options market has grown dramatically over time}
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
-  \end{tabular}
-  \caption*{\emph{Sources: OptionMetrics,  Authors' creation}}
-  \label{fig:spx_options_over_time}
-\end{figure}
+\paragraph{Options} 
+Our monthly SPX options portfolio returns series follows the data cleaning and portfolio construction methodology of \citet{Constantinides2013}. This framework forms forms the foundation of the approach used by \citet{He2017} to construct the options portfolios used in their paper. The \citet{Constantinides2013} portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to $2 \times 9 \times 3 = 54$ distinct portfolios. The 18 portfolios in \citet{He2017} were constructed by taking an equal weight average across the 3 maturities for CJS portfolios with the same moneyness, adding $2 \times 9 = 18$ distinct portfolios to the dataset, for a total of 72 distinct SPX option portfolios. Our dataset is comprised of monthly leverage-adjusted portfolio returns for all 72 SPX option portfolios, spanning 23 years from January 1996 to December 2019. The 72 portfolio returns series were constructed from a raw daily dataset of approximately 19 million individual SPX option contracts. These portfolios are constructed using leverage-adjustments and daily dynamic rebalancing to maintain constant risk exposures over time.
 
 
-The \citet{Constantinides2013} portfolios are organized by option type (call or put), moneyness (9 levels), and maturity (3 levels), leading to $2 \times 9 \times 3 = 54$ distinct portfolios. The 18 portfolios in \citet{He2017} were constructed by taking an equal weight average across the 3 maturities for CJS portfolios with the same moneyness, adding $2 \times 9 = 18$ distinct portfolios to the dataset, for a total of 72 distinct SPX option portfolios. \emph{We have provided a simple coding system to identify individual portfolios and access these returns series.}
+The leverage adjustments and dynamic portfolio rebalancing process outlined in \citet{Constantinides2013} had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and if a particular process was not sufficiently detailed in the original paper, we acknowledge these areas and made educated guesses about the authors' intent. For convenience, we provide the user with generalized functions that operate on any set of options data that is structured the same as the dataset we utilized (OptionMetrics). 
 
-Our dataset is comprised of monthly leverage-adjusted portfolio returns for \textbf{all 72 SPX option portfolios, spanning 23 years from January 1996 to December 2019}. The 72 portfolio returns series were constructed from a raw daily dataset of approximately 19 million individual SPX option contracts. These portfolios are constructed using leverage-adjustments and daily dynamic rebalancing to maintain constant risk exposures over time.
+We also provide a comprehensive overview of the data cleaning and preprocessing steps we undertook to prepare the raw SPX options data for analysis and portfolio construction, which includes technical and mathematical details on volatility estimation, kernel methods, and other relevant techniques. These details are given in the appendix as well as in the code module provided online.
 
-
-The leverage adjustments and dynamic portfolio rebalancing process outlined in \citet{Constantinides2013} had the overarching objective of constructing monthly portfolio returns that were roughly normally distributed over time, and only moderately skewed. We document our good faith reproduction of these procedures, and if a particular process was not sufficiently detailed in the original paper, we acknowledge these areas and made educated guesses about the authors' intent. For convenience, we provide the user with generalized functions that operate on \emph{any set} of options data that is structured the same as the dataset we utilized (OptionMetrics). 
-
-We also provide a comprehensive overview of the data cleaning and preprocessing steps we undertook to prepare the raw SPX options data for analysis and portfolio construction, which includes technical and mathematical details on volatility estimation, kernel methods, and other relevant techniques.
-
-Additionally, we found it helpful to create some visualizations of the entire dataset we utilized in the data filtration process, in order to see the data filters in action. These visualizations are integrated into the filtration code, so will be generated when our filtration functions are utilized.
-
-Our options dataset and code module are designed to be user-friendly and easily adaptable for researchers interested in exploring the SPX options market or applying similar portfolio construction techniques to other options datasets. 
+% \begin{figure}[H]
+%   \centering
+%   \caption{The SPX options market has grown dramatically over time}
+%   \begin{tabular}{@{}c@{}}
+%     \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
+%   \end{tabular}
+%   \caption*{\emph{Sources: OptionMetrics,  Authors' creation}}
+%   \label{fig:spx_options_over_time}
+% \end{figure}
 
 
 \paragraph{Foreign Exchange}
-For foreign exchange, we provide daily returns from the individual foreign currencies, against the US dollar. 
+We provide daily returns from the individual foreign currencies, against the US dollar. 
 The specified structure is based upon implied returns of the US dollar if converted to foreign currency then investing 
 in the foreign currencies overnight repo rate (we use the interest rate).
-We also provide the portfolios constructed in \cite{Lettau2014} and \cite{Menkhoff2012}, as they appear in \cite{He2017}.
+
 
 \paragraph{Commodity Futures}
-Commodity futures follow the protocol of \cite{Yang2013}, but the raw CRB feed
-is no longer available. Our replication therefore adopts the approach of
+Commodity futures follow the protocol of \cite{Yang2013}, but we are unable
+to access the same Commodity Research Bureau data that the authors used. 
+Our replication therefore adopts the approach of
 \cite{Koijen2018}, who provide Bloomberg tickers for the Goldman Sachs
 Commodity Index (GSCI) with directly computed monthly returns for 24 commodities.
 These GSCI-based return series constitute the entirety of our dataset, ensuring
 transparency and consistency with a well-documented and externally validated
 source. Because the GSCI returns are directly provided by Bloomberg, no further
 futures-chain construction or interpolation is required in our baseline analysis.
+An example of a few of the commodity futures returns are shown in Figure~\ref{fig:gsci_commodity_returns}.
 
-
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
     \caption{GSCI Commodity Returns}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/commod_gsci_return.png}
+    \includegraphics[width=.95\linewidth]{../docs_src/commod_gsci_return.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:gsci_commodity_returns}
 \end{figure}
 
 \paragraph{Credit Default Swaps}
-Our CDS data originate from S\&P Global CDS database (formerly Markit), 
+Our Credit Default Swap (CDS) data originate from S\&P Global CDS database (formerly Markit), 
 providing daily dealer-contributed curves, reference entity identifiers,
 and rich quote metadata for all USD-denominated contracts. 
 Our CDS sample follows the constant-risky-duration construction of
-\cite{Palhares2012}, a canonical protocol that neutralises maturity roll-over
+\cite{Palhares2012}, a commonly used protocol that neutralises maturity roll-over
 noise introduced by the 2009 ``Big Bang'' contract change. Raw Markit XR quotes
 are first filtered to exclude zero-bid or non-standard contracts, reconciled
 with auction recovery data, and rescaled by the risky annuity so that spreads
@@ -459,9 +453,8 @@ During crisis episodes, these CIP deviations tend to spike sharply, revealing st
 Central banks and financial regulators closely monitor and respond to these metrics.
 And the Federal Reserve's swap lines are agreements with other central banks to exchange currencies, primarily to provide U.S. dollars to foreign institutions during times of market stress.
 
-In this benchmark repository, we provide code that will allow researchers to replicate a number of basis spreads across several different asset classes. We replicate the basis spreads in \cite{Siriwardane2021}, including spot-futures arbitrage in treasuries, treasury swap arbitrage, TIPS-Treasury arbitrage, CDS-bond basis, CIP arbitrage, spot futures arbitrage in equities, and box arbitrage in equity options.
-Each of these basis spreads are, themselves, constructed following methodologies that are well-established in the literature. To validate out replication, I follow the papers recommended in \cite{Siriwardane2021} and replicate key summary statistics from each source paper.
-
+In this paper and its associated code repository, we provide code that will allow researchers to replicate a number of basis spreads across several different asset classes. We replicate many of the basis spreads in \cite{Siriwardane2021}, including spot-futures arbitrage in treasuries, treasury swap arbitrage, TIPS-Treasury arbitrage, CDS-bond basis, and CIP arbitrage.
+Each of these basis spreads are, themselves, constructed following methodologies that are well-established in the literature. To validate out replication, we follow the papers recommended in \cite{Siriwardane2021} and replicate key summary statistics from each source paper.
 
 
 % Please create a paragraph for each basis spread dataset and then, within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
@@ -469,7 +462,18 @@ Each of these basis spreads are, themselves, constructed following methodologies
 % A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
 
 \paragraph{Spot-Futures Arbitrage in Treasuries}
-Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we extract implied risk-free rates from the first-deferred 2-, 5-, 10-, 20- and 30-year Treasury futures.  We retain only days with positive volume, drop the delivery month to avoid the option-to-deliver distortions of \citet{Burghardt2005}, align quotes to the 17:00 ET close, and, per \citet{Barth2021}, match each futures-implied rate to a maturity-matched OIS benchmark-yielding a clean daily Treasury basis series.
+Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we extract implied risk-free rates from the first-deferred 2-, 5-, 10-, 20- and 30-year Treasury futures.  We retain only days with positive volume, drop the delivery month to avoid the option-to-deliver distortions of \citet{Burghardt2005}, align quotes to the 17:00 ET close, and, per \citet{Barth2021}, match each futures-implied rate to a maturity-matched OIS benchmark-yielding a clean daily Treasury basis series. These spreads are shown in Figure~\ref{fig:treasury_sf_basis}.
+
+\begin{figure}[h]
+    \centering
+    \caption{Treasury Spot-Futures Basis (FTSFR Replication)}
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.95\linewidth]{../docs_src/treasury_spot_futures_arbitrage.png}
+  \end{tabular}
+  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+  \label{fig:treasury_sf_basis}
+\end{figure}
+
 
 \paragraph{Treasury Swap Arbitrage}
 We follow \citet{Siriwardane2021} in constructing daily OIS-Treasury swap
@@ -480,23 +484,13 @@ quotes are dropped, delivery-month futures are excluded to sidestep
 cheapest-to-deliver noise, and we winsorise the extreme 1\% of spreads; the
 resulting series replicates the persistently negative swap spreads documented by
 \citet{Jermann2020}, \citet{Du2023}, and \citet{Hanson2023}.
+These spreads are shown in Figure~\ref{fig:treasury_swap_arbitrage}.
 
-\begin{figure}[h!]
-    \centering
-    \caption{Treasury Spot-Futures Basis (FTSFR Replication)}
-  \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_spot_futures_arbitrage.png}
-  \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
-  \label{fig:treasury_sf_basis}
-\end{figure}
-
-
-\begin{figure}[h!]
+\begin{figure}[h]
   \centering
   \caption{Treasury Swap Arbitrage spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/treasury_swap_arbitrage_spreads.png}
+    \includegraphics[width=.95\linewidth]{../docs_src/treasury_swap_arbitrage_spreads.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:treasury_swap_arbitrage}
@@ -505,48 +499,42 @@ resulting series replicates the persistently negative swap spreads documented by
 
 \paragraph{TIPS-Treasury Arbitrage}
 Replicating \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we splice Federal Reserve zero-coupon TIPS yields with Bloomberg constant-maturity inflation-swap rates to create synthetic nominal yields, then difference these against equal-maturity zero-coupon Treasury yields for the 2-, 5-, 10- and 20-year tenors.  We exclude days with missing swap quotes or illiquid TIPS issues, drop outliers beyond the extreme 1\%, and harmonise all series to 17:00 ET closes to obtain a clean daily TIPS-Treasury basis series.
+These spreads are shown in Figure~\ref{fig:tips_treasury_basis}.
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \caption{TIPS-Treasury Arbitrage spreads.}
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/tips_treasury_arbitrage_spreads.png}
+    \includegraphics[width=.95\linewidth]{../docs_src/tips_treasury_arbitrage_spreads.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:tips_treasury_basis}
 \end{figure}
 
 \paragraph{CDS-Bond Basis}
-% TODO: Check this paragraph.
-% we should be doing duration matching, added that in
-% i am removing RFR when over 1, representing 100%
-% - Vincent
+
 Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a duration-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorise extreme 100\% bases, and require each bond to appear in our cleaned version of the public FINRA TRACE dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
+These spreads are shown in Figure~\ref{fig:cds_basis}.
 
 
-% TODO: Vincent and Alex
-% 1. Change y axis label so that it shows percents. Change rfr to "Implied Risk-Free Rate (percent)"
-% 2. Get rid of Title in the plot. I can add the title in the LaTeX code myself.
-% 3. Get rid of Rating "2", since Rating 2 is the weird hybrid one.
-% 4. Rename rating 0 to "High Yield" and rating 1 to "Investment Grade"
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
     \caption{CDS Arbitrage spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth]{../docs_src/CDS_replicate.png}
+    \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png}
   \end{tabular}
   \caption*{\emph{Sources: S\&P Global, WRDS TRACE,Authors' creation}}
   \label{fig:cds_basis}
 \end{figure}
 
 \paragraph{CIP Arbitrage}
-For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for spot rates, 3-month forwards, and maturity-matched OIS curves.  Core filters rescale forward points (and invert USD-quoted pairs), synchronise all legs to the 17:00 ET close while dropping holiday or stale quotes, and winsorise the extreme 1\% of annualised spreads with spline interpolation for any missing OIS tenors to remove scaling, timing, and rate-sourcing distortions.
+For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for spot rates, 3-month forwards, and maturity-matched OIS curves.  Core filters rescale forward points (and invert USD-quoted pairs), synchronise all legs to the 17:00 ET close while dropping holiday or stale quotes, and winsorise the extreme 1\% of annualised spreads with spline interpolation for any missing OIS tenors to remove scaling, timing, and rate-sourcing distortions. These spreads are shown in Figure~\ref{fig:cip_basis}.
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
     \caption{CIP Arbitrage spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth]{../docs_src/CIP_replicate.png}
+    \includegraphics[width=.95\linewidth]{../docs_src/CIP_replicate.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' creation}}
   \label{fig:cip_basis}
@@ -565,7 +553,8 @@ For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018},
 Bank variables come directly from the Drechsler-Savov-Schnabl Call Report panel, \citep{Drechsler2017}. Their WRDS code downloads FFIEC 031/041 series and harmonizes item definitions across form changes (e.g., RCFD$\rightarrow$RCON after 2011; time-deposit thresholds shifting from \$100k to \$250k in 2010), converts YTD income/expense to quarterly flows, handles pre-1982 semiannual filers, and builds consistent series for assets, loans, deposits, and interest expense. We use their released bank-level file (1976-2020) and construct our ratios (e.g., cash/liquidity, leverage). 
 
 \paragraph{Intermediary Capital Risk Factors}
-We use the series released by \citet{He2017}\footnote{See \url{https://zhiguohe.net/data-and-empirical-patterns/intermediary-capital-ratio-and-risk-factor/}}. He, Kelly, and Manela (HKM) construct the intermediary capital ratio for primary dealer holding companies as aggregate market equity divided by aggregate market equity plus book debt, matching the dealer list to public holding companies in CRSP/Compustat/Datastream. The "intermediary capital risk factor" is the AR(1) innovation in the capital ratio scaled by the lagged ratio. We simply align the published monthly (and post-2000 daily) series to our panel and do not re-estimate the factor.
+We use the series released by \citet{He2017}\footnote{See \url{https://zhiguohe.net/data-and-empirical-patterns/intermediary-capital-ratio-and-risk-factor/}}. This is constructed from CRSP and Compustat data.
+He, Kelly, and Manela (HKM) construct the intermediary capital ratio for primary dealer holding companies as aggregate market equity divided by aggregate market equity plus book debt, matching the dealer list to public holding companies in CRSP/Compustat. The "intermediary capital risk factor" is the AR(1) innovation in the capital ratio scaled by the lagged ratio. We simply align the published monthly (and post-2000 daily) series to our panel and do not re-estimate the factor.
 
 
 \paragraph{Yield Curve}
@@ -964,19 +953,19 @@ The earlier years of the dataset are dominated by small stocks,
 which have higher average returns and higher volatility, while the later years of 
 the dataset is more diverse, leading to lower average returns and lower volatility.
 
-\begin{figure}[h!]
+\begin{figure}[h]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/daily_avg_returns_CRSP_COMPU.png}
+    \includegraphics[width=.95\linewidth]{../docs_src/daily_avg_returns_CRSP_COMPU.png}
   \end{tabular}
   \caption{Average returns of all stocks for a given date}
   \label{fig:avg_returns_crsp}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[h]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/Average_three_month_rolling_std.png}
+    \includegraphics[width=.95\linewidth]{../docs_src/Average_three_month_rolling_std.png}
   \end{tabular}
   \caption{Average three month rolling standard deviation for a given date}
   \label{fig:avg_rolling_std_crsp}
@@ -1020,7 +1009,7 @@ For portfolio construction, bonds are sorted into deciles based on credit spread
 
 The final output is a dataset containing monthly corporate bond portfolio returns sorted by credit spread deciles, making it well-suited for credit risk analysis and for benchmarking against other bond market data. The constructed returns are validated against the dataset by He, Kelly, and Manela (2017), which serves as a benchmark for credit spread deciles. As shown in Figure \ref{fig:corp_bond_returns_comparison}, the time series comparison between the two datasets exhibits strong alignment in return patterns, especially during volatile periods such as the 2008 financial crisis.
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{../docs_src/corporate_returns_compare.png}
     \caption{Comparison of He, Kelly, and Manela (2017) corporate bond returns dataset with FTSFR dataset}
@@ -1329,7 +1318,7 @@ where
 \begin{figure}
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/FX_returns.png} \\[\abovecaptionskip]
+    \includegraphics[width=.95\linewidth]{../docs_src/FX_returns.png} \\[\abovecaptionskip]
   \end{tabular}
 
   \caption{Foreign Currency Returns}
@@ -1450,7 +1439,7 @@ to those reported in their paper.
 \begin{figure}
   \centering
 %   \begin{tabular}{@{}c@{}}
-%     \includegraphics[width=.7\linewidth]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
+%     \includegraphics[width=.95\linewidth]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
 %     \small (a) Findings in Siriwardane et al. (2023)
 %   \end{tabular}
 
@@ -1580,14 +1569,14 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
 % \begin{figure}
 %   \centering
 %   \begin{tabular}{@{}c@{}}
-%     \includegraphics[width=.7\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
+%     \includegraphics[width=.95\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
 %     \small (a) Findings in Siriwardane et al. (2023)
 %   \end{tabular}
 
 %   \vspace{\floatsep}
 
 %   \begin{tabular}{@{}c@{}}
-%     \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
+%     \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
 %     \small (b) Our findings
 %   \end{tabular}
 
@@ -1599,7 +1588,7 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
 \begin{figure}
     \centering
     \begin{tabular}{@{}c@{}}
-      \includegraphics[width=.7\linewidth,height=200pt,width=400pt]{../docs_src/CDS_replicate.png}
+      \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png}
     \end{tabular}
 \caption{Comparison of CDS Arbitrage spreads}
 \label{fig:CDS_replicate}
