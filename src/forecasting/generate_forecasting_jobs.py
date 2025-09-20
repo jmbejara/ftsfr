@@ -61,8 +61,14 @@ def extract_models(models_config: Dict[str, Any]) -> List[Dict[str, str]]:
     return sorted(models, key=lambda x: x['name'])
 
 
-def generate_job_commands(datasets: List[str], models: List[Dict[str, str]]) -> List[str]:
-    """Generate job commands for all dataset x model combinations."""
+def generate_job_commands(datasets: List[str], models: List[Dict[str, str]], skip_existing: bool = False) -> List[str]:
+    """Generate job commands for all dataset x model combinations.
+
+    Args:
+        datasets: List of dataset names
+        models: List of model configurations
+        skip_existing: If True, add --skip-existing flag to commands
+    """
     commands = []
 
     for dataset in datasets:
@@ -70,6 +76,8 @@ def generate_job_commands(datasets: List[str], models: List[Dict[str, str]]) -> 
             model_name = model['name']
             script_name = model['script']
             command = f"python ./src/forecasting/{script_name} --dataset {dataset} --model {model_name}"
+            if skip_existing:
+                command += " --skip-existing"
             commands.append(command)
 
     return commands
@@ -89,6 +97,14 @@ def write_jobs_file(commands: List[str], output_file: Path) -> None:
 
 def main():
     """Main function to generate forecasting jobs."""
+    import argparse
+
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Generate forecasting jobs from configuration")
+    parser.add_argument("--skip-existing", action="store_true",
+                       help="Add --skip-existing flag to generated commands")
+    args = parser.parse_args()
+
     # Define file paths
     script_dir = Path(__file__).resolve().parent
     repo_root = script_dir.parent.parent  # src/forecasting -> src -> repo root
@@ -118,10 +134,12 @@ def main():
         print(f"  - {model['name']} → {model['script']} ({model['display_name']})")
 
     # Generate job commands
-    commands = generate_job_commands(datasets, models)
+    commands = generate_job_commands(datasets, models, skip_existing=args.skip_existing)
     total_jobs = len(commands)
 
     print(f"\nGenerating {total_jobs} jobs ({len(datasets)} datasets × {len(models)} models)")
+    if args.skip_existing:
+        print("  Including --skip-existing flag in commands")
     
     # Write to file
     write_jobs_file(commands, output_file)

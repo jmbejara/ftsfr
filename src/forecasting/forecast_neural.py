@@ -29,7 +29,8 @@ from forecast_utils import (
     read_dataset_config,
     get_test_size_from_frequency,
     convert_pandas_freq_to_polars,
-    evaluate_cv
+    evaluate_cv,
+    should_skip_forecast
 )
 from robust_preprocessing import robust_preprocess_pipeline
 
@@ -519,11 +520,19 @@ def main():
                        help="Neural model to use")
     parser.add_argument("--debug", action="store_true",
                        help="Enable debug mode for faster testing with limited data")
+    parser.add_argument("--skip-existing", action="store_true",
+                       help="Skip if valid error metrics already exist")
     args = parser.parse_args()
 
     DATASET_NAME = args.dataset
     MODEL_NAME = args.model
     DEBUG_MODE = args.debug
+    SKIP_EXISTING = args.skip_existing
+
+    # Check if we should skip this forecast
+    if SKIP_EXISTING and should_skip_forecast(DATASET_NAME, MODEL_NAME, verbose=True):
+        print(f"Skipping {MODEL_NAME} for {DATASET_NAME} - valid metrics already exist")
+        sys.exit(0)
 
     # Set NUM_SAMPLES based on debug mode
     if DEBUG_MODE:

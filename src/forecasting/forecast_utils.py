@@ -421,6 +421,90 @@ def get_minimum_requirements_by_frequency(frequency, test_size, seasonality=1):
     }
 
 
+def should_skip_forecast(dataset_name, model_name, verbose=True):
+    """Check if forecast should be skipped because valid results already exist.
+
+    Args:
+        dataset_name: Name of the dataset
+        model_name: Name of the model (as used in filename, e.g., 'ses', 'auto_deepar')
+        verbose: If True, print messages about skip decision
+
+    Returns:
+        bool: True if valid metrics exist and forecast can be skipped, False otherwise
+    """
+    import pandas as pd
+    import numpy as np
+    from pathlib import Path
+
+    # Construct the path to the error metrics CSV
+    csv_path = Path(f"./_output/forecasting/error_metrics/{dataset_name}/{model_name}.csv")
+
+    # Check if file exists
+    if not csv_path.exists():
+        if verbose:
+            print(f"  Metrics file not found: {csv_path}")
+        return False
+
+    try:
+        # Read the CSV file
+        df = pd.read_csv(csv_path)
+
+        if df.empty:
+            if verbose:
+                print(f"  Metrics file is empty: {csv_path}")
+            return False
+
+        # Check required columns exist
+        required_cols = ['MASE', 'MSE', 'RMSE', 'R2oos']
+        missing_cols = [col for col in required_cols if col not in df.columns]
+        if missing_cols:
+            if verbose:
+                print(f"  Metrics file missing columns {missing_cols}: {csv_path}")
+            return False
+
+        # Get the first row of metrics
+        if len(df) == 0:
+            if verbose:
+                print(f"  No metrics rows in file: {csv_path}")
+            return False
+
+        metrics = df.iloc[0]
+
+        # Check that metrics are not null
+        for col in required_cols:
+            if pd.isna(metrics[col]):
+                if verbose:
+                    print(f"  Metric {col} is null in file: {csv_path}")
+                return False
+
+        # Check that key metrics are not zero (which would indicate failed computation)
+        # Note: R2oos can legitimately be negative or zero, so we don't check it
+        if metrics['MSE'] == 0 or metrics['RMSE'] == 0:
+            if verbose:
+                print(f"  Metrics MSE or RMSE are zero (likely failed computation): {csv_path}")
+            return False
+
+        # Check for invalid values (inf)
+        for col in required_cols:
+            if np.isinf(metrics[col]):
+                if verbose:
+                    print(f"  Metric {col} is infinite in file: {csv_path}")
+                return False
+
+        # All checks passed - valid metrics exist
+        if verbose:
+            print(f"  Valid metrics found, skipping: {csv_path}")
+            print(f"    MASE={metrics['MASE']:.4f}, MSE={metrics['MSE']:.4f}, "
+                  f"RMSE={metrics['RMSE']:.4f}, R2oos={metrics['R2oos']:.4f}")
+
+        return True
+
+    except Exception as e:
+        if verbose:
+            print(f"  Error reading metrics file {csv_path}: {e}")
+        return False
+
+
 def filter_series_by_cv_requirements(df, test_size, frequency='ME', seasonality=1, min_test_coverage=0.3, debug=False):
     """Filter series based on cross-validation requirements.
 

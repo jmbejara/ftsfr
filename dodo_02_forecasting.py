@@ -13,7 +13,7 @@ def task_generate_forecasting_jobs():
 
     return {
         "actions": [
-            (debug_action, ["python src/forecasting/generate_forecasting_jobs.py"])
+            (debug_action, ["python src/forecasting/generate_forecasting_jobs.py --skip-existing"])
         ],
         "file_dep": [
             "src/forecasting/generate_forecasting_jobs.py",

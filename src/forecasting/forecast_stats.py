@@ -24,7 +24,8 @@ from forecast_utils import (
     read_dataset_config,
     get_test_size_from_frequency,
     convert_pandas_freq_to_polars,
-    evaluate_cv
+    evaluate_cv,
+    should_skip_forecast
 )
 from robust_preprocessing import robust_preprocess_pipeline
 
@@ -57,11 +58,19 @@ def main():
                        help="Statistical model to use")
     parser.add_argument("--debug", action="store_true",
                        help="Enable debug mode for faster testing with limited data")
+    parser.add_argument("--skip-existing", action="store_true",
+                       help="Skip if valid error metrics already exist")
     args = parser.parse_args()
 
     DATASET_NAME = args.dataset
     MODEL_NAME = args.model
     DEBUG_MODE = args.debug
+    SKIP_EXISTING = args.skip_existing
+
+    # Check if we should skip this forecast
+    if SKIP_EXISTING and should_skip_forecast(DATASET_NAME, MODEL_NAME, verbose=True):
+        print(f"Skipping {MODEL_NAME} for {DATASET_NAME} - valid metrics already exist")
+        sys.exit(0)
 
     print("=" * 60)
     print("Simple Forecast Statistics with Cross-Validation")
@@ -350,12 +359,17 @@ def main():
 
     # Get the selected model's metrics
     model_name = model_names[0]  # Should be only one model
-    if model_name in avg_metrics:
+
+    # StatsForecast may use different names in columns (e.g., "SES" instead of "SimpleExponentialSmoothing")
+    # Since we're running with a single model, use the actual column name from results
+    metrics_key = actual_model_cols[0] if actual_model_cols else model_name
+
+    if metrics_key in avg_metrics:
         # Validate metrics before saving
-        mase_val = avg_metrics[model_name]['MASE']
-        mse_val = avg_metrics[model_name]['MSE']
-        rmse_val = avg_metrics[model_name]['RMSE']
-        r2oos_val = avg_metrics[model_name]['R2oos']
+        mase_val = avg_metrics[metrics_key]['MASE']
+        mse_val = avg_metrics[metrics_key]['MSE']
+        rmse_val = avg_metrics[metrics_key]['RMSE']
+        r2oos_val = avg_metrics[metrics_key]['R2oos']
 
         # Check for invalid metric values
         import numpy as np
@@ -392,7 +406,7 @@ def main():
         metrics_df.write_csv(csv_path)
         print(f"Error metrics saved to: {csv_path}")
     else:
-        print(f"Warning: Could not find metrics for {model_name}")
+        print(f"Warning: Could not find metrics for model. Looking for key '{metrics_key}' in {list(avg_metrics.keys())}")
 
     print("\n" + "=" * 60)
     print("Forecast Statistics Complete!")

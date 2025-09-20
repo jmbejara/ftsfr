@@ -135,25 +135,91 @@ def get_data_requirements(frequency, test_size, seasonality=1):
     }
 
 
+def normalize_month_end_dates(df, frequency):
+    """Normalize dates to consistent month-end format for ME frequency.
+
+    This is crucial for datasets with inconsistent month-end dates (e.g., Jan 30, Feb 27)
+    to align properly with the canonical grid.
+    """
+    if frequency == 'ME':
+        # Convert to true month-end using Polars date manipulation
+        # This ensures all dates are the actual last day of their month
+        df = df.with_columns(
+            pl.col('ds').dt.month_end().alias('ds')
+        )
+
+        # Remove any duplicates that might arise from normalization
+        # (e.g., if Jan 30 and Jan 31 both existed, they'd both become Jan 31)
+        # Keep the last value if duplicates exist
+        df = df.group_by(['unique_id', 'ds']).last()
+    return df
+
+
 def build_canonical_grid(df, frequency):
     """Build canonical time grid using fill_gaps with per_serie start/end."""
     print("  Building canonical time grid...")
 
-    # Convert frequency to format expected by fill_gaps
-    freq_map = {
-        'ME': '1mo', 'MS': '1mo', 'D': '1d', 'B': '1d',
-        'QE': '3mo', 'QS': '3mo', 'YE': '1y', 'YS': '1y'
-    }
-    polars_freq = freq_map.get(frequency, '1mo')
+    if frequency == 'ME':
+        # For month-end data that's already normalized, create a proper canonical grid
+        # by filling gaps manually to ensure alignment
+        return build_month_end_grid(df)
+    else:
+        # Convert frequency to format expected by fill_gaps
+        freq_map = {
+            'MS': '1mo', 'D': '1d', 'B': '1d',
+            'QE': '3mo', 'QS': '3mo', 'YE': '1y', 'YS': '1y'
+        }
+        polars_freq = freq_map.get(frequency, '1mo')
 
-    # Use per_serie for both start and end to avoid artificial padding
-    df_filled = fill_gaps(df, freq=polars_freq, start='per_serie', end='per_serie')
+        # Use per_serie for both start and end to avoid artificial padding
+        df_filled = fill_gaps(df, freq=polars_freq, start='per_serie', end='per_serie')
+
+        original_series = df['unique_id'].n_unique()
+        filled_series = df_filled['unique_id'].n_unique()
+
+        print(f"    Grid built: {original_series} → {filled_series} series")
+        return df_filled
+
+
+def build_month_end_grid(df):
+    """Build canonical month-end grid for ME frequency data.
+
+    This creates a complete monthly grid for each series using proper month-end dates.
+    """
+    result_dfs = []
+
+    for unique_id in df['unique_id'].unique():
+        series = df.filter(pl.col('unique_id') == unique_id).sort('ds')
+
+        if len(series) == 0:
+            continue
+
+        # Get start and end dates
+        start_date = series['ds'].min()
+        end_date = series['ds'].max()
+
+        # Create complete month-end date range
+        date_range = pl.date_range(
+            start_date, end_date, interval='1mo', eager=True
+        ).dt.month_end().cast(pl.Datetime('ns'))
+
+        # Create grid dataframe
+        grid_df = pl.DataFrame({
+            'unique_id': [unique_id] * len(date_range),
+            'ds': date_range
+        })
+
+        # Left join with original data to preserve values and add nulls for gaps
+        filled_series = grid_df.join(series, on=['unique_id', 'ds'], how='left')
+        result_dfs.append(filled_series)
+
+    final_df = pl.concat(result_dfs)
 
     original_series = df['unique_id'].n_unique()
-    filled_series = df_filled['unique_id'].n_unique()
+    filled_series = final_df['unique_id'].n_unique()
 
     print(f"    Grid built: {original_series} → {filled_series} series")
-    return df_filled
+    return final_df
 
 
 def split_train_test_aligned(df, test_size):
@@ -395,6 +461,9 @@ def robust_preprocess_pipeline(df, frequency, test_size, seasonality=1,
         limited_series = df['unique_id'].unique()[:debug_limit]
         df = df.filter(pl.col('unique_id').is_in(limited_series))
         print(f"Debug mode: Limited to {debug_limit} series (from {initial_series})")
+
+    # Normalize dates for month-end frequency to ensure alignment with canonical grid
+    df = normalize_month_end_dates(df, frequency)
 
     # Step 1: Build canonical grid
     df_grid = build_canonical_grid(df, frequency)
