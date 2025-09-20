@@ -49,7 +49,9 @@ fig, ax = plt.subplots(figsize=(12, 6))
 
 for col in tenors_plot_mine:
     data = df_mine.set_index("Date")[col]
-    ax.plot(data.index, data.values, label=col.replace("Treasury_SF_", "").replace("Y", "Y"))
+    ax.plot(
+        data.index, data.values, label=col.replace("Treasury_SF_", "").replace("Y", "Y")
+    )
 
 ax.set_title("Treasury Spot-Futures Basis")
 ax.set_xlabel("Date")

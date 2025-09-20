@@ -182,7 +182,7 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-y: min=-1.805303277625713, max=1.2258522666583378, mean=0.00, median=0.0016596077365234052
+y: min=-1.805303277625713, max=1.2258522666583374, mean=0.00, median=0.0016596277982949825
 __index_level_0__: min=0, max=657848, mean=330612.87, median=331160.0
 ```
 
@@ -195,7 +195,7 @@ ds: min=2001-01-01 00:00:00, max=2023-12-01 00:00:00
 
 ## ftsfr_CDS_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_returns/ftsfr_CDS_portfolio_returns.parquet`
-**Size:** 57416 bytes | **Type:** Parquet | **Shape:** 5,510 rows × 4 columns
+**Size:** 57422 bytes | **Type:** Parquet | **Shape:** 5,510 rows × 4 columns
 
 **All rows unique:** ✅ Yes
 
@@ -209,8 +209,8 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-y: min=5.3636447198150465e-05, max=0.019337155864089337, mean=0.00, median=0.0008424713798078191
-__index_level_0__: min=0, max=5519, mean=2759.22, median=2759.5
+y: min=5.3628018753738094e-05, max=0.019341884154433435, mean=0.00, median=0.000844851743564012
+__index_level_0__: min=0, max=5519, mean=2759.04, median=2759.5
 ```
 
 ### Date/Datetime Column Statistics
@@ -323,7 +323,7 @@ ds: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ## ftsfr_treas_yield_curve_zero_coupon.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/fed_yield_curve/ftsfr_treas_yield_curve_zero_coupon.parquet`
-**Size:** 2.4 MB | **Type:** Parquet | **Shape:** 373,592 rows × 4 columns
+**Size:** 2.4 MB | **Type:** Parquet | **Shape:** 374,312 rows × 4 columns
 
 **All rows unique:** ✅ Yes
 
@@ -337,13 +337,13 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-y: min=0.0554, max=16.462, mean=5.60, median=5.3053296461184996
-__index_level_0__: min=0, max=502139, mean=226282.43, median=211512.5
+y: min=0.0554, max=16.462, mean=5.60, median=5.2962389140670005
+__index_level_0__: min=0, max=502889, mean=226669.36, median=211886.5
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=1961-06-14 00:00:00, max=2025-08-08 00:00:00
+ds: min=1961-06-14 00:00:00, max=2025-09-12 00:00:00
 ```
 
 ---
@@ -677,7 +677,7 @@ ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
 
 ## ftsfr_treas_bond_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_bond_portfolio_returns.parquet`
-**Size:** 59418 bytes | **Type:** Parquet | **Shape:** 6,639 rows × 3 columns
+**Size:** 59572 bytes | **Type:** Parquet | **Shape:** 6,659 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -695,14 +695,14 @@ y: min=-0.06045740780772699, max=0.1210504349533954, mean=0.00, median=0.0038475
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=1970-01-31 00:00:00, max=2025-06-30 00:00:00
+ds: min=1970-01-31 00:00:00, max=2025-08-31 00:00:00
 ```
 
 ---
 
 ## ftsfr_treas_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_bond_returns.parquet`
-**Size:** 913924 bytes | **Type:** Parquet | **Shape:** 121,123 rows × 3 columns
+**Size:** 919213 bytes | **Type:** Parquet | **Shape:** 121,827 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -715,13 +715,13 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-unique_id: min=200636.0, max=208417.0, mean=204526.79, median=204053.0
-y: min=-0.15135394584216577, max=0.1751899693786838, mean=0.00, median=0.0030176055730861684
+unique_id: min=200636.0, max=208448.0, mean=204544.46, median=204055.0
+y: min=-0.15135394584216577, max=0.1751899693786838, mean=0.00, median=0.003016939008775532
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=1970-01-31 00:00:00, max=2025-06-30 00:00:00
+ds: min=1970-01-31 00:00:00, max=2025-08-31 00:00:00
 ```
 
 ---

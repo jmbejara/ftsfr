@@ -278,12 +278,16 @@ def monthly_returns_mixed_prices(
                 collected.append(sub)
 
         if not collected:
-            raise ValueError(f"No MultiIndex columns with last level in {suffixes} found.")
+            raise ValueError(
+                f"No MultiIndex columns with last level in {suffixes} found."
+            )
         price_df = pd.concat(collected, axis=1)
 
     else:
         # Single-level columns: keep those that end with any of the suffixes
-        sel_cols = [c for c in df.columns if any(str(c).endswith(sfx) for sfx in suffixes)]
+        sel_cols = [
+            c for c in df.columns if any(str(c).endswith(sfx) for sfx in suffixes)
+        ]
         if not sel_cols:
             raise ValueError(f"No columns ending with any of {suffixes} were found.")
         price_df = df[sel_cols].copy()
@@ -327,9 +331,11 @@ def monthly_returns_mixed_prices(
     out = out.set_index("yyyymm")
     return out
 
+
 def load_commodities_returns(data_dir=DATA_DIR):
     df_gsci = generate_replication_gsci(data_dir=data_dir)
     return df_gsci
+
 
 if __name__ == "__main__":
     # Output paths
@@ -345,7 +351,6 @@ if __name__ == "__main__":
 
     df_ticker = generate_replication_future_ticker(data_dir=DATA_DIR)
     df_ticker.to_parquet(path_ticker)
-
 
     print("Replication outputs saved as pickle files:")
     print(f" - GSCI-based: {path_gsci}")

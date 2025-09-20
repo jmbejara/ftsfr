@@ -4,17 +4,15 @@ import os
 import sys
 import asyncio
 import pandas as pd
-import sys
+
 sys.path.append("..")
 
 from settings import config
 import pull_bbg_treas_swap
 from calc_swap_spreads import calc_swap_spreads
 from plot_figure import (
-    plot_figure,
     plot_supplementary,
     DEFAULT_START_DATE,
-    REPLICATION_END_DATE,
 )
 from supplementary import replication_df
 

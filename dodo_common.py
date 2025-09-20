@@ -250,7 +250,9 @@ def get_available_datasets(
         if not is_available:
             continue
 
-        if module_name in datasets_config and isinstance(datasets_config[module_name], dict):
+        if module_name in datasets_config and isinstance(
+            datasets_config[module_name], dict
+        ):
             module_config = datasets_config[module_name]
 
             for key, value in module_config.items():
@@ -262,7 +264,10 @@ def get_available_datasets(
                     dataset_name = key.replace("ftsfr_", "")
 
                     available_datasets[dataset_name] = {
-                        "path": Path(data_dir) / "formatted" / module_name / f"{key}.parquet",
+                        "path": Path(data_dir)
+                        / "formatted"
+                        / module_name
+                        / f"{key}.parquet",
                         "module": module_name,
                         "frequency": value.get("frequency", "D"),
                         "seasonality": value.get("seasonality"),

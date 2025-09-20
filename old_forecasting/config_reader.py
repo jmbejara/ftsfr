@@ -115,4 +115,12 @@ def get_model_config(environment_dict=None):
         print(f"  Description: {dataset_config['description']}")
     print()
 
-    return (test_split, frequency, seasonality, dataset_path, output_dir, dataset_name, winsorization)
+    return (
+        test_split,
+        frequency,
+        seasonality,
+        dataset_path,
+        output_dir,
+        dataset_name,
+        winsorization,
+    )

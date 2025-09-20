@@ -103,9 +103,14 @@ def output_cb_final_products(df):
 
     # filter out for combination of IG and HY
     df = df.loc[df["c_rating"] != "IG + HY"]
-    
+
     # outliers were removed so aggregation should be ok
-    agg_df = df[["c_rating", "date", "rfr"]].groupby(["c_rating", "date"]).mean().reset_index()
+    agg_df = (
+        df[["c_rating", "date", "rfr"]]
+        .groupby(["c_rating", "date"])
+        .mean()
+        .reset_index()
+    )
 
     # no grouping or aggregation here
     non_agg_df = df[["cusip", "date", "rfr"]]

@@ -41,17 +41,14 @@ import logging
 
 logging.getLogger("statsforecast").setLevel(logging.ERROR)
 
-import os
 import time
 import numpy as np
 import pandas as pd
 import polars as pl
 from pathlib import Path
-from functools import partial
 from tabulate import tabulate
 
 import matplotlib.pyplot as plt
-import seaborn as sns
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.seasonal import seasonal_decompose
 import scipy.stats as stats
@@ -106,11 +103,8 @@ sys.path.append(str(REPO_ROOT / "src"))
 from forecast_utils import (
     read_dataset_config,
     load_and_preprocess_data,
-    convert_frequency_to_statsforecast,
 )
 
-from utilsforecast.losses import mase, mae, rmse, smape
-from utilsforecast.evaluation import evaluate
 
 # %%
 """
@@ -126,6 +120,7 @@ The dataset characteristics:
 - **Entities**: 25 portfolios
 - **Time span**: Multiple decades of data
 """
+
 
 # %%
 def main():
@@ -148,8 +143,9 @@ def main():
     print(f"Display Name: {model_config['display_name']}")
     print(f"Library: {model_config['library']}")
     print(f"Parameters: {model_config.get('params', {})}")
-    
+
     return DATASET_NAME, MODEL_NAME, dataset_config, model_configs, model_config
+
 
 # %%
 if __name__ == "__main__":
@@ -169,7 +165,10 @@ Let's load the data and explore its structure. We'll examine:
 if __name__ == "__main__":
     # Load and preprocess data using the current forecasting system
     train_data, test_data, full_data = load_and_preprocess_data(
-        dataset_config["data_path"], dataset_config["frequency"], test_split=0.2, seasonality=dataset_config["seasonality"]
+        dataset_config["data_path"],
+        dataset_config["frequency"],
+        test_split=0.2,
+        seasonality=dataset_config["seasonality"],
     )
 
     print(f"Full dataset shape: {full_data.shape}")
@@ -177,19 +176,23 @@ if __name__ == "__main__":
     print(f"Test data shape: {test_data.shape}")
     print(f"Number of portfolios: {len(full_data['unique_id'].unique())}")
     print(f"Date range: {full_data['ds'].min()} to {full_data['ds'].max()}")
-    
-    print(f"\nNote: The data has been processed using the current forecasting system which includes:")
-    print(f"- Consistent series filtering to ensure fair model comparisons")
-    print(f"- Standardized data cleaning with forward-fill strategy")
-    print(f"- Entity-based forecast horizon calculation for short-lived series")
-    print(f"- Protection for small datasets (≤10 entities) to preserve all data")
+
+    print(
+        "\nNote: The data has been processed using the current forecasting system which includes:"
+    )
+    print("- Consistent series filtering to ensure fair model comparisons")
+    print("- Standardized data cleaning with forward-fill strategy")
+    print("- Entity-based forecast horizon calculation for short-lived series")
+    print("- Protection for small datasets (≤10 entities) to preserve all data")
 
 # %%
 if __name__ == "__main__":
     # Convert to pandas for visualization (keeping one portfolio for detailed analysis)
     sample_portfolio = "SMALL LoBM"  # Small size, low book-to-market portfolio
     sample_data = full_data.filter(pl.col("unique_id") == sample_portfolio).to_pandas()
-    sample_train = train_data.filter(pl.col("unique_id") == sample_portfolio).to_pandas()
+    sample_train = train_data.filter(
+        pl.col("unique_id") == sample_portfolio
+    ).to_pandas()
     sample_test = test_data.filter(pl.col("unique_id") == sample_portfolio).to_pandas()
 
     print(f"\nSample portfolio: {sample_portfolio}")
@@ -220,34 +223,36 @@ Let's demonstrate these concepts with our data:
 # %%
 if __name__ == "__main__":
     # Import the preprocessing functions to demonstrate them
-    from forecast import filter_series_for_forecasting, standardize_data_cleaning
-    
+    from forecast import standardize_data_cleaning
+
     # Show series length distribution before filtering
     series_lengths_before = (
-        full_data.group_by("unique_id")
-        .agg(pl.len().alias("length"))
-        .sort("length")
+        full_data.group_by("unique_id").agg(pl.len().alias("length")).sort("length")
     )
-    
+
     print("Series Length Distribution (Before Filtering):")
     print(f"  Min length: {series_lengths_before['length'].min()}")
     print(f"  Max length: {series_lengths_before['length'].max()}")
     print(f"  Median length: {series_lengths_before['length'].median()}")
     print(f"  Mean length: {series_lengths_before['length'].mean():.1f}")
-    
+
     # Demonstrate what the filtering function would do (it was already applied in load_and_preprocess_data)
-    print(f"\nFiltering was applied during data loading:")
-    print(f"  Dataset: {len(full_data['unique_id'].unique())} entities (post-filtering)")
+    print("\nFiltering was applied during data loading:")
+    print(
+        f"  Dataset: {len(full_data['unique_id'].unique())} entities (post-filtering)"
+    )
     print(f"  Forecast horizon: {int(test_data['ds'].n_unique())} periods")
     print(f"  Seasonality: {dataset_config['seasonality']}")
-    
+
     # Show data cleaning effects on a sample series
     sample_before_cleaning = train_data.filter(pl.col("unique_id") == sample_portfolio)
-    sample_after_cleaning = standardize_data_cleaning(sample_before_cleaning, fill_strategy="forward_only")
-    
+    sample_after_cleaning = standardize_data_cleaning(
+        sample_before_cleaning, fill_strategy="forward_only"
+    )
+
     null_count_before = sample_before_cleaning.filter(pl.col("y").is_null()).height
     null_count_after = sample_after_cleaning.filter(pl.col("y").is_null()).height
-    
+
     print(f"\nData Cleaning Example ({sample_portfolio}):")
     print(f"  Null values before cleaning: {null_count_before}")
     print(f"  Null values after cleaning: {null_count_after}")
@@ -258,74 +263,113 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     # Create visualization showing preprocessing effects
     fig, axes = plt.subplots(2, 2, figsize=(16, 10))
-    
+
     # Plot 1: Series length distribution
     ax1 = axes[0, 0]
-    series_lengths = series_lengths_before['length'].to_numpy()
-    ax1.hist(series_lengths, bins=20, alpha=0.7, color='blue', edgecolor='black')
-    ax1.axvline(x=series_lengths_before['length'].median(), color='red', linestyle='--', 
-                label=f'Median: {series_lengths_before["length"].median()}')
-    ax1.set_title('Distribution of Series Lengths\n(After Current Filtering)')
-    ax1.set_xlabel('Series Length (observations)')
-    ax1.set_ylabel('Count')
+    series_lengths = series_lengths_before["length"].to_numpy()
+    ax1.hist(series_lengths, bins=20, alpha=0.7, color="blue", edgecolor="black")
+    ax1.axvline(
+        x=series_lengths_before["length"].median(),
+        color="red",
+        linestyle="--",
+        label=f"Median: {series_lengths_before['length'].median()}",
+    )
+    ax1.set_title("Distribution of Series Lengths\n(After Current Filtering)")
+    ax1.set_xlabel("Series Length (observations)")
+    ax1.set_ylabel("Count")
     ax1.legend()
     ax1.grid(True, alpha=0.3)
-    
+
     # Plot 2: Forecast horizon comparison
     ax2 = axes[0, 1]
-    forecast_horizon = int(test_data['ds'].n_unique())
-    min_length = series_lengths_before['length'].min()
-    ax2.bar(['Min Series\nLength', 'Forecast\nHorizon', 'Seasonality'], 
-            [min_length, forecast_horizon, dataset_config['seasonality']], 
-            color=['lightcoral', 'lightblue', 'lightgreen'], alpha=0.7)
-    ax2.set_title('Key Length Comparisons')
-    ax2.set_ylabel('Number of Periods')
+    forecast_horizon = int(test_data["ds"].n_unique())
+    min_length = series_lengths_before["length"].min()
+    ax2.bar(
+        ["Min Series\nLength", "Forecast\nHorizon", "Seasonality"],
+        [min_length, forecast_horizon, dataset_config["seasonality"]],
+        color=["lightcoral", "lightblue", "lightgreen"],
+        alpha=0.7,
+    )
+    ax2.set_title("Key Length Comparisons")
+    ax2.set_ylabel("Number of Periods")
     ax2.grid(True, alpha=0.3)
-    
+
     # Plot 3: Data cleaning effect (before/after null handling)
     ax3 = axes[1, 0]
     sample_series_raw = sample_before_cleaning.to_pandas()
     sample_series_clean = sample_after_cleaning.to_pandas()
-    
+
     # Show recent data where nulls might be more visible
-    recent_start = sample_series_raw['ds'].iloc[-500] if len(sample_series_raw) > 500 else sample_series_raw['ds'].iloc[0]
-    recent_raw = sample_series_raw[sample_series_raw['ds'] >= recent_start].copy()
-    recent_clean = sample_series_clean[sample_series_clean['ds'] >= recent_start].copy()
-    
-    ax3.plot(recent_raw['ds'], recent_raw['y'], alpha=0.6, label='Before cleaning', marker='o', markersize=1)
-    ax3.plot(recent_clean['ds'], recent_clean['y'], alpha=0.8, label='After cleaning', linewidth=2)
-    ax3.set_title(f'Data Cleaning Effect: {sample_portfolio}\n(Recent {len(recent_raw)} observations)')
-    ax3.set_xlabel('Date')
-    ax3.set_ylabel('Returns')
+    recent_start = (
+        sample_series_raw["ds"].iloc[-500]
+        if len(sample_series_raw) > 500
+        else sample_series_raw["ds"].iloc[0]
+    )
+    recent_raw = sample_series_raw[sample_series_raw["ds"] >= recent_start].copy()
+    recent_clean = sample_series_clean[sample_series_clean["ds"] >= recent_start].copy()
+
+    ax3.plot(
+        recent_raw["ds"],
+        recent_raw["y"],
+        alpha=0.6,
+        label="Before cleaning",
+        marker="o",
+        markersize=1,
+    )
+    ax3.plot(
+        recent_clean["ds"],
+        recent_clean["y"],
+        alpha=0.8,
+        label="After cleaning",
+        linewidth=2,
+    )
+    ax3.set_title(
+        f"Data Cleaning Effect: {sample_portfolio}\n(Recent {len(recent_raw)} observations)"
+    )
+    ax3.set_xlabel("Date")
+    ax3.set_ylabel("Returns")
     ax3.legend()
     ax3.grid(True, alpha=0.3)
-    
+
     # Plot 4: Pipeline summary
     ax4 = axes[1, 1]
-    pipeline_steps = ['Raw Data', 'Fill Gaps', 'Filter Series', 'Clean Data', 'Ready for\nModeling']
-    pipeline_counts = [len(full_data['unique_id'].unique()), 
-                      len(full_data['unique_id'].unique()),
-                      len(full_data['unique_id'].unique()),
-                      len(full_data['unique_id'].unique()),
-                      len(full_data['unique_id'].unique())]
-    
-    colors = ['lightgray', 'yellow', 'orange', 'lightgreen', 'darkgreen']
+    pipeline_steps = [
+        "Raw Data",
+        "Fill Gaps",
+        "Filter Series",
+        "Clean Data",
+        "Ready for\nModeling",
+    ]
+    pipeline_counts = [
+        len(full_data["unique_id"].unique()),
+        len(full_data["unique_id"].unique()),
+        len(full_data["unique_id"].unique()),
+        len(full_data["unique_id"].unique()),
+        len(full_data["unique_id"].unique()),
+    ]
+
+    colors = ["lightgray", "yellow", "orange", "lightgreen", "darkgreen"]
     bars = ax4.bar(pipeline_steps, pipeline_counts, color=colors, alpha=0.7)
-    ax4.set_title('Data Processing Pipeline')
-    ax4.set_ylabel('Number of Entities')
-    ax4.tick_params(axis='x', rotation=45)
-    
+    ax4.set_title("Data Processing Pipeline")
+    ax4.set_ylabel("Number of Entities")
+    ax4.tick_params(axis="x", rotation=45)
+
     # Add value labels on bars
     for bar, count in zip(bars, pipeline_counts):
         height = bar.get_height()
-        ax4.text(bar.get_x() + bar.get_width()/2., height + 0.5,
-                f'{count}', ha='center', va='bottom')
-    
+        ax4.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height + 0.5,
+            f"{count}",
+            ha="center",
+            va="bottom",
+        )
+
     ax4.grid(True, alpha=0.3)
-    
+
     plt.tight_layout()
     plt.show()
-    
+
     print("\nPipeline Summary:")
     print("- Modern forecasting system ensures consistent preprocessing")
     print("- All models work with the same filtered and cleaned data")
@@ -348,7 +392,11 @@ if __name__ == "__main__":
     # Plot 1: Full time series with train/test split
     ax1 = axes[0]
     ax1.plot(
-        sample_train["ds"], sample_train["y"], label="Training Data", alpha=0.7, linewidth=1
+        sample_train["ds"],
+        sample_train["y"],
+        label="Training Data",
+        alpha=0.7,
+        linewidth=1,
     )
     ax1.plot(
         sample_test["ds"],
@@ -375,7 +423,9 @@ if __name__ == "__main__":
     ax2 = axes[1]
     recent_data = sample_data[sample_data["ds"] >= pd.Timestamp("2020-01-01")]
     ax2.plot(recent_data["ds"], recent_data["y"], linewidth=1.5, color="darkblue")
-    ax2.set_title("Recent Data (2020 onwards) - Showing Volatility Patterns", fontsize=14)
+    ax2.set_title(
+        "Recent Data (2020 onwards) - Showing Volatility Patterns", fontsize=14
+    )
     ax2.set_xlabel("Date")
     ax2.set_ylabel("Returns")
     ax2.grid(True, alpha=0.3)
@@ -479,10 +529,6 @@ This configuration balances speed and accuracy, making it suitable for multiple 
 
 # %%
 if __name__ == "__main__":
-    from statsforecast import StatsForecast
-    from statsforecast.models import Naive
-    from statsforecast.arima import arima_string
-
     # Create the AutoARIMA model
     print("Creating AutoARIMA model with fast configuration...")
     model = create_model(MODEL_NAME, dataset_config["seasonality"], model_configs)
@@ -500,14 +546,16 @@ in parallel, making it efficient for our 25 portfolios.
 # %%
 if __name__ == "__main__":
     # Train the model and generate forecasts using the imported function
-    print(f"Training AutoARIMA on {len(train_data['unique_id'].unique())} portfolios...")
-    
+    print(
+        f"Training AutoARIMA on {len(train_data['unique_id'].unique())} portfolios..."
+    )
+
     forecast_start_time = time.time()
     forecasts = train_and_forecast_statsforecast(
         model, train_data, test_data, dataset_config["frequency"]
     )
     forecast_time = time.time() - forecast_start_time
-    
+
     print(f"Training and forecasting completed in {forecast_time:.2f} seconds")
     print(f"Generated forecasts for {len(forecasts['unique_id'].unique())} portfolios")
 
@@ -523,11 +571,15 @@ shows us the selected ARIMA order in standard notation: ARIMA(p,d,q)(P,D,Q)[m]
 if __name__ == "__main__":
     # Note: Model fitting details would be available if we used the StatsForecast object directly
     # For this tutorial, we focus on the forecasting results and evaluation
-    print(f"\nModel has been trained successfully for all {len(forecasts['unique_id'].unique())} portfolios")
+    print(
+        f"\nModel has been trained successfully for all {len(forecasts['unique_id'].unique())} portfolios"
+    )
     print("AutoARIMA automatically selected optimal parameters for each time series")
-    
+
     # Get forecasts for our sample portfolio
-    sample_forecasts = forecasts.filter(pl.col("unique_id") == sample_portfolio).to_pandas()
+    sample_forecasts = forecasts.filter(
+        pl.col("unique_id") == sample_portfolio
+    ).to_pandas()
     print(f"\nSample forecasts for {sample_portfolio}: {len(sample_forecasts)} periods")
 
 # %%
@@ -542,7 +594,7 @@ if __name__ == "__main__":
     # Forecasts were already generated in the training step above
     forecast_horizon = int(test_data["ds"].n_unique())
     print(f"\nForecast horizon: {forecast_horizon} periods")
-    
+
     # Note: The forecasts from train_and_forecast_statsforecast don't include confidence intervals by default
     # For this tutorial, we'll focus on point forecasts and evaluation
 
@@ -565,7 +617,9 @@ if __name__ == "__main__":
 
     # Plot 1: Forecasts (without confidence intervals for this version)
     ax1 = axes[0]
-    ax1.plot(plot_train["ds"], plot_train["y"], label="Historical", alpha=0.7, color="blue")
+    ax1.plot(
+        plot_train["ds"], plot_train["y"], label="Historical", alpha=0.7, color="blue"
+    )
     ax1.plot(
         plot_test["ds"],
         plot_test["y"],
@@ -574,9 +628,13 @@ if __name__ == "__main__":
         color="green",
         linewidth=2,
     )
-    
+
     # Check if forecast column exists
-    forecast_col = 'AutoARIMA' if 'AutoARIMA' in plot_forecast.columns else plot_forecast.columns[-1]
+    forecast_col = (
+        "AutoARIMA"
+        if "AutoARIMA" in plot_forecast.columns
+        else plot_forecast.columns[-1]
+    )
     ax1.plot(
         plot_forecast["ds"],
         plot_forecast[forecast_col],
@@ -621,43 +679,57 @@ if __name__ == "__main__":
     # For this tutorial version, we'll focus on forecast errors rather than model residuals
     # since we're using the simplified forecasting approach
     print("\nResidual Analysis:")
-    print("Note: For detailed residual analysis, you would need access to the fitted StatsForecast object")
+    print(
+        "Note: For detailed residual analysis, you would need access to the fitted StatsForecast object"
+    )
     print("This tutorial focuses on forecast evaluation using the imported functions.")
-    
+
     # Instead, let's analyze forecast errors
-    forecast_errors = plot_test["y"].values[: len(plot_forecast)] - plot_forecast[forecast_col].values
-    
+    forecast_errors = (
+        plot_test["y"].values[: len(plot_forecast)] - plot_forecast[forecast_col].values
+    )
+
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    
+
     # Plot 1: Forecast errors over time
     axes[0, 0].plot(range(len(forecast_errors)), forecast_errors, alpha=0.7)
     axes[0, 0].set_title("Forecast Errors Over Time")
     axes[0, 0].set_xlabel("Forecast Period")
     axes[0, 0].set_ylabel("Error")
     axes[0, 0].grid(True, alpha=0.3)
-    
+
     # Plot 2: Histogram of forecast errors
     axes[0, 1].hist(
-        forecast_errors, bins=20, density=True, alpha=0.7, color="blue", edgecolor="black"
+        forecast_errors,
+        bins=20,
+        density=True,
+        alpha=0.7,
+        color="blue",
+        edgecolor="black",
     )
     axes[0, 1].set_title("Forecast Error Distribution")
     axes[0, 1].set_xlabel("Error")
     axes[0, 1].set_ylabel("Density")
     axes[0, 1].grid(True, alpha=0.3)
-    
+
     # Plot 3: Q-Q plot of forecast errors
     stats.probplot(forecast_errors, dist="norm", plot=axes[1, 0])
     axes[1, 0].set_title("Q-Q Plot of Forecast Errors")
     axes[1, 0].grid(True, alpha=0.3)
-    
+
     # Plot 4: ACF of forecast errors
-    plot_acf(forecast_errors, lags=min(20, len(forecast_errors)-1), ax=axes[1, 1], alpha=0.05)
+    plot_acf(
+        forecast_errors,
+        lags=min(20, len(forecast_errors) - 1),
+        ax=axes[1, 1],
+        alpha=0.05,
+    )
     axes[1, 1].set_title("ACF of Forecast Errors")
     axes[1, 1].set_xlabel("Lag")
-    
+
     plt.tight_layout()
     plt.show()
-    
+
     # Error statistics
     print(f"\nForecast Error Statistics for {sample_portfolio}:")
     print(f"  Mean Error: {np.mean(forecast_errors):.6f}")
@@ -677,7 +749,7 @@ forecasting accuracy measures.
 if __name__ == "__main__":
     # Use the imported function to calculate comprehensive metrics
     print("Calculating global evaluation metrics...")
-    
+
     global_mase, global_smape, global_mae, global_rmse = calculate_global_metrics(
         train_data, test_data, forecasts, dataset_config["seasonality"], MODEL_NAME
     )
@@ -688,11 +760,13 @@ if __name__ == "__main__":
     print(f"{'SMAPE':10s}: {global_smape:.4f}")
     print(f"{'MAE':10s}: {global_mae:.4f}")
     print(f"{'RMSE':10s}: {global_rmse:.4f}")
-    
+
     print("\\nInterpretation:")
     print("- MASE < 1 indicates the model outperforms naive forecasts")
     print("- Lower values indicate better performance")
-    print("- Financial returns are inherently difficult to predict due to market efficiency")
+    print(
+        "- Financial returns are inherently difficult to predict due to market efficiency"
+    )
 
 # %%
 """
@@ -706,37 +780,59 @@ a sliding window approach to evaluate performance on multiple forecast horizons.
 if __name__ == "__main__":
     print("Note: Cross-validation requires the full StatsForecast object")
     print("For this simplified tutorial, we focus on out-of-sample evaluation")
-    print("\nThe train/test split already provides a robust evaluation of model performance")
-    print(f"We trained on {len(train_data):,} samples and tested on {len(test_data):,} samples")
-    
+    print(
+        "\nThe train/test split already provides a robust evaluation of model performance"
+    )
+    print(
+        f"We trained on {len(train_data):,} samples and tested on {len(test_data):,} samples"
+    )
+
     # Instead, let's show some time-based performance analysis
     print("\nAnalyzing forecast performance over time...")
-    
+
     # Get forecasts for sample portfolio and calculate errors by month
-    sample_forecast_errors = plot_test["y"].values[: len(plot_forecast)] - plot_forecast[forecast_col].values
+    sample_forecast_errors = (
+        plot_test["y"].values[: len(plot_forecast)] - plot_forecast[forecast_col].values
+    )
     sample_test_dates = plot_forecast["ds"].values
-    
+
     # Create a simple time-based performance plot
     fig, ax = plt.subplots(1, 1, figsize=(14, 6))
-    
+
     # Rolling MAE over time (if we have enough data points)
     if len(sample_forecast_errors) >= 20:
         window_size = min(20, len(sample_forecast_errors) // 4)
-        rolling_mae = pd.Series(np.abs(sample_forecast_errors)).rolling(window=window_size, center=True).mean()
-        
-        ax.plot(sample_test_dates, rolling_mae, color='red', linewidth=2, label=f'Rolling MAE (window={window_size})')
-        ax.set_title(f'Rolling Mean Absolute Error Over Time - {sample_portfolio}', fontsize=14)
-        ax.set_xlabel('Date')
-        ax.set_ylabel('MAE')
+        rolling_mae = (
+            pd.Series(np.abs(sample_forecast_errors))
+            .rolling(window=window_size, center=True)
+            .mean()
+        )
+
+        ax.plot(
+            sample_test_dates,
+            rolling_mae,
+            color="red",
+            linewidth=2,
+            label=f"Rolling MAE (window={window_size})",
+        )
+        ax.set_title(
+            f"Rolling Mean Absolute Error Over Time - {sample_portfolio}", fontsize=14
+        )
+        ax.set_xlabel("Date")
+        ax.set_ylabel("MAE")
         ax.legend()
         ax.grid(True, alpha=0.3)
     else:
-        ax.scatter(range(len(sample_forecast_errors)), np.abs(sample_forecast_errors), alpha=0.7)
-        ax.set_title(f'Absolute Forecast Errors - {sample_portfolio}', fontsize=14)
-        ax.set_xlabel('Forecast Period')
-        ax.set_ylabel('Absolute Error')
+        ax.scatter(
+            range(len(sample_forecast_errors)),
+            np.abs(sample_forecast_errors),
+            alpha=0.7,
+        )
+        ax.set_title(f"Absolute Forecast Errors - {sample_portfolio}", fontsize=14)
+        ax.set_xlabel("Forecast Period")
+        ax.set_ylabel("Absolute Error")
         ax.grid(True, alpha=0.3)
-    
+
     plt.tight_layout()
     plt.show()
 
@@ -753,39 +849,48 @@ if __name__ == "__main__":
     # For this simplified version, we'll create a summary of performance
     print("\nPerformance Summary Across All Portfolios:")
     print("=" * 50)
-    
+
     # Calculate basic statistics for all forecasts
     forecast_df = pl.DataFrame(forecasts)
-    
+
     print(f"Total portfolios forecasted: {len(forecast_df['unique_id'].unique())}")
     print(f"Total forecast points: {len(forecast_df)}")
     print(f"Forecast horizon: {forecast_horizon} trading days")
-    
+
     # Simple performance visualization - distribution of forecasts
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    
+
     # Plot 1: Distribution of forecast values
-    forecast_col_name = [col for col in forecast_df.columns if col not in ['unique_id', 'ds']][0]
+    forecast_col_name = [
+        col for col in forecast_df.columns if col not in ["unique_id", "ds"]
+    ][0]
     forecast_values = forecast_df[forecast_col_name].to_numpy()
-    
-    axes[0].hist(forecast_values, bins=50, alpha=0.7, color='blue', edgecolor='black')
-    axes[0].set_title('Distribution of Forecast Values Across All Portfolios')
-    axes[0].set_xlabel('Forecast Return')
-    axes[0].set_ylabel('Frequency')
+
+    axes[0].hist(forecast_values, bins=50, alpha=0.7, color="blue", edgecolor="black")
+    axes[0].set_title("Distribution of Forecast Values Across All Portfolios")
+    axes[0].set_xlabel("Forecast Return")
+    axes[0].set_ylabel("Frequency")
     axes[0].grid(True, alpha=0.3)
-    
+
     # Plot 2: Number of forecasts per portfolio (should be equal)
-    forecasts_per_portfolio = forecast_df.group_by('unique_id').agg(pl.len().alias('count'))
-    axes[1].bar(range(len(forecasts_per_portfolio)), forecasts_per_portfolio['count'], alpha=0.7, color='green')
-    axes[1].set_title('Number of Forecasts per Portfolio')
-    axes[1].set_xlabel('Portfolio Index')
-    axes[1].set_ylabel('Forecast Count')
+    forecasts_per_portfolio = forecast_df.group_by("unique_id").agg(
+        pl.len().alias("count")
+    )
+    axes[1].bar(
+        range(len(forecasts_per_portfolio)),
+        forecasts_per_portfolio["count"],
+        alpha=0.7,
+        color="green",
+    )
+    axes[1].set_title("Number of Forecasts per Portfolio")
+    axes[1].set_xlabel("Portfolio Index")
+    axes[1].set_ylabel("Forecast Count")
     axes[1].grid(True, alpha=0.3)
-    
+
     plt.tight_layout()
     plt.show()
-    
-    print(f"\nForecast statistics:")
+
+    print("\nForecast statistics:")
     print(f"  Mean forecast value: {np.mean(forecast_values):.6f}")
     print(f"  Std dev of forecasts: {np.std(forecast_values):.6f}")
     print(f"  Min forecast: {np.min(forecast_values):.6f}")

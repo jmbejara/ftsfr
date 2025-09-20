@@ -13,7 +13,12 @@ def task_generate_forecasting_jobs():
 
     return {
         "actions": [
-            (debug_action, ["python src/forecasting/generate_forecasting_jobs.py --skip-existing --skip-daily"])
+            (
+                debug_action,
+                [
+                    "python src/forecasting/generate_forecasting_jobs.py --skip-existing --skip-daily"
+                ],
+            )
         ],
         "file_dep": [
             "src/forecasting/generate_forecasting_jobs.py",
@@ -21,9 +26,7 @@ def task_generate_forecasting_jobs():
             "datasets.toml",
             OUTPUT_DIR / "available_datasets.csv",
         ],
-        "targets": [
-            str(jobs_file)
-        ],
+        "targets": [str(jobs_file)],
         "clean": True,
         "verbosity": 2,
     }
@@ -35,7 +38,9 @@ def task_run_forecasting_jobs():
     jobs_file = Path("src/forecasting/forecasting_jobs.txt")
 
     try:
-        commands = [line.strip() for line in jobs_file.read_text().splitlines() if line.strip()]
+        commands = [
+            line.strip() for line in jobs_file.read_text().splitlines() if line.strip()
+        ]
     except FileNotFoundError:
         commands = []
 
@@ -57,13 +62,13 @@ def task_run_forecasting_jobs():
 
         targets = []
         if dataset and model:
-            targets.append(OUTPUT_DIR / "forecasting" / "error_metrics" / dataset / f"{model}.csv")
+            targets.append(
+                OUTPUT_DIR / "forecasting" / "error_metrics" / dataset / f"{model}.csv"
+            )
 
         yield {
             "name": task_name,
-            "actions": [
-                (debug_action, [command])
-            ],
+            "actions": [(debug_action, [command])],
             "file_dep": [str(jobs_file), str(script_path)],
             "task_dep": ["generate_forecasting_jobs"],
             "targets": [str(path) for path in targets],

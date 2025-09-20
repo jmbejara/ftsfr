@@ -104,7 +104,9 @@ print(f"Found {len(constant_rssdids)} constant series, removing them...")
 df_bank = df_bank[~df_bank["rssdid"].isin(constant_rssdids)]
 print(f"Final cash liquidity dataset rows: {len(df_bank)}")
 
-df_bank = df_bank.rename(columns={"rssdid": "unique_id", "date": "ds", "cash_liquidity": "y"})
+df_bank = df_bank.rename(
+    columns={"rssdid": "unique_id", "date": "ds", "cash_liquidity": "y"}
+)
 df_bank.reset_index(drop=True, inplace=True)
 df_bank.to_parquet(DATA_DIR / "ftsfr_nyu_call_report_cash_liquidity.parquet")
 # df_wide = df.pivot(index="date", columns="rssdid", values="cash_liquidity")

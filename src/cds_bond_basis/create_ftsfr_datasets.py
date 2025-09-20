@@ -21,8 +21,6 @@ CDS_FILE_NAME = (
 )
 
 
-
-
 ## Calculate cds_basis
 
 
@@ -67,7 +65,9 @@ df_stacked.to_parquet(DATA_DIR / "ftsfr_CDS_bond_basis_aggregated.parquet")
 duplicates = df_stacked2.duplicated(subset=["unique_id", "ds"])
 num_duplicates = duplicates.sum()
 if num_duplicates > 0:
-    print(f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_stacked2.")
+    print(
+        f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_stacked2."
+    )
     print(df_stacked2[duplicates][["unique_id", "ds"]].head())
     df_stacked2.drop_duplicates(subset=["unique_id", "ds"], inplace=True)
 else:

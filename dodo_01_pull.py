@@ -812,7 +812,7 @@ def task_organize_ftsfr_datasets():
     """Organize ftsfr datasets into formatted structure"""
     # Get all Python files in src directory as dependencies
     src_files = list(Path("./src").rglob("*.py"))
-    
+
     # Find all existing ftsfr files to generate targets
     formatted_targets = []
     if DATA_DIR.exists():
@@ -822,9 +822,11 @@ def task_organize_ftsfr_datasets():
                 # Find ftsfr files in this module
                 for ftsfr_file in module_dir.glob("ftsfr_*.parquet"):
                     # Create corresponding target path in formatted structure
-                    formatted_path = DATA_DIR / "formatted" / module_name / ftsfr_file.name
+                    formatted_path = (
+                        DATA_DIR / "formatted" / module_name / ftsfr_file.name
+                    )
                     formatted_targets.append(formatted_path)
-    
+
     return {
         "actions": [(debug_action, ["python ./src/organize_ftsfr_datasets.py"])],
         "file_dep": [

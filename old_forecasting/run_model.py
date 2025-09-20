@@ -182,7 +182,7 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
     ):
         if "season_length" not in params:
             params["season_length"] = seasonality
-    
+
     # StatsForecast AutoARIMA speed optimizations
     if "AutoARIMA" in model_name and model_config.get("class") == "StatsForecastMain":
         # Speed optimizations for StatsForecast AutoARIMA
@@ -198,7 +198,9 @@ def create_estimator(model_config, seasonality, frequency, n_epochs=None):
             params["max_P"] = 2  # Limit seasonal AR order for speed
         if "max_Q" not in params:
             params["max_Q"] = 2  # Limit seasonal MA order for speed
-        print(f"Applied speed optimizations for StatsForecast AutoARIMA: approximation={params['approximation']}, stepwise={params['stepwise']}")
+        print(
+            f"Applied speed optimizations for StatsForecast AutoARIMA: approximation={params['approximation']}, stepwise={params['stepwise']}"
+        )
 
     # Models that need input_chunk_length (typically seasonality * 4)
     if any(
@@ -488,7 +490,14 @@ def run_model(
         raise ValueError(f"Unknown model class: {model_class}")
 
     model_obj = object_class(
-        estimator, model_name, test_split, frequency, seasonality, data_path, output_dir, winsorization
+        estimator,
+        model_name,
+        test_split,
+        frequency,
+        seasonality,
+        data_path,
+        output_dir,
+        winsorization,
     )
 
     # Run the selected workflow
@@ -599,23 +608,35 @@ def main():
     # Read configuration (dataset config + environment overrides)
     dataset_config = get_model_config(modified_env)
     # Unpack the full configuration tuple
-    (test_split, frequency, seasonality, data_path, output_dir, dataset_name, winsorization) = dataset_config
-    
+    (
+        test_split,
+        frequency,
+        seasonality,
+        data_path,
+        output_dir,
+        dataset_name,
+        winsorization,
+    ) = dataset_config
+
     # Handle winsorization CLI override
     if args.winsorize is not None:
-        if args.winsorize.lower() == 'none':
+        if args.winsorize.lower() == "none":
             winsorization = None
             print("DEBUG: Disabled winsorization via --winsorize none")
         else:
             # Parse format like '[1.0,99.0]'
             try:
-                winsorize_str = args.winsorize.strip('[]')
-                winsorization = [float(x.strip()) for x in winsorize_str.split(',')]
+                winsorize_str = args.winsorize.strip("[]")
+                winsorization = [float(x.strip()) for x in winsorize_str.split(",")]
                 if len(winsorization) != 2:
                     raise ValueError("Expected exactly 2 values")
-                print(f"DEBUG: Override winsorization to {winsorization} via --winsorize")
+                print(
+                    f"DEBUG: Override winsorization to {winsorization} via --winsorize"
+                )
             except Exception as e:
-                raise ValueError(f"Invalid winsorization format '{args.winsorize}'. Expected format: '[1.0,99.0]' or 'none'") from e
+                raise ValueError(
+                    f"Invalid winsorization format '{args.winsorize}'. Expected format: '[1.0,99.0]' or 'none'"
+                ) from e
 
     # Handle N_EPOCHS environment variable for debugging
     n_epochs = None

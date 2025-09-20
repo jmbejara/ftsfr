@@ -51,7 +51,9 @@ df_portfolio_long = df_portfolio_long[["unique_id", "ds", "y"]]
 duplicates = df_portfolio_long.duplicated(subset=["unique_id", "ds"])
 num_duplicates = duplicates.sum()
 if num_duplicates > 0:
-    print(f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_portfolio_long.")
+    print(
+        f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_portfolio_long."
+    )
     print(df_portfolio_long[duplicates][["unique_id", "ds"]].head())
     df_portfolio_long.drop_duplicates(subset=["unique_id", "ds"], inplace=True)
 else:
@@ -85,7 +87,9 @@ df_contract_long = df_contract_long.sort_values(by=["unique_id", "ds"]).reset_in
 duplicates = df_contract_long.duplicated(subset=["unique_id", "ds"])
 num_duplicates = duplicates.sum()
 if num_duplicates > 0:
-    print(f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_contract_long.")
+    print(
+        f"Warning: Found {num_duplicates} duplicate (unique_id, ds) pairs in df_contract_long."
+    )
     print(df_contract_long[duplicates][["unique_id", "ds"]].head())
     df_contract_long.drop_duplicates(subset=["unique_id", "ds"], inplace=True)
 else:
@@ -96,4 +100,3 @@ else:
 # Save as ftsfr dataset
 df_contract_long = df_contract_long.dropna()
 df_contract_long.to_parquet(DATA_DIR / "ftsfr_CDS_contract_returns.parquet")
-

@@ -294,34 +294,40 @@ def get_dataset_report(
         if ftsfr_enhanced:
             # Calculate null fractions for all columns (not just processed ones)
             null_fraction_exprs = [
-                (pl.col(col).null_count() / pl.len()).alias(f"{col}_null_fraction") 
+                (pl.col(col).null_count() / pl.len()).alias(f"{col}_null_fraction")
                 for col in all_columns
             ]
             null_fractions_df = lf.select(null_fraction_exprs).collect()
             null_fractions_dict = null_fractions_df.to_dicts()[0]
-            
+
             # Store null fractions for each column
             null_fractions = []
             for col in all_columns:
                 fraction = null_fractions_dict.get(f"{col}_null_fraction", 0.0)
-                null_fractions.append({
-                    "name": col,
-                    "null_fraction": fraction,
-                    "null_percentage": fraction * 100
-                })
+                null_fractions.append(
+                    {
+                        "name": col,
+                        "null_fraction": fraction,
+                        "null_percentage": fraction * 100,
+                    }
+                )
             report["null_fractions"] = null_fractions
-            
+
             # Check row uniqueness - compare total rows to unique rows
-            unique_row_count_df = lf.unique().select(pl.len().alias("unique_count")).collect()
+            unique_row_count_df = (
+                lf.unique().select(pl.len().alias("unique_count")).collect()
+            )
             unique_row_count = unique_row_count_df["unique_count"][0]
             total_rows = report["n_rows"]
-            
+
             report["row_uniqueness"] = {
                 "total_rows": total_rows,
                 "unique_rows": unique_row_count,
                 "all_rows_unique": unique_row_count == total_rows,
                 "duplicate_rows": total_rows - unique_row_count,
-                "uniqueness_percentage": (unique_row_count / total_rows * 100) if total_rows > 0 else 100.0
+                "uniqueness_percentage": (unique_row_count / total_rows * 100)
+                if total_rows > 0
+                else 100.0,
             }
 
     except Exception as e:
@@ -359,9 +365,11 @@ def filter_ftsfr_files(existing_files):
         filepath_obj = Path(filepath)
         filename = filepath_obj.name
         # Only include ftsfr files that are in the formatted directory structure
-        if (filename.startswith("ftsfr_") and 
-            filename.endswith(".parquet") and 
-            "formatted" in filepath_obj.parts):
+        if (
+            filename.startswith("ftsfr_")
+            and filename.endswith(".parquet")
+            and "formatted" in filepath_obj.parts
+        ):
             ftsfr_files.add(filepath)
     return ftsfr_files
 
@@ -370,13 +378,13 @@ def find_formatted_ftsfr_files():
     """Find all ftsfr parquet files in the formatted directory structure."""
     formatted_dir = DATA_DIR / "formatted"
     ftsfr_files = set()
-    
+
     if formatted_dir.exists():
         # Recursively search for ftsfr_*.parquet files in formatted directory
         for parquet_file in formatted_dir.rglob("ftsfr_*.parquet"):
             if parquet_file.is_file():
                 ftsfr_files.add(str(parquet_file))
-    
+
     return ftsfr_files
 
 
@@ -599,7 +607,9 @@ def create_ftsfr_enhanced_report(
     output_lines.append("# Data Glimpses Report: FTSFR only")
     output_lines.append(f"Total FTSFR datasets: {len(ftsfr_files)}")
     output_lines.append("")
-    output_lines.append("This report provides enhanced analysis specifically for FTSFR (Financial Time Series Forecasting Repository) datasets, including:")
+    output_lines.append(
+        "This report provides enhanced analysis specifically for FTSFR (Financial Time Series Forecasting Repository) datasets, including:"
+    )
     output_lines.append("- Detailed null value analysis for all columns")
     output_lines.append("- Row uniqueness verification")
     output_lines.append("- Standard dataset metadata and glimpses")
@@ -682,7 +692,9 @@ def create_ftsfr_enhanced_report(
         # Enhanced FTSFR Analysis Section
         if "row_uniqueness" in report:
             uniqueness = report["row_uniqueness"]
-            output_lines.append(f"**All rows unique:** {'✅ Yes' if uniqueness['all_rows_unique'] else '❌ No'}")
+            output_lines.append(
+                f"**All rows unique:** {'✅ Yes' if uniqueness['all_rows_unique'] else '❌ No'}"
+            )
             output_lines.append("")
 
         # Columns section
@@ -923,9 +935,11 @@ def main():
         print("\nGenerating FTSFR enhanced report only...")
         ftsfr_files = find_formatted_ftsfr_files()
         print(f"Found {len(ftsfr_files)} FTSFR datasets in formatted directory")
-        
+
         if verbose:
-            print(f"\nPreparing to create FTSFR enhanced glimpses for {len(ftsfr_files)} data files...")
+            print(
+                f"\nPreparing to create FTSFR enhanced glimpses for {len(ftsfr_files)} data files..."
+            )
 
         ftsfr_content = create_ftsfr_enhanced_report(
             ftsfr_files,
@@ -938,13 +952,17 @@ def main():
         with open(ftsfr_output_file, "w", encoding="utf-8") as f:
             f.write(ftsfr_content)
         print(f"FTSFR enhanced report saved to: {ftsfr_output_file}")
-        
-        print(f"\nProcessed {len(ftsfr_files)} FTSFR files from {len(task_files)} tasks")
+
+        print(
+            f"\nProcessed {len(ftsfr_files)} FTSFR files from {len(task_files)} tasks"
+        )
     else:
         # Generate both reports
         print("\nGenerating all-datasets report...")
         if verbose:
-            print(f"\nPreparing to create glimpses for {len(existing_files)} data files...")
+            print(
+                f"\nPreparing to create glimpses for {len(existing_files)} data files..."
+            )
 
         txt_content = create_txt_report(
             existing_files,
@@ -962,7 +980,7 @@ def main():
         print("\nGenerating FTSFR enhanced report...")
         ftsfr_files = find_formatted_ftsfr_files()
         print(f"Found {len(ftsfr_files)} FTSFR datasets in formatted directory")
-        
+
         if len(ftsfr_files) > 0:
             ftsfr_content = create_ftsfr_enhanced_report(
                 ftsfr_files,
@@ -978,7 +996,9 @@ def main():
         else:
             print("No FTSFR datasets found - skipping FTSFR enhanced report")
 
-        print(f"\nProcessed {len(existing_files)} files ({len(ftsfr_files)} FTSFR) from {len(task_files)} tasks")
+        print(
+            f"\nProcessed {len(existing_files)} files ({len(ftsfr_files)} FTSFR) from {len(task_files)} tasks"
+        )
 
     print("Report(s) generated successfully!")
 

@@ -12,8 +12,6 @@ from dodo_common import (
     DATA_DIR,
     OUTPUT_DIR,
 )
-from pathlib import Path
-
 
 
 def task_assemble_results():
@@ -36,13 +34,13 @@ def task_assemble_results():
 def task_create_dataset_statistics():
     """Create dataset statistics table from active datasets in datasets.toml"""
     import glob
-    
+
     # Get all parquet files from formatted directory only
     dataset_parquet_files = glob.glob(
         str(DATA_DIR / "formatted" / "**" / "ftsfr_*.parquet"),
         recursive=True,
     )
-    
+
     return {
         "actions": [
             "python ./src/forecasting/create_dataset_statistics.py",
@@ -63,13 +61,13 @@ def task_create_dataset_statistics():
 def task_create_filtered_dataset_statistics():
     """Create filtered dataset statistics table showing effects of forecasting system filtering"""
     import glob
-    
+
     # Get all parquet files from formatted directory only
     dataset_parquet_files = glob.glob(
         str(DATA_DIR / "formatted" / "**" / "ftsfr_*.parquet"),
         recursive=True,
     )
-    
+
     return {
         "actions": [
             "python ./src/forecasting/create_filtered_dataset_statistics.py",
@@ -100,7 +98,6 @@ def task_create_results_tables():
             OUTPUT_DIR / "forecasting" / "paper" / "rmse_pivot_table.csv",
             OUTPUT_DIR / "forecasting" / "paper" / "r2oos_pivot_table.csv",
             OUTPUT_DIR / "forecasting" / "paper" / "median_mase_summary.csv",
-
             # Heatmap plots (PNG files)
             OUTPUT_DIR / "forecasting" / "paper" / "mase_heatmap.png",
             OUTPUT_DIR / "forecasting" / "paper" / "rmse_heatmap.png",
@@ -152,7 +149,6 @@ def task_create_results_tables():
 def task_compile_latex_docs():
     """Compile the LaTeX documents to PDFs using forecasting outputs"""
 
-
     return {
         "actions": [
             "latexmk -xelatex -halt-on-error -cd ./reports/draft_ftsfr.tex",  # Compile
@@ -170,7 +166,10 @@ def task_compile_latex_docs():
             "./reports/draft_ftsfr.tex",
             "./reports/slides_ftsfr.tex",
             OUTPUT_DIR / "forecasting" / "paper" / "dataset_statistics_tabular.tex",
-            OUTPUT_DIR / "forecasting" / "paper" / "filtered_dataset_statistics_tabular.tex",
+            OUTPUT_DIR
+            / "forecasting"
+            / "paper"
+            / "filtered_dataset_statistics_tabular.tex",
             OUTPUT_DIR / "forecasting" / "paper" / "mase_pivot_tabular.tex",
             OUTPUT_DIR / "forecasting" / "paper" / "rmse_pivot_tabular.tex",
             OUTPUT_DIR / "forecasting" / "paper" / "r2oos_pivot_tabular.tex",

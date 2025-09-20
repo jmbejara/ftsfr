@@ -14,7 +14,6 @@ import time
 import argparse
 import polars as pl
 import pandas as pd
-import numpy as np
 from pathlib import Path
 from tabulate import tabulate
 import os
@@ -22,6 +21,7 @@ import multiprocessing
 import torch
 
 import sys
+
 sys.path.append(str(Path(__file__).parent))
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
@@ -30,7 +30,7 @@ from forecast_utils import (
     get_test_size_from_frequency,
     convert_pandas_freq_to_polars,
     evaluate_cv,
-    should_skip_forecast
+    should_skip_forecast,
 )
 from robust_preprocessing import robust_preprocess_pipeline
 
@@ -44,20 +44,17 @@ from neuralforecast.models import (
     VanillaTransformer,
     TiDE,
     KAN,
-    LSTM
 )
 from neuralforecast.losses.pytorch import MAE, DistributionLoss
 
 from statsforecast import StatsForecast
-from statsforecast.models import (
-    HistoricAverage,
-    SeasonalNaive
-)
+from statsforecast.models import HistoricAverage, SeasonalNaive
 
 warnings.filterwarnings("ignore")
 
 # Fixed hyperparameters for non-auto models
 # These are reasonable defaults that work well for most cases
+
 
 # Hardware detection functions
 def detect_hardware():
@@ -68,9 +65,9 @@ def detect_hardware():
     cuda_available = torch.cuda.is_available()
     cuda_count = torch.cuda.device_count() if cuda_available else 0
 
-    mps_available = hasattr(torch.backends, 'mps') and torch.backends.mps.is_available()
+    mps_available = hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
 
-    print(f"Hardware detected:")
+    print("Hardware detected:")
     print(f"  CPUs: {cpu_count}")
     print(f"  CUDA GPUs: {cuda_count}")
     print(f"  MPS available: {mps_available}")
@@ -85,17 +82,17 @@ def detect_hardware():
         accelerator = "gpu"  # CUDA
         devices = 1
         strategy = "auto"
-        print(f"  Using single CUDA GPU training")
+        print("  Using single CUDA GPU training")
     elif mps_available:
         accelerator = "mps"  # Apple Silicon
         devices = 1
         strategy = "auto"
-        print(f"  Using Apple MPS GPU training")
+        print("  Using Apple MPS GPU training")
     else:
         accelerator = "cpu"
         devices = 1
         strategy = "auto"
-        print(f"  Using CPU training")
+        print("  Using CPU training")
 
     # Configure workers and parallel jobs based on CPU count
     # Conservative estimates to avoid overwhelming the system
@@ -111,24 +108,26 @@ def detect_hardware():
     print(f"  Data loading workers: {num_workers}")
 
     return {
-        'cpu_count': cpu_count,
-        'cuda_count': cuda_count,
-        'mps_available': mps_available,
-        'accelerator': accelerator,
-        'devices': devices,
-        'strategy': strategy,
-        'num_workers': num_workers,
+        "cpu_count": cpu_count,
+        "cuda_count": cuda_count,
+        "mps_available": mps_available,
+        "accelerator": accelerator,
+        "devices": devices,
+        "strategy": strategy,
+        "num_workers": num_workers,
     }
 
 
-def create_config_nhits(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_nhits(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for NHITS."""
     config_dict = {
         "input_size": 12 if debug else 24,
         "start_padding_enabled": True,
         "n_blocks": 5 * [1],
         "mlp_units": 5 * [[64, 64]],
-        "n_pool_kernel_size": 5*[2],
+        "n_pool_kernel_size": 5 * [2],
         "n_freq_downsample": [2, 2, 1, 1, 1],
         "learning_rate": 1e-3,
         "scaler_type": "robust",
@@ -141,22 +140,24 @@ def create_config_nhits(seasonality, lightning_logs_dir=None, debug=False, hardw
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
 
-def create_config_lstm(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_lstm(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for LSTM."""
     config_dict = {
         "input_size": 12 if debug else 24,
         "encoder_hidden_size": 128,
         "encoder_n_layers": 2,
         "learning_rate": 1e-3,
-        "scaler_type": 'robust',
+        "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
         "random_seed": 42,
@@ -168,20 +169,22 @@ def create_config_lstm(seasonality, lightning_logs_dir=None, debug=False, hardwa
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
 
-def create_config_simple(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_simple(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for linear models."""
     config_dict = {
         "input_size": 12 if debug else 24,
         "learning_rate": 1e-3,
-        "scaler_type": 'robust',
+        "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
         "random_seed": 42,
@@ -191,15 +194,17 @@ def create_config_simple(seasonality, lightning_logs_dir=None, debug=False, hard
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
 
-def create_config_deepar(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_deepar(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for DeepAR."""
     config_dict = {
         "input_size": 12 if debug else 24,
@@ -217,15 +222,17 @@ def create_config_deepar(seasonality, lightning_logs_dir=None, debug=False, hard
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
 
-def create_config_nbeats(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_nbeats(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for NBEATS."""
     config_dict = {
         "input_size": 12 if debug else 24,
@@ -243,15 +250,17 @@ def create_config_nbeats(seasonality, lightning_logs_dir=None, debug=False, hard
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
 
-def create_config_transformer(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_transformer(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for VanillaTransformer."""
     config_dict = {
         "input_size": 12 if debug else 24,
@@ -268,15 +277,17 @@ def create_config_transformer(seasonality, lightning_logs_dir=None, debug=False,
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
 
-def create_config_tide(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_tide(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for TiDE."""
     config_dict = {
         "input_size": 12 if debug else 24,
@@ -295,15 +306,17 @@ def create_config_tide(seasonality, lightning_logs_dir=None, debug=False, hardwa
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
 
-def create_config_kan(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+def create_config_kan(
+    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+):
     """Create fixed configuration for KAN."""
     config_dict = {
         "input_size": 12 if debug else 24,
@@ -322,10 +335,10 @@ def create_config_kan(seasonality, lightning_logs_dir=None, debug=False, hardwar
         config_dict["default_root_dir"] = lightning_logs_dir
 
     if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        config_dict["accelerator"] = hardware_config["accelerator"]
+        config_dict["devices"] = hardware_config["devices"]
+        if hardware_config["strategy"] != "auto":
+            config_dict["strategy"] = hardware_config["strategy"]
 
     return config_dict
 
@@ -334,16 +347,37 @@ def main():
     """Main function for neural forecast with cross-validation."""
 
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Neural Forecasting with Fixed Hyperparameters")
-    parser.add_argument("--dataset", required=True, help="Dataset name from datasets.toml")
-    parser.add_argument("--model", required=True,
-                       choices=["deepar", "nbeats", "nhits", "dlinear",
-                               "nlinear", "vanilla_transformer", "tide", "kan"],
-                       help="Neural model to use")
-    parser.add_argument("--debug", action="store_true",
-                       help="Enable debug mode for faster testing with limited data")
-    parser.add_argument("--skip-existing", action="store_true",
-                       help="Skip if valid error metrics already exist")
+    parser = argparse.ArgumentParser(
+        description="Neural Forecasting with Fixed Hyperparameters"
+    )
+    parser.add_argument(
+        "--dataset", required=True, help="Dataset name from datasets.toml"
+    )
+    parser.add_argument(
+        "--model",
+        required=True,
+        choices=[
+            "deepar",
+            "nbeats",
+            "nhits",
+            "dlinear",
+            "nlinear",
+            "vanilla_transformer",
+            "tide",
+            "kan",
+        ],
+        help="Neural model to use",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug mode for faster testing with limited data",
+    )
+    parser.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="Skip if valid error metrics already exist",
+    )
     args = parser.parse_args()
 
     DATASET_NAME = args.dataset
@@ -377,8 +411,8 @@ def main():
 
     # Load dataset configuration
     dataset_config = read_dataset_config(DATASET_NAME)
-    frequency = dataset_config['frequency']
-    seasonality = dataset_config['seasonality']
+    frequency = dataset_config["frequency"]
+    seasonality = dataset_config["seasonality"]
 
     # Convert frequency to Polars format
     polars_frequency = convert_pandas_freq_to_polars(frequency)
@@ -418,7 +452,9 @@ def main():
         .alias("y")
     )
 
-    print(f"Raw data loaded: {len(df_raw)} observations, {df_raw['unique_id'].n_unique()} series")
+    print(
+        f"Raw data loaded: {len(df_raw)} observations, {df_raw['unique_id'].n_unique()} series"
+    )
 
     # Apply robust preprocessing pipeline
     train_df, test_df = robust_preprocess_pipeline(
@@ -427,24 +463,28 @@ def main():
         test_size=test_size,
         seasonality=seasonality,
         apply_train_imputation=True,
-        debug_limit=20 if DEBUG_MODE else None
+        debug_limit=20 if DEBUG_MODE else None,
     )
 
     # Prepare two synchronized views of the panel:
     #  - df_baseline uses imputed values for baseline models (StatsForecast models need complete data)
     #  - df_neural forward-fills gaps for neural models that cannot ingest NaNs
-    if 'y_imputed' in train_df.columns:
+    if "y_imputed" in train_df.columns:
         # Use imputed values for training portion to ensure baseline models work properly
-        train_for_baseline = train_df.select(['unique_id', 'ds', 'y_imputed']).rename({'y_imputed': 'y'})
+        train_for_baseline = train_df.select(["unique_id", "ds", "y_imputed"]).rename(
+            {"y_imputed": "y"}
+        )
     else:
-        train_for_baseline = train_df.select(['unique_id', 'ds', 'y'])
+        train_for_baseline = train_df.select(["unique_id", "ds", "y"])
 
-    test_for_baseline = test_df.select(['unique_id', 'ds', 'y'])
+    test_for_baseline = test_df.select(["unique_id", "ds", "y"])
 
-    df_baseline = pl.concat([train_for_baseline, test_for_baseline]).sort(['unique_id', 'ds'])
+    df_baseline = pl.concat([train_for_baseline, test_for_baseline]).sort(
+        ["unique_id", "ds"]
+    )
 
     df_neural = df_baseline.with_columns(
-        pl.col('y').forward_fill().over('unique_id').alias('y_filled')
+        pl.col("y").forward_fill().over("unique_id").alias("y_filled")
     )
 
     # Robust validation for neural model data
@@ -452,15 +492,18 @@ def main():
     def validate_neural_series(df):
         """Validate series for neural model consumption."""
         import numpy as np
+
         problematic_series = []
 
-        for unique_id in df['unique_id'].unique():
-            series_data = df.filter(pl.col('unique_id') == unique_id)
-            y_vals = series_data['y_filled'].to_numpy()
+        for unique_id in df["unique_id"].unique():
+            series_data = df.filter(pl.col("unique_id") == unique_id)
+            y_vals = series_data["y_filled"].to_numpy()
 
             # Check for remaining nulls
             if pd.isna(y_vals).any():
-                problematic_series.append((unique_id, "remaining nulls after forward fill"))
+                problematic_series.append(
+                    (unique_id, "remaining nulls after forward fill")
+                )
                 continue
 
             # Check for infinite values
@@ -472,14 +515,18 @@ def main():
             if len(y_vals) > 0:
                 abs_max = np.max(np.abs(y_vals))
                 if abs_max > 1e12:
-                    problematic_series.append((unique_id, f"extreme values (max: {abs_max:.2e})"))
+                    problematic_series.append(
+                        (unique_id, f"extreme values (max: {abs_max:.2e})")
+                    )
                     continue
 
                 # Check for zero variance (constant series)
                 if len(y_vals) > 1:
                     std_val = np.std(y_vals, ddof=1)
                     if std_val < 1e-12:  # Near-zero variance
-                        problematic_series.append((unique_id, f"near-zero variance ({std_val:.2e})"))
+                        problematic_series.append(
+                            (unique_id, f"near-zero variance ({std_val:.2e})")
+                        )
                         continue
 
         return problematic_series
@@ -488,29 +535,32 @@ def main():
     problematic = validate_neural_series(df_neural)
     if problematic:
         problematic_ids = [uid for uid, _ in problematic]
-        print(f"  Warning: Removing {len(problematic_ids)} series with neural model issues:")
+        print(
+            f"  Warning: Removing {len(problematic_ids)} series with neural model issues:"
+        )
         for uid, reason in problematic[:3]:  # Show first 3
             print(f"    {uid}: {reason}")
         if len(problematic) > 3:
             print(f"    ... and {len(problematic) - 3} more")
 
         # Filter out problematic series from all dataframes
-        df_baseline = df_baseline.filter(~pl.col('unique_id').is_in(problematic_ids))
-        df_neural = df_neural.filter(~pl.col('unique_id').is_in(problematic_ids))
-        train_df = train_df.filter(~pl.col('unique_id').is_in(problematic_ids))
-        test_df = test_df.filter(~pl.col('unique_id').is_in(problematic_ids))
+        df_baseline = df_baseline.filter(~pl.col("unique_id").is_in(problematic_ids))
+        df_neural = df_neural.filter(~pl.col("unique_id").is_in(problematic_ids))
+        train_df = train_df.filter(~pl.col("unique_id").is_in(problematic_ids))
+        test_df = test_df.filter(~pl.col("unique_id").is_in(problematic_ids))
 
     # Additional baseline data validation and cleaning
     def validate_baseline_series(df):
         """Validate and clean baseline data for StatsForecast models."""
         import numpy as np
+
         print("  Validating baseline data for StatsForecast models...")
 
         # Check for series with insufficient non-null values
         series_to_remove = []
-        for unique_id in df['unique_id'].unique():
-            series_data = df.filter(pl.col('unique_id') == unique_id)
-            y_vals = series_data['y'].to_numpy()
+        for unique_id in df["unique_id"].unique():
+            series_data = df.filter(pl.col("unique_id") == unique_id)
+            y_vals = series_data["y"].to_numpy()
 
             # Count non-null values
             non_null_count = np.sum(~pd.isna(y_vals))
@@ -518,12 +568,16 @@ def main():
 
             # Remove series with too many nulls (>50% null)
             if non_null_count < total_count * 0.5:
-                series_to_remove.append((unique_id, f"too many nulls: {non_null_count}/{total_count}"))
+                series_to_remove.append(
+                    (unique_id, f"too many nulls: {non_null_count}/{total_count}")
+                )
                 continue
 
             # Remove series with insufficient non-null values for forecasting
             if non_null_count < 10:  # Need at least 10 non-null points
-                series_to_remove.append((unique_id, f"insufficient data: {non_null_count} non-null values"))
+                series_to_remove.append(
+                    (unique_id, f"insufficient data: {non_null_count} non-null values")
+                )
                 continue
 
             # Check for problematic patterns
@@ -531,7 +585,9 @@ def main():
             if len(finite_vals) > 1:
                 std_val = np.std(finite_vals, ddof=1)
                 if std_val < 1e-12:  # Near-zero variance
-                    series_to_remove.append((unique_id, f"near-zero variance ({std_val:.2e})"))
+                    series_to_remove.append(
+                        (unique_id, f"near-zero variance ({std_val:.2e})")
+                    )
                     continue
 
         if series_to_remove:
@@ -549,31 +605,33 @@ def main():
     baseline_problematic_ids = validate_baseline_series(df_baseline)
     if baseline_problematic_ids:
         # Remove from all dataframes to maintain synchronization
-        df_baseline = df_baseline.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
-        df_neural = df_neural.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
-        train_df = train_df.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
-        test_df = test_df.filter(~pl.col('unique_id').is_in(baseline_problematic_ids))
+        df_baseline = df_baseline.filter(
+            ~pl.col("unique_id").is_in(baseline_problematic_ids)
+        )
+        df_neural = df_neural.filter(
+            ~pl.col("unique_id").is_in(baseline_problematic_ids)
+        )
+        train_df = train_df.filter(~pl.col("unique_id").is_in(baseline_problematic_ids))
+        test_df = test_df.filter(~pl.col("unique_id").is_in(baseline_problematic_ids))
 
     # Drop any series that remain entirely missing after forward fill (defensive)
-    empty_series = df_neural.filter(pl.col('y_filled').is_null())['unique_id'].unique()
+    empty_series = df_neural.filter(pl.col("y_filled").is_null())["unique_id"].unique()
     if empty_series.len() > 0:
         empty_ids = empty_series.to_list()
-        print("  Warning: Removing series with no available targets after forward fill:")
+        print(
+            "  Warning: Removing series with no available targets after forward fill:"
+        )
         print(f"    {empty_ids}")
-        df_baseline = df_baseline.filter(~pl.col('unique_id').is_in(empty_ids))
-        df_neural = df_neural.filter(~pl.col('unique_id').is_in(empty_ids))
-        train_df = train_df.filter(~pl.col('unique_id').is_in(empty_ids))
-        test_df = test_df.filter(~pl.col('unique_id').is_in(empty_ids))
+        df_baseline = df_baseline.filter(~pl.col("unique_id").is_in(empty_ids))
+        df_neural = df_neural.filter(~pl.col("unique_id").is_in(empty_ids))
+        train_df = train_df.filter(~pl.col("unique_id").is_in(empty_ids))
+        test_df = test_df.filter(~pl.col("unique_id").is_in(empty_ids))
 
-    df_neural = df_neural.select([
-        'unique_id',
-        'ds',
-        pl.col('y_filled').alias('y')
-    ])
+    df_neural = df_neural.select(["unique_id", "ds", pl.col("y_filled").alias("y")])
 
     # Final validation: ensure baseline and neural datasets are synchronized
-    baseline_series = set(df_baseline['unique_id'].unique().to_list())
-    neural_series = set(df_neural['unique_id'].unique().to_list())
+    baseline_series = set(df_baseline["unique_id"].unique().to_list())
+    neural_series = set(df_neural["unique_id"].unique().to_list())
 
     if baseline_series != neural_series:
         print("  Warning: Baseline and neural datasets have different series counts.")
@@ -582,16 +640,22 @@ def main():
 
         # Use intersection to ensure both datasets have exactly the same series
         common_series = list(baseline_series.intersection(neural_series))
-        if len(common_series) < len(baseline_series) or len(common_series) < len(neural_series):
+        if len(common_series) < len(baseline_series) or len(common_series) < len(
+            neural_series
+        ):
             print(f"    Synchronizing to common {len(common_series)} series")
-            df_baseline = df_baseline.filter(pl.col('unique_id').is_in(common_series))
-            df_neural = df_neural.filter(pl.col('unique_id').is_in(common_series))
-            train_df = train_df.filter(pl.col('unique_id').is_in(common_series))
-            test_df = test_df.filter(pl.col('unique_id').is_in(common_series))
+            df_baseline = df_baseline.filter(pl.col("unique_id").is_in(common_series))
+            df_neural = df_neural.filter(pl.col("unique_id").is_in(common_series))
+            train_df = train_df.filter(pl.col("unique_id").is_in(common_series))
+            test_df = test_df.filter(pl.col("unique_id").is_in(common_series))
 
     print("Final synchronized data for CV:")
-    print(f"  Baseline: {len(df_baseline):,} observations, {df_baseline['unique_id'].n_unique()} series")
-    print(f"  Neural: {len(df_neural):,} observations, {df_neural['unique_id'].n_unique()} series")
+    print(
+        f"  Baseline: {len(df_baseline):,} observations, {df_baseline['unique_id'].n_unique()} series"
+    )
+    print(
+        f"  Neural: {len(df_neural):,} observations, {df_neural['unique_id'].n_unique()} series"
+    )
 
     # Define models
     print("\n3. Setting Up Models")
@@ -610,14 +674,54 @@ def main():
     # Create the selected neural model with fixed configuration
     # Get the configuration for the selected model
     config_mapping = {
-        "deepar": create_config_deepar(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "nbeats": create_config_nbeats(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "nhits": create_config_nhits(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "dlinear": create_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "nlinear": create_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "vanilla_transformer": create_config_transformer(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "tide": create_config_tide(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "kan": create_config_kan(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+        "deepar": create_config_deepar(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
+        "nbeats": create_config_nbeats(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
+        "nhits": create_config_nhits(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
+        "dlinear": create_config_simple(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
+        "nlinear": create_config_simple(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
+        "vanilla_transformer": create_config_transformer(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
+        "tide": create_config_tide(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
+        "kan": create_config_kan(
+            seasonality,
+            lightning_logs_dir,
+            debug=DEBUG_MODE,
+            hardware_config=hardware_config,
+        ),
     }
 
     model_config = config_mapping[MODEL_NAME]
@@ -625,7 +729,9 @@ def main():
     # Create model instances with fixed hyperparameters
     # Each model needs its own specific configuration
     if MODEL_NAME == "deepar":
-        selected_model = DeepAR(h=test_size, loss=DistributionLoss(distribution='Normal'), **model_config)
+        selected_model = DeepAR(
+            h=test_size, loss=DistributionLoss(distribution="Normal"), **model_config
+        )
     elif MODEL_NAME == "nbeats":
         selected_model = NBEATS(h=test_size, loss=MAE(), **model_config)
     elif MODEL_NAME == "nhits":
@@ -661,46 +767,50 @@ def main():
         print(f"  Performing final validation for {model_type} models...")
 
         if len(df) == 0:
-            raise ValueError(f"Empty dataset for {model_type} models after preprocessing")
+            raise ValueError(
+                f"Empty dataset for {model_type} models after preprocessing"
+            )
 
-        series_count = df['unique_id'].n_unique()
+        series_count = df["unique_id"].n_unique()
         if series_count == 0:
-            raise ValueError(f"No series remaining for {model_type} models after preprocessing")
+            raise ValueError(
+                f"No series remaining for {model_type} models after preprocessing"
+            )
 
         # Check for minimum series requirement
         if series_count < 5:
-            print(f"    Warning: Only {series_count} series remaining for {model_type} models")
+            print(
+                f"    Warning: Only {series_count} series remaining for {model_type} models"
+            )
 
         # Validate each series has minimum data
         min_length_per_series = 5  # Minimum observations per series
         short_series = []
-        for unique_id in df['unique_id'].unique():
-            series_data = df.filter(pl.col('unique_id') == unique_id)
+        for unique_id in df["unique_id"].unique():
+            series_data = df.filter(pl.col("unique_id") == unique_id)
             if len(series_data) < min_length_per_series:
                 short_series.append(unique_id)
 
         if short_series:
-            print(f"    Warning: {len(short_series)} series have less than {min_length_per_series} observations")
+            print(
+                f"    Warning: {len(short_series)} series have less than {min_length_per_series} observations"
+            )
 
-        print(f"    {model_type.capitalize()} data validation passed: {series_count} series, {len(df)} observations")
+        print(
+            f"    {model_type.capitalize()} data validation passed: {series_count} series, {len(df)} observations"
+        )
         return True
 
     # Validate baseline data
     validate_data_for_training(df_baseline, "baseline")
 
     sf = StatsForecast(
-        models=baseline_models,
-        freq=polars_frequency,
-        n_jobs=-1,
-        verbose=True
+        models=baseline_models, freq=polars_frequency, n_jobs=-1, verbose=True
     )
 
     start_time = time.time()
     baseline_cv_df = sf.cross_validation(
-        df=df_baseline,
-        h=test_size,
-        step_size=test_size,
-        n_windows=1
+        df=df_baseline, h=test_size, step_size=test_size, n_windows=1
     )
     baseline_time = time.time() - start_time
     print(f"Baseline cross-validation completed in {baseline_time:.2f} seconds")
@@ -711,23 +821,21 @@ def main():
     print("Note: Using fixed hyperparameters (no optimization)")
     print(f"Lightning logs will be saved to: {lightning_logs_dir}")
 
-    nf = NeuralForecast(
-        models=neural_models,
-        freq=polars_frequency
-    )
+    nf = NeuralForecast(models=neural_models, freq=polars_frequency)
 
     def debug_data_quality(df, name):
         """Debug function to check data quality before model training."""
         import numpy as np
+
         print(f"  Debug: {name} data quality check:")
         print(f"    Shape: {df.shape}")
         print(f"    Series: {df['unique_id'].n_unique()}")
 
         # Use the correct column based on the dataframe
-        if 'y_filled' in df.columns:
-            y_col = 'y_filled'
+        if "y_filled" in df.columns:
+            y_col = "y_filled"
         else:
-            y_col = 'y'
+            y_col = "y"
 
         print(f"    Null values in {y_col}: {df[y_col].null_count()}")
 
@@ -735,7 +843,9 @@ def main():
         y_vals = df[y_col].to_numpy()
         finite_vals = y_vals[np.isfinite(y_vals)]
         if len(finite_vals) > 0:
-            print(f"    Value range: [{finite_vals.min():.2e}, {finite_vals.max():.2e}]")
+            print(
+                f"    Value range: [{finite_vals.min():.2e}, {finite_vals.max():.2e}]"
+            )
             print(f"    Standard deviation: {finite_vals.std():.2e}")
         else:
             print("    Warning: No finite values found!")
@@ -750,17 +860,16 @@ def main():
     start_time = time.time()
     try:
         neural_cv_df = nf.cross_validation(
-            df=df_neural,
-            val_size=test_size,
-            n_windows=1,
-            step_size=test_size
+            df=df_neural, val_size=test_size, n_windows=1, step_size=test_size
         )
         neural_time = time.time() - start_time
         print(f"Neural cross-validation completed in {neural_time:.2f} seconds")
 
     except Exception as e:
         print(f"Error during neural model cross-validation: {e}")
-        print("This likely indicates data quality issues that weren't caught by preprocessing.")
+        print(
+            "This likely indicates data quality issues that weren't caught by preprocessing."
+        )
 
         # Additional debugging information
         print("\nDiagnostic information:")
@@ -768,10 +877,12 @@ def main():
 
         # Check for specific problematic patterns
         print("\nChecking for specific issues:")
-        for unique_id in df_neural['unique_id'].unique()[:5]:  # Check first 5 series
-            series_data = df_neural.filter(pl.col('unique_id') == unique_id)
-            y_vals = series_data['y'].to_numpy()
-            print(f"  Series {unique_id}: min={y_vals.min():.2e}, max={y_vals.max():.2e}, std={y_vals.std():.2e}")
+        for unique_id in df_neural["unique_id"].unique()[:5]:  # Check first 5 series
+            series_data = df_neural.filter(pl.col("unique_id") == unique_id)
+            y_vals = series_data["y"].to_numpy()
+            print(
+                f"  Series {unique_id}: min={y_vals.min():.2e}, max={y_vals.max():.2e}, std={y_vals.std():.2e}"
+            )
 
         raise  # Re-raise the exception
 
@@ -781,22 +892,22 @@ def main():
 
     # Join baseline and neural forecasts
     cv_df = baseline_cv_df.join(
-        neural_cv_df.drop(['y', 'cutoff']),
-        on=['unique_id', 'ds'],
-        how='left'
+        neural_cv_df.drop(["y", "cutoff"]), on=["unique_id", "ds"], how="left"
     )
 
     # Extract the cutoff date
-    cutoff_date = cv_df['cutoff'].unique()[0]
+    cutoff_date = cv_df["cutoff"].unique()[0]
 
     # Create training data by filtering original data up to cutoff
     # Use the preprocessed training data which may have imputed values
-    if 'y_imputed' in train_df.columns:
-        train_data_for_eval = train_df.select(['unique_id', 'ds', 'y_imputed']).rename({'y_imputed': 'y'})
+    if "y_imputed" in train_df.columns:
+        train_data_for_eval = train_df.select(["unique_id", "ds", "y_imputed"]).rename(
+            {"y_imputed": "y"}
+        )
     else:
-        train_data_for_eval = train_df.select(['unique_id', 'ds', 'y'])
+        train_data_for_eval = train_df.select(["unique_id", "ds", "y"])
 
-    train_data = train_data_for_eval.filter(pl.col('ds') <= cutoff_date)
+    train_data = train_data_for_eval.filter(pl.col("ds") <= cutoff_date)
 
     # Evaluate all models
     print("\n7. Evaluating Model Performance")
@@ -823,20 +934,24 @@ def main():
             )
 
         if valid_mase < total_series * 0.1:  # Less than 10% valid
-            print(f"  Warning: Only {valid_mase}/{total_series} series have valid MASE scores")
+            print(
+                f"  Warning: Only {valid_mase}/{total_series} series have valid MASE scores"
+            )
 
         avg_metrics[model_col] = {
-            'MASE': mase_scores[model_col].mean(),
-            'MSE': mse_scores[model_col].mean(),
-            'RMSE': rmse_scores[model_col].mean(),
-            'R2oos': r2oos_scores[model_col].mean()
+            "MASE": mase_scores[model_col].mean(),
+            "MSE": mse_scores[model_col].mean(),
+            "RMSE": rmse_scores[model_col].mean(),
+            "R2oos": r2oos_scores[model_col].mean(),
         }
 
     # Create comparison table
     print("\n8. Model Performance Summary")
     print("-" * 40)
 
-    comparison_data = [["Model", "Type", "Avg MASE", "Avg MSE", "Avg RMSE", "Avg R2oos"]]
+    comparison_data = [
+        ["Model", "Type", "Avg MASE", "Avg MSE", "Avg RMSE", "Avg R2oos"]
+    ]
 
     # Add baseline models
     for model_col in actual_model_cols:
@@ -845,14 +960,16 @@ def main():
         else:
             model_type = "Neural"
 
-        comparison_data.append([
-            model_col,
-            model_type,
-            f"{avg_metrics[model_col]['MASE']:.4f}",
-            f"{avg_metrics[model_col]['MSE']:.4f}",
-            f"{avg_metrics[model_col]['RMSE']:.4f}",
-            f"{avg_metrics[model_col]['R2oos']:.4f}"
-        ])
+        comparison_data.append(
+            [
+                model_col,
+                model_type,
+                f"{avg_metrics[model_col]['MASE']:.4f}",
+                f"{avg_metrics[model_col]['MSE']:.4f}",
+                f"{avg_metrics[model_col]['RMSE']:.4f}",
+                f"{avg_metrics[model_col]['R2oos']:.4f}",
+            ]
+        )
 
     print(tabulate(comparison_data, headers="firstrow", tablefmt="grid"))
 
@@ -861,14 +978,14 @@ def main():
     print("-" * 40)
 
     best_models = {}
-    for metric in ['MASE', 'MSE', 'RMSE']:
+    for metric in ["MASE", "MSE", "RMSE"]:
         best_model = min(avg_metrics.items(), key=lambda x: x[1][metric])[0]
         best_models[metric] = best_model
         print(f"Best {metric}: {best_model} ({avg_metrics[best_model][metric]:.4f})")
 
     # For R2oos, higher is better
-    best_model = max(avg_metrics.items(), key=lambda x: x[1]['R2oos'])[0]
-    best_models['R2oos'] = best_model
+    best_model = max(avg_metrics.items(), key=lambda x: x[1]["R2oos"])[0]
+    best_models["R2oos"] = best_model
     print(f"Best R2oos: {best_model} ({avg_metrics[best_model]['R2oos']:.4f})")
 
     # Save CSV error metrics for the neural model
@@ -883,28 +1000,40 @@ def main():
     neural_model_name = neural_model_names[0]  # Should be only one model
     if neural_model_name in avg_metrics:
         # Validate metrics before saving
-        mase_val = avg_metrics[neural_model_name]['MASE']
-        mse_val = avg_metrics[neural_model_name]['MSE']
-        rmse_val = avg_metrics[neural_model_name]['RMSE']
-        r2oos_val = avg_metrics[neural_model_name]['R2oos']
+        mase_val = avg_metrics[neural_model_name]["MASE"]
+        mse_val = avg_metrics[neural_model_name]["MSE"]
+        rmse_val = avg_metrics[neural_model_name]["RMSE"]
+        r2oos_val = avg_metrics[neural_model_name]["R2oos"]
 
         # Check for invalid metric values
         import numpy as np
+
         if mase_val == 0.0:
-            print(f"Warning: MASE is exactly 0.0 for model {neural_model_name}. This typically indicates:")
+            print(
+                f"Warning: MASE is exactly 0.0 for model {neural_model_name}. This typically indicates:"
+            )
             print("  - The model produces constant predictions")
             print("  - Data quality issues with training/test series")
             print("  - Insufficient variation in the time series")
             print("  Continuing with other metrics, but results may not be meaningful.")
             # Don't raise an error, just warn and continue
 
-        if np.isnan(mase_val) or np.isnan(mse_val) or np.isnan(rmse_val) or np.isnan(r2oos_val):
-            print(f"Warning: NaN values detected in metrics for model {neural_model_name}:")
+        if (
+            np.isnan(mase_val)
+            or np.isnan(mse_val)
+            or np.isnan(rmse_val)
+            or np.isnan(r2oos_val)
+        ):
+            print(
+                f"Warning: NaN values detected in metrics for model {neural_model_name}:"
+            )
             print(f"  MASE: {mase_val}")
             print(f"  MSE: {mse_val}")
             print(f"  RMSE: {rmse_val}")
             print(f"  R2oos: {r2oos_val}")
-            print("  This typically indicates insufficient valid data for metric calculation.")
+            print(
+                "  This typically indicates insufficient valid data for metric calculation."
+            )
             print("  Saving available metrics and continuing.")
             # Don't raise an error, just warn and continue
 
@@ -915,7 +1044,7 @@ def main():
             "MSE": [mse_val],
             "RMSE": [rmse_val],
             "R2oos": [r2oos_val],
-            "time_taken": [neural_time]
+            "time_taken": [neural_time],
         }
 
         metrics_df = pl.DataFrame(metrics_data)

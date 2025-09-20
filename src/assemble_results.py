@@ -29,8 +29,8 @@ def is_valid_result(row):
     Check if a result row has valid MASE and R2oos values.
     Valid = non-zero, non-null, non-infinite
     """
-    mase = row['MASE']
-    r2oos = row['R2oos']
+    mase = row["MASE"]
+    r2oos = row["R2oos"]
 
     # Convert to numeric if they're strings
     try:
@@ -57,7 +57,7 @@ def normalize_model_name(model_name):
     auto_nbeats -> nbeats
     deepar -> deepar (unchanged)
     """
-    if model_name.startswith('auto_'):
+    if model_name.startswith("auto_"):
         return model_name[5:]  # Remove 'auto_' prefix
     return model_name
 
@@ -95,8 +95,8 @@ def load_all_csv_files():
                     df = df.head(1)  # Take first row if multiple
 
                 # Add file path info for debugging
-                df['_dataset_from_path'] = dataset_name
-                df['_model_from_path'] = model_name
+                df["_dataset_from_path"] = dataset_name
+                df["_model_from_path"] = model_name
 
                 all_results.append(df)
 
@@ -123,13 +123,13 @@ def filter_auto_vs_nonuto_duplicates(df):
     filtered_results = []
 
     # Group by dataset
-    for dataset_name in df['dataset_name'].unique():
-        dataset_df = df[df['dataset_name'] == dataset_name].copy()
+    for dataset_name in df["dataset_name"].unique():
+        dataset_df = df[df["dataset_name"] == dataset_name].copy()
 
         # Group models by their normalized names
         model_groups = {}
         for _, row in dataset_df.iterrows():
-            model_name = row['model_name']
+            model_name = row["model_name"]
             normalized_name = normalize_model_name(model_name)
 
             if normalized_name not in model_groups:
@@ -141,11 +141,13 @@ def filter_auto_vs_nonuto_duplicates(df):
             if len(rows) == 1:
                 # Only one version exists, keep it
                 chosen_row = rows[0].copy()
-                chosen_row['auto'] = chosen_row['model_name'].startswith('auto_')
+                chosen_row["auto"] = chosen_row["model_name"].startswith("auto_")
             else:
                 # Multiple versions exist, apply filtering logic
-                auto_rows = [r for r in rows if r['model_name'].startswith('auto_')]
-                non_auto_rows = [r for r in rows if not r['model_name'].startswith('auto_')]
+                auto_rows = [r for r in rows if r["model_name"].startswith("auto_")]
+                non_auto_rows = [
+                    r for r in rows if not r["model_name"].startswith("auto_")
+                ]
 
                 # Try to find valid auto version first
                 valid_auto = None
@@ -157,28 +159,36 @@ def filter_auto_vs_nonuto_duplicates(df):
                 if valid_auto is not None:
                     # Use valid auto version
                     chosen_row = valid_auto.copy()
-                    chosen_row['auto'] = True
+                    chosen_row["auto"] = True
                     # Only print for datasets where we're choosing between versions
                     if len(rows) > 1:
-                        print(f"Dataset {dataset_name}, model {normalized_name}: Using auto version (valid)")
+                        print(
+                            f"Dataset {dataset_name}, model {normalized_name}: Using auto version (valid)"
+                        )
                 elif non_auto_rows:
                     # Use non-auto version
                     chosen_row = non_auto_rows[0].copy()
-                    chosen_row['auto'] = False
-                    print(f"Dataset {dataset_name}, model {normalized_name}: Using non-auto version (auto invalid/missing)")
+                    chosen_row["auto"] = False
+                    print(
+                        f"Dataset {dataset_name}, model {normalized_name}: Using non-auto version (auto invalid/missing)"
+                    )
                 elif auto_rows:
                     # Use auto version even if invalid (last resort)
                     chosen_row = auto_rows[0].copy()
-                    chosen_row['auto'] = True
-                    print(f"Dataset {dataset_name}, model {normalized_name}: Using auto version (only option, but invalid)")
+                    chosen_row["auto"] = True
+                    print(
+                        f"Dataset {dataset_name}, model {normalized_name}: Using auto version (only option, but invalid)"
+                    )
                 else:
                     # This shouldn't happen, but handle it
                     chosen_row = rows[0].copy()
-                    chosen_row['auto'] = chosen_row['model_name'].startswith('auto_')
-                    print(f"Dataset {dataset_name}, model {normalized_name}: Using first available (fallback)")
+                    chosen_row["auto"] = chosen_row["model_name"].startswith("auto_")
+                    print(
+                        f"Dataset {dataset_name}, model {normalized_name}: Using first available (fallback)"
+                    )
 
             # Normalize the model name
-            chosen_row['model_name'] = normalized_name
+            chosen_row["model_name"] = normalized_name
 
             filtered_results.append(chosen_row)
 
@@ -194,17 +204,17 @@ def main():
     raw_df = load_all_csv_files()
 
     # Show what we loaded
-    print(f"\nRaw data summary:")
+    print("\nRaw data summary:")
     print(f"  Total rows: {len(raw_df)}")
     print(f"  Unique datasets: {raw_df['dataset_name'].nunique()}")
     print(f"  Unique models: {raw_df['model_name'].nunique()}")
 
     # Filter auto vs non-auto duplicates
-    print(f"\nFiltering auto vs non-auto duplicates...")
+    print("\nFiltering auto vs non-auto duplicates...")
     filtered_df = filter_auto_vs_nonuto_duplicates(raw_df)
 
     # Show filtering results
-    print(f"\nFiltered data summary:")
+    print("\nFiltered data summary:")
     print(f"  Total rows: {len(filtered_df)}")
     print(f"  Unique datasets: {filtered_df['dataset_name'].nunique()}")
     print(f"  Unique models: {filtered_df['model_name'].nunique()}")
@@ -212,11 +222,20 @@ def main():
     print(f"  Non-auto versions used: {(~filtered_df['auto']).sum()}")
 
     # Clean up columns
-    columns_to_keep = ['model_name', 'dataset_name', 'MASE', 'MSE', 'RMSE', 'R2oos', 'time_taken', 'auto']
+    columns_to_keep = [
+        "model_name",
+        "dataset_name",
+        "MASE",
+        "MSE",
+        "RMSE",
+        "R2oos",
+        "time_taken",
+        "auto",
+    ]
     final_df = filtered_df[columns_to_keep].copy()
 
     # Sort for consistent output
-    final_df = final_df.sort_values(['dataset_name', 'model_name'])
+    final_df = final_df.sort_values(["dataset_name", "model_name"])
 
     # Save results
     output_file = FORECASTING_DIR / "results_all.csv"
@@ -224,12 +243,16 @@ def main():
     print(f"\nSaved results to: {output_file}")
 
     # Show some quality stats
-    print(f"\nData quality summary:")
-    mase_valid = pd.to_numeric(final_df['MASE'], errors='coerce')
-    r2oos_valid = pd.to_numeric(final_df['R2oos'], errors='coerce')
+    print("\nData quality summary:")
+    mase_valid = pd.to_numeric(final_df["MASE"], errors="coerce")
+    r2oos_valid = pd.to_numeric(final_df["R2oos"], errors="coerce")
 
-    print(f"  MASE - Valid: {mase_valid.notna().sum()}, Invalid: {mase_valid.isna().sum()}")
-    print(f"  R2oos - Valid: {r2oos_valid.notna().sum()}, Invalid: {r2oos_valid.isna().sum()}")
+    print(
+        f"  MASE - Valid: {mase_valid.notna().sum()}, Invalid: {mase_valid.isna().sum()}"
+    )
+    print(
+        f"  R2oos - Valid: {r2oos_valid.notna().sum()}, Invalid: {r2oos_valid.isna().sum()}"
+    )
 
     if mase_valid.notna().any():
         print(f"  MASE range: {mase_valid.min():.4f} to {mase_valid.max():.4f}")

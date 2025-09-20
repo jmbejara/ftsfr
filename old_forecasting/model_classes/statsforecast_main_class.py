@@ -136,13 +136,12 @@ class StatsForecastMain(forecasting_model):
         # StatsForecast expects frequency as string
         # Use all available cores for parallel processing (or user-specified number)
         import os
+
         n_jobs = int(os.getenv("STATSFORECAST_N_JOBS", os.cpu_count() or 1))
         StatsForecastMain_logger.info(f"Using {n_jobs} cores for parallel processing")
-        
+
         self.sf = StatsForecast(
-            models=[self.estimator], 
-            freq=self.frequency,
-            n_jobs=n_jobs
+            models=[self.estimator], freq=self.frequency, n_jobs=n_jobs
         )
         self.sf.fit(df=self.train_data)
         StatsForecastMain_logger.info("Model trained.")
@@ -152,6 +151,7 @@ class StatsForecastMain(forecasting_model):
         # StatsForecast models are typically lightweight and don't require explicit saving
         # We'll save the model configuration for consistency
         import pickle
+
         with open(Path(self.model_path) / "model.pkl", "wb") as f:
             pickle.dump(self.sf, f)
         StatsForecastMain_logger.info('Model saved to "' + str(self.model_path) + '".')
@@ -159,9 +159,12 @@ class StatsForecastMain(forecasting_model):
     def load_model(self):
         # Load the saved StatsForecast model
         import pickle
+
         with open(Path(self.model_path) / "model.pkl", "rb") as f:
             self.sf = pickle.load(f)
-        StatsForecastMain_logger.info('Model loaded from "' + str(self.model_path) + '".')
+        StatsForecastMain_logger.info(
+            'Model loaded from "' + str(self.model_path) + '".'
+        )
 
     @common_error_catch
     def forecast(self):
@@ -208,7 +211,9 @@ class StatsForecastMain(forecasting_model):
                 "⚠ Darts not available - skipping one-step-ahead verification"
             )
 
-        StatsForecastMain_logger.info("Forecasting complete. Internal variable updated.")
+        StatsForecastMain_logger.info(
+            "Forecasting complete. Internal variable updated."
+        )
 
     @common_error_catch
     def save_forecast(self):
@@ -218,7 +223,9 @@ class StatsForecastMain(forecasting_model):
             )
             raise ValueError("No forecasts available to save")
         self.pred_data.to_parquet(self.forecast_path, engine="pyarrow")
-        StatsForecastMain_logger.info('Saved forecasts to "' + str(self.forecast_path) + '".')
+        StatsForecastMain_logger.info(
+            'Saved forecasts to "' + str(self.forecast_path) + '".'
+        )
 
     def load_forecast(self):
         temp_df = pd.read_parquet(self.forecast_path)
@@ -303,4 +310,6 @@ class StatsForecastMain(forecasting_model):
         )
         forecast_res.to_csv(self.result_path)
 
-        StatsForecastMain_logger.info('Saved results to "' + str(self.result_path) + '".')
+        StatsForecastMain_logger.info(
+            'Saved results to "' + str(self.result_path) + '".'
+        )

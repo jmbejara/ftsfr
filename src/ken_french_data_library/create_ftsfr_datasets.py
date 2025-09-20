@@ -20,6 +20,7 @@ from settings import config
 DATA_DIR = config("DATA_DIR")
 # DATA_DIR = DATA_DIR / "ken_french_data_library"
 
+
 def convert_wide_to_long_format(df):
     """
     Convert a wide format DataFrame to long format.
@@ -105,7 +106,9 @@ french_portfolios_25_daily_size_and_op = french_portfolios_25_daily_size_and_op.
 french_portfolios_25_daily_size_and_op.to_parquet(
     DATA_DIR / "ftsfr_french_portfolios_25_daily_size_and_op.parquet"
 )
-french_portfolios_25_daily_size_and_inv = french_portfolios_25_daily_size_and_inv.dropna()
+french_portfolios_25_daily_size_and_inv = (
+    french_portfolios_25_daily_size_and_inv.dropna()
+)
 french_portfolios_25_daily_size_and_inv.to_parquet(
     DATA_DIR / "ftsfr_french_portfolios_25_daily_size_and_inv.parquet"
 )
