@@ -22,13 +22,13 @@ from settings import config
 # Configuration
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
-FORECAST2_DIR = OUTPUT_DIR / "forecasting2"
-DOCS_SRC_DIR = Path(__file__).parent.parent / "docs_src"
+FORECAST_DIR = OUTPUT_DIR / "forecasting"
+PAPER_DIR = FORECAST_DIR / "paper"
 
 
 def load_active_datasets():
     """Load active (uncommented) datasets from datasets.toml"""
-    datasets_toml_path = Path(__file__).parent.parent / "datasets.toml"
+    datasets_toml_path = Path(__file__).parent.parent.parent / "datasets.toml"
     
     if not datasets_toml_path.exists():
         raise FileNotFoundError(f"datasets.toml not found at {datasets_toml_path}")
@@ -389,8 +389,8 @@ def main():
     print("Creating dataset statistics tables...")
     
     # Ensure output directories exist
-    FORECAST2_DIR.mkdir(parents=True, exist_ok=True)
-    DOCS_SRC_DIR.mkdir(parents=True, exist_ok=True)
+    FORECAST_DIR.mkdir(parents=True, exist_ok=True)
+    PAPER_DIR.mkdir(parents=True, exist_ok=True)
     
     # Load active datasets from TOML
     active_datasets = load_active_datasets()
@@ -423,42 +423,35 @@ def main():
     
     # Create output files
     base_filename = "dataset_statistics"
-    
+
     # CSV files
-    csv_forecast_path = FORECAST2_DIR / f"{base_filename}.csv"
-    csv_docs_path = DOCS_SRC_DIR / f"{base_filename}.csv"
-    
-    df = create_csv_table(all_stats, csv_forecast_path)
-    df.write_csv(csv_docs_path)  # Copy to docs_src
-    
+    csv_path = PAPER_DIR / f"{base_filename}.csv"
+    csv_forecast_path = FORECAST_DIR / f"{base_filename}.csv"  # Keep legacy location for compatibility
+
+    df = create_csv_table(all_stats, csv_path)
+    df.write_csv(csv_forecast_path)  # Copy to main forecasting directory
+
     # LaTeX files
-    latex_forecast_path = FORECAST2_DIR / f"{base_filename}.tex"
-    latex_docs_path = DOCS_SRC_DIR / f"{base_filename}.tex"
-    latex_tabular_forecast_path = FORECAST2_DIR / f"{base_filename}_tabular.tex"
-    latex_tabular_docs_path = DOCS_SRC_DIR / f"{base_filename}_tabular.tex"
-    
-    create_latex_table(grouped_stats, latex_forecast_path)
-    create_latex_tabular_only(grouped_stats, latex_tabular_forecast_path)
-    
-    # Copy LaTeX files to docs_src
-    with open(latex_forecast_path, 'r') as f:
+    latex_path = PAPER_DIR / f"{base_filename}.tex"
+    latex_forecast_path = FORECAST_DIR / f"{base_filename}.tex"  # Keep legacy location for compatibility
+    latex_tabular_path = PAPER_DIR / f"{base_filename}_tabular.tex"
+
+    create_latex_table(grouped_stats, latex_path)
+    create_latex_tabular_only(grouped_stats, latex_tabular_path)
+
+    # Copy LaTeX files to main forecasting directory for compatibility
+    with open(latex_path, 'r') as f:
         latex_content = f.read()
-    with open(latex_docs_path, 'w') as f:
+    with open(latex_forecast_path, 'w') as f:
         f.write(latex_content)
-    
-    with open(latex_tabular_forecast_path, 'r') as f:
-        latex_tabular_content = f.read()
-    with open(latex_tabular_docs_path, 'w') as f:
-        f.write(latex_tabular_content)
     
     print(f"\nDataset statistics tables created successfully!")
     print(f"Files saved to:")
+    print(f"  - {csv_path}")
     print(f"  - {csv_forecast_path}")
-    print(f"  - {csv_docs_path}")
+    print(f"  - {latex_path}")
     print(f"  - {latex_forecast_path}")
-    print(f"  - {latex_docs_path}")
-    print(f"  - {latex_tabular_forecast_path}")
-    print(f"  - {latex_tabular_docs_path}")
+    print(f"  - {latex_tabular_path}")
     
     # Display summary
     print(f"\nSummary by group:")

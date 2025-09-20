@@ -61,13 +61,14 @@ def extract_models(models_config: Dict[str, Any]) -> List[Dict[str, str]]:
     return sorted(models, key=lambda x: x['name'])
 
 
-def generate_job_commands(datasets: List[str], models: List[Dict[str, str]], skip_existing: bool = False) -> List[str]:
+def generate_job_commands(datasets: List[str], models: List[Dict[str, str]], skip_existing: bool = False, skip_daily: bool = False) -> List[str]:
     """Generate job commands for all dataset x model combinations.
 
     Args:
         datasets: List of dataset names
         models: List of model configurations
         skip_existing: If True, add --skip-existing flag to commands
+        skip_daily: If True, add --skip-daily flag to auto model commands
     """
     commands = []
 
@@ -78,6 +79,9 @@ def generate_job_commands(datasets: List[str], models: List[Dict[str, str]], ski
             command = f"python ./src/forecasting/{script_name} --dataset {dataset} --model {model_name}"
             if skip_existing:
                 command += " --skip-existing"
+            # Add --skip-daily flag only to auto models (forecast_neural_auto.py)
+            if skip_daily and script_name == "forecast_neural_auto.py":
+                command += " --skip-daily"
             commands.append(command)
 
     return commands
@@ -103,6 +107,8 @@ def main():
     parser = argparse.ArgumentParser(description="Generate forecasting jobs from configuration")
     parser.add_argument("--skip-existing", action="store_true",
                        help="Add --skip-existing flag to generated commands")
+    parser.add_argument("--skip-daily", action="store_true",
+                       help="Add --skip-daily flag to auto model commands")
     args = parser.parse_args()
 
     # Define file paths
@@ -134,12 +140,14 @@ def main():
         print(f"  - {model['name']} → {model['script']} ({model['display_name']})")
 
     # Generate job commands
-    commands = generate_job_commands(datasets, models, skip_existing=args.skip_existing)
+    commands = generate_job_commands(datasets, models, skip_existing=args.skip_existing, skip_daily=args.skip_daily)
     total_jobs = len(commands)
 
     print(f"\nGenerating {total_jobs} jobs ({len(datasets)} datasets × {len(models)} models)")
     if args.skip_existing:
         print("  Including --skip-existing flag in commands")
+    if args.skip_daily:
+        print("  Including --skip-daily flag in auto model commands")
     
     # Write to file
     write_jobs_file(commands, output_file)

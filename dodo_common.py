@@ -425,7 +425,7 @@ def load_all_module_requirements():
 
 
 # Forecasting-specific utilities
-def load_models_config(config_path="forecasting/models_config.toml"):
+def load_models_config(config_path="src/forecasting/models_config.toml"):
     """Load the models configuration from TOML file."""
     with open(config_path, "rb") as f:
         return tomli.load(f)

@@ -522,12 +522,15 @@ def main():
                        help="Enable debug mode for faster testing with limited data")
     parser.add_argument("--skip-existing", action="store_true",
                        help="Skip if valid error metrics already exist")
+    parser.add_argument("--skip-daily", action="store_true",
+                       help="Skip datasets with business day (B) or daily (D) frequency")
     args = parser.parse_args()
 
     DATASET_NAME = args.dataset
     MODEL_NAME = args.model
     DEBUG_MODE = args.debug
     SKIP_EXISTING = args.skip_existing
+    SKIP_DAILY = args.skip_daily
 
     # Check if we should skip this forecast
     if SKIP_EXISTING and should_skip_forecast(DATASET_NAME, MODEL_NAME, verbose=True):
@@ -554,6 +557,11 @@ def main():
     dataset_config = read_dataset_config(DATASET_NAME)
     frequency = dataset_config['frequency']
     seasonality = dataset_config['seasonality']
+
+    # Check if we should skip daily frequency datasets
+    if SKIP_DAILY and frequency in ['B', 'D']:
+        print(f"Skipping {MODEL_NAME} for {DATASET_NAME} - daily frequency dataset (frequency: {frequency})")
+        sys.exit(0)
 
     # Convert frequency to Polars format
     polars_frequency = convert_pandas_freq_to_polars(frequency)

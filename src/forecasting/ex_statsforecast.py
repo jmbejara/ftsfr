@@ -103,14 +103,10 @@ sys.path.append(str(FILE_DIR))
 sys.path.append(str(REPO_ROOT / "src"))
 
 # Import the functions we need from forecast.py
-from forecast import (
+from forecast_utils import (
     read_dataset_config,
-    load_model_config,
-    create_model,
     load_and_preprocess_data,
     convert_frequency_to_statsforecast,
-    train_and_forecast_statsforecast,
-    calculate_global_metrics,
 )
 
 from utilsforecast.losses import mase, mae, rmse, smape
