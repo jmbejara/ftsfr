@@ -35,16 +35,16 @@ from forecast_utils import (
 from robust_preprocessing import robust_preprocess_pipeline
 
 from neuralforecast import NeuralForecast
-from neuralforecast.models import (
-    DeepAR,
-    NBEATS,
-    NHITS,
-    DLinear,
-    NLinear,
-    VanillaTransformer,
-    TiDE,
-    KAN,
-    LSTM
+from neuralforecast.auto import (
+    AutoDeepAR,
+    AutoNBEATS,
+    AutoNHITS,
+    AutoDLinear,
+    AutoNLinear,
+    AutoVanillaTransformer,
+    AutoTiDE,
+    AutoKAN,
+    AutoLSTM
 )
 from neuralforecast.losses.pytorch import MAE, DistributionLoss
 
@@ -56,8 +56,8 @@ from statsforecast.models import (
 
 warnings.filterwarnings("ignore")
 
-# Fixed hyperparameters for non-auto models
-# These are reasonable defaults that work well for most cases
+# Default NUM_SAMPLES - overridden by debug mode
+NUM_SAMPLES = 20
 
 # Hardware detection functions
 def detect_hardware():
@@ -109,6 +109,7 @@ def detect_hardware():
         optuna_jobs = min(cpu_count // 4, 8)
 
     print(f"  Data loading workers: {num_workers}")
+    print(f"  Optuna parallel jobs: {optuna_jobs}")
 
     return {
         'cpu_count': cpu_count,
@@ -118,227 +119,404 @@ def detect_hardware():
         'devices': devices,
         'strategy': strategy,
         'num_workers': num_workers,
+        'optuna_jobs': optuna_jobs
     }
 
 
-def create_config_nhits(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for NHITS."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "start_padding_enabled": True,
-        "n_blocks": 5 * [1],
-        "mlp_units": 5 * [[64, 64]],
-        "n_pool_kernel_size": 5*[2],
-        "n_freq_downsample": [2, 2, 1, 1, 1],
-        "learning_rate": 1e-3,
-        "scaler_type": "robust",
-        "max_steps": 200 if debug else 500,
-        "batch_size": 32,
-        "windows_batch_size": 256,
-        "random_seed": 42,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
+def create_auto_config_nhits(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+    """Create configuration for AutoNHITS with optuna backend."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+            "n_blocks": 5 * [1],
+            "mlp_units": 5 * [[64, 64]],
+            "n_pool_kernel_size": trial.suggest_categorical(
+                "n_pool_kernel_size",
+                (5*[1], 5*[2], 5*[4])  # Remove most aggressive pooling
+            ),
+            "n_freq_downsample": trial.suggest_categorical(
+                "n_freq_downsample",
+                ([1, 1, 1, 1, 1], [2, 2, 1, 1, 1])  # Less aggressive downsampling
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate",
+                low=1e-4,
+                high=1e-2,
+                log=True,
+            ),
+            "scaler_type": "robust",
+            "max_steps": trial.suggest_categorical(
+                "max_steps", (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "batch_size": trial.suggest_categorical(
+                "batch_size",
+                (32, 64),  # Larger batches for stability
+            ),
+            "windows_batch_size": trial.suggest_categorical(
+                "windows_batch_size",
+                (128, 256),
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed",
+                low=1,
+                high=20,
+            ),
+        }
+        if lightning_logs_dir:
+            config_dict["default_root_dir"] = lightning_logs_dir
 
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
 
-    return config_dict
-
-
-def create_config_lstm(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for LSTM."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "encoder_hidden_size": 128,
-        "encoder_n_layers": 2,
-        "learning_rate": 1e-3,
-        "scaler_type": 'robust',
-        "max_steps": 200 if debug else 500,
-        "batch_size": 32,
-        "random_seed": 42,
-        "start_padding_enabled": True,
-        "decoder_layers": 1,
-        "decoder_hidden_size": 128,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
-
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
-
-    return config_dict
-
-
-def create_config_simple(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for linear models."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "learning_rate": 1e-3,
-        "scaler_type": 'robust',
-        "max_steps": 200 if debug else 500,
-        "batch_size": 32,
-        "random_seed": 42,
-        "start_padding_enabled": True,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
-
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
-
-    return config_dict
+        return config_dict
+    return config
 
 
-def create_config_deepar(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for DeepAR."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "lstm_hidden_size": 128,
-        "lstm_n_layers": 2,
-        "lstm_dropout": 0.2,
-        "learning_rate": 1e-3,
-        "scaler_type": "robust",
-        "max_steps": 200 if debug else 500,
-        "batch_size": 64,
-        "random_seed": 42,
-        "start_padding_enabled": True,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
+def create_auto_config_lstm(seasonality, debug=False, hardware_config=None):
+    """Create configuration for AutoLSTM with optuna backend."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "encoder_hidden_size": trial.suggest_categorical(
+                "encoder_hidden_size",
+                (64, 128),
+            ),
+            "encoder_n_layers": trial.suggest_categorical(
+                "encoder_n_layers",
+                (2, 3),  # Reduced max layers
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate",
+                low=1e-4,
+                high=1e-2,
+                log=True,
+            ),
+            "scaler_type": 'robust',
+            "max_steps": trial.suggest_categorical(
+                "max_steps",
+                (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "batch_size": trial.suggest_categorical(
+                "batch_size",
+                (32, 64)  # Larger batches for stability
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed",
+                low=1,
+                high=20
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+            "decoder_layers": trial.suggest_categorical(
+                "decoder_layers", (1, 2)  # Add decoder configuration
+            ),
+            "decoder_hidden_size": trial.suggest_categorical(
+                "decoder_hidden_size", (64, 128)  # Match encoder hidden size
+            ),
+        }
 
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
 
-    return config_dict
-
-
-def create_config_nbeats(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for NBEATS."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "max_steps": 200 if debug else 500,
-        "learning_rate": 1e-3,
-        "scaler_type": "robust",
-        "batch_size": 32,
-        "stack_types": ["trend", "seasonality"],
-        "n_blocks": [2, 2],
-        "mlp_units": [[64, 64], [64, 64]],
-        "random_seed": 42,
-        "start_padding_enabled": True,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
-
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
-
-    return config_dict
-
-
-def create_config_transformer(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for VanillaTransformer."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "hidden_size": 128,
-        "n_head": 4,
-        "learning_rate": 1e-3,
-        "scaler_type": "robust",
-        "max_steps": 200 if debug else 500,
-        "batch_size": 32,
-        "random_seed": 42,
-        "start_padding_enabled": True,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
-
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
-
-    return config_dict
+        return config_dict
+    return config
 
 
-def create_config_tide(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for TiDE."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "hidden_size": 256,
-        "decoder_output_dim": 32,
-        "temporal_decoder_dim": 128,
-        "dropout": 0.3,
-        "learning_rate": 1e-3,
-        "scaler_type": "robust",
-        "max_steps": 200 if debug else 500,
-        "batch_size": 32,
-        "random_seed": 42,
-        "start_padding_enabled": True,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
+def create_auto_config_simple(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+    """Create simple configuration for linear models with optuna backend."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate",
+                low=1e-4,
+                high=1e-2,
+                log=True,
+            ),
+            "scaler_type": 'robust',
+            "max_steps": trial.suggest_categorical(
+                "max_steps",
+                (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "batch_size": trial.suggest_categorical(
+                "batch_size",
+                (32, 64)  # Larger batches for stability
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed",
+                low=1,
+                high=20
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+        }
+        if lightning_logs_dir:
+            config_dict["default_root_dir"] = lightning_logs_dir
 
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
 
-    return config_dict
+        return config_dict
+    return config
 
 
-def create_config_kan(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
-    """Create fixed configuration for KAN."""
-    config_dict = {
-        "input_size": 12 if debug else 24,
-        "grid_size": 5,
-        "spline_order": 3,
-        "n_hidden_layers": 1,
-        "hidden_size": 256,
-        "learning_rate": 1e-3,
-        "scaler_type": "robust",
-        "max_steps": 200 if debug else 500,
-        "batch_size": 32,
-        "random_seed": 42,
-        "start_padding_enabled": True,
-    }
-    if lightning_logs_dir:
-        config_dict["default_root_dir"] = lightning_logs_dir
+def create_auto_config_deepar(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+    """Create configuration for AutoDeepAR with optuna backend with robust scaling."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "lstm_hidden_size": trial.suggest_categorical(
+                "lstm_hidden_size", (64, 128, 256)
+            ),
+            "lstm_n_layers": trial.suggest_categorical(
+                "lstm_n_layers", (2, 3)
+            ),
+            "lstm_dropout": trial.suggest_float(
+                "lstm_dropout", 0.1, 0.4
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate", low=1e-4, high=1e-2, log=True
+            ),
+            # Remove minmax1 scaler which can cause -inf scale parameters
+            "scaler_type": trial.suggest_categorical(
+                "scaler_type", ("robust", "standard")
+            ),
+            "max_steps": trial.suggest_categorical(
+                "max_steps", (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "batch_size": trial.suggest_categorical(
+                "batch_size", (32, 64, 128)
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed", low=1, high=20
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+        }
+        if lightning_logs_dir:
+            config_dict["default_root_dir"] = lightning_logs_dir
 
-    if hardware_config:
-        config_dict["accelerator"] = hardware_config['accelerator']
-        config_dict["devices"] = hardware_config['devices']
-        if hardware_config['strategy'] != 'auto':
-            config_dict["strategy"] = hardware_config['strategy']
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
 
-    return config_dict
+        return config_dict
+    return config
+
+
+def create_auto_config_nbeats(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+    """Create configuration for AutoNBEATS with optuna backend."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "max_steps": trial.suggest_categorical(
+                "max_steps", (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate", low=1e-4, high=1e-2, log=True
+            ),
+            "scaler_type": "robust",
+            "batch_size": trial.suggest_categorical(
+                "batch_size", (32, 64)
+            ),
+            "stack_types": trial.suggest_categorical(
+                "stack_types", (["identity", "identity"], ["trend", "seasonality"])
+            ),
+            "n_blocks": trial.suggest_categorical(
+                "n_blocks", ([2, 2], [3, 3])
+            ),
+            "mlp_units": trial.suggest_categorical(
+                "mlp_units", ([[64, 64], [64, 64]], [[128, 128], [128, 128]])
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed", low=1, high=20
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+        }
+        if lightning_logs_dir:
+            config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
+        return config_dict
+    return config
+
+
+def create_auto_config_transformer(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+    """Create configuration for AutoVanillaTransformer with optuna backend."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "hidden_size": trial.suggest_categorical(
+                "hidden_size", (64, 128, 256)
+            ),
+            "n_head": trial.suggest_categorical(
+                "n_head", (4, 8)
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate", low=1e-4, high=1e-2, log=True
+            ),
+            "scaler_type": "robust",
+            "max_steps": trial.suggest_categorical(
+                "max_steps", (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "batch_size": trial.suggest_categorical(
+                "batch_size", (32, 64)
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed", low=1, high=20
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+        }
+        if lightning_logs_dir:
+            config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
+        return config_dict
+    return config
+
+
+def create_auto_config_tide(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+    """Create configuration for AutoTiDE with optuna backend."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "hidden_size": trial.suggest_categorical(
+                "hidden_size", (256, 512)
+            ),
+            "decoder_output_dim": trial.suggest_categorical(
+                "decoder_output_dim", (16, 32, 64)
+            ),
+            "temporal_decoder_dim": trial.suggest_categorical(
+                "temporal_decoder_dim", (64, 128)
+            ),
+            "dropout": trial.suggest_float(
+                "dropout", 0.1, 0.5
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate", low=1e-4, high=1e-2, log=True
+            ),
+            "scaler_type": "robust",
+            "max_steps": trial.suggest_categorical(
+                "max_steps", (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "batch_size": trial.suggest_categorical(
+                "batch_size", (32, 64)
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed", low=1, high=20
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+        }
+        if lightning_logs_dir:
+            config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
+        return config_dict
+    return config
+
+
+def create_auto_config_kan(seasonality, lightning_logs_dir=None, debug=False, hardware_config=None):
+    """Create configuration for AutoKAN with optuna backend."""
+    def config(trial):
+        config_dict = {
+            "input_size": trial.suggest_categorical(
+                "input_size", (6, 12) if debug else (12, 24, 48)  # Smaller for debug
+            ),
+            "grid_size": trial.suggest_categorical(
+                "grid_size", (3, 5, 7)
+            ),
+            "spline_order": trial.suggest_categorical(
+                "spline_order", (3, 4)
+            ),
+            "n_hidden_layers": trial.suggest_categorical(
+                "n_hidden_layers", (1, 2)
+            ),
+            "hidden_size": trial.suggest_categorical(
+                "hidden_size", (256, 512)
+            ),
+            "learning_rate": trial.suggest_float(
+                "learning_rate", low=1e-4, high=1e-2, log=True
+            ),
+            "scaler_type": "robust",
+            "max_steps": trial.suggest_categorical(
+                "max_steps", (100, 200) if debug else (500, 1000)  # Reduced for debug
+            ),
+            "batch_size": trial.suggest_categorical(
+                "batch_size", (32, 64)
+            ),
+            "random_seed": trial.suggest_int(
+                "random_seed", low=1, high=20
+            ),
+            "start_padding_enabled": True,  # Enable padding for short series
+        }
+        if lightning_logs_dir:
+            config_dict["default_root_dir"] = lightning_logs_dir
+
+        # Add hardware-aware settings for PyTorch Lightning
+        if hardware_config:
+            config_dict["accelerator"] = hardware_config['accelerator']
+            config_dict["devices"] = hardware_config['devices']
+            if hardware_config['strategy'] != 'auto':
+                config_dict["strategy"] = hardware_config['strategy']
+
+        return config_dict
+    return config
 
 
 def main():
     """Main function for neural forecast with cross-validation."""
 
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Neural Forecasting with Fixed Hyperparameters")
+    parser = argparse.ArgumentParser(description="Neural Forecasting with Auto Hyperparameter Optimization")
     parser.add_argument("--dataset", required=True, help="Dataset name from datasets.toml")
     parser.add_argument("--model", required=True,
-                       choices=["deepar", "nbeats", "nhits", "dlinear",
-                               "nlinear", "vanilla_transformer", "tide", "kan"],
+                       choices=["auto_deepar", "auto_nbeats", "auto_nhits", "auto_dlinear",
+                               "auto_nlinear", "auto_vanilla_transformer", "auto_tide", "auto_kan"],
                        help="Neural model to use")
     parser.add_argument("--debug", action="store_true",
                        help="Enable debug mode for faster testing with limited data")
@@ -356,8 +534,6 @@ def main():
         print(f"Skipping {MODEL_NAME} for {DATASET_NAME} - valid metrics already exist")
         sys.exit(0)
 
-    # Debug mode affects training time, not hyperparameter search
-
     print("=" * 60)
     print("Neural Forecast with Cross-Validation")
     if DEBUG_MODE:
@@ -365,7 +541,6 @@ def main():
     print("=" * 60)
     print(f"Dataset: {DATASET_NAME}")
     print(f"Model: {MODEL_NAME}")
-    print("Using fixed hyperparameters (no optimization)")
 
     # Detect hardware and configure settings
     print("\n0. Hardware Detection")
@@ -385,6 +560,20 @@ def main():
 
     print(f"Frequency: {frequency} (Polars: {polars_frequency})")
     print(f"Seasonality: {seasonality}")
+
+    # Set NUM_SAMPLES based on debug mode and data frequency
+    if DEBUG_MODE:
+        NUM_SAMPLES = 2  # Very few samples for debug
+    else:
+        # Detect if this is a daily frequency dataset
+        # B = business days, D = daily
+        if frequency in ['B', 'D']:
+            NUM_SAMPLES = 5  # Much fewer samples for daily data
+            print(f"Daily frequency detected, reducing hyperparameter samples to {NUM_SAMPLES}")
+        else:
+            NUM_SAMPLES = 20  # Normal number of samples for monthly/quarterly data
+
+    print(f"Hyperparameter samples: {NUM_SAMPLES}")
 
     # Get test size based on frequency (reduce for debug mode)
     if DEBUG_MODE:
@@ -607,43 +796,29 @@ def main():
     lightning_logs_dir = f"./_output/forecasting/logs/{DATASET_NAME}/{MODEL_NAME}"
     os.makedirs(lightning_logs_dir, exist_ok=True)
 
-    # Create the selected neural model with fixed configuration
-    # Get the configuration for the selected model
-    config_mapping = {
-        "deepar": create_config_deepar(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "nbeats": create_config_nbeats(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "nhits": create_config_nhits(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "dlinear": create_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "nlinear": create_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "vanilla_transformer": create_config_transformer(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "tide": create_config_tide(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
-        "kan": create_config_kan(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+    # Create the selected neural model with custom configuration and lightning logs path
+    model_mapping = {
+        "auto_deepar": AutoDeepAR(h=test_size, config=create_auto_config_deepar(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                                  loss=DistributionLoss(distribution='Normal'),
+                                  backend='optuna', num_samples=NUM_SAMPLES),
+        "auto_nbeats": AutoNBEATS(h=test_size, config=create_auto_config_nbeats(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                                  loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
+        "auto_nhits": AutoNHITS(h=test_size, config=create_auto_config_nhits(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                                loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
+        "auto_dlinear": AutoDLinear(h=test_size, config=create_auto_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                                    loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
+        "auto_nlinear": AutoNLinear(h=test_size, config=create_auto_config_simple(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                                    loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
+        "auto_vanilla_transformer": AutoVanillaTransformer(h=test_size, config=create_auto_config_transformer(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                                                           loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
+        "auto_tide": AutoTiDE(h=test_size, config=create_auto_config_tide(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                              loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
+        "auto_kan": AutoKAN(h=test_size, config=create_auto_config_kan(seasonality, lightning_logs_dir, debug=DEBUG_MODE, hardware_config=hardware_config),
+                            loss=MAE(), backend='optuna', num_samples=NUM_SAMPLES),
     }
 
-    model_config = config_mapping[MODEL_NAME]
-
-    # Create model instances with fixed hyperparameters
-    # Each model needs its own specific configuration
-    if MODEL_NAME == "deepar":
-        selected_model = DeepAR(h=test_size, loss=DistributionLoss(distribution='Normal'), **model_config)
-    elif MODEL_NAME == "nbeats":
-        selected_model = NBEATS(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "nhits":
-        selected_model = NHITS(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "dlinear":
-        selected_model = DLinear(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "nlinear":
-        selected_model = NLinear(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "vanilla_transformer":
-        selected_model = VanillaTransformer(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "tide":
-        selected_model = TiDE(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "kan":
-        selected_model = KAN(h=test_size, loss=MAE(), **model_config)
-    else:
-        raise ValueError(f"Unknown model name: {MODEL_NAME}")
-
-    neural_models = [selected_model]
+    selected_neural_model = model_mapping[MODEL_NAME]
+    neural_models = [selected_neural_model]
 
     baseline_model_names = [type(model).__name__ for model in baseline_models]
     neural_model_names = [type(model).__name__ for model in neural_models]
@@ -708,7 +883,7 @@ def main():
     # Perform cross-validation with neural models
     print("\n5. Performing Cross-Validation with Neural Models")
     print("-" * 40)
-    print("Note: Using fixed hyperparameters (no optimization)")
+    print("Note: This will take longer due to hyperparameter optimization")
     print(f"Lightning logs will be saved to: {lightning_logs_dir}")
 
     nf = NeuralForecast(

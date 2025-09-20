@@ -67,53 +67,105 @@ description = "Theta method for forecasting"
 # Neural Models (forecast_neural.py)
 # All neural models use automatic hyperparameter optimization with Optuna
 
+# Auto-optimized versions (slower but finds best hyperparameters)
 [auto_deepar]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto DeepAR"
 table_name = "DeepAR"
 description = "Auto hyperparameter optimization for DeepAR with LSTM encoder-decoder"
 
 [auto_nbeats]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto N-BEATS"
 table_name = "NBEATS"
 description = "Auto hyperparameter optimization for N-BEATS neural network"
 
 [auto_nhits]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto N-HiTS"
 table_name = "NHITS"
 description = "Auto hyperparameter optimization for N-HiTS hierarchical interpolation"
 
 [auto_dlinear]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto DLinear"
 table_name = "DLinear"
 description = "Auto hyperparameter optimization for DLinear decomposition model"
 
 [auto_nlinear]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto NLinear"
 table_name = "NLinear"
 description = "Auto hyperparameter optimization for NLinear normalization model"
 
 [auto_vanilla_transformer]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto Vanilla Transformer"
 table_name = "Transformer"
 description = "Auto hyperparameter optimization for Vanilla Transformer"
 
 [auto_tide]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto TiDE"
 table_name = "TiDE"
 description = "Auto hyperparameter optimization for TiDE (Time-series Dense Encoder)"
 
 [auto_kan]
-script = "forecast_neural.py"
+script = "forecast_neural_auto.py"
 display_name = "Auto KAN"
 table_name = "KAN"
 description = "Auto hyperparameter optimization for Kolmogorov-Arnold Networks"
+
+# Non-auto versions (faster with fixed reasonable hyperparameters)
+# Uncomment these and comment out the auto versions above for faster execution on daily datasets
+
+[deepar]
+script = "forecast_neural.py"
+display_name = "DeepAR"
+table_name = "DeepAR"
+description = "DeepAR with LSTM encoder-decoder using default hyperparameters"
+
+[nbeats]
+script = "forecast_neural.py"
+display_name = "N-BEATS"
+table_name = "NBEATS"
+description = "N-BEATS neural network with default hyperparameters"
+
+[nhits]
+script = "forecast_neural.py"
+display_name = "N-HiTS"
+table_name = "NHITS"
+description = "N-HiTS hierarchical interpolation with default hyperparameters"
+
+[dlinear]
+script = "forecast_neural.py"
+display_name = "DLinear"
+table_name = "DLinear"
+description = "DLinear decomposition model with default hyperparameters"
+
+[nlinear]
+script = "forecast_neural.py"
+display_name = "NLinear"
+table_name = "NLinear"
+description = "NLinear normalization model with default hyperparameters"
+
+[vanilla_transformer]
+script = "forecast_neural.py"
+display_name = "Vanilla Transformer"
+table_name = "Transformer"
+description = "Vanilla Transformer with default hyperparameters"
+
+[tide]
+script = "forecast_neural.py"
+display_name = "TiDE"
+table_name = "TiDE"
+description = "TiDE (Time-series Dense Encoder) with default hyperparameters"
+
+[kan]
+script = "forecast_neural.py"
+display_name = "KAN"
+table_name = "KAN"
+description = "Kolmogorov-Arnold Networks with default hyperparameters"
 
 # Note: auto_lstm temporarily disabled due to tensor dimension mismatch issues
 # [auto_lstm]
