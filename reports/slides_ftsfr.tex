@@ -555,33 +555,24 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \vspace{-0.5cm}
     \centering
     \textbf{Relative MASE Results by Dataset and Model}\\
-    {\scriptsize \textit{Performance relative to Naive: $<1$ = better, $>1$ = worse}}\\
+    {\scriptsize \textit{Performance relative to Historic Average: $<1$ = better, $>1$ = worse}}\\
     \vspace{0.2cm}
     \input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}
   \end{frame}
 
-  \begin{frame}[plain]
-    \tiny
-    \vspace{-0.5cm}
-    \centering
-    \textbf{Overall Model Performance Summary: Median MASE Across All Datasets}\\
-    \vspace{0.2cm}
-    \input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
-  \end{frame}
-
 \begin{frame}
-  \frametitle{Relative MASE Heatmap: Performance vs Naive Baseline}
+  \frametitle{Relative MASE Heatmap: Performance vs Historic Average}
   \centering
   \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/relative_mase_heatmap.png}
   \vspace{0.2cm}
 
-  Blue = outperforms Naive ($<1$), Red = underperforms Naive ($>1$)
+  Blue = outperforms Historic Average ($<1$), Red = underperforms baseline ($>1$)
 \end{frame}
 
 \begin{frame}
   \frametitle{Relative MASE Analysis: Key Patterns}
   \begin{itemize}
-  \item \alert{Naive baseline dominance:} Competitive across most datasets, especially for efficient markets
+  \item \alert{Historic Average baseline dominance:} Competitive across most datasets, especially for efficient markets
   \vspace{0.3cm}
   \item \alert{Where sophisticated models excel:}
   \begin{itemize}
@@ -615,7 +606,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \begin{itemize}
   \item \alert{No Free Lunch confirmed:} Model performance varies significantly by dataset characteristics
   \vspace{0.3cm}
-  \item \alert{Naive baseline is remarkably competitive}, especially for returns data where market efficiency limits predictability
+  \item \alert{Simple baselines remain remarkably competitive}, especially for returns data where market efficiency limits predictability
   \vspace{0.3cm}
   \item \alert{When sophisticated models win:}
   \begin{itemize}
@@ -674,6 +665,15 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 
   Positive values = better than historical mean, Negative = worse
 \end{frame}
+
+  \begin{frame}[plain]
+    \tiny
+    \vspace{-0.5cm}
+    \centering
+    \textbf{Overall Model Performance Summary: MASE, Relative MASE, and $R^2_{\text{oos}}$ Across All Datasets}\\
+    \vspace{0.2cm}
+    \input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
+  \end{frame}
 
 \begin{frame}
   \frametitle{OOS $R^2$ Analysis: Predictability Insights}
@@ -926,7 +926,5 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 
 
 \end{document}
-
-
 
 

@@ -764,6 +764,13 @@ We evaluate forecasting performance using two complementary error metrics: Mean 
 The denominator is the in-sample MAE of a seasonal naïve forecast on the training window of length $N$ (with seasonal period $s$; $s{=}1$ for nonseasonal data). MASE values $<1$ indicate the model outperforms the naïve benchmark; values $>1$ indicate underperformance.
 
 \medskip
+\noindent\textbf{Relative MASE.}
+\[
+\mathrm{Relative\;MASE}=\frac{\mathrm{MASE}_{\text{model}}}{\mathrm{MASE}_{\text{HA}}}
+\]
+This compares each model's MASE to the Historic Average (HA) baseline on the same dataset. Values below 1.0 indicate a model improves upon the Historic Average, while values above 1.0 indicate weaker performance than the baseline.
+
+\medskip
 \noindent\textbf{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$).}
 \[
 R^2_{\text{oos}} = 1 - \frac{\sum_{t=1}^T (y_t-\hat y_t)^2}{\sum_{t=1}^T (y_t-\bar{y}_{\text{train}})^2}
@@ -802,7 +809,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 % \label{fig:mase_heatmap}
 % \end{figure}
 
-To better understand the relative performance of sophisticated models compared to the simple Naive benchmark, Table~\ref{tab:relative_mase_results} presents MASE ratios where each model's MASE is divided by the Naive model's MASE for the same dataset. Values less than 1.0 indicate that the model outperforms the Naive baseline, while values greater than 1.0 indicate underperformance. This normalization allows for clear interpretation of whether the additional complexity of advanced forecasting models provides meaningful improvements over the simple baseline.
+To better understand the relative performance of sophisticated models compared to the Historic Average baseline, Table~\ref{tab:relative_mase_results} presents MASE ratios where each model's MASE is divided by the Historic Average model's MASE for the same dataset. Values less than 1.0 indicate that the model outperforms the Historic Average baseline, while values greater than 1.0 indicate underperformance. This normalization allows for clear interpretation of whether the additional complexity of advanced forecasting models provides meaningful improvements over the simple benchmark.
 
 \begin{table}[htbp]
 \centering
@@ -812,41 +819,21 @@ To better understand the relative performance of sophisticated models compared t
 % \textit{Relative MASE table unavailable: requires Naive baseline model which is not present in current results.}
 \caption*{
     \scriptsize
-\textbf{Note:} Values show MASE ratios relative to the Naive baseline. Values $<$ 1.0 indicate better performance than Naive. Numbers in bold indicate the best performing model for each dataset.
+\textbf{Note:} Values show MASE ratios relative to the Historic Average baseline. Values $<$ 1.0 indicate better performance than the baseline. Numbers in bold indicate the best performing model for each dataset.
 
 \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
 }
 \end{table}
 
-To provide an overall assessment of model performance across all datasets, Table~\ref{tab:median_mase_summary} presents summary statistics for each model across three key performance metrics. The table shows median and mean values for MASE (absolute performance), Relative MASE (performance relative to Historic Average baseline), and out-of-sample R² (predictive power), with models sorted by their median MASE performance. This comprehensive summary allows identification of models that consistently perform well across the diverse range of financial time series in our benchmark, providing guidance for practitioners seeking robust forecasting approaches.
+Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the relative MASE results using a diverging color scheme where blue indicates better performance than the Historic Average baseline (values $<$ 1.0), white represents performance equal to the baseline, and red shows worse performance (values $>$ 1.0). This visualization makes it easy to identify which models consistently outperform the simple baseline and which datasets benefit most from sophisticated forecasting approaches.
 
-\begin{table}[htbp]
-\centering
-\caption{Overall Model Performance Summary: MASE, Relative MASE, and R² Across All Datasets}
-\label{tab:median_mase_summary}
-\footnotesize
-\resizebox{\textwidth}{!}{%
-\input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
-}
-\caption*{
-    \scriptsize
-\textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), Relative MASE shows performance relative to Historic Average (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.
-
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
-}
-\end{table}
-
-% Commented out: Relative MASE heatmap requires Naive baseline model which is not available
-% Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the relative MASE results using a diverging color scheme where blue indicates better performance than Naive (values $<$ 1.0), white represents performance equal to Naive, and red shows worse performance than Naive (values $>$ 1.0). This visualization makes it easy to identify which models consistently outperform the simple baseline and which datasets benefit most from sophisticated forecasting approaches.
-
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=\textwidth]{../_output/forecasting/paper/relative_mase_heatmap.png}
-%     \caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Naive baseline, with blue indicating better performance than Naive ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*). \\
-%     \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
-%     }
-%     \label{fig:relative_mase_heatmap}
-% \end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{../_output/forecasting/paper/relative_mase_heatmap.png}
+    \caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Historic Average baseline, with blue indicating better performance than the baseline ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*).}
+    \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' creation}}
+    \label{fig:relative_mase_heatmap}
+\end{figure}
 
 Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the same organization. While MASE provides scale-free comparisons, RMSE offers insights into the actual magnitude of forecasting errors, which can be particularly relevant for risk management applications.
 
@@ -884,6 +871,34 @@ Table~\ref{tab:r2oos_results} presents the out-of-sample $R^2$ ($R^2_{\text{oos}
 \noindent {\scriptsize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
 \scriptsize
 \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
+\end{table}
+
+Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highlighting which datasets and models deliver the greatest gains over the historical average benchmark. The diverging color scale emphasizes positive predictive power while clearly flagging underperformance.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{../_output/forecasting/paper/r2oos_heatmap.png}
+    \caption{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$) Heatmap by Dataset and Model. Warmer colors indicate larger improvements over the Historic Average baseline, while cooler colors indicate underperformance. Cells with extreme values are annotated to preserve readability.}
+    \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' creation}}
+    \label{fig:r2oos_heatmap}
+\end{figure}
+
+To provide an overall assessment of model performance across all datasets, Table~\ref{tab:median_mase_summary} presents summary statistics for each model across three key performance metrics. The table shows median and mean values for MASE (absolute performance), Relative MASE (performance relative to Historic Average baseline), and out-of-sample R² (predictive power), with models sorted by their median MASE performance. This comprehensive summary allows identification of models that consistently perform well across the diverse range of financial time series in our benchmark, providing guidance for practitioners seeking robust forecasting approaches.
+
+\begin{table}[htbp]
+\centering
+\caption{Overall Model Performance Summary: MASE, Relative MASE, and R² Across All Datasets}
+\label{tab:median_mase_summary}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
+}
+\caption*{
+    \scriptsize
+\textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), Relative MASE shows performance relative to Historic Average (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.
+
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
+}
 \end{table}
 
 The $R^2_{\text{oos}}$ results reveal important patterns that complement the MASE and RMSE findings. Notably, many models achieve positive $R^2_{\text{oos}}$ values for yield curve and basis spread data, indicating genuine predictive ability beyond historical averages. For instance, Treasury Yield Curve data shows consistently high $R^2_{\text{oos}}$ values (around 0.9) across most models, confirming the strong predictability in interest rate term structure. Similarly, several models achieve positive performance on BHC Cash Liquidity and BHC Leverage datasets, suggesting that bank characteristics contain predictable patterns.
