@@ -527,21 +527,23 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \section{Results}
 
 \begin{frame}
-    \frametitle{Detailed Performance Results}
+  \frametitle{Forecasting Design and Metrics}
+  \begin{itemize}
+  \item \textbf{Horizon:} \alert{One month ahead} for monthly data; \alert{21 trading days} (business) or \alert{30 calendar days} (daily); \alert{one quarter} for quarterly series
+  \item \textbf{Rolling windows:} up to \alert{6 expanding cross-validation windows}, limited by the shortest surviving series
+  \item \textbf{MASE:} Performance relative to a seasonal naïve baseline
     \begin{itemize}
-    \item MASE: Performance compared to Naive baseline
-    \begin{itemize}
-      \item Values $<$ 1.0 = better than Naive
-      \item Values $>$ 1.0 = worse than Naive
+      \item Values $<$ 1.0 = better than naïve
+      \item Values $>$ 1.0 = worse than naïve
     \end{itemize}
-    \item Out-of-sample $R^2$: Percentage reduction in MSE vs historical average
+  \item \textbf{Out-of-sample $R^2$:} Percentage reduction in MSE vs historical mean
     \begin{itemize}
       \item Positive values = model outperforms benchmark
       \item Negative values = model underperforms benchmark
     \end{itemize}
-    \item Following slides show detailed tables for both metrics
-    \end{itemize}
-  \end{frame}
+  \item Following slides report detailed tables and heatmaps for both metrics
+  \end{itemize}
+\end{frame}
   
 \begin{frame}[plain]
     \tiny
@@ -803,22 +805,23 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \label{slide:dataset_stats}
 \small
 \begin{itemize}
-\item \alert{Scale varies dramatically across datasets:}
+\item \alert{Scale varies dramatically across datasets (after filtering):}
 \begin{itemize}
-  \item Commodities: 4 series (GSCI-based)
-  \item CDS Contracts: 6,388 individual contracts
-  \item CRSP Stock: 4,000+ individual equities
-  \item Corporate Bonds: 1,000+ individual bonds
+  \item Commodities: 23 series (GSCI-based)
+  \item CDS Contracts: 234 individual contracts retained (out of 6,552)
+  \item CRSP Stock: 25,095 individual equities after filtering (93.8\% retention)
+  \item Corporate Bonds: 16,719 individual bonds (71.2\% retention)
 \end{itemize}
 \vspace{0.3cm}
 \item \alert{Time coverage:} Most datasets span 10-25 years
 \vspace{0.3cm}
-\item \alert{Frequency:} Daily (FX, yield curves) to quarterly (bank data)
+\item \alert{Frequency:} Daily (FX, yield curves) to quarterly (bank data); horizons set to one calendar or trading month (daily) and one period (monthly/quarterly)
 \vspace{0.3cm}
 \item \alert{Two levels of aggregation:}
 \begin{itemize}
   \item Portfolio-level (10-50 series) for replication
   \item Security-level (100s-1000s) for global forecasting
+  \item Some daily panels drop out if 21-day hold-outs cannot be formed (e.g., FF25 daily portfolios)
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -837,13 +840,13 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \item \alert{Data preprocessing:}
 \begin{itemize}
   \item Forward-fill for missing values (no look-ahead bias)
-  \item Length-based filtering with dataset-specific thresholds
-  \item Seasonality-aware forecast horizon calculation
+  \item Length-based filtering with dataset-specific thresholds (minimum test coverage now matches horizon)
+  \item Frequency-specific horizons: 30-day (calendar), 21-day (trading), 1-month, 1-quarter; up to six rolling windows per dataset
 \end{itemize}
 \vspace{0.3cm}
 \item \alert{Evaluation:}
 \begin{itemize}
-  \item Train/test split with substantial out-of-sample periods
+  \item Rolling-origin cross-validation aligned across statistical and neural models
   \item Two complementary error metrics for robust comparison
   \item Minimal hyperparameter tuning for baseline results
 \end{itemize}

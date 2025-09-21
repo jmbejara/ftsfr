@@ -20,7 +20,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "forecasting"))
 
 from settings import config
 
-from forecast_utils import get_test_size_from_frequency
+from forecast_utils import (
+    get_test_size_from_frequency,
+    determine_cv_windows,
+    MAX_CV_WINDOWS,
+)
 from robust_preprocessing import (
     normalize_month_end_dates,
     build_canonical_grid,
@@ -187,6 +191,7 @@ def calculate_filtering_statistics(dataset_info):
 
         train_df, test_df = split_train_test_aligned(df_grid, test_size)
 
+        cv_windows = determine_cv_windows(df_grid, test_size)
         requirements = get_data_requirements(frequency, test_size, seasonality)
 
         try:
@@ -210,6 +215,9 @@ def calculate_filtering_statistics(dataset_info):
                 else 0,
                 "median_length_after": 0,
                 "min_required_obs": int(requirements["min_total_obs"]),
+                "min_test_obs": int(requirements["min_test_obs"]),
+                "horizon": int(test_size),
+                "cv_windows": cv_windows,
                 "date_range": format_date_range(min_date_before, max_date_before),
                 "error": None,
             }
@@ -270,6 +278,9 @@ def calculate_filtering_statistics(dataset_info):
             if median_length_after
             else 0,
             "min_required_obs": int(requirements["min_total_obs"]),
+            "min_test_obs": int(requirements["min_test_obs"]),
+            "horizon": int(test_size),
+            "cv_windows": cv_windows,
             "date_range": date_range_after
             if entities_after
             else format_date_range(min_date_before, max_date_before),
@@ -289,6 +300,9 @@ def calculate_filtering_statistics(dataset_info):
             "median_length_before": "Error",
             "median_length_after": "Error",
             "min_required_obs": "Error",
+            "min_test_obs": "Error",
+            "horizon": "Error",
+            "cv_windows": "Error",
             "date_range": "Error",
             "error": str(e),
         }
@@ -338,16 +352,16 @@ def create_latex_table(grouped_stats, output_path):
         "\\footnotesize",
         "\\setlength{\\tabcolsep}{1.0pt}",
         "\\renewcommand{\\arraystretch}{0.9}",
-        "\\begin{tabular}{@{}llrrrrrrrl@{}}",
+        "\\begin{tabular}{@{}llrrrrrrrrrrl@{}}",
         "\\toprule",
-        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & Date Range \\\\",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Test\\\\Obs\\end{tabular} & Horizon & \\begin{tabular}[c]{@{}r@{}}CV\\\\Windows\\end{tabular} & Date Range \\\\",
         "\\midrule",
     ]
 
     for group_name, datasets in grouped_stats.items():
         # Add group header
         latex_content.append(
-            f"\\multicolumn{{10}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
+            f"\\multicolumn{{13}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
         )
 
         # Add datasets in this group
@@ -362,6 +376,9 @@ def create_latex_table(grouped_stats, output_path):
                 str(stats["median_length_before"]),
                 str(stats["median_length_after"]),
                 str(stats["min_required_obs"]),
+                str(stats["min_test_obs"]),
+                str(stats["horizon"]),
+                str(stats["cv_windows"]),
                 stats["date_range"],
             ]
             latex_content.append(" & ".join(row_data) + " \\\\")
@@ -379,7 +396,8 @@ def create_latex_table(grouped_stats, output_path):
             "\\scriptsize",
             "\\textbf{Notes:} Statistics reflect the robust preprocessing pipeline used prior to model estimation. ",
             "Entities Before/After = unique time series counts before and after filtering; Entities Removed and Retention (\\%) highlight the impact of quality screens; ",
-            "Median Len Before/After = median series length (train+test) in observations; Min Req. Obs = adaptive minimum total observations required by the pipeline. ",
+            "Median Len Before/After = median series length (train+test) in observations; Min Req. Obs = adaptive minimum total observations required by the pipeline; ",
+            "Min Test Obs shows the minimum hold-out coverage implied by the forecasting horizon; Horizon reflects the per-frequency forecast length; CV Windows reports the maximum number of rolling windows used (capped at 6); ",
             "Filtering enforces data-quality standards (variance, gap ratio, coverage) and consistent cleaning across models.",
             "\\end{minipage}",
             "\\end{table}",
@@ -401,16 +419,16 @@ def create_latex_tabular_only(grouped_stats, output_path):
         "\\footnotesize",
         "\\setlength{\\tabcolsep}{1.0pt}",
         "\\renewcommand{\\arraystretch}{0.9}",
-        "\\begin{tabular}{@{}llrrrrrrrl@{}}",
+        "\\begin{tabular}{@{}llrrrrrrrrrrl@{}}",
         "\\toprule",
-        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & Date Range \\\\",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Test\\\\Obs\\end{tabular} & Horizon & \\begin{tabular}[c]{@{}r@{}}CV\\\\Windows\\end{tabular} & Date Range \\\\",
         "\\midrule",
     ]
 
     for group_name, datasets in grouped_stats.items():
         # Add group header
         latex_content.append(
-            f"\\multicolumn{{10}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
+            f"\\multicolumn{{13}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
         )
 
         # Add datasets in this group
@@ -425,6 +443,9 @@ def create_latex_tabular_only(grouped_stats, output_path):
                 str(stats["median_length_before"]),
                 str(stats["median_length_after"]),
                 str(stats["min_required_obs"]),
+                str(stats["min_test_obs"]),
+                str(stats["horizon"]),
+                str(stats["cv_windows"]),
                 stats["date_range"],
             ]
             latex_content.append(" & ".join(row_data) + " \\\\")
@@ -459,6 +480,9 @@ def create_csv_table(stats_list, output_path):
         "median_length_before",
         "median_length_after",
         "min_required_obs",
+        "min_test_obs",
+        "horizon",
+        "cv_windows",
         "date_range",
     ]
 
