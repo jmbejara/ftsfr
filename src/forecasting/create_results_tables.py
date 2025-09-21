@@ -4,6 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import pandas as pd
+import numpy as np
 import tomli
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -147,6 +148,76 @@ def load_model_order():
     print(f"  - Other models: {len(remaining_models)}")
 
     return ordered_models
+
+
+def format_best_values_for_table(
+    df,
+    *,
+    lower_is_better=None,
+    higher_is_better=None,
+    integer_columns=None,
+    decimals=3,
+    group_level=None,
+):
+    """Format a DataFrame with boldface applied to best-performing entries."""
+
+    lower_is_better = set(lower_is_better or [])
+    higher_is_better = set(higher_is_better or [])
+    integer_columns = set(integer_columns or [])
+
+    numeric_df = df.apply(pd.to_numeric, errors="coerce")
+    best_masks = {col: pd.Series(False, index=df.index) for col in df.columns}
+
+    if group_level is None:
+        group_masks = [(pd.Series(True, index=df.index), None)]
+    else:
+        level_values = df.index.get_level_values(group_level)
+        group_masks = [
+            (pd.Series(level_values == group_value, index=df.index), group_value)
+            for group_value in level_values.unique()
+        ]
+
+    for col in df.columns:
+        if col not in lower_is_better and col not in higher_is_better:
+            continue
+
+        col_values = numeric_df[col]
+        if col_values.dropna().empty:
+            continue
+
+        for mask, _ in group_masks:
+            group_values = col_values[mask]
+            group_values = group_values.dropna()
+            if group_values.empty:
+                continue
+
+            best_value = (
+                group_values.max() if col in higher_is_better else group_values.min()
+            )
+
+            close_mask = np.isclose(group_values, best_value, rtol=1e-9, atol=1e-9)
+            best_indices = group_values.index[close_mask]
+            best_masks[col].loc[best_indices] = True
+
+    formatted = pd.DataFrame(index=df.index, columns=df.columns, dtype=object)
+
+    for col in df.columns:
+        is_integer = col in integer_columns
+        for idx, value in df[col].items():
+            if pd.isna(value):
+                formatted_value = "."
+            else:
+                if is_integer:
+                    formatted_value = f"{int(value)}"
+                else:
+                    formatted_value = f"{float(value):.{decimals}f}"
+
+                if best_masks[col].get(idx, False) and formatted_value != ".":
+                    formatted_value = f"\\textbf{{{formatted_value}}}"
+
+            formatted.at[idx, col] = formatted_value
+
+    return formatted
 
 
 DATASET_CATEGORY_ORDER = ["Basis Spreads", "Returns", "Other"]
@@ -1510,17 +1581,22 @@ def create_median_mase_summary_table():
     # Escape underscores in index names for LaTeX
     summary_display.index = [idx.replace("_", "\\_") for idx in summary_display.index]
 
+    formatted_summary = format_best_values_for_table(
+        summary_display,
+        lower_is_better={"Med MASE", "Mean MASE", "Med Rel MASE", "Mean Rel MASE"},
+        higher_is_better={"Med R²", "Mean R²"},
+        integer_columns={"N"},
+    )
+
     # Determine column format based on number of columns
     num_cols = len(summary_display.columns) + 1  # +1 for model name column
     column_format = "l" + "r" * (num_cols - 1)
 
-    latex_output = summary_display.to_latex(
+    latex_output = formatted_summary.to_latex(
         caption="Model Performance Summary: MASE, Relative MASE, and R² Across All Datasets",
         label="tab:median_mase_summary",
-        float_format="%.3f",
         column_format=column_format,
         escape=False,
-        na_rep=".",  # Replace NaN values with "." for better presentation
     )
 
     # Save as .tex file
@@ -1530,15 +1606,15 @@ def create_median_mase_summary_table():
     print(f"Saved median MASE summary (LaTeX) to: {tex_file}")
 
     # Create tabular-only version for embedding
-    tabular_output = summary_display.to_latex(
-        float_format="%.3f", column_format=column_format, escape=False, na_rep="."
+    tabular_output = formatted_summary.to_latex(
+        column_format=column_format, escape=False
     )
     tabular_only = extract_tabular_content(tabular_output)
 
     tabular_file = FORECAST_DIR / "median_mase_summary_tabular.tex"
     with open(tabular_file, "w") as f:
         f.write(
-            f"% Median MASE Summary - tabular content only\n% Generated automatically by create_results_tables2.py\n{tabular_only}"
+            f"% Median MASE Summary - tabular content only\n% Generated automatically by create_results_tables.py\n{tabular_only}"
         )
     print(f"Saved median MASE summary tabular (LaTeX) to: {tabular_file}")
 
@@ -1713,10 +1789,16 @@ def create_grouped_model_summary_table():
     escaped_models = display_df.index.levels[1].str.replace("_", r"\\_", regex=False)
     display_df.index = display_df.index.set_levels(escaped_models, level=1)
 
+    formatted_display = format_best_values_for_table(
+        display_df,
+        lower_is_better={"Med MASE", "Mean MASE", "Med Rel MASE", "Mean Rel MASE"},
+        higher_is_better={"Med R$^2$", "Mean R$^2$"},
+        integer_columns={"N"},
+        group_level=0,
+    )
+
     column_format = "ll" + "r" * len(available_columns)
-    latex_tabular = display_df.to_latex(
-        float_format="%.3f",
-        na_rep=".",
+    latex_tabular = formatted_display.to_latex(
         escape=False,
         multicolumn=True,
         multirow=True,

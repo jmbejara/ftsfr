@@ -21,7 +21,7 @@ Benchmarking Forecasting Methods for Financial Stability
   Yangge Xu\inst{2}
 }
 \institute[OFR]{
-  \inst{1}Office of Financial Research, U.S. Department of the Treasury \and
+  \inst{1}Office of Financial Research, U.S. Department of the Treasury; Financial Mathematics Program, University of Chicago \and
   \inst{2}Independent
 }
 \date{\today}
@@ -32,7 +32,10 @@ Benchmarking Forecasting Methods for Financial Stability
 \titlepage
 \begin{tikzpicture}[remember picture,overlay]
   \node[anchor=south east,xshift=-0.5cm,yshift=0.5cm] at (current page.south east) {
-    \includegraphics[height=1cm]{OFR_LOGO_WEB.png}
+    \begin{tabular}{cc}
+      \includegraphics[height=1cm]{ofr_logo.png} & 
+      \includegraphics[height=1cm]{uchi_logo.png} \\
+    \end{tabular}
   };
 \end{tikzpicture}
 \end{frame}
@@ -542,22 +545,22 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   
 \begin{frame}[plain]
     \tiny
-    \vspace{-0.5cm}
+    \vspace{-0.2cm}
     \centering
     \textbf{MASE Results by Dataset and Model}\\
     {\scriptsize \textit{Lower values = better performance; Values $<1$ beat seasonal naive baseline}}\\
     \vspace{0.2cm}
-    \input{../_output/forecasting/paper/mase_pivot_tabular.tex}
+    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/mase_pivot_tabular.tex}}
   \end{frame}
   
   \begin{frame}[plain]
     \tiny
-    \vspace{-0.5cm}
+    \vspace{-0.2cm}
     \centering
     \textbf{Relative MASE Results by Dataset and Model}\\
     {\scriptsize \textit{Performance relative to Historic Average: $<1$ = better, $>1$ = worse}}\\
     \vspace{0.2cm}
-    \input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}
+    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}}
   \end{frame}
 
 \begin{frame}
@@ -668,21 +671,21 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 
   \begin{frame}[plain]
     \tiny
-    \vspace{-0.5cm}
+    \vspace{-0.2cm}
     \centering
     \textbf{Overall Model Performance Summary: MASE, Relative MASE, and $R^2_{\text{oos}}$ Across All Datasets}\\
     \vspace{0.2cm}
-    \input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
+    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/median_mase_summary_tabular.tex}}
   \end{frame}
 
   \begin{frame}[plain]
     \tiny
-    \vspace{-0.5cm}
+    \vspace{-0.2cm}
     \centering
     \textbf{Model Performance by Dataset Category}\\
     {\scriptsize Basis Spreads vs Returns vs Other}\\
     \vspace{0.2cm}
-    \input{../_output/forecasting/paper/model_summary_by_category_tabular.tex}
+    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/model_summary_by_category_tabular.tex}}
   \end{frame}
 
 \begin{frame}
@@ -931,9 +934,9 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \vspace{0.5cm}
 
   \normalsize
-  Contact: jeremiah.bejarano@ofr.treasury.gov
+%   Contact: jbejarano@ofr.treasury.gov
+Contact: jbejarano@uchicago.edu
 \end{frame}
 
 
 \end{document}
-
