@@ -1693,46 +1693,35 @@ def create_grouped_model_summary_table():
         "Mean_MASE": "Mean MASE",
         "Median_Relative_MASE": "Med Rel MASE",
         "Mean_Relative_MASE": "Mean Rel MASE",
-        "Median_R2oos": "Med R²",
-        "Mean_R2oos": "Mean R²",
+        "Median_R2oos": "Med R$^2$",
+        "Mean_R2oos": "Mean R$^2$",
     }
 
     available_columns = [
         col for col in columns_full if any(col in df.columns for _, df in category_summaries)
     ]
 
-    num_cols = len(available_columns) + 1
-    column_format = "l" + "r" * (num_cols - 1)
+    latex_df = combined_csv.copy()
+    latex_df["Category"] = pd.Categorical(
+        latex_df["Category"], categories=DATASET_CATEGORY_ORDER, ordered=True
+    )
+    latex_df = latex_df.sort_values(["Category", "Model"])
 
-    def format_value(value):
-        if pd.isna(value):
-            return "."
-        return f"{value:.3f}"
+    display_df = latex_df.set_index(["Category", "Model"])[available_columns]
+    display_df = display_df.rename(columns=column_name_mapping)
 
-    header = ["Model"] + [column_name_mapping.get(c, c) for c in available_columns]
+    escaped_models = display_df.index.levels[1].str.replace("_", r"\\_", regex=False)
+    display_df.index = display_df.index.set_levels(escaped_models, level=1)
 
-    tabular_lines = [
-        f"\\begin{{tabular}}{{{column_format}}}",
-        "\\toprule",
-        " & ".join(header) + " \\",
-    ]
-
-    for category, df in category_summaries:
-        df_display = df.reindex(columns=available_columns, fill_value=pd.NA)
-        tabular_lines.append("\\midrule")
-        tabular_lines.append(
-            "\\multicolumn{{{}}}{{l}}{{\\textbf{{{}}}}} \\".format(
-                num_cols, category
-            )
-        )
-        for model_name, row in df_display.iterrows():
-            row_values = [model_name] + [format_value(row[col]) for col in available_columns]
-            tabular_lines.append(" & ".join(row_values) + " \\")
-
-    tabular_lines.append("\\bottomrule")
-    tabular_lines.append("\\end{tabular}")
-
-    tabular_content = "\n".join(tabular_lines)
+    column_format = "ll" + "r" * len(available_columns)
+    latex_tabular = display_df.to_latex(
+        float_format="%.3f",
+        na_rep=".",
+        escape=False,
+        multicolumn=True,
+        multirow=True,
+        column_format=column_format,
+    )
 
     caption = "Model Performance by Dataset Category"
     label = "tab:model_summary_by_category"
@@ -1749,7 +1738,7 @@ def create_grouped_model_summary_table():
             f"\\caption{{{caption}}}",
             f"\\label{{{label}}}",
             "\\scriptsize",
-            tabular_content,
+            latex_tabular,
             f"\\caption*{{\\scriptsize {note}}}",
             "\\end{table}",
         ]
@@ -1765,7 +1754,7 @@ def create_grouped_model_summary_table():
         f.write(
             "% Model Summary by Category - tabular content only\n"
             "% Generated automatically by create_results_tables.py\n"
-            f"{tabular_content}"
+            f"{latex_tabular}"
         )
     print(f"Saved model summary by category tabular (LaTeX) to: {tabular_file}")
 
@@ -1779,7 +1768,7 @@ def create_grouped_model_summary_table():
         f.write(
             "% Model Summary by Category - tabular content only\n"
             "% Generated automatically by create_results_tables.py\n"
-            f"{tabular_content}"
+            f"{latex_tabular}"
         )
     print(f"Saved model summary by category tabular (LaTeX) to: {paper_tabular}")
 
