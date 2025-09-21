@@ -26,10 +26,11 @@ sys.path.append(str(Path(__file__).parent))
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from forecast_utils import (
-    read_dataset_config,
-    get_test_size_from_frequency,
+    align_train_data_with_cutoffs,
     convert_pandas_freq_to_polars,
     evaluate_cv,
+    get_test_size_from_frequency,
+    read_dataset_config,
     should_skip_forecast,
 )
 from robust_preprocessing import robust_preprocess_pipeline
@@ -1102,19 +1103,14 @@ def main():
         neural_cv_df.drop(["y", "cutoff"]), on=["unique_id", "ds"], how="left"
     )
 
-    # Extract the cutoff date
-    cutoff_date = cv_df["cutoff"].unique()[0]
-
-    # Create training data by filtering original data up to cutoff
-    # Use the preprocessed training data which may have imputed values
+    # Create training data aligned with per-series cutoffs
     if "y_imputed" in train_df.columns:
         train_data_for_eval = train_df.select(["unique_id", "ds", "y_imputed"]).rename(
             {"y_imputed": "y"}
         )
     else:
         train_data_for_eval = train_df.select(["unique_id", "ds", "y"])
-
-    train_data = train_data_for_eval.filter(pl.col("ds") <= cutoff_date)
+    train_data = align_train_data_with_cutoffs(train_data_for_eval, cv_df)
 
     # Evaluate all models
     print("\n7. Evaluating Model Performance")

@@ -22,10 +22,11 @@ sys.path.append(str(Path(__file__).parent))
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from forecast_utils import (
-    read_dataset_config,
-    get_test_size_from_frequency,
+    align_train_data_with_cutoffs,
     convert_pandas_freq_to_polars,
     evaluate_cv,
+    get_test_size_from_frequency,
+    read_dataset_config,
     should_skip_forecast,
 )
 from robust_preprocessing import robust_preprocess_pipeline
@@ -336,19 +337,14 @@ def main():
     print("\n5. Evaluating Model Performance")
     print("-" * 40)
 
-    # Extract the cutoff date from cross-validation results
-    cutoff_date = cv_df["cutoff"].unique()[0]
-
-    # Create training data by filtering original data up to cutoff
-    # Use the preprocessed training data which may have imputed values
+    # Align training data with per-series cutoffs reported by cross-validation
     if "y_imputed" in train_df.columns:
         train_data_for_eval = train_df.select(["unique_id", "ds", "y_imputed"]).rename(
             {"y_imputed": "y"}
         )
     else:
         train_data_for_eval = train_df.select(["unique_id", "ds", "y"])
-
-    train_data = train_data_for_eval.filter(pl.col("ds") <= cutoff_date)
+    train_data = align_train_data_with_cutoffs(train_data_for_eval, cv_df)
 
     mase_scores, mse_scores, rmse_scores, r2oos_scores, actual_model_cols = evaluate_cv(
         cv_df, train_data, seasonality

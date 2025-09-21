@@ -427,6 +427,55 @@ def evaluate_cv(cv_df, train_df, seasonality):
     return mase_scores, mse_scores, rmse_scores, r2oos_scores, actual_model_cols
 
 
+def align_train_data_with_cutoffs(train_df, cv_df, cutoff_col="cutoff"):
+    """Align training data with per-series cross-validation cutoffs.
+
+    StatsForecast reports a cutoff for each series/window. When multiple series
+    end on different dates, using a single global cutoff can truncate most of
+    the training history for many series. This in turn makes scale-based error
+    metrics like MASE blow up (division by ~0) because the training sample for
+    those series appears nearly constant. This helper preserves the correct
+    history for each series by filtering with its own cutoff.
+
+    Args:
+        train_df: Polars DataFrame containing the (imputed) training data with
+            at least ``unique_id`` and ``ds`` columns.
+        cv_df: Polars DataFrame with cross-validation results that include a
+            ``cutoff`` column per series.
+        cutoff_col: Name of the cutoff column in ``cv_df`` (default ``cutoff``).
+
+    Returns:
+        Polars DataFrame with the same schema as ``train_df`` but filtered so
+        that, for each series, only observations with ``ds`` up to that
+        series' last cutoff are retained.
+    """
+
+    if cutoff_col not in cv_df.columns:
+        raise ValueError(
+            f"Cross-validation dataframe is missing required '{cutoff_col}' column"
+        )
+
+    # Each series may have a different cutoff; keep the most recent one per id
+    per_series_cutoffs = (
+        cv_df.select(["unique_id", cutoff_col])
+        .group_by("unique_id")
+        .agg(pl.col(cutoff_col).max().alias(cutoff_col))
+    )
+
+    # Align training data with those cutoffs
+    train_with_cutoffs = train_df.join(per_series_cutoffs, on="unique_id", how="inner")
+    aligned_train = train_with_cutoffs.filter(pl.col("ds") <= pl.col(cutoff_col))
+
+    missing_series = per_series_cutoffs.height - aligned_train["unique_id"].n_unique()
+    if missing_series > 0:
+        print(
+            "Warning: Dropped {missing_series} series when aligning train data with cutoffs."
+            .format(missing_series=missing_series)
+        )
+
+    return aligned_train.drop(cutoff_col)
+
+
 def get_minimum_requirements_by_frequency(frequency, test_size, seasonality=1):
     """Calculate minimum data requirements based on frequency and seasonality."""
     freq_multipliers = {
