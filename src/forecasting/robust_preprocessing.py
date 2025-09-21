@@ -198,6 +198,9 @@ def build_month_end_grid(df):
         if len(series) == 0:
             continue
 
+        # Ensure timestamp precision matches the grid (nanoseconds) so joins succeed
+        series = series.with_columns(pl.col("ds").cast(pl.Datetime("ns")))
+
         # Get start and end dates
         start_date = series["ds"].min()
         end_date = series["ds"].max()
@@ -213,6 +216,8 @@ def build_month_end_grid(df):
         grid_df = pl.DataFrame(
             {"unique_id": [unique_id] * len(date_range), "ds": date_range}
         )
+
+        grid_df = grid_df.with_columns(pl.col("ds").cast(pl.Datetime("ns")))
 
         # Left join with original data to preserve values and add nulls for gaps
         filled_series = grid_df.join(series, on=["unique_id", "ds"], how="left")

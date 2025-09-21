@@ -1,36 +1,100 @@
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model deepar --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model dlinear --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model kan --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model nbeats --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model nhits --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model nlinear --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model tide --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model vanilla_transformer --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model deepar --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model dlinear --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model kan --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model nbeats --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model nhits --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model nlinear --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model tide --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model vanilla_transformer --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model deepar --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model dlinear --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model kan --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model nbeats --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model nhits --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model nlinear --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model tide --skip-existing
-python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model vanilla_transformer --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_contract_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_contract_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_contract_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_contract_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_portfolio_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_portfolio_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_portfolio_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_portfolio_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CIP_spreads --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CIP_spreads --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CIP_spreads --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CIP_spreads --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_commodities_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_commodities_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_commodities_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_commodities_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_portfolio_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_portfolio_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_portfolio_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_ret --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_ret --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_ret --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_retx --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_retx --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_retx --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_FX_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_FX_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_FX_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_FX_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_all --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_all --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_all --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_all --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_daily --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_daily --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_daily --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_monthly --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_monthly --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_monthly --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_hkm_option_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_hkm_option_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_hkm_option_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_hkm_option_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_cash_liquidity --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_cash_liquidity --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_cash_liquidity --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_leverage --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_leverage --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_leverage --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_leverage --model theta --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis --model auto_arima --skip-existing
-python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis --model historic_average --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis --model historic_average
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis --model ses --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_portfolio_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_portfolio_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_portfolio_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_returns --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_returns --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_returns --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_returns --model theta --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_arima --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_yield_curve_zero_coupon --model historic_average
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_yield_curve_zero_coupon --model ses --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_yield_curve_zero_coupon --model theta --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --model auto_arima --skip-existing
-python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --model historic_average --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --model historic_average
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --model ses --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --model theta --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_swap_basis --model auto_arima --skip-existing
-python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_swap_basis --model historic_average --skip-existing
+python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_swap_basis --model historic_average
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_swap_basis --model ses --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_swap_basis --model theta --skip-existing

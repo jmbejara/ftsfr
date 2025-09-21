@@ -818,16 +818,19 @@ To better understand the relative performance of sophisticated models compared t
 }
 \end{table}
 
-To provide an overall assessment of model performance across all datasets, Table~\ref{tab:median_mase_summary} presents summary statistics for each model's MASE values aggregated across all datasets. The table shows the median, mean, standard deviation, minimum, and maximum MASE values for each model, with models sorted by their median MASE performance. This summary allows identification of models that consistently perform well across the diverse range of financial time series in our benchmark, providing guidance for practitioners seeking robust forecasting approaches.
+To provide an overall assessment of model performance across all datasets, Table~\ref{tab:median_mase_summary} presents summary statistics for each model across three key performance metrics. The table shows median and mean values for MASE (absolute performance), Relative MASE (performance relative to Historic Average baseline), and out-of-sample R² (predictive power), with models sorted by their median MASE performance. This comprehensive summary allows identification of models that consistently perform well across the diverse range of financial time series in our benchmark, providing guidance for practitioners seeking robust forecasting approaches.
 
 \begin{table}[htbp]
 \centering
-\caption{Overall Model Performance Summary: Median MASE Across All Datasets}
+\caption{Overall Model Performance Summary: MASE, Relative MASE, and R² Across All Datasets}
 \label{tab:median_mase_summary}
+\footnotesize
+\resizebox{\textwidth}{!}{%
 \input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
+}
 \caption*{
     \scriptsize
-\textbf{Note:} Summary statistics of MASE values across all datasets for each model. Models are sorted by median MASE (lower is better). This provides an overall ranking of model performance across the entire benchmark.
+\textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), Relative MASE shows performance relative to Historic Average (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.
 
 \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
 }
@@ -1533,7 +1536,7 @@ where:
 
 The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
 
-The CDS-Bond basis is plotted in Figure \ref{fig:cds_replicate}.    
+The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.    
 
 \subsubsection{Z-Spread (Zero-Volatility Spread)}
 
@@ -1608,7 +1611,8 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
     \begin{tabular}{@{}c@{}}
       \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png}
     \end{tabular}
-\caption{Comparison of CDS Arbitrage spreads}
+    \caption{Comparison of CDS Arbitrage spreads}
+    \label{fig:CDS_replicate}
 \end{figure}
   
 

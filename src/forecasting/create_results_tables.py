@@ -1325,21 +1325,71 @@ def create_median_mase_summary_table():
     # Convert MASE to numeric (in case there are any string values)
     results["MASE_numeric"] = pd.to_numeric(results["MASE"], errors="coerce")
 
-    # Calculate summary statistics by model
-    model_summary = (
+    # Convert R2oos to numeric
+    results["R2oos_numeric"] = pd.to_numeric(results["R2oos"], errors="coerce")
+
+    # Calculate MASE summary statistics by model
+    mase_summary = (
         results.groupby("model_name")["MASE_numeric"]
-        .agg(["count", "median", "mean", "std", "min", "max"])
+        .agg(["count", "median", "mean"])
         .round(4)
     )
 
-    model_summary.columns = [
+    mase_summary.columns = [
         "N_Datasets",
         "Median_MASE",
         "Mean_MASE",
-        "Std_MASE",
-        "Min_MASE",
-        "Max_MASE",
     ]
+
+    # Calculate R2oos summary statistics by model
+    r2oos_summary = (
+        results.groupby("model_name")["R2oos_numeric"]
+        .agg(["median", "mean"])
+        .round(4)
+    )
+
+    r2oos_summary.columns = [
+        "Median_R2oos",
+        "Mean_R2oos",
+    ]
+
+    # Calculate Relative MASE (relative to Historic Average)
+    # First, get Historic Average MASE values for each dataset
+    historic_avg_results = results[results["model_name"] == "Historic Average"].copy()
+
+    if len(historic_avg_results) > 0:
+        # Create a mapping of dataset to Historic Average MASE
+        historic_mase_map = historic_avg_results.set_index("dataset_name")["MASE_numeric"].to_dict()
+
+        # Calculate relative MASE for each result
+        results["Relative_MASE"] = results.apply(
+            lambda row: row["MASE_numeric"] / historic_mase_map.get(row["dataset_name"], 1.0)
+            if row["model_name"] != "Historic Average" else None,
+            axis=1
+        )
+
+        # Calculate Relative MASE summary statistics (excluding Historic Average)
+        relative_mase_data = results[results["model_name"] != "Historic Average"].copy()
+        relative_mase_summary = (
+            relative_mase_data.groupby("model_name")["Relative_MASE"]
+            .agg(["median", "mean"])
+            .round(4)
+        )
+
+        relative_mase_summary.columns = [
+            "Median_Relative_MASE",
+            "Mean_Relative_MASE",
+        ]
+    else:
+        print("Warning: Historic Average model not found, skipping Relative MASE calculation")
+        relative_mase_summary = pd.DataFrame()
+
+    # Combine all summaries
+    model_summary = mase_summary.copy()
+    model_summary = model_summary.join(r2oos_summary, how="left")
+
+    if not relative_mase_summary.empty:
+        model_summary = model_summary.join(relative_mase_summary, how="left")
 
     # Sort by median MASE (ascending - lower is better)
     model_summary = model_summary.sort_values("Median_MASE")
@@ -1384,23 +1434,45 @@ def create_median_mase_summary_table():
         lambda x: model_table_names.get(x, x)
     )
 
-    # Create LaTeX table - show only the most important columns for readability
-    summary_display = model_summary_latex[
-        ["N_Datasets", "Median_MASE", "Mean_MASE"]
-    ].copy()
+    # Create LaTeX table - show all the key metrics
+    # Select columns based on what's available
+    columns_to_show = ["N_Datasets", "Median_MASE", "Mean_MASE", "Median_R2oos", "Mean_R2oos"]
+    if "Median_Relative_MASE" in model_summary_latex.columns:
+        columns_to_show = ["N_Datasets", "Median_MASE", "Mean_MASE", "Median_Relative_MASE", "Mean_Relative_MASE", "Median_R2oos", "Mean_R2oos"]
 
-    # Escape underscores in column names and index names for LaTeX
+    # Filter to only include columns that exist
+    available_columns = [col for col in columns_to_show if col in model_summary_latex.columns]
+    summary_display = model_summary_latex[available_columns].copy()
+
+    # Create better column names for LaTeX (without underscores)
+    column_name_mapping = {
+        "N_Datasets": "N",
+        "Median_MASE": "Med MASE",
+        "Mean_MASE": "Mean MASE",
+        "Median_Relative_MASE": "Med Rel MASE",
+        "Mean_Relative_MASE": "Mean Rel MASE",
+        "Median_R2oos": "Med R²",
+        "Mean_R2oos": "Mean R²"
+    }
+
     summary_display.columns = [
-        col.replace("_", "\\_") for col in summary_display.columns
+        column_name_mapping.get(col, col) for col in summary_display.columns
     ]
+
+    # Escape underscores in index names for LaTeX
     summary_display.index = [idx.replace("_", "\\_") for idx in summary_display.index]
 
+    # Determine column format based on number of columns
+    num_cols = len(summary_display.columns) + 1  # +1 for model name column
+    column_format = "l" + "r" * (num_cols - 1)
+
     latex_output = summary_display.to_latex(
-        caption="Model Performance Summary: Median MASE Across All Datasets",
+        caption="Model Performance Summary: MASE, Relative MASE, and R² Across All Datasets",
         label="tab:median_mase_summary",
         float_format="%.3f",
-        column_format="lrrr",
+        column_format=column_format,
         escape=False,
+        na_rep=".",  # Replace NaN values with "." for better presentation
     )
 
     # Save as .tex file
@@ -1411,7 +1483,7 @@ def create_median_mase_summary_table():
 
     # Create tabular-only version for embedding
     tabular_output = summary_display.to_latex(
-        float_format="%.3f", column_format="lrrr", escape=False
+        float_format="%.3f", column_format=column_format, escape=False, na_rep="."
     )
     tabular_only = extract_tabular_content(tabular_output)
 
