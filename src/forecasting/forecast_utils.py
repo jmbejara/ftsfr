@@ -315,54 +315,59 @@ def convert_pandas_freq_to_polars(pandas_freq):
     return freq_map.get(pandas_freq, "1mo")  # Default to monthly
 
 
-def calculate_oos_r2(cv_df, train_df, models):
+def calculate_oos_r2(cv_df, train_df, models, benchmark_model="HistoricAverage"):
     """Calculate out-of-sample R-squared: R2oos = 1 - MSE_model / MSE_benchmark."""
 
-    # Calculate historical mean for each series from training data
-    historical_means = train_df.group_by("unique_id").agg(
-        pl.col("y").mean().alias("historical_mean")
-    )
+    benchmark_col = None
+    if benchmark_model:
+        target = benchmark_model.lower()
+        for col in models:
+            if col.lower() == target:
+                benchmark_col = col
+                break
 
-    # Join historical means with cv_df
-    cv_with_means = cv_df.join(historical_means, on="unique_id")
-
-    # Calculate MSE_benchmark (using historical mean as forecast)
-    cv_with_benchmark = cv_with_means.with_columns(
-        ((pl.col("y") - pl.col("historical_mean")) ** 2).alias(
-            "squared_error_benchmark"
+    if benchmark_col:
+        print(
+            f"Using model '{benchmark_col}' as the R2 benchmark (expected R2=0)."
         )
+        benchmark_errors = cv_df.with_columns(
+            ((pl.col("y") - pl.col(benchmark_col)) ** 2).alias("se_benchmark")
+        )
+    else:
+        historical_means = train_df.group_by("unique_id").agg(
+            pl.col("y").mean().alias("historical_mean")
+        )
+        benchmark_errors = cv_df.join(historical_means, on="unique_id").with_columns(
+            ((pl.col("y") - pl.col("historical_mean")) ** 2).alias("se_benchmark")
+        )
+
+    mse_benchmark_by_series = benchmark_errors.group_by("unique_id").agg(
+        pl.col("se_benchmark").mean().alias("MSE_benchmark")
     )
 
-    # Calculate MSE_benchmark for each series
-    mse_benchmark_by_series = cv_with_benchmark.group_by("unique_id").agg(
-        pl.col("squared_error_benchmark").mean().alias("MSE_benchmark")
-    )
-
-    # Calculate MSE_model for each model and series
     r2_results = []
     for model in models:
-        # Calculate squared errors for this model
-        cv_with_model_errors = cv_with_means.with_columns(
-            ((pl.col("y") - pl.col(model)) ** 2).alias("squared_error_model")
+        mse_model_by_series = (
+            cv_df.with_columns(
+                ((pl.col("y") - pl.col(model)) ** 2).alias("se_model")
+            )
+            .group_by("unique_id")
+            .agg(pl.col("se_model").mean().alias("MSE_model"))
         )
 
-        # Calculate MSE_model for each series
-        mse_model_by_series = cv_with_model_errors.group_by("unique_id").agg(
-            pl.col("squared_error_model").mean().alias("MSE_model")
-        )
-
-        # Join with benchmark MSE and calculate R2oos
         r2_by_series = (
             mse_model_by_series.join(mse_benchmark_by_series, on="unique_id")
             .with_columns(
-                (1 - (pl.col("MSE_model") / pl.col("MSE_benchmark"))).alias(model)
+                pl.when(pl.col("MSE_benchmark") <= 1e-12)
+                .then(None)
+                .otherwise(1 - (pl.col("MSE_model") / pl.col("MSE_benchmark")))
+                .alias(model)
             )
             .select("unique_id", model)
         )
 
         r2_results.append(r2_by_series)
 
-    # Combine all model R2 results
     final_r2 = r2_results[0]
     for r2_df in r2_results[1:]:
         final_r2 = final_r2.join(r2_df, on="unique_id")
