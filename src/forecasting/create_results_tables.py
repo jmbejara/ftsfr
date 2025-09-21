@@ -99,26 +99,53 @@ def load_model_table_names():
 
 
 def load_model_order():
-    """Load ordered list of model names from models_config.toml to preserve column order"""
+    """Load ordered list of model names with custom ordering: Historical Average first, then statsforecast alphabetically, then neural alphabetically"""
     models_config = load_models_config()
 
-    # Get ordered list of models as they appear in the config file
-    ordered_models = []
-
+    # Get all models from config
+    all_models = []
     for model_key, model_config in models_config.items():
         if isinstance(model_config, dict):
             display_name = model_config.get("display_name", model_key)
-            # Also get table_name for potential use
             table_name = model_config.get("table_name", display_name)
-            ordered_models.append(
+            script = model_config.get("script", "")
+            all_models.append(
                 {
                     "key": model_key,
                     "display_name": display_name,
                     "table_name": table_name,
+                    "script": script,
                 }
             )
 
-    print(f"Loaded model order with {len(ordered_models)} models from config")
+    # Custom ordering: Historical Average first, then statsforecast models alphabetically, then neural models alphabetically
+    ordered_models = []
+
+    # 1. First add Historic Average if it exists
+    historic_avg = [m for m in all_models if m["display_name"] == "Historic Average"]
+    ordered_models.extend(historic_avg)
+
+    # 2. Add statsforecast models (forecast_stats.py) alphabetically by table_name
+    stats_models = [m for m in all_models if m["script"] == "forecast_stats.py" and m["display_name"] != "Historic Average"]
+    stats_models.sort(key=lambda x: x["table_name"])
+    ordered_models.extend(stats_models)
+
+    # 3. Add neural models (forecast_neural.py and forecast_neural_auto.py) alphabetically by table_name
+    neural_models = [m for m in all_models if m["script"] in ["forecast_neural.py", "forecast_neural_auto.py"]]
+    neural_models.sort(key=lambda x: x["table_name"])
+    ordered_models.extend(neural_models)
+
+    # 4. Add any remaining models (safety check)
+    remaining_models = [m for m in all_models if m not in ordered_models]
+    remaining_models.sort(key=lambda x: x["table_name"])
+    ordered_models.extend(remaining_models)
+
+    print(f"Loaded custom model order with {len(ordered_models)} models:")
+    print(f"  - Historic Average: {len(historic_avg)}")
+    print(f"  - Statistical models: {len(stats_models)}")
+    print(f"  - Neural models: {len(neural_models)}")
+    print(f"  - Other models: {len(remaining_models)}")
+
     return ordered_models
 
 
@@ -580,10 +607,10 @@ def create_mase_pivot_table():
         results["dataset_name"].map(dataset_short_names).fillna(results["dataset_name"])
     )
 
-    # Rename model names for consistency
+    # Additional consistency fixes
     results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
 
-    # Filter to only include active models from config
+    # Filter to only include active models from config (do this BEFORE converting to display names)
     results = filter_results_by_active_models(results)
 
     # Filter to only include active datasets from config
@@ -591,6 +618,17 @@ def create_mase_pivot_table():
 
     # Apply quality filtering
     results = filter_quality_results(results)
+
+    # Now map model keys to display names for consistency (do this AFTER filtering)
+    models_config = load_models_config()
+    key_to_display_name = {}
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get("display_name", model_key)
+            key_to_display_name[model_key] = display_name
+
+    # Replace model keys with display names
+    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
 
     # Check if we have the required columns (new column names)
     if "MASE" not in results.columns:
@@ -720,10 +758,10 @@ def create_rmse_pivot_table():
         results["dataset_name"].map(dataset_short_names).fillna(results["dataset_name"])
     )
 
-    # Rename model names for consistency
+    # Additional consistency fixes
     results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
 
-    # Filter to only include active models from config
+    # Filter to only include active models from config (do this BEFORE converting to display names)
     results = filter_results_by_active_models(results)
 
     # Filter to only include active datasets from config
@@ -731,6 +769,17 @@ def create_rmse_pivot_table():
 
     # Apply quality filtering
     results = filter_quality_results(results)
+
+    # Now map model keys to display names for consistency (do this AFTER filtering)
+    models_config = load_models_config()
+    key_to_display_name = {}
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get("display_name", model_key)
+            key_to_display_name[model_key] = display_name
+
+    # Replace model keys with display names
+    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
 
     # Check if we have the required columns
     if "RMSE" not in results.columns:
@@ -843,7 +892,7 @@ def create_rmse_pivot_table():
 
 
 def create_relative_mase_pivot_table():
-    """Create a pivot table with MASE values relative to Naive predictor: datasets as rows, models as columns"""
+    """Create a pivot table with MASE values relative to Historic Average: datasets as rows, models as columns"""
 
     print("Creating Relative MASE pivot table...")
 
@@ -863,10 +912,10 @@ def create_relative_mase_pivot_table():
         results["dataset_name"].map(dataset_short_names).fillna(results["dataset_name"])
     )
 
-    # Rename model names for consistency
+    # Additional consistency fixes
     results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
 
-    # Filter to only include active models from config
+    # Filter to only include active models from config (do this BEFORE converting to display names)
     results = filter_results_by_active_models(results)
 
     # Filter to only include active datasets from config
@@ -875,15 +924,26 @@ def create_relative_mase_pivot_table():
     # Apply quality filtering
     results = filter_quality_results(results)
 
-    # Check if we have the required columns and Naive model
+    # Now map model keys to display names for consistency (do this AFTER filtering)
+    models_config = load_models_config()
+    key_to_display_name = {}
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get("display_name", model_key)
+            key_to_display_name[model_key] = display_name
+
+    # Replace model keys with display names
+    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+
+    # Check if we have the required columns and Historic Average model
     if "MASE" not in results.columns:
         print("Error: MASE column not found in results")
         print(f"Available columns: {list(results.columns)}")
         sys.exit(1)
 
-    if "Naive" not in results["model_name"].values:
+    if "Historic Average" not in results["model_name"].values:
         print(
-            "Warning: Naive model not found in results - skipping relative MASE calculations"
+            "Warning: Historic Average model not found in results - skipping relative MASE calculations"
         )
         print(f"Available models: {sorted(results['model_name'].unique())}")
         return None
@@ -900,24 +960,24 @@ def create_relative_mase_pivot_table():
         f"Created initial pivot table with {len(mase_pivot)} datasets and {len(mase_pivot.columns)} models"
     )
 
-    # Check if Naive column exists in the pivot table
-    if "Naive" not in mase_pivot.columns:
+    # Check if Historic Average column exists in the pivot table
+    if "Historic Average" not in mase_pivot.columns:
         print(
-            "Warning: Naive column not found in pivot table - skipping relative calculations"
+            "Warning: Historic Average column not found in pivot table - skipping relative calculations"
         )
         print(f"Available columns: {list(mase_pivot.columns)}")
         return None
 
-    # Create relative MASE table by dividing each model by Naive
+    # Create relative MASE table by dividing each model by Historic Average
     relative_mase_pivot = mase_pivot.copy()
-    naive_values = mase_pivot["Naive"]
+    historic_avg_values = mase_pivot["Historic Average"]
 
     for col in mase_pivot.columns:
-        if col != "Naive":  # Don't divide Naive by itself
-            relative_mase_pivot[col] = mase_pivot[col] / naive_values
+        if col != "Historic Average":  # Don't divide Historic Average by itself
+            relative_mase_pivot[col] = mase_pivot[col] / historic_avg_values
 
-    # Remove the Naive column since it would always be 1.0
-    relative_mase_pivot = relative_mase_pivot.drop(columns=["Naive"])
+    # Remove the Historic Average column since it would always be 1.0
+    relative_mase_pivot = relative_mase_pivot.drop(columns=["Historic Average"])
 
     print(
         f"Created relative MASE table with {len(relative_mase_pivot)} datasets and {len(relative_mase_pivot.columns)} models"
@@ -926,11 +986,11 @@ def create_relative_mase_pivot_table():
     # Apply model ordering based on models_config.toml
     model_order = load_model_order()
     if model_order:
-        # Create ordered list of display names that exist in the data (excluding Naive)
+        # Create ordered list of display names that exist in the data (excluding Historic Average)
         ordered_display_names = [
             model["display_name"]
             for model in model_order
-            if model["display_name"] != "Naive"
+            if model["display_name"] != "Historic Average"
         ]
         # Filter to only include columns that actually exist in the pivot table
         existing_ordered_columns = [
@@ -1068,10 +1128,10 @@ def create_r2oos_pivot_table():
         results["dataset_name"].map(dataset_short_names).fillna(results["dataset_name"])
     )
 
-    # Rename model names for consistency
+    # Additional consistency fixes
     results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
 
-    # Filter to only include active models from config
+    # Filter to only include active models from config (do this BEFORE converting to display names)
     results = filter_results_by_active_models(results)
 
     # Filter to only include active datasets from config
@@ -1079,6 +1139,17 @@ def create_r2oos_pivot_table():
 
     # Apply quality filtering
     results = filter_quality_results(results)
+
+    # Now map model keys to display names for consistency (do this AFTER filtering)
+    models_config = load_models_config()
+    key_to_display_name = {}
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get("display_name", model_key)
+            key_to_display_name[model_key] = display_name
+
+    # Replace model keys with display names
+    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
 
     # Check if we have the required columns
     if "R2oos" not in results.columns:
@@ -1222,10 +1293,10 @@ def create_median_mase_summary_table():
     results = pd.read_csv(results_file)
     print(f"Loaded {len(results)} result rows")
 
-    # Rename model names for consistency
+    # Additional consistency fixes
     results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
 
-    # Filter to only include active models from config
+    # Filter to only include active models from config (do this BEFORE converting to display names)
     results = filter_results_by_active_models(results)
 
     # Filter to only include active datasets from config
@@ -1233,6 +1304,17 @@ def create_median_mase_summary_table():
 
     # Apply quality filtering
     results = filter_quality_results(results)
+
+    # Now map model keys to display names for consistency (do this AFTER filtering)
+    models_config = load_models_config()
+    key_to_display_name = {}
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get("display_name", model_key)
+            key_to_display_name[model_key] = display_name
+
+    # Replace model keys with display names
+    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
 
     # Check if we have the required columns
     if "MASE" not in results.columns:
@@ -1692,7 +1774,7 @@ def create_heatmap_plots():
     model_names = load_model_table_names()
     results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
 
-    # Filter to only include active models from config
+    # Filter to only include active models from config (do this BEFORE converting to display names)
     results = filter_results_by_active_models(results)
 
     # Filter to only include active datasets from config
@@ -1700,6 +1782,17 @@ def create_heatmap_plots():
 
     # Apply quality filtering
     results = filter_quality_results(results)
+
+    # Now map model keys to display names for consistency (do this AFTER filtering)
+    models_config = load_models_config()
+    key_to_display_name = {}
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get("display_name", model_key)
+            key_to_display_name[model_key] = display_name
+
+    # Replace model keys with display names
+    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
 
     # Define error metrics to create heatmaps for
     error_metrics = [
@@ -1710,7 +1803,7 @@ def create_heatmap_plots():
             "Relative_MASE",
             "Relative MASE",
             "relative_mase_heatmap.png",
-            "Relative MASE (vs Naive Baseline)",
+            "Relative MASE (vs Historic Average Baseline)",
         ),
     ]
 
@@ -1720,8 +1813,8 @@ def create_heatmap_plots():
             if "MASE" not in results.columns:
                 print(f"Skipping {metric_short} heatmap - MASE column not found")
                 continue
-            if "Naive" not in results["model_name"].values:
-                print(f"Skipping {metric_short} heatmap - Naive model not found")
+            if "Historic Average" not in results["model_name"].values:
+                print(f"Skipping {metric_short} heatmap - Historic Average model not found")
                 continue
         elif metric_col not in results.columns:
             print(f"Skipping {metric_short} heatmap - column {metric_col} not found")
@@ -1739,21 +1832,21 @@ def create_heatmap_plots():
                 aggfunc="mean",
             )
 
-            # Check if Naive column exists in the pivot table
-            if "Naive" not in pivot_data.columns:
+            # Check if Historic Average column exists in the pivot table
+            if "Historic Average" not in pivot_data.columns:
                 print(
-                    f"Skipping {metric_short} heatmap - Naive column not found in pivot table"
+                    f"Skipping {metric_short} heatmap - Historic Average column not found in pivot table"
                 )
                 continue
 
-            # Calculate relative MASE by dividing each model by Naive
-            naive_values = pivot_data["Naive"]
+            # Calculate relative MASE by dividing each model by Historic Average
+            historic_avg_values = pivot_data["Historic Average"]
             for col in pivot_data.columns:
-                if col != "Naive":  # Don't divide Naive by itself
-                    pivot_data[col] = pivot_data[col] / naive_values
+                if col != "Historic Average":  # Don't divide Historic Average by itself
+                    pivot_data[col] = pivot_data[col] / historic_avg_values
 
-            # Remove the Naive column since it would always be 1.0
-            pivot_data = pivot_data.drop(columns=["Naive"])
+            # Remove the Historic Average column since it would always be 1.0
+            pivot_data = pivot_data.drop(columns=["Historic Average"])
         else:
             pivot_data = results.pivot_table(
                 index="Dataset_Short",
@@ -1767,11 +1860,11 @@ def create_heatmap_plots():
         if model_order:
             # Create ordered list of display names that exist in the data
             if metric_col == "Relative_MASE":
-                # Exclude Naive for relative MASE since it was removed
+                # Exclude Historic Average for relative MASE since it was removed
                 ordered_display_names = [
                     model["display_name"]
                     for model in model_order
-                    if model["display_name"] != "Naive"
+                    if model["display_name"] != "Historic Average"
                 ]
             else:
                 ordered_display_names = [model["display_name"] for model in model_order]
@@ -1812,8 +1905,8 @@ def create_heatmap_plots():
 
         # Color scheme and scaling depends on metric type
         if metric_col == "Relative_MASE":
-            # For relative MASE, use diverging colormap centered at 1.0 (equal to naive)
-            # RdBu_r: Red for worse than naive (>1), White near 1, Blue for better than naive (<1)
+            # For relative MASE, use diverging colormap centered at 1.0 (equal to historic average)
+            # RdBu_r: Red for worse than historic average (>1), White near 1, Blue for better than historic average (<1)
             colormap = "RdBu_r"
         elif metric_col == "R2oos":
             # For R2oos, use diverging colormap centered at 0.0 (no predictive power)
@@ -1924,10 +2017,10 @@ def create_heatmap_plots():
         # Create colorbar label and title based on metric type
         if metric_col == "Relative_MASE":
             cbar_label = (
-                f"{metric_long} (1.0 = Equal to Naive, <1.0 = Better, >1.0 = Worse)"
+                f"{metric_long} (1.0 = Equal to Historic Average, <1.0 = Better, >1.0 = Worse)"
             )
             title_subtitle = (
-                "(Blue = Better than Naive, White ≈ Equal, Red = Worse than Naive)"
+                "(Blue = Better than Historic Average, White ≈ Equal, Red = Worse than Historic Average)"
             )
         elif metric_col == "R2oos":
             cbar_label = (
@@ -2194,10 +2287,10 @@ if __name__ == "__main__":
     # Create R2oos pivot table (new metric)
     r2oos_table = create_r2oos_pivot_table()
 
-    # Create relative MASE pivot table (comparing to Naive baseline)
+    # Create relative MASE pivot table (comparing to Historic Average baseline)
     relative_mase_table = create_relative_mase_pivot_table()
     if relative_mase_table is None:
-        print("Skipping relative MASE table creation - Naive model not available")
+        print("Skipping relative MASE table creation - Historic Average model not available")
 
     # Create median MASE summary table (overall model ranking)
     median_mase_summary = create_median_mase_summary_table()

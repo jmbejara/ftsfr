@@ -388,15 +388,6 @@ The leverage adjustments and dynamic portfolio rebalancing process outlined in \
 
 We also provide a comprehensive overview of the data cleaning and preprocessing steps we undertook to prepare the raw SPX options data for analysis and portfolio construction, which includes technical and mathematical details on volatility estimation, kernel methods, and other relevant techniques. These details are given in the appendix as well as in the code module provided online.
 
-% \begin{figure}[H]
-%   \centering
-%   \caption{The SPX options market has grown dramatically over time}
-%   \begin{tabular}{@{}c@{}}
-%     \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
-%   \end{tabular}
-%   \caption*{\emph{Sources: OptionMetrics,  Authors' creation}}
-%   \label{fig:spx_options_over_time}
-% \end{figure}
 
 
 \paragraph{Foreign Exchange}
@@ -817,8 +808,8 @@ To better understand the relative performance of sophisticated models compared t
 \centering
 \caption{Relative MASE Results by Dataset and Model}
 \label{tab:relative_mase_results}
-% \input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}
-\textit{Relative MASE table unavailable: requires Naive baseline model which is not present in current results.}
+\input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}
+% \textit{Relative MASE table unavailable: requires Naive baseline model which is not present in current results.}
 \caption*{
     \scriptsize
 \textbf{Note:} Values show MASE ratios relative to the Naive baseline. Values $<$ 1.0 indicate better performance than Naive. Numbers in bold indicate the best performing model for each dataset.
@@ -878,6 +869,23 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 % \caption{RMSE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile to highlight performance differences across the majority of datasets, with extreme outliers marked with asterisks (*). The visualization reveals models that consistently perform well and datasets that pose particular forecasting challenges.}
 % \label{fig:rmse_heatmap}
 % \end{figure}
+
+Table~\ref{tab:r2oos_results} presents the out-of-sample $R^2$ ($R^2_{\text{oos}}$) results, providing a complementary perspective to the MASE and RMSE metrics. While MASE focuses on absolute scaled errors and RMSE captures error magnitudes, $R^2_{\text{oos}}$ measures the percentage reduction in mean squared error achieved by each model relative to predicting the historical average. This metric is particularly valuable in finance as it directly quantifies predictive performance against the standard benchmark of using historical means for forecasting.
+
+\begin{table}[htbp]
+\centering
+\caption{Out-of-Sample $R^2$ Results by Dataset and Model}
+\label{tab:r2oos_results}
+\input{../_output/forecasting/paper/r2oos_pivot_tabular.tex}
+\caption*{
+\noindent {\scriptsize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
+\scriptsize
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
+\end{table}
+
+The $R^2_{\text{oos}}$ results reveal important patterns that complement the MASE and RMSE findings. Notably, many models achieve positive $R^2_{\text{oos}}$ values for yield curve and basis spread data, indicating genuine predictive ability beyond historical averages. For instance, Treasury Yield Curve data shows consistently high $R^2_{\text{oos}}$ values (around 0.9) across most models, confirming the strong predictability in interest rate term structure. Similarly, several models achieve positive performance on BHC Cash Liquidity and BHC Leverage datasets, suggesting that bank characteristics contain predictable patterns.
+
+In contrast, returns data generally shows poor $R^2_{\text{oos}}$ performance, with most values near zero or negative, consistent with market efficiency theory. This pattern is particularly pronounced for equity returns (CRSP Stock, FF25 Size-BM) and options data, where even sophisticated models struggle to consistently outperform the historical average. The contrast between the predictability of yield curves and the unpredictability of returns reinforces the importance of asset-class-specific forecasting approaches.
 
 
 The results reveal several important patterns in financial time series forecasting. First and most notably, there is no universal best model across all datasets. While deep learning models like Transformers and TiDE show promise in certain contexts, they do not consistently outperform simpler statistical methods. The Naive baseline proves remarkably competitive, particularly for returns data where market efficiency limits predictability.
@@ -1029,6 +1037,16 @@ Our monthly SPX options portfolio returns series follows the data cleaning and p
 The original CJS paper used data from 1986 through 2012 (26 years of data). As of the time of writing, due to the unavailability of SPX option data from 1985 to 1995, we replicated the 54 CJS portfolios using data from January 1996 to December 2019 (23 years of data). As shown in Figure~\ref{fig:spx_options_over_time}, the number of SPX option observations has increased significantly over time, and since the volume of SPX options traded prior to 1996 was very low, we believe that our dataset from 1996 to 2019, while 3 years shorter is far richer in content and more relevant for current and future research.
 
 The process to construct our returns series involved two major phases: (1) Replicating with the highest practical fidelity the raw daily data filtration and monthly portfolio construction procedures outlined in \citet{Constantinides2013}, and (2) Transforming these returns series into the 18 portfolios outlined in \citet{He2017}.
+
+\begin{figure}[H]
+  \centering
+  \caption{The SPX options market has grown dramatically over time}
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
+  \end{tabular}
+  \caption*{\emph{Sources: OptionMetrics,  Authors' creation}}
+  \label{fig:spx_options_over_time}
+\end{figure}
 
 \paragraph{Options Data Series Access}
 
@@ -1591,7 +1609,6 @@ Z-spread is said to be populated by Markit in the CDS dataset but during the rec
       \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png}
     \end{tabular}
 \caption{Comparison of CDS Arbitrage spreads}
-\label{fig:CDS_replicate}
 \end{figure}
   
 
@@ -1641,7 +1658,6 @@ Table~\ref{tab:mae_results} shows MAE results for all combinations. MAE measures
 \noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Error (MAE). Lower values indicate better performance. -- indicates missing results.}
 \end{table}
 
-Figure~\ref{fig:mae_heatmap} visualizes the MAE results, complementing the numerical table with clear visual patterns of absolute error magnitudes across all model-dataset combinations.
 
 % \begin{figure}[htbp]
 % \centering
