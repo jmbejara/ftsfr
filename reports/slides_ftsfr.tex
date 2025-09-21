@@ -545,6 +545,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \vspace{-0.5cm}
     \centering
     \textbf{MASE Results by Dataset and Model}\\
+    {\scriptsize \textit{Lower values = better performance; Values $<1$ beat seasonal naive baseline}}\\
     \vspace{0.2cm}
     \input{../_output/forecasting/paper/mase_pivot_tabular.tex}
   \end{frame}
@@ -554,6 +555,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \vspace{-0.5cm}
     \centering
     \textbf{Relative MASE Results by Dataset and Model}\\
+    {\scriptsize \textit{Performance relative to Naive: $<1$ = better, $>1$ = worse}}\\
     \vspace{0.2cm}
     \input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}
   \end{frame}
@@ -566,6 +568,38 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \vspace{0.2cm}
     \input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
   \end{frame}
+
+\begin{frame}
+  \frametitle{Relative MASE Heatmap: Performance vs Naive Baseline}
+  \centering
+  \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/relative_mase_heatmap.png}
+  \vspace{0.2cm}
+
+  Blue = outperforms Naive ($<1$), Red = underperforms Naive ($>1$)
+\end{frame}
+
+\begin{frame}
+  \frametitle{Relative MASE Analysis: Key Patterns}
+  \begin{itemize}
+  \item \alert{Naive baseline dominance:} Competitive across most datasets, especially for efficient markets
+  \vspace{0.3cm}
+  \item \alert{Where sophisticated models excel:}
+  \begin{itemize}
+    \item Disaggregated data: CRSP Stock, Corporate Bonds, CDS Contracts
+    \item Basis spreads: CIP, Treasury-Swap show higher predictability
+    \item Bank regulatory data: Leverage and liquidity metrics
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Model-specific insights:}
+  \begin{itemize}
+    \item Theta and Auto-ARIMA: Consistent moderate improvements
+    \item Deep learning (N-BEATS, TiDE): Strong on large cross-sections
+    \item Linear models (DLinear/NLinear): Surprisingly competitive
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Challenge areas:} Options, FX, and aggregated portfolios show limited gains
+  \end{itemize}
+\end{frame}
 
 \begin{frame}
   \frametitle{Key Finding: No Universal Best Model}
@@ -623,16 +657,69 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 
 
 
-% \begin{frame}[plain]
+\begin{frame}[plain]
+    \tiny
+    \vspace{-0.5cm}
+    \centering
+    \textbf{Out-of-Sample $R^2$ Results by Dataset and Model}\\
+    \vspace{0.2cm}
+    \input{../_output/forecasting/paper/r2oos_pivot_tabular.tex}
+\end{frame}
 
-%     \centering
-%     \textbf{Out-of-Sample $R^2$ Results by Dataset and Model}\\
-%     \vspace{0.2cm}
-%     \scalebox{0.9}{%
-%       \input{../output/forecasting/r2_oos_pivot_tabular.tex}%
-%     }
-%   \end{frame}
+\begin{frame}
+  \frametitle{Out-of-Sample $R^2$ Heatmap: Predictive Performance}
+  \centering
+  \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/r2oos_heatmap.png}
+  \vspace{0.2cm}
 
+  Positive values = better than historical mean, Negative = worse
+\end{frame}
+
+\begin{frame}
+  \frametitle{OOS $R^2$ Analysis: Predictability Insights}
+  \begin{itemize}
+  \item \alert{Overall challenge:} Most models struggle to beat historical mean (negative $R^2$)
+  \vspace{0.3cm}
+  \item \alert{Where predictability exists:}
+  \begin{itemize}
+    \item Basis spreads: CIP, Treasury-Swap, CDS-Bond basis
+    \item Bank metrics: Leverage ratios show structure
+    \item Yield curves: Term structure has inherent predictability
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Market efficiency dominates:}
+  \begin{itemize}
+    \item Equity returns: Near-random walk behavior
+    \item Options: High noise-to-signal ratio
+    \item FX: Efficient international markets
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Key finding:} Positive $R^2$ achievable mainly in markets with frictions or structural patterns
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Comparing Metrics: MASE vs OOS $R^2$}
+  \begin{itemize}
+  \item \alert{MASE insights:}
+  \begin{itemize}
+    \item More forgiving metric (absolute errors)
+    \item Most models achieve $<1$ (beat seasonal naive)
+    \item Better for operational forecasting decisions
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{OOS $R^2$ insights:}
+  \begin{itemize}
+    \item Stricter metric (squared errors penalize outliers)
+    \item Most models achieve negative values
+    \item Better for risk management and portfolio decisions
+  \end{itemize}
+  \vspace{0.3cm}
+  \item \alert{Divergence reveals:} Models may forecast direction well (good MASE) but miss extreme events (poor $R^2$)
+  \vspace{0.3cm}
+  \item \alert{For financial stability:} Both metrics needed - MASE for monitoring, $R^2$ for stress scenarios
+  \end{itemize}
+\end{frame}
 
 \begin{frame}
   \frametitle{Practical Guidance for Financial Stability Monitoring}
