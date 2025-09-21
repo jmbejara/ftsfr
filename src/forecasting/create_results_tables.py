@@ -149,6 +149,89 @@ def load_model_order():
     return ordered_models
 
 
+DATASET_CATEGORY_ORDER = ["Basis Spreads", "Returns", "Other"]
+
+
+def categorize_dataset_group(group_name):
+    """Map raw dataset group into high-level category."""
+
+    if not isinstance(group_name, str):
+        return "Other"
+
+    group_name = group_name.lower()
+    if group_name == "basis_spreads":
+        return "Basis Spreads"
+    if group_name.startswith("returns"):
+        return "Returns"
+    return "Other"
+
+
+def load_filtered_results_for_summary():
+    """Load results_all.csv with filtering applied and numeric metrics prepared."""
+
+    print("Loading filtered forecasting results for summary tables...")
+
+    results_file = FORECAST_DIR / "results_all.csv"
+    if not results_file.exists():
+        print(f"Error: Results file not found at {results_file}")
+        print("Please run the assemble_results3 task first")
+        sys.exit(1)
+
+    results = pd.read_csv(results_file)
+    print(f"Loaded {len(results)} result rows")
+
+    results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
+
+    results = filter_results_by_active_models(results)
+    results = filter_results_by_active_datasets(results)
+    results = filter_quality_results(results)
+
+    models_config = load_models_config()
+    key_to_display_name = {}
+    for model_key, model_config in models_config.items():
+        if isinstance(model_config, dict):
+            display_name = model_config.get("display_name", model_key)
+            key_to_display_name[model_key] = display_name
+
+    results["model_name"] = (
+        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    )
+
+    dataset_groups, _ = load_dataset_groups_and_names()
+    results["dataset_group"] = results["dataset_name"].map(dataset_groups)
+    results["dataset_category"] = results["dataset_group"].apply(categorize_dataset_group)
+
+    results["MASE_numeric"] = pd.to_numeric(results["MASE"], errors="coerce")
+    results["R2oos_numeric"] = pd.to_numeric(results["R2oos"], errors="coerce")
+
+    relative_available = False
+    results["Relative_MASE"] = pd.NA
+
+    historic_avg_results = results[results["model_name"] == "Historic Average"].copy()
+    if len(historic_avg_results) > 0:
+        historic_mase_map = historic_avg_results.set_index("dataset_name")[
+            "MASE_numeric"
+        ].to_dict()
+
+        def compute_relative(row):
+            if row["model_name"] == "Historic Average":
+                return pd.NA
+            baseline = historic_mase_map.get(row["dataset_name"])
+            if baseline is None or baseline == 0:
+                return pd.NA
+            return row["MASE_numeric"] / baseline
+
+        results["Relative_MASE"] = results.apply(compute_relative, axis=1)
+        results["Relative_MASE"] = pd.to_numeric(results["Relative_MASE"], errors="coerce")
+        relative_available = bool(results["Relative_MASE"].notna().any())
+    else:
+        print(
+            "Warning: Historic Average model not found when computing Relative MASE; values will be omitted."
+        )
+
+    return results, relative_available
+
+
 def get_active_model_display_names():
     """Get list of active model display names from models_config.toml (excluding commented out models)"""
     models_config = load_models_config()
@@ -1294,50 +1377,7 @@ def create_median_mase_summary_table():
 
     print("Creating median MASE summary table...")
 
-    # Read the assembled results from new location
-    results_file = FORECAST_DIR / "results_all.csv"
-    if not results_file.exists():
-        print(f"Error: Results file not found at {results_file}")
-        print("Please run the assemble_results3 task first")
-        sys.exit(1)
-
-    results = pd.read_csv(results_file)
-    print(f"Loaded {len(results)} result rows")
-
-    # Additional consistency fixes
-    results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
-
-    # Filter to only include active models from config (do this BEFORE converting to display names)
-    results = filter_results_by_active_models(results)
-
-    # Filter to only include active datasets from config
-    results = filter_results_by_active_datasets(results)
-
-    # Apply quality filtering
-    results = filter_quality_results(results)
-
-    # Now map model keys to display names for consistency (do this AFTER filtering)
-    models_config = load_models_config()
-    key_to_display_name = {}
-    for model_key, model_config in models_config.items():
-        if isinstance(model_config, dict):
-            display_name = model_config.get("display_name", model_key)
-            key_to_display_name[model_key] = display_name
-
-    # Replace model keys with display names
-    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
-
-    # Check if we have the required columns
-    if "MASE" not in results.columns:
-        print("Error: MASE column not found in results")
-        print(f"Available columns: {list(results.columns)}")
-        sys.exit(1)
-
-    # Convert MASE to numeric (in case there are any string values)
-    results["MASE_numeric"] = pd.to_numeric(results["MASE"], errors="coerce")
-
-    # Convert R2oos to numeric
-    results["R2oos_numeric"] = pd.to_numeric(results["R2oos"], errors="coerce")
+    results, relative_available = load_filtered_results_for_summary()
 
     # Calculate MASE summary statistics by model
     mase_summary = (
@@ -1366,34 +1406,23 @@ def create_median_mase_summary_table():
 
     # Calculate Relative MASE (relative to Historic Average)
     # First, get Historic Average MASE values for each dataset
-    historic_avg_results = results[results["model_name"] == "Historic Average"].copy()
+    relative_mase_summary = pd.DataFrame()
+    if relative_available:
+        relative_mase_data = results[
+            (results["model_name"] != "Historic Average")
+            & results["Relative_MASE"].notna()
+        ].copy()
+        if not relative_mase_data.empty:
+            relative_mase_summary = (
+                relative_mase_data.groupby("model_name")["Relative_MASE"]
+                .agg(["median", "mean"])
+                .round(4)
+            )
 
-    if len(historic_avg_results) > 0:
-        # Create a mapping of dataset to Historic Average MASE
-        historic_mase_map = historic_avg_results.set_index("dataset_name")["MASE_numeric"].to_dict()
-
-        # Calculate relative MASE for each result
-        results["Relative_MASE"] = results.apply(
-            lambda row: row["MASE_numeric"] / historic_mase_map.get(row["dataset_name"], 1.0)
-            if row["model_name"] != "Historic Average" else None,
-            axis=1
-        )
-
-        # Calculate Relative MASE summary statistics (excluding Historic Average)
-        relative_mase_data = results[results["model_name"] != "Historic Average"].copy()
-        relative_mase_summary = (
-            relative_mase_data.groupby("model_name")["Relative_MASE"]
-            .agg(["median", "mean"])
-            .round(4)
-        )
-
-        relative_mase_summary.columns = [
-            "Median_Relative_MASE",
-            "Mean_Relative_MASE",
-        ]
-    else:
-        print("Warning: Historic Average model not found, skipping Relative MASE calculation")
-        relative_mase_summary = pd.DataFrame()
+            relative_mase_summary.columns = [
+                "Median_Relative_MASE",
+                "Mean_Relative_MASE",
+            ]
 
     # Combine all summaries
     model_summary = mase_summary.copy()
@@ -1449,7 +1478,15 @@ def create_median_mase_summary_table():
     # Select columns based on what's available
     columns_to_show = ["N_Datasets", "Median_MASE", "Mean_MASE", "Median_R2oos", "Mean_R2oos"]
     if "Median_Relative_MASE" in model_summary_latex.columns:
-        columns_to_show = ["N_Datasets", "Median_MASE", "Mean_MASE", "Median_Relative_MASE", "Mean_Relative_MASE", "Median_R2oos", "Mean_R2oos"]
+        columns_to_show = [
+            "N_Datasets",
+            "Median_MASE",
+            "Mean_MASE",
+            "Median_Relative_MASE",
+            "Mean_Relative_MASE",
+            "Median_R2oos",
+            "Mean_R2oos",
+        ]
 
     # Filter to only include columns that exist
     available_columns = [col for col in columns_to_show if col in model_summary_latex.columns]
@@ -1537,6 +1574,216 @@ def create_median_mase_summary_table():
         )
 
     return model_summary
+
+
+def create_grouped_model_summary_table():
+    """Create summary tables by high-level dataset category."""
+
+    print("Creating model performance summary by dataset category...")
+
+    results, relative_available = load_filtered_results_for_summary()
+
+    model_order = load_model_order()
+    display_name_order = {model["display_name"]: idx for idx, model in enumerate(model_order)}
+    model_table_names = load_model_table_names()
+
+    if relative_available:
+        columns_full = [
+            "N_Datasets",
+            "Median_MASE",
+            "Mean_MASE",
+            "Median_Relative_MASE",
+            "Mean_Relative_MASE",
+            "Median_R2oos",
+            "Mean_R2oos",
+        ]
+    else:
+        columns_full = [
+            "N_Datasets",
+            "Median_MASE",
+            "Mean_MASE",
+            "Median_R2oos",
+            "Mean_R2oos",
+        ]
+
+    category_summaries = []
+
+    for category in DATASET_CATEGORY_ORDER:
+        cat_results = results[results["dataset_category"] == category]
+        if cat_results.empty:
+            continue
+
+        cat_mase = (
+            cat_results.groupby("model_name")["MASE_numeric"]
+            .agg(["count", "median", "mean"])
+            .round(4)
+        )
+        cat_mase.columns = ["N_Datasets", "Median_MASE", "Mean_MASE"]
+
+        cat_r2 = (
+            cat_results.groupby("model_name")["R2oos_numeric"]
+            .agg(["median", "mean"])
+            .round(4)
+        )
+        cat_r2.columns = ["Median_R2oos", "Mean_R2oos"]
+
+        cat_summary = cat_mase.join(cat_r2, how="left")
+
+        if relative_available:
+            cat_rel = cat_results[
+                (cat_results["model_name"] != "Historic Average")
+                & cat_results["Relative_MASE"].notna()
+            ].copy()
+
+            if not cat_rel.empty:
+                cat_rel_summary = (
+                    cat_rel.groupby("model_name")["Relative_MASE"]
+                    .agg(["median", "mean"]).round(4)
+                )
+                cat_rel_summary.columns = [
+                    "Median_Relative_MASE",
+                    "Mean_Relative_MASE",
+                ]
+                cat_summary = cat_summary.join(cat_rel_summary, how="left")
+            else:
+                cat_summary["Median_Relative_MASE"] = pd.NA
+                cat_summary["Mean_Relative_MASE"] = pd.NA
+
+        if model_order:
+            cat_summary["Order"] = cat_summary.index.map(
+                lambda x: display_name_order.get(x, 999)
+            )
+            cat_summary = cat_summary.sort_values(["Order", "Median_MASE"])
+            cat_summary = cat_summary.drop(columns="Order")
+        else:
+            cat_summary = cat_summary.sort_values("Median_MASE")
+
+        cat_summary.index = cat_summary.index.map(
+            lambda x: model_table_names.get(x, x)
+        )
+
+        category_summaries.append((category, cat_summary))
+
+    if not category_summaries:
+        print("No category summaries produced.")
+        return None
+
+    # Prepare CSV output
+    csv_frames = []
+    for category, df in category_summaries:
+        df_csv = df.reindex(columns=columns_full, fill_value=pd.NA).copy()
+        df_csv.insert(0, "Category", category)
+        df_csv.insert(1, "Model", df_csv.index)
+        csv_frames.append(df_csv.reset_index(drop=True))
+
+    combined_csv = pd.concat(csv_frames, ignore_index=True)
+
+    csv_file = FORECAST_DIR / "model_summary_by_category.csv"
+    combined_csv.to_csv(csv_file, index=False)
+    print(f"Saved model summary by category (CSV) to: {csv_file}")
+
+    paper_csv = PAPER_DIR / "model_summary_by_category.csv"
+    paper_csv.parent.mkdir(parents=True, exist_ok=True)
+    combined_csv.to_csv(paper_csv, index=False)
+    print(f"Saved model summary by category (CSV) to: {paper_csv}")
+
+    column_name_mapping = {
+        "N_Datasets": "N",
+        "Median_MASE": "Med MASE",
+        "Mean_MASE": "Mean MASE",
+        "Median_Relative_MASE": "Med Rel MASE",
+        "Mean_Relative_MASE": "Mean Rel MASE",
+        "Median_R2oos": "Med R²",
+        "Mean_R2oos": "Mean R²",
+    }
+
+    available_columns = [
+        col for col in columns_full if any(col in df.columns for _, df in category_summaries)
+    ]
+
+    num_cols = len(available_columns) + 1
+    column_format = "l" + "r" * (num_cols - 1)
+
+    def format_value(value):
+        if pd.isna(value):
+            return "."
+        return f"{value:.3f}"
+
+    header = ["Model"] + [column_name_mapping.get(c, c) for c in available_columns]
+
+    tabular_lines = [
+        f"\\begin{{tabular}}{{{column_format}}}",
+        "\\toprule",
+        " & ".join(header) + " \\",
+    ]
+
+    for category, df in category_summaries:
+        df_display = df.reindex(columns=available_columns, fill_value=pd.NA)
+        tabular_lines.append("\\midrule")
+        tabular_lines.append(
+            "\\multicolumn{{{}}}{{l}}{{\\textbf{{{}}}}} \\".format(
+                num_cols, category
+            )
+        )
+        for model_name, row in df_display.iterrows():
+            row_values = [model_name] + [format_value(row[col]) for col in available_columns]
+            tabular_lines.append(" & ".join(row_values) + " \\")
+
+    tabular_lines.append("\\bottomrule")
+    tabular_lines.append("\\end{tabular}")
+
+    tabular_content = "\n".join(tabular_lines)
+
+    caption = "Model Performance by Dataset Category"
+    label = "tab:model_summary_by_category"
+    note = (
+        "\\textbf{Note:} Metrics are computed within each dataset category (Basis Spreads, Returns, Other). "
+        "Lower MASE/Relative MASE values indicate better performance; higher $R^2_{\\text{oos}}$ values indicate "
+        "better performance."
+    )
+
+    latex_output = "\n".join(
+        [
+            "\\begin{table}[htbp]",
+            "\\centering",
+            f"\\caption{{{caption}}}",
+            f"\\label{{{label}}}",
+            "\\scriptsize",
+            tabular_content,
+            f"\\caption*{{\\scriptsize {note}}}",
+            "\\end{table}",
+        ]
+    )
+
+    tex_file = FORECAST_DIR / "model_summary_by_category.tex"
+    with open(tex_file, "w") as f:
+        f.write(latex_output)
+    print(f"Saved model summary by category (LaTeX) to: {tex_file}")
+
+    tabular_file = FORECAST_DIR / "model_summary_by_category_tabular.tex"
+    with open(tabular_file, "w") as f:
+        f.write(
+            "% Model Summary by Category - tabular content only\n"
+            "% Generated automatically by create_results_tables.py\n"
+            f"{tabular_content}"
+        )
+    print(f"Saved model summary by category tabular (LaTeX) to: {tabular_file}")
+
+    paper_tex = PAPER_DIR / "model_summary_by_category.tex"
+    with open(paper_tex, "w") as f:
+        f.write(latex_output)
+    print(f"Saved model summary by category (LaTeX) to: {paper_tex}")
+
+    paper_tabular = PAPER_DIR / "model_summary_by_category_tabular.tex"
+    with open(paper_tabular, "w") as f:
+        f.write(
+            "% Model Summary by Category - tabular content only\n"
+            "% Generated automatically by create_results_tables.py\n"
+            f"{tabular_content}"
+        )
+    print(f"Saved model summary by category tabular (LaTeX) to: {paper_tabular}")
+
+    return category_summaries
 
 
 def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
@@ -2371,6 +2618,9 @@ if __name__ == "__main__":
     # Create median MASE summary table (overall model ranking)
     median_mase_summary = create_median_mase_summary_table()
 
+    # Create grouped model performance summary table
+    grouped_model_summary = create_grouped_model_summary_table()
+
     # Create summary statistics (now with quality filtering)
     summary_stats = create_summary_statistics()
 
@@ -2402,6 +2652,9 @@ if __name__ == "__main__":
     print(f"  - {FORECAST_DIR / 'relative_mase_pivot_table.tex'}")
     print(f"  - {FORECAST_DIR / 'model_summary_statistics.csv'}")
     print(f"  - {FORECAST_DIR / 'model_summary_statistics.tex'}")
+    print(f"  - {FORECAST_DIR / 'model_summary_by_category.csv'}")
+    print(f"  - {FORECAST_DIR / 'model_summary_by_category.tex'}")
+    print(f"  - {FORECAST_DIR / 'model_summary_by_category_tabular.tex'}")
     if slurm_summary is not None:
         print("SLURM Job Analysis:")
         print(f"  - {FORECAST_DIR / 'slurm_job_summary.csv'}")
@@ -2417,3 +2670,6 @@ if __name__ == "__main__":
     print(f"  - {PAPER_DIR / 'relative_mase_pivot_table.tex'}")
     print(f"  - {PAPER_DIR / 'median_mase_summary.csv'}")
     print(f"  - {PAPER_DIR / 'median_mase_summary.tex'}")
+    print(f"  - {PAPER_DIR / 'model_summary_by_category.csv'}")
+    print(f"  - {PAPER_DIR / 'model_summary_by_category.tex'}")
+    print(f"  - {PAPER_DIR / 'model_summary_by_category_tabular.tex'}")
