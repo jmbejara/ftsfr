@@ -1156,6 +1156,17 @@ def create_r2oos_pivot_table():
         print("Warning: R2oos column not found in results, skipping R2oos table")
         return None
 
+    # Historic Average is the baseline used to define R2oos, so its score should be exactly 0.
+    baseline_mask = results["model_name"] == "Historic Average"
+    if baseline_mask.any():
+        baseline_r2 = results.loc[baseline_mask, "R2oos"].dropna()
+        if not baseline_r2.empty:
+            max_abs_r2 = baseline_r2.abs().max()
+            assert (
+                max_abs_r2 < 1e-5
+            ), f"Historic Average R2oos deviates from zero (max |value|={max_abs_r2})"
+        results.loc[baseline_mask, "R2oos"] = 0.0
+
     # Create pivot table: datasets as rows, models as columns, values as R2oos
     r2oos_pivot = results.pivot_table(
         index="Dataset_Short",  # Short dataset names as rows
