@@ -127,12 +127,21 @@ def load_model_order():
     ordered_models.extend(historic_avg)
 
     # 2. Add statsforecast models (forecast_stats.py) alphabetically by table_name
-    stats_models = [m for m in all_models if m["script"] == "forecast_stats.py" and m["display_name"] != "Historic Average"]
+    stats_models = [
+        m
+        for m in all_models
+        if m["script"] == "forecast_stats.py"
+        and m["display_name"] != "Historic Average"
+    ]
     stats_models.sort(key=lambda x: x["table_name"])
     ordered_models.extend(stats_models)
 
     # 3. Add neural models (forecast_neural.py and forecast_neural_auto.py) alphabetically by table_name
-    neural_models = [m for m in all_models if m["script"] in ["forecast_neural.py", "forecast_neural_auto.py"]]
+    neural_models = [
+        m
+        for m in all_models
+        if m["script"] in ["forecast_neural.py", "forecast_neural_auto.py"]
+    ]
     neural_models.sort(key=lambda x: x["table_name"])
     ordered_models.extend(neural_models)
 
@@ -270,7 +279,9 @@ def load_filtered_results_for_summary():
 
     dataset_groups, _ = load_dataset_groups_and_names()
     results["dataset_group"] = results["dataset_name"].map(dataset_groups)
-    results["dataset_category"] = results["dataset_group"].apply(categorize_dataset_group)
+    results["dataset_category"] = results["dataset_group"].apply(
+        categorize_dataset_group
+    )
 
     results["MASE_numeric"] = pd.to_numeric(results["MASE"], errors="coerce")
     results["R2oos_numeric"] = pd.to_numeric(results["R2oos"], errors="coerce")
@@ -293,7 +304,9 @@ def load_filtered_results_for_summary():
             return row["MASE_numeric"] / baseline
 
         results["Relative_MASE"] = results.apply(compute_relative, axis=1)
-        results["Relative_MASE"] = pd.to_numeric(results["Relative_MASE"], errors="coerce")
+        results["Relative_MASE"] = pd.to_numeric(
+            results["Relative_MASE"], errors="coerce"
+        )
         relative_available = bool(results["Relative_MASE"].notna().any())
     else:
         print(
@@ -782,7 +795,9 @@ def create_mase_pivot_table():
             key_to_display_name[model_key] = display_name
 
     # Replace model keys with display names
-    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    results["model_name"] = (
+        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    )
 
     # Check if we have the required columns (new column names)
     if "MASE" not in results.columns:
@@ -933,7 +948,9 @@ def create_rmse_pivot_table():
             key_to_display_name[model_key] = display_name
 
     # Replace model keys with display names
-    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    results["model_name"] = (
+        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    )
 
     # Check if we have the required columns
     if "RMSE" not in results.columns:
@@ -1087,7 +1104,9 @@ def create_relative_mase_pivot_table():
             key_to_display_name[model_key] = display_name
 
     # Replace model keys with display names
-    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    results["model_name"] = (
+        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    )
 
     # Check if we have the required columns and Historic Average model
     if "MASE" not in results.columns:
@@ -1303,7 +1322,9 @@ def create_r2oos_pivot_table():
             key_to_display_name[model_key] = display_name
 
     # Replace model keys with display names
-    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    results["model_name"] = (
+        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    )
 
     # Check if we have the required columns
     if "R2oos" not in results.columns:
@@ -1316,9 +1337,9 @@ def create_r2oos_pivot_table():
         baseline_r2 = results.loc[baseline_mask, "R2oos"].dropna()
         if not baseline_r2.empty:
             max_abs_r2 = baseline_r2.abs().max()
-            assert (
-                max_abs_r2 < 1e-5
-            ), f"Historic Average R2oos deviates from zero (max |value|={max_abs_r2})"
+            assert max_abs_r2 < 1e-5, (
+                f"Historic Average R2oos deviates from zero (max |value|={max_abs_r2})"
+            )
         results.loc[baseline_mask, "R2oos"] = 0.0
 
     # Create pivot table: datasets as rows, models as columns, values as R2oos
@@ -1465,9 +1486,7 @@ def create_median_mase_summary_table():
 
     # Calculate R2oos summary statistics by model
     r2oos_summary = (
-        results.groupby("model_name")["R2oos_numeric"]
-        .agg(["median", "mean"])
-        .round(4)
+        results.groupby("model_name")["R2oos_numeric"].agg(["median", "mean"]).round(4)
     )
 
     r2oos_summary.columns = [
@@ -1547,7 +1566,13 @@ def create_median_mase_summary_table():
 
     # Create LaTeX table - show all the key metrics
     # Select columns based on what's available
-    columns_to_show = ["N_Datasets", "Median_MASE", "Mean_MASE", "Median_R2oos", "Mean_R2oos"]
+    columns_to_show = [
+        "N_Datasets",
+        "Median_MASE",
+        "Mean_MASE",
+        "Median_R2oos",
+        "Mean_R2oos",
+    ]
     if "Median_Relative_MASE" in model_summary_latex.columns:
         columns_to_show = [
             "N_Datasets",
@@ -1560,7 +1585,9 @@ def create_median_mase_summary_table():
         ]
 
     # Filter to only include columns that exist
-    available_columns = [col for col in columns_to_show if col in model_summary_latex.columns]
+    available_columns = [
+        col for col in columns_to_show if col in model_summary_latex.columns
+    ]
     summary_display = model_summary_latex[available_columns].copy()
 
     # Create better column names for LaTeX (without underscores)
@@ -1571,7 +1598,7 @@ def create_median_mase_summary_table():
         "Median_Relative_MASE": "Med Rel MASE",
         "Mean_Relative_MASE": "Mean Rel MASE",
         "Median_R2oos": "Med R²",
-        "Mean_R2oos": "Mean R²"
+        "Mean_R2oos": "Mean R²",
     }
 
     summary_display.columns = [
@@ -1660,7 +1687,9 @@ def create_grouped_model_summary_table():
     results, relative_available = load_filtered_results_for_summary()
 
     model_order = load_model_order()
-    display_name_order = {model["display_name"]: idx for idx, model in enumerate(model_order)}
+    display_name_order = {
+        model["display_name"]: idx for idx, model in enumerate(model_order)
+    }
     model_table_names = load_model_table_names()
 
     if relative_available:
@@ -1714,7 +1743,8 @@ def create_grouped_model_summary_table():
             if not cat_rel.empty:
                 cat_rel_summary = (
                     cat_rel.groupby("model_name")["Relative_MASE"]
-                    .agg(["median", "mean"]).round(4)
+                    .agg(["median", "mean"])
+                    .round(4)
                 )
                 cat_rel_summary.columns = [
                     "Median_Relative_MASE",
@@ -1734,9 +1764,7 @@ def create_grouped_model_summary_table():
         else:
             cat_summary = cat_summary.sort_values("Median_MASE")
 
-        cat_summary.index = cat_summary.index.map(
-            lambda x: model_table_names.get(x, x)
-        )
+        cat_summary.index = cat_summary.index.map(lambda x: model_table_names.get(x, x))
 
         category_summaries.append((category, cat_summary))
 
@@ -1774,7 +1802,9 @@ def create_grouped_model_summary_table():
     }
 
     available_columns = [
-        col for col in columns_full if any(col in df.columns for _, df in category_summaries)
+        col
+        for col in columns_full
+        if any(col in df.columns for _, df in category_summaries)
     ]
 
     latex_df = combined_csv.copy()
@@ -2193,7 +2223,9 @@ def create_heatmap_plots():
             key_to_display_name[model_key] = display_name
 
     # Replace model keys with display names
-    results["model_name"] = results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    results["model_name"] = (
+        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+    )
 
     # Define error metrics to create heatmaps for
     error_metrics = [
@@ -2215,7 +2247,9 @@ def create_heatmap_plots():
                 print(f"Skipping {metric_short} heatmap - MASE column not found")
                 continue
             if "Historic Average" not in results["model_name"].values:
-                print(f"Skipping {metric_short} heatmap - Historic Average model not found")
+                print(
+                    f"Skipping {metric_short} heatmap - Historic Average model not found"
+                )
                 continue
         elif metric_col not in results.columns:
             print(f"Skipping {metric_short} heatmap - column {metric_col} not found")
@@ -2410,12 +2444,8 @@ def create_heatmap_plots():
 
         # Create colorbar label and title based on metric type
         if metric_col == "Relative_MASE":
-            cbar_label = (
-                f"{metric_long} (1.0 = Baseline; Colors capped at 2.0, * marks values >2.0)"
-            )
-            title_subtitle = (
-                "(Blue = Better than Historic Average, White = Equal to Baseline, Red = Worse; Dark red at 2.0)"
-            )
+            cbar_label = f"{metric_long} (1.0 = Baseline; Colors capped at 2.0, * marks values >2.0)"
+            title_subtitle = "(Blue = Better than Historic Average, White = Equal to Baseline, Red = Worse; Dark red at 2.0)"
         elif metric_col == "R2oos":
             cbar_label = (
                 f"{metric_long} (0.0 = No predictive power, >0.0 = Better than mean)"
@@ -2684,7 +2714,9 @@ if __name__ == "__main__":
     # Create relative MASE pivot table (comparing to Historic Average baseline)
     relative_mase_table = create_relative_mase_pivot_table()
     if relative_mase_table is None:
-        print("Skipping relative MASE table creation - Historic Average model not available")
+        print(
+            "Skipping relative MASE table creation - Historic Average model not available"
+        )
 
     # Create median MASE summary table (overall model ranking)
     median_mase_summary = create_median_mase_summary_table()

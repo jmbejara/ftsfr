@@ -104,8 +104,16 @@ def format_date_range(min_date, max_date):
     if min_date is None or max_date is None:
         return "N/A"
 
-    min_str = min_date.strftime("%Y-%m-%d") if hasattr(min_date, "strftime") else str(min_date)
-    max_str = max_date.strftime("%Y-%m-%d") if hasattr(max_date, "strftime") else str(max_date)
+    min_str = (
+        min_date.strftime("%Y-%m-%d")
+        if hasattr(min_date, "strftime")
+        else str(min_date)
+    )
+    max_str = (
+        max_date.strftime("%Y-%m-%d")
+        if hasattr(max_date, "strftime")
+        else str(max_date)
+    )
     return f"{min_str} -- {max_str}"
 
 
@@ -166,7 +174,9 @@ def calculate_filtering_statistics(dataset_info):
 
         # Baseline (pre-filter) statistics from cleaned raw data
         entities_before = df["unique_id"].n_unique()
-        lengths_before = df.group_by("unique_id").agg(pl.len().alias("length"))["length"]
+        lengths_before = df.group_by("unique_id").agg(pl.len().alias("length"))[
+            "length"
+        ]
         median_length_before = lengths_before.median() if len(lengths_before) else 0
         min_date_before = df["ds"].min()
         max_date_before = df["ds"].max()

@@ -26,6 +26,8 @@ from forecast_utils import (
     convert_pandas_freq_to_polars,
     evaluate_cv,
     get_test_size_from_frequency,
+    determine_cv_windows,
+    MAX_CV_WINDOWS,
     read_dataset_config,
     should_skip_forecast,
 )
@@ -125,7 +127,7 @@ def main():
         print(f"Test size (DEBUG): {test_size}")
     else:
         test_size = get_test_size_from_frequency(frequency)
-        print(f"Test size (last N observations): {test_size}")
+    print(f"Test size (forecast horizon): {test_size}")
 
     # Load and preprocess data
     print("\n2. Loading and Preprocessing Data")
@@ -326,10 +328,15 @@ def main():
     print("\n4. Performing Cross-Validation")
     print("-" * 40)
     print(f"Forecast horizon: {test_size}")
-    print("Cross-validation windows: 1 (end of series)")
+    cv_windows = determine_cv_windows(df, test_size)
+    print(f"Cross-validation windows (max {MAX_CV_WINDOWS}): {cv_windows}")
+    if cv_windows < MAX_CV_WINDOWS:
+        print("  Shortest series length limits the number of windows.")
 
     start_time = time.time()
-    cv_df = sf.cross_validation(df=df, h=test_size, step_size=test_size, n_windows=1)
+    cv_df = sf.cross_validation(
+        df=df, h=test_size, step_size=test_size, n_windows=cv_windows
+    )
     cv_time = time.time() - start_time
     print(f"Cross-validation completed in {cv_time:.2f} seconds")
 

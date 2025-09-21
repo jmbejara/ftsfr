@@ -30,6 +30,8 @@ from forecast_utils import (
     convert_pandas_freq_to_polars,
     evaluate_cv,
     get_test_size_from_frequency,
+    determine_cv_windows,
+    MAX_CV_WINDOWS,
     read_dataset_config,
     should_skip_forecast,
 )
@@ -611,7 +613,7 @@ def main():
         print(f"Test size (DEBUG): {test_size}")
     else:
         test_size = get_test_size_from_frequency(frequency)
-        print(f"Test size (last N observations): {test_size}")
+        print(f"Test size (forecast horizon): {test_size}")
 
     # Load and preprocess data using robust pipeline
     print("\n2. Loading and Preprocessing Data")
@@ -1016,9 +1018,14 @@ def main():
         models=baseline_models, freq=polars_frequency, n_jobs=-1, verbose=True
     )
 
+    cv_windows = determine_cv_windows(df_baseline, test_size)
+    print(f"  Cross-validation windows (max {MAX_CV_WINDOWS}): {cv_windows}")
+    if cv_windows < MAX_CV_WINDOWS:
+        print("  Shortest baseline series length limits the number of windows.")
+
     start_time = time.time()
     baseline_cv_df = sf.cross_validation(
-        df=df_baseline, h=test_size, step_size=test_size, n_windows=1
+        df=df_baseline, h=test_size, step_size=test_size, n_windows=cv_windows
     )
     baseline_time = time.time() - start_time
     print(f"Baseline cross-validation completed in {baseline_time:.2f} seconds")
@@ -1065,10 +1072,17 @@ def main():
     if DEBUG_MODE:
         debug_data_quality(df_neural, "Neural model input")
 
+    print(f"  Cross-validation windows for neural models: {cv_windows}")
+    if cv_windows < MAX_CV_WINDOWS:
+        print("  Neural windows limited by available history.")
+
     start_time = time.time()
     try:
         neural_cv_df = nf.cross_validation(
-            df=df_neural, val_size=test_size, n_windows=1, step_size=test_size
+            df=df_neural,
+            val_size=test_size,
+            n_windows=cv_windows,
+            step_size=test_size,
         )
         neural_time = time.time() - start_time
         print(f"Neural cross-validation completed in {neural_time:.2f} seconds")

@@ -115,9 +115,10 @@ def get_data_requirements(frequency, test_size, seasonality=1):
         else config["base_min_train"],
     )
 
+    adaptive_test_floor = max(1, math.ceil(test_size * config["test_ratio"]))
     min_test_obs = max(
-        config["base_min_test"],
-        min(test_size, math.ceil(test_size * config["test_ratio"])),
+        test_size,
+        min(config["base_min_test"], adaptive_test_floor),
     )
 
     # Require enough total observations to support the train/test split

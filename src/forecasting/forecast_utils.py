@@ -14,6 +14,8 @@ from utilsforecast.losses import mase, mse, rmse
 FILE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = FILE_DIR.parent.parent
 
+MAX_CV_WINDOWS = 6
+
 
 def convert_frequency_to_statsforecast(frequency):
     """Convert pandas/dataset frequency to StatsForecast frequency format."""
@@ -265,14 +267,34 @@ def load_and_preprocess_data(data_path, frequency="D", test_split=0.2, seasonali
 def get_test_size_from_frequency(frequency):
     """Get test size based on frequency."""
     freq_map = {
-        "ME": 36,  # Monthly: 36 months
-        "MS": 36,  # Month start: 36 months
-        "B": 90,  # Business day: 90 days
-        "D": 90,  # Daily: 90 days
-        "QE": 12,  # Quarterly: 12 quarters
-        "QS": 12,  # Quarter start: 12 quarters
+        "ME": 1,  # Monthly: 1 month ahead
+        "MS": 1,  # Month start: 1 month ahead
+        "B": 21,  # Business day: ~1 trading month ahead
+        "D": 30,  # Calendar day: ~1 calendar month ahead
+        "QE": 1,  # Quarterly: 1 quarter ahead
+        "QS": 1,  # Quarter start: 1 quarter ahead
     }
-    return freq_map.get(frequency, 36)
+    return freq_map.get(frequency, 1)
+
+
+def determine_cv_windows(
+    panel_df: pl.DataFrame, horizon: int, max_windows: int = MAX_CV_WINDOWS
+) -> int:
+    """Determine how many cross-validation windows can be supported."""
+
+    if horizon <= 0:
+        return 1
+
+    if panel_df.height == 0:
+        return 1
+
+    lengths = panel_df.group_by("unique_id").len().rename({"len": "length"})
+    if lengths.height == 0:
+        return 1
+
+    min_length = int(lengths["length"].min())
+    possible_windows = max(1, min_length // horizon)
+    return max(1, min(max_windows, possible_windows))
 
 
 def convert_pandas_freq_to_polars(pandas_freq):
@@ -469,8 +491,9 @@ def align_train_data_with_cutoffs(train_df, cv_df, cutoff_col="cutoff"):
     missing_series = per_series_cutoffs.height - aligned_train["unique_id"].n_unique()
     if missing_series > 0:
         print(
-            "Warning: Dropped {missing_series} series when aligning train data with cutoffs."
-            .format(missing_series=missing_series)
+            "Warning: Dropped {missing_series} series when aligning train data with cutoffs.".format(
+                missing_series=missing_series
+            )
         )
 
     return aligned_train.drop(cutoff_col)

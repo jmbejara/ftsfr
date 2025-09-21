@@ -64,7 +64,7 @@ Both scripts follow the same 3-step process:
 - Ensure data compatibility with chosen models
 
 ### 3. Cross-Validation & Evaluation
-- Run forecasting with 1 window at the end of each series
+- Run forecasting with up to 6 rolling windows (capped by the shortest series)
 - Calculate multiple metrics: MASE, MSE, RMSE, R²oos
 - Save results to CSV files
 
@@ -82,7 +82,8 @@ Model: auto_arima
 ----------------------------------------
 Frequency: ME (Polars: 1mo)
 Seasonality: 1
-Test size (last N observations): 36
+Test size (forecast horizon): 1
+Cross-validation windows (max 6): 6
 
 2. Loading and Preprocessing Data
 ----------------------------------------
@@ -97,8 +98,8 @@ Test: 10,476 observations
 
 [... model training ...]
 
-6. Model Performance Summary
-----------------------------------------
+6. Model Performance Summary (rolling windows)
+----------------------------------------------
 +-----------+------------+-----------+------------+-------------+
 | Model     |   Avg MASE |   Avg MSE |   Avg RMSE |   Avg R2oos |
 +===========+============+===========+============+=============+
@@ -199,6 +200,13 @@ _output/forecasting/
 - Parquet files with `unique_id`, `ds`, `y` columns
 - Regular time frequencies (daily, monthly, etc.)
 - Sufficient series length for train/test splitting
+
+### Forecast Horizons & Windows
+- Daily (`D`): 30-day horizon, step size 30, up to 6 rolling windows (capped by history)
+- Business day (`B`): 21-trading-day horizon, step size 21, up to 6 windows
+- Monthly (`ME`/`MS`): 1-month horizon, step size 1, up to 6 windows
+- Quarterly (`QE`/`QS`): 1-quarter horizon, step size 1, up to 6 windows
+- Other frequencies default to a single-step horizon with a maximum of 6 windows
 
 ### Key Functions
 - `robust_preprocess_pipeline()`: Core preprocessing
