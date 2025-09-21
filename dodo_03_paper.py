@@ -155,10 +155,13 @@ def task_compile_latex_docs():
             "latexmk -xelatex -halt-on-error -c -cd ./reports/draft_ftsfr.tex",  # Clean
             "latexmk -xelatex -halt-on-error -cd ./reports/slides_ftsfr.tex",  # Compile
             "latexmk -xelatex -halt-on-error -c -cd ./reports/slides_ftsfr.tex",  # Clean
+            "latexmk -xelatex -halt-on-error -cd ./reports/internet_appendix.tex",  # Compile
+            "latexmk -xelatex -halt-on-error -c -cd ./reports/internet_appendix.tex",  # Clean
         ],
         "targets": [
             "./reports/draft_ftsfr.pdf",
             "./reports/slides_ftsfr.pdf",
+            "./reports/internet_appendix.pdf",
         ],
         "file_dep": [
             "./src/forecasting/create_results_tables.py",
