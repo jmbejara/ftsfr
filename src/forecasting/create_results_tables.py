@@ -1989,8 +1989,27 @@ def create_heatmap_plots():
         # Color scheme and scaling depends on metric type
         if metric_col == "Relative_MASE":
             # For relative MASE, use diverging colormap centered at 1.0 (equal to historic average)
-            # RdBu_r: Red for worse than historic average (>1), White near 1, Blue for better than historic average (<1)
+            # RdBu_r: Red for worse than historic average (>1), White at 1.0, Blue for better than historic average (<1)
             colormap = "RdBu_r"
+
+            # Calculate color scale limits centered around 1.0
+            if not heatmap_data.empty:
+                data_min = heatmap_data.min().min()
+
+                # For diverging colormap, ensure 1.0 is at the center
+                # Set max at 2.0 for truncation (values above 2.0 will be marked with *)
+                vmax_val = 2.0
+
+                # Calculate vmin to keep 1.0 centered
+                # If 1.0 is centered between vmin and 2.0, then vmin = 2.0 - 1.0 = 0.0
+                vmin_val = 0.0
+
+                # However, if data_min is larger than 0, adjust accordingly
+                if data_min > 0.0:
+                    vmin_val = min(data_min, 0.5)  # Don't go too close to 1.0
+            else:
+                vmin_val = 0.0
+                vmax_val = 2.0
         elif metric_col == "R2oos":
             # For R2oos, use diverging colormap centered at 0.0 (no predictive power)
             # RdBu: Red for negative (worse than mean), White near 0, Blue for positive (better than mean)
@@ -2012,36 +2031,6 @@ def create_heatmap_plots():
 
                 vmin_val = -max_abs
                 vmax_val = max_abs
-        elif metric_col == "Relative_MASE":
-            # Calculate color scale limits centered around 1.0
-            if not heatmap_data.empty:
-                # Get min and max values
-                data_min = heatmap_data.min().min()
-                data_max = heatmap_data.quantile(
-                    0.95
-                ).max()  # Use 95th percentile to handle outliers
-
-                # For diverging colormap, we need to ensure 1.0 is at the center
-                # Calculate deviations from 1.0
-                min_deviation = abs(1.0 - data_min)
-                max_deviation = abs(data_max - 1.0)
-
-                # Use the larger deviation to create symmetric bounds around 1.0
-                max_dev = max(min_deviation, max_deviation)
-
-                # Cap extreme deviations to keep the scale reasonable
-                max_dev = min(max_dev, 4.0)  # Don't go beyond 4x deviation from 1.0
-
-                vmin_val = 1.0 - max_dev
-                vmax_val = 1.0 + max_dev
-
-                # Ensure we don't go below 0 for relative values
-                if vmin_val < 0:
-                    vmin_val = 0.0
-                    vmax_val = 2.0  # Keep 1.0 as center between 0 and 2
-            else:
-                vmin_val = 0.5
-                vmax_val = 1.5
         else:
             # Use a color scheme where lower values (better performance) are lighter/cooler
             # RdYlBu_r gives red for high (bad), yellow for medium, blue for low (good)
@@ -2073,7 +2062,11 @@ def create_heatmap_plots():
                 vmax_val = 1
 
         # Identify outliers for special annotation formatting
-        outlier_threshold = vmax_val
+        # For Relative_MASE, use 2.0 as the threshold for asterisk marking
+        if metric_col == "Relative_MASE":
+            outlier_threshold = 2.0
+        else:
+            outlier_threshold = vmax_val
 
         # Create custom annotations with special formatting for outliers
         # Initialize annotation data as object dtype to avoid dtype warnings
@@ -2100,10 +2093,10 @@ def create_heatmap_plots():
         # Create colorbar label and title based on metric type
         if metric_col == "Relative_MASE":
             cbar_label = (
-                f"{metric_long} (1.0 = Equal to Historic Average, <1.0 = Better, >1.0 = Worse)"
+                f"{metric_long} (1.0 = Baseline; Colors capped at 2.0, * marks values >2.0)"
             )
             title_subtitle = (
-                "(Blue = Better than Historic Average, White ≈ Equal, Red = Worse than Historic Average)"
+                "(Blue = Better than Historic Average, White = Equal to Baseline, Red = Worse; Dark red at 2.0)"
             )
         elif metric_col == "R2oos":
             cbar_label = (
