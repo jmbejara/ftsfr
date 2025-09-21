@@ -199,8 +199,8 @@ required_data_sources = ["wrds_crsp", "he_kelly_manela"]
 
 [us_treasury_returns.ftsfr_treas_bond_returns]
 description = """This data module contains the returns of individual treasury bonds sourced from the CRSP database."""
-short_name = "Treasury Bond Returns"
-table_name = "Treasury Bond"
+short_name = "Treasury Returns"
+table_name = "Treasuries"
 group = "returns_disaggregated"
 frequency = "ME"
 # seasonality = 12

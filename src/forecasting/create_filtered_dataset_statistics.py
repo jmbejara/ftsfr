@@ -20,12 +20,16 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "forecasting"))
 
 from settings import config
 
-# Import filtering functions from the forecasting script
-from forecast_utils import (
-    filter_series_for_forecasting,
-    convert_frequency_to_statsforecast,
+from forecast_utils import get_test_size_from_frequency
+from robust_preprocessing import (
+    normalize_month_end_dates,
+    build_canonical_grid,
+    split_train_test_aligned,
+    get_data_requirements,
+    filter_series_by_quality,
+    add_gap_indicators,
+    light_train_imputation,
 )
-from utilsforecast.preprocessing import fill_gaps
 
 # Configuration
 DATA_DIR = Path(config("DATA_DIR"))
@@ -95,88 +99,14 @@ def simplify_frequency(freq_code):
     return freq_mapping.get(freq_code, freq_code)  # Return original if not found
 
 
-def apply_forecasting_preprocessing(df, frequency, seasonality, test_split=0.2):
-    """
-    Apply the same preprocessing logic as forecasting/forecast.py
+def format_date_range(min_date, max_date):
+    """Format a date range for display in the table."""
+    if min_date is None or max_date is None:
+        return "N/A"
 
-    Returns:
-        Tuple of (train_data_before_filtering, train_data_after_filtering, full_data_after_filtering)
-    """
-    # Rename 'id' to 'unique_id' if needed
-    if "id" in df.columns:
-        df = df.rename({"id": "unique_id"})
-
-    drop_cols = [c for c in df.columns if c.startswith("__index_level_")]
-    if drop_cols:
-        df = df.drop(drop_cols)
-    df = df.select(["unique_id", "ds", "y"])
-
-    # Ensure proper dtypes & guard against inf/nan
-    df = df.with_columns(pl.col("y").cast(pl.Float32))
-    df = df.with_columns(
-        pl.when((pl.col("y").is_infinite()) | (pl.col("y").is_nan()))
-        .then(None)
-        .otherwise(pl.col("y"))
-        .alias("y")
-    )
-
-    # Calculate forecast horizon based on ORIGINAL entity lengths before fill_gaps
-    # This prevents fill_gaps from artificially inflating entity lengths
-    original_entity_lengths = df.group_by("unique_id").agg(pl.len().alias("length"))
-    median_entity_length = original_entity_lengths["length"].median()
-
-    # Fill date grid: avoid padding leading nulls (start='per_serie'); keep aligned tail
-    polars_freq = convert_frequency_to_statsforecast(frequency)
-    df = fill_gaps(df, freq=polars_freq, start="per_serie", end="global")
-
-    # Use entity-based forecast horizon calculation
-    if median_entity_length < 100:  # Short-lived entities (< 100 observations)
-        # Use a reasonable fraction of median entity length for forecast horizon
-        forecast_horizon = max(int(median_entity_length * test_split), 6)
-        print(
-            f"  Using entity-based forecast horizon: {forecast_horizon} (median entity length: {int(median_entity_length)})"
-        )
-    else:
-        # For long series, use global timeline approach
-        unique_dates = df["ds"].unique().sort()
-        split_idx = int(len(unique_dates) * (1 - test_split))
-        train_cutoff = unique_dates[split_idx - 1]
-        forecast_horizon = len(unique_dates) - split_idx
-        print(f"  Using global forecast horizon: {forecast_horizon}")
-
-    # For entity-based approach, we still need a train_cutoff for data splitting
-    if median_entity_length < 100:
-        # Use a more recent cutoff based on the last portion of data
-        unique_dates = df["ds"].unique().sort()
-        # Take the last portion for testing, but cap it reasonably
-        test_dates_count = min(
-            forecast_horizon, len(unique_dates) // 5
-        )  # Max 20% of global dates
-        train_cutoff = unique_dates[len(unique_dates) - test_dates_count - 1]
-
-    train_data = df.filter(pl.col("ds") <= train_cutoff)
-    test_data = df.filter(pl.col("ds") > train_cutoff)
-
-    # This is the state BEFORE filtering (after basic preprocessing)
-    train_data_before = train_data.clone()
-
-    # Apply consistent filtering BEFORE any model-specific processing
-    train_data_filtered, original_count, final_count, min_length = (
-        filter_series_for_forecasting(train_data, forecast_horizon, seasonality)
-    )
-
-    # Filter test data to match training series
-    valid_series = train_data_filtered["unique_id"].unique().to_list()
-    test_data_filtered = test_data.filter(pl.col("unique_id").is_in(valid_series))
-    full_data_filtered = df.filter(pl.col("unique_id").is_in(valid_series))
-
-    return (
-        train_data_before,
-        train_data_filtered,
-        full_data_filtered,
-        original_count,
-        final_count,
-    )
+    min_str = min_date.strftime("%Y-%m-%d") if hasattr(min_date, "strftime") else str(min_date)
+    max_str = max_date.strftime("%Y-%m-%d") if hasattr(max_date, "strftime") else str(max_date)
+    return f"{min_str} -- {max_str}"
 
 
 def calculate_filtering_statistics(dataset_info):
@@ -214,94 +144,127 @@ def calculate_filtering_statistics(dataset_info):
         # Load the dataset with Polars
         df = pl.read_parquet(dataset_path)
 
-        # Apply the same preprocessing and filtering logic as forecasting script
+        # Basic cleanup matching forecasting pipeline
+        if "id" in df.columns:
+            df = df.rename({"id": "unique_id"})
+        drop_cols = [c for c in df.columns if c.startswith("__index_level_")]
+        if drop_cols:
+            df = df.drop(drop_cols)
+        df = df.select(["unique_id", "ds", "y"])
+
+        df = df.with_columns(pl.col("y").cast(pl.Float32))
+        df = df.with_columns(
+            pl.when((pl.col("y").is_infinite()) | (pl.col("y").is_nan()))
+            .then(None)
+            .otherwise(pl.col("y"))
+            .alias("y")
+        )
+
+        frequency = dataset_info["frequency"]
+        seasonality = dataset_info["seasonality"]
+        test_size = get_test_size_from_frequency(frequency)
+
+        # Baseline (pre-filter) statistics from cleaned raw data
+        entities_before = df["unique_id"].n_unique()
+        lengths_before = df.group_by("unique_id").agg(pl.len().alias("length"))["length"]
+        median_length_before = lengths_before.median() if len(lengths_before) else 0
+        min_date_before = df["ds"].min()
+        max_date_before = df["ds"].max()
+
+        # Reproduce robust preprocessing pipeline step-by-step to capture filtering impact
+        df_normalized = normalize_month_end_dates(df, frequency)
+        df_grid = build_canonical_grid(df_normalized, frequency)
+
+        train_df, test_df = split_train_test_aligned(df_grid, test_size)
+
+        requirements = get_data_requirements(frequency, test_size, seasonality)
+
         try:
-            train_before, train_after, full_after, original_count, final_count = (
-                apply_forecasting_preprocessing(
-                    df, dataset_info["frequency"], dataset_info["seasonality"]
-                )
+            train_filtered, test_filtered, valid_series = filter_series_by_quality(
+                train_df, test_df, requirements
             )
-
-            # Calculate statistics BEFORE filtering
-            entities_before = train_before["unique_id"].n_unique()
-            lengths_before = train_before.group_by("unique_id").agg(
-                pl.len().alias("length")
-            )["length"]
-            median_length_before = lengths_before.median()
-
-            # Calculate statistics AFTER filtering (may have 0 entities)
-            if final_count > 0:
-                entities_after = train_after["unique_id"].n_unique()
-                lengths_after = train_after.group_by("unique_id").agg(
-                    pl.len().alias("length")
-                )["length"]
-                median_length_after = lengths_after.median()
-                min_date = full_after["ds"].min()
-                max_date = full_after["ds"].max()
-                min_date_str = min_date.strftime("%Y-%m-%d") if min_date else "N/A"
-                max_date_str = max_date.strftime("%Y-%m-%d") if max_date else "N/A"
-            else:
-                # All entities were filtered out
-                entities_after = 0
-                median_length_after = 0
-                min_date_str = "N/A"
-                max_date_str = "N/A"
-
+        except ValueError as ve:
+            if "No series pass quality requirements" not in str(ve):
+                raise
+            # All series removed – capture before stats and return
             return {
                 "table_name": dataset_info["table_name"],
                 "group": dataset_info["group"],
-                "frequency": simplify_frequency(dataset_info["frequency"]),
+                "frequency": simplify_frequency(frequency),
                 "entities_before": int(entities_before),
-                "entities_after": int(entities_after),
-                "median_length_before": int(median_length_before),
-                "median_length_after": int(median_length_after)
-                if median_length_after
+                "entities_after": 0,
+                "entities_removed": int(entities_before),
+                "retention_pct": 0.0,
+                "median_length_before": int(median_length_before)
+                if median_length_before
                 else 0,
-                "min_date": min_date_str,
-                "max_date": max_date_str,
+                "median_length_after": 0,
+                "min_required_obs": int(requirements["min_total_obs"]),
+                "date_range": format_date_range(min_date_before, max_date_before),
                 "error": None,
             }
 
-        except ValueError as ve:
-            # Handle case where no series meet minimum requirements
-            if "No series meet the minimum length requirement" in str(ve):
-                # Still calculate before statistics from the original data
-                df_processed = df.clone()
-                if "id" in df_processed.columns:
-                    df_processed = df_processed.rename({"id": "unique_id"})
-                drop_cols = [
-                    c for c in df_processed.columns if c.startswith("__index_level_")
+        # Add gap indicators (matches forecasting pipeline) and apply imputation stage
+        train_with_gaps = add_gap_indicators(train_filtered)
+        test_with_gaps = add_gap_indicators(test_filtered)
+
+        train_imputed = light_train_imputation(
+            train_with_gaps, seasonality, method="forward_fill"
+        )
+
+        valid_series_after = train_imputed["unique_id"].unique()
+        valid_series_list = valid_series_after.to_list()
+        test_synced = test_with_gaps.filter(
+            pl.col("unique_id").is_in(valid_series_list)
+        )
+
+        entities_after = len(valid_series_after)
+
+        if entities_after == 0:
+            median_length_after = 0
+            date_range_after = "N/A"
+        else:
+            combined_after = pl.concat(
+                [
+                    train_imputed.select(["unique_id", "ds"]),
+                    test_synced.select(["unique_id", "ds"]),
                 ]
-                if drop_cols:
-                    df_processed = df_processed.drop(drop_cols)
-                df_processed = df_processed.select(["unique_id", "ds", "y"])
+            )
+            lengths_after = combined_after.group_by("unique_id").agg(
+                pl.len().alias("length")
+            )["length"]
+            median_length_after = lengths_after.median() if len(lengths_after) else 0
+            min_date_after = combined_after["ds"].min()
+            max_date_after = combined_after["ds"].max()
+            date_range_after = format_date_range(min_date_after, max_date_after)
 
-                entities_before = df_processed["unique_id"].n_unique()
-                lengths_before = df_processed.group_by("unique_id").agg(
-                    pl.len().alias("length")
-                )["length"]
-                median_length_before = lengths_before.median()
+        entities_removed = int(entities_before) - int(entities_after)
+        retention_pct = (
+            round((entities_after / entities_before) * 100, 1)
+            if entities_before
+            else 0.0
+        )
 
-                # Get original date range
-                min_date = df_processed["ds"].min()
-                max_date = df_processed["ds"].max()
-
-                return {
-                    "table_name": dataset_info["table_name"],
-                    "group": dataset_info["group"],
-                    "frequency": simplify_frequency(dataset_info["frequency"]),
-                    "entities_before": int(entities_before),
-                    "entities_after": 0,
-                    "median_length_before": int(median_length_before)
-                    if median_length_before
-                    else 0,
-                    "median_length_after": 0,
-                    "min_date": min_date.strftime("%Y-%m-%d") if min_date else "N/A",
-                    "max_date": max_date.strftime("%Y-%m-%d") if max_date else "N/A",
-                    "error": None,
-                }
-            else:
-                raise ve
+        return {
+            "table_name": dataset_info["table_name"],
+            "group": dataset_info["group"],
+            "frequency": simplify_frequency(frequency),
+            "entities_before": int(entities_before),
+            "entities_after": int(entities_after),
+            "entities_removed": int(entities_removed),
+            "retention_pct": retention_pct,
+            "median_length_before": int(median_length_before)
+            if median_length_before
+            else 0,
+            "median_length_after": int(median_length_after)
+            if median_length_after
+            else 0,
+            "min_required_obs": int(requirements["min_total_obs"]),
+            "date_range": date_range_after
+            if entities_after
+            else format_date_range(min_date_before, max_date_before),
+            "error": None,
+        }
 
     except Exception as e:
         print(f"  Error processing {dataset_name}: {str(e)}")
@@ -311,10 +274,12 @@ def calculate_filtering_statistics(dataset_info):
             "frequency": simplify_frequency(dataset_info["frequency"]),
             "entities_before": "Error",
             "entities_after": "Error",
+            "entities_removed": "Error",
+            "retention_pct": "Error",
             "median_length_before": "Error",
             "median_length_after": "Error",
-            "min_date": "Error",
-            "max_date": "Error",
+            "min_required_obs": "Error",
+            "date_range": "Error",
             "error": str(e),
         }
 
@@ -358,21 +323,21 @@ def create_latex_table(grouped_stats, output_path):
         "",
         "\\begin{table}[htbp]",
         "\\centering",
-        "\\caption{Dataset Statistics After Filtering Applied in Forecasting System}",
+        "\\caption{Dataset Statistics After Robust Forecasting Preprocessing}",
         "\\label{tab:filtered_dataset_stats}",
         "\\footnotesize",
         "\\setlength{\\tabcolsep}{1.0pt}",
         "\\renewcommand{\\arraystretch}{0.9}",
-        "\\begin{tabular}{@{}llrrrrlll@{}}",
+        "\\begin{tabular}{@{}llrrrrrrrl@{}}",
         "\\toprule",
-        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Length\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Length\\\\After\\end{tabular} & Min Date & Max Date \\\\",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & Date Range \\\\",
         "\\midrule",
     ]
 
     for group_name, datasets in grouped_stats.items():
         # Add group header
         latex_content.append(
-            f"\\multicolumn{{8}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
+            f"\\multicolumn{{10}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
         )
 
         # Add datasets in this group
@@ -382,10 +347,12 @@ def create_latex_table(grouped_stats, output_path):
                 stats["frequency"],
                 str(stats["entities_before"]),
                 str(stats["entities_after"]),
+                str(stats["entities_removed"]),
+                f"{stats['retention_pct']:.1f}\\%",
                 str(stats["median_length_before"]),
                 str(stats["median_length_after"]),
-                stats["min_date"],
-                stats["max_date"],
+                str(stats["min_required_obs"]),
+                stats["date_range"],
             ]
             latex_content.append(" & ".join(row_data) + " \\\\")
 
@@ -400,10 +367,10 @@ def create_latex_table(grouped_stats, output_path):
             "\\vspace{0.1cm}",
             "\\begin{minipage}{\\textwidth}",
             "\\scriptsize",
-            "\\textbf{Notes:} This table shows the effect of filtering applied in the forecasting system for fair model comparison. ",
-            "Entities Before/After = unique time series counts before and after filtering; ",
-            "Median Length Before/After = median time series lengths per entity before and after filtering. ",
-            "Filtering removes series that are too short for reliable forecasting and applies consistent data cleaning.",
+            "\\textbf{Notes:} Statistics reflect the robust preprocessing pipeline used prior to model estimation. ",
+            "Entities Before/After = unique time series counts before and after filtering; Entities Removed and Retention (\\%) highlight the impact of quality screens; ",
+            "Median Len Before/After = median series length (train+test) in observations; Min Req. Obs = adaptive minimum total observations required by the pipeline. ",
+            "Filtering enforces data-quality standards (variance, gap ratio, coverage) and consistent cleaning across models.",
             "\\end{minipage}",
             "\\end{table}",
         ]
@@ -424,16 +391,16 @@ def create_latex_tabular_only(grouped_stats, output_path):
         "\\footnotesize",
         "\\setlength{\\tabcolsep}{1.0pt}",
         "\\renewcommand{\\arraystretch}{0.9}",
-        "\\begin{tabular}{@{}llrrrrlll@{}}",
+        "\\begin{tabular}{@{}llrrrrrrrl@{}}",
         "\\toprule",
-        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Length\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Length\\\\After\\end{tabular} & Min Date & Max Date \\\\",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & Date Range \\\\",
         "\\midrule",
     ]
 
     for group_name, datasets in grouped_stats.items():
         # Add group header
         latex_content.append(
-            f"\\multicolumn{{8}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
+            f"\\multicolumn{{10}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
         )
 
         # Add datasets in this group
@@ -443,10 +410,12 @@ def create_latex_tabular_only(grouped_stats, output_path):
                 stats["frequency"],
                 str(stats["entities_before"]),
                 str(stats["entities_after"]),
+                str(stats["entities_removed"]),
+                f"{stats['retention_pct']:.1f}\\%",
                 str(stats["median_length_before"]),
                 str(stats["median_length_after"]),
-                stats["min_date"],
-                stats["max_date"],
+                str(stats["min_required_obs"]),
+                stats["date_range"],
             ]
             latex_content.append(" & ".join(row_data) + " \\\\")
 
@@ -475,10 +444,12 @@ def create_csv_table(stats_list, output_path):
         "frequency",
         "entities_before",
         "entities_after",
+        "entities_removed",
+        "retention_pct",
         "median_length_before",
         "median_length_after",
-        "min_date",
-        "max_date",
+        "min_required_obs",
+        "date_range",
     ]
 
     if "error" in df.columns:

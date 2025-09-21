@@ -429,7 +429,7 @@ def light_train_imputation(train_df, seasonality=1, method="seasonal_naive"):
                         y_vals[i] = y_vals[lag_idx]
         elif method == "forward_fill":
             # Simple forward fill
-            y_vals = pd.Series(y_vals).fillna(method="ffill").values
+            y_vals = pd.Series(y_vals).ffill().values
 
         return series_df.with_columns(pl.Series("y_imputed", y_vals))
 
