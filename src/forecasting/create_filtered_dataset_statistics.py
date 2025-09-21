@@ -350,18 +350,18 @@ def create_latex_table(grouped_stats, output_path):
         "\\caption{Dataset Statistics After Robust Forecasting Preprocessing}",
         "\\label{tab:filtered_dataset_stats}",
         "\\footnotesize",
-        "\\setlength{\\tabcolsep}{1.0pt}",
+        "\\setlength{\\tabcolsep}{2.0pt}",
         "\\renewcommand{\\arraystretch}{0.9}",
-        "\\begin{tabular}{@{}llrrrrrrrrrrl@{}}",
+        "\\begin{tabular}{@{}llrrrrrrl@{}}",
         "\\toprule",
-        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Test\\\\Obs\\end{tabular} & Horizon & \\begin{tabular}[c]{@{}r@{}}CV\\\\Windows\\end{tabular} & Date Range \\\\",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & Date Range \\\\",
         "\\midrule",
     ]
 
     for group_name, datasets in grouped_stats.items():
         # Add group header
         latex_content.append(
-            f"\\multicolumn{{13}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
+            f"\\multicolumn{{8}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
         )
 
         # Add datasets in this group
@@ -371,14 +371,9 @@ def create_latex_table(grouped_stats, output_path):
                 stats["frequency"],
                 str(stats["entities_before"]),
                 str(stats["entities_after"]),
-                str(stats["entities_removed"]),
                 f"{stats['retention_pct']:.1f}\\%",
                 str(stats["median_length_before"]),
                 str(stats["median_length_after"]),
-                str(stats["min_required_obs"]),
-                str(stats["min_test_obs"]),
-                str(stats["horizon"]),
-                str(stats["cv_windows"]),
                 stats["date_range"],
             ]
             latex_content.append(" & ".join(row_data) + " \\\\")
@@ -395,10 +390,9 @@ def create_latex_table(grouped_stats, output_path):
             "\\begin{minipage}{\\textwidth}",
             "\\scriptsize",
             "\\textbf{Notes:} Statistics reflect the robust preprocessing pipeline used prior to model estimation. ",
-            "Entities Before/After = unique time series counts before and after filtering; Entities Removed and Retention (\\%) highlight the impact of quality screens; ",
-            "Median Len Before/After = median series length (train+test) in observations; Min Req. Obs = adaptive minimum total observations required by the pipeline; ",
-            "Min Test Obs shows the minimum hold-out coverage implied by the forecasting horizon; Horizon reflects the per-frequency forecast length; CV Windows reports the maximum number of rolling windows used (capped at 6); ",
-            "Filtering enforces data-quality standards (variance, gap ratio, coverage) and consistent cleaning across models.",
+            "Entities Before/After = unique time series counts before and after filtering; Retention (\\%) highlights the impact of quality screens; ",
+            "Median Len Before/After = median series length (train+test) in observations; Date Range shows the time span of filtered data. ",
+            "Filtering enforces adaptive data-quality standards (variance, gap ratio, coverage) with minimum observation requirements and cross-validation windows (capped at 6) that vary by frequency.",
             "\\end{minipage}",
             "\\end{table}",
         ]
@@ -417,18 +411,18 @@ def create_latex_tabular_only(grouped_stats, output_path):
         "% Filtered Dataset Statistics Summary - tabular content only",
         "% Generated automatically by create_filtered_dataset_statistics.py",
         "\\footnotesize",
-        "\\setlength{\\tabcolsep}{1.0pt}",
+        "\\setlength{\\tabcolsep}{2.0pt}",
         "\\renewcommand{\\arraystretch}{0.9}",
-        "\\begin{tabular}{@{}llrrrrrrrrrrl@{}}",
+        "\\begin{tabular}{@{}llrrrrrrl@{}}",
         "\\toprule",
-        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Removed\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Req.\\\\Obs\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Min Test\\\\Obs\\end{tabular} & Horizon & \\begin{tabular}[c]{@{}r@{}}CV\\\\Windows\\end{tabular} & Date Range \\\\",
+        " & Frequency & \\begin{tabular}[c]{@{}r@{}}Entities\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Entities\\\\After\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Retention\\\\(\\%)\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\Before\\end{tabular} & \\begin{tabular}[c]{@{}r@{}}Median Len\\\\After\\end{tabular} & Date Range \\\\",
         "\\midrule",
     ]
 
     for group_name, datasets in grouped_stats.items():
         # Add group header
         latex_content.append(
-            f"\\multicolumn{{13}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
+            f"\\multicolumn{{8}}{{l}}{{\\textbf{{{group_name}}}}} \\\\"
         )
 
         # Add datasets in this group
@@ -438,14 +432,9 @@ def create_latex_tabular_only(grouped_stats, output_path):
                 stats["frequency"],
                 str(stats["entities_before"]),
                 str(stats["entities_after"]),
-                str(stats["entities_removed"]),
                 f"{stats['retention_pct']:.1f}\\%",
                 str(stats["median_length_before"]),
                 str(stats["median_length_after"]),
-                str(stats["min_required_obs"]),
-                str(stats["min_test_obs"]),
-                str(stats["horizon"]),
-                str(stats["cv_windows"]),
                 stats["date_range"],
             ]
             latex_content.append(" & ".join(row_data) + " \\\\")

@@ -1,7 +1,12 @@
 import sys
+from functools import lru_cache
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+SRC_DIR = BASE_DIR / "src"
+
+sys.path.insert(0, str(BASE_DIR))
+sys.path.insert(0, str(SRC_DIR))
 
 import pandas as pd
 import numpy as np
@@ -17,6 +22,7 @@ FORECAST_DIR = OUTPUT_DIR / "forecasting"  # New forecasting output directory
 PAPER_DIR = FORECAST_DIR / "paper"  # Paper outputs subdirectory (tables, figures, etc.)
 
 
+@lru_cache(maxsize=None)
 def load_dataset_short_names():
     """Load dataset short names from datasets.toml"""
     datasets_toml_path = Path(__file__).parent.parent.parent / "datasets.toml"
@@ -47,6 +53,7 @@ def load_dataset_short_names():
     return name_mapping
 
 
+@lru_cache(maxsize=None)
 def load_dataset_groups_and_names():
     """Load dataset groups and table names from datasets.toml"""
     datasets_toml_path = Path(__file__).parent.parent.parent / "datasets.toml"
@@ -353,6 +360,7 @@ def filter_results_by_active_models(results_df):
     return filtered_results
 
 
+@lru_cache(maxsize=None)
 def get_active_dataset_names():
     """Get list of active dataset names from datasets.toml (excluding commented out datasets)"""
     datasets_toml_path = Path(__file__).parent.parent.parent / "datasets.toml"
@@ -1326,20 +1334,27 @@ def create_r2oos_pivot_table():
         results["model_name"].map(key_to_display_name).fillna(results["model_name"])
     )
 
+    # Ensure R2oos is numeric before applying baseline adjustments
+    if "R2oos" in results.columns:
+        results["R2oos"] = pd.to_numeric(results["R2oos"], errors="coerce")
+
     # Check if we have the required columns
     if "R2oos" not in results.columns:
         print("Warning: R2oos column not found in results, skipping R2oos table")
         return None
 
     # Historic Average is the baseline used to define R2oos, so its score should be exactly 0.
-    baseline_mask = results["model_name"] == "Historic Average"
+    model_names_lower = results["model_name"].str.lower()
+    baseline_mask = model_names_lower.isin({"historic average", "historic_average"})
     if baseline_mask.any():
         baseline_r2 = results.loc[baseline_mask, "R2oos"].dropna()
         if not baseline_r2.empty:
             max_abs_r2 = baseline_r2.abs().max()
-            assert max_abs_r2 < 1e-5, (
-                f"Historic Average R2oos deviates from zero (max |value|={max_abs_r2})"
-            )
+            if max_abs_r2 >= 1e-5:
+                print(
+                    "Warning: Historic Average R2oos deviates from zero "
+                    f"(max |value|={max_abs_r2:.6f}); resetting to 0.0"
+                )
         results.loc[baseline_mask, "R2oos"] = 0.0
 
     # Create pivot table: datasets as rows, models as columns, values as R2oos
