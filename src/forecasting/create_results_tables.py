@@ -22,6 +22,37 @@ FORECAST_DIR = OUTPUT_DIR / "forecasting"  # New forecasting output directory
 PAPER_DIR = FORECAST_DIR / "paper"  # Paper outputs subdirectory (tables, figures, etc.)
 
 
+def normalize_model_key(model_key: str) -> str:
+    """Normalize model identifiers so auto_* variants map to their base names."""
+
+    return model_key[5:] if model_key.startswith("auto_") else model_key
+
+
+@lru_cache(maxsize=None)
+def get_model_display_mapping():
+    """Return mapping of model identifiers (including normalized aliases) to display names."""
+
+    models_config = load_models_config()
+    mapping = {}
+
+    for model_key, model_config in models_config.items():
+        if not isinstance(model_config, dict):
+            continue
+
+        display_name = model_config.get("display_name", model_key)
+
+        # Primary key mapping
+        if model_key not in mapping:
+            mapping[model_key] = display_name
+
+        # Normalized alias mapping (auto_* -> base name) if not already defined
+        normalized_key = normalize_model_key(model_key)
+        if normalized_key not in mapping:
+            mapping[normalized_key] = display_name
+
+    return mapping
+
+
 @lru_cache(maxsize=None)
 def load_dataset_short_names():
     """Load dataset short names from datasets.toml"""
@@ -273,15 +304,9 @@ def load_filtered_results_for_summary():
     results = filter_results_by_active_datasets(results)
     results = filter_quality_results(results)
 
-    models_config = load_models_config()
-    key_to_display_name = {}
-    for model_key, model_config in models_config.items():
-        if isinstance(model_config, dict):
-            display_name = model_config.get("display_name", model_key)
-            key_to_display_name[model_key] = display_name
-
+    display_mapping = get_model_display_mapping()
     results["model_name"] = (
-        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+        results["model_name"].map(display_mapping).fillna(results["model_name"])
     )
 
     dataset_groups, _ = load_dataset_groups_and_names()
@@ -342,16 +367,20 @@ def filter_results_by_active_models(results_df):
     models_config = load_models_config()
     active_model_ids = list(models_config.keys())
 
+    # Allow normalized model ids (e.g., auto_arima -> arima) so assembled results keep baseline names
+    normalized_ids = {normalize_model_key(model_id) for model_id in active_model_ids}
+    allowed_model_ids = set(active_model_ids) | normalized_ids
+
     # Filter results to only include active models
     initial_count = len(results_df)
     filtered_results = results_df[
-        results_df["model_name"].isin(active_model_ids)
+        results_df["model_name"].isin(allowed_model_ids)
     ].copy()
     filtered_count = len(filtered_results)
 
     if filtered_count < initial_count:
         removed_count = initial_count - filtered_count
-        removed_models = set(results_df["model_name"].unique()) - set(active_model_ids)
+        removed_models = set(results_df["model_name"].unique()) - allowed_model_ids
         print(
             f"Filtered out {removed_count} results from inactive models: {sorted(removed_models)}"
         )
@@ -795,16 +824,11 @@ def create_mase_pivot_table():
     results = filter_quality_results(results)
 
     # Now map model keys to display names for consistency (do this AFTER filtering)
-    models_config = load_models_config()
-    key_to_display_name = {}
-    for model_key, model_config in models_config.items():
-        if isinstance(model_config, dict):
-            display_name = model_config.get("display_name", model_key)
-            key_to_display_name[model_key] = display_name
+    display_mapping = get_model_display_mapping()
 
     # Replace model keys with display names
     results["model_name"] = (
-        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+        results["model_name"].map(display_mapping).fillna(results["model_name"])
     )
 
     # Check if we have the required columns (new column names)
@@ -948,16 +972,11 @@ def create_rmse_pivot_table():
     results = filter_quality_results(results)
 
     # Now map model keys to display names for consistency (do this AFTER filtering)
-    models_config = load_models_config()
-    key_to_display_name = {}
-    for model_key, model_config in models_config.items():
-        if isinstance(model_config, dict):
-            display_name = model_config.get("display_name", model_key)
-            key_to_display_name[model_key] = display_name
+    display_mapping = get_model_display_mapping()
 
     # Replace model keys with display names
     results["model_name"] = (
-        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+        results["model_name"].map(display_mapping).fillna(results["model_name"])
     )
 
     # Check if we have the required columns
@@ -1104,16 +1123,11 @@ def create_relative_mase_pivot_table():
     results = filter_quality_results(results)
 
     # Now map model keys to display names for consistency (do this AFTER filtering)
-    models_config = load_models_config()
-    key_to_display_name = {}
-    for model_key, model_config in models_config.items():
-        if isinstance(model_config, dict):
-            display_name = model_config.get("display_name", model_key)
-            key_to_display_name[model_key] = display_name
+    display_mapping = get_model_display_mapping()
 
     # Replace model keys with display names
     results["model_name"] = (
-        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+        results["model_name"].map(display_mapping).fillna(results["model_name"])
     )
 
     # Check if we have the required columns and Historic Average model
@@ -1322,16 +1336,11 @@ def create_r2oos_pivot_table():
     results = filter_quality_results(results)
 
     # Now map model keys to display names for consistency (do this AFTER filtering)
-    models_config = load_models_config()
-    key_to_display_name = {}
-    for model_key, model_config in models_config.items():
-        if isinstance(model_config, dict):
-            display_name = model_config.get("display_name", model_key)
-            key_to_display_name[model_key] = display_name
+    display_mapping = get_model_display_mapping()
 
     # Replace model keys with display names
     results["model_name"] = (
-        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+        results["model_name"].map(display_mapping).fillna(results["model_name"])
     )
 
     # Ensure R2oos is numeric before applying baseline adjustments
@@ -2230,16 +2239,11 @@ def create_heatmap_plots():
     results = filter_quality_results(results)
 
     # Now map model keys to display names for consistency (do this AFTER filtering)
-    models_config = load_models_config()
-    key_to_display_name = {}
-    for model_key, model_config in models_config.items():
-        if isinstance(model_config, dict):
-            display_name = model_config.get("display_name", model_key)
-            key_to_display_name[model_key] = display_name
+    display_mapping = get_model_display_mapping()
 
     # Replace model keys with display names
     results["model_name"] = (
-        results["model_name"].map(key_to_display_name).fillna(results["model_name"])
+        results["model_name"].map(display_mapping).fillna(results["model_name"])
     )
 
     # Define error metrics to create heatmaps for
