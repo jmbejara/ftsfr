@@ -332,11 +332,20 @@ def create_auto_config_deepar(
 
 
 def create_auto_config_nbeats(
-    seasonality, lightning_logs_dir=None, debug=False, hardware_config=None
+    seasonality,
+    horizon,
+    lightning_logs_dir=None,
+    debug=False,
+    hardware_config=None,
 ):
     """Create configuration for AutoNBEATS with optuna backend."""
 
     def config(trial):
+        # Trend/seasonality stacks require horizon > 1; fall back to identity-only otherwise.
+        stack_options = (["identity", "identity"], ["trend", "seasonality"])
+        if horizon is not None and horizon <= 1:
+            stack_options = (["identity", "identity"],)
+
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
@@ -351,9 +360,7 @@ def create_auto_config_nbeats(
             ),
             "scaler_type": "robust",
             "batch_size": trial.suggest_categorical("batch_size", (32, 64)),
-            "stack_types": trial.suggest_categorical(
-                "stack_types", (["identity", "identity"], ["trend", "seasonality"])
-            ),
+            "stack_types": trial.suggest_categorical("stack_types", stack_options),
             "n_blocks": trial.suggest_categorical("n_blocks", ([2, 2], [3, 3])),
             "mlp_units": trial.suggest_categorical(
                 "mlp_units", ([[64, 64], [64, 64]], [[128, 128], [128, 128]])
@@ -876,6 +883,7 @@ def main():
             h=test_size,
             config=create_auto_config_nbeats(
                 seasonality,
+                test_size,
                 lightning_logs_dir,
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
