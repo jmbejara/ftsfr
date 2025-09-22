@@ -60,9 +60,9 @@ Benchmarking Forecasting Methods for Financial Stability
   \item \alert{Approach:}
   Systematic benchmarking of over a dozen forecasting methods (classical to deep learning) on 25 canonical financial datasets with standardized evaluation.
   \item \alert{Main Result:}
-  No universal best model; sophisticated methods achieve 3-10\% improvements over naive baselines, but gains are dataset-specific.
+  Returns remain extremely hard to beat—the historical average dominates—yet global ML models deliver sizable MASE gains on basis spreads (CIP, Treasury swaps) and supervisory indicators (bank liquidity/leverage).
   \item \alert{Application:}
-  Evidence-based guidance for financial stability authorities on which forecasting approaches work best for specific market segments.
+  Evidence-based guidance for financial stability authorities on when to lean on classical baselines versus global ML methods across market segments.
   \end{itemize}
 \end{frame}
 
@@ -395,7 +395,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \begin{itemize}
 \item \alert{Classical Statistical Methods:}
 \begin{itemize}
-  \item Naive, Seasonal Naive, Theta, Simple Exponential Smoothing, Auto-ARIMA
+  \item Naive benchmarks plus Theta, SES (simple exponential smoothing family), and ARIMA
   \item Computationally efficient, interpretable, strong baselines
 \end{itemize}
 \vspace{0.3cm}
@@ -407,9 +407,9 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \vspace{0.3cm}
 \item \alert{Deep Learning (Global Methods):}
 \begin{itemize}
-  \item Transformer, N-BEATS, N-HiTS, TiDE, KAN, DLinear, NLinear
-  \item Train single model across all time series in dataset
-  \item Learn cross-sectional patterns and spillover effects
+  \item NBEATS, NHITS, VanillaTransformer, TiDE, KAN, DLinear, NLinear
+  \item Train single model across all time series in dataset with automated hyperparameter search
+  \item Learn cross-sectional patterns while guarding against overfitting via shared folds
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -418,6 +418,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \begin{itemize}
     \item \alert{Classical Statistical Methods}
     \begin{itemize}
+        \item \textbf{Auto wrappers:} Theta, ARIMA, and SES reuse the rolling CV folds to tune parameters and avoid overfitting
         \item \textbf{Theta Models:} Decompose series by modifying local curvature into short and long-term components, then extrapolate separately
         \vspace{0.2cm}
         \item Simple but effective, often outperforming sophisticated methods on short, unrelated, or noisy series
@@ -440,7 +441,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 
 \begin{frame}{Model Deep Dive: Deep Learning (Global Methods)}
     \begin{itemize}
-        \item \textbf{Global Models} train single model across all time series, learning cross-series information and controlling overfitting globally
+        \item \textbf{Global Auto Models} (NBEATS, NHITS, TiDE, KAN, VanillaTransformer, DLinear, NLinear) train a single model across all time series and tune hyperparameters with Bayesian search on shared validation folds
         \vspace{0.3cm}
         \item \alert{Transformer-based Models}
         \begin{itemize}
@@ -530,7 +531,8 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \frametitle{Forecasting Design and Metrics}
   \begin{itemize}
   \item \textbf{Horizon:} \alert{One month ahead} for monthly data; \alert{21 trading days} (business) or \alert{30 calendar days} (daily); \alert{one quarter} for quarterly series
-  \item \textbf{Rolling windows:} up to \alert{6 expanding cross-validation windows}, limited by the shortest surviving series
+  \item \textbf{Rolling windows:} up to \alert{6 expanding cross-validation windows}, limited by the shortest surviving series and reused by the Auto models to keep hyperparameters honest
+  \item \textbf{Auto model selection:} Nixtla's \alert{Auto wrappers} (NBEATS, NHITS, NLinear, Theta, ARIMA, DeepAR) run Bayesian searches on these folds, helping avoid overfitting while keeping the workflow reproducible
   \item \textbf{MASE:} Performance relative to a seasonal naïve baseline
     \begin{itemize}
       \item Values $<$ 1.0 = better than naïve
@@ -577,23 +579,13 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \begin{frame}
   \frametitle{Relative MASE Analysis: Key Patterns}
   \begin{itemize}
-  \item \alert{Historic Average baseline dominance:} Competitive across most datasets, especially for efficient markets
+  \item \alert{Auto deep models lead on MASE:} NBEATS (median) and NHITS (mean) post the lowest scaled errors, beating DAR, Historic Average, and simple exponential smoothing by comfortable margins
   \vspace{0.3cm}
-  \item \alert{Where sophisticated models excel:}
-  \begin{itemize}
-    \item Disaggregated data: CRSP Stock, Corporate Bonds, CDS Contracts
-    \item Basis spreads: CIP, Treasury-Swap show higher predictability
-    \item Bank regulatory data: Leverage and liquidity metrics
-  \end{itemize}
+  \item \alert{Basis spreads love global decompositions:} NLinear, NHITS, and NBEATS capture seasonal funding stress cycles and medium-run mean reversion
   \vspace{0.3cm}
-  \item \alert{Model-specific insights:}
-  \begin{itemize}
-    \item Theta and Auto-ARIMA: Consistent moderate improvements
-    \item Deep learning (N-BEATS, TiDE): Strong on large cross-sections
-    \item Linear models (DLinear/NLinear): Surprisingly competitive
-  \end{itemize}
+  \item \alert{Classics still matter:} Theta and ARIMA remain among the best performers on smoother supervisory series
   \vspace{0.3cm}
-  \item \alert{Challenge areas:} Options, FX, and aggregated portfolios show limited gains
+  \item \alert{Returns remain tough:} MASE gains are modest where the Historic Average is already a strong benchmark (equities, FX, options)
   \end{itemize}
 \end{frame}
 
@@ -609,23 +601,13 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \begin{frame}
   \frametitle{Main Results}
   \begin{itemize}
-  \item \alert{No Free Lunch confirmed:} Model performance varies significantly by dataset characteristics
+  \item \alert{Metric choice changes leaders:} MASE crowns NBEATS/NHITS, while $R^2_{\text{oos}}$ favours Theta and ARIMA
   \vspace{0.3cm}
-  \item \alert{Simple baselines remain remarkably competitive}, especially for returns data where market efficiency limits predictability
+  \item \alert{Returns behave as expected:} Out-of-sample $R^2$ is essentially zero, signalling that the Historic Average remains a formidable benchmark for asset returns
   \vspace{0.3cm}
-  \item \alert{When sophisticated models win:}
-  \begin{itemize}
-    \item Disaggregated datasets (thousands of entities) benefit from global methods
-    \item 10-15\% improvements over naive for CRSP Stock, Corporate Bond data
-    \item Cross-sectional learning adds value
-  \end{itemize}
+  \item \alert{Basis spreads reward global decompositions:} NLinear and NHITS exploit seasonal funding stress patterns and outperform DAR, HA, and SES by large margins
   \vspace{0.3cm}
-  \item \alert{Asset class differences:}
-  \begin{itemize}
-    \item Basis spreads \& yield curves: Higher predictability
-    \item Equity \& options returns: More challenging
-    \item Portfolio-level data: Limited gains from complexity
-  \end{itemize}
+  \item \alert{Supervisory/other panels tilt classical:} Theta (with NHITS and ARIMA close behind) offers the best trade-off between scaled errors and positive $R^2$
   \end{itemize}
 \end{frame}
 
@@ -693,23 +675,13 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 \begin{frame}
   \frametitle{OOS $R^2$ Analysis: Predictability Insights}
   \begin{itemize}
-  \item \alert{Overall challenge:} Most models struggle to beat historical mean (negative $R^2$)
+  \item \alert{Overall challenge:} Beating the historical mean remains difficult—$R^2_{\text{oos}}$ hovers near zero for most models and datasets
   \vspace{0.3cm}
-  \item \alert{Where predictability exists:}
-  \begin{itemize}
-    \item Basis spreads: CIP, Treasury-Swap, CDS-Bond basis
-    \item Bank metrics: Leverage ratios show structure
-    \item Yield curves: Term structure has inherent predictability
-  \end{itemize}
+  \item \alert{Classical leaders:} Theta and ARIMA top the $R^2$ tables, reflecting their strength at reducing mean-squared error relative to the historic average
   \vspace{0.3cm}
-  \item \alert{Market efficiency dominates:}
-  \begin{itemize}
-    \item Equity returns: Near-random walk behavior
-    \item Options: High noise-to-signal ratio
-    \item FX: Efficient international markets
-  \end{itemize}
+  \item \alert{Returns tell a familiar story:} Equity, FX, option, and bond returns deliver $R^2_{\text{oos}} \approx 0$, implying the historical average is an almost unbeatable forecast—consistent with efficient-markets intuition
   \vspace{0.3cm}
-  \item \alert{Key finding:} Positive $R^2$ achievable mainly in markets with frictions or structural patterns
+  \item \alert{Where positive $R^2$ emerges:} Basis spreads, bank ratios, and yield curves contain structural signals (seasonality, regulation, term-structure dynamics) that Theta/NHITS can harness
   \end{itemize}
 \end{frame}
 
@@ -718,36 +690,34 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \begin{itemize}
   \item \alert{MASE insights:}
   \begin{itemize}
-    \item More forgiving metric (absolute errors)
-    \item Most models achieve $<1$ (beat seasonal naive)
-    \item Better for operational forecasting decisions
+    \item Absolute-error scaling highlights seasonal accuracy—crucial for basis spreads and supervisory indicators with strong cyclical structure
+    \item NBEATS/NHITS/NLinear dominate on this view, far ahead of DAR, HA, and SES
+    \item Preferred when the goal is operational monitoring or sizing seasonal funding pressure
   \end{itemize}
   \vspace{0.3cm}
   \item \alert{OOS $R^2$ insights:}
   \begin{itemize}
-    \item Stricter metric (squared errors penalize outliers)
-    \item Most models achieve negative values
-    \item Better for risk management and portfolio decisions
+    \item Compares forecasts to the Historic Average—the right benchmark for return forecasting
+    \item Theta and ARIMA lead the $R^2$ table, but values hover near zero for returns, underscoring how hard it is to beat the mean
+    \item Best suited to investment and risk questions where the economic payoff hinges on improving mean-squared performance
   \end{itemize}
   \vspace{0.3cm}
-  \item \alert{Divergence reveals:} Models may forecast direction well (good MASE) but miss extreme events (poor $R^2$)
+  \item \alert{Divergence reveals:} The same model can win on MASE yet show $R^2 \approx 0$ on returns—metric choice must match the question
   \vspace{0.3cm}
-  \item \alert{For financial stability:} Both metrics needed - MASE for monitoring, $R^2$ for stress scenarios
+  \item \alert{For financial stability:} Use MASE-style scaling for basis spread surveillance and $R^2_{\text{oos}}$ for asset-return risk assessments
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Practical Guidance for Financial Stability Monitoring}
   \begin{itemize}
-  \item \alert{For disaggregated financial data:} Global methods can provide meaningful improvements
+  \item \alert{Basis spreads:} Lean on NLinear/NHITS/NBEATS—seasonal decompositions and global training generate the largest error reductions
   \vspace{0.3cm}
-  \item \alert{For portfolio-level indicators:} Simple methods often sufficient
+  \item \alert{Asset returns:} Historic Average already performs well; use $R^2_{\text{oos}}$ to document that most models (even auto deep nets) struggle to add value
   \vspace{0.3cm}
-  \item \alert{For basis spreads \& yield curves:} Higher predictability makes sophisticated methods worthwhile
+  \item \alert{Supervisory \& other panels:} Theta with support from NHITS/ARIMA balances low MASE and positive $R^2$
   \vspace{0.3cm}
-  \item \alert{For equity returns:} Naive baselines hard to beat (market efficiency)
-  \vspace{0.3cm}
-  \item \alert{Key takeaway:} Match method complexity to data characteristics and economic context
+  \item \alert{Global vs local:} Automated global models prevent overfitting across thousands of series while keeping tuning reproducible—match the metric to the policy question
   \end{itemize}
 \end{frame}
 
@@ -760,11 +730,11 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \begin{itemize}
     \item First comprehensive financial time series forecasting benchmark
     \item 25 datasets with canonical academic cleaning procedures
-    \item Evidence that model choice depends critically on data characteristics
+    \item Baseline evidence: returns stay hard to forecast (historical average wins) while global ML models deliver large MASE gains for basis spreads (CIP, Treasury swaps) and supervisory metrics (bank liquidity, leverage)
     \item Open-source implementation enabling reproducible research
   \end{itemize}
   \vspace{0.3cm}
-  \item \alert{For practitioners:} Evidence-based guidance on forecasting method selection for financial stability monitoring
+  \item \alert{For practitioners:} Use classical baselines for returns, but deploy global ML models when monitoring funding stress and liquidity indicators
   \vspace{0.3cm}
   \item \alert{Future work:}
   \begin{itemize}
