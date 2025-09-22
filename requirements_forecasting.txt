@@ -1,0 +1,25 @@
+torch
+torchvision
+torchaudio
+lightning
+# Forecasting libraries
+gluonts
+darts
+neuralforecast
+statsforecast
+catboost
+prophet
+numpy
+pandas
+tqdm
+scipy
+statsmodels
+pyarrow
+fastparquet
+tabulate
+scikit-learn
+tomli
+# Other
+doit
+python-decouple
+polars
