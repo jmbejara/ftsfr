@@ -11,6 +11,7 @@
 
 % Useful packages
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{natbib}  % Required for JPE bibliography style
@@ -132,7 +133,7 @@ Our proposed benchmark creates a standardized, literature-compliant repository s
 
 By providing this resource, we enable the kind of standardized, apples-to-apples comparisons that have been lacking in financial forecasting research, while also contributing replication code for key papers and insights into predictability across financial markets. 
 
-Our own basesline forecasting estimates confirms two stylised facts. For asset returns—whether CRSP equities, TRACE corporate bonds, CDS, FX, or SPX options—forecasting remains extraordinarily difficult: even the best auto deep-learning models achieve out-of-sample $R^2$ values near zero, leaving the historical average as the practical standard. In contrast, machine-learning-based global models deliver economically meaningful gains for the basis spreads and supervisory indicators that underpin liquidity and funding surveillance. This illustrates why a domain-specific benchmark matters: the answer to “which model works best?” depends on whether the task. Thus, the choice of forecasting model might depend on, e.g., whether  we are forecasting returns or detecting stress in funding and balance-sheet data.
+Our own basesline forecasting estimates confirms two stylised facts. For asset returns—whether CRSP equities, TRACE corporate bonds, CDS, FX, or SPX options—forecasting remains extraordinarily difficult: even the best auto deep-learning models achieve out-of-sample $R^2$ values near zero, leaving the historical average as the practical standard. In contrast, machine-learning-based global models deliver economically meaningful gains for the basis spreads and supervisory indicators that underpin liquidity and funding surveillance. This illustrates why a domain-specific benchmark matters: the answer to "which model works best?" depends on the task. Thus, the choice of forecasting model might depend on, e.g., whether  we are forecasting returns or detecting stress in funding and balance-sheet data.
 
 Taken together, the datasets and baseline results enhance the infrastructure for developing the next generation of forecasting methods tailored to financial markets, with direct implications for risk management, asset allocation, and financial stability monitoring.
 
@@ -158,7 +159,7 @@ Source & Name & Coverage of Finance Domain & Website \\
 \cite{Aksu2024} & GIFT-EVAL & Anonymous data, unclear & \href{https://github.com/SalesforceAIResearch/gift-eval}{Link}\\
 \bottomrule
 \end{tabular}
-\caption*{\emph{Source: Authors' creation}}
+\caption*{\emph{Source: Authors' analysis}}
 \end{table}
 
 
@@ -178,7 +179,7 @@ A large literature shows that exploiting many predictors improves forecast perfo
 
 \subsection{Return Predictability and Asset Pricing}
 
-Furthermore, financial forecasting as a more broad importance. Return predictability is central to modern asset pricing. Traditional efficient market views held that prices primarily varied with expected dividend growth, implying little scope for forecasting returns. Subsequent evidence overturned this perspective: variation in price-dividend ratios corresponds almost entirely to changes in discount rates—expected returns and not to expected cash flows \citep{Cochrane2011}. High valuations reliably precede periods of low subsequent returns across asset classes, including equities, bonds, currencies, credit, and real estate. This common pattern underscores discount-rate variation as the organizing principle of contemporary asset pricing research.
+Furthermore, financial forecasting has a more broad importance. Return predictability is central to modern asset pricing. Traditional efficient market views held that prices primarily varied with expected dividend growth, implying little scope for forecasting returns. Subsequent evidence overturned this perspective: variation in price-dividend ratios corresponds almost entirely to changes in discount rates—expected returns—and not to expected cash flows \citep{Cochrane2011}. High valuations reliably precede periods of low subsequent returns across asset classes, including equities, bonds, currencies, credit, and real estate. This common pattern underscores discount-rate variation as the organizing principle of contemporary asset pricing research.
 
 Related to the many-predictor methods discussed previously, \citet{Kelly2013} show that cross-sectional valuation ratios contain even more forecasting power than aggregate predictors. Using a partial least squares framework, they extract latent factors from the cross-section of book-to-market ratios, yielding substantial out-of-sample predictive power for both market returns and dividend growth. Out-of-sample $R^2$ values reach 13\% at the annual horizon, magnitudes rarely achieved in predictive regressions. Their approach demonstrates that cross-sectional information can sharpen aggregate forecasts, highlighting how high-dimensional predictor sets can be distilled into robust factors that capture time-varying risk premia.
 
@@ -196,6 +197,17 @@ The empirical success of this approach is well documented in major forecasting c
 The advantages of global methods are particularly pronounced in financial applications. They can handle short series by borrowing strength from longer ones, provide robust parameter estimation through implicit regularization across series, and naturally capture spillover effects between markets. This enables them to learn common patterns while accounting for series-specific variations-especially valuable when forecasting related financial series that share underlying economic drivers. Recent implementations range from pooled regression approaches to sophisticated deep learning architectures, with many demonstrating superior performance over traditional univariate methods \citep{Godahewa2021}.
 
 This paper contributes to the global forecasting literature by providing a suite of benchmark datasets specifically designed for financial markets. Our benchmark thus serves to improve the infrastructure for developing the next generation of forecasting methods tailored to the complexities of financial markets, potentially improving risk management, asset allocation, and financial stability monitoring.
+
+\subsection{Univariate vs Multivariate Forecasting and the Inclusion of Exogenous Variables}\label{subsec:univariate_multivariate}
+
+Following \citet{Godahewa2021}, this paper focuses specifically on \emph{univariate} global methods. 
+Local methods fit a separate model to each individual time series, so parameters are estimated solely from the history of that series. Classical ARIMA specifications are a good example of a univariate local model. By contrast, global methods estimate a single model---with shared parameters or shared representation---over an entire panel of series. Deep learning architectures that pool all bond spreads into one training problem, or a pooled exponential smoothing model, are global because they borrow strength across cross-sectional units. Hybrid approaches also exist: a researcher might still run ARIMA on each series (local), but learn the hyperparameters or initial states from panel-wide principal components, thereby moving toward a univariate global perspective.
+
+Orthogonal to the local/global distinction is the choice between univariate and multivariate targets. Univariate models forecast each series separately, even if parameters are shared across series as in global pooling. Multivariate models, such as vector autoregressions (VARs) or state-space systems with multiple jointly estimated equations, explicitly model the evolution of several dependent series simultaneously so that the forecast for one variable can depend on the lags of others. A global multivariate model would combine both ideas, fitting one high-dimensional system across the entire panel, whereas the univariate global models considered here forecast each series individually using parameters learned collectively from all series.
+
+Many forecasting algorithms can also ingest exogenous information. In the classical literature, ARIMAX and VARX extensions incorporate external regressors. Modern deep learning methods such as DeepAR or Temporal Fusion Transformers can accept static attributes (such as sector, rating, tenor for bonds) or contemporaneous macro variables as covariates. These exogenous variables can improve forecasts by providing leading indicators or by capturing heterogeneity that the time-series dynamics alone miss. Allowing such augmentations, however, requires additional modeling decisions about feature engineering, alignment, and availability across datasets.
+
+To maintain clarity and comparability, the benchmark focuses on univariate global forecasting without any exogenous regressors. Each dataset (basis spreads, asset returns, other supervisory indicators) is modeled and evaluated in isolation, and the taxonomy (e.g., the one we will provide in Table \ref{tab:datasets}  ) is meant purely to organize data access rather than to impose cross-panel interactions. Researchers interested in extending these models with multivariate structures or exogenous signals can do so. We leave this for future research
 
 
 \subsection{The Importance Of Open Source And Replicability}
@@ -260,7 +272,7 @@ HKM Monthly Factor & Same as above, but monthly & ibid. \\
 Treasury Yield Curve & Daily Nelson-Siegel-Svensson zero-coupon yields, 1-30 years & \cite{Gurkaynak2007} \\
 \bottomrule
 \end{tabular}
-\caption*{\emph{Source: Authors' creation}}
+\caption*{\emph{Source: Authors' analysis}}
 \end{table}
 
 Table~\ref{tab:data_sources} shows the specific data sources required for each dataset in our benchmark. The table illustrates the diverse range of financial data providers needed to construct the datasets.
@@ -319,7 +331,7 @@ Treasury Yield Curve & Yield Curve Data from Board of Governors of the Federal R
 \item[$^{e}$] See \url{https://www.federalreserve.gov/data/nominal-yield-curve.htm}
 \end{tablenotes}
 \end{threeparttable}
-\caption*{\emph{Source: Authors' creation}}
+\caption*{\emph{Source: Authors' analysis}}
 \end{table}
 
 Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in our benchmark, including entity counts, time series characteristics, and temporal coverage. The table shows substantial variation across datasets, with disaggregated series (individual bonds, stocks, options contracts) containing thousands of entities, while portfolio-level datasets typically contain 10-50 series. The cutoff dates indicate the train/test split boundary used in our forecasting evaluation, with most datasets providing substantial out-of-sample periods for robust model comparison.
@@ -332,7 +344,7 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 \vspace{0.1cm}
 \scriptsize
 % \textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.
-\caption*{\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
+\caption*{\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
 \end{table}
 
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
@@ -402,7 +414,7 @@ An example of a few of the commodity futures returns are shown in Figure~\ref{fi
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{../docs_src/commod_gsci_return.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:gsci_commodity_returns}
 \end{figure}
 
@@ -426,7 +438,7 @@ inconsistencies.
 \subsection{Basis Spread Datasets}
 
 In well-functioning markets, basis spreads---deviations from classical no-arbitrage conditions like covered interest parity (CIP) or put-call parity---should be essentially zero. Persistent or large basis spreads signal that arbitrageurs are unable or unwilling to close riskless profit opportunities, often due to funding frictions or balance sheet constraints. Since the Global Financial Crisis (GFC), researchers have documented several such anomalies across asset classes, and these have important implications for financial stability.
-For example, the Covered interest parity (CIP), once ``the closest thing to a physical law in international finance," has been systematically violated since 2008 \cite{Du2018}.
+For example, the Covered interest parity (CIP), once ``the closest thing to a physical law in international finance," has been systematically violated since 2008 \citep{Du2018}.
 During crisis episodes, these CIP deviations tend to spike sharply, revealing strains in global funding liquidity. For example, in 2008 and again in March 2020, the USD cross-currency basis for major currencies widened dramatically, indicating that foreign institutions were scrambling for dollar liquidity.
 \citep{BoardofGovernorsoftheFederalReserveSystem2020}.
 Central banks and financial regulators closely monitor and respond to these metrics.
@@ -449,7 +461,7 @@ Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein20
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{../docs_src/treasury_spot_futures_arbitrage.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:treasury_sf_basis}
 \end{figure}
 
@@ -471,7 +483,7 @@ These spreads are shown in Figure~\ref{fig:treasury_swap_arbitrage}.
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{../docs_src/treasury_swap_arbitrage_spreads.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:treasury_swap_arbitrage}
 \end{figure}
 
@@ -486,7 +498,7 @@ These spreads are shown in Figure~\ref{fig:tips_treasury_basis}.
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{../docs_src/tips_treasury_arbitrage_spreads.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:tips_treasury_basis}
 \end{figure}
 
@@ -502,7 +514,7 @@ These spreads are shown in Figure~\ref{fig:cds_basis}.
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png}
   \end{tabular}
-  \caption*{\emph{Sources: S\&P Global, WRDS TRACE,Authors' creation}}
+  \caption*{\emph{Sources: S\&P Global, WRDS TRACE, Authors' analysis}}
   \label{fig:cds_basis}
 \end{figure}
 
@@ -515,7 +527,7 @@ For Covered Interest Parity (CIP) we replicate the G10 series in \citet{Du2018},
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{../docs_src/CIP_replicate.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' creation}}
+  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:cip_basis}
 \end{figure}
 
@@ -539,6 +551,15 @@ He, Kelly, and Manela (HKM) construct the intermediary capital ratio for primary
 \paragraph{Yield Curve}
 We take the off-the-shelf Gürkaynak-Sack-Wright (GSW) nominal zero-coupon curve published by the Federal Reserve \citep{Gurkaynak2007}. GSW fit a smooth Nelson-Siegel-Svensson curve to off-the-run Treasury notes and bonds (bills/FRNs and on-the-run issues excluded). The six-parameter Svensson model is used post-1980 and Nelson-Siegel before 1980. We simply reshape the released zero-coupon yields to our panel. 
 
+
+\subsection{A Note about Potential Cross-Panel Interactions}\label{subsec:cross_panel}
+
+We would like to note that these various datasets may also be combined to create richer forecasts.
+Information embedded in, say, covered interest parity (CIP) deviations could plausibly help forecast credit default swap (CDS) bond basis spreads, and liquidity stress in one asset class might foreshadow strains elsewhere. Similarly, macroeconomic announcements or regulatory indicators may serve as valuable covariates for certain panels while acting as leading indicators for others.
+In section~\ref{subsec:univariate_multivariate}, we explained that we while we acknowledge the opportunity
+to create richers forecasts in this way, forecasting methodologies that do so are outside of the scope of this paper.
+Consequently, the comparative results in Table~\ref{tab:model_summary_by_category} remain panel-specific by construction, even though the underlying data resources support broader experimentation. Exploring these cross-panel dynamics and exogenous-variable augmentations is an important avenue for future work. Our goal in this release is to provide clean, panel-specific baselines. The modular data construction and standardized preprocessing allow researchers to layer on cross-panel pooling or covariate-informed architectures when tackling those broader questions.
+Out dataset design intentionally preserves the possibility of richer linkages and we hope that future research will address this.  
 
 \section{Forecasting Methodology}
 \label{sec:methodology}
@@ -680,6 +701,38 @@ Throughout, we rely on the \emph{Auto} variants provided by Nixtla (e.g., \textt
     \item KAN: Kolmogorov-Arnold Networks with spline-based activations that gain interpretability and accuracy; the auto routine selects spline granularity and network width, following \cite{Liu2025}.
 \end{itemize}
 
+Table~\ref{tab:model_properties} summarises how these baselines differ across a set of practical design dimensions \citep{Assimakopoulos2000, Brown2004, Winters1960, Box2013, Hyndman2008, Salinas2020, Oreshkin2020, Challu2022, Zeng2022, Vaswani2017, Das2023a, Liu2025}. The comparison emphasises which models encode seasonality directly, which can absorb exogenous regressors, and which natively generate probabilistic forecasts. These distinctions may help interpret the performance tables in Section~\ref{sec:results}. These contrasts provide context for the error metrics we report in Tables~\ref{tab:mase_results} through \ref{tab:model_summary_by_category}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Key Properties of Baseline Forecasting Models}
+\label{tab:model_properties}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+Model & Category & Seasonal & Exogenous & Prob. \\
+\midrule
+Theta & Statistical & \checkmark & -- & -- \\
+SES/ETS & Statistical & \checkmark & -- & -- \\
+ARIMA & Statistical & \checkmark & \checkmark & \checkmark \\
+DeepAR & Deep Learning & -- & \checkmark & \checkmark \\
+N-BEATS & Deep Learning & \checkmark & --$^{\dagger}$ & -- \\
+N-HiTS & Deep Learning & \checkmark & -- & -- \\
+DLinear & Hybrid & \checkmark & \checkmark & -- \\
+NLinear & Hybrid & -- & \checkmark & -- \\
+Vanilla Transformer & Deep Learning & \checkmark & \checkmark & -- \\
+TiDE & Deep Learning & -- & \checkmark & -- \\
+KAN & Deep Learning & -- & \checkmark & -- \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item \textit{Notes:} ``Seasonal'' indicates built-in mechanisms for seasonal components; ``Exogenous'' denotes native support for additional regressors; ``Prob.'' captures whether the implementation produces full predictive distributions rather than point forecasts. $^{\dagger}$N-BEATSx extends the architecture to exogenous inputs. Attributes are assessed from the original model publications and Nixtla documentation.\footnote{\url{https://nixtlaverse.nixtla.io/}}
+\item \textit{Source:} Authors' analysis.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
 
 \subsection{Data Preprocessing}
 
@@ -698,7 +751,7 @@ To ensure fair model comparisons, our forecasting system applies a unified prepr
 \caption{Impact of Robust Forecasting Preprocessing on Dataset Statistics}
 \label{tab:filtered_dataset_stats}
 \input{../_output/forecasting/paper/filtered_dataset_statistics_tabular.tex}
-\caption*{\scriptsize \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' creation}}
+\caption*{\scriptsize \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
 \end{table}
 
 \subsection{Error Metrics}\label{subsec:error_metrics}
@@ -728,7 +781,6 @@ R^2_{\text{oos}} = 1 - \frac{\sum_{t=1}^T (y_t-\hat y_t)^2}{\sum_{t=1}^T (y_t-\b
 \]
 This measures the percentage reduction in MSE achieved by the model relative to predicting the training sample mean. Positive values indicate the model outperforms the historical average benchmark; zero or negative values indicate underperformance.
 
-
 \section{Baseline Results and Analysis}
 \label{sec:results}
 
@@ -745,7 +797,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 \caption*{
 \noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
 \scriptsize
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
 \end{table}
 
 % Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE results from Table~\ref{tab:mase_results}. The color-coded heatmap makes it easy to identify patterns in model performance across different dataset types, with cooler colors (blues) indicating better performance and warmer colors (reds) indicating poorer performance.
@@ -756,7 +808,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 % \includegraphics[width=\textwidth]{../_output/forecasting/paper/mase_heatmap.png}
 % \caption*{\textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.
 
-% \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
+% \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
 % \label{fig:mase_heatmap}
 % \end{figure}
 
@@ -772,7 +824,7 @@ To better understand the relative performance of sophisticated models compared t
     \scriptsize
 \textbf{Note:} Values show MASE ratios relative to the Historic Average baseline. Values $<$ 1.0 indicate better performance than the baseline. Numbers in bold indicate the best performing model for each dataset.
 
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 }
 \end{table}
 
@@ -782,7 +834,7 @@ Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the r
     \centering
     \includegraphics[width=\textwidth]{../_output/forecasting/paper/relative_mase_heatmap.png}
     \caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Historic Average baseline, with blue indicating better performance than the baseline ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*).}
-    \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' creation}}
+    \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
     \label{fig:relative_mase_heatmap}
 \end{figure}
 
@@ -798,7 +850,7 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 \caption*{\scriptsize 
 \textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.
 
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 }
 \end{table}
 
@@ -821,7 +873,7 @@ Table~\ref{tab:r2oos_results} presents the out-of-sample $R^2$ ($R^2_{\text{oos}
 \caption*{
 \noindent {\scriptsize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
 \scriptsize
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
 \end{table}
 
 Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highlighting which datasets and models deliver the greatest gains over the historical average benchmark. The diverging color scale emphasizes positive predictive power while clearly flagging underperformance.
@@ -830,7 +882,7 @@ Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highl
     \centering
     \includegraphics[width=\textwidth]{../_output/forecasting/paper/r2oos_heatmap.png}
     \caption{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$) Heatmap by Dataset and Model. Warmer colors indicate larger improvements over the Historic Average baseline, while cooler colors indicate underperformance. Cells with extreme values are annotated to preserve readability.}
-    \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' creation}}
+    \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
     \label{fig:r2oos_heatmap}
 \end{figure}
 
@@ -848,7 +900,7 @@ To synthesize performance across datasets, Table~\ref{tab:median_mase_summary} r
     \scriptsize
 \textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), Relative MASE shows performance relative to Historic Average (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.
 
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global,  Authors' creation}
+\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 }
 \end{table}
 
@@ -878,6 +930,11 @@ Traditional statistical models like Theta, SES, and ARIMA remain competitive acr
 Among deep learning models, the results are mixed. Transformer-based models demonstrate strong performance on disaggregated datasets but struggle when data is limited. NBEATS and NHITS perform well on certain datasets but fail to consistently justify their additional computational costs. The newer KAN architecture shows promise but requires further investigation to understand its strengths and limitations.
 
 Interestingly, linear deep models like DLinear and NLinear achieve competitive results on many datasets despite their simplicity. This supports recent findings in the time series literature suggesting that complex architectures may be unnecessary for many forecasting tasks. The performance of these simpler models indicates that the inductive biases of traditional deep learning architectures may not align well with the characteristics of financial time series.
+
+A notable pattern emerges in DeepAR's performance: the model exhibits relatively weak out-of-sample results across several datasets, particularly when compared to other deep learning architectures. This underperformance merits discussion in the context of our experimental design. All neural models in this benchmark use Nixtla's Auto implementations,\footnote{\url{https://nixtlaverse.nixtla.io/}} which automate hyperparameter selection through Bayesian optimization and related search strategies. The Auto wrappers---AutoDeepAR, AutoNBEATS, AutoNHITS, and others---systematically search over model-specific hyperparameters (e.g., hidden size, dropout, learning rate for DeepAR; stack types and block depth for NBEATS) using cross-validation on the training data. While these Auto methods employ sophisticated search algorithms and have been extensively tested on large-scale datasets, they cannot guarantee optimal performance for every individual dataset, particularly in the diverse and challenging landscape of financial time series.
+
+The central objective of this paper is to provide a comprehensive benchmark of financial datasets that can be used by both practitioners and time-series forecasting researchers. We establish baseline results using off-the-shelf Auto methods from Nixtla to demonstrate feasible performance levels and to highlight which model families show promise on different types of financial data. However, we emphasize that achieving the absolute best forecast for any given dataset typically requires domain-specific expertise and careful manual tuning. Each model architecture embodies different inductive biases, and extracting maximum performance often demands understanding the specific characteristics of both the model and the data-generating process. For instance, DeepAR's autoregressive RNN structure with LSTM cells may require careful calibration of sequence length, distributional assumptions, and regularization strategies that generic hyperparameter searches might not fully explore. The benchmark's value lies not in claiming to provide optimal forecasts for every model, but in offering standardized datasets and reproducible pipelines that enable researchers to systematically investigate such questions. Future work can leverage these datasets to conduct focused hyperparameter sensitivity analyses, explore ensemble methods, or incorporate domain knowledge. However, these investigations fall outside the scope of establishing the set of datasets that form this benchmark.
+
 
 \section{Conclusions and Future Work}
 \label{sec:conclusion}
@@ -1012,7 +1069,7 @@ The process to construct our returns series involved two major phases: (1) Repli
   \begin{tabular}{@{}c@{}}
     \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
   \end{tabular}
-  \caption*{\emph{Sources: OptionMetrics,  Authors' creation}}
+  \caption*{\emph{Sources: OptionMetrics, Authors' analysis}}
   \label{fig:spx_options_over_time}
 \end{figure}
 
