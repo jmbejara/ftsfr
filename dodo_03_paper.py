@@ -11,6 +11,7 @@ This file contains all tasks related to:
 from dodo_common import (
     DATA_DIR,
     OUTPUT_DIR,
+    notebook_subtask,
 )
 
 
@@ -144,6 +145,22 @@ def task_create_results_tables():
 #         "clean": True,
 #         "verbosity": 2,  # Show output for educational purposes
 #     }
+
+def task_run_example_forecasts():
+    """Run the example forecasts walkthrough demonstrating the forecasting pipeline"""
+
+    yield from notebook_subtask(
+        {
+            "name": "example_forecasts_ipynb",
+            "notebook_path": "./src/forecasting/example_forecasts_ipynb.py",
+            "file_dep": [
+                "./src/forecasting/example_forecasts_ipynb.py",
+                "./src/forecasting/forecast_neural_auto.py",
+                DATA_DIR / "formatted" / "basis_tips_treas" / "ftsfr_tips_treasury_basis.parquet",
+            ],
+            "targets": [],
+        }
+    )
 
 
 def task_compile_latex_docs():
