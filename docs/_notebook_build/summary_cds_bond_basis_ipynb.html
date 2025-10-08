@@ -1,0 +1,1825 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cleaning Summary: CDS Bond Basis &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_notebook_build/summary_cds_bond_basis_ipynb';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cleaning Summary: CDS Returns" href="summary_cds_returns_ipynb.html" />
+    <link rel="prev" title="Data Glimpses Report: FTSFR only" href="../data_glimpses_ftsfr.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2F_notebook_build/summary_cds_bond_basis_ipynb.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_notebook_build/summary_cds_bond_basis_ipynb.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Cleaning Summary: CDS Bond Basis</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Cleaning Summary: CDS Bond Basis</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paper-introduction">Paper Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cds-par-spread-returns">CDS Par Spread Returns</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spread-construction">Spread Construction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implied-risk-free-return">Implied Risk Free Return</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-filters-when-selecting-viable-data-as-specified-in-segmented-arbitrage">Key Filters when selecting viable data as specified in Segmented Arbitrage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#z-spread-zero-volatility-spread">Z-Spread (Zero-Volatility Spread)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#link-to-yield-to-maturity">Link to Yield-to-Maturity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-compounding-identity">Continuous-Compounding Identity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-proxy-ytm-credit-spread">Practical Proxy: YTM Credit Spread</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-overview">Data Overview</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-merge-the-redcodes-of-firms-on-to-the-corporate-bonds">Step 1: Merge the Redcodes of firms on to the corporate bonds.</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-cds-data-pull-and-cds-data-processing">Step 2: CDS data pull and CDS data processing</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-1-cds-data-pull">Step 2.1: CDS data pull</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-2-cds-data-processing">Step 2.2: CDS data processing</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-processing">Step 3: Processing</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-results">Step 4: Results</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="cleaning-summary-cds-bond-basis">
+<h1>Cleaning Summary: CDS Bond Basis<a class="headerlink" href="#cleaning-summary-cds-bond-basis" title="Link to this heading">#</a></h1>
+<section id="paper-introduction">
+<h2>Paper Introduction<a class="headerlink" href="#paper-introduction" title="Link to this heading">#</a></h2>
+<p>This construction is based upon the structure proposed by Siriwardane, Sunderam, and Wallen in Segmented Arbitrage (<a class="reference external" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3960980">https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3960980</a>). The original paper studies the concept of implied arbitrage returns in many different markets. If markets were truly frictionless, we would expect there to be perfect correlation between all of the arbitrage returns. This is because efficient capital allocation would dictate that capital be spent where the best opportunity is, thus dictating the arbitrage opportunites we calculate via different product would have correlating rates as capital would be allocated to a different source if the arbitrage opportunity looks more attractive.</p>
+</section>
+<section id="cds-par-spread-returns">
+<h2>CDS Par Spread Returns<a class="headerlink" href="#cds-par-spread-returns" title="Link to this heading">#</a></h2>
+<section id="spread-construction">
+<h3>Spread Construction<a class="headerlink" href="#spread-construction" title="Link to this heading">#</a></h3>
+<p>In the following notebook, we will walk through the steps to constructing the implied arbitrage found in the CDS and corporate bond market as specified in the Appendix of the paper (<a class="reference external" href="https://static1.squarespace.com/static/5e29e11bb83a3f5d75beb17d/t/654d74d916f20316049a0889/1699575002123/Appendix.pdf">https://static1.squarespace.com/static/5e29e11bb83a3f5d75beb17d/t/654d74d916f20316049a0889/1699575002123/Appendix.pdf</a>). The authors define the CDS basis (<span class="math notranslate nohighlight">\(CB\)</span>) as</p>
+<div class="math notranslate nohighlight">
+\[
+CB_{i, t, \tau} = CDS_{i, t, \tau} - FR_{i, t, \tau}
+\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(FR_{i, t, \tau}\)</span> = time <span class="math notranslate nohighlight">\(t\)</span> floating rate spread implied by a fixed-rate corporate bond issued by firm <span class="math notranslate nohighlight">\(i\)</span> at tenor <span class="math notranslate nohighlight">\(\tau\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(CDS_{i, t, \tau}\)</span> = time <span class="math notranslate nohighlight">\(t\)</span> Credit Default Swap (CDS) par spread for firm <span class="math notranslate nohighlight">\(i\)</span> with tenor <span class="math notranslate nohighlight">\(\tau\)</span></p></li>
+</ul>
+<p>A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.</p>
+<p>The value of <span class="math notranslate nohighlight">\(FR\)</span> is substituted by the paper with <strong>Z-spread</strong> which we also modify in our construction. We will go into the substitution in detail later.</p>
+<p>The value of <span class="math notranslate nohighlight">\(CDS\)</span> is interpolated by the authors using a cubic spline function.</p>
+</section>
+<section id="implied-risk-free-return">
+<h3>Implied Risk Free Return<a class="headerlink" href="#implied-risk-free-return" title="Link to this heading">#</a></h3>
+<p>Given the CDS spread from above, traditional construction of a risk free rate for implied arbitrage implied the following return.</p>
+<div class="math notranslate nohighlight">
+\[
+rfr^{CDS}_{i, t, \tau} = y_{t, \tau} - CB_{i , t, \tau}
+\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(y_{t, \tau}\)</span> = maturity matched treasury yield at time <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p>The risk free rate then can be seen as the treasury yield in addition to the basis recieved when executing the CDS basis trade (investor benefits from negative basis).</p>
+</section>
+</section>
+<section id="key-filters-when-selecting-viable-data-as-specified-in-segmented-arbitrage">
+<h2>Key Filters when selecting viable data as specified in Segmented Arbitrage<a class="headerlink" href="#key-filters-when-selecting-viable-data-as-specified-in-segmented-arbitrage" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Include only Senior Unsecured Debt issued in USD by US firms with valid ISIN</p></li>
+<li><p>Include only fixed rate bonds with maturity between 1 and 10 years</p></li>
+<li><p>Include only bonds with outstanding principle of at least 100,000 USD</p></li>
+<li><p>Exclude putable and convertible bonds</p></li>
+<li><p>Exclude bonds trading at less than half of face value</p></li>
+<li><p>Include only assets on a certain date if a cubic spline of the CDS set is possible</p></li>
+</ol>
+<ul class="simple">
+<li><p>There must be 2 or more CDS products corresponding to a corporate bond on a certain day for parspread cubic spline to be possible</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;../../src&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;./src&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pull_open_source_bond</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pull_wrds_markit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">merge_cds_bond</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">process_final_product</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+
+<span class="c1"># %load_ext autoreload</span>
+<span class="c1"># %autoreload 2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;DATA_DIR&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="z-spread-zero-volatility-spread">
+<h2>Z-Spread (Zero-Volatility Spread)<a class="headerlink" href="#z-spread-zero-volatility-spread" title="Link to this heading">#</a></h2>
+<p><strong>Mathematical definition</strong></p>
+<p>For a bond with cash-flows <span class="math notranslate nohighlight">\(CF_t\)</span> at times <span class="math notranslate nohighlight">\(t=1,\dots,N\)</span> and Treasury spot rates <span class="math notranslate nohighlight">\(s_t\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
+\]</div>
+<p>The constant <span class="math notranslate nohighlight">\(Z\)</span> that solves this equation is the <strong>Z-spread</strong>.</p>
+<p><strong>Intuition</strong></p>
+<p><span class="math notranslate nohighlight">\(Z\)</span> is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond’s dirty price <span class="math notranslate nohighlight">\(P\)</span>. It compensates investors for credit and liquidity risk relative to Treasuries.</p>
+<section id="link-to-yield-to-maturity">
+<h3>Link to Yield-to-Maturity<a class="headerlink" href="#link-to-yield-to-maturity" title="Link to this heading">#</a></h3>
+<p>Setting the Z-spread pricing equation equal to the standard YTM equation gives</p>
+<div class="math notranslate nohighlight">
+\[\sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
+=\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
+\tag{A1}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(y\)</span> is the bond’s yield-to-maturity.  Except for the trivial flat-curve case (<span class="math notranslate nohighlight">\(s_t=s\)</span>), (A1) has no algebraic solution—<span class="math notranslate nohighlight">\(y\)</span> or <span class="math notranslate nohighlight">\(Z\)</span> must be found numerically.</p>
+</section>
+<section id="continuous-compounding-identity">
+<h3>Continuous-Compounding Identity<a class="headerlink" href="#continuous-compounding-identity" title="Link to this heading">#</a></h3>
+<p>Rewrite discounts as <span class="math notranslate nohighlight">\(e^{-r t}\)</span>.  With PV-weights</p>
+<div class="math notranslate nohighlight">
+\[
+w_t=\frac{CF_t\,e^{-(s_t+Z)t}}{P},\qquad\sum_{t}w_t=1,
+\]</div>
+<p>equation (A1) yields the convenient mean-value relationship</p>
+<div class="math notranslate nohighlight">
+\[
+y \;=\; \sum_{t=1}^{N} w_t\,(s_t+Z)\tag{A2}
+\]</div>
+<p>Thus YTM is the PV-weighted average of the spot rates plus the Z-spread.</p>
+</section>
+<section id="practical-proxy-ytm-credit-spread">
+<h3>Practical Proxy: YTM Credit Spread<a class="headerlink" href="#practical-proxy-ytm-credit-spread" title="Link to this heading">#</a></h3>
+<p>Analysts often approximate <span class="math notranslate nohighlight">\(Z\)</span> with the <strong>credit spread</strong></p>
+<div class="math notranslate nohighlight">
+\[
+\Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(y_{\text{Treasury-DM}}\)</span> is the yield on a Treasury portfolio matched to the bond’s (modified) duration.</p>
+<p><strong>Why it works</strong></p>
+<ol class="arabic simple">
+<li><p>A small parallel shift <span class="math notranslate nohighlight">\(Z\)</span> applied to all discount rates changes price by <span class="math notranslate nohighlight">\(-D_{\text{mod}}\;Z\)</span>.  For modest spreads, this produces nearly the same price change as replacing the spot curve with a single rate shift <span class="math notranslate nohighlight">\(\Delta y\)</span>.</p></li>
+<li><p>Duration-matching the Treasury benchmark neutralises curve-shape effects, so <span class="math notranslate nohighlight">\(\Delta y\)</span> isolates the average extra yield attributable to credit/liquidity risk.</p></li>
+<li><p>Empirically, <span class="math notranslate nohighlight">\(\Delta y\)</span> tracks <span class="math notranslate nohighlight">\(Z\)</span> closely for plain-vanilla, option-free bonds, making it a “good-enough” proxy when full spot-curve data or iterative Z-spread calculations are impractical.</p></li>
+</ol>
+<p><strong>Note</strong></p>
+<p>Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.</p>
+</section>
+</section>
+<section id="data-overview">
+<h2>Data Overview<a class="headerlink" href="#data-overview" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+
+<span class="n">corp_bonds_data</span> <span class="o">=</span> <span class="n">pull_open_source_bond</span><span class="o">.</span><span class="n">load_corporate_bond_returns</span><span class="p">(</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;cds_bond_basis&quot;</span>
+<span class="p">)</span>
+<span class="n">red_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;cds_bond_basis&quot;</span> <span class="o">/</span> <span class="s2">&quot;RED_and_ISIN_mapping.parquet&quot;</span><span class="p">)</span>
+<span class="n">cds_data</span> <span class="o">=</span> <span class="n">pull_wrds_markit</span><span class="o">.</span><span class="n">load_cds_data</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;cds_bond_basis&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corp_bonds_data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 1572384 entries, 0 to 1572383
+Data columns (total 49 columns):
+ #   Column           Non-Null Count    Dtype         
+---  ------           --------------    -----         
+ 0   date             1572384 non-null  datetime64[ns]
+ 1   cusip            1572384 non-null  object        
+ 2   issuer_cusip     1572384 non-null  object        
+ 3   permno           1422169 non-null  float64       
+ 4   exretn_t+1       1041541 non-null  float64       
+ 5   exretnc_bns_t+1  1030933 non-null  float64       
+ 6   exretnc_t+1      1038056 non-null  float64       
+ 7   exretnc_dur_t+1  1038056 non-null  float64       
+ 8   bond_ret_t+1     1041541 non-null  float64       
+ 9   bond_ret         1046059 non-null  float64       
+ 10  exretn           1046059 non-null  float64       
+ 11  exretnc_bns      1035383 non-null  float64       
+ 12  exretnc          1042538 non-null  float64       
+ 13  exretnc_dur      1042538 non-null  float64       
+ 14  rating           1398323 non-null  float64       
+ 15  cs               1389316 non-null  float64       
+ 16  cs_6m_delta      1200967 non-null  float64       
+ 17  bond_yield       1389838 non-null  float64       
+ 18  bond_amount_out  1398323 non-null  float64       
+ 19  offering_amt     1398323 non-null  float64       
+ 20  bondprc          1188065 non-null  float64       
+ 21  perc_par         1188065 non-null  float64       
+ 22  tmt              1398323 non-null  float64       
+ 23  duration         1389316 non-null  float64       
+ 24  ind_num_17       1036811 non-null  float64       
+ 25  sic_code         1398323 non-null  float64       
+ 26  mom6_1           1468700 non-null  float64       
+ 27  ltrev48_12       770557 non-null   float64       
+ 28  BOND_RET         1206499 non-null  float64       
+ 29  ILLIQ            1137969 non-null  float64       
+ 30  var95            672058 non-null   float64       
+ 31  n_trades_month   1212316 non-null  float64       
+ 32  size_ig          1398323 non-null  float64       
+ 33  size_jk          1398323 non-null  float64       
+ 34  zcb              1398323 non-null  float64       
+ 35  conv             1398323 non-null  float64       
+ 36  BOND_YIELD       1294588 non-null  float64       
+ 37  CS               1294588 non-null  float64       
+ 38  BONDPRC          1294588 non-null  float64       
+ 39  PRFULL           1294588 non-null  float64       
+ 40  DURATION         1294588 non-null  float64       
+ 41  CONVEXITY        1294588 non-null  float64       
+ 42  CS_6M_DELTA      1084920 non-null  float64       
+ 43  bond_value       1188065 non-null  float64       
+ 44  BOND_VALUE       1294585 non-null  float64       
+ 45  coupon           1572384 non-null  float64       
+ 46  bond_type        1572384 non-null  object        
+ 47  principal_amt    1572384 non-null  float64       
+ 48  bondpar_mil      1398323 non-null  float64       
+dtypes: datetime64[ns](1), float64(45), object(3)
+memory usage: 587.8+ MB
+</pre></div>
+</div>
+</div>
+</div>
+<p>As a proxy for the Z-spread, we will use the credit spread between the bond’s yield and the yield on a Treasury portfolio matched to the bond’s (modified) duration. In this data,</p>
+<ul class="simple">
+<li><p>“cs” is the market-microstructure-noise-biased credit spread</p></li>
+<li><p>“CS” is the credit spread that has been adjusted for the market-microstructure noise. We will use this as our proxy for the Z-spread.</p></li>
+<li><p>“BOND_YIELD” is the corporate bond yield that has been adjusted for market-microstructure noise. We will use “BOND_YIELD” - “CS” as our treasury yield during the period.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corp_bonds_data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>permno</th>
+      <th>exretn_t+1</th>
+      <th>exretnc_bns_t+1</th>
+      <th>exretnc_t+1</th>
+      <th>exretnc_dur_t+1</th>
+      <th>bond_ret_t+1</th>
+      <th>bond_ret</th>
+      <th>exretn</th>
+      <th>exretnc_bns</th>
+      <th>...</th>
+      <th>BONDPRC</th>
+      <th>PRFULL</th>
+      <th>DURATION</th>
+      <th>CONVEXITY</th>
+      <th>CS_6M_DELTA</th>
+      <th>bond_value</th>
+      <th>BOND_VALUE</th>
+      <th>coupon</th>
+      <th>principal_amt</th>
+      <th>bondpar_mil</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>1572384</td>
+      <td>1.422169e+06</td>
+      <td>1.041541e+06</td>
+      <td>1.030933e+06</td>
+      <td>1.038056e+06</td>
+      <td>1.038056e+06</td>
+      <td>1.041541e+06</td>
+      <td>1.046059e+06</td>
+      <td>1.046059e+06</td>
+      <td>1.035383e+06</td>
+      <td>...</td>
+      <td>1.294588e+06</td>
+      <td>1.294588e+06</td>
+      <td>1.294588e+06</td>
+      <td>1.294588e+06</td>
+      <td>1.084920e+06</td>
+      <td>1.188065e+06</td>
+      <td>1.294585e+06</td>
+      <td>1.572384e+06</td>
+      <td>1.572384e+06</td>
+      <td>1.398323e+06</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>2013-03-05 13:07:44.259111936</td>
+      <td>5.166780e+04</td>
+      <td>3.282121e-03</td>
+      <td>2.130163e-03</td>
+      <td>2.326617e-03</td>
+      <td>2.529531e-03</td>
+      <td>4.099201e-03</td>
+      <td>4.168516e-03</td>
+      <td>3.349400e-03</td>
+      <td>2.137542e-03</td>
+      <td>...</td>
+      <td>1.050217e+02</td>
+      <td>1.063816e+02</td>
+      <td>6.507442e+00</td>
+      <td>8.344123e+01</td>
+      <td>-3.073578e-02</td>
+      <td>6.512686e+07</td>
+      <td>6.196192e+07</td>
+      <td>5.730033e+00</td>
+      <td>9.998092e+02</td>
+      <td>5.559556e+02</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>2002-08-31 00:00:00</td>
+      <td>1.002500e+04</td>
+      <td>-9.767108e-01</td>
+      <td>-9.788410e-01</td>
+      <td>-9.754962e-01</td>
+      <td>-9.750838e-01</td>
+      <td>-9.753108e-01</td>
+      <td>-9.753108e-01</td>
+      <td>-9.767108e-01</td>
+      <td>-9.788410e-01</td>
+      <td>...</td>
+      <td>1.000000e-04</td>
+      <td>1.009944e-01</td>
+      <td>5.683952e-03</td>
+      <td>1.021010e-04</td>
+      <td>-1.066395e+01</td>
+      <td>1.500000e+01</td>
+      <td>1.700000e+01</td>
+      <td>0.000000e+00</td>
+      <td>1.000000e+01</td>
+      <td>1.000000e-03</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>2007-12-31 00:00:00</td>
+      <td>2.322900e+04</td>
+      <td>-6.494539e-03</td>
+      <td>-5.660667e-03</td>
+      <td>-6.013460e-03</td>
+      <td>-5.673846e-03</td>
+      <td>-5.630089e-03</td>
+      <td>-5.611824e-03</td>
+      <td>-6.479160e-03</td>
+      <td>-5.682974e-03</td>
+      <td>...</td>
+      <td>9.967818e+01</td>
+      <td>1.005404e+02</td>
+      <td>3.231727e+00</td>
+      <td>1.276730e+01</td>
+      <td>-2.339199e-01</td>
+      <td>2.726895e+07</td>
+      <td>2.593350e+07</td>
+      <td>4.200000e+00</td>
+      <td>1.000000e+03</td>
+      <td>2.386430e+02</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>2013-07-31 00:00:00</td>
+      <td>5.627400e+04</td>
+      <td>2.460858e-03</td>
+      <td>1.367245e-03</td>
+      <td>1.515543e-03</td>
+      <td>1.514050e-03</td>
+      <td>3.312874e-03</td>
+      <td>3.337704e-03</td>
+      <td>2.483598e-03</td>
+      <td>1.364946e-03</td>
+      <td>...</td>
+      <td>1.042477e+02</td>
+      <td>1.055880e+02</td>
+      <td>5.275024e+00</td>
+      <td>3.381145e+01</td>
+      <td>-4.462923e-02</td>
+      <td>4.723913e+07</td>
+      <td>4.368532e+07</td>
+      <td>5.875000e+00</td>
+      <td>1.000000e+03</td>
+      <td>4.000000e+02</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>2018-04-30 00:00:00</td>
+      <td>7.892700e+04</td>
+      <td>1.359472e-02</td>
+      <td>1.012049e-02</td>
+      <td>1.096072e-02</td>
+      <td>1.054284e-02</td>
+      <td>1.441620e-02</td>
+      <td>1.448506e-02</td>
+      <td>1.366403e-02</td>
+      <td>1.013573e-02</td>
+      <td>...</td>
+      <td>1.105670e+02</td>
+      <td>1.121482e+02</td>
+      <td>8.567085e+00</td>
+      <td>9.504011e+01</td>
+      <td>1.521478e-01</td>
+      <td>7.836473e+07</td>
+      <td>7.508250e+07</td>
+      <td>7.125000e+00</td>
+      <td>1.000000e+03</td>
+      <td>7.000000e+02</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>2022-09-30 00:00:00</td>
+      <td>9.343300e+04</td>
+      <td>3.683310e+00</td>
+      <td>3.679218e+00</td>
+      <td>1.093704e+00</td>
+      <td>1.026469e+00</td>
+      <td>3.683510e+00</td>
+      <td>3.683510e+00</td>
+      <td>3.683310e+00</td>
+      <td>3.679218e+00</td>
+      <td>...</td>
+      <td>8.491486e+03</td>
+      <td>8.491486e+03</td>
+      <td>3.546374e+01</td>
+      <td>1.346690e+03</td>
+      <td>7.585604e+00</td>
+      <td>1.899989e+09</td>
+      <td>1.908028e+09</td>
+      <td>1.650000e+01</td>
+      <td>1.000000e+03</td>
+      <td>1.500000e+04</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>NaN</td>
+      <td>2.817581e+04</td>
+      <td>4.198366e-02</td>
+      <td>4.125521e-02</td>
+      <td>4.183619e-02</td>
+      <td>4.056453e-02</td>
+      <td>4.193871e-02</td>
+      <td>4.217267e-02</td>
+      <td>4.221634e-02</td>
+      <td>4.147882e-02</td>
+      <td>...</td>
+      <td>1.604661e+01</td>
+      <td>1.615361e+01</td>
+      <td>4.342256e+00</td>
+      <td>1.118131e+02</td>
+      <td>4.059461e-01</td>
+      <td>6.674075e+07</td>
+      <td>6.490551e+07</td>
+      <td>2.133292e+00</td>
+      <td>1.374154e+01</td>
+      <td>5.971824e+02</td>
+    </tr>
+  </tbody>
+</table>
+<p>8 rows × 46 columns</p>
+</div></div></div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="step-1-merge-the-redcodes-of-firms-on-to-the-corporate-bonds">
+<h1>Step 1: Merge the Redcodes of firms on to the corporate bonds.<a class="headerlink" href="#step-1-merge-the-redcodes-of-firms-on-to-the-corporate-bonds" title="Link to this heading">#</a></h1>
+<p>The code for it is in <strong>merge_cds_bond.py</strong> in the function <strong>merge_redcode_into_bond_treas</strong>. The more specific inputs are within the function itself.</p>
+<p>Given CDS tables record issuers of the Credit Default Swaps using Redcode and the bond tables only had CUSIPs, we needed to conduct a merge using a redcode-CUSIP matching table to the end product of step 1.2 for CDS processing later on.</p>
+<p>We will pull the results without processing for CDS implied arbitrage returns.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corp_red_data</span> <span class="o">=</span> <span class="n">merge_red_code_into_bond_treas</span><span class="p">(</span><span class="n">corp_bonds_data</span><span class="p">,</span> <span class="n">red_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corp_red_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>cusip</th>
+      <th>issuer_cusip</th>
+      <th>BOND_YIELD</th>
+      <th>CS</th>
+      <th>size_ig</th>
+      <th>size_jk</th>
+      <th>mat_days</th>
+      <th>redcode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2013-05-31</td>
+      <td>00101JAE6</td>
+      <td>00101J</td>
+      <td>0.021252</td>
+      <td>0.013751</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1506.0</td>
+      <td>0A119O</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2013-05-31</td>
+      <td>00101JAE6</td>
+      <td>00101J</td>
+      <td>0.021252</td>
+      <td>0.013751</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1506.0</td>
+      <td>UU079R</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2013-06-30</td>
+      <td>00101JAE6</td>
+      <td>00101J</td>
+      <td>0.026850</td>
+      <td>0.017144</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1476.0</td>
+      <td>0A119O</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2013-06-30</td>
+      <td>00101JAE6</td>
+      <td>00101J</td>
+      <td>0.026850</td>
+      <td>0.017144</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1476.0</td>
+      <td>UU079R</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2013-07-31</td>
+      <td>00101JAE6</td>
+      <td>00101J</td>
+      <td>0.023579</td>
+      <td>0.014047</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1445.0</td>
+      <td>0A119O</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corp_red_data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>BOND_YIELD</th>
+      <th>CS</th>
+      <th>size_ig</th>
+      <th>size_jk</th>
+      <th>mat_days</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>1398784</td>
+      <td>1.252264e+06</td>
+      <td>1.252264e+06</td>
+      <td>1.316230e+06</td>
+      <td>1.316230e+06</td>
+      <td>1.316230e+06</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>2013-01-17 01:58:03.485084672</td>
+      <td>4.866752e-02</td>
+      <td>2.608657e-02</td>
+      <td>8.228288e-01</td>
+      <td>9.783617e-01</td>
+      <td>3.761267e+03</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>2002-08-31 00:00:00</td>
+      <td>-7.918977e-01</td>
+      <td>-8.427172e-01</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>3.610000e+02</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>2008-01-31 00:00:00</td>
+      <td>2.911486e-02</td>
+      <td>9.941452e-03</td>
+      <td>1.000000e+00</td>
+      <td>1.000000e+00</td>
+      <td>1.342000e+03</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>2013-03-31 00:00:00</td>
+      <td>4.339818e-02</td>
+      <td>1.698669e-02</td>
+      <td>1.000000e+00</td>
+      <td>1.000000e+00</td>
+      <td>2.479000e+03</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>2018-01-31 00:00:00</td>
+      <td>5.791579e-02</td>
+      <td>2.852355e-02</td>
+      <td>1.000000e+00</td>
+      <td>1.000000e+00</td>
+      <td>5.522000e+03</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>2022-09-30 00:00:00</td>
+      <td>2.442612e+01</td>
+      <td>2.441472e+01</td>
+      <td>1.000000e+00</td>
+      <td>1.000000e+00</td>
+      <td>3.652500e+04</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>NaN</td>
+      <td>6.505191e-02</td>
+      <td>6.460367e-02</td>
+      <td>3.818136e-01</td>
+      <td>1.454995e-01</td>
+      <td>3.532676e+03</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="step-2-cds-data-pull-and-cds-data-processing">
+<h1>Step 2: CDS data pull and CDS data processing<a class="headerlink" href="#step-2-cds-data-pull-and-cds-data-processing" title="Link to this heading">#</a></h1>
+<section id="step-2-1-cds-data-pull">
+<h2>Step 2.1: CDS data pull<a class="headerlink" href="#step-2-1-cds-data-pull" title="Link to this heading">#</a></h2>
+<p>The CDS data pull will be filtered using the redcodes from the above <strong>bond_redcode_merged_data</strong> dataframe, ensuring that only the firms that have corporate bond data are pulled from the CDS table. Daily CDS data is being pulled initially,</p>
+<p>resulting in a mismatch in amount compared to corporate bonds. The data will be reduced during the merge process as the corporate bonds are indicated by monthly data.</p>
+</section>
+<section id="step-2-2-cds-data-processing">
+<h2>Step 2.2: CDS data processing<a class="headerlink" href="#step-2-2-cds-data-processing" title="Link to this heading">#</a></h2>
+<p>Let’s first observe the data to see what we are working with:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cds_data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 46851870 entries, 0 to 46851869
+Data columns (total 7 columns):
+ #   Column     Dtype         
+---  ------     -----         
+ 0   date       datetime64[ns]
+ 1   ticker     string        
+ 2   redcode    string        
+ 3   parspread  Float64       
+ 4   tenor      string        
+ 5   country    string        
+ 6   year       int64         
+dtypes: Float64(1), datetime64[ns](1), int64(1), string(4)
+memory usage: 2.5 GB
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cds_data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>parspread</th>
+      <th>year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>46851870</td>
+      <td>46707717.0</td>
+      <td>4.685187e+07</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>2011-12-19 02:04:52.993115392</td>
+      <td>0.021868</td>
+      <td>2.011462e+03</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>2001-01-02 00:00:00</td>
+      <td>0.000007</td>
+      <td>2.001000e+03</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>2006-12-18 00:00:00</td>
+      <td>0.003602</td>
+      <td>2.006000e+03</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>2010-07-13 00:00:00</td>
+      <td>0.007839</td>
+      <td>2.010000e+03</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>2017-05-02 00:00:00</td>
+      <td>0.018148</td>
+      <td>2.017000e+03</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>2023-12-29 00:00:00</td>
+      <td>491.842763</td>
+      <td>2.023000e+03</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>NaN</td>
+      <td>0.638027</td>
+      <td>6.115298e+00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The CDS data has a flaw: the <strong>tenor</strong> is displayed as opposed to <strong>maturity date</strong> which would allow for more accurate cubic splines of the par spread. To approximate the correct number of days, we use tenor as is and annualize.</p>
+<p>For example, if the tenor is <span class="math notranslate nohighlight">\(3Y\)</span>, the number of days that we use to annualize is <span class="math notranslate nohighlight">\(3 \times 365 = 1095\)</span>.</p>
+<p>In our processing function <strong>merge_cds_bond</strong>, we grab the <strong>redcode, date</strong> tuples for which we can generate a viable cubic spline function, filter the bond and treasury dataframe (output of step 1).</p>
+<p>Then, we use the days between the <strong>maturity</strong> and the <strong>date</strong> for each corporate bond as the input for the cubic spline function for par spread generation. Thus, our final product contains corporate bonds, duration matched treasury rates, and implied</p>
+<p>CDS par spreads as specified by the Segmented Arbitrage paper.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">final_data</span> <span class="o">=</span> <span class="n">merge_cds_into_bonds</span><span class="p">(</span><span class="n">corp_red_data</span><span class="p">,</span> <span class="n">cds_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">final_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cusip</th>
+      <th>date</th>
+      <th>mat_days</th>
+      <th>BOND_YIELD</th>
+      <th>CS</th>
+      <th>size_ig</th>
+      <th>size_jk</th>
+      <th>par_spread</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>39</th>
+      <td>00101JAE6</td>
+      <td>2014-12-31</td>
+      <td>927.0</td>
+      <td>0.033902</td>
+      <td>0.025627</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.034591</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>00101JAE6</td>
+      <td>2015-03-31</td>
+      <td>837.0</td>
+      <td>0.026494</td>
+      <td>0.020114</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.017713</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>00101JAE6</td>
+      <td>2015-04-30</td>
+      <td>807.0</td>
+      <td>0.024420</td>
+      <td>0.018444</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.017103</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>00101JAE6</td>
+      <td>2015-06-30</td>
+      <td>746.0</td>
+      <td>0.026136</td>
+      <td>0.019872</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.016516</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>00101JAE6</td>
+      <td>2015-07-31</td>
+      <td>715.0</td>
+      <td>0.022742</td>
+      <td>0.015899</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.012640</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="step-3-processing">
+<h1>Step 3: Processing<a class="headerlink" href="#step-3-processing" title="Link to this heading">#</a></h1>
+<p>Revisiting the original model:</p>
+<div class="math notranslate nohighlight">
+\[
+CB_{i, t, \tau} = CDS_{i, t, \tau} - FR_{i, t, \tau}
+\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(FR_{i, t, \tau}\)</span> = time <span class="math notranslate nohighlight">\(t\)</span> floating rate spread implied by a fixed-rate corporate bond issued by firm <span class="math notranslate nohighlight">\(i\)</span> at tenor <span class="math notranslate nohighlight">\(\tau\)</span></p>
+<ul>
+<li><p>We use “CS” from the original corporate bonds table for this</p></li>
+</ul>
+</li>
+<li><p><span class="math notranslate nohighlight">\(CDS_{i, t, \tau}\)</span> = time <span class="math notranslate nohighlight">\(t\)</span> Credit Default Swap (CDS) par spread for firm <span class="math notranslate nohighlight">\(i\)</span> with tenor <span class="math notranslate nohighlight">\(\tau\)</span></p>
+<ul>
+<li><p>CDS parspread is constructed using a Cubic Spline</p></li>
+</ul>
+</li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+rfr^{CDS}_{i, t, \tau} = y_{t, \tau} - CB_{i , t, \tau}
+\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(y_{t, \tau}\)</span> = duration matched treasury yield at time <span class="math notranslate nohighlight">\(t\)</span></p>
+<ul>
+<li><p>this is constructed via the “BOND_YIELD” - “CS” in the original corporate bond table</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Note: Filtering</strong></p>
+<p>We threw out some unreasonable data for the absolute rf values exceeding 1 (risk free annual return of 100%).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">processed_final_data</span> <span class="o">=</span> <span class="n">process_cb_spread</span><span class="p">(</span><span class="n">final_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">processed_final_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cusip</th>
+      <th>date</th>
+      <th>mat_days</th>
+      <th>BOND_YIELD</th>
+      <th>CS</th>
+      <th>size_ig</th>
+      <th>size_jk</th>
+      <th>par_spread</th>
+      <th>FR</th>
+      <th>CB</th>
+      <th>rfr</th>
+      <th>c_rating</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>39</th>
+      <td>00101JAE6</td>
+      <td>2014-12-31</td>
+      <td>927.0</td>
+      <td>0.033902</td>
+      <td>0.025627</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.034591</td>
+      <td>0.025627</td>
+      <td>0.008964</td>
+      <td>-0.068971</td>
+      <td>IG + HY</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>00101JAE6</td>
+      <td>2015-03-31</td>
+      <td>837.0</td>
+      <td>0.026494</td>
+      <td>0.020114</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.017713</td>
+      <td>0.020114</td>
+      <td>-0.002401</td>
+      <td>0.878103</td>
+      <td>IG + HY</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>00101JAE6</td>
+      <td>2015-04-30</td>
+      <td>807.0</td>
+      <td>0.024420</td>
+      <td>0.018444</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.017103</td>
+      <td>0.018444</td>
+      <td>-0.001340</td>
+      <td>0.731656</td>
+      <td>IG + HY</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>00101JAE6</td>
+      <td>2015-06-30</td>
+      <td>746.0</td>
+      <td>0.026136</td>
+      <td>0.019872</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.016516</td>
+      <td>0.019872</td>
+      <td>-0.003356</td>
+      <td>0.961969</td>
+      <td>IG + HY</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>00101JAE6</td>
+      <td>2015-07-31</td>
+      <td>715.0</td>
+      <td>0.022742</td>
+      <td>0.015899</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.012640</td>
+      <td>0.015899</td>
+      <td>-0.003259</td>
+      <td>1.010164</td>
+      <td>IG + HY</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">processed_final_data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Index: 585507 entries, 39 to 1398297
+Data columns (total 12 columns):
+ #   Column      Non-Null Count   Dtype         
+---  ------      --------------   -----         
+ 0   cusip       585507 non-null  object        
+ 1   date        585507 non-null  datetime64[ns]
+ 2   mat_days    585507 non-null  float64       
+ 3   BOND_YIELD  585507 non-null  float64       
+ 4   CS          585507 non-null  float64       
+ 5   size_ig     585507 non-null  float64       
+ 6   size_jk     585507 non-null  float64       
+ 7   par_spread  585507 non-null  float64       
+ 8   FR          585507 non-null  float64       
+ 9   CB          585507 non-null  float64       
+ 10  rfr         585507 non-null  float64       
+ 11  c_rating    585507 non-null  object        
+dtypes: datetime64[ns](1), float64(9), object(2)
+memory usage: 58.1+ MB
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">processed_final_data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>mat_days</th>
+      <th>BOND_YIELD</th>
+      <th>CS</th>
+      <th>size_ig</th>
+      <th>size_jk</th>
+      <th>par_spread</th>
+      <th>FR</th>
+      <th>CB</th>
+      <th>rfr</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>585507</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+      <td>585507.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>2013-08-09 15:05:17.429509632</td>
+      <td>3639.666931</td>
+      <td>0.045777</td>
+      <td>0.023430</td>
+      <td>0.849758</td>
+      <td>0.981083</td>
+      <td>0.023292</td>
+      <td>0.023430</td>
+      <td>-0.000138</td>
+      <td>2.248486</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>2002-09-30 00:00:00</td>
+      <td>361.000000</td>
+      <td>-0.791898</td>
+      <td>-0.842717</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>-0.964251</td>
+      <td>-0.842717</td>
+      <td>-0.981998</td>
+      <td>-99.986240</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>2008-10-31 00:00:00</td>
+      <td>1320.000000</td>
+      <td>0.027924</td>
+      <td>0.009315</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>0.002744</td>
+      <td>0.009315</td>
+      <td>-0.012180</td>
+      <td>1.343552</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>2013-12-31 00:00:00</td>
+      <td>2419.000000</td>
+      <td>0.041776</td>
+      <td>0.015993</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>0.007503</td>
+      <td>0.015993</td>
+      <td>-0.005046</td>
+      <td>2.579079</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>2018-05-31 00:00:00</td>
+      <td>5281.000000</td>
+      <td>0.056008</td>
+      <td>0.026505</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>0.020888</td>
+      <td>0.026505</td>
+      <td>-0.001138</td>
+      <td>4.404756</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>2022-09-30 00:00:00</td>
+      <td>36478.000000</td>
+      <td>5.665780</td>
+      <td>5.663980</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>5.728639</td>
+      <td>5.663980</td>
+      <td>1.043381</td>
+      <td>99.845030</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>NaN</td>
+      <td>3182.769546</td>
+      <td>0.041844</td>
+      <td>0.040593</td>
+      <td>0.357309</td>
+      <td>0.136232</td>
+      <td>0.111905</td>
+      <td>0.040593</td>
+      <td>0.104321</td>
+      <td>10.388473</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="step-4-results">
+<h1>Step 4: Results<a class="headerlink" href="#step-4-results" title="Link to this heading">#</a></h1>
+<p>Below is a graph of 3 categories of bonds where certain ETFs may include both IG and Junk (HY) bonds.</p>
+<p>Rating 0: Only junk bonds (HY)</p>
+<p>Rating 1: Only IG bonds</p>
+<p>Rating 2: Both IG and Junk bonds (HY) in the product</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">generate_graph</span><span class="p">(</span><span class="n">processed_final_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/8567096a3245e8ffa059fa6c866ffb7db3e08ee09f40f913ca45a88904d4ae02.png" src="../_images/8567096a3245e8ffa059fa6c866ffb7db3e08ee09f40f913ca45a88904d4ae02.png" />
+</div>
+</div>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../data_glimpses_ftsfr.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Data Glimpses Report: FTSFR only</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="summary_cds_returns_ipynb.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Cleaning Summary: CDS Returns</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Cleaning Summary: CDS Bond Basis</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paper-introduction">Paper Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cds-par-spread-returns">CDS Par Spread Returns</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spread-construction">Spread Construction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implied-risk-free-return">Implied Risk Free Return</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-filters-when-selecting-viable-data-as-specified-in-segmented-arbitrage">Key Filters when selecting viable data as specified in Segmented Arbitrage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#z-spread-zero-volatility-spread">Z-Spread (Zero-Volatility Spread)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#link-to-yield-to-maturity">Link to Yield-to-Maturity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-compounding-identity">Continuous-Compounding Identity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-proxy-ytm-credit-spread">Practical Proxy: YTM Credit Spread</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-overview">Data Overview</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-merge-the-redcodes-of-firms-on-to-the-corporate-bonds">Step 1: Merge the Redcodes of firms on to the corporate bonds.</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-cds-data-pull-and-cds-data-processing">Step 2: CDS data pull and CDS data processing</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-1-cds-data-pull">Step 2.1: CDS data pull</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-2-cds-data-processing">Step 2.2: CDS data processing</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-processing">Step 3: Processing</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-results">Step 4: Results</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

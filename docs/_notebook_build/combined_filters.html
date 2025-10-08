@@ -1,0 +1,4104 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Imports &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_notebook_build/combined_filters';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Imports" href="portfolios.html" />
+    <link rel="prev" title="Cleaning Summary: Options Data" href="../cleaning_options.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../cleaning_options.html">Cleaning Summary: Options Data</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2F_notebook_build/combined_filters.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_notebook_build/combined_filters.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Imports</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Imports</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#function-definitions">Function Definitions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#data-note">Data Note</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#data-filtration">1. Data Filtration</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#level-1-filters">Level 1 Filters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identical-filter">Identical Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identical-except-price-filter">Identical Except Price Filter</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#filter-options-with-bid-0">Filter Options with Bid = 0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#filter-options-with-vol-0">Filter Options with Vol = 0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#level-2-filters">Level 2 Filters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#days-to-maturity-7-or-180-filter">Days to Maturity &lt;7 or &gt;180 Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iv-5-or-100-filter">IV&lt;5% or &gt;100% Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#moneyness-0-8-or-1-2-filter">Moneyness &lt;0.8 or &gt;1.2 Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implied-interest-rate-0-filter">Implied Interest Rate &lt; 0 Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unable-to-compute-iv-filter">Unable to Compute IV Filter</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#level-3-filters">Level 3 Filters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iv-filter">IV Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#put-call-parity-filter">Put-Call Parity Filter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="imports">
+<h1>Imports<a class="headerlink" href="#imports" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.cm</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cm</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;./../&quot;</span><span class="p">)</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">level_1_filters</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">f1</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">level_2_filters</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">f2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">level_3_filters</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">f3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
+
+<span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;OUTPUT_DIR&quot;</span><span class="p">))</span>
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;DATA_DIR&quot;</span><span class="p">))</span>
+<span class="n">WRDS_USERNAME</span> <span class="o">=</span> <span class="n">config</span><span class="p">(</span><span class="s2">&quot;WRDS_USERNAME&quot;</span><span class="p">)</span>
+
+<span class="n">START_DATE_01</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">1996</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">END_DATE_01</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+
+<span class="n">START_DATE_02</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">END_DATE_02</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+
+<span class="n">NOTE_START</span> <span class="o">=</span> <span class="n">START_DATE_01</span>
+<span class="n">NOTE_END</span> <span class="o">=</span> <span class="n">END_DATE_01</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DATE_RANGE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">START_DATE_01</span><span class="p">)</span><span class="si">:</span><span class="s2">%Y-%m</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">END_DATE_02</span><span class="p">)</span><span class="si">:</span><span class="s2">%Y-%m</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="function-definitions">
+<h1>Function Definitions<a class="headerlink" href="#function-definitions" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compare_filtered_data_to_orig</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">orig_df</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="s2">&quot;Identical Filter&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&gt;&gt; Records removed: </span><span class="si">{</span><span class="n">orig_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">filtered_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> out of </span><span class="si">{</span><span class="n">orig_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="p">(</span><span class="n">orig_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">filtered_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">orig_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,.2%</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&gt;&gt; Filtered data shape: </span><span class="si">{</span><span class="n">filtered_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> rows // </span><span class="si">{</span><span class="n">filtered_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> columns&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="data-note">
+<h1>Data Note<a class="headerlink" href="#data-note" title="Link to this heading">#</a></h1>
+<ul class="simple">
+<li><p>The original CJS 2013 paper used data from 1986 through 2012 (26 years of data).</p></li>
+<li><p>Due to the unavailability of SPX option data from 1985 to 1995, we replicated the <strong>54 CJS portfolios</strong> using data from <strong>January 1996 to December 2019</strong> (23 years).</p></li>
+<li><p>Our dataset (from 1996 to 2019) comprises over 19.2 million rows of SPX options data.</p></li>
+<li><p>The original effectiveness of the data filters was examined in <em>The Puzzle of Filtering Index Options (Desai, Hammock, Holt; 2024)</em>. Due to similar reasons as outlined in that work (loss of data filter elegance when transposed across timeframes), we expect that the data filter parameters (and thus the portfolios constructed) will not yield identical results to the original published work, and the user should not have this expectation.</p></li>
+</ul>
+<p><em>The spirit of this project is to replicate with the highest practical fidelity the <em>process</em> of data filtration and portfolio construction in the original CJS and HKM papers, without commenting on the effectiveness or appropriateness of the process and parameters. We leave that analysis to a future study.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="s2">&quot;data_1996-01_2019-12.parquet&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt;&gt; File already exists. Loading data from file...&quot;</span><span class="p">)</span>
+    <span class="c1"># Load the data from the file</span>
+    <span class="n">raw_option_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt;&gt; File does not exist. Loading data from WRDS...&quot;</span><span class="p">)</span>
+    <span class="c1"># Load the data from WRDS</span>
+    <span class="n">raw_option_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="s2">&quot;data_1996-01_2012-01.parquet&quot;</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="s2">&quot;data_2012-02_2019-12.parquet&quot;</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">raw_option_data</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+<span class="c1"># add the mid price</span>
+<span class="n">raw_option_data</span><span class="p">[</span><span class="s2">&quot;mid_price&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">raw_option_data</span><span class="p">[</span><span class="s2">&quot;best_bid&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">raw_option_data</span><span class="p">[</span><span class="s2">&quot;best_offer&quot;</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="c1"># adjust strike price</span>
+<span class="n">raw_option_data</span><span class="p">[</span><span class="s2">&quot;strike_price&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+<span class="c1"># calc moneyness</span>
+<span class="n">raw_option_data</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">calc_moneyness</span><span class="p">(</span><span class="n">raw_option_data</span><span class="p">)</span>
+<span class="c1"># rename IV column</span>
+<span class="n">raw_option_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;impl_volatility&quot;</span><span class="p">:</span> <span class="s2">&quot;IV&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">raw_option_data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&gt;&gt; File already exists. Loading data from file...
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>1704.0</td>
+      <td>55.000</td>
+      <td>56.000</td>
+      <td>565.0</td>
+      <td>100.0</td>
+      <td>55.500</td>
+      <td>0.914684</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>108.0</td>
+      <td>75.500</td>
+      <td>76.500</td>
+      <td>540.0</td>
+      <td>100.0</td>
+      <td>76.000</td>
+      <td>0.874211</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-05</td>
+      <td>617.70</td>
+      <td>616.71</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>NaN</td>
+      <td>5.03</td>
+      <td>500.0</td>
+      <td>5900.0</td>
+      <td>57.750</td>
+      <td>58.750</td>
+      <td>560.0</td>
+      <td>100.0</td>
+      <td>58.250</td>
+      <td>0.908044</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>108105.0</td>
+      <td>1996-01-08</td>
+      <td>616.71</td>
+      <td>618.46</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>NaN</td>
+      <td>5.03</td>
+      <td>0.0</td>
+      <td>315.0</td>
+      <td>145.500</td>
+      <td>146.500</td>
+      <td>475.0</td>
+      <td>100.0</td>
+      <td>146.000</td>
+      <td>0.768037</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-09</td>
+      <td>618.46</td>
+      <td>609.45</td>
+      <td>C</td>
+      <td>1996-12-21</td>
+      <td>NaN</td>
+      <td>5.01</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>188.375</td>
+      <td>189.375</td>
+      <td>425.0</td>
+      <td>100.0</td>
+      <td>188.875</td>
+      <td>0.697350</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>66102</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>944.700</td>
+      <td>962.900</td>
+      <td>4200.0</td>
+      <td>100.0</td>
+      <td>953.800</td>
+      <td>1.299996</td>
+    </tr>
+    <tr>
+      <th>66103</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1042.000</td>
+      <td>1060.300</td>
+      <td>4300.0</td>
+      <td>100.0</td>
+      <td>1051.150</td>
+      <td>1.330948</td>
+    </tr>
+    <tr>
+      <th>66104</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1140.000</td>
+      <td>1158.200</td>
+      <td>4400.0</td>
+      <td>100.0</td>
+      <td>1149.100</td>
+      <td>1.361900</td>
+    </tr>
+    <tr>
+      <th>66105</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1237.900</td>
+      <td>1256.100</td>
+      <td>4500.0</td>
+      <td>100.0</td>
+      <td>1247.000</td>
+      <td>1.392853</td>
+    </tr>
+    <tr>
+      <th>66106</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1335.900</td>
+      <td>1354.100</td>
+      <td>4600.0</td>
+      <td>100.0</td>
+      <td>1345.000</td>
+      <td>1.423805</td>
+    </tr>
+  </tbody>
+</table>
+<p>19213898 rows × 16 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Histogram parameters</span>
+<span class="n">counts</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">raw_option_data</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+<span class="c1"># Apply plasma_r colormap</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;plasma_r&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">))</span>
+<span class="n">normed</span> <span class="o">=</span> <span class="p">(</span><span class="n">counts</span> <span class="o">-</span> <span class="n">counts</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">counts</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+<span class="k">for</span> <span class="n">patch</span><span class="p">,</span> <span class="n">norm</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="n">normed</span><span class="p">):</span>
+    <span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">cmap</span><span class="p">(</span><span class="n">norm</span><span class="p">))</span>
+
+<span class="c1"># Labels and aesthetics</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Options (log scale)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;SPX Options Traded Over Time&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="c1"># Save before show</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="s2">&quot;spx_options_over_time.png&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/b974df993ab52c9842451a015525f150bbfff59d5aa7ffe85f645fa139ff884e.png" src="../_images/b974df993ab52c9842451a015525f150bbfff59d5aa7ffe85f645fa139ff884e.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="o">.</span><span class="n">build_raw_iv_chart</span><span class="p">(</span><span class="n">raw_option_data</span><span class="p">,</span> <span class="n">DATE_RANGE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/13c7e6d7f19d416878e161ed14670599aaf725a766c243735b089fff32d1c598.png" src="../_images/13c7e6d7f19d416878e161ed14670599aaf725a766c243735b089fff32d1c598.png" />
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="data-filtration">
+<h1>1. Data Filtration<a class="headerlink" href="#data-filtration" title="Link to this heading">#</a></h1>
+<p>In order to minimize possible quoting errors, CJS filtered the raw options data through 3 levels of filters. The filters are applied to the trade-in (buy) side to make sure the portfolios are buying into reliable quotes. When positions are exited, if there is no quote in the filtered data, the raw data is searched. These filters are detailed in <em>Appendix B</em> of CJS.</p>
+<section id="level-1-filters">
+<h2>Level 1 Filters<a class="headerlink" href="#level-1-filters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Identical Filter:</strong> Retain only one instance of quotes with the same <strong>option type</strong>, <strong>strike price</strong>, <strong>expiration date/maturity</strong>, and <strong>price</strong>.</p></li>
+<li><p><strong>Identical Except Price Filter:</strong> There are a few sets of quotes with identical terms (<strong>type</strong>, <strong>strike</strong>, and <strong>maturity</strong>) but different prices. Keep the quote whose <strong>T-bill-based implied volatility</strong> is closest to that of its <strong>moneyness neighbors</strong>, and delete the others.</p></li>
+<li><p><strong>Bid = 0 Filter:</strong> Drop quotes with a <strong>bid price</strong> of zero, thereby avoiding low-valued options. Also, a zero bid may indicate censoring as negative bids cannot be recorded.</p></li>
+<li><p><strong>Volume = 0 Filter:</strong> Drop quotes of zero for volumes. <em>Note: Appendix B of CJS does not explicitly detail this filter, but we include it here since it is included in <em>Table B.1. Filters</em> of CJS.</em></p></li>
+</ul>
+<section id="identical-filter">
+<h3>Identical Filter<a class="headerlink" href="#identical-filter" title="Link to this heading">#</a></h3>
+<p>We drop records with identical <strong>option type, strike, expiration date, and price</strong>. In each such case, we eliminate all but one of the quotes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">identical_filter</span><span class="p">(</span><span class="n">raw_option_data</span><span class="p">)</span>
+<span class="n">spx_filtered</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>1704.0</td>
+      <td>55.000</td>
+      <td>56.000</td>
+      <td>565.0</td>
+      <td>100.0</td>
+      <td>55.500</td>
+      <td>0.914684</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>108.0</td>
+      <td>75.500</td>
+      <td>76.500</td>
+      <td>540.0</td>
+      <td>100.0</td>
+      <td>76.000</td>
+      <td>0.874211</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-05</td>
+      <td>617.70</td>
+      <td>616.71</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>NaN</td>
+      <td>5.03</td>
+      <td>500.0</td>
+      <td>5900.0</td>
+      <td>57.750</td>
+      <td>58.750</td>
+      <td>560.0</td>
+      <td>100.0</td>
+      <td>58.250</td>
+      <td>0.908044</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>108105.0</td>
+      <td>1996-01-08</td>
+      <td>616.71</td>
+      <td>618.46</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>NaN</td>
+      <td>5.03</td>
+      <td>0.0</td>
+      <td>315.0</td>
+      <td>145.500</td>
+      <td>146.500</td>
+      <td>475.0</td>
+      <td>100.0</td>
+      <td>146.000</td>
+      <td>0.768037</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-09</td>
+      <td>618.46</td>
+      <td>609.45</td>
+      <td>C</td>
+      <td>1996-12-21</td>
+      <td>NaN</td>
+      <td>5.01</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>188.375</td>
+      <td>189.375</td>
+      <td>425.0</td>
+      <td>100.0</td>
+      <td>188.875</td>
+      <td>0.697350</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>66102</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>944.700</td>
+      <td>962.900</td>
+      <td>4200.0</td>
+      <td>100.0</td>
+      <td>953.800</td>
+      <td>1.299996</td>
+    </tr>
+    <tr>
+      <th>66103</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1042.000</td>
+      <td>1060.300</td>
+      <td>4300.0</td>
+      <td>100.0</td>
+      <td>1051.150</td>
+      <td>1.330948</td>
+    </tr>
+    <tr>
+      <th>66104</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1140.000</td>
+      <td>1158.200</td>
+      <td>4400.0</td>
+      <td>100.0</td>
+      <td>1149.100</td>
+      <td>1.361900</td>
+    </tr>
+    <tr>
+      <th>66105</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1237.900</td>
+      <td>1256.100</td>
+      <td>4500.0</td>
+      <td>100.0</td>
+      <td>1247.000</td>
+      <td>1.392853</td>
+    </tr>
+    <tr>
+      <th>66106</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-12-31</td>
+      <td>NaN</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1335.900</td>
+      <td>1354.100</td>
+      <td>4600.0</td>
+      <td>100.0</td>
+      <td>1345.000</td>
+      <td>1.423805</td>
+    </tr>
+  </tbody>
+</table>
+<p>18936796 rows × 16 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span><span class="n">spx_filtered</span><span class="p">,</span> <span class="n">raw_option_data</span><span class="p">,</span> <span class="s2">&quot;Identical Filter&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Identical Filter :
+&gt;&gt; Records removed: 277,102 out of 19,213,898 (1.44%)
+&gt;&gt; Filtered data shape: 18,936,796 rows // 16 columns
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="identical-except-price-filter">
+<h3>Identical Except Price Filter<a class="headerlink" href="#identical-except-price-filter" title="Link to this heading">#</a></h3>
+<p>We drop records with <strong>identical terms (type, strike, and maturity) but different prices</strong>. Retained quotes are those whose T-bill-based implied volatility is closest to that of its moneyness neighbors, and delete the others.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_2</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">identical_but_price_filter</span><span class="p">(</span><span class="n">spx_filtered</span><span class="p">)</span>
+<span class="n">spx_filtered_2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>1704.0</td>
+      <td>55.00</td>
+      <td>56.00</td>
+      <td>565.0</td>
+      <td>100.0</td>
+      <td>55.50</td>
+      <td>0.914684</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>108.0</td>
+      <td>75.50</td>
+      <td>76.50</td>
+      <td>540.0</td>
+      <td>100.0</td>
+      <td>76.00</td>
+      <td>0.874211</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>0.106792</td>
+      <td>5.04</td>
+      <td>150.0</td>
+      <td>5633.0</td>
+      <td>24.75</td>
+      <td>25.75</td>
+      <td>600.0</td>
+      <td>100.0</td>
+      <td>25.25</td>
+      <td>0.971345</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>48.25</td>
+      <td>49.25</td>
+      <td>570.0</td>
+      <td>100.0</td>
+      <td>48.75</td>
+      <td>0.922778</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-06-22</td>
+      <td>0.123411</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>195.0</td>
+      <td>38.50</td>
+      <td>39.50</td>
+      <td>595.0</td>
+      <td>100.0</td>
+      <td>39.00</td>
+      <td>0.963251</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>16379461</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-01-17</td>
+      <td>0.426246</td>
+      <td>1.52</td>
+      <td>24.0</td>
+      <td>719.0</td>
+      <td>0.25</td>
+      <td>0.35</td>
+      <td>2545.0</td>
+      <td>100.0</td>
+      <td>0.30</td>
+      <td>0.787735</td>
+    </tr>
+    <tr>
+      <th>16379462</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-02-21</td>
+      <td>0.188281</td>
+      <td>1.52</td>
+      <td>22.0</td>
+      <td>231.0</td>
+      <td>14.30</td>
+      <td>14.60</td>
+      <td>2985.0</td>
+      <td>100.0</td>
+      <td>14.45</td>
+      <td>0.923925</td>
+    </tr>
+    <tr>
+      <th>16379463</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-03-20</td>
+      <td>0.234228</td>
+      <td>1.52</td>
+      <td>26.0</td>
+      <td>1003.0</td>
+      <td>8.50</td>
+      <td>8.70</td>
+      <td>2730.0</td>
+      <td>100.0</td>
+      <td>8.60</td>
+      <td>0.844997</td>
+    </tr>
+    <tr>
+      <th>16379464</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-04-17</td>
+      <td>0.134421</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>651.0</td>
+      <td>92.90</td>
+      <td>93.80</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>93.35</td>
+      <td>0.999759</td>
+    </tr>
+    <tr>
+      <th>16379465</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-05-15</td>
+      <td>0.138240</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>107.20</td>
+      <td>108.30</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>107.75</td>
+      <td>0.999759</td>
+    </tr>
+  </tbody>
+</table>
+<p>16379466 rows × 16 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span>
+    <span class="n">spx_filtered_2</span><span class="p">,</span> <span class="n">spx_filtered</span><span class="p">,</span> <span class="s2">&quot;Identical Except Price Filter:&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Identical Except Price Filter: :
+&gt;&gt; Records removed: 2,557,330 out of 18,936,796 (13.50%)
+&gt;&gt; Filtered data shape: 16,379,466 rows // 16 columns
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="filter-options-with-bid-0">
+<h2>Filter Options with Bid = 0<a class="headerlink" href="#filter-options-with-bid-0" title="Link to this heading">#</a></h2>
+<p>We drop quotes with bids of zero (implying little to no market interest) and thereby avoiding low-valued options.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_3</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">delete_zero_bid_filter</span><span class="p">(</span><span class="n">spx_filtered_2</span><span class="p">)</span>
+<span class="n">compare_filtered_data_to_orig</span><span class="p">(</span><span class="n">spx_filtered_3</span><span class="p">,</span> <span class="n">spx_filtered_2</span><span class="p">,</span> <span class="s2">&quot;Delete Zero Bid Filter&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Delete Zero Bid Filter :
+&gt;&gt; Records removed: 1,341,403 out of 16,379,466 (8.19%)
+&gt;&gt; Filtered data shape: 15,038,063 rows // 16 columns
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="c1"># Plot distribution of best_bid for optm_l1_id</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">spx_filtered_2</span><span class="p">[</span><span class="s2">&quot;best_bid&quot;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Best Bid&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of Best Bid - Pre-filter&quot;</span><span class="p">)</span>
+
+<span class="c1"># Plot distribution of best_bid for optm_l1_zbid</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">spx_filtered_3</span><span class="p">[</span><span class="s2">&quot;best_bid&quot;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;darkred&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Best Bid&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of Best Bid - Post-filter&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Need some better plots here...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/54928d6ce41bd4449d6ac629083b5de41251df3ba1741c621d6ce12b50639156.png" src="../_images/54928d6ce41bd4449d6ac629083b5de41251df3ba1741c621d6ce12b50639156.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Need some better plots here...
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="filter-options-with-vol-0">
+<h2>Filter Options with Vol = 0<a class="headerlink" href="#filter-options-with-vol-0" title="Link to this heading">#</a></h2>
+<p>Table B.1 of <em>CJS 2013</em> appears to signal the inclusion of a Volume = 0 filter, however, Appendix B does not describe this filter. We note that there are a significant number of quotes with zero volume in our dataset, and the application of this filter would dramatically skew the results from the original dataset (with 70% of remaining records dropped using this criterion). Given that Appendix B of <em>CJS 2013</em> did not describe this filter, we assume its inclusion in Table B.1 was an error.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_4</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">delete_zero_volume_filter</span><span class="p">(</span><span class="n">spx_filtered_3</span><span class="p">)</span>
+<span class="n">compare_filtered_data_to_orig</span><span class="p">(</span>
+    <span class="n">spx_filtered_4</span><span class="p">,</span> <span class="n">spx_filtered_3</span><span class="p">,</span> <span class="s2">&quot;Delete Zero Volume Filter&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Delete Zero Volume Filter :
+&gt;&gt; Records removed: 10,570,785 out of 15,038,063 (70.29%)
+&gt;&gt; Filtered data shape: 4,467,278 rows // 16 columns
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_4</span> <span class="o">=</span> <span class="n">spx_filtered_3</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zero_vol_rows</span> <span class="o">=</span> <span class="n">spx_filtered_3</span><span class="p">[</span><span class="n">spx_filtered_3</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">zero_vol_rows</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribution of Options with Zero Volume&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/66e97210fadf9f0b19fad7e1cfbdfea22c6d0cd5d74aaa4d55e98f2dff579a5c.png" src="../_images/66e97210fadf9f0b19fad7e1cfbdfea22c6d0cd5d74aaa4d55e98f2dff579a5c.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># save L1 filtered data</span>
+<span class="n">spx_l1_filtered</span> <span class="o">=</span> <span class="n">spx_filtered_4</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">spx_l1_filtered</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;L1_filtered_</span><span class="si">{</span><span class="n">DATE_RANGE</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="o">.</span><span class="n">build_l1_iv_chart</span><span class="p">(</span><span class="n">spx_l1_filtered</span><span class="p">,</span> <span class="n">date_range</span><span class="o">=</span><span class="n">DATE_RANGE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4fd631a962f412ed0b13902fbf937e0618fb4af711777828055e385fde621b69.png" src="../_images/4fd631a962f412ed0b13902fbf937e0618fb4af711777828055e385fde621b69.png" />
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="level-2-filters">
+<h2>Level 2 Filters<a class="headerlink" href="#level-2-filters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Days to Maturity &lt;7 or &gt;180 Filter:</strong> Drop options with fewer than seven or more than 180 calendar days to expiration.</p></li>
+<li><p><strong>IV&lt;5% or &gt;100% Filter:</strong> We remove all option quotes with implied volatilities lower than 5% or higher than 100%, computed using T-bill interest rates.</p></li>
+<li><p><strong>Moneyness &lt;0.8 or &gt;1.2 Filter:</strong> We remove all option quotes with moneyness, the ratio of strike price to index price, below 0.8 or above 1.2. These options have little value beyond their intrinsic value and are also very thinly traded.</p></li>
+<li><p><strong>Implied Interest Rate &lt;0 Filter:</strong> When filtering outliers, we use T-bill interest rates to compute implied volatilities. T-bill interest rates are obtained from the Federal Reserve’s H.15 release. We assign a T-bill rate to each observation by assuming that we can use the next shortest rate if the time to expiration of the option is shorter than the shortest constant maturity rate.
+Our goal is to obtain an interest rate that is as close as possible to the one faced by investors in the options market. It appears that the T-bill rates are not the relevant ones when pricing these options. Specifically, when the T-bill rates are used, put and call implied volatilities do not line up very well; for example, the T-bill rate tends to be too high for short maturity options, perhaps because no T-bill has maturity of less than a month. To address these issues, we compute a put-call parity-implied interest rate. Since we believe that put-call parity holds reasonably well in this deep and liquid European options market, we use the put-call parity-implied interest rate as our interest rate in the remainder of the paper and for further filters. To construct this rate, we take all put-call pairs of a given maturity and impose put-call parity using the bid-ask midpoint as the price, and allowing the interest rate to adjust. We remove 89,563 pairs with a negative implied interest rate. We then take the median-implied interest rate across all remaining pairs of the same maturity with moneyness between 0.95 and 1.05 and assign it to all quotes with that maturity. We are able to directly assign an implied interest rate to 93% of our sample in this way. We fill in the gaps by interpolating across maturities and if necessary, across days. Our implied interest rate is on average 54 bps above the T-bill rate</p></li>
+<li><p><strong>Unable to Compute IV Filter:</strong> We remove quotes that imply negative time
+value.</p></li>
+</ul>
+<section id="days-to-maturity-7-or-180-filter">
+<h3>Days to Maturity &lt;7 or &gt;180 Filter<a class="headerlink" href="#days-to-maturity-7-or-180-filter" title="Link to this heading">#</a></h3>
+<p>We drop records with days to maturity less than 7 and greater than 180 days. The short maturity options tend to move erratically close to expiration and the long maturity options lack volume and open interest.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_5</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">days_to_maturity_filter</span><span class="p">(</span><span class="n">spx_filtered_4</span><span class="p">,</span> <span class="n">min_days</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">max_days</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
+<span class="n">spx_filtered_5</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+      <th>days_to_maturity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>1704.0</td>
+      <td>55.00</td>
+      <td>56.00</td>
+      <td>565.0</td>
+      <td>100.0</td>
+      <td>55.50</td>
+      <td>0.914684</td>
+      <td>72 days</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>108.0</td>
+      <td>75.50</td>
+      <td>76.50</td>
+      <td>540.0</td>
+      <td>100.0</td>
+      <td>76.00</td>
+      <td>0.874211</td>
+      <td>16 days</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>0.106792</td>
+      <td>5.04</td>
+      <td>150.0</td>
+      <td>5633.0</td>
+      <td>24.75</td>
+      <td>25.75</td>
+      <td>600.0</td>
+      <td>100.0</td>
+      <td>25.25</td>
+      <td>0.971345</td>
+      <td>72 days</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>NaN</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>48.25</td>
+      <td>49.25</td>
+      <td>570.0</td>
+      <td>100.0</td>
+      <td>48.75</td>
+      <td>0.922778</td>
+      <td>44 days</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-06-22</td>
+      <td>0.123411</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>195.0</td>
+      <td>38.50</td>
+      <td>39.50</td>
+      <td>595.0</td>
+      <td>100.0</td>
+      <td>39.00</td>
+      <td>0.963251</td>
+      <td>170 days</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>16379461</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-01-17</td>
+      <td>0.426246</td>
+      <td>1.52</td>
+      <td>24.0</td>
+      <td>719.0</td>
+      <td>0.25</td>
+      <td>0.35</td>
+      <td>2545.0</td>
+      <td>100.0</td>
+      <td>0.30</td>
+      <td>0.787735</td>
+      <td>17 days</td>
+    </tr>
+    <tr>
+      <th>16379462</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-02-21</td>
+      <td>0.188281</td>
+      <td>1.52</td>
+      <td>22.0</td>
+      <td>231.0</td>
+      <td>14.30</td>
+      <td>14.60</td>
+      <td>2985.0</td>
+      <td>100.0</td>
+      <td>14.45</td>
+      <td>0.923925</td>
+      <td>52 days</td>
+    </tr>
+    <tr>
+      <th>16379463</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-03-20</td>
+      <td>0.234228</td>
+      <td>1.52</td>
+      <td>26.0</td>
+      <td>1003.0</td>
+      <td>8.50</td>
+      <td>8.70</td>
+      <td>2730.0</td>
+      <td>100.0</td>
+      <td>8.60</td>
+      <td>0.844997</td>
+      <td>80 days</td>
+    </tr>
+    <tr>
+      <th>16379464</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-04-17</td>
+      <td>0.134421</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>651.0</td>
+      <td>92.90</td>
+      <td>93.80</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>93.35</td>
+      <td>0.999759</td>
+      <td>108 days</td>
+    </tr>
+    <tr>
+      <th>16379465</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-05-15</td>
+      <td>0.138240</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>107.20</td>
+      <td>108.30</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>107.75</td>
+      <td>0.999759</td>
+      <td>136 days</td>
+    </tr>
+  </tbody>
+</table>
+<p>10659473 rows × 17 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span><span class="n">spx_filtered_5</span><span class="p">,</span> <span class="n">spx_filtered_4</span><span class="p">,</span> <span class="s2">&quot;Days to Maturity Filter&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Days to Maturity Filter :
+&gt;&gt; Records removed: 4,378,590 out of 15,038,063 (29.12%)
+&gt;&gt; Filtered data shape: 10,659,473 rows // 17 columns
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="iv-5-or-100-filter">
+<h3>IV&lt;5% or &gt;100% Filter<a class="headerlink" href="#iv-5-or-100-filter" title="Link to this heading">#</a></h3>
+<p>We drop quotes with <strong>implied volatilities lower than 5% or higher than 100%</strong>, computed using T-bill interest rates of the nearest matching maturity. Such extreme IV values are likely a quotation problem or attached to low-value options.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_6</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">iv_range_filter</span><span class="p">(</span><span class="n">spx_filtered_5</span><span class="p">,</span> <span class="n">min_iv</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">max_iv</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">spx_filtered_6</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+      <th>days_to_maturity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>0.106792</td>
+      <td>5.04</td>
+      <td>150.0</td>
+      <td>5633.0</td>
+      <td>24.750</td>
+      <td>25.750</td>
+      <td>600.0</td>
+      <td>100.0</td>
+      <td>25.250</td>
+      <td>0.971345</td>
+      <td>72 days</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-06-22</td>
+      <td>0.123411</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>195.0</td>
+      <td>38.500</td>
+      <td>39.500</td>
+      <td>595.0</td>
+      <td>100.0</td>
+      <td>39.000</td>
+      <td>0.963251</td>
+      <td>170 days</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>0.093700</td>
+      <td>5.04</td>
+      <td>13.0</td>
+      <td>1364.0</td>
+      <td>10.625</td>
+      <td>11.375</td>
+      <td>615.0</td>
+      <td>100.0</td>
+      <td>11.000</td>
+      <td>0.995629</td>
+      <td>44 days</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>0.092695</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>1702.0</td>
+      <td>0.250</td>
+      <td>0.500</td>
+      <td>655.0</td>
+      <td>100.0</td>
+      <td>0.375</td>
+      <td>1.060385</td>
+      <td>44 days</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>0.101465</td>
+      <td>5.04</td>
+      <td>463.0</td>
+      <td>5037.0</td>
+      <td>9.125</td>
+      <td>9.875</td>
+      <td>625.0</td>
+      <td>100.0</td>
+      <td>9.500</td>
+      <td>1.011818</td>
+      <td>72 days</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>16379461</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-01-17</td>
+      <td>0.426246</td>
+      <td>1.52</td>
+      <td>24.0</td>
+      <td>719.0</td>
+      <td>0.250</td>
+      <td>0.350</td>
+      <td>2545.0</td>
+      <td>100.0</td>
+      <td>0.300</td>
+      <td>0.787735</td>
+      <td>17 days</td>
+    </tr>
+    <tr>
+      <th>16379462</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-02-21</td>
+      <td>0.188281</td>
+      <td>1.52</td>
+      <td>22.0</td>
+      <td>231.0</td>
+      <td>14.300</td>
+      <td>14.600</td>
+      <td>2985.0</td>
+      <td>100.0</td>
+      <td>14.450</td>
+      <td>0.923925</td>
+      <td>52 days</td>
+    </tr>
+    <tr>
+      <th>16379463</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-03-20</td>
+      <td>0.234228</td>
+      <td>1.52</td>
+      <td>26.0</td>
+      <td>1003.0</td>
+      <td>8.500</td>
+      <td>8.700</td>
+      <td>2730.0</td>
+      <td>100.0</td>
+      <td>8.600</td>
+      <td>0.844997</td>
+      <td>80 days</td>
+    </tr>
+    <tr>
+      <th>16379464</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-04-17</td>
+      <td>0.134421</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>651.0</td>
+      <td>92.900</td>
+      <td>93.800</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>93.350</td>
+      <td>0.999759</td>
+      <td>108 days</td>
+    </tr>
+    <tr>
+      <th>16379465</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-05-15</td>
+      <td>0.138240</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>107.200</td>
+      <td>108.300</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>107.750</td>
+      <td>0.999759</td>
+      <td>136 days</td>
+    </tr>
+  </tbody>
+</table>
+<p>9586861 rows × 17 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span><span class="n">spx_filtered_6</span><span class="p">,</span> <span class="n">spx_filtered_5</span><span class="p">,</span> <span class="s2">&quot;IV Range Filter&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| IV Range Filter :
+&gt;&gt; Records removed: 1,072,612 out of 10,659,473 (10.06%)
+&gt;&gt; Filtered data shape: 9,586,861 rows // 17 columns
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="moneyness-0-8-or-1-2-filter">
+<h3>Moneyness &lt;0.8 or &gt;1.2 Filter<a class="headerlink" href="#moneyness-0-8-or-1-2-filter" title="Link to this heading">#</a></h3>
+<p>We remove all option quotes with moneyness (<span class="math notranslate nohighlight">\(\frac{K}{S}\)</span>) below 0.8 or above 1.2. These options have little value beyond their intrinsic value and are also very thinly traded.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_7</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">moneyness_filter</span><span class="p">(</span>
+    <span class="n">spx_filtered_6</span><span class="p">,</span> <span class="n">min_moneyness</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">max_moneyness</span><span class="o">=</span><span class="mf">1.2</span>
+<span class="p">)</span>
+<span class="n">spx_filtered_7</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+      <th>days_to_maturity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>0.106792</td>
+      <td>5.04</td>
+      <td>150.0</td>
+      <td>5633.0</td>
+      <td>24.750</td>
+      <td>25.750</td>
+      <td>600.0</td>
+      <td>100.0</td>
+      <td>25.250</td>
+      <td>0.971345</td>
+      <td>72 days</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-06-22</td>
+      <td>0.123411</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>195.0</td>
+      <td>38.500</td>
+      <td>39.500</td>
+      <td>595.0</td>
+      <td>100.0</td>
+      <td>39.000</td>
+      <td>0.963251</td>
+      <td>170 days</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>0.093700</td>
+      <td>5.04</td>
+      <td>13.0</td>
+      <td>1364.0</td>
+      <td>10.625</td>
+      <td>11.375</td>
+      <td>615.0</td>
+      <td>100.0</td>
+      <td>11.000</td>
+      <td>0.995629</td>
+      <td>44 days</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-02-17</td>
+      <td>0.092695</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>1702.0</td>
+      <td>0.250</td>
+      <td>0.500</td>
+      <td>655.0</td>
+      <td>100.0</td>
+      <td>0.375</td>
+      <td>1.060385</td>
+      <td>44 days</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-03-16</td>
+      <td>0.101465</td>
+      <td>5.04</td>
+      <td>463.0</td>
+      <td>5037.0</td>
+      <td>9.125</td>
+      <td>9.875</td>
+      <td>625.0</td>
+      <td>100.0</td>
+      <td>9.500</td>
+      <td>1.011818</td>
+      <td>72 days</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>7657970</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-05-29</td>
+      <td>0.120268</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>561.300</td>
+      <td>575.500</td>
+      <td>3800.0</td>
+      <td>100.0</td>
+      <td>568.400</td>
+      <td>1.176187</td>
+      <td>150 days</td>
+    </tr>
+    <tr>
+      <th>7657971</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-02-21</td>
+      <td>0.188281</td>
+      <td>1.52</td>
+      <td>22.0</td>
+      <td>231.0</td>
+      <td>14.300</td>
+      <td>14.600</td>
+      <td>2985.0</td>
+      <td>100.0</td>
+      <td>14.450</td>
+      <td>0.923925</td>
+      <td>52 days</td>
+    </tr>
+    <tr>
+      <th>7657972</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-03-20</td>
+      <td>0.234228</td>
+      <td>1.52</td>
+      <td>26.0</td>
+      <td>1003.0</td>
+      <td>8.500</td>
+      <td>8.700</td>
+      <td>2730.0</td>
+      <td>100.0</td>
+      <td>8.600</td>
+      <td>0.844997</td>
+      <td>80 days</td>
+    </tr>
+    <tr>
+      <th>7657973</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-04-17</td>
+      <td>0.134421</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>651.0</td>
+      <td>92.900</td>
+      <td>93.800</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>93.350</td>
+      <td>0.999759</td>
+      <td>108 days</td>
+    </tr>
+    <tr>
+      <th>7657974</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-05-15</td>
+      <td>0.138240</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>107.200</td>
+      <td>108.300</td>
+      <td>3230.0</td>
+      <td>100.0</td>
+      <td>107.750</td>
+      <td>0.999759</td>
+      <td>136 days</td>
+    </tr>
+  </tbody>
+</table>
+<p>7657975 rows × 17 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span><span class="n">spx_filtered_7</span><span class="p">,</span> <span class="n">spx_filtered_6</span><span class="p">,</span> <span class="s2">&quot;Moneyness Filter&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Moneyness Filter :
+&gt;&gt; Records removed: 1,928,886 out of 9,586,861 (20.12%)
+&gt;&gt; Filtered data shape: 7,657,975 rows // 17 columns
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="implied-interest-rate-0-filter">
+<h3>Implied Interest Rate &lt; 0 Filter<a class="headerlink" href="#implied-interest-rate-0-filter" title="Link to this heading">#</a></h3>
+<p>We remove all option quotes with negative implied interest rates, assuming put-call parity.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_8</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">implied_interest_rate_filter</span><span class="p">(</span><span class="n">spx_filtered_7</span><span class="p">)</span>
+<span class="n">spx_filtered_8</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> |-- PCP filter: Check ok --&gt; Underlying prices, strike prices of put and call options match exactly.
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+      <th>days_to_maturity</th>
+      <th>pc_parity_int_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.282774</td>
+      <td>5.04</td>
+      <td>8.0</td>
+      <td>6914.0</td>
+      <td>0.0625</td>
+      <td>0.1250</td>
+      <td>540.0</td>
+      <td>100.0</td>
+      <td>0.09375</td>
+      <td>0.874211</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.265845</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>3897.0</td>
+      <td>0.0625</td>
+      <td>0.1250</td>
+      <td>545.0</td>
+      <td>100.0</td>
+      <td>0.09375</td>
+      <td>0.882305</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.266303</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>3259.0</td>
+      <td>0.1250</td>
+      <td>0.1875</td>
+      <td>550.0</td>
+      <td>100.0</td>
+      <td>0.15625</td>
+      <td>0.890400</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.255099</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>862.0</td>
+      <td>0.1250</td>
+      <td>0.2500</td>
+      <td>555.0</td>
+      <td>100.0</td>
+      <td>0.18750</td>
+      <td>0.898494</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.247617</td>
+      <td>5.04</td>
+      <td>100.0</td>
+      <td>7438.0</td>
+      <td>0.1875</td>
+      <td>0.3125</td>
+      <td>560.0</td>
+      <td>100.0</td>
+      <td>0.25000</td>
+      <td>0.906589</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5137994</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.110925</td>
+      <td>1.52</td>
+      <td>20.0</td>
+      <td>310.0</td>
+      <td>222.8000</td>
+      <td>228.9000</td>
+      <td>3425.0</td>
+      <td>100.0</td>
+      <td>225.85000</td>
+      <td>1.060116</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+    </tr>
+    <tr>
+      <th>5137995</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>C</td>
+      <td>2020-06-19</td>
+      <td>0.108577</td>
+      <td>1.52</td>
+      <td>400.0</td>
+      <td>3483.0</td>
+      <td>24.6000</td>
+      <td>25.1000</td>
+      <td>3450.0</td>
+      <td>100.0</td>
+      <td>24.85000</td>
+      <td>1.067854</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+    </tr>
+    <tr>
+      <th>5137996</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.108540</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>12.0</td>
+      <td>241.2000</td>
+      <td>247.6000</td>
+      <td>3450.0</td>
+      <td>100.0</td>
+      <td>244.40000</td>
+      <td>1.067854</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+    </tr>
+    <tr>
+      <th>5137997</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>C</td>
+      <td>2020-06-19</td>
+      <td>0.106848</td>
+      <td>1.52</td>
+      <td>36.0</td>
+      <td>227.0</td>
+      <td>19.6000</td>
+      <td>20.1000</td>
+      <td>3475.0</td>
+      <td>100.0</td>
+      <td>19.85000</td>
+      <td>1.075592</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+    </tr>
+    <tr>
+      <th>5137998</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.106814</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>260.9000</td>
+      <td>267.5000</td>
+      <td>3475.0</td>
+      <td>100.0</td>
+      <td>264.20000</td>
+      <td>1.075592</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+    </tr>
+  </tbody>
+</table>
+<p>5137999 rows × 18 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span>
+    <span class="n">spx_filtered_8</span><span class="p">,</span> <span class="n">spx_filtered_7</span><span class="p">,</span> <span class="s2">&quot;Negative Implied Interest Rate Filter&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Negative Implied Interest Rate Filter :
+&gt;&gt; Records removed: 2,519,976 out of 7,657,975 (32.91%)
+&gt;&gt; Filtered data shape: 5,137,999 rows // 18 columns
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="unable-to-compute-iv-filter">
+<h3>Unable to Compute IV Filter<a class="headerlink" href="#unable-to-compute-iv-filter" title="Link to this heading">#</a></h3>
+<p>We remove all option quotes that imply negative time value.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_9</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">unable_to_compute_iv_filter</span><span class="p">(</span><span class="n">spx_filtered_8</span><span class="p">)</span>
+<span class="n">spx_filtered_9</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+      <th>days_to_maturity</th>
+      <th>pc_parity_int_rate</th>
+      <th>intrinsic</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.282774</td>
+      <td>5.04</td>
+      <td>8.0</td>
+      <td>6914.0</td>
+      <td>0.0625</td>
+      <td>0.1250</td>
+      <td>540.0</td>
+      <td>100.0</td>
+      <td>0.09375</td>
+      <td>0.874211</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.265845</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>3897.0</td>
+      <td>0.0625</td>
+      <td>0.1250</td>
+      <td>545.0</td>
+      <td>100.0</td>
+      <td>0.09375</td>
+      <td>0.882305</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.266303</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>3259.0</td>
+      <td>0.1250</td>
+      <td>0.1875</td>
+      <td>550.0</td>
+      <td>100.0</td>
+      <td>0.15625</td>
+      <td>0.890400</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.255099</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>862.0</td>
+      <td>0.1250</td>
+      <td>0.2500</td>
+      <td>555.0</td>
+      <td>100.0</td>
+      <td>0.18750</td>
+      <td>0.898494</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>P</td>
+      <td>1996-01-20</td>
+      <td>0.247617</td>
+      <td>5.04</td>
+      <td>100.0</td>
+      <td>7438.0</td>
+      <td>0.1875</td>
+      <td>0.3125</td>
+      <td>560.0</td>
+      <td>100.0</td>
+      <td>0.25000</td>
+      <td>0.906589</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5137994</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.110925</td>
+      <td>1.52</td>
+      <td>20.0</td>
+      <td>310.0</td>
+      <td>222.8000</td>
+      <td>228.9000</td>
+      <td>3425.0</td>
+      <td>100.0</td>
+      <td>225.85000</td>
+      <td>1.060116</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>194.22</td>
+    </tr>
+    <tr>
+      <th>5137995</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>C</td>
+      <td>2020-06-19</td>
+      <td>0.108577</td>
+      <td>1.52</td>
+      <td>400.0</td>
+      <td>3483.0</td>
+      <td>24.6000</td>
+      <td>25.1000</td>
+      <td>3450.0</td>
+      <td>100.0</td>
+      <td>24.85000</td>
+      <td>1.067854</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>5137996</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.108540</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>12.0</td>
+      <td>241.2000</td>
+      <td>247.6000</td>
+      <td>3450.0</td>
+      <td>100.0</td>
+      <td>244.40000</td>
+      <td>1.067854</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>219.22</td>
+    </tr>
+    <tr>
+      <th>5137997</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>C</td>
+      <td>2020-06-19</td>
+      <td>0.106848</td>
+      <td>1.52</td>
+      <td>36.0</td>
+      <td>227.0</td>
+      <td>19.6000</td>
+      <td>20.1000</td>
+      <td>3475.0</td>
+      <td>100.0</td>
+      <td>19.85000</td>
+      <td>1.075592</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>5137998</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.106814</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>260.9000</td>
+      <td>267.5000</td>
+      <td>3475.0</td>
+      <td>100.0</td>
+      <td>264.20000</td>
+      <td>1.075592</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>244.22</td>
+    </tr>
+  </tbody>
+</table>
+<p>4657476 rows × 19 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span>
+    <span class="n">spx_filtered_9</span><span class="p">,</span> <span class="n">spx_filtered_8</span><span class="p">,</span> <span class="s2">&quot;Unable to Compute IV Filter&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Unable to Compute IV Filter :
+&gt;&gt; Records removed: 480,523 out of 5,137,999 (9.35%)
+&gt;&gt; Filtered data shape: 4,657,476 rows // 19 columns
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># save L2 filtered data</span>
+<span class="n">spx_l2_filtered</span> <span class="o">=</span> <span class="n">spx_filtered_9</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">spx_l2_filtered</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;L2_filtered_</span><span class="si">{</span><span class="n">DATE_RANGE</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="o">.</span><span class="n">build_l2_iv_chart</span><span class="p">(</span><span class="n">spx_l2_filtered</span><span class="p">,</span> <span class="n">date_range</span><span class="o">=</span><span class="n">DATE_RANGE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ae9dcb0d9b0cb867858665ade28ff89f41cf9b6e518d7abf2eabcd5c11fb6630.png" src="../_images/ae9dcb0d9b0cb867858665ade28ff89f41cf9b6e518d7abf2eabcd5c11fb6630.png" />
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="level-3-filters">
+<h2>Level 3 Filters<a class="headerlink" href="#level-3-filters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>IV Filter:</strong> The IV filter removes volatility outliers to reduce the prevalence of apparent butterfly arbitrage.</p></li>
+<li><p><strong>Put-Call Parity Filter:</strong> The puts and calls need to be matched up based on trading date, expiry date, and option type.</p></li>
+</ul>
+<section id="iv-filter">
+<h3>IV Filter<a class="headerlink" href="#iv-filter" title="Link to this heading">#</a></h3>
+<p>The IV filter removes volatility outliers to reduce the prevalence of apparent butterfly arbitrage. This involves dropping calls and puts that have the same expiration date and strike price, but have anomalous prices due to extreme implied volatility values. For each <em>date</em> and <em>maturity</em>, we fit a quadratic curve to the implied volatility of puts and calls (separately) through the observed log implied volatilities.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">l2_data_with_fit</span><span class="p">,</span> <span class="n">spx_filtered_10</span> <span class="o">=</span> <span class="n">f3</span><span class="o">.</span><span class="n">IV_filter</span><span class="p">(</span><span class="n">spx_filtered_9</span><span class="p">,</span> <span class="n">DATE_RANGE</span><span class="p">)</span>
+<span class="n">spx_filtered_10</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
+&gt;&gt; Running IV filter...
+ |-- IV filter: applying quadratic fit...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> |-- !! Execution time: apply_quadratic_iv_fit --&gt; 26.82598 seconds
+ |-- IV filter: filtering outliers...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> |-- IV filter: saving L3 IV-filtered data...
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>secid</th>
+      <th>date</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>exdate</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>moneyness</th>
+      <th>days_to_maturity</th>
+      <th>pc_parity_int_rate</th>
+      <th>intrinsic</th>
+      <th>log_iv</th>
+      <th>fitted_iv</th>
+      <th>rel_distance_iv</th>
+      <th>moneyness_bin</th>
+      <th>stdev_iv_moneyness_bin</th>
+      <th>is_outlier_iv</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th>exdate</th>
+      <th>cp_flag</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">1996-01-04</th>
+      <th rowspan="5" valign="top">1996-01-20</th>
+      <th rowspan="5" valign="top">C</th>
+      <th>14</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>0.082711</td>
+      <td>5.04</td>
+      <td>444.0</td>
+      <td>5905.0</td>
+      <td>10.0000</td>
+      <td>10.375</td>
+      <td>610.0</td>
+      <td>100.0</td>
+      <td>10.18750</td>
+      <td>0.987534</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>7.70</td>
+      <td>-2.492403</td>
+      <td>-2.377298</td>
+      <td>4.841838</td>
+      <td>(0.975, 1.0]</td>
+      <td>3.516840</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>0.109019</td>
+      <td>5.04</td>
+      <td>465.0</td>
+      <td>4270.0</td>
+      <td>7.5000</td>
+      <td>8.000</td>
+      <td>615.0</td>
+      <td>100.0</td>
+      <td>7.75000</td>
+      <td>0.995629</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>2.70</td>
+      <td>-2.216233</td>
+      <td>-2.353701</td>
+      <td>-5.840486</td>
+      <td>(0.975, 1.0]</td>
+      <td>3.516840</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>0.101986</td>
+      <td>5.04</td>
+      <td>2606.0</td>
+      <td>6635.0</td>
+      <td>4.5000</td>
+      <td>4.875</td>
+      <td>620.0</td>
+      <td>100.0</td>
+      <td>4.68750</td>
+      <td>1.003723</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.282920</td>
+      <td>-2.330581</td>
+      <td>-2.045020</td>
+      <td>(1.0, 1.025]</td>
+      <td>5.219336</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>0.097356</td>
+      <td>5.04</td>
+      <td>4022.0</td>
+      <td>5969.0</td>
+      <td>1.1875</td>
+      <td>1.375</td>
+      <td>630.0</td>
+      <td>100.0</td>
+      <td>1.28125</td>
+      <td>1.019913</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.329381</td>
+      <td>-2.285771</td>
+      <td>1.907866</td>
+      <td>(1.0, 1.025]</td>
+      <td>5.219336</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>108105.0</td>
+      <td>1996-01-04</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>1996-01-20</td>
+      <td>0.101756</td>
+      <td>5.04</td>
+      <td>1627.0</td>
+      <td>6224.0</td>
+      <td>0.6250</td>
+      <td>0.750</td>
+      <td>635.0</td>
+      <td>100.0</td>
+      <td>0.68750</td>
+      <td>1.028007</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.285177</td>
+      <td>-2.264082</td>
+      <td>0.931727</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">2019-12-31</th>
+      <th rowspan="5" valign="top">2020-06-19</th>
+      <th rowspan="5" valign="top">P</th>
+      <th>5137990</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.117063</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>395.0</td>
+      <td>192.2000</td>
+      <td>193.000</td>
+      <td>3375.0</td>
+      <td>100.0</td>
+      <td>192.60000</td>
+      <td>1.044639</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>144.22</td>
+      <td>-2.145043</td>
+      <td>-2.132215</td>
+      <td>0.601630</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5137992</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.113900</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>163.0</td>
+      <td>208.2000</td>
+      <td>209.100</td>
+      <td>3400.0</td>
+      <td>100.0</td>
+      <td>208.65000</td>
+      <td>1.052377</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>169.22</td>
+      <td>-2.172434</td>
+      <td>-2.165558</td>
+      <td>0.317525</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5137994</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.110925</td>
+      <td>1.52</td>
+      <td>20.0</td>
+      <td>310.0</td>
+      <td>222.8000</td>
+      <td>228.900</td>
+      <td>3425.0</td>
+      <td>100.0</td>
+      <td>225.85000</td>
+      <td>1.060116</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>194.22</td>
+      <td>-2.198901</td>
+      <td>-2.199596</td>
+      <td>-0.031616</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5137996</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.108540</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>12.0</td>
+      <td>241.2000</td>
+      <td>247.600</td>
+      <td>3450.0</td>
+      <td>100.0</td>
+      <td>244.40000</td>
+      <td>1.067854</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>219.22</td>
+      <td>-2.220637</td>
+      <td>-2.234330</td>
+      <td>-0.612848</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5137998</th>
+      <td>108105.0</td>
+      <td>2019-12-31</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>2020-06-19</td>
+      <td>0.106814</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>260.9000</td>
+      <td>267.500</td>
+      <td>3475.0</td>
+      <td>100.0</td>
+      <td>264.20000</td>
+      <td>1.075592</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>244.22</td>
+      <td>-2.236666</td>
+      <td>-2.269758</td>
+      <td>-1.457925</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>4301341 rows × 25 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span><span class="n">spx_filtered_10</span><span class="p">,</span> <span class="n">spx_filtered_9</span><span class="p">,</span> <span class="s2">&quot;IV Filter&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| IV Filter :
+&gt;&gt; Records removed: 356,135 out of 4,657,476 (7.65%)
+&gt;&gt; Filtered data shape: 4,301,341 rows // 25 columns
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="o">.</span><span class="n">build_l2_iv_chart</span><span class="p">(</span><span class="n">l2_data_with_fit</span><span class="p">,</span> <span class="n">date_range</span><span class="o">=</span><span class="n">DATE_RANGE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4f8a05cce2f80b45220a691c3e24114a1ea73bc249585a7ee3c48b5d61ced5a8.png" src="../_images/4f8a05cce2f80b45220a691c3e24114a1ea73bc249585a7ee3c48b5d61ced5a8.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="o">.</span><span class="n">build_l3_iv_chart</span><span class="p">(</span><span class="n">spx_filtered_10</span><span class="p">,</span> <span class="n">DATE_RANGE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/82a96b60b0785d9aaad4915e2ddec903ca66906f78ca5ea5a67d0c79271873c5.png" src="../_images/82a96b60b0785d9aaad4915e2ddec903ca66906f78ca5ea5a67d0c79271873c5.png" />
+</div>
+</div>
+</section>
+<section id="put-call-parity-filter">
+<h3>Put-Call Parity Filter<a class="headerlink" href="#put-call-parity-filter" title="Link to this heading">#</a></h3>
+<p>The puts and calls need to be matched up based on trading date, expiry date, and option type. We then calculate the put-call parity implied interest rate, and filter out outliers based on the standard deviation of the relative distance between the interest rate implied by put-call parity, and the calculated daily median 3-month T-bill rate from the pulled data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered_11</span> <span class="o">=</span> <span class="n">f3</span><span class="o">.</span><span class="n">put_call_filter</span><span class="p">(</span><span class="n">spx_filtered_10</span><span class="p">,</span> <span class="n">DATE_RANGE</span><span class="p">)</span>
+<span class="n">spx_filtered_11</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
+&gt;&gt; Running PCP filter...
+ |-- PCP filter: calculating bid-ask midpoint...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> |-- PCP filter: building put-call pairs...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> |-- PCP filter: calculating PCP implied interest rate...
+ |-- PCP filter: Check ok --&gt; Underlying prices, strike prices of put and call options match exactly.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> |-- PCP filter: filtering outliers...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> |-- PCP filter: building L3 final filtered options chart...
+ |-- PCP filter complete.
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>secid</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>best_bid</th>
+      <th>best_offer</th>
+      <th>strike_price</th>
+      <th>contract_size</th>
+      <th>mid_price</th>
+      <th>days_to_maturity</th>
+      <th>pc_parity_int_rate</th>
+      <th>intrinsic</th>
+      <th>log_iv</th>
+      <th>fitted_iv</th>
+      <th>rel_distance_iv</th>
+      <th>moneyness_bin</th>
+      <th>stdev_iv_moneyness_bin</th>
+      <th>is_outlier_iv</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th>exdate</th>
+      <th>moneyness</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">1996-01-04</th>
+      <th rowspan="4" valign="top">1996-01-20</th>
+      <th>0.987534</th>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.082711</td>
+      <td>5.04</td>
+      <td>444.0</td>
+      <td>5905.0</td>
+      <td>10.0000</td>
+      <td>10.375</td>
+      <td>610.0</td>
+      <td>100.0</td>
+      <td>10.18750</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>7.70</td>
+      <td>-2.492403</td>
+      <td>-2.377298</td>
+      <td>4.841838</td>
+      <td>(0.975, 1.0]</td>
+      <td>3.516840</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1.019913</th>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.097356</td>
+      <td>5.04</td>
+      <td>4022.0</td>
+      <td>5969.0</td>
+      <td>1.1875</td>
+      <td>1.375</td>
+      <td>630.0</td>
+      <td>100.0</td>
+      <td>1.28125</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.329381</td>
+      <td>-2.285771</td>
+      <td>1.907866</td>
+      <td>(1.0, 1.025]</td>
+      <td>5.219336</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1.028007</th>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.101756</td>
+      <td>5.04</td>
+      <td>1627.0</td>
+      <td>6224.0</td>
+      <td>0.6250</td>
+      <td>0.750</td>
+      <td>635.0</td>
+      <td>100.0</td>
+      <td>0.68750</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.285177</td>
+      <td>-2.264082</td>
+      <td>0.931727</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1.036102</th>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.100588</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>6593.0</td>
+      <td>0.1875</td>
+      <td>0.375</td>
+      <td>640.0</td>
+      <td>100.0</td>
+      <td>0.28125</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.296722</td>
+      <td>-2.242870</td>
+      <td>2.401027</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1996-02-17</th>
+      <th>0.963251</th>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.071852</td>
+      <td>5.04</td>
+      <td>3.0</td>
+      <td>34.0</td>
+      <td>25.2500</td>
+      <td>26.250</td>
+      <td>595.0</td>
+      <td>100.0</td>
+      <td>25.75000</td>
+      <td>44 days</td>
+      <td>0.014622</td>
+      <td>22.70</td>
+      <td>-2.633147</td>
+      <td>-2.563785</td>
+      <td>2.705450</td>
+      <td>(0.95, 0.975]</td>
+      <td>2.301503</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">2019-12-31</th>
+      <th rowspan="5" valign="top">2020-06-19</th>
+      <th>1.044639</th>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.117063</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>395.0</td>
+      <td>192.2000</td>
+      <td>193.000</td>
+      <td>3375.0</td>
+      <td>100.0</td>
+      <td>192.60000</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>144.22</td>
+      <td>-2.145043</td>
+      <td>-2.132215</td>
+      <td>0.601630</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1.052377</th>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.113900</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>163.0</td>
+      <td>208.2000</td>
+      <td>209.100</td>
+      <td>3400.0</td>
+      <td>100.0</td>
+      <td>208.65000</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>169.22</td>
+      <td>-2.172434</td>
+      <td>-2.165558</td>
+      <td>0.317525</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1.060116</th>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.110925</td>
+      <td>1.52</td>
+      <td>20.0</td>
+      <td>310.0</td>
+      <td>222.8000</td>
+      <td>228.900</td>
+      <td>3425.0</td>
+      <td>100.0</td>
+      <td>225.85000</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>194.22</td>
+      <td>-2.198901</td>
+      <td>-2.199596</td>
+      <td>-0.031616</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1.067854</th>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.108540</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>12.0</td>
+      <td>241.2000</td>
+      <td>247.600</td>
+      <td>3450.0</td>
+      <td>100.0</td>
+      <td>244.40000</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>219.22</td>
+      <td>-2.220637</td>
+      <td>-2.234330</td>
+      <td>-0.612848</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1.075592</th>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.106814</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>260.9000</td>
+      <td>267.500</td>
+      <td>3475.0</td>
+      <td>100.0</td>
+      <td>264.20000</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>244.22</td>
+      <td>-2.236666</td>
+      <td>-2.269758</td>
+      <td>-1.457925</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>3195886 rows × 22 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compare_filtered_data_to_orig</span><span class="p">(</span>
+    <span class="n">spx_filtered_11</span><span class="p">,</span> <span class="n">spx_filtered_10</span><span class="p">,</span> <span class="s2">&quot;Put-Call Parity Filter&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>| Put-Call Parity Filter :
+&gt;&gt; Records removed: 1,105,455 out of 4,301,341 (25.70%)
+&gt;&gt; Filtered data shape: 3,195,886 rows // 22 columns
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># save L3 filtered data</span>
+<span class="n">spx_l3_filtered</span> <span class="o">=</span> <span class="n">spx_filtered_11</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">spx_l3_filtered</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;L3_filtered_</span><span class="si">{</span><span class="n">DATE_RANGE</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="o">.</span><span class="n">build_l3_iv_pcp_chart</span><span class="p">(</span><span class="n">spx_l3_filtered</span><span class="p">,</span> <span class="n">DATE_RANGE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/796da945b08b97a487c2c7cdf2c8c8948adc80867e490ffe46d86eee9a85ef04.png" src="../_images/796da945b08b97a487c2c7cdf2c8c8948adc80867e490ffe46d86eee9a85ef04.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># save final cleaned data to folder</span>
+<span class="n">spx_filtered_final</span> <span class="o">=</span> <span class="n">spx_filtered_11</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">final_savefile</span> <span class="o">=</span> <span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;spx_filtered_final_</span><span class="si">{</span><span class="n">DATE_RANGE</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">spx_filtered_final</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">final_savefile</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;&gt; Final filtered data saved to </span><span class="si">{</span><span class="n">final_savefile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;&gt; </span><span class="si">{</span><span class="n">DATA_DIR</span><span class="si">}</span><span class="s2"> does not exist. Creating directory...&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">spx_filtered_final</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">final_savefile</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;&gt; Final filtered data saved to </span><span class="si">{</span><span class="n">final_savefile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&gt;&gt; Final filtered data saved to /Users/jbejarano/GitRepositories/ftsfr/_data/options/spx_filtered_final_1996-01_2024-12.parquet
+</pre></div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../cleaning_options.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Cleaning Summary: Options Data</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="portfolios.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Imports</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Imports</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#function-definitions">Function Definitions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#data-note">Data Note</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#data-filtration">1. Data Filtration</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#level-1-filters">Level 1 Filters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identical-filter">Identical Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identical-except-price-filter">Identical Except Price Filter</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#filter-options-with-bid-0">Filter Options with Bid = 0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#filter-options-with-vol-0">Filter Options with Vol = 0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#level-2-filters">Level 2 Filters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#days-to-maturity-7-or-180-filter">Days to Maturity &lt;7 or &gt;180 Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iv-5-or-100-filter">IV&lt;5% or &gt;100% Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#moneyness-0-8-or-1-2-filter">Moneyness &lt;0.8 or &gt;1.2 Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implied-interest-rate-0-filter">Implied Interest Rate &lt; 0 Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unable-to-compute-iv-filter">Unable to Compute IV Filter</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#level-3-filters">Level 3 Filters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iv-filter">IV Filter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#put-call-parity-filter">Put-Call Parity Filter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

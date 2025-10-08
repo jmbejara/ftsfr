@@ -1,0 +1,1694 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Data Glimpses Report: FTSFR only &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'data_glimpses_ftsfr';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cleaning Summary: CDS Bond Basis" href="_notebook_build/summary_cds_bond_basis_ipynb.html" />
+    <link rel="prev" title="Data Glimpses Report" href="data_glimpses.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2Fdata_glimpses_ftsfr.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/data_glimpses_ftsfr.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Data Glimpses Report: FTSFR only</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-ftsfr-datasets-by-task">Summary of FTSFR Datasets by Task</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#organize-ftsfr-datasets">Organize Ftsfr Datasets</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-tips-treasury-basis-parquet">ftsfr_tips_treasury_basis.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#columns">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numeric-column-statistics">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#date-datetime-column-statistics">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treasury-sf-basis-parquet">ftsfr_treasury_sf_basis.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treasury-swap-basis-parquet">ftsfr_treasury_swap_basis.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-bond-basis-aggregated-parquet">ftsfr_CDS_bond_basis_aggregated.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-bond-basis-non-aggregated-parquet">ftsfr_CDS_bond_basis_non_aggregated.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-contract-returns-parquet">ftsfr_CDS_contract_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-portfolio-returns-parquet">ftsfr_CDS_portfolio_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cip-spreads-parquet">ftsfr_CIP_spreads.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-commodities-returns-parquet">ftsfr_commodities_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-corp-bond-portfolio-returns-parquet">ftsfr_corp_bond_portfolio_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-corp-bond-returns-parquet">ftsfr_corp_bond_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treas-yield-curve-zero-coupon-parquet">ftsfr_treas_yield_curve_zero_coupon.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-fx-returns-parquet">ftsfr_FX_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-he-kelly-manela-all-parquet">ftsfr_he_kelly_manela_all.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-he-kelly-manela-factors-daily-parquet">ftsfr_he_kelly_manela_factors_daily.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-he-kelly-manela-factors-monthly-parquet">ftsfr_he_kelly_manela_factors_monthly.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id45">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-french-portfolios-25-daily-size-and-bm-parquet">ftsfr_french_portfolios_25_daily_size_and_bm.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id46">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id47">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id48">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-french-portfolios-25-daily-size-and-inv-parquet">ftsfr_french_portfolios_25_daily_size_and_inv.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id49">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id50">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id51">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-french-portfolios-25-daily-size-and-op-parquet">ftsfr_french_portfolios_25_daily_size_and_op.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id52">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id53">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id54">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-cash-liquidity-parquet">ftsfr_nyu_call_report_cash_liquidity.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id55">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id56">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id57">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet">ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id58">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id59">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id60">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-holding-company-leverage-parquet">ftsfr_nyu_call_report_holding_company_leverage.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id61">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id62">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id63">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-leverage-parquet">ftsfr_nyu_call_report_leverage.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id64">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id65">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id66">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cjs-option-returns-parquet">ftsfr_cjs_option_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id67">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id68">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id69">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-hkm-option-returns-parquet">ftsfr_hkm_option_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id70">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id71">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id72">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treas-bond-portfolio-returns-parquet">ftsfr_treas_bond_portfolio_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id73">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id74">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id75">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treas-bond-returns-parquet">ftsfr_treas_bond_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id76">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id77">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id78">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-crsp-monthly-stock-ret-parquet">ftsfr_CRSP_monthly_stock_ret.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id79">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id80">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id81">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-crsp-monthly-stock-retx-parquet">ftsfr_CRSP_monthly_stock_retx.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id82">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id83">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id84">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="data-glimpses-report-ftsfr-only">
+<h1>Data Glimpses Report: FTSFR only<a class="headerlink" href="#data-glimpses-report-ftsfr-only" title="Link to this heading">#</a></h1>
+<p>Total FTSFR datasets: 29</p>
+<p>This report provides enhanced analysis specifically for FTSFR (Financial Time Series Forecasting Repository) datasets, including:</p>
+<ul class="simple">
+<li><p>Detailed null value analysis for all columns</p></li>
+<li><p>Row uniqueness verification</p></li>
+<li><p>Standard dataset metadata and glimpses</p></li>
+</ul>
+<section id="summary-of-ftsfr-datasets-by-task">
+<h2>Summary of FTSFR Datasets by Task<a class="headerlink" href="#summary-of-ftsfr-datasets-by-task" title="Link to this heading">#</a></h2>
+<section id="organize-ftsfr-datasets">
+<h3>Organize Ftsfr Datasets<a class="headerlink" href="#organize-ftsfr-datasets" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="#ftsfr-tips-treasury-basis-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_tips_treasury_basis.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-treasury-sf-basis-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_treasury_sf_basis.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-treasury-swap-basis-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_treasury_swap_basis.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-cds-bond-basis-aggregated-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_CDS_bond_basis_aggregated.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-cds-bond-basis-non-aggregated-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_CDS_bond_basis_non_aggregated.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-cds-contract-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_CDS_contract_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-cds-portfolio-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_CDS_portfolio_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-cip-spreads-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_CIP_spreads.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-commodities-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_commodities_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-corp-bond-portfolio-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_corp_bond_portfolio_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-corp-bond-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_corp_bond_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-treas-yield-curve-zero-coupon-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_treas_yield_curve_zero_coupon.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-fx-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_FX_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-he-kelly-manela-all-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_he_kelly_manela_all.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-he-kelly-manela-factors-daily-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_he_kelly_manela_factors_daily.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-he-kelly-manela-factors-monthly-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_he_kelly_manela_factors_monthly.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-french-portfolios-25-daily-size-and-bm-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_french_portfolios_25_daily_size_and_bm.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-french-portfolios-25-daily-size-and-inv-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_french_portfolios_25_daily_size_and_inv.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-french-portfolios-25-daily-size-and-op-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_french_portfolios_25_daily_size_and_op.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-nyu-call-report-cash-liquidity-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_nyu_call_report_cash_liquidity.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-nyu-call-report-holding-company-leverage-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_nyu_call_report_holding_company_leverage.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-nyu-call-report-leverage-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_nyu_call_report_leverage.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-cjs-option-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_cjs_option_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-hkm-option-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_hkm_option_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-treas-bond-portfolio-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_treas_bond_portfolio_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-treas-bond-returns-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_treas_bond_returns.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-crsp-monthly-stock-ret-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_CRSP_monthly_stock_ret.parquet</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#ftsfr-crsp-monthly-stock-retx-parquet"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">ftsfr_CRSP_monthly_stock_retx.parquet</span></code></span></a></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-tips-treasury-basis-parquet">
+<h2>ftsfr_tips_treasury_basis.parquet<a class="headerlink" href="#ftsfr-tips-treasury-basis-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/basis_tips_treas/ftsfr_tips_treasury_basis.parquet</span></code>
+<strong>Size:</strong> 206374 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 20,647 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="columns">
+<h3>Columns<a class="headerlink" href="#columns" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;us&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="numeric-column-statistics">
+<h3>Numeric Column Statistics<a class="headerlink" href="#numeric-column-statistics" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">28.952341619528084</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">243.18891701256675</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">24.87</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">23.50302543169036</span>
+</pre></div>
+</div>
+</section>
+<section id="date-datetime-column-statistics">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#date-datetime-column-statistics" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2004</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">21</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-treasury-sf-basis-parquet">
+<h2>ftsfr_treasury_sf_basis.parquet<a class="headerlink" href="#ftsfr-treasury-sf-basis-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/basis_treas_sf/ftsfr_treasury_sf_basis.parquet</span></code>
+<strong>Size:</strong> 175432 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 24,537 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id1">
+<h3>Columns<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;us&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">420.7967777777778</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">288.82433333333336</span><span class="p">,</span> <span class="n">mean</span><span class="o">=-</span><span class="mf">23.23</span><span class="p">,</span> <span class="n">median</span><span class="o">=-</span><span class="mf">10.56133333333333</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2004</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">23</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">08</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-treasury-swap-basis-parquet">
+<h2>ftsfr_treasury_swap_basis.parquet<a class="headerlink" href="#ftsfr-treasury-swap-basis-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/basis_treas_swap/ftsfr_treasury_swap_basis.parquet</span></code>
+<strong>Size:</strong> 169214 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 32,022 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id4">
+<h3>Columns<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;us&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">105.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">87.79999999999997</span><span class="p">,</span> <span class="n">mean</span><span class="o">=-</span><span class="mf">12.67</span><span class="p">,</span> <span class="n">median</span><span class="o">=-</span><span class="mf">10.899999999999999</span>
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2001</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">20</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">11</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-cds-bond-basis-aggregated-parquet">
+<h2>ftsfr_CDS_bond_basis_aggregated.parquet<a class="headerlink" href="#ftsfr-cds-bond-basis-aggregated-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_aggregated.parquet</span></code>
+<strong>Size:</strong> 5308 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 346 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id7">
+<h3>Columns<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">5.751113076375435</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">9.081822277149262</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.81</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">2.002582027998724</span>
+</pre></div>
+</div>
+</section>
+<section id="id9">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2002</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2022</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-cds-bond-basis-non-aggregated-parquet">
+<h2>ftsfr_CDS_bond_basis_non_aggregated.parquet<a class="headerlink" href="#ftsfr-cds-bond-basis-non-aggregated-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet</span></code>
+<strong>Size:</strong> 759958 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 91,742 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id10">
+<h3>Columns<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id11">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">99.98623956278941</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">99.84502978149779</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">2.32</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">3.127317613581347</span>
+</pre></div>
+</div>
+</section>
+<section id="id12">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2002</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2022</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-cds-contract-returns-parquet">
+<h2>ftsfr_CDS_contract_returns.parquet<a class="headerlink" href="#ftsfr-cds-contract-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_returns/ftsfr_CDS_contract_returns.parquet</span></code>
+<strong>Size:</strong> 1.7 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 201,830 rows × 4 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id13">
+<h3>Columns<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+<span class="n">__index_level_0__</span>                        <span class="n">Int64</span>          
+</pre></div>
+</div>
+</section>
+<section id="id14">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">1.805303277625713</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.2258522666583374</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0016596277982949825</span>
+<span class="n">__index_level_0__</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">657848</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">330612.87</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">331160.0</span>
+</pre></div>
+</div>
+</section>
+<section id="id15">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2001</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2023</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-cds-portfolio-returns-parquet">
+<h2>ftsfr_CDS_portfolio_returns.parquet<a class="headerlink" href="#ftsfr-cds-portfolio-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_returns/ftsfr_CDS_portfolio_returns.parquet</span></code>
+<strong>Size:</strong> 57422 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 5,510 rows × 4 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id16">
+<h3>Columns<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+<span class="n">__index_level_0__</span>                        <span class="n">Int64</span>          
+</pre></div>
+</div>
+</section>
+<section id="id17">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">5.3628018753738094e-05</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.019341884154433435</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.000844851743564012</span>
+<span class="n">__index_level_0__</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">5519</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">2759.04</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">2759.5</span>
+</pre></div>
+</div>
+</section>
+<section id="id18">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2001</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2023</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-cip-spreads-parquet">
+<h2>ftsfr_CIP_spreads.parquet<a class="headerlink" href="#ftsfr-cip-spreads-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cip/ftsfr_CIP_spreads.parquet</span></code>
+<strong>Size:</strong> 405282 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 43,490 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id19">
+<h3>Columns<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id20">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">75.02010739148606</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">439.59367390435733</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">18.90</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">12.660612223492215</span>
+</pre></div>
+</div>
+</section>
+<section id="id21">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id21" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2001</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">04</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">28</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-commodities-returns-parquet">
+<h2>ftsfr_commodities_returns.parquet<a class="headerlink" href="#ftsfr-commodities-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/commodities/ftsfr_commodities_returns.parquet</span></code>
+<strong>Size:</strong> 96067 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 11,553 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id22">
+<h3>Columns<a class="headerlink" href="#id22" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id23">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.6026668174158621</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.6741843598832211</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=-</span><span class="mf">5.1923181702440147e-05</span>
+</pre></div>
+</div>
+</section>
+<section id="id24">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id24" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">12</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-corp-bond-portfolio-returns-parquet">
+<h2>ftsfr_corp_bond_portfolio_returns.parquet<a class="headerlink" href="#ftsfr-corp-bond-portfolio-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_portfolio_returns.parquet</span></code>
+<strong>Size:</strong> 21603 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 2,420 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id25">
+<h3>Columns<a class="headerlink" href="#id25" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">Float64</span>        
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id26">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id26" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">5.50</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">5.5</span>
+<span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.2357410309055786</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.21497478314108745</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.004769802911585877</span>
+</pre></div>
+</div>
+</section>
+<section id="id27">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id27" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2002</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2022</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-corp-bond-returns-parquet">
+<h2>ftsfr_corp_bond_returns.parquet<a class="headerlink" href="#ftsfr-corp-bond-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_returns.parquet</span></code>
+<strong>Size:</strong> 8.0 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 1,046,059 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id28">
+<h3>Columns<a class="headerlink" href="#id28" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id29">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id29" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.9753107633155358</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">3.68351</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0033377041526085</span>
+</pre></div>
+</div>
+</section>
+<section id="id30">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id30" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2002</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2022</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-treas-yield-curve-zero-coupon-parquet">
+<h2>ftsfr_treas_yield_curve_zero_coupon.parquet<a class="headerlink" href="#ftsfr-treas-yield-curve-zero-coupon-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/fed_yield_curve/ftsfr_treas_yield_curve_zero_coupon.parquet</span></code>
+<strong>Size:</strong> 2.4 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 374,312 rows × 4 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id31">
+<h3>Columns<a class="headerlink" href="#id31" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+<span class="n">__index_level_0__</span>                        <span class="n">Int64</span>          
+</pre></div>
+</div>
+</section>
+<section id="id32">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id32" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.0554</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">16.462</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">5.60</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">5.2962389140670005</span>
+<span class="n">__index_level_0__</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">502889</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">226669.36</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">211886.5</span>
+</pre></div>
+</div>
+</section>
+<section id="id33">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id33" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1961</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">14</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">12</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-fx-returns-parquet">
+<h2>ftsfr_FX_returns.parquet<a class="headerlink" href="#ftsfr-fx-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/foreign_exchange/ftsfr_FX_returns.parquet</span></code>
+<strong>Size:</strong> 548157 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 52,473 rows × 4 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id34">
+<h3>Columns<a class="headerlink" href="#id34" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+<span class="n">__index_level_0__</span>                        <span class="n">Int64</span>          
+</pre></div>
+</div>
+</section>
+<section id="id35">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id35" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">1.0326500049101444</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">8.548700375536482</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.77</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">1.0010820813484795</span>
+<span class="n">__index_level_0__</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">726</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">61109</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">30845.96</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">31254.0</span>
+</pre></div>
+</div>
+</section>
+<section id="id36">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id36" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1999</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">09</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">28</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-he-kelly-manela-all-parquet">
+<h2>ftsfr_he_kelly_manela_all.parquet<a class="headerlink" href="#ftsfr-he-kelly-manela-all-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_all.parquet</span></code>
+<strong>Size:</strong> 14697 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 2,064 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id37">
+<h3>Columns<a class="headerlink" href="#id37" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id38">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id38" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.2811</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">2012.9658</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">95.79</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0509</span>
+</pre></div>
+</div>
+</section>
+<section id="id39">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id39" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-he-kelly-manela-factors-daily-parquet">
+<h2>ftsfr_he_kelly_manela_factors_daily.parquet<a class="headerlink" href="#ftsfr-he-kelly-manela-factors-daily-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_factors_daily.parquet</span></code>
+<strong>Size:</strong> 210033 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 19,063 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id40">
+<h3>Columns<a class="headerlink" href="#id40" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id41">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id41" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.1603005169783573</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">4698.062377977052</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">77.57</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0327419481774856</span>
+</pre></div>
+</div>
+</section>
+<section id="id42">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id42" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">2000</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">03</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2018</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">11</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-he-kelly-manela-factors-monthly-parquet">
+<h2>ftsfr_he_kelly_manela_factors_monthly.parquet<a class="headerlink" href="#ftsfr-he-kelly-manela-factors-monthly-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_factors_monthly.parquet</span></code>
+<strong>Size:</strong> 19717 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 2,348 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id43">
+<h3>Columns<a class="headerlink" href="#id43" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id44">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id44" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.2811</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">2012.9658</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">92.06</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.052500000000000005</span>
+</pre></div>
+</div>
+</section>
+<section id="id45">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id45" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2018</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-french-portfolios-25-daily-size-and-bm-parquet">
+<h2>ftsfr_french_portfolios_25_daily_size_and_bm.parquet<a class="headerlink" href="#ftsfr-french-portfolios-25-daily-size-and-bm-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/ken_french_data_library/ftsfr_french_portfolios_25_daily_size_and_bm.parquet</span></code>
+<strong>Size:</strong> 2.5 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 650,575 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id46">
+<h3>Columns<a class="headerlink" href="#id46" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id47">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id47" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.9998999999999999</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.2793999999999999</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0008</span>
+</pre></div>
+</div>
+</section>
+<section id="id48">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id48" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1926</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-french-portfolios-25-daily-size-and-inv-parquet">
+<h2>ftsfr_french_portfolios_25_daily_size_and_inv.parquet<a class="headerlink" href="#ftsfr-french-portfolios-25-daily-size-and-inv-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/ken_french_data_library/ftsfr_french_portfolios_25_daily_size_and_inv.parquet</span></code>
+<strong>Size:</strong> 1.1 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 390,075 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id49">
+<h3>Columns<a class="headerlink" href="#id49" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id50">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id50" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.2089</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.1524</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0008</span>
+</pre></div>
+</div>
+</section>
+<section id="id51">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id51" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1963</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-french-portfolios-25-daily-size-and-op-parquet">
+<h2>ftsfr_french_portfolios_25_daily_size_and_op.parquet<a class="headerlink" href="#ftsfr-french-portfolios-25-daily-size-and-op-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/ken_french_data_library/ftsfr_french_portfolios_25_daily_size_and_op.parquet</span></code>
+<strong>Size:</strong> 1.1 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 390,075 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id52">
+<h3>Columns<a class="headerlink" href="#id52" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id53">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id53" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.21719999999999998</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.3675</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0008</span>
+</pre></div>
+</div>
+</section>
+<section id="id54">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id54" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1963</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-nyu-call-report-cash-liquidity-parquet">
+<h2>ftsfr_nyu_call_report_cash_liquidity.parquet<a class="headerlink" href="#ftsfr-nyu-call-report-cash-liquidity-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_cash_liquidity.parquet</span></code>
+<strong>Size:</strong> 13.9 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 1,906,765 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id55">
+<h3>Columns<a class="headerlink" href="#id55" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id56">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id56" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0230938416422288</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.05780420579828501</span>
+</pre></div>
+</div>
+</section>
+<section id="id57">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id57" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1976</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2020</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet">
+<h2>ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet<a class="headerlink" href="#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet</span></code>
+<strong>Size:</strong> 6.1 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 832,902 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id58">
+<h3>Columns<a class="headerlink" href="#id58" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id59">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id59" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.9987931814753357</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.05177395811931505</span>
+</pre></div>
+</div>
+</section>
+<section id="id60">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id60" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1976</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2020</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-nyu-call-report-holding-company-leverage-parquet">
+<h2>ftsfr_nyu_call_report_holding_company_leverage.parquet<a class="headerlink" href="#ftsfr-nyu-call-report-holding-company-leverage-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_holding_company_leverage.parquet</span></code>
+<strong>Size:</strong> 6.0 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 831,858 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id61">
+<h3>Columns<a class="headerlink" href="#id61" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id62">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id62" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">14698.6</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">11.62</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">10.981269862683128</span>
+</pre></div>
+</div>
+</section>
+<section id="id63">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id63" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1976</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2020</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-nyu-call-report-leverage-parquet">
+<h2>ftsfr_nyu_call_report_leverage.parquet<a class="headerlink" href="#ftsfr-nyu-call-report-leverage-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/nyu_call_report/ftsfr_nyu_call_report_leverage.parquet</span></code>
+<strong>Size:</strong> 13.4 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 1,849,957 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id64">
+<h3>Columns<a class="headerlink" href="#id64" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id65">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id65" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.952712100139082</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">36527.066666666666</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">11.86</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">11.121173104434908</span>
+</pre></div>
+</div>
+</section>
+<section id="id66">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id66" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1976</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2020</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-cjs-option-returns-parquet">
+<h2>ftsfr_cjs_option_returns.parquet<a class="headerlink" href="#ftsfr-cjs-option-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_cjs_option_returns.parquet</span></code>
+<strong>Size:</strong> 91630 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 15,552 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id67">
+<h3>Columns<a class="headerlink" href="#id67" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id68">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id68" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.13864600229548996</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">2.791869182116687</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0</span>
+</pre></div>
+</div>
+</section>
+<section id="id69">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id69" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1996</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-hkm-option-returns-parquet">
+<h2>ftsfr_hkm_option_returns.parquet<a class="headerlink" href="#ftsfr-hkm-option-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_hkm_option_returns.parquet</span></code>
+<strong>Size:</strong> 39817 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 5,184 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id70">
+<h3>Columns<a class="headerlink" href="#id70" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id71">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id71" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.07194785160690693</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.9284949815963346</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.004017050151524223</span>
+</pre></div>
+</div>
+</section>
+<section id="id72">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id72" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1996</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2019</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-treas-bond-portfolio-returns-parquet">
+<h2>ftsfr_treas_bond_portfolio_returns.parquet<a class="headerlink" href="#ftsfr-treas-bond-portfolio-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_bond_portfolio_returns.parquet</span></code>
+<strong>Size:</strong> 59572 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 6,659 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id73">
+<h3>Columns<a class="headerlink" href="#id73" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">String</span>         
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id74">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id74" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.06045740780772699</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.1210504349533954</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0038475717070697857</span>
+</pre></div>
+</div>
+</section>
+<section id="id75">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id75" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-treas-bond-returns-parquet">
+<h2>ftsfr_treas_bond_returns.parquet<a class="headerlink" href="#ftsfr-treas-bond-returns-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_bond_returns.parquet</span></code>
+<strong>Size:</strong> 919213 bytes | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 121,827 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id76">
+<h3>Columns<a class="headerlink" href="#id76" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">Float64</span>        
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id77">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id77" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mf">200636.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">208448.0</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">204544.46</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">204055.0</span>
+<span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">0.15135394584216577</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.1751899693786838</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.003016939008775532</span>
+</pre></div>
+</div>
+</section>
+<section id="id78">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id78" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-crsp-monthly-stock-ret-parquet">
+<h2>ftsfr_CRSP_monthly_stock_ret.parquet<a class="headerlink" href="#ftsfr-crsp-monthly-stock-ret-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_ret.parquet</span></code>
+<strong>Size:</strong> 15.7 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 3,810,519 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id79">
+<h3>Columns<a class="headerlink" href="#id79" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">Int64</span>          
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id80">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id80" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">93436</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">49672.81</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">48195.0</span>
+<span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">26.583827</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0</span>
+</pre></div>
+</div>
+</section>
+<section id="id81">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id81" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1926</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2024</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ftsfr-crsp-monthly-stock-retx-parquet">
+<h2>ftsfr_CRSP_monthly_stock_retx.parquet<a class="headerlink" href="#ftsfr-crsp-monthly-stock-retx-parquet" title="Link to this heading">#</a></h2>
+<p><strong>Path:</strong> <code class="docutils literal notranslate"><span class="pre">/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/wrds_crsp_compustat/ftsfr_CRSP_monthly_stock_retx.parquet</span></code>
+<strong>Size:</strong> 14.4 MB | <strong>Type:</strong> Parquet | <strong>Shape:</strong> 3,810,519 rows × 3 columns</p>
+<p><strong>All rows unique:</strong> ✅ Yes</p>
+<section id="id82">
+<h3>Columns<a class="headerlink" href="#id82" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span>                                <span class="n">Int64</span>          
+<span class="n">ds</span>                                       <span class="n">Datetime</span><span class="p">(</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">,</span> <span class="n">time_zone</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">y</span>                                        <span class="n">Float64</span>        
+</pre></div>
+</div>
+</section>
+<section id="id83">
+<h3>Numeric Column Statistics<a class="headerlink" href="#id83" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unique_id</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">93436</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">49672.81</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">48195.0</span>
+<span class="n">y</span><span class="p">:</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">26.583827</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="mf">0.0</span>
+</pre></div>
+</div>
+</section>
+<section id="id84">
+<h3>Date/Datetime Column Statistics<a class="headerlink" href="#id84" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">:</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1926</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">30</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">2024</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span> <span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="data_glimpses.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Data Glimpses Report</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="_notebook_build/summary_cds_bond_basis_ipynb.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Cleaning Summary: CDS Bond Basis</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-ftsfr-datasets-by-task">Summary of FTSFR Datasets by Task</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#organize-ftsfr-datasets">Organize Ftsfr Datasets</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-tips-treasury-basis-parquet">ftsfr_tips_treasury_basis.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#columns">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numeric-column-statistics">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#date-datetime-column-statistics">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treasury-sf-basis-parquet">ftsfr_treasury_sf_basis.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treasury-swap-basis-parquet">ftsfr_treasury_swap_basis.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-bond-basis-aggregated-parquet">ftsfr_CDS_bond_basis_aggregated.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-bond-basis-non-aggregated-parquet">ftsfr_CDS_bond_basis_non_aggregated.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-contract-returns-parquet">ftsfr_CDS_contract_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cds-portfolio-returns-parquet">ftsfr_CDS_portfolio_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cip-spreads-parquet">ftsfr_CIP_spreads.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-commodities-returns-parquet">ftsfr_commodities_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-corp-bond-portfolio-returns-parquet">ftsfr_corp_bond_portfolio_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-corp-bond-returns-parquet">ftsfr_corp_bond_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treas-yield-curve-zero-coupon-parquet">ftsfr_treas_yield_curve_zero_coupon.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-fx-returns-parquet">ftsfr_FX_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-he-kelly-manela-all-parquet">ftsfr_he_kelly_manela_all.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-he-kelly-manela-factors-daily-parquet">ftsfr_he_kelly_manela_factors_daily.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-he-kelly-manela-factors-monthly-parquet">ftsfr_he_kelly_manela_factors_monthly.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id45">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-french-portfolios-25-daily-size-and-bm-parquet">ftsfr_french_portfolios_25_daily_size_and_bm.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id46">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id47">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id48">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-french-portfolios-25-daily-size-and-inv-parquet">ftsfr_french_portfolios_25_daily_size_and_inv.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id49">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id50">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id51">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-french-portfolios-25-daily-size-and-op-parquet">ftsfr_french_portfolios_25_daily_size_and_op.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id52">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id53">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id54">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-cash-liquidity-parquet">ftsfr_nyu_call_report_cash_liquidity.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id55">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id56">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id57">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-holding-company-cash-liquidity-parquet">ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id58">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id59">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id60">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-holding-company-leverage-parquet">ftsfr_nyu_call_report_holding_company_leverage.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id61">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id62">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id63">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-nyu-call-report-leverage-parquet">ftsfr_nyu_call_report_leverage.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id64">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id65">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id66">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-cjs-option-returns-parquet">ftsfr_cjs_option_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id67">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id68">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id69">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-hkm-option-returns-parquet">ftsfr_hkm_option_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id70">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id71">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id72">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treas-bond-portfolio-returns-parquet">ftsfr_treas_bond_portfolio_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id73">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id74">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id75">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-treas-bond-returns-parquet">ftsfr_treas_bond_returns.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id76">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id77">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id78">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-crsp-monthly-stock-ret-parquet">ftsfr_CRSP_monthly_stock_ret.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id79">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id80">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id81">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ftsfr-crsp-monthly-stock-retx-parquet">ftsfr_CRSP_monthly_stock_retx.parquet</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id82">Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id83">Numeric Column Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id84">Date/Datetime Column Statistics</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

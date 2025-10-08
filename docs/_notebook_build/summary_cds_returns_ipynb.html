@@ -1,0 +1,2640 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cleaning Summary: CDS Returns &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_notebook_build/summary_cds_returns_ipynb';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads" href="summary_cip_ipynb.html" />
+    <link rel="prev" title="Cleaning Summary: CDS Bond Basis" href="summary_cds_bond_basis_ipynb.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2F_notebook_build/summary_cds_returns_ipynb.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_notebook_build/summary_cds_returns_ipynb.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Cleaning Summary: CDS Returns</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">1. Introduction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#target-replication-quarterly-cds-return-structure">Target Replication: Quarterly CDS Return Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#federal-reserve-zero-coupon-yields">2.2 Federal Reserve Zero-Coupon Yields</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#treasury-yield-data">2.3 Treasury Yield Data</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replication">3. Replication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-free-rate-calculation">3.1. Risk-Free Rate Calculation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#monthly-return-computation">3.2. Monthly Return Computation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio-construction">3.3. Portfolio Construction</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">4. Comparison</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="cleaning-summary-cds-returns">
+<h1>Cleaning Summary: CDS Returns<a class="headerlink" href="#cleaning-summary-cds-returns" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports and path setup</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Plotting style</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+
+<span class="c1"># Add project root to path</span>
+<span class="n">project_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project_root</span><span class="p">))</span>
+
+<span class="c1"># Load project modules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cds_returns</span><span class="w"> </span><span class="kn">import</span> <span class="n">pull_fed_yield_curve</span><span class="p">,</span> <span class="n">pull_fred</span><span class="p">,</span> <span class="n">pull_markit_cds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">he_kelly_manela</span><span class="w"> </span><span class="kn">import</span> <span class="n">pull_he_kelly_manela</span>
+
+<span class="c1"># Load project settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;DATA_DIR&quot;</span><span class="p">))</span> <span class="o">/</span> <span class="s2">&quot;cds_returns&quot;</span>
+<span class="n">HE_DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;DATA_DIR&quot;</span><span class="p">))</span> <span class="o">/</span> <span class="s2">&quot;he_kelly_manela&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Change default pandas display options</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_colwidth</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.float_format&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># Change default figure size</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="introduction">
+<h2>1. Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
+<p>This notebook replicates monthly CDS portfolio returns as constructed in He, Kelly, and Manela (2017) and Palhares (2013)’s paper <em>“Cash-Flow Maturity and Risk Premia in CDS Markets.”</em></p>
+<blockquote>
+<div><p>“For CDS, we construct 20 portfolios sorted by spreads using individual name 5-year contracts… Our definition of CDS returns follows Palhares (2013).”</p>
+</div></blockquote>
+<p>While He, Kelly, and Manela (2017) construct CDS portfolios using data up to 2012, in this notebook we extend the sample period through 2024 for demonstration purposes.</p>
+<section id="target-replication-quarterly-cds-return-structure">
+<h3>Target Replication: Quarterly CDS Return Structure<a class="headerlink" href="#target-replication-quarterly-cds-return-structure" title="Link to this heading">#</a></h3>
+<p>The CDS return series consists of 20 portfolios, formed by sorting 5-year single-name CDS contracts into 4 quintiles based on credit spreads. Each month, returns are computed for portfolios within each quintile, producing 20 total portfolios.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">he_kelly</span> <span class="o">=</span> <span class="n">pull_he_kelly_manela</span><span class="o">.</span><span class="n">load_he_kelly_manela_all</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">HE_DATA_DIR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">col_lst</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;yyyymm&quot;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="n">col_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CDS_0</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">21</span><span class="p">):</span>
+    <span class="n">col_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CDS_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">he_kelly_df</span> <span class="o">=</span> <span class="n">he_kelly</span><span class="p">[</span><span class="n">col_lst</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">he_kelly_df</span><span class="p">[</span><span class="s2">&quot;Month&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+    <span class="n">he_kelly_df</span><span class="p">[</span><span class="s2">&quot;yyyymm&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y%m&quot;</span>
+<span class="p">)</span>
+<span class="n">he_kelly_df</span> <span class="o">=</span> <span class="n">he_kelly_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;yyyymm&quot;</span><span class="p">)</span>
+<span class="n">he_kelly_df</span> <span class="o">=</span> <span class="n">he_kelly_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Month&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">he_kelly_df</span><span class="p">)</span>
+<span class="c1"># %%</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">## 2. Data Retrieval</span>
+
+<span class="sd">We retrieve the datasets required to replicate the quarterly CDS returns. Retrieval scripts are modularized by source.</span>
+
+<span class="sd">### 2.1 CDS Data from Markit</span>
+
+<span class="sd">Following He et al. and Palhares, we use Markit as the source for CDS-related information. Specifically, we filter data by the following conditions:</span>
+
+<span class="sd">- `currency = &#39;USD&#39;`: USD-denominated CDS contracts only  </span>
+<span class="sd">- `docclause LIKE &#39;XR%%&#39;`: Only XR (no restructuring) contracts  </span>
+<span class="sd">- `CompositeDepth5Y &gt;= 3`: Minimum 3 dealer submissions for 5Y quotes  </span>
+<span class="sd">- `tenor IN (&#39;1Y&#39;, &#39;3Y&#39;, &#39;5Y&#39;, &#39;7Y&#39;, &#39;10Y&#39;)`: Focus on standard maturities</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;\n## 2. Data Retrieval\n\nWe retrieve the datasets required to replicate the quarterly CDS returns. Retrieval scripts are modularized by source.\n\n### 2.1 CDS Data from Markit\n\nFollowing He et al. and Palhares, we use Markit as the source for CDS-related information. Specifically, we filter data by the following conditions:\n\n- `currency = &#39;USD&#39;`: USD-denominated CDS contracts only  \n- `docclause LIKE &#39;XR%%&#39;`: Only XR (no restructuring) contracts  \n- `CompositeDepth5Y &gt;= 3`: Minimum 3 dealer submissions for 5Y quotes  \n- `tenor IN (&#39;1Y&#39;, &#39;3Y&#39;, &#39;5Y&#39;, &#39;7Y&#39;, &#39;10Y&#39;)`: Focus on standard maturities\n\n&quot;
+</pre></div>
+</div>
+<img alt="../_images/f1c39a57fca8d444ef077757556a16a521d811011b68f49d2d7db7870df0119f.png" src="../_images/f1c39a57fca8d444ef077757556a16a521d811011b68f49d2d7db7870df0119f.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cds_df</span> <span class="o">=</span> <span class="n">pull_markit_cds</span><span class="o">.</span><span class="n">load_cds_data</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cds_df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;date&#39;, &#39;ticker&#39;, &#39;redcode&#39;, &#39;parspread&#39;, &#39;convspreard&#39;, &#39;tenor&#39;,
+       &#39;country&#39;, &#39;creditdv01&#39;, &#39;riskypv01&#39;, &#39;irdv01&#39;, &#39;rec01&#39;, &#39;dp&#39;, &#39;jtd&#39;,
+       &#39;dtz&#39;, &#39;year&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong>Columns in <code class="docutils literal notranslate"><span class="pre">markit_cds.parquet</span></code></strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">date</span></code>: The date on which the CDS curve was calculated.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ticker</span></code>: Markit ticker symbol representing the reference entity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reddode</span></code>: Unique Markit RED (Reference Entity Database) code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parspread</span></code>: CDS par spread (in basis points); the fair premium for credit protection.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">convspreard</span></code>: Conversion spread used to translate CDS prices into spreads.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tenor</span></code>: Maturity of the CDS contract (e.g., 1Y, 3Y, 5Y, 7Y, 10Y).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">country</span></code>: Country of the reference entity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">creditdv01</span></code>: Change in CDS value from a 1 basis point change in credit spread.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">riskypv01</span></code>: Present value of the risky annuity (expected PV of CDS payments).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">irdv01</span></code>: Change in mark-to-market from a 1 bp shift in interest rates.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rec01</span></code>: Change in value from a 1% change in the assumed recovery rate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dp</span></code>: Implied default probability of the reference entity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jtd</span></code>: Jump-to-default — change in value assuming immediate credit event.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dtz</span></code>: Jump-to-zero — change in value assuming default and 0% recovery.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">year</span></code>: The year the data was pulled from (based on source table like <code class="docutils literal notranslate"><span class="pre">CDS2019</span></code>).</p></li>
+</ul>
+</div></blockquote>
+<p>We have also generated two additional CDS tables, which are not used directly in our calculations but are included in the <code class="docutils literal notranslate"><span class="pre">pull_markit_cds.py</span></code> script for reference:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">markit_red_crsp_link.parquet</span></code>:
+A mapping table that links Markit RED codes to CRSP Permnos using CUSIP and Ticker, supplemented by a fuzzy-matched name similarity score (nameRatio) and a linking flag (flg), indicating the method used (CUSIP or Ticker).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">markit_cds_subsetted_to_crsp.parquet</span></code>:
+A filtered subset of markit_cds.parquet that includes only records with RED codes successfully matched to CRSP Permnos (where nameRatio &gt;= 50). This table is intended for use when merging CDS data with CRSP equity or financial datasets.</p></li>
+</ol>
+</section>
+<section id="federal-reserve-zero-coupon-yields">
+<h3>2.2 Federal Reserve Zero-Coupon Yields<a class="headerlink" href="#federal-reserve-zero-coupon-yields" title="Link to this heading">#</a></h3>
+<p>In this step, we download and process the <a class="reference internal" href="#(https://www.federalreserve.gov/econres/feds/the-us-treasury-yield-curve-1961-to-the-present.htm)"><span class="xref myst">U.S. Treasury zero-coupon yield curve data</span></a> published by the Federal Reserve Board. This dataset is based on the Gürkaynak, Sack, and Wright (2007) methodology, which fits a smooth yield curve to observed Treasury yields.<br />
+We retrieve zero-coupon yield data directly from the Federal Reserve, labeled SVENY01 to SVENY30, representing 1-year to 30-year maturities.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fed_df</span> <span class="o">=</span> <span class="n">pull_fed_yield_curve</span><span class="o">.</span><span class="n">load_fed_yield_curve</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fed_df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;SVENY01&#39;, &#39;SVENY02&#39;, &#39;SVENY03&#39;, &#39;SVENY04&#39;, &#39;SVENY05&#39;, &#39;SVENY06&#39;,
+       &#39;SVENY07&#39;, &#39;SVENY08&#39;, &#39;SVENY09&#39;, &#39;SVENY10&#39;, &#39;SVENY11&#39;, &#39;SVENY12&#39;,
+       &#39;SVENY13&#39;, &#39;SVENY14&#39;, &#39;SVENY15&#39;, &#39;SVENY16&#39;, &#39;SVENY17&#39;, &#39;SVENY18&#39;,
+       &#39;SVENY19&#39;, &#39;SVENY20&#39;, &#39;SVENY21&#39;, &#39;SVENY22&#39;, &#39;SVENY23&#39;, &#39;SVENY24&#39;,
+       &#39;SVENY25&#39;, &#39;SVENY26&#39;, &#39;SVENY27&#39;, &#39;SVENY28&#39;, &#39;SVENY29&#39;, &#39;SVENY30&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="treasury-yield-data">
+<h3>2.3 Treasury Yield Data<a class="headerlink" href="#treasury-yield-data" title="Link to this heading">#</a></h3>
+<p>To calculate risk-free rates at shorter maturities, we also retrieve 3-month and 6-month Treasury yields (DGS3MO and DGS6MO) from FRED.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">swap_rates_df</span> <span class="o">=</span> <span class="n">pull_fred</span><span class="o">.</span><span class="n">load_fred</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">swap_rates_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>DGS1MO</th>
+      <th>DGS3MO</th>
+      <th>DGS6MO</th>
+      <th>DGS1</th>
+      <th>DGS2</th>
+      <th>DGS3</th>
+    </tr>
+    <tr>
+      <th>DATE</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2001-01-01</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2001-01-02</th>
+      <td>NaN</td>
+      <td>5.870</td>
+      <td>5.580</td>
+      <td>5.110</td>
+      <td>4.870</td>
+      <td>4.820</td>
+    </tr>
+    <tr>
+      <th>2001-01-03</th>
+      <td>NaN</td>
+      <td>5.690</td>
+      <td>5.440</td>
+      <td>5.040</td>
+      <td>4.920</td>
+      <td>4.920</td>
+    </tr>
+    <tr>
+      <th>2001-01-04</th>
+      <td>NaN</td>
+      <td>5.370</td>
+      <td>5.200</td>
+      <td>4.820</td>
+      <td>4.770</td>
+      <td>4.780</td>
+    </tr>
+    <tr>
+      <th>2001-01-05</th>
+      <td>NaN</td>
+      <td>5.120</td>
+      <td>4.980</td>
+      <td>4.600</td>
+      <td>4.560</td>
+      <td>4.570</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="replication">
+<h2>3. Replication<a class="headerlink" href="#replication" title="Link to this heading">#</a></h2>
+<p>We follow the return formula used in <em>He-Kelly-Manela (2017)</em>, referencing Palhares:</p>
+<div class="math notranslate nohighlight">
+\[
+\text{CDS}^{Ret}_t = \frac{\text{CDS}_{t-1}}{250} + \Delta \text{CDS}_t \cdot \text{RD}_{t-1}
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\frac{\text{CDS}_{t-1}}{250}\)</span>: <strong>Carry return</strong>, daily accrual from previous day’s spread (annualized over 250 days)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Delta \text{CDS}_t\)</span>: Daily change in spread</p></li>
+<li><p><span class="math notranslate nohighlight">\(\text{RD}_{t-1}\)</span>: <strong>Risky duration</strong>, proxy for PV of future spread payments</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+\text{RD}_t = \frac{1}{4} \sum_{j=1}^{4M} e^{-j\lambda/4} \cdot e^{-jr_t^{(j/4)}/4}
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(M\)</span>: CDS maturity (e.g., 5)</p></li>
+<li><p><span class="math notranslate nohighlight">\(r_t^{(j/4)}\)</span>: Quarterly risk-free rate</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lambda\)</span>: Default intensity, computed as:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+\lambda = 4 \cdot \log \left(1 + \frac{\text{CDS}}{4L} \right), \quad L = 0.6
+\]</div>
+<section id="risk-free-rate-calculation">
+<h3>3.1. Risk-Free Rate Calculation<a class="headerlink" href="#risk-free-rate-calculation" title="Link to this heading">#</a></h3>
+<p>We calculate the quarterly risk-free rates <span class="math notranslate nohighlight">\(r_t^{(j/4)}\)</span> via interpolation, since the raw data is only available annually (plus 0.25Y and 0.5Y points). Cubic interpolation fills in missing quarterly maturities.</p>
+<p>Even though returns are monthly, we retain quarterly rates under the assumption that CDS spreads are paid quarterly.</p>
+</section>
+<section id="monthly-return-computation">
+<h3>3.2. Monthly Return Computation<a class="headerlink" href="#monthly-return-computation" title="Link to this heading">#</a></h3>
+<p>We compute monthly CDS returns by applying the above formula for each individual name and maturity. Spread data is first aligned and cleaned at the monthly frequency.</p>
+</section>
+<section id="portfolio-construction">
+<h3>3.3. Portfolio Construction<a class="headerlink" href="#portfolio-construction" title="Link to this heading">#</a></h3>
+<p>We focus on U.S.-based 5Y CDS contracts and process spreads monthly. For each firm in each month, we keep only the <strong>first observed 5Y par spread</strong>, ensuring consistency in time series construction.</p>
+<p>To sort firms into credit quality groups, we compute quintiles based on the cross-sectional distribution of 5Y spreads for each month. These breakpoints define five credit buckets (quantiles 1–5), from safest to riskiest.</p>
+<p>We then assign each firm a quantile label based on their spread ranking. This quantile label is merged back into the full dataset, including other tenors (3Y, 7Y, 10Y), allowing us to analyze spread dynamics across maturities while controlling for credit quality.</p>
+<p>Finally, we compute the <strong>average par spread</strong> for each combination of:</p>
+<ul class="simple">
+<li><p>Tenor ∈ {3Y, 5Y, 7Y, 10Y}</p></li>
+<li><p>Credit Quantile ∈ {1, 2, 3, 4, 5}</p></li>
+</ul>
+<p>This results in 20 tenor–quantile portfolios, each with a monthly spread time series.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">final_result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;markit_cds_returns.parquet&quot;</span><span class="p">)</span>
+<span class="n">final_result</span> <span class="o">=</span> <span class="n">final_result</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Month&quot;</span><span class="p">)</span>
+<span class="n">final_result</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>3Y_Q1</th>
+      <th>3Y_Q2</th>
+      <th>3Y_Q3</th>
+      <th>3Y_Q4</th>
+      <th>3Y_Q5</th>
+      <th>5Y_Q1</th>
+      <th>5Y_Q2</th>
+      <th>5Y_Q3</th>
+      <th>5Y_Q4</th>
+      <th>5Y_Q5</th>
+      <th>7Y_Q1</th>
+      <th>7Y_Q2</th>
+      <th>7Y_Q3</th>
+      <th>7Y_Q4</th>
+      <th>7Y_Q5</th>
+      <th>10Y_Q1</th>
+      <th>10Y_Q2</th>
+      <th>10Y_Q3</th>
+      <th>10Y_Q4</th>
+      <th>10Y_Q5</th>
+    </tr>
+    <tr>
+      <th>Month</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2001-01-01</th>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.003</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.005</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.005</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.005</td>
+    </tr>
+    <tr>
+      <th>2001-02-01</th>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.005</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.005</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.007</td>
+    </tr>
+    <tr>
+      <th>2001-03-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.006</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.004</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.012</td>
+    </tr>
+    <tr>
+      <th>2001-04-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.004</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.005</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.006</td>
+      <td>0.003</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.006</td>
+      <td>0.006</td>
+    </tr>
+    <tr>
+      <th>2001-05-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.009</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.004</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.009</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.005</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="comparison">
+<h2>4. Comparison<a class="headerlink" href="#comparison" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">he_kelly_df</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CDS_01</th>
+      <th>CDS_02</th>
+      <th>CDS_03</th>
+      <th>CDS_04</th>
+      <th>CDS_05</th>
+      <th>CDS_06</th>
+      <th>CDS_07</th>
+      <th>CDS_08</th>
+      <th>CDS_09</th>
+      <th>CDS_10</th>
+      <th>CDS_11</th>
+      <th>CDS_12</th>
+      <th>CDS_13</th>
+      <th>CDS_14</th>
+      <th>CDS_15</th>
+      <th>CDS_16</th>
+      <th>CDS_17</th>
+      <th>CDS_18</th>
+      <th>CDS_19</th>
+      <th>CDS_20</th>
+    </tr>
+    <tr>
+      <th>Month</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2012-08-01</th>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.002</td>
+      <td>0.004</td>
+      <td>0.003</td>
+      <td>0.004</td>
+      <td>0.006</td>
+      <td>0.008</td>
+      <td>0.006</td>
+      <td>0.005</td>
+      <td>0.015</td>
+    </tr>
+    <tr>
+      <th>2012-09-01</th>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.003</td>
+      <td>0.002</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.004</td>
+      <td>0.004</td>
+      <td>0.005</td>
+      <td>0.006</td>
+      <td>0.006</td>
+      <td>0.009</td>
+      <td>0.007</td>
+      <td>0.008</td>
+      <td>0.009</td>
+      <td>0.012</td>
+      <td>0.012</td>
+      <td>0.017</td>
+    </tr>
+    <tr>
+      <th>2012-10-01</th>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.004</td>
+      <td>0.004</td>
+      <td>0.001</td>
+      <td>0.004</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>-0.001</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <th>2012-11-01</th>
+      <td>-0.001</td>
+      <td>-0.001</td>
+      <td>-0.001</td>
+      <td>-0.001</td>
+      <td>-0.001</td>
+      <td>-0.001</td>
+      <td>-0.001</td>
+      <td>-0.002</td>
+      <td>-0.002</td>
+      <td>0.001</td>
+      <td>-0.004</td>
+      <td>-0.001</td>
+      <td>-0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>-0.000</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.011</td>
+      <td>0.002</td>
+    </tr>
+    <tr>
+      <th>2012-12-01</th>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.004</td>
+      <td>0.003</td>
+      <td>0.002</td>
+      <td>0.007</td>
+      <td>0.007</td>
+      <td>0.010</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">replication_df</span> <span class="o">=</span> <span class="n">final_result</span><span class="p">[</span><span class="s2">&quot;2001-02-01&quot;</span><span class="p">:</span><span class="s2">&quot;2012-12-01&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">replication_df</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>3Y_Q1</th>
+      <th>3Y_Q2</th>
+      <th>3Y_Q3</th>
+      <th>3Y_Q4</th>
+      <th>3Y_Q5</th>
+      <th>5Y_Q1</th>
+      <th>5Y_Q2</th>
+      <th>5Y_Q3</th>
+      <th>5Y_Q4</th>
+      <th>5Y_Q5</th>
+      <th>7Y_Q1</th>
+      <th>7Y_Q2</th>
+      <th>7Y_Q3</th>
+      <th>7Y_Q4</th>
+      <th>7Y_Q5</th>
+      <th>10Y_Q1</th>
+      <th>10Y_Q2</th>
+      <th>10Y_Q3</th>
+      <th>10Y_Q4</th>
+      <th>10Y_Q5</th>
+    </tr>
+    <tr>
+      <th>Month</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2012-08-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.013</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.005</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>0.005</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.006</td>
+    </tr>
+    <tr>
+      <th>2012-09-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.006</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.003</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.005</td>
+      <td>0.004</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <th>2012-10-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.004</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.002</td>
+      <td>0.004</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.003</td>
+      <td>0.008</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.002</td>
+      <td>0.003</td>
+      <td>0.009</td>
+    </tr>
+    <tr>
+      <th>2012-11-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.004</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.006</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.005</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.003</td>
+    </tr>
+    <tr>
+      <th>2012-12-01</th>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.004</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.008</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>0.002</td>
+      <td>0.005</td>
+      <td>0.000</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>0.005</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">replication_df</span><span class="p">)</span>
+<span class="c1"># %%</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">he_kelly_df</span><span class="p">)</span>
+<span class="c1"># %%</span>
+<span class="n">nan_rows_rep</span> <span class="o">=</span> <span class="n">replication_df</span><span class="p">[</span><span class="n">replication_df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">nan_rows_rep</span>
+<span class="c1"># TODO: why?</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>3Y_Q1</th>
+      <th>3Y_Q2</th>
+      <th>3Y_Q3</th>
+      <th>3Y_Q4</th>
+      <th>3Y_Q5</th>
+      <th>5Y_Q1</th>
+      <th>5Y_Q2</th>
+      <th>5Y_Q3</th>
+      <th>5Y_Q4</th>
+      <th>5Y_Q5</th>
+      <th>7Y_Q1</th>
+      <th>7Y_Q2</th>
+      <th>7Y_Q3</th>
+      <th>7Y_Q4</th>
+      <th>7Y_Q5</th>
+      <th>10Y_Q1</th>
+      <th>10Y_Q2</th>
+      <th>10Y_Q3</th>
+      <th>10Y_Q4</th>
+      <th>10Y_Q5</th>
+    </tr>
+    <tr>
+      <th>Month</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</div></div><img alt="../_images/4d5ec8bbed8adac2edaa66cf4c356181ca96a65318bf52cdcc470bf4d0862e33.png" src="../_images/4d5ec8bbed8adac2edaa66cf4c356181ca96a65318bf52cdcc470bf4d0862e33.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">replication_df</span> <span class="o">=</span> <span class="n">replication_df</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics.pairwise</span><span class="w"> </span><span class="kn">import</span> <span class="n">cosine_similarity</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">replication_df</span><span class="o">.</span><span class="n">T</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">he_kelly_df</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">similarity_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">Y</span><span class="o">.</span><span class="n">index</span>
+<span class="p">)</span>
+
+<span class="n">similarity_matrix</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CDS_01</th>
+      <th>CDS_02</th>
+      <th>CDS_03</th>
+      <th>CDS_04</th>
+      <th>CDS_05</th>
+      <th>CDS_06</th>
+      <th>CDS_07</th>
+      <th>CDS_08</th>
+      <th>CDS_09</th>
+      <th>CDS_10</th>
+      <th>CDS_11</th>
+      <th>CDS_12</th>
+      <th>CDS_13</th>
+      <th>CDS_14</th>
+      <th>CDS_15</th>
+      <th>CDS_16</th>
+      <th>CDS_17</th>
+      <th>CDS_18</th>
+      <th>CDS_19</th>
+      <th>CDS_20</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3Y_Q1</th>
+      <td>0.190</td>
+      <td>0.260</td>
+      <td>0.290</td>
+      <td>0.200</td>
+      <td>0.290</td>
+      <td>0.250</td>
+      <td>0.260</td>
+      <td>0.330</td>
+      <td>0.250</td>
+      <td>0.160</td>
+      <td>0.210</td>
+      <td>0.200</td>
+      <td>0.140</td>
+      <td>0.150</td>
+      <td>0.070</td>
+      <td>0.190</td>
+      <td>0.260</td>
+      <td>0.210</td>
+      <td>0.280</td>
+      <td>0.450</td>
+    </tr>
+    <tr>
+      <th>3Y_Q2</th>
+      <td>0.420</td>
+      <td>0.420</td>
+      <td>0.380</td>
+      <td>0.330</td>
+      <td>0.380</td>
+      <td>0.320</td>
+      <td>0.350</td>
+      <td>0.360</td>
+      <td>0.300</td>
+      <td>0.240</td>
+      <td>0.270</td>
+      <td>0.160</td>
+      <td>0.200</td>
+      <td>0.180</td>
+      <td>0.140</td>
+      <td>0.200</td>
+      <td>0.200</td>
+      <td>0.180</td>
+      <td>0.230</td>
+      <td>0.360</td>
+    </tr>
+    <tr>
+      <th>3Y_Q3</th>
+      <td>0.370</td>
+      <td>0.380</td>
+      <td>0.370</td>
+      <td>0.280</td>
+      <td>0.360</td>
+      <td>0.300</td>
+      <td>0.310</td>
+      <td>0.320</td>
+      <td>0.250</td>
+      <td>0.220</td>
+      <td>0.230</td>
+      <td>0.170</td>
+      <td>0.130</td>
+      <td>0.120</td>
+      <td>0.080</td>
+      <td>0.120</td>
+      <td>0.170</td>
+      <td>0.160</td>
+      <td>0.180</td>
+      <td>0.340</td>
+    </tr>
+    <tr>
+      <th>3Y_Q4</th>
+      <td>0.340</td>
+      <td>0.390</td>
+      <td>0.360</td>
+      <td>0.300</td>
+      <td>0.330</td>
+      <td>0.310</td>
+      <td>0.310</td>
+      <td>0.330</td>
+      <td>0.300</td>
+      <td>0.240</td>
+      <td>0.240</td>
+      <td>0.170</td>
+      <td>0.200</td>
+      <td>0.190</td>
+      <td>0.160</td>
+      <td>0.220</td>
+      <td>0.200</td>
+      <td>0.180</td>
+      <td>0.200</td>
+      <td>0.360</td>
+    </tr>
+    <tr>
+      <th>3Y_Q5</th>
+      <td>0.400</td>
+      <td>0.410</td>
+      <td>0.410</td>
+      <td>0.320</td>
+      <td>0.390</td>
+      <td>0.320</td>
+      <td>0.360</td>
+      <td>0.380</td>
+      <td>0.310</td>
+      <td>0.260</td>
+      <td>0.270</td>
+      <td>0.220</td>
+      <td>0.190</td>
+      <td>0.180</td>
+      <td>0.140</td>
+      <td>0.190</td>
+      <td>0.260</td>
+      <td>0.220</td>
+      <td>0.250</td>
+      <td>0.420</td>
+    </tr>
+    <tr>
+      <th>5Y_Q1</th>
+      <td>0.380</td>
+      <td>0.390</td>
+      <td>0.360</td>
+      <td>0.280</td>
+      <td>0.340</td>
+      <td>0.290</td>
+      <td>0.300</td>
+      <td>0.320</td>
+      <td>0.280</td>
+      <td>0.220</td>
+      <td>0.220</td>
+      <td>0.130</td>
+      <td>0.140</td>
+      <td>0.140</td>
+      <td>0.100</td>
+      <td>0.170</td>
+      <td>0.200</td>
+      <td>0.150</td>
+      <td>0.200</td>
+      <td>0.360</td>
+    </tr>
+    <tr>
+      <th>5Y_Q2</th>
+      <td>0.450</td>
+      <td>0.450</td>
+      <td>0.450</td>
+      <td>0.380</td>
+      <td>0.420</td>
+      <td>0.370</td>
+      <td>0.370</td>
+      <td>0.380</td>
+      <td>0.350</td>
+      <td>0.280</td>
+      <td>0.290</td>
+      <td>0.240</td>
+      <td>0.220</td>
+      <td>0.220</td>
+      <td>0.180</td>
+      <td>0.230</td>
+      <td>0.260</td>
+      <td>0.240</td>
+      <td>0.290</td>
+      <td>0.420</td>
+    </tr>
+    <tr>
+      <th>5Y_Q3</th>
+      <td>0.410</td>
+      <td>0.430</td>
+      <td>0.440</td>
+      <td>0.340</td>
+      <td>0.400</td>
+      <td>0.350</td>
+      <td>0.370</td>
+      <td>0.390</td>
+      <td>0.340</td>
+      <td>0.260</td>
+      <td>0.280</td>
+      <td>0.240</td>
+      <td>0.210</td>
+      <td>0.200</td>
+      <td>0.170</td>
+      <td>0.210</td>
+      <td>0.260</td>
+      <td>0.240</td>
+      <td>0.270</td>
+      <td>0.420</td>
+    </tr>
+    <tr>
+      <th>5Y_Q4</th>
+      <td>0.420</td>
+      <td>0.420</td>
+      <td>0.440</td>
+      <td>0.370</td>
+      <td>0.420</td>
+      <td>0.390</td>
+      <td>0.400</td>
+      <td>0.420</td>
+      <td>0.350</td>
+      <td>0.270</td>
+      <td>0.320</td>
+      <td>0.270</td>
+      <td>0.250</td>
+      <td>0.270</td>
+      <td>0.220</td>
+      <td>0.280</td>
+      <td>0.300</td>
+      <td>0.270</td>
+      <td>0.300</td>
+      <td>0.440</td>
+    </tr>
+    <tr>
+      <th>5Y_Q5</th>
+      <td>0.470</td>
+      <td>0.470</td>
+      <td>0.480</td>
+      <td>0.400</td>
+      <td>0.460</td>
+      <td>0.390</td>
+      <td>0.400</td>
+      <td>0.430</td>
+      <td>0.370</td>
+      <td>0.280</td>
+      <td>0.320</td>
+      <td>0.270</td>
+      <td>0.220</td>
+      <td>0.230</td>
+      <td>0.180</td>
+      <td>0.230</td>
+      <td>0.270</td>
+      <td>0.260</td>
+      <td>0.310</td>
+      <td>0.430</td>
+    </tr>
+    <tr>
+      <th>7Y_Q1</th>
+      <td>0.440</td>
+      <td>0.460</td>
+      <td>0.450</td>
+      <td>0.390</td>
+      <td>0.420</td>
+      <td>0.390</td>
+      <td>0.390</td>
+      <td>0.400</td>
+      <td>0.360</td>
+      <td>0.280</td>
+      <td>0.310</td>
+      <td>0.250</td>
+      <td>0.230</td>
+      <td>0.240</td>
+      <td>0.200</td>
+      <td>0.270</td>
+      <td>0.290</td>
+      <td>0.270</td>
+      <td>0.310</td>
+      <td>0.440</td>
+    </tr>
+    <tr>
+      <th>7Y_Q2</th>
+      <td>0.430</td>
+      <td>0.450</td>
+      <td>0.430</td>
+      <td>0.360</td>
+      <td>0.410</td>
+      <td>0.360</td>
+      <td>0.380</td>
+      <td>0.380</td>
+      <td>0.330</td>
+      <td>0.260</td>
+      <td>0.310</td>
+      <td>0.240</td>
+      <td>0.220</td>
+      <td>0.240</td>
+      <td>0.190</td>
+      <td>0.230</td>
+      <td>0.260</td>
+      <td>0.240</td>
+      <td>0.260</td>
+      <td>0.420</td>
+    </tr>
+    <tr>
+      <th>7Y_Q3</th>
+      <td>0.450</td>
+      <td>0.450</td>
+      <td>0.450</td>
+      <td>0.380</td>
+      <td>0.430</td>
+      <td>0.380</td>
+      <td>0.390</td>
+      <td>0.410</td>
+      <td>0.370</td>
+      <td>0.310</td>
+      <td>0.310</td>
+      <td>0.260</td>
+      <td>0.240</td>
+      <td>0.250</td>
+      <td>0.200</td>
+      <td>0.230</td>
+      <td>0.290</td>
+      <td>0.260</td>
+      <td>0.290</td>
+      <td>0.450</td>
+    </tr>
+    <tr>
+      <th>7Y_Q4</th>
+      <td>0.410</td>
+      <td>0.440</td>
+      <td>0.440</td>
+      <td>0.370</td>
+      <td>0.420</td>
+      <td>0.380</td>
+      <td>0.390</td>
+      <td>0.420</td>
+      <td>0.360</td>
+      <td>0.270</td>
+      <td>0.300</td>
+      <td>0.290</td>
+      <td>0.230</td>
+      <td>0.240</td>
+      <td>0.180</td>
+      <td>0.240</td>
+      <td>0.290</td>
+      <td>0.260</td>
+      <td>0.270</td>
+      <td>0.420</td>
+    </tr>
+    <tr>
+      <th>7Y_Q5</th>
+      <td>0.420</td>
+      <td>0.430</td>
+      <td>0.430</td>
+      <td>0.350</td>
+      <td>0.410</td>
+      <td>0.360</td>
+      <td>0.380</td>
+      <td>0.380</td>
+      <td>0.320</td>
+      <td>0.290</td>
+      <td>0.300</td>
+      <td>0.260</td>
+      <td>0.220</td>
+      <td>0.220</td>
+      <td>0.190</td>
+      <td>0.230</td>
+      <td>0.270</td>
+      <td>0.250</td>
+      <td>0.260</td>
+      <td>0.410</td>
+    </tr>
+    <tr>
+      <th>10Y_Q1</th>
+      <td>0.470</td>
+      <td>0.490</td>
+      <td>0.480</td>
+      <td>0.410</td>
+      <td>0.470</td>
+      <td>0.420</td>
+      <td>0.420</td>
+      <td>0.440</td>
+      <td>0.390</td>
+      <td>0.310</td>
+      <td>0.340</td>
+      <td>0.280</td>
+      <td>0.260</td>
+      <td>0.260</td>
+      <td>0.200</td>
+      <td>0.250</td>
+      <td>0.300</td>
+      <td>0.270</td>
+      <td>0.300</td>
+      <td>0.460</td>
+    </tr>
+    <tr>
+      <th>10Y_Q2</th>
+      <td>0.440</td>
+      <td>0.470</td>
+      <td>0.460</td>
+      <td>0.390</td>
+      <td>0.430</td>
+      <td>0.390</td>
+      <td>0.400</td>
+      <td>0.420</td>
+      <td>0.340</td>
+      <td>0.290</td>
+      <td>0.300</td>
+      <td>0.270</td>
+      <td>0.230</td>
+      <td>0.230</td>
+      <td>0.190</td>
+      <td>0.240</td>
+      <td>0.280</td>
+      <td>0.250</td>
+      <td>0.300</td>
+      <td>0.430</td>
+    </tr>
+    <tr>
+      <th>10Y_Q3</th>
+      <td>0.450</td>
+      <td>0.460</td>
+      <td>0.440</td>
+      <td>0.360</td>
+      <td>0.420</td>
+      <td>0.370</td>
+      <td>0.390</td>
+      <td>0.390</td>
+      <td>0.340</td>
+      <td>0.290</td>
+      <td>0.300</td>
+      <td>0.250</td>
+      <td>0.210</td>
+      <td>0.220</td>
+      <td>0.180</td>
+      <td>0.230</td>
+      <td>0.250</td>
+      <td>0.250</td>
+      <td>0.270</td>
+      <td>0.420</td>
+    </tr>
+    <tr>
+      <th>10Y_Q4</th>
+      <td>0.460</td>
+      <td>0.490</td>
+      <td>0.480</td>
+      <td>0.410</td>
+      <td>0.460</td>
+      <td>0.410</td>
+      <td>0.420</td>
+      <td>0.440</td>
+      <td>0.390</td>
+      <td>0.320</td>
+      <td>0.340</td>
+      <td>0.300</td>
+      <td>0.270</td>
+      <td>0.270</td>
+      <td>0.220</td>
+      <td>0.260</td>
+      <td>0.310</td>
+      <td>0.300</td>
+      <td>0.290</td>
+      <td>0.440</td>
+    </tr>
+    <tr>
+      <th>10Y_Q5</th>
+      <td>0.430</td>
+      <td>0.450</td>
+      <td>0.450</td>
+      <td>0.370</td>
+      <td>0.430</td>
+      <td>0.350</td>
+      <td>0.390</td>
+      <td>0.400</td>
+      <td>0.320</td>
+      <td>0.230</td>
+      <td>0.270</td>
+      <td>0.220</td>
+      <td>0.190</td>
+      <td>0.210</td>
+      <td>0.150</td>
+      <td>0.220</td>
+      <td>0.230</td>
+      <td>0.190</td>
+      <td>0.260</td>
+      <td>0.420</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">similarity_matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Replicated vs Benchmark Portfolio: Cosine Similarity Heatmap&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Benchmark Portfolios (he_kelly_df)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Replicated Portfolios (replication_df)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/15fab7ca1507283dbd8768abad79b4bdf5965560dcfa659b3f276c3e4bdebd0e.png" src="../_images/15fab7ca1507283dbd8768abad79b4bdf5965560dcfa659b3f276c3e4bdebd0e.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">Y</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">rep_col</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">bench_col</span> <span class="ow">in</span> <span class="n">Y</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="n">correlation_matrix</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rep_col</span><span class="p">,</span> <span class="n">bench_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rep_col</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span>
+            <span class="n">Y</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bench_col</span><span class="p">]</span>
+        <span class="p">)</span>
+
+<span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">correlation_matrix</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="n">correlation_matrix</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CDS_01</th>
+      <th>CDS_02</th>
+      <th>CDS_03</th>
+      <th>CDS_04</th>
+      <th>CDS_05</th>
+      <th>CDS_06</th>
+      <th>CDS_07</th>
+      <th>CDS_08</th>
+      <th>CDS_09</th>
+      <th>CDS_10</th>
+      <th>CDS_11</th>
+      <th>CDS_12</th>
+      <th>CDS_13</th>
+      <th>CDS_14</th>
+      <th>CDS_15</th>
+      <th>CDS_16</th>
+      <th>CDS_17</th>
+      <th>CDS_18</th>
+      <th>CDS_19</th>
+      <th>CDS_20</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3Y_Q1</th>
+      <td>-0.550</td>
+      <td>-0.430</td>
+      <td>-0.350</td>
+      <td>-0.360</td>
+      <td>-0.290</td>
+      <td>-0.250</td>
+      <td>-0.240</td>
+      <td>-0.140</td>
+      <td>-0.180</td>
+      <td>-0.250</td>
+      <td>-0.180</td>
+      <td>-0.090</td>
+      <td>-0.180</td>
+      <td>-0.170</td>
+      <td>-0.230</td>
+      <td>-0.080</td>
+      <td>0.010</td>
+      <td>-0.060</td>
+      <td>0.030</td>
+      <td>0.110</td>
+    </tr>
+    <tr>
+      <th>3Y_Q2</th>
+      <td>0.030</td>
+      <td>-0.020</td>
+      <td>-0.080</td>
+      <td>-0.050</td>
+      <td>-0.060</td>
+      <td>-0.060</td>
+      <td>-0.030</td>
+      <td>-0.030</td>
+      <td>-0.050</td>
+      <td>-0.050</td>
+      <td>-0.040</td>
+      <td>-0.180</td>
+      <td>-0.030</td>
+      <td>-0.080</td>
+      <td>-0.060</td>
+      <td>-0.050</td>
+      <td>-0.120</td>
+      <td>-0.120</td>
+      <td>-0.080</td>
+      <td>-0.090</td>
+    </tr>
+    <tr>
+      <th>3Y_Q3</th>
+      <td>-0.030</td>
+      <td>-0.050</td>
+      <td>-0.060</td>
+      <td>-0.110</td>
+      <td>-0.040</td>
+      <td>-0.080</td>
+      <td>-0.080</td>
+      <td>-0.080</td>
+      <td>-0.120</td>
+      <td>-0.070</td>
+      <td>-0.100</td>
+      <td>-0.120</td>
+      <td>-0.140</td>
+      <td>-0.180</td>
+      <td>-0.160</td>
+      <td>-0.190</td>
+      <td>-0.150</td>
+      <td>-0.120</td>
+      <td>-0.140</td>
+      <td>-0.090</td>
+    </tr>
+    <tr>
+      <th>3Y_Q4</th>
+      <td>-0.030</td>
+      <td>0.020</td>
+      <td>-0.030</td>
+      <td>-0.030</td>
+      <td>-0.050</td>
+      <td>-0.010</td>
+      <td>-0.020</td>
+      <td>-0.010</td>
+      <td>0.020</td>
+      <td>0.010</td>
+      <td>-0.020</td>
+      <td>-0.070</td>
+      <td>0.020</td>
+      <td>-0.010</td>
+      <td>0.010</td>
+      <td>0.030</td>
+      <td>-0.050</td>
+      <td>-0.050</td>
+      <td>-0.060</td>
+      <td>-0.000</td>
+    </tr>
+    <tr>
+      <th>3Y_Q5</th>
+      <td>0.000</td>
+      <td>-0.020</td>
+      <td>-0.020</td>
+      <td>-0.060</td>
+      <td>-0.020</td>
+      <td>-0.060</td>
+      <td>0.010</td>
+      <td>0.010</td>
+      <td>-0.020</td>
+      <td>-0.010</td>
+      <td>-0.030</td>
+      <td>-0.030</td>
+      <td>-0.040</td>
+      <td>-0.080</td>
+      <td>-0.060</td>
+      <td>-0.070</td>
+      <td>0.020</td>
+      <td>-0.030</td>
+      <td>-0.010</td>
+      <td>0.050</td>
+    </tr>
+    <tr>
+      <th>5Y_Q1</th>
+      <td>-0.100</td>
+      <td>-0.130</td>
+      <td>-0.190</td>
+      <td>-0.200</td>
+      <td>-0.200</td>
+      <td>-0.170</td>
+      <td>-0.180</td>
+      <td>-0.170</td>
+      <td>-0.130</td>
+      <td>-0.120</td>
+      <td>-0.190</td>
+      <td>-0.290</td>
+      <td>-0.190</td>
+      <td>-0.210</td>
+      <td>-0.190</td>
+      <td>-0.160</td>
+      <td>-0.150</td>
+      <td>-0.230</td>
+      <td>-0.170</td>
+      <td>-0.120</td>
+    </tr>
+    <tr>
+      <th>5Y_Q2</th>
+      <td>0.080</td>
+      <td>0.030</td>
+      <td>0.030</td>
+      <td>0.050</td>
+      <td>0.010</td>
+      <td>0.020</td>
+      <td>-0.020</td>
+      <td>-0.020</td>
+      <td>0.040</td>
+      <td>0.010</td>
+      <td>-0.030</td>
+      <td>-0.030</td>
+      <td>-0.010</td>
+      <td>-0.010</td>
+      <td>0.010</td>
+      <td>-0.010</td>
+      <td>-0.020</td>
+      <td>-0.010</td>
+      <td>0.030</td>
+      <td>0.020</td>
+    </tr>
+    <tr>
+      <th>5Y_Q3</th>
+      <td>-0.050</td>
+      <td>-0.030</td>
+      <td>-0.010</td>
+      <td>-0.070</td>
+      <td>-0.070</td>
+      <td>-0.030</td>
+      <td>-0.030</td>
+      <td>-0.020</td>
+      <td>0.000</td>
+      <td>-0.030</td>
+      <td>-0.050</td>
+      <td>-0.040</td>
+      <td>-0.030</td>
+      <td>-0.090</td>
+      <td>-0.040</td>
+      <td>-0.060</td>
+      <td>-0.010</td>
+      <td>-0.030</td>
+      <td>-0.020</td>
+      <td>0.010</td>
+    </tr>
+    <tr>
+      <th>5Y_Q4</th>
+      <td>0.040</td>
+      <td>0.000</td>
+      <td>0.050</td>
+      <td>0.050</td>
+      <td>0.050</td>
+      <td>0.090</td>
+      <td>0.080</td>
+      <td>0.110</td>
+      <td>0.060</td>
+      <td>0.010</td>
+      <td>0.070</td>
+      <td>0.080</td>
+      <td>0.070</td>
+      <td>0.120</td>
+      <td>0.100</td>
+      <td>0.110</td>
+      <td>0.080</td>
+      <td>0.080</td>
+      <td>0.090</td>
+      <td>0.100</td>
+    </tr>
+    <tr>
+      <th>5Y_Q5</th>
+      <td>0.120</td>
+      <td>0.060</td>
+      <td>0.100</td>
+      <td>0.090</td>
+      <td>0.100</td>
+      <td>0.070</td>
+      <td>0.070</td>
+      <td>0.100</td>
+      <td>0.070</td>
+      <td>0.020</td>
+      <td>0.040</td>
+      <td>0.040</td>
+      <td>-0.030</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>-0.020</td>
+      <td>-0.000</td>
+      <td>0.020</td>
+      <td>0.080</td>
+      <td>0.020</td>
+    </tr>
+    <tr>
+      <th>7Y_Q1</th>
+      <td>0.010</td>
+      <td>-0.010</td>
+      <td>-0.040</td>
+      <td>0.020</td>
+      <td>-0.070</td>
+      <td>0.010</td>
+      <td>-0.000</td>
+      <td>-0.050</td>
+      <td>0.020</td>
+      <td>-0.020</td>
+      <td>0.000</td>
+      <td>-0.040</td>
+      <td>-0.000</td>
+      <td>0.010</td>
+      <td>0.030</td>
+      <td>0.110</td>
+      <td>0.050</td>
+      <td>0.040</td>
+      <td>0.070</td>
+      <td>0.020</td>
+    </tr>
+    <tr>
+      <th>7Y_Q2</th>
+      <td>-0.040</td>
+      <td>-0.020</td>
+      <td>-0.070</td>
+      <td>-0.070</td>
+      <td>-0.070</td>
+      <td>-0.070</td>
+      <td>-0.050</td>
+      <td>-0.100</td>
+      <td>-0.090</td>
+      <td>-0.090</td>
+      <td>-0.010</td>
+      <td>-0.050</td>
+      <td>-0.050</td>
+      <td>0.010</td>
+      <td>0.000</td>
+      <td>-0.050</td>
+      <td>-0.050</td>
+      <td>-0.060</td>
+      <td>-0.090</td>
+      <td>-0.060</td>
+    </tr>
+    <tr>
+      <th>7Y_Q3</th>
+      <td>0.060</td>
+      <td>0.010</td>
+      <td>0.010</td>
+      <td>0.030</td>
+      <td>0.030</td>
+      <td>0.010</td>
+      <td>0.030</td>
+      <td>0.030</td>
+      <td>0.060</td>
+      <td>0.090</td>
+      <td>0.020</td>
+      <td>0.020</td>
+      <td>0.030</td>
+      <td>0.040</td>
+      <td>0.030</td>
+      <td>-0.010</td>
+      <td>0.040</td>
+      <td>0.040</td>
+      <td>0.050</td>
+      <td>0.090</td>
+    </tr>
+    <tr>
+      <th>7Y_Q4</th>
+      <td>-0.080</td>
+      <td>-0.030</td>
+      <td>-0.020</td>
+      <td>-0.030</td>
+      <td>-0.010</td>
+      <td>0.020</td>
+      <td>0.020</td>
+      <td>0.050</td>
+      <td>0.030</td>
+      <td>-0.020</td>
+      <td>-0.010</td>
+      <td>0.090</td>
+      <td>0.010</td>
+      <td>0.020</td>
+      <td>-0.030</td>
+      <td>-0.000</td>
+      <td>0.050</td>
+      <td>0.020</td>
+      <td>-0.030</td>
+      <td>-0.010</td>
+    </tr>
+    <tr>
+      <th>7Y_Q5</th>
+      <td>-0.040</td>
+      <td>-0.060</td>
+      <td>-0.050</td>
+      <td>-0.060</td>
+      <td>-0.060</td>
+      <td>-0.040</td>
+      <td>-0.020</td>
+      <td>-0.060</td>
+      <td>-0.080</td>
+      <td>0.010</td>
+      <td>-0.020</td>
+      <td>0.010</td>
+      <td>-0.030</td>
+      <td>-0.030</td>
+      <td>0.020</td>
+      <td>-0.040</td>
+      <td>-0.030</td>
+      <td>-0.010</td>
+      <td>-0.060</td>
+      <td>-0.060</td>
+    </tr>
+    <tr>
+      <th>10Y_Q1</th>
+      <td>0.140</td>
+      <td>0.130</td>
+      <td>0.110</td>
+      <td>0.120</td>
+      <td>0.130</td>
+      <td>0.150</td>
+      <td>0.100</td>
+      <td>0.130</td>
+      <td>0.140</td>
+      <td>0.100</td>
+      <td>0.110</td>
+      <td>0.090</td>
+      <td>0.090</td>
+      <td>0.080</td>
+      <td>0.060</td>
+      <td>0.020</td>
+      <td>0.070</td>
+      <td>0.050</td>
+      <td>0.040</td>
+      <td>0.090</td>
+    </tr>
+    <tr>
+      <th>10Y_Q2</th>
+      <td>-0.010</td>
+      <td>0.040</td>
+      <td>0.020</td>
+      <td>0.030</td>
+      <td>-0.010</td>
+      <td>0.030</td>
+      <td>0.030</td>
+      <td>0.020</td>
+      <td>-0.050</td>
+      <td>-0.000</td>
+      <td>-0.030</td>
+      <td>0.040</td>
+      <td>-0.030</td>
+      <td>-0.040</td>
+      <td>-0.000</td>
+      <td>-0.030</td>
+      <td>-0.010</td>
+      <td>-0.030</td>
+      <td>0.050</td>
+      <td>-0.030</td>
+    </tr>
+    <tr>
+      <th>10Y_Q3</th>
+      <td>0.040</td>
+      <td>0.000</td>
+      <td>-0.030</td>
+      <td>-0.050</td>
+      <td>-0.030</td>
+      <td>-0.040</td>
+      <td>-0.000</td>
+      <td>-0.030</td>
+      <td>-0.040</td>
+      <td>0.030</td>
+      <td>-0.040</td>
+      <td>-0.030</td>
+      <td>-0.070</td>
+      <td>-0.050</td>
+      <td>-0.010</td>
+      <td>-0.040</td>
+      <td>-0.090</td>
+      <td>-0.010</td>
+      <td>-0.030</td>
+      <td>-0.030</td>
+    </tr>
+    <tr>
+      <th>10Y_Q4</th>
+      <td>0.110</td>
+      <td>0.120</td>
+      <td>0.090</td>
+      <td>0.100</td>
+      <td>0.110</td>
+      <td>0.110</td>
+      <td>0.120</td>
+      <td>0.110</td>
+      <td>0.140</td>
+      <td>0.120</td>
+      <td>0.120</td>
+      <td>0.130</td>
+      <td>0.110</td>
+      <td>0.120</td>
+      <td>0.100</td>
+      <td>0.040</td>
+      <td>0.100</td>
+      <td>0.140</td>
+      <td>0.010</td>
+      <td>0.020</td>
+    </tr>
+    <tr>
+      <th>10Y_Q5</th>
+      <td>-0.010</td>
+      <td>-0.010</td>
+      <td>-0.000</td>
+      <td>-0.020</td>
+      <td>0.010</td>
+      <td>-0.070</td>
+      <td>0.020</td>
+      <td>-0.010</td>
+      <td>-0.100</td>
+      <td>-0.160</td>
+      <td>-0.110</td>
+      <td>-0.120</td>
+      <td>-0.130</td>
+      <td>-0.090</td>
+      <td>-0.100</td>
+      <td>-0.080</td>
+      <td>-0.150</td>
+      <td>-0.200</td>
+      <td>-0.080</td>
+      <td>-0.030</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">correlation_matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Replicated vs Benchmark Portfolio: Pearson Correlation Heatmap&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Benchmark Portfolios (he_kelly_df)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Replicated Portfolios (replication_df)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c53b43dff138f30184fa83d324ddd46c1f73a8666de5ae6a44789e397323f7f3.png" src="../_images/c53b43dff138f30184fa83d324ddd46c1f73a8666de5ae6a44789e397323f7f3.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">replication_df</span><span class="p">[</span><span class="s2">&quot;10Y_Q5&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">he_kelly_df</span><span class="p">[</span><span class="s2">&quot;CDS_19&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x6c1158320&gt;]
+</pre></div>
+</div>
+<img alt="../_images/736c7ac4ae355f9c377b17834ecc5bbdf0b6ab47afe8fec118951304b17a36fd.png" src="../_images/736c7ac4ae355f9c377b17834ecc5bbdf0b6ab47afe8fec118951304b17a36fd.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="summary_cds_bond_basis_ipynb.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Cleaning Summary: CDS Bond Basis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="summary_cip_ipynb.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">1. Introduction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#target-replication-quarterly-cds-return-structure">Target Replication: Quarterly CDS Return Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#federal-reserve-zero-coupon-yields">2.2 Federal Reserve Zero-Coupon Yields</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#treasury-yield-data">2.3 Treasury Yield Data</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replication">3. Replication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-free-rate-calculation">3.1. Risk-Free Rate Calculation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#monthly-return-computation">3.2. Monthly Return Computation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio-construction">3.3. Portfolio Construction</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">4. Comparison</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
