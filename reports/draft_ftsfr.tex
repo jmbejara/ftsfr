@@ -453,7 +453,7 @@ Each of these basis spreads are, themselves, constructed following methodologies
 % A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
 
 \paragraph{Spot-Futures Arbitrage in Treasuries}
-Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we extract implied risk-free rates from the first-deferred 2-, 5-, 10-, 20- and 30-year Treasury futures.  We retain only days with positive volume, drop the delivery month to avoid the option-to-deliver distortions of \citet{Burghardt2005}, align quotes to the 17:00 ET close, and, per \citet{Barth2021}, match each futures-implied rate to a maturity-matched OIS benchmark-yielding a clean daily Treasury basis series. These spreads are shown in Figure~\ref{fig:treasury_sf_basis}.
+Following \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we construct the Treasury spot-futures basis using Bloomberg cheapest-to-deliver implied repo rates for 2-, 5-, 10-, 20-, and 30-year Treasury futures contracts. For each tenor and date, we use only the first-deferred contract to avoid delivery option distortions documented by \citet{Burghardt2005}. We compute days-to-maturity for each contract based on the last business day of the delivery month, then linearly interpolate OIS rates across available tenors (1-week through 1-year) to match the futures horizon. The basis is the difference between the futures-implied repo rate and the interpolated OIS rate. We restrict the sample to post-June-2004 observations, require positive trading volume in the deferred contract, and remove outliers using a rolling 45-day median absolute deviation filter with a threshold of 10 times the MAD. Missing values are forward-filled for up to 5 days. These spreads are shown in Figure~\ref{fig:treasury_sf_basis}.
 
 \begin{figure}[h]
     \centering
@@ -467,12 +467,12 @@ Following the Bloomberg cheapest-to-deliver methodology of \citet{Fleckenstein20
 
 
 \paragraph{Treasury Swap Arbitrage}
-We follow \citet{Siriwardane2021} in constructing daily OIS-Treasury swap
-spreads: Bloomberg fixed-rate USD OIS quotes for tenors 1-, 2-, 3-, 5-, 10-, 20-
-and 30-years are aligned to 17:00 ET and paired with linearly-interpolated
-zero-coupon Treasury yields of identical maturities.  Observations with missing
-quotes are dropped, delivery-month futures are excluded to sidestep
-cheapest-to-deliver noise, and we winsorise the extreme 1\% of spreads; the
+We follow \citet{Siriwardane2021} in constructing daily Treasury-Swap arbitrage
+spreads by pairing Bloomberg fixed-rate USD OIS quotes for tenors 1-, 2-, 3-, 5-, 10-, 20-,
+and 30-years with Bloomberg constant-maturity Treasury yields of identical maturities.
+For each tenor, the spread is computed as 100 times the difference between the swap rate
+and Treasury yield (Swap - Treasury), expressed in basis points. Observations with missing
+values are dropped, and the sample is restricted to 2000 onwards. The
 resulting series replicates the persistently negative swap spreads documented by
 \citet{Jermann2020}, \citet{Du2023}, and \citet{Hanson2023}.
 These spreads are shown in Figure~\ref{fig:treasury_swap_arbitrage}.
@@ -1388,6 +1388,10 @@ Following \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we
 Following \citet{Fleckenstein2020} and \citet{Siriwardane2021}, we construct the Treasury spot-futures basis by extracting implied repo rates from Bloomberg data for 2-, 5-, 10-, 20-, and 30-year Treasury futures contracts and comparing them to maturity-matched OIS rates. For each tenor and date, we pull both the near contract and the first-deferred contract, using Bloomberg's cheapest-to-deliver implied repo rate calculation along with trading volume and contract month specifications. To avoid the delivery option distortions documented by \citet{Burghardt2005}, we compute the basis using only the first-deferred contract, which by construction is not in its delivery month.
 
 The core technical challenge lies in constructing a clean maturity-matched benchmark. We parse each contract's expiration month and year to compute days-to-maturity relative to the last business day of the delivery month, then linearly interpolate OIS rates across available tenors (1-week through 1-year) to match the futures contract horizon. The basis is simply the difference between the futures-implied repo rate and this interpolated OIS rate, expressed in basis points. We restrict to post-June-2004 data, require positive trading volume in the deferred contract, and remove outliers using a rolling 45-day median absolute deviation filter with a threshold of 10 times the MAD. Missing values are forward-filled for up to 5 days. The resulting series successfully replicates the persistent positive spreads documented in \citet{Siriwardane2021}, particularly during stress episodes in 2008-2009 and March 2020, when funding market frictions cause the futures-implied rate to exceed OIS by substantial margins.
+
+\subsubsection{Treasury-Swap Basis}
+
+Following \citet{Siriwardane2021}, we construct the Treasury-Swap arbitrage spread by comparing fixed-rate USD overnight indexed swap (OIS) yields to zero-coupon Treasury yields of matching maturities. The arbitrage opportunity arises when the swap spread is negative---when Treasury yields exceed swap rates. In this scenario, an investor purchases a Treasury financed via repo, pays fixed in a matched-tenor swap, and receives floating. The position earns positive carry because the Treasury coupon exceeds the swap fixed rate paid, while the floating rate received (LIBOR or SOFR) exceeds the repo financing cost. This constitutes a textbook arbitrage under frictionless conditions. The reverse trade does not work when spreads are positive because shorting Treasuries through reverse repo is expensive---LIBOR typically exceeds the reverse repo rate earned, making the floating leg unprofitable and the overall position uneconomical. This asymmetry explains why negative spreads violate no-arbitrage conditions while positive spreads simply reflect normal credit and liquidity premia. Despite the theoretical arbitrage, negative spreads have persisted since 2008 due to balance sheet costs, supplementary leverage ratio requirements, and margin constraints that limit dealer arbitrage capacity. Our implementation pulls Bloomberg constant-maturity Treasury yields for 1-, 2-, 3-, 5-, 10-, 20-, and 30-year tenors along with corresponding fixed-rate OIS quotes for identical maturities. For each tenor, the arbitrage spread is computed as 100 times the difference between the swap rate and the Treasury yield, expressed in basis points. We restrict the sample to observations beginning in 2000 and drop dates with missing values across all tenors. The replication successfully matches the persistent negative swap spreads documented by \citet{Jermann2020}, \citet{Du2023}, and \citet{Hanson2023}, with the 10-year and 30-year tenors showing particularly large deviations during the post-crisis period.
 
 
 \end{appendices}
