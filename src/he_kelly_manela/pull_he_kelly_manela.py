@@ -16,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from settings import config
 
 DATA_DIR = config("DATA_DIR")
-URL = "https://apps.olin.wustl.edu/faculty/manela/hkm/intermediarycapitalrisk/He_Kelly_Manela_Factors.zip"
+URL = "https://asaf.manela.org/papers/hkm/intermediarycapitalrisk/He_Kelly_Manela_Factors.zip"
 
 
 def pull_he_kelly_manela(data_dir=DATA_DIR):
@@ -53,5 +53,6 @@ def load_he_kelly_manela_all(data_dir=DATA_DIR):
 
 if __name__ == "__main__":
     data_dir = DATA_DIR
-    pull_he_kelly_manela(data_dir=data_dir)
+    # data_dir = DATA_DIR / "he_kelly_manela"
     data_dir.mkdir(parents=True, exist_ok=True)
+    pull_he_kelly_manela(data_dir=data_dir)
