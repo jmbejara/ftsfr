@@ -1,0 +1,667 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>He, Kelly, Manela (HKM) Test Portfolios: Options &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'spx_options_description';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cleaning Summary: Options Data" href="cleaning_options.html" />
+    <link rel="prev" title="Cleaning Summary: Corporate Bond Returns" href="_notebook_build/summary_corp_bond_returns_ipynb.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2Fspx_options_description.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/spx_options_description.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>He, Kelly, Manela (HKM) Test Portfolios: Options</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-filtration-and-cleaning">Data Filtration and Cleaning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs-2013-and-hkm-2017">Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS 2013 and HKM 2017</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussian-kernel-weighting">1. Gaussian Kernel Weighting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-elasticity">2. Option Elasticity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-return-of-option-i">3. Arithmetic Return of Option <span class="math notranslate nohighlight">\(i\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leverage-adjusted-portfolio-construction">4. Leverage-Adjusted Portfolio Construction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-be-implemented-filling-nans">5. (to be implemented) Filling NaNs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs">6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017">7. Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#final-ftfsr-data-series">Final FTFSR Data Series</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="he-kelly-manela-hkm-test-portfolios-options">
+<h1>He, Kelly, Manela (HKM) Test Portfolios: Options<a class="headerlink" href="#he-kelly-manela-hkm-test-portfolios-options" title="Link to this heading">#</a></h1>
+<p>From the HKM 2017 paper on intermediary asset pricing:</p>
+<blockquote>
+<div><p>For options, we use 54 portfolios of S&amp;P 500 index options sorted on moneyness and maturity from Constantinides, Jackwerth and Savov (2013),
+split by contract type (27 call and 27 put portfolios), and starting in 1986. Portfolio returns are leverage-adjusted, meaning that each option
+portfolio is combined with the risk-free rate to achieve a targeted market beta of one. According to Constantinides et al. (2013),
+<em>The major advantage of this construction is to lower the variance and skewness of the monthly portfolio returns and render the returns close to
+normal (about as close to normal as the index return), thereby making applicable the standard linear factor pricing methodology</em>. To keep
+the number of portfolios used in our tests similar across asset classes, we reduce the 54 portfolios to 18 portfolios by constructing equal-weighted
+averages of portfolios that have the same moneyness but different maturity (though our results are essentially unchanged if we use all 54 portfolios separately).</p>
+</div></blockquote>
+<p>In order to replicate the HKM options portfolio returns, we necessarily needed to construct the 54 portfolios of S&amp;P 500 index options sorted on 9 tiers of moneyness and 3 maturities from Constantinides, Jackwerth and Savov (2013), split by contract type (9 moneyness x 3 maturities = 27 call portfolios, and similarly, 27 put portfolios). HKM take an equal-weighted average over the 3 maturities in CJS 2013, and obtain <strong>54 / 3 = 18 portfolios for the HKM analysis</strong>.</p>
+<p>The original CJS 2013 paper used data from 1986 through 2012 (26 years of data). Due to unavailability of SPX option data from 1985 to 1995, we replicated the data cleaning and portfolio construction process for the 54 portfolios in CJS using data from <strong>January 1996 to December 2019</strong> (23 years). Our dataset (from 1996 to 2019) comprises over 19.2 million rows of SPX options data, and, due to increasing liquidity in the SPX options market over time, our dataset contains significantly more options than the original paper. Portfolio returns are leverage-adjusted, meaning that each option portfolio is combined with the risk-free rate to achieve a targeted market beta of one, as described broadly in CJS 2013. <em>The spirit of this project is to replicate with the highest practical fidelity the <em><strong>process</strong></em> of data filtration and portfolio construction in the original CJS and HKM papers, without commenting on the effectiveness or appropriateness of the process and parameters. The idea here is that we provide the logic so the user can apply the same data cleaning and portfolio construction process to any date range of SPX options data.</em></p>
+<section id="data-filtration-and-cleaning">
+<h2>Data Filtration and Cleaning<a class="headerlink" href="#data-filtration-and-cleaning" title="Link to this heading">#</a></h2>
+<p>We replicate the Level 1, 2, and 3 data filters outlined in <em>CJS 2013 Appendix B</em> as follows:</p>
+<p><em><strong>Level 1 Filters</strong></em></p>
+<ul class="simple">
+<li><p><strong>Identical Filter:</strong> Retain only one instance of quotes with the same <strong>option type</strong>, <strong>strike price</strong>, <strong>expiration date/maturity</strong>, and <strong>price</strong>.</p></li>
+<li><p><strong>Identical Except Price Filter:</strong> There are a few sets of quotes with identical terms (<strong>type</strong>, <strong>strike</strong>, and <strong>maturity</strong>) but different prices. Keep the quote whose <strong>T-bill-based implied volatility</strong> is closest to that of its <strong>moneyness neighbors</strong>, and delete the others.</p></li>
+<li><p><strong>Bid = 0 Filter:</strong> Drop quotes with a <strong>bid price</strong> of zero, thereby avoiding low-valued options. Also, a zero bid may indicate censoring as negative bids cannot be recorded.</p></li>
+<li><p><strong>Volume = 0 Filter:</strong> Drop quotes of zero for volumes. <em>Note: Appendix B of CJS does not explicitly detail this filter, but we include it here since it is included in <em>Table B.1. Filters</em> of CJS.</em></p></li>
+</ul>
+<p><em><strong>Level 2 Filters</strong></em></p>
+<ul class="simple">
+<li><p><strong>Days to Maturity &lt;7 or &gt;180 Filter:</strong> Drop options with fewer than seven or more than 180 calendar days to expiration.</p></li>
+<li><p><strong>IV&lt;5% or &gt;100% Filter:</strong> We remove all option quotes with implied volatilities lower than 5% or higher than 100%, computed using T-bill interest rates.</p></li>
+<li><p><strong>Moneyness &lt;0.8 or &gt;1.2 Filter:</strong> We remove all option quotes with moneyness, the ratio of strike price to index price, below 0.8 or above 1.2. These options have little value beyond their intrinsic value and are also very thinly traded.</p></li>
+<li><p><strong>Implied Interest Rate &lt;0 Filter:</strong> When filtering outliers, we use T-bill interest rates to compute implied volatilities. T-bill interest rates are obtained from the Federal Reserve’s H.15 release. We assign a T-bill rate to each observation by assuming that we can use the next shortest rate if the time to expiration of the option is shorter than the shortest constant maturity rate. Our goal is to obtain an interest rate that is as close as possible to the one faced by investors in the options market. It appears that the T-bill rates are not the relevant ones when pricing these options. Specifically, when the T-bill rates are used, put and call implied volatilities do not line up very well; for
+example, the T-bill rate tends to be too high for short maturity options, perhaps because no T-bill has maturity of less than a month. To address these issues, we compute a put-call parity-implied interest rate. Since we believe that put-call parity holds reasonably well in this deep and liquid European options market, we use the put-call parity-implied interest rate as our interest rate in the remainder of the paper and for further filters. To construct this rate, we take all put-call pairs of a given maturity and impose put-call parity using the bid-ask midpoint as the price, and allowing the interest rate to adjust. We then take the median-implied interest rate across all remaining pairs of the same maturity with moneyness between 0.95 and 1.05 and assign it to all quotes with that maturity. We fill in the gaps by interpolating across maturities and if necessary, across days.</p></li>
+<li><p><strong>Unable to Compute IV Filter:</strong> We remove quotes that imply negative time
+value.</p></li>
+</ul>
+<p><em><strong>Level 3 Filters</strong></em></p>
+<ul class="simple">
+<li><p><strong>IV Filter:</strong> The IV filter removes volatility outliers to reduce the prevalence of apparent butterfly arbitrage.</p></li>
+<li><p><strong>Put-Call Parity Filter:</strong> The puts and calls need to be matched up based on trading date, expiry date, and option type.</p></li>
+</ul>
+</section>
+<section id="construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs-2013-and-hkm-2017">
+<h2>Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS 2013 and HKM 2017<a class="headerlink" href="#construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs-2013-and-hkm-2017" title="Link to this heading">#</a></h2>
+<p>The construction of the 27 call and 27 put portfolios in CJS is a multi-step process, with the objective of developing portfolio returns series that are stationary and only moderately skewed. Note that the discrete bucketing of moneyness and days to maturity lead to multiple candidate options for each portfolio on each trading day. These options  are given weights according to a <strong>bivariate Gaussian weighting kernel</strong> in moneyness and maturity (bandwidths: <em>0.0125 in moneyness</em> and <em>10 days to maturity</em>).</p>
+<p>Each portfolio’s daily returns are initially calculated as simple arithmetic return, assuming the option is bought and sold at its bid-ask midpoint at each rebalancing. The one-day arithmetic return is then converted to a <strong>leverage-adjusted return</strong>. This procedure is achieved by calculating the one-day return of a hypothetical portfolio with <span class="math notranslate nohighlight">\(\omega_{BSM}^{-1}\)</span> dollars invested in the option, and <span class="math notranslate nohighlight">\((1 - \omega^{-1})\)</span> dollars invested in the risk-free rate, where <span class="math notranslate nohighlight">\(\omega_{BSM}\)</span> is the BSM elasticity based on the implied volatility of the option.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\omega_{\text{BSM, Call}} &amp;= \frac{\partial C_{\text{BSM}}}{\partial S} \cdot \frac{S}{C_{\text{BSM}}} &gt; 1 \\
+\omega_{\text{BSM, Put}}  &amp;= \frac{\partial P_{\text{BSM}}}{\partial S} \cdot \frac{S}{P_{\text{BSM}}} &lt; -1
+\end{aligned}
+\end{split}\]</div>
+<p>Each <strong>leverage-adjusted call portfolio</strong> comprises of a long position in a fraction of a call, and some investment in the risk-free rate.</p>
+<p>Each <strong>leverage-adjusted put portfolio</strong> comprises of a short position in a fraction of a put, and &gt;100% investment in the risk-free rate.</p>
+<p><font color="blue"><em>While the original paper did not provide this level of detail, for clarity, we present below the mathematics we utilized to implement CJS’ portfolio construction process. The following applies for a single trading day <i>t</i>, for a set of candidate call or put options. Portfolios in CJS are identified by 3 characteristics: option type (call or put), moneyness (9 discrete targets), and time to maturity (3 discrete targets). On any given day, it is rare to find options that exactly match the moneyness and maturity targets. Instead, there may be multiple options that are “close to” the target moneyness / maturity (each a <strong>“candidate option”</strong>). Furthermore, each candidate option has its own price and price sensitivity to changes in the underlying SPX index level. In order to arrive at a “price” for an option portfolio, CJS applies a <strong>Gaussian weighting kernel</strong> in moneyness and maturity, as described below. This kernel-weighted price across the candidate options on a given day is used as the price of the <strong>option component</strong> of the portfolio (the other component being the risk-free rate). This portfolio is leverage-adjusted using the BSM elasticity, in order to standardize the sensitivity of OTM and ITM portfolios to changes in the underlying.</em></font></p>
+<section id="gaussian-kernel-weighting">
+<h3>1. Gaussian Kernel Weighting<a class="headerlink" href="#gaussian-kernel-weighting" title="Link to this heading">#</a></h3>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(m_{i}\)</span> = moneyness of option <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tau_{i}\)</span> = days to maturity of option <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(k_{s}\)</span> = target moneyness</p></li>
+<li><p><span class="math notranslate nohighlight">\(\tau\)</span> = target maturity</p></li>
+<li><p><span class="math notranslate nohighlight">\(h_{m}\)</span>, <span class="math notranslate nohighlight">\(h_{\tau}\)</span> = bandwidths for moneyness and maturity</p></li>
+<li><p><span class="math notranslate nohighlight">\(d_{i}^2 = \left( \frac{m_{i} - k_{s}}{h_{m}} \right)^2 + \left( \frac{\tau_{i} - \tau}{h_{\tau}} \right)^2\)</span></p></li>
+</ul>
+<p>Then the unnormalized Gaussian kernel weight for option <span class="math notranslate nohighlight">\(i\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+w_{i}^\ast &amp;= \exp\left( -\frac{1}{2} d_{i}^2 \right) \\
+\end{aligned}
+\end{split}\]</div>
+<p>And the normalized Gaussian kernel weight for option <span class="math notranslate nohighlight">\(i\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+w_{i} &amp;= \frac{w_{i}^\ast}{\sum_{j} w_{j}^\ast} \\
+\end{aligned}
+\end{split}\]</div>
+</section>
+<section id="option-elasticity">
+<h3>2. Option Elasticity<a class="headerlink" href="#option-elasticity" title="Link to this heading">#</a></h3>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(S_{t}\)</span> = underlying index level at time <span class="math notranslate nohighlight">\(t\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(P_{i}\)</span> = price of option <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\Delta_{i}\)</span> = option delta</p></li>
+</ul>
+<p>Then:</p>
+<div class="math notranslate nohighlight">
+\[
+\varepsilon_{i} = \frac{S_t \cdot \Delta_{i}}{P_{i}}
+\]</div>
+</section>
+<section id="arithmetic-return-of-option-i">
+<h3>3. Arithmetic Return of Option <span class="math notranslate nohighlight">\(i\)</span><a class="headerlink" href="#arithmetic-return-of-option-i" title="Link to this heading">#</a></h3>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(P_{i,t-1}\)</span> = price of option <span class="math notranslate nohighlight">\(i\)</span> at time <span class="math notranslate nohighlight">\(t-1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(P_{i,t}\)</span> = price of option <span class="math notranslate nohighlight">\(i\)</span> at time <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p>Then:</p>
+<div class="math notranslate nohighlight">
+\[
+r_{i} = \frac{P_{i,t} - P_{i,t-1}}{P_{i,t-1}}
+\]</div>
+</section>
+<section id="leverage-adjusted-portfolio-construction">
+<h3>4. Leverage-Adjusted Portfolio Construction<a class="headerlink" href="#leverage-adjusted-portfolio-construction" title="Link to this heading">#</a></h3>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(r_{f}\)</span> = risk-free rate on day <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p>The leverage-adjusted return of the call portfolio is:</p>
+<div class="math notranslate nohighlight">
+\[
+R_t^{call} = \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 - \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+\]</div>
+<p>The leverage-adjusted return of the put portfolio is:</p>
+<div class="math notranslate nohighlight">
+\[
+R_t^{put} = -\sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 + \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+\]</div>
+<p>On each trading day, the return of a portfolio is calculated as the <u>weighted average return of the set of candidate options that comprise a single day’s option portfolio</u>. The weighting used is the Gaussian kernel weight calculated earlier. Thus the daily return from period <span class="math notranslate nohighlight">\(t\)</span> to <span class="math notranslate nohighlight">\(t+1\)</span> represents the return from holding a set of candidate options, weighted using the kernel weights as of <span class="math notranslate nohighlight">\(t\)</span>, from period <span class="math notranslate nohighlight">\(t\)</span> to <span class="math notranslate nohighlight">\(t+1\)</span>.</p>
+</section>
+<section id="to-be-implemented-filling-nans">
+<h3>5. (to be implemented) Filling NaNs<a class="headerlink" href="#to-be-implemented-filling-nans" title="Link to this heading">#</a></h3>
+<p>CJS implement an multi-step process to deal with options with missing prices (detailed in section <strong>1.3 Portfolio Formation</strong> of the paper). We reserve the implementation this NaN-filling process for a future version of this dataset. For the current version, we compound the daily portfolio returns into monthly returns, which is the final form of the data utilized in the paper.</p>
+</section>
+<section id="compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs">
+<h3>6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)<a class="headerlink" href="#compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs" title="Link to this heading">#</a></h3>
+</section>
+<section id="construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017">
+<h3>7. Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)<a class="headerlink" href="#construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017" title="Link to this heading">#</a></h3>
+<p>HKM 2017 reduces the 54 portfolio return series constructed in CJS to 18 by taking an equal-weight average across the 3 maturities for the CJS portfolios with the same moneyness. We implement that procedure to obtain the final return series for the FTSFR.
+<br></p>
+<p align="center">* * *</p>
+</section>
+<section id="final-ftfsr-data-series">
+<h3>Final FTFSR Data Series<a class="headerlink" href="#final-ftfsr-data-series" title="Link to this heading">#</a></h3>
+<p>The final FTFSR data series comprise the monthly leverage-adjusted returns for call and put portfolios for <strong>both CJS 2013 (54 portfolios) and HKM 2017 (18 portfolios)</strong> for the period from Jan 1996 - Dec 2019. The format for the unique id for each portfolio is as follows: <br><p align="center"><b>{Call C or Put P flag}_{moneyness * 1000}_{maturity in days}</b></p></p>
+<p>So if we want to retrieve the monthly return series of the Call (<b>C</b>) portfolio with moneyness (<span class="math notranslate nohighlight">\(\frac{K}{S}\)</span>) of 0.90 (x1000 = <b>900</b>), and maturity of <b>30</b> days, the unique id would be the string <b>‘C_900_30’</b>.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="_notebook_build/summary_corp_bond_returns_ipynb.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Cleaning Summary: Corporate Bond Returns</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cleaning_options.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Cleaning Summary: Options Data</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-filtration-and-cleaning">Data Filtration and Cleaning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs-2013-and-hkm-2017">Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS 2013 and HKM 2017</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussian-kernel-weighting">1. Gaussian Kernel Weighting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-elasticity">2. Option Elasticity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-return-of-option-i">3. Arithmetic Return of Option <span class="math notranslate nohighlight">\(i\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leverage-adjusted-portfolio-construction">4. Leverage-Adjusted Portfolio Construction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-be-implemented-filling-nans">5. (to be implemented) Filling NaNs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs">6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017">7. Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#final-ftfsr-data-series">Final FTFSR Data Series</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

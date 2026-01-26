@@ -1119,113 +1119,294 @@ date: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ## corporate_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/corporate_bond_returns.parquet`
-**Size:** 271.5 MB | **Type:** Parquet | **Shape:** 1,572,384 rows × 49 columns
+**Size:** 1.2 GB | **Type:** Parquet | **Shape:** 1,859,546 rows × 140 columns
 
 ### Columns
 ```
+cusip                                    Categorical    
 date                                     Datetime(time_unit='ns', time_zone=None)
-cusip                                    String         
-issuer_cusip                             String         
-permno                                   Float64         (9.6% null)
-exretn_t+1                               Float64         (33.8% null)
-exretnc_bns_t+1                          Float64         (34.4% null)
-exretnc_t+1                              Float64         (34.0% null)
-exretnc_dur_t+1                          Float64         (34.0% null)
-bond_ret_t+1                             Float64         (33.8% null)
-bond_ret                                 Float64         (33.5% null)
-exretn                                   Float64         (33.5% null)
-exretnc_bns                              Float64         (34.2% null)
-exretnc                                  Float64         (33.7% null)
-exretnc_dur                              Float64         (33.7% null)
-rating                                   Float64         (11.1% null)
-cs                                       Float64         (11.6% null)
-cs_6m_delta                              Float64         (23.6% null)
-bond_yield                               Float64         (11.6% null)
-bond_amount_out                          Float64         (11.1% null)
-offering_amt                             Float64         (11.1% null)
-bondprc                                  Float64         (24.4% null)
-perc_par                                 Float64         (24.4% null)
-tmt                                      Float64         (11.1% null)
-duration                                 Float64         (11.6% null)
-ind_num_17                               Float64         (34.1% null)
-sic_code                                 Float64         (11.1% null)
-mom6_1                                   Float64         (6.6% null)
-ltrev48_12                               Float64         (51.0% null)
-BOND_RET                                 Float64         (23.3% null)
-ILLIQ                                    Float64         (27.6% null)
-var95                                    Float64         (57.3% null)
-n_trades_month                           Float64         (22.9% null)
-size_ig                                  Float64         (11.1% null)
-size_jk                                  Float64         (11.1% null)
-zcb                                      Float64         (11.1% null)
-conv                                     Float64         (11.1% null)
-BOND_YIELD                               Float64         (17.7% null)
-CS                                       Float64         (17.7% null)
-BONDPRC                                  Float64         (17.7% null)
-PRFULL                                   Float64         (17.7% null)
-DURATION                                 Float64         (17.7% null)
-CONVEXITY                                Float64         (17.7% null)
-CS_6M_DELTA                              Float64         (31.0% null)
-bond_value                               Float64         (24.4% null)
-BOND_VALUE                               Float64         (17.7% null)
-coupon                                   Float64        
-bond_type                                String         
-principal_amt                            Float64        
-bondpar_mil                              Float64         (11.1% null)
+issuer_cusip                             Categorical    
+permno                                   Float64         (10.8% null)
+permco                                   Float64         (100.0% null)
+gvkey                                    Float64         (100.0% null)
+144a                                     Int8           
+country                                  Categorical     (0.0% null)
+call                                     Int8           
+ret_vw                                   Float32         (0.0% null)
+ret_vw_bgn                               Float32         (7.8% null)
+hprd                                     Int16          
+lib                                      Float32         (15.7% null)
+libd                                     Float32         (15.7% null)
+ret_type                                 Categorical    
+spc_rat                                  Int32          
+mdc_rat                                  Int32          
+ff17num                                  Int8           
+ff30num                                  Int8           
+fce_val                                  Int64          
+mcap_s                                   Float32         (0.0% null)
+mcap_e                                   Float32         (0.0% null)
+tret                                     Float32         (1.8% null)
+rfret                                    Float64        
+dt_s                                     Datetime(time_unit='ns', time_zone=None)
+dt_e                                     Datetime(time_unit='ns', time_zone=None)
+dt_s_bgn                                 Datetime(time_unit='ns', time_zone=None) (7.8% null)
+dt_e_bgn                                 Datetime(time_unit='ns', time_zone=None) (7.8% null)
+hprd_bgn                                 Int16           (7.8% null)
+igap_bgn                                 Int8            (7.8% null)
+sig_dt                                   Datetime(time_unit='ns', time_zone=None) (3.5% null)
+sig_gap                                  Float64         (3.5% null)
+tmat                                     Float32        
+age                                      Float32        
+ytm                                      Float32         (3.5% null)
+cs                                       Float32         (5.3% null)
+md_dur                                   Float32         (3.5% null)
+convx                                    Float32         (3.5% null)
+bbtm                                     Float32         (3.5% null)
+sze                                      Float32         (3.5% null)
+val_hz                                   Float32         (15.7% null)
+val_hz_dts                               Float32         (15.7% null)
+val_ipr                                  Float32         (15.7% null)
+val_ipr_dts                              Float32         (15.7% null)
+dcs6                                     Float32         (17.0% null)
+cs_mu12_1                                Float64         (16.4% null)
+pi                                       Float64         (17.4% null)
+ami                                      Float32         (14.8% null)
+ami_v                                    Float64         (14.8% null)
+lix                                      Float32         (15.0% null)
+ilq                                      Float32         (17.4% null)
+roll                                     Float32         (17.4% null)
+spd_abs                                  Float64         (5.4% null)
+spd_rel                                  Float64         (5.4% null)
+cs_sprd                                  Float64         (11.4% null)
+ar_sprd                                  Float64         (11.4% null)
+p_zro                                    Float64         (0.9% null)
+p_fht                                    Float64         (14.8% null)
+vov                                      Float64         (14.8% null)
+dvol                                     Float64         (14.8% null)
+dskew                                    Float64         (14.8% null)
+dkurt                                    Float64         (14.8% null)
+db_mkt                                   Float64         (14.8% null)
+dvol_sys                                 Float64         (14.8% null)
+dvol_idio                                Float64         (14.8% null)
+rvol                                     Float64         (14.8% null)
+rsj                                      Float64         (14.8% null)
+rsk                                      Float64         (14.8% null)
+rkt                                      Float64         (14.8% null)
+b_vix                                    Float64         (14.8% null)
+b_dvixd                                  Float64         (14.8% null)
+b_mktrf_mkt                              Float64         (21.7% null)
+b_mktb_mkt                               Float64         (21.7% null)
+ivol_mkt                                 Float64         (21.7% null)
+ivol_bbw                                 Float64         (23.8% null)
+b_mktbx_dcapm                            Float64         (21.7% null)
+b_term_dcapm                             Float64         (21.7% null)
+b_dvix_va                                Float64         (22.3% null)
+b_dvix_vp                                Float64         (22.3% null)
+ivol_vp                                  Float64         (22.3% null)
+b_psb_m                                  Float64         (23.8% null)
+b_amd_m                                  Float64         (23.8% null)
+b_dvix                                   Float64         (21.7% null)
+b_cpi_vol6                               Float64         (21.7% null)
+b_dunc                                   Float64         (21.7% null)
+b_unc                                    Float64         (21.7% null)
+b_dunc3                                  Float64         (21.7% null)
+b_dunc6                                  Float64         (21.7% null)
+b_duncr                                  Float64         (21.7% null)
+b_duncf                                  Float64         (21.7% null)
+b_dcredit                                Float64         (21.7% null)
+b_credit                                 Float64         (21.7% null)
+b_dcpi                                   Float64         (21.7% null)
+b_cptlt                                  Float64         (20.2% null)
+b_rvol                                   Float64         (23.8% null)
+b_rsj                                    Float64         (23.8% null)
+b_psb                                    Float64         (23.8% null)
+b_amd                                    Float64         (23.8% null)
+b_illiq                                  Float64         (23.8% null)
+b_dvix_dn                                Float64         (20.2% null)
+b_dvix_up                                Float64         (20.2% null)
+b_coskew                                 Float64         (21.7% null)
+iskew                                    Float64         (21.7% null)
+b_defb                                   Float64         (21.7% null)
+b_termb                                  Float64         (21.7% null)
+b_drf                                    Float64         (21.7% null)
+b_crf                                    Float64         (21.7% null)
+b_lrf                                    Float64         (23.8% null)
+b_mktb                                   Float64         (21.7% null)
+b_lvl                                    Float64         (20.2% null)
+b_ysp                                    Float64         (20.2% null)
+b_mktb_dn                                Float64         (20.2% null)
+b_mktb_up                                Float64         (20.2% null)
+b_epu                                    Float64         (21.7% null)
+b_epum                                   Float64         (21.7% null)
+b_eput                                   Float64         (21.7% null)
+sysmom3_1                                Float64         (21.7% null)
+sysmom6_1                                Float64         (21.7% null)
+sysmom12_1                               Float64         (21.7% null)
+idimom3_1                                Float64         (21.7% null)
+idimom6_1                                Float64         (21.7% null)
+idimom12_1                               Float64         (21.7% null)
+mom3_1                                   Float64         (3.8% null)
+mom6_1                                   Float64         (9.7% null)
+mom9_1                                   Float64         (15.1% null)
+mom12_1                                  Float64         (20.2% null)
+mom12_7                                  Float64         (20.2% null)
+ltr48_12                                 Float64         (20.2% null)
+ltr30_6                                  Float64         (20.2% null)
+ltr24_3                                  Float64         (20.2% null)
+imom1                                    Float64         (1.7% null)
+imom3_1                                  Float64         (1.7% null)
+imom12_1                                 Float64         (1.9% null)
+iltr48_12                                Float64         (1.9% null)
+iltr30_6                                 Float64         (1.9% null)
+iltr24_3                                 Float64         (1.9% null)
+var_90                                   Float64         (20.2% null)
+es_90                                    Float64         (20.2% null)
+var_95                                   Float64         (20.2% null)
+str                                      Float32         (3.5% null)
 ```
 
 ### Numeric Column Statistics
 ```
-permno: min=10025.0, max=93433.0, mean=51667.80, median=56274.0
-exretn_t+1: min=-0.9767107633155356, max=3.68331, mean=0.00, median=0.0024608583916704
-exretnc_bns_t+1: min=-0.9788409650955358, max=3.679218441265, mean=0.00, median=0.0013672454083213
-exretnc_t+1: min=-0.975496159872277, max=1.0937039372664568, mean=0.00, median=0.00151554299576355
-exretnc_dur_t+1: min=-0.9750837579521624, max=1.026469200126305, mean=0.00, median=0.0015140504246088
-bond_ret_t+1: min=-0.9753107633155358, max=3.68351, mean=0.00, median=0.0033128735591761
-bond_ret: min=-0.9753107633155358, max=3.68351, mean=0.00, median=0.0033377041526085
-exretn: min=-0.9767107633155356, max=3.68331, mean=0.00, median=0.0024835982207484
-exretnc_bns: min=-0.9788409650955358, max=3.679218441265, mean=0.00, median=0.0013649457596122
-exretnc: min=-0.975496159872277, max=1.0937039372664568, mean=0.00, median=0.00151315367870985
-exretnc_dur: min=-0.9750837579521624, max=1.026469200126305, mean=0.00, median=0.0015178250172955
-rating: min=1.0, max=22.0, mean=8.66, median=8.0
-cs: min=-0.9729639446210764, max=0.998901539738254, mean=0.03, median=0.0177682208160528
-cs_6m_delta: min=-10.878444246922706, max=9.309785967566132, mean=-0.04, median=-0.0462234915593731
-bond_yield: min=-1.0, max=1.0, mean=0.05, median=0.0433994659389245
-bond_amount_out: min=1.0, max=15000000.0, mean=555958.59, median=400000.0
-offering_amt: min=1.0, max=15000000.0, mean=577398.30, median=400000.0
-bondprc: min=0.01, max=3347.9645670033674, mean=104.91, median=104.14881024096384
-perc_par: min=0.0001, max=105.34653465346534, mean=1.05, median=1.0415
-tmt: min=12.033333333333331, max=1217.5, mean=122.37, median=79.60000000000001
-duration: min=0.0333651407924791, max=30.0, mean=6.51, median=5.294389227744916
-ind_num_17: min=1.0, max=17.0, mean=12.68, median=14.0
-sic_code: min=181.0, max=9532.0, mean=4783.57, median=4922.0
-mom6_1: min=-0.97616417196161, max=12.68648163262489, mean=0.02, median=0.0066739471799154
-ltrev48_12: min=-0.9685054217585898, max=22.631086156600592, mean=0.16, median=0.1195484294788225
-BOND_RET: min=-0.9908377470148158, max=89.81803240743932, mean=0.00, median=0.0025021959575501
-ILLIQ: min=-4506.5558135121155, max=10815.473510796275, mean=2.17, median=0.0812535815242251
-var95: min=-0.00171, max=0.7020304326820522, mean=0.04, median=0.0300963510511023
-n_trades_month: min=1.0, max=24.0, mean=11.59, median=12.0
-size_ig: min=0.0, max=1.0, mean=0.78, median=1.0
-size_jk: min=0.0, max=1.0, mean=0.97, median=1.0
-zcb: min=0.0, max=1.0, mean=0.01, median=0.0
-conv: min=0.0, max=1.0, mean=0.00, median=0.0
-BOND_YIELD: min=-1.1481999312401832, max=139.41116520263148, mean=0.05, median=0.04279601144790645
-CS: min=-1.1611301537537178, max=139.39916520263148, mean=0.03, median=0.01705836639896655
-BONDPRC: min=0.0001, max=8491.4861, mean=105.02, median=104.24775
-PRFULL: min=0.1009944444335674, max=8491.486257238086, mean=106.38, median=105.58799728776982
-DURATION: min=0.0056839521747671, max=35.463740358046394, mean=6.51, median=5.275024154030079
-CONVEXITY: min=0.0001021010147481, max=1346.6896180823323, mean=83.44, median=33.81145002739121
-CS_6M_DELTA: min=-10.663948714220927, max=7.585603513125841, mean=-0.03, median=-0.0446292284079974
-bond_value: min=15.0, max=1899989423.0, mean=65126862.38, median=47239131.0
-BOND_VALUE: min=17.0, max=1908028500.0, mean=61961917.12, median=43685320.0
-coupon: min=0.0, max=16.5, mean=5.73, median=5.875
-principal_amt: min=10.0, max=1000.0, mean=999.81, median=1000.0
-bondpar_mil: min=0.001, max=15000.0, mean=555.96, median=400.0
+permno: min=10025.0, max=93436.0, mean=52827.38, median=59408.0
+permco: min=N/A, max=N/A, mean=N/A, median=N/A
+gvkey: min=N/A, max=N/A, mean=N/A, median=N/A
+144a: min=0, max=1, mean=0.11, median=0.0
+call: min=0, max=1, mean=0.79, median=1.0
+ret_vw: min=-0.9981083273887634, max=9.000757217407227, mean=0.00, median=0.0037167782429605722
+ret_vw_bgn: min=-0.9983446598052979, max=5.195072174072266, mean=0.00, median=0.0033784452825784683
+hprd: min=19, max=27, mean=21.83, median=22.0
+lib: min=-0.973014771938324, max=12.419955253601074, mean=0.00, median=0.00012955942656844854
+libd: min=-0.9030926823616028, max=6.2988667488098145, mean=0.00, median=0.000412673776736483
+spc_rat: min=1, max=11, mean=3.28, median=1.0
+mdc_rat: min=1, max=11, mean=3.41, median=1.0
+ff17num: min=1, max=17, mean=13.08, median=16.0
+ff30num: min=1, max=30, mean=21.87, median=23.0
+fce_val: min=1, max=15000000, mean=642054.33, median=500000.0
+mcap_s: min=0.0005666689830832183, max=19236.90625, mean=662.98, median=500.82421875
+mcap_e: min=0.0005666689830832183, max=19236.90625, mean=661.95, median=500.2959899902344
+tret: min=-0.13225233554840088, max=0.1337672770023346, mean=0.00, median=0.0013065884122624993
+rfret: min=0.0, max=0.0048, mean=0.00, median=0.0007000000000000001
+hprd_bgn: min=10, max=22, mean=18.95, median=19.0
+igap_bgn: min=1, max=5, mean=1.50, median=1.0
+sig_gap: min=1.0, max=10.0, mean=1.68, median=1.0
+tmat: min=1.0019999742507935, max=100.00800323486328, mean=9.60, median=6.385000228881836
+age: min=0.06023271754384041, max=90.08076477050781, mean=4.76, median=3.4113621711730957
+ytm: min=-0.04614030942320824, max=2.721390962600708, mean=0.05, median=0.047989167273044586
+cs: min=-0.06119731813669205, max=2.70243239402771, mean=0.03, median=0.014648811891674995
+md_dur: min=0.0020000000949949026, max=31.981000900268555, mean=6.39, median=5.2210001945495605
+convx: min=0.0, max=1763.532958984375, mean=79.79, median=32.972999572753906
+bbtm: min=0.4797283709049225, max=10000.0, mean=1.06, median=0.9841357469558716
+sze: min=0.0005786875262856483, max=19338.623046875, mean=677.21, median=507.9854736328125
+val_hz: min=-0.9998649954795837, max=142.27110290527344, mean=-0.02, median=-0.08415959775447845
+val_hz_dts: min=-1.613982081413269, max=141.39512634277344, mean=-0.01, median=-0.056984465569257736
+val_ipr: min=-9.075562477111816, max=4.1725897789001465, mean=-0.01, median=-0.017367485910654068
+val_ipr_dts: min=-8.863336563110352, max=4.067607402801514, mean=-0.01, median=-0.021380119025707245
+dcs6: min=-7.619980335235596, max=9.141984939575195, mean=0.03, median=0.04934856295585632
+cs_mu12_1: min=-0.024122654099483044, max=1.338869116523049, mean=0.02, median=0.015327041095588356
+pi: min=-220116.11126050615, max=252451.11623131274, mean=0.09, median=-0.002887648014614448
+ami: min=5.5002133194648195e-06, max=11261.7197265625, mean=0.43, median=0.03748023509979248
+ami_v: min=1.898147538026151e-06, max=33781.174592976786, mean=0.84, median=0.0700974930586428
+lix: min=-6.50123405456543, max=3.886056661605835, mean=-2.06, median=-2.1623404026031494
+ilq: min=-1611.2640380859375, max=22880.57421875, mean=1.25, median=0.06175573915243149
+roll: min=0.0, max=302.5265197753906, mean=0.99, median=0.49701404571533203
+spd_abs: min=-52.806768012988265, max=58.13458872349912, mean=0.81, median=0.3896629564018568
+spd_rel: min=-1.3269233892484076, max=1.5555555555555556, mean=0.01, median=0.0038568535239435478
+cs_sprd: min=0.0, max=1.0887068794278045, mean=0.02, median=0.011000985011970398
+ar_sprd: min=0.0, max=0.6825942233517418, mean=0.01, median=0.0037143170528098476
+p_zro: min=0.0, max=0.9565217391304348, mean=0.38, median=0.3333333333333333
+p_fht: min=0.0, max=15.711365328752144, mean=0.01, median=0.0027885779328675276
+vov: min=0.004739881523082324, max=24.495708357263034, mean=0.16, median=0.10383591991925235
+dvol: min=6.62803696248082e-05, max=1.9247870524640667, mean=0.01, median=0.006136453422900886
+dskew: min=-3.904577907525174, max=3.963940556537785, mean=-0.01, median=-0.008043051545831155
+dkurt: min=-2.3042875238492657, max=14.707639232780267, mean=-0.48, median=-0.7352938805202567
+db_mkt: min=-767.6241313386747, max=1014.9879485030154, mean=1.06, median=0.7726074505490964
+dvol_sys: min=9.880121329243227e-10, max=1.137658235596538, mean=0.00, median=0.0020537248509415436
+dvol_idio: min=6.600825984144691e-05, max=1.8055832418167057, mean=0.01, median=0.00501586906796703
+rvol: min=0.0002391533418205396, max=6.333745516324725, mean=0.03, median=0.022569586954749338
+rsj: min=-2141.6772056155773, max=2253.992254986454, mean=5.16, median=1.7649089193920995
+rsk: min=-4.518947188434787, max=4.5837456975927235, mean=0.13, median=0.15202991954760917
+rkt: min=1.001834093620052, max=21.349185152078885, mean=3.04, median=2.7021762537580702
+b_vix: min=-169.3116788293221, max=688.1213439446273, mean=-0.07, median=-0.026851225622083207
+b_dvixd: min=-215.11658561764497, max=390.61722381838985, mean=-0.11, median=-0.046471023094628194
+b_mktrf_mkt: min=-85.58295968818375, max=13.473917571284812, mean=0.01, median=-0.039641704556200676
+b_mktb_mkt: min=-14.405918400980934, max=170.39430558616135, mean=1.12, median=0.9521306507907795
+ivol_mkt: min=0.0003569400869152177, max=6.910424133267597, mean=0.02, median=0.015369921510589715
+ivol_bbw: min=0.00034410968306700703, max=4.110724649433245, mean=0.02, median=0.013472404310933859
+b_mktbx_dcapm: min=-20.92293193492868, max=127.0479098491878, mean=1.18, median=0.8803630729633298
+b_term_dcapm: min=-205.3212790837008, max=48.87627924179838, mean=1.05, median=0.9483883714164307
+b_dvix_va: min=-128.26995282028028, max=308.6952823764602, mean=-0.56, median=-0.24894236395060884
+b_dvix_vp: min=-365.20180613955307, max=186.22502053076602, mean=-0.56, median=-0.2739403143781042
+ivol_vp: min=0.00038744069537006043, max=4.173845563328997, mean=0.03, median=0.020321889118026588
+b_psb_m: min=-1.186675040969698, max=0.8684993301975288, mean=-0.00, median=7.346809040883115e-05
+b_amd_m: min=-6.424601049147454, max=6.072206148528057, mean=-0.01, median=-0.0008399845540484655
+b_dvix: min=-293.1417391008838, max=188.6230664168538, mean=-0.02, median=0.01078308664960558
+b_cpi_vol6: min=-2.3716752563975434, max=17.51276348780078, mean=0.00, median=-0.0003543312172933246
+b_dunc: min=-159.18943550544117, max=38.913764139392114, mean=-0.02, median=0.007105239990899664
+b_unc: min=-13.355788778005765, max=40.4972478741288, mean=0.00, median=0.0022285606942160233
+b_dunc3: min=-70.16926385045053, max=14.223933885858681, mean=-0.02, median=0.002479336168631455
+b_dunc6: min=-19.050309091104676, max=40.4071200847731, mean=-0.01, median=0.00229094337277027
+b_duncr: min=-108.1913350914576, max=82.55265467583655, mean=-0.01, median=0.016140191538525406
+b_duncf: min=-87.19789808710185, max=17.615900440881113, mean=-0.01, median=0.010068991217926669
+b_dcredit: min=-177.7817410442719, max=72.45623255601421, mean=-0.13, median=0.036373391575193995
+b_credit: min=-56.86551689920585, max=128.8614372316075, mean=0.02, median=0.03269527246560874
+b_dcpi: min=-6.364872059270202, max=0.6653882756087045, mean=-0.00, median=-0.00037267885651232844
+b_cptlt: min=-53.35294165107803, max=10.543988409133894, mean=-0.00, median=-0.02734132735010685
+b_rvol: min=-282.15402161165474, max=86.40056112760051, mean=-0.18, median=-0.014321130644890268
+b_rsj: min=-96.30041912469851, max=42.849339757488316, mean=-0.03, median=0.011501846018483863
+b_psb: min=-1.0623691681743486, max=0.7934206064520152, mean=-0.00, median=2.5674988685123922e-05
+b_amd: min=-5.607574161549745, max=6.471978741334538, mean=-0.01, median=0.00019521553646572362
+b_illiq: min=-1.6662071942572245, max=2.0464688896926604, mean=-0.00, median=-1.5152214288905028e-06
+b_dvix_dn: min=-268.3492061307264, max=237.64591845017165, mean=-0.12, median=-0.03940212067880317
+b_dvix_up: min=-310.8153707313046, max=738.3689260345268, mean=-0.06, median=-0.0944107701869242
+b_coskew: min=-2186.2498021535766, max=6214.0782117769995, mean=-0.14, median=-0.24519657383883656
+iskew: min=-5.923646756488455, max=5.951195066011716, mean=0.04, median=0.021456734685039114
+b_defb: min=-19.707557940860166, max=113.19607815278158, mean=0.95, median=0.6290080862943398
+b_termb: min=-242.25557743692107, max=26.01660663297699, mean=0.55, median=0.5909307824318598
+b_drf: min=-13.77334996107455, max=66.0468990652739, mean=0.73, median=0.5615997730442012
+b_crf: min=-11.888600458649844, max=80.01716129874758, mean=0.04, median=-0.04374332697487936
+b_lrf: min=-31.327649363665977, max=156.0292483182653, mean=1.30, median=0.910468961715085
+b_mktb: min=-20.568083008187894, max=87.76094417232656, mean=1.13, median=0.9432266946705217
+b_lvl: min=-576.3479212264855, max=104.35858530013812, mean=-0.89, median=-0.46287165060533375
+b_ysp: min=-297.94888173718516, max=434.52592674986613, mean=-0.89, median=-0.7171007231786972
+b_mktb_dn: min=-339.11290868244765, max=190.82764721172305, mean=1.11, median=0.9491867656708515
+b_mktb_up: min=-47.250916018969754, max=187.78408429570902, mean=1.15, median=0.890312773169611
+b_epu: min=-21.19472055175888, max=110.38191252913546, mean=-0.01, median=-0.0015436846646421272
+b_epum: min=-19.004805323455475, max=15.404934164416341, mean=-0.01, median=0.005876901459016893
+b_eput: min=-15.169183198094766, max=63.0141346502362, mean=-0.01, median=-0.005979063460477949
+sysmom3_1: min=-2.4602093772536393, max=4.415956272554328, mean=0.01, median=0.009205217615070397
+sysmom6_1: min=-1.8219240248214277, max=3.9550107866378497, mean=0.02, median=0.02276765833031702
+sysmom12_1: min=-2.3224812657050746, max=14.805356344544732, mean=0.05, median=0.047632609914670145
+idimom3_1: min=-2.7636804953091274, max=12.621122631728706, mean=-0.00, median=-0.0004378214904601947
+idimom6_1: min=-4.93701632068136, max=10.717609092898318, mean=-0.00, median=-0.0004976374273692424
+idimom12_1: min=-15.579423105680787, max=9.246582938571109, mean=-0.00, median=-0.0003318518933694836
+mom3_1: min=-0.9984032940903846, max=14.023292216513314, mean=0.01, median=0.007300352216242552
+mom6_1: min=-0.998724492372518, max=17.727042009465, mean=0.02, median=0.019701793433238513
+mom9_1: min=-0.9987351047053308, max=19.554431302837777, mean=0.04, median=0.032789218772054846
+mom12_1: min=-0.9987762901512514, max=22.24953677162908, mean=0.05, median=0.04365855485255758
+mom12_7: min=-0.9969631052866385, max=17.727042009465, mean=0.02, median=0.019976711847260804
+ltr48_12: min=-0.999120335386223, max=24.33498729394523, mean=0.15, median=0.12109223547816957
+ltr30_6: min=-0.999120335386223, max=33.746061105712194, mean=0.10, median=0.08830042347087241
+ltr24_3: min=-0.9986076823939898, max=35.43124187124598, mean=0.09, median=0.0804354701354928
+imom1: min=-0.9856957793235779, max=30.30000114440918, mean=0.01, median=0.00541091554232561
+imom3_1: min=-0.9915952526916385, max=162.4797853309825, mean=0.01, median=0.009945651756952029
+imom12_1: min=-0.9735327661171094, max=1280.3074852379725, mean=0.06, median=0.053953128571829184
+iltr48_12: min=-0.9944900021193184, max=1361.6001879849698, mean=0.21, median=0.18735278746447886
+iltr30_6: min=-0.9944900021193184, max=1309.5947971445098, mean=0.13, median=0.1122625728010583
+iltr24_3: min=-0.9944900021193184, max=1323.1085131643338, mean=0.11, median=0.10045731169759901
+var_90: min=-0.020391881465911865, max=0.8333333134651184, mean=0.03, median=0.022077342495322227
+es_90: min=-0.009837267687544227, max=0.8842830061912537, mean=0.05, median=0.03451567143201828
+var_95: min=-0.006537846755236387, max=0.981425940990448, mean=0.05, median=0.034091219305992126
+str: min=-0.9772710204124451, max=7.744128227233887, mean=0.00, median=0.002901438158005476
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
+date: min=2002-08-31 00:00:00, max=2025-03-31 00:00:00
+dt_s: min=2002-07-25 00:00:00, max=2025-02-28 00:00:00
+dt_e: min=2002-08-26 00:00:00, max=2025-03-31 00:00:00
+dt_s_bgn: min=2002-08-01 00:00:00, max=2025-03-07 00:00:00
+dt_e_bgn: min=2002-08-26 00:00:00, max=2025-03-31 00:00:00
+sig_dt: min=2002-08-19 00:00:00, max=2025-03-28 00:00:00
 ```
 
 ---
@@ -3484,7 +3665,7 @@ All_124: min=-0.0849, max=0.1822, mean=0.01, median=0.0067
 
 ## He_Kelly_Manela_Factors_daily.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/he_kelly_manela/He_Kelly_Manela_Factors_daily.csv`
-**Size:** 431266 bytes | **Type:** Csv | **Shape:** 4,766 rows × 5 columns
+**Size:** 431199 bytes | **Type:** Csv | **Shape:** 4,766 rows × 5 columns
 
 ### Columns
 ```
@@ -3499,7 +3680,7 @@ intermediary_leverage_ratio_squared      Float64
 ```
 yyyymmdd: min=20000103, max=20181211, mean=20090450.16, median=20090624.5
 intermediary_capital_ratio: min=0.0145895067948756, max=0.17355099318704817, mean=0.08, median=0.07230790204221717
-intermediary_capital_risk_factor: min=-0.16030051697835737, max=0.1805224049114429, mean=0.00, median=0.00024427127323118573
+intermediary_capital_risk_factor: min=-0.16030051697835535, max=0.1805224049114438, mean=0.00, median=0.00024427127323147966
 intermediary_value_weighted_investment_return: min=-0.1183881055505066, max=0.19350923576363566, mean=0.00, median=0.00025370052227591255
 intermediary_leverage_ratio_squared: min=33.2005893688213, max=4698.062377977052, mean=310.19, median=191.26190829049523
 ```
@@ -3508,7 +3689,7 @@ intermediary_leverage_ratio_squared: min=33.2005893688213, max=4698.062377977052
 
 ## He_Kelly_Manela_Factors_monthly.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/he_kelly_manela/He_Kelly_Manela_Factors_monthly.csv`
-**Size:** 25659 bytes | **Type:** Csv | **Shape:** 587 rows × 5 columns
+**Size:** 25629 bytes | **Type:** Csv | **Shape:** 587 rows × 5 columns
 
 ### Columns
 ```

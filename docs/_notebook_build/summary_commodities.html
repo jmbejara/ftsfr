@@ -1,0 +1,2325 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cleaning Summary: Commodities Returns &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_notebook_build/summary_commodities';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cleaning Summary: Corporate Bond Returns" href="summary_corp_bond_returns_ipynb.html" />
+    <link rel="prev" title="Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads" href="summary_cip_ipynb.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2F_notebook_build/summary_commodities.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_notebook_build/summary_commodities.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Cleaning Summary: Commodities Returns</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach1-gsci-indices">Approach1 – GSCI Indices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matching-procedure">Matching Procedure</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-standardized-table">Generate Standardized table</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-approach-1">Alternative Approach 1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-approach-2-spot-commodities-futures">Alternative Approach 2 – Spot Commodities Futures</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">extract_hkm_cmdty</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">load_futures_data</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">calc_commodities_returns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pull_bbg_commodities_basis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">replicate_cmdty</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_corr_matrix</span><span class="p">,</span> <span class="n">decide_optimal_pairs</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">config</span><span class="p">(</span><span class="s2">&quot;BASE_DIR&quot;</span><span class="p">)</span>
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">config</span><span class="p">(</span><span class="s2">&quot;DATA_DIR&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="cleaning-summary-commodities-returns">
+<h1>Cleaning Summary: Commodities Returns<a class="headerlink" href="#cleaning-summary-commodities-returns" title="Link to this heading">#</a></h1>
+<p>This notebook outlines the steps taken to generate an approximate replication of the commodity return series presented in He, Kelly, and Manela (2017).</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>He, Kelly, and Manela constructed monthly returns for 23 commodities selected from a larger set of 31 commodities originally studied by Yang (2013). These commodities were chosen based on data availability from the Commodity Research Bureau (CRB), requiring at least 25 years of monthly returns data. He, Kelly, and Manela employed an equal-weighted portfolio of all futures contracts with maturities of four months or less, slightly modifying Yang’s original method, which used contracts with maturities between one month and twelve months.</p>
+<p><em>Note: the Yang paper ranges from 197101-200812 and hkm ranges from 198609-201212</em></p>
+<p>However, when attempting direct replication, we encountered significant data limitations. The CRB dataset, as originally utilized by Yang and subsequently He, Kelly, and Manela, is not readily accessible. Matching the precise contract numbers listed in Yang’s Table 1 (“N” values) was also impractical given current dataset constraints.</p>
+<blockquote>
+<div><p>While it may not be perfectly accurate—since neither the Yang nor the HKM papers specify the yearspan of the commodities they used—we can still make a reasonable inference. Both studies rely on the same underlying dataset. By sorting Yang’s table of commodities by the number of monthly observations (N), we can roughly estimate which commodities were likely selected by HKM, given their stated requirement of at least 25 years of monthly return data.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Barley&quot;</span><span class="p">,</span> <span class="s2">&quot;WA&quot;</span><span class="p">,</span> <span class="mi">235</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.66</span><span class="p">,</span> <span class="mf">27.66</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.24</span><span class="p">,</span> <span class="mf">19.62</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.21</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Butter&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&quot;</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.68</span><span class="p">,</span> <span class="mf">33.33</span><span class="p">,</span> <span class="mf">3.66</span><span class="p">,</span> <span class="mf">27.22</span><span class="p">,</span> <span class="mf">13.46</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Canola&quot;</span><span class="p">,</span> <span class="s2">&quot;WC&quot;</span><span class="p">,</span> <span class="mi">377</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.98</span><span class="p">,</span> <span class="mf">33.16</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.18</span><span class="p">,</span> <span class="mf">19.82</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.89</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Cocoa&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">,</span> <span class="mi">452</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.61</span><span class="p">,</span> <span class="mf">25.22</span><span class="p">,</span> <span class="mf">4.52</span><span class="p">,</span> <span class="mf">30.32</span><span class="p">,</span> <span class="mf">14.90</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Coffee&quot;</span><span class="p">,</span> <span class="s2">&quot;KC&quot;</span><span class="p">,</span> <span class="mi">420</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.57</span><span class="p">,</span> <span class="mf">36.90</span><span class="p">,</span> <span class="mf">6.00</span><span class="p">,</span> <span class="mf">36.52</span><span class="p">,</span> <span class="mf">16.44</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Corn&quot;</span><span class="p">,</span> <span class="s2">&quot;C-&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.03</span><span class="p">,</span> <span class="mf">23.08</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">23.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.04</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Cotton&quot;</span><span class="p">,</span> <span class="s2">&quot;CT&quot;</span><span class="p">,</span> <span class="mi">452</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.75</span><span class="p">,</span> <span class="mf">36.50</span><span class="p">,</span> <span class="mf">3.60</span><span class="p">,</span> <span class="mf">22.96</span><span class="p">,</span> <span class="mf">15.69</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Lumber&quot;</span><span class="p">,</span> <span class="s2">&quot;LB&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.63</span><span class="p">,</span> <span class="mf">33.55</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.13</span><span class="p">,</span> <span class="mf">22.80</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.98</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Oats&quot;</span><span class="p">,</span> <span class="s2">&quot;O-&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.65</span><span class="p">,</span> <span class="mf">31.20</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">28.90</span><span class="p">,</span> <span class="mf">1.53</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Orange juice&quot;</span><span class="p">,</span> <span class="s2">&quot;JO&quot;</span><span class="p">,</span> <span class="mi">448</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.08</span><span class="p">,</span> <span class="mf">36.61</span><span class="p">,</span> <span class="mf">2.32</span><span class="p">,</span> <span class="mf">29.56</span><span class="p">,</span> <span class="mf">7.86</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Rough rice&quot;</span><span class="p">,</span> <span class="s2">&quot;RR&quot;</span><span class="p">,</span> <span class="mi">265</span><span class="p">,</span> <span class="o">-</span><span class="mf">7.56</span><span class="p">,</span> <span class="mf">26.04</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.50</span><span class="p">,</span> <span class="mf">25.01</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.01</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Soybean meal&quot;</span><span class="p">,</span> <span class="s2">&quot;SM&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">,</span> <span class="mf">44.87</span><span class="p">,</span> <span class="mf">7.80</span><span class="p">,</span> <span class="mf">28.63</span><span class="p">,</span> <span class="mf">27.25</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Soybeans&quot;</span><span class="p">,</span> <span class="s2">&quot;S-&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.58</span><span class="p">,</span> <span class="mf">37.18</span><span class="p">,</span> <span class="mf">5.99</span><span class="p">,</span> <span class="mf">26.25</span><span class="p">,</span> <span class="mf">22.81</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Agriculture&quot;</span><span class="p">,</span> <span class="s2">&quot;Wheat&quot;</span><span class="p">,</span> <span class="s2">&quot;W-&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.88</span><span class="p">,</span> <span class="mf">38.68</span><span class="p">,</span> <span class="mf">2.79</span><span class="p">,</span> <span class="mf">23.76</span><span class="p">,</span> <span class="mf">11.72</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Energy&quot;</span><span class="p">,</span> <span class="s2">&quot;Crude oil&quot;</span><span class="p">,</span> <span class="s2">&quot;CL&quot;</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mf">4.25</span><span class="p">,</span> <span class="mf">66.78</span><span class="p">,</span> <span class="mf">10.56</span><span class="p">,</span> <span class="mf">27.87</span><span class="p">,</span> <span class="mf">37.89</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Energy&quot;</span><span class="p">,</span> <span class="s2">&quot;Gasoline&quot;</span><span class="p">,</span> <span class="s2">&quot;RB&quot;</span><span class="p">,</span> <span class="mi">275</span><span class="p">,</span> <span class="mf">8.09</span><span class="p">,</span> <span class="mf">70.91</span><span class="p">,</span> <span class="mf">12.82</span><span class="p">,</span> <span class="mf">30.18</span><span class="p">,</span> <span class="mf">42.47</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Energy&quot;</span><span class="p">,</span> <span class="s2">&quot;Heating oil&quot;</span><span class="p">,</span> <span class="s2">&quot;HO&quot;</span><span class="p">,</span> <span class="mi">345</span><span class="p">,</span> <span class="mf">1.49</span><span class="p">,</span> <span class="mf">55.65</span><span class="p">,</span> <span class="mf">9.50</span><span class="p">,</span> <span class="mf">28.65</span><span class="p">,</span> <span class="mf">33.15</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Energy&quot;</span><span class="p">,</span> <span class="s2">&quot;Natural gas&quot;</span><span class="p">,</span> <span class="s2">&quot;NG&quot;</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.63</span><span class="p">,</span> <span class="mf">43.06</span><span class="p">,</span> <span class="mf">8.66</span><span class="p">,</span> <span class="mf">34.63</span><span class="p">,</span> <span class="mf">25.00</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Energy&quot;</span><span class="p">,</span> <span class="s2">&quot;Propane&quot;</span><span class="p">,</span> <span class="s2">&quot;PN&quot;</span><span class="p">,</span> <span class="mi">247</span><span class="p">,</span> <span class="mf">5.53</span><span class="p">,</span> <span class="mf">55.47</span><span class="p">,</span> <span class="mf">14.28</span><span class="p">,</span> <span class="mf">34.18</span><span class="p">,</span> <span class="mf">41.77</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Energy&quot;</span><span class="p">,</span> <span class="s2">&quot;Unleaded gas&quot;</span><span class="p">,</span> <span class="s2">&quot;HU&quot;</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mf">8.62</span><span class="p">,</span> <span class="mf">71.20</span><span class="p">,</span> <span class="mf">16.02</span><span class="p">,</span> <span class="mf">29.24</span><span class="p">,</span> <span class="mf">54.78</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Livestock&quot;</span><span class="p">,</span> <span class="s2">&quot;Broilers&quot;</span><span class="p">,</span> <span class="s2">&quot;BR&quot;</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mf">4.58</span><span class="p">,</span> <span class="mf">52.63</span><span class="p">,</span> <span class="mf">1.49</span><span class="p">,</span> <span class="mf">7.28</span><span class="p">,</span> <span class="mf">20.53</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Livestock&quot;</span><span class="p">,</span> <span class="s2">&quot;Feeder cattle&quot;</span><span class="p">,</span> <span class="s2">&quot;FC&quot;</span><span class="p">,</span> <span class="mi">443</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">53.27</span><span class="p">,</span> <span class="mf">4.43</span><span class="p">,</span> <span class="mf">14.28</span><span class="p">,</span> <span class="mf">31.01</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Livestock&quot;</span><span class="p">,</span> <span class="s2">&quot;Lean hogs&quot;</span><span class="p">,</span> <span class="s2">&quot;LH&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="mf">2.66</span><span class="p">,</span> <span class="mf">59.40</span><span class="p">,</span> <span class="mf">7.98</span><span class="p">,</span> <span class="mf">22.34</span><span class="p">,</span> <span class="mf">35.70</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Livestock&quot;</span><span class="p">,</span> <span class="s2">&quot;Live cattle&quot;</span><span class="p">,</span> <span class="s2">&quot;LC&quot;</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">50.64</span><span class="p">,</span> <span class="mf">4.55</span><span class="p">,</span> <span class="mf">14.92</span><span class="p">,</span> <span class="mf">30.46</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span> <span class="s2">&quot;Aluminum&quot;</span><span class="p">,</span> <span class="s2">&quot;AL&quot;</span><span class="p">,</span> <span class="mi">215</span><span class="p">,</span> <span class="mf">1.06</span><span class="p">,</span> <span class="mf">35.35</span><span class="p">,</span> <span class="mf">5.46</span><span class="p">,</span> <span class="mf">19.11</span><span class="p">,</span> <span class="mf">28.56</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span> <span class="s2">&quot;Coal&quot;</span><span class="p">,</span> <span class="s2">&quot;QL&quot;</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.55</span><span class="p">,</span> <span class="mf">34.12</span><span class="p">,</span> <span class="mf">6.20</span><span class="p">,</span> <span class="mf">30.02</span><span class="p">,</span> <span class="mf">20.65</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span> <span class="s2">&quot;Copper&quot;</span><span class="p">,</span> <span class="s2">&quot;HG&quot;</span><span class="p">,</span> <span class="mi">412</span><span class="p">,</span> <span class="mf">0.52</span><span class="p">,</span> <span class="mf">41.75</span><span class="p">,</span> <span class="mf">4.62</span><span class="p">,</span> <span class="mf">25.50</span><span class="p">,</span> <span class="mf">18.12</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span> <span class="s2">&quot;Gold&quot;</span><span class="p">,</span> <span class="s2">&quot;GC&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.24</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">19.88</span><span class="p">,</span> <span class="mf">2.18</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span> <span class="s2">&quot;Palladium&quot;</span><span class="p">,</span> <span class="s2">&quot;PA&quot;</span><span class="p">,</span> <span class="mi">362</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.16</span><span class="p">,</span> <span class="mf">30.66</span><span class="p">,</span> <span class="mf">10.21</span><span class="p">,</span> <span class="mf">35.19</span><span class="p">,</span> <span class="mf">29.01</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span> <span class="s2">&quot;Platinum&quot;</span><span class="p">,</span> <span class="s2">&quot;PL&quot;</span><span class="p">,</span> <span class="mi">410</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.21</span><span class="p">,</span> <span class="mf">23.66</span><span class="p">,</span> <span class="mf">3.69</span><span class="p">,</span> <span class="mf">27.81</span><span class="p">,</span> <span class="mf">13.27</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span> <span class="s2">&quot;Silver&quot;</span><span class="p">,</span> <span class="s2">&quot;SI&quot;</span><span class="p">,</span> <span class="mi">419</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.51</span><span class="p">,</span> <span class="mf">1.19</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">32.09</span><span class="p">,</span> <span class="mf">1.37</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Sector&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Commodity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Symbol&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Basis&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Freq. of bw.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;E[Rᵉ]&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;σ[Rᵉ]&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Sharpe ratio&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">df_yang</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">df_yang</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>         Sector      Commodity Symbol    N  Basis  Freq. of bw.  E[Rᵉ]  σ[Rᵉ]  \
+0     Livestock      Lean hogs     LH  468   2.66         59.40   7.98  22.34   
+1   Agriculture          Wheat     W-  468  -2.88         38.68   2.79  23.76   
+2     Livestock    Live cattle     LC  468   0.46         50.64   4.55  14.92   
+3   Agriculture           Corn     C-  468  -6.03         23.08  -0.01  23.35   
+4   Agriculture         Lumber     LB  468  -5.63         33.55  -1.13  22.80   
+5   Agriculture           Oats     O-  468  -5.65         31.20   0.44  28.90   
+6   Agriculture   Soybean meal     SM  468   0.20         44.87   7.80  28.63   
+7   Agriculture       Soybeans     S-  468  -0.58         37.18   5.99  26.25   
+8   Agriculture          Cocoa     CC  452  -2.61         25.22   4.52  30.32   
+9   Agriculture         Cotton     CT  452  -1.75         36.50   3.60  22.96   
+10  Agriculture   Orange juice     JO  448  -3.08         36.61   2.32  29.56   
+11    Livestock  Feeder cattle     FC  443   0.35         53.27   4.43  14.28   
+12  Agriculture         Coffee     KC  420  -2.57         36.90   6.00  36.52   
+13       Metals         Silver     SI  419  -6.51          1.19   0.44  32.09   
+14       Metals         Copper     HG  412   0.52         41.75   4.62  25.50   
+15       Metals       Platinum     PL  410  -3.21         23.66   3.69  27.81   
+16       Metals           Gold     GC  400  -6.24          0.00   0.43  19.88   
+17  Agriculture         Canola     WC  377  -2.98         33.16  -0.18  19.82   
+18       Metals      Palladium     PA  362  -2.16         30.66  10.21  35.19   
+19       Energy    Heating oil     HO  345   1.49         55.65   9.50  28.65   
+20       Energy      Crude oil     CL  295   4.25         66.78  10.56  27.87   
+21       Energy       Gasoline     RB  275   8.09         70.91  12.82  30.18   
+22  Agriculture     Rough rice     RR  265  -7.56         26.04  -1.50  25.01   
+23       Energy   Unleaded gas     HU  250   8.62         71.20  16.02  29.24   
+24       Energy        Propane     PN  247   5.53         55.47  14.28  34.18   
+25  Agriculture         Barley     WA  235  -3.66         27.66  -0.24  19.62   
+26       Energy    Natural gas     NG  216  -3.63         43.06   8.66  34.63   
+27       Metals       Aluminum     AL  215   1.06         35.35   5.46  19.11   
+28  Agriculture         Butter     O2  141  -3.68         33.33   3.66  27.22   
+29       Metals           Coal     QL   85  -1.55         34.12   6.20  30.02   
+30    Livestock       Broilers     BR   19   4.58         52.63   1.49   7.28   
+
+    Sharpe ratio  
+0          35.70  
+1          11.72  
+2          30.46  
+3          -0.04  
+4          -4.98  
+5           1.53  
+6          27.25  
+7          22.81  
+8          14.90  
+9          15.69  
+10          7.86  
+11         31.01  
+12         16.44  
+13          1.37  
+14         18.12  
+15         13.27  
+16          2.18  
+17         -0.89  
+18         29.01  
+19         33.15  
+20         37.89  
+21         42.47  
+22         -6.01  
+23         54.78  
+24         41.77  
+25         -1.21  
+26         25.00  
+27         28.56  
+28         13.46  
+29         20.65  
+30         20.53  
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="approach1-gsci-indices">
+<h2>Approach1 – GSCI Indices<a class="headerlink" href="#approach1-gsci-indices" title="Link to this heading">#</a></h2>
+<p>Fortunately, He, Kelly, and Manela mentioned an alternative method tested by Koijen, Moskowitz, Pedersen, and Vrugt (2018) (KMPV), which closely approximated their original findings. The KMPV paper explicitly provided Bloomberg tickers of 24 different commodities, enabling direct extraction of reliable and consistent monthly return data.</p>
+<p>Thus, for our replication, we adopted the Bloomberg database following KMPV’s approach. Since KMPV did not explicitly present a calculation formula but rather directly extracted monthly returns from Bloomberg, our replication followed the same straightforward procedure.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_return1</span> <span class="o">=</span> <span class="n">load_futures_data</span><span class="o">.</span><span class="n">load_gsci_data</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;commodities&quot;</span><span class="p">)</span>
+<span class="n">df_return1</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Index: 669 entries, 196912 to 202508
+Data columns (total 25 columns):
+ #   Column                        Non-Null Count  Dtype         
+---  ------                        --------------  -----         
+ 0   Date                          669 non-null    datetime64[ns]
+ 1   SPGCBRP Index_PX_LAST_Return  319 non-null    float64       
+ 2   SPGCGOP Index_PX_LAST_Return  319 non-null    float64       
+ 3   SPGCCLP Index_PX_LAST_Return  463 non-null    float64       
+ 4   SPGCHUP Index_PX_LAST_Return  451 non-null    float64       
+ 5   SPGCHOP Index_PX_LAST_Return  511 non-null    float64       
+ 6   SPGCNGP Index_PX_LAST_Return  379 non-null    float64       
+ 7   SPGCCTP Index_PX_LAST_Return  583 non-null    float64       
+ 8   SPGCKCP Index_PX_LAST_Return  535 non-null    float64       
+ 9   SPGCCCP Index_PX_LAST_Return  499 non-null    float64       
+ 10  SPGCSBP Index_PX_LAST_Return  631 non-null    float64       
+ 11  SPGCSOP Index_PX_LAST_Return  668 non-null    float64       
+ 12  SPGCKWP Index_PX_LAST_Return  319 non-null    float64       
+ 13  SPGCCNP Index_PX_LAST_Return  668 non-null    float64       
+ 14  SPGCWHP Index_PX_LAST_Return  668 non-null    float64       
+ 15  SPGCLHP Index_PX_LAST_Return  595 non-null    float64       
+ 16  SPGCFCP Index_PX_LAST_Return  283 non-null    float64       
+ 17  SPGCLCP Index_PX_LAST_Return  668 non-null    float64       
+ 18  SPGCGCP Index_PX_LAST_Return  571 non-null    float64       
+ 19  SPGCSIP Index_PX_LAST_Return  631 non-null    float64       
+ 20  SPGCIAP Index_PX_LAST_Return  415 non-null    float64       
+ 21  SPGCIKP Index_PX_LAST_Return  391 non-null    float64       
+ 22  SPGCILP Index_PX_LAST_Return  367 non-null    float64       
+ 23  SPGCIZP Index_PX_LAST_Return  415 non-null    float64       
+ 24  SPGCICP Index_PX_LAST_Return  583 non-null    float64       
+dtypes: datetime64[ns](1), float64(24)
+memory usage: 135.9+ KB
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_return1</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Date</th>
+      <th>SPGCBRP Index_PX_LAST_Return</th>
+      <th>SPGCGOP Index_PX_LAST_Return</th>
+      <th>SPGCCLP Index_PX_LAST_Return</th>
+      <th>SPGCHUP Index_PX_LAST_Return</th>
+      <th>SPGCHOP Index_PX_LAST_Return</th>
+      <th>SPGCNGP Index_PX_LAST_Return</th>
+      <th>SPGCCTP Index_PX_LAST_Return</th>
+      <th>SPGCKCP Index_PX_LAST_Return</th>
+      <th>SPGCCCP Index_PX_LAST_Return</th>
+      <th>...</th>
+      <th>SPGCLHP Index_PX_LAST_Return</th>
+      <th>SPGCFCP Index_PX_LAST_Return</th>
+      <th>SPGCLCP Index_PX_LAST_Return</th>
+      <th>SPGCGCP Index_PX_LAST_Return</th>
+      <th>SPGCSIP Index_PX_LAST_Return</th>
+      <th>SPGCIAP Index_PX_LAST_Return</th>
+      <th>SPGCIKP Index_PX_LAST_Return</th>
+      <th>SPGCILP Index_PX_LAST_Return</th>
+      <th>SPGCIZP Index_PX_LAST_Return</th>
+      <th>SPGCICP Index_PX_LAST_Return</th>
+    </tr>
+    <tr>
+      <th>yyyymm</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>202504</th>
+      <td>2025-04-30</td>
+      <td>-0.176246</td>
+      <td>-0.114556</td>
+      <td>-0.179416</td>
+      <td>-0.115157</td>
+      <td>-0.103167</td>
+      <td>-0.215774</td>
+      <td>-0.023963</td>
+      <td>0.061948</td>
+      <td>0.133033</td>
+      <td>...</td>
+      <td>0.031488</td>
+      <td>0.016751</td>
+      <td>0.023324</td>
+      <td>0.053582</td>
+      <td>-0.060372</td>
+      <td>-0.056096</td>
+      <td>-0.034990</td>
+      <td>-0.024421</td>
+      <td>-0.096317</td>
+      <td>-0.057642</td>
+    </tr>
+    <tr>
+      <th>202505</th>
+      <td>2025-05-30</td>
+      <td>0.034989</td>
+      <td>-0.006110</td>
+      <td>0.051259</td>
+      <td>0.013584</td>
+      <td>0.015693</td>
+      <td>-0.048471</td>
+      <td>-0.014541</td>
+      <td>-0.145477</td>
+      <td>0.101722</td>
+      <td>...</td>
+      <td>0.034167</td>
+      <td>0.012880</td>
+      <td>0.026952</td>
+      <td>-0.009677</td>
+      <td>0.006123</td>
+      <td>0.015721</td>
+      <td>-0.016660</td>
+      <td>-0.003130</td>
+      <td>0.009227</td>
+      <td>0.044607</td>
+    </tr>
+    <tr>
+      <th>202506</th>
+      <td>2025-06-30</td>
+      <td>0.075806</td>
+      <td>0.126826</td>
+      <td>0.089940</td>
+      <td>0.036585</td>
+      <td>0.141990</td>
+      <td>-0.023071</td>
+      <td>0.010908</td>
+      <td>-0.118045</td>
+      <td>-0.017596</td>
+      <td>...</td>
+      <td>0.006904</td>
+      <td>0.039655</td>
+      <td>0.021615</td>
+      <td>-0.002324</td>
+      <td>0.085410</td>
+      <td>0.064561</td>
+      <td>-0.005331</td>
+      <td>0.039348</td>
+      <td>0.047681</td>
+      <td>0.040931</td>
+    </tr>
+    <tr>
+      <th>202507</th>
+      <td>2025-07-31</td>
+      <td>0.092004</td>
+      <td>0.082365</td>
+      <td>0.084626</td>
+      <td>0.069299</td>
+      <td>0.069372</td>
+      <td>-0.110300</td>
+      <td>-0.012916</td>
+      <td>-0.014328</td>
+      <td>-0.054888</td>
+      <td>...</td>
+      <td>-0.036915</td>
+      <td>0.067376</td>
+      <td>0.055640</td>
+      <td>-0.004224</td>
+      <td>0.014930</td>
+      <td>-0.014084</td>
+      <td>-0.023706</td>
+      <td>-0.046216</td>
+      <td>0.004186</td>
+      <td>-0.032005</td>
+    </tr>
+    <tr>
+      <th>202508</th>
+      <td>2025-08-12</td>
+      <td>-0.077099</td>
+      <td>-0.056212</td>
+      <td>-0.086503</td>
+      <td>-0.046403</td>
+      <td>-0.061954</td>
+      <td>-0.093846</td>
+      <td>0.016952</td>
+      <td>0.065448</td>
+      <td>0.060844</td>
+      <td>...</td>
+      <td>0.022607</td>
+      <td>0.044167</td>
+      <td>0.026328</td>
+      <td>0.015051</td>
+      <td>0.035123</td>
+      <td>0.020532</td>
+      <td>0.024847</td>
+      <td>0.023599</td>
+      <td>0.032195</td>
+      <td>0.021583</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 25 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hkm_df</span> <span class="o">=</span> <span class="n">extract_hkm_cmdty</span><span class="o">.</span><span class="n">extract_hkm_cmdty</span><span class="p">(</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">&quot;_data&quot;</span> <span class="o">/</span> <span class="s2">&quot;he_kelly_manela&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hkm_df</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Commod_01</th>
+      <th>Commod_02</th>
+      <th>Commod_03</th>
+      <th>Commod_04</th>
+      <th>Commod_05</th>
+      <th>Commod_06</th>
+      <th>Commod_07</th>
+      <th>Commod_08</th>
+      <th>Commod_09</th>
+      <th>Commod_10</th>
+      <th>...</th>
+      <th>Commod_14</th>
+      <th>Commod_15</th>
+      <th>Commod_16</th>
+      <th>Commod_17</th>
+      <th>Commod_18</th>
+      <th>Commod_19</th>
+      <th>Commod_20</th>
+      <th>Commod_21</th>
+      <th>Commod_22</th>
+      <th>Commod_23</th>
+    </tr>
+    <tr>
+      <th>yyyymm</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>201208</th>
+      <td>-0.0057</td>
+      <td>0.1002</td>
+      <td>0.0883</td>
+      <td>0.0801</td>
+      <td>0.0291</td>
+      <td>0.0444</td>
+      <td>0.0095</td>
+      <td>0.1050</td>
+      <td>0.1311</td>
+      <td>-0.0655</td>
+      <td>...</td>
+      <td>0.0297</td>
+      <td>0.0611</td>
+      <td>0.0817</td>
+      <td>0.1266</td>
+      <td>-0.0392</td>
+      <td>0.0656</td>
+      <td>0.1165</td>
+      <td>0.0673</td>
+      <td>-0.0175</td>
+      <td>0.0100</td>
+    </tr>
+    <tr>
+      <th>201209</th>
+      <td>-0.0558</td>
+      <td>-0.0366</td>
+      <td>-0.0479</td>
+      <td>-0.0950</td>
+      <td>-0.0196</td>
+      <td>0.0499</td>
+      <td>0.0847</td>
+      <td>-0.0085</td>
+      <td>-0.0490</td>
+      <td>0.0518</td>
+      <td>...</td>
+      <td>-0.0702</td>
+      <td>0.0181</td>
+      <td>0.0800</td>
+      <td>0.0228</td>
+      <td>0.0123</td>
+      <td>-0.0905</td>
+      <td>0.0951</td>
+      <td>-0.0907</td>
+      <td>0.0146</td>
+      <td>-0.0639</td>
+    </tr>
+    <tr>
+      <th>201210</th>
+      <td>-0.0006</td>
+      <td>-0.0521</td>
+      <td>-0.0616</td>
+      <td>-0.0081</td>
+      <td>0.0113</td>
+      <td>-0.0313</td>
+      <td>-0.0653</td>
+      <td>-0.0255</td>
+      <td>-0.0627</td>
+      <td>-0.1149</td>
+      <td>...</td>
+      <td>0.0488</td>
+      <td>-0.0498</td>
+      <td>-0.0558</td>
+      <td>-0.0519</td>
+      <td>-0.0422</td>
+      <td>-0.0342</td>
+      <td>-0.0675</td>
+      <td>-0.0138</td>
+      <td>-0.0429</td>
+      <td>0.0288</td>
+    </tr>
+    <tr>
+      <th>201211</th>
+      <td>-0.0079</td>
+      <td>0.0504</td>
+      <td>0.0203</td>
+      <td>0.0355</td>
+      <td>-0.0179</td>
+      <td>-0.0048</td>
+      <td>0.0329</td>
+      <td>0.0058</td>
+      <td>0.1388</td>
+      <td>-0.0705</td>
+      <td>...</td>
+      <td>-0.0611</td>
+      <td>0.1182</td>
+      <td>0.0168</td>
+      <td>0.0480</td>
+      <td>0.0089</td>
+      <td>-0.0676</td>
+      <td>0.0272</td>
+      <td>-0.0855</td>
+      <td>-0.0205</td>
+      <td>-0.0328</td>
+    </tr>
+    <tr>
+      <th>201212</th>
+      <td>-0.0751</td>
+      <td>-0.1107</td>
+      <td>0.0197</td>
+      <td>0.0166</td>
+      <td>0.0403</td>
+      <td>-0.0216</td>
+      <td>0.0007</td>
+      <td>-0.0109</td>
+      <td>-0.0572</td>
+      <td>-0.0461</td>
+      <td>...</td>
+      <td>-0.0860</td>
+      <td>0.0223</td>
+      <td>-0.0417</td>
+      <td>0.0125</td>
+      <td>-0.0268</td>
+      <td>-0.0150</td>
+      <td>-0.0963</td>
+      <td>-0.0262</td>
+      <td>-0.1042</td>
+      <td>0.0028</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 23 columns</p>
+</div></div></div>
+</div>
+<section id="matching-procedure">
+<h3>Matching Procedure<a class="headerlink" href="#matching-procedure" title="Link to this heading">#</a></h3>
+<p>Given that He, Kelly, and Manela presented anonymized commodities without explicit tickers or identifiers, we needed a systematic approach to match our Bloomberg-based commodities with the paper’s 23 commodities. We computed the Pearson correlation matrix between our monthly return series and those presented in the paper. Then, we used the linear assignment algorithm to find the optimal one-to-one commodity matches, maximizing the total correlation between the two datasets.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corr_matrix1</span> <span class="o">=</span> <span class="n">generate_corr_matrix</span><span class="p">(</span><span class="n">df_return1</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]),</span> <span class="n">hkm_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">corr_matrix_float1</span> <span class="o">=</span> <span class="n">corr_matrix1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+    <span class="n">corr_matrix_float1</span><span class="p">,</span>
+    <span class="n">annot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">cbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Commodity Return Correlation Matrix&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/d8cecfff6e138671fc42b4b18e8174904b9c324fdd97af823b291df8f1710594.png" src="../_images/d8cecfff6e138671fc42b4b18e8174904b9c324fdd97af823b291df8f1710594.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimal_pairs_df1</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">,</span> <span class="n">col_ind</span> <span class="o">=</span> <span class="n">decide_optimal_pairs</span><span class="p">(</span><span class="n">corr_matrix_float1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ticker_to_commodity</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;SPGCBRP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Crude Oil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCGOP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Gasoil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCCLP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;WTI Crude&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCHUP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Unl. Gasoline&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCHOP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Heating Oil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCNGP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Natural Gas&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCCTP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Cotton&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCKCP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Coffee&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCCCP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Cocoa&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCSBP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Sugar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCSOP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Soybeans&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCKWP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Kansas Wheat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCCNP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Corn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCWHP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Wheat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCLHP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Lean Hogs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCFCP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Feeder Cattle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCLCP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Live Cattle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCGCP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Gold&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCSIP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Silver&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCIAP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Aluminum&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCIKP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Nickel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCILP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Lead&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCIZP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Zinc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPGCICP Index&quot;</span><span class="p">:</span> <span class="s2">&quot;Copper&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimal_pairs_df1</span><span class="p">[</span><span class="s2">&quot;GSCI Index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimal_pairs_df1</span><span class="p">[</span><span class="s2">&quot;Commodity_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+    <span class="s2">&quot;_PX_LAST_Return&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="c1"># Map to real commodity names</span>
+<span class="n">optimal_pairs_df1</span><span class="p">[</span><span class="s2">&quot;Commodity Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimal_pairs_df1</span><span class="p">[</span><span class="s2">&quot;GSCI Index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="n">ticker_to_commodity</span>
+<span class="p">)</span>
+<span class="n">optimal_pairs_df1</span> <span class="o">=</span> <span class="n">optimal_pairs_df1</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Commodity_2&quot;</span><span class="p">:</span> <span class="s2">&quot;HKM Column Name&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df1</span> <span class="o">=</span> <span class="n">df_return1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">hkm_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">row_ind</span><span class="p">,</span> <span class="n">col_ind</span><span class="p">):</span>
+    <span class="n">corr_value</span> <span class="o">=</span> <span class="n">corr_matrix1</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">corr_value</span> <span class="o">&lt;</span> <span class="mf">0.85</span><span class="p">:</span>
+        <span class="k">continue</span>  <span class="c1"># Skip low correlation pairs</span>
+
+    <span class="n">commodity_1</span> <span class="o">=</span> <span class="n">corr_matrix1</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+    <span class="n">commodity_2</span> <span class="o">=</span> <span class="n">corr_matrix1</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+
+    <span class="n">merged</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Date&quot;</span><span class="p">:</span> <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">&quot;d1_</span><span class="si">{</span><span class="n">commodity_1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">df1</span><span class="p">[</span><span class="n">commodity_1</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">&quot;d2_</span><span class="si">{</span><span class="n">commodity_2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">df2</span><span class="p">[</span><span class="n">commodity_2</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">merged</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">merged</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;d1_</span><span class="si">{</span><span class="n">commodity_1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">commodity_1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">merged</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">merged</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;d2_</span><span class="si">{</span><span class="n">commodity_2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">commodity_2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Matched Pair: </span><span class="si">{</span><span class="n">commodity_1</span><span class="si">}</span><span class="s2"> &amp; </span><span class="si">{</span><span class="n">commodity_2</span><span class="si">}</span><span class="se">\n</span><span class="s2">Correlation = </span><span class="si">{</span><span class="n">corr_value</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Monthly Return&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/28ecf909de94fe5423a1c43142e1671cdf6ded90e3dd0ca316a0d06e094c312f.png" src="../_images/28ecf909de94fe5423a1c43142e1671cdf6ded90e3dd0ca316a0d06e094c312f.png" />
+<img alt="../_images/09b01ef53f50a7a23af51b0936bd85e298408404396b9e5958326584a67d9ade.png" src="../_images/09b01ef53f50a7a23af51b0936bd85e298408404396b9e5958326584a67d9ade.png" />
+<img alt="../_images/5c13e5b759410cede3ce769aa915fcd3ebe32a7216a679cac575ea07d4a76f6c.png" src="../_images/5c13e5b759410cede3ce769aa915fcd3ebe32a7216a679cac575ea07d4a76f6c.png" />
+<img alt="../_images/af7de04b6832f209934c6bce7e8c1b6c4167026d84d67a89d960ec7d46035066.png" src="../_images/af7de04b6832f209934c6bce7e8c1b6c4167026d84d67a89d960ec7d46035066.png" />
+<img alt="../_images/567d46bed1d94fb412a88f1f14277eb274737ce0cad77e6f1377bf65cf36ebb5.png" src="../_images/567d46bed1d94fb412a88f1f14277eb274737ce0cad77e6f1377bf65cf36ebb5.png" />
+<img alt="../_images/ce5b2934c53d0d959b593f6a4d3d695d2d155ff74191e6551cc0706a24cccbc4.png" src="../_images/ce5b2934c53d0d959b593f6a4d3d695d2d155ff74191e6551cc0706a24cccbc4.png" />
+<img alt="../_images/f45645de31b5cd22b9e9fc7098a1cc83cb182c4c98baddbb037c91dd207122e5.png" src="../_images/f45645de31b5cd22b9e9fc7098a1cc83cb182c4c98baddbb037c91dd207122e5.png" />
+<img alt="../_images/4d6f09947effabda2e49680ff6f28b384ad704cc81ac47613913c57b53fda8e6.png" src="../_images/4d6f09947effabda2e49680ff6f28b384ad704cc81ac47613913c57b53fda8e6.png" />
+<img alt="../_images/7848c43960111e7c2fbf977bffcae703382a982e085dc587000c789f2c5564c1.png" src="../_images/7848c43960111e7c2fbf977bffcae703382a982e085dc587000c789f2c5564c1.png" />
+<img alt="../_images/4463eb787b5ae368ec7b3175091cc7db97e8e3cb3822e18a1f812d790ef98f96.png" src="../_images/4463eb787b5ae368ec7b3175091cc7db97e8e3cb3822e18a1f812d790ef98f96.png" />
+<img alt="../_images/3966d6ece3a5780439aa44d4255ee6138a6fdf01dc457c5b78abe931c0b3920e.png" src="../_images/3966d6ece3a5780439aa44d4255ee6138a6fdf01dc457c5b78abe931c0b3920e.png" />
+<img alt="../_images/3c809da58308fba4d7b372aa05e2a2027b0bda679c1e01f2953c8bf1595a9f32.png" src="../_images/3c809da58308fba4d7b372aa05e2a2027b0bda679c1e01f2953c8bf1595a9f32.png" />
+<img alt="../_images/308b7818d0cf7ab3a022f3c173ae5078dfb051b193ff5b7fe531b599649a85a1.png" src="../_images/308b7818d0cf7ab3a022f3c173ae5078dfb051b193ff5b7fe531b599649a85a1.png" />
+<img alt="../_images/d8b9ab71fa99da3bf471c42fe09bc951c2e49834fe74c127f0878d3e669850dd.png" src="../_images/d8b9ab71fa99da3bf471c42fe09bc951c2e49834fe74c127f0878d3e669850dd.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="generate-standardized-table">
+<h2>Generate Standardized table<a class="headerlink" href="#generate-standardized-table" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">list_of_return_ticker</span> <span class="o">=</span> <span class="n">optimal_pairs_df1</span><span class="p">[</span><span class="s2">&quot;Commodity_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">wide_to_long_returns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">list_of_return_ticker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a wide-format return DataFrame to long-format with columns: ds, unique_id, y</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="s2">&quot;yyyymm&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">id_col</span> <span class="o">=</span> <span class="s2">&quot;yyyymm&quot;</span>
+    <span class="k">elif</span> <span class="s2">&quot;Date&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">id_col</span> <span class="o">=</span> <span class="s2">&quot;Date&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No date column found!&quot;</span><span class="p">)</span>
+
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_col</span><span class="p">]</span> <span class="o">+</span> <span class="n">list_of_return_ticker</span>
+    <span class="n">df_sub</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">df_long</span> <span class="o">=</span> <span class="n">df_sub</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span>
+        <span class="n">id_vars</span><span class="o">=</span><span class="n">id_col</span><span class="p">,</span>
+        <span class="n">value_vars</span><span class="o">=</span><span class="n">list_of_return_ticker</span><span class="p">,</span>
+        <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;unique_id&quot;</span><span class="p">,</span>
+        <span class="n">value_name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">df_long</span> <span class="o">=</span> <span class="n">df_long</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">id_col</span><span class="p">:</span> <span class="s2">&quot;ds&quot;</span><span class="p">})</span>
+
+    <span class="n">df_long</span> <span class="o">=</span> <span class="n">df_long</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+
+    <span class="n">df_long</span> <span class="o">=</span> <span class="n">df_long</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;unique_id&quot;</span><span class="p">,</span> <span class="s2">&quot;ds&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_long</span><span class="p">[[</span><span class="s2">&quot;unique_id&quot;</span><span class="p">,</span> <span class="s2">&quot;ds&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gsci_replication_df</span> <span class="o">=</span> <span class="n">wide_to_long_returns</span><span class="p">(</span><span class="n">df_return1</span><span class="p">,</span> <span class="n">list_of_return_ticker</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gsci_replication_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>unique_id</th>
+      <th>ds</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SPGCBRP Index_PX_LAST_Return</td>
+      <td>1999-02-26</td>
+      <td>-0.060203</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SPGCBRP Index_PX_LAST_Return</td>
+      <td>1999-03-31</td>
+      <td>0.359040</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SPGCBRP Index_PX_LAST_Return</td>
+      <td>1999-04-30</td>
+      <td>0.075051</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SPGCBRP Index_PX_LAST_Return</td>
+      <td>1999-05-28</td>
+      <td>-0.057141</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SPGCBRP Index_PX_LAST_Return</td>
+      <td>1999-06-30</td>
+      <td>0.132458</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>One source of deviation in our replication arises from differences in the underlying universe of commodities. The original HKM dataset selects 23 commodities from a broader pool of 31, whereas our replication process matches 23 out of 24 available contracts. Moreover, the two original pools themselves are not entirely overlapping, making mismatches almost inevitable. Commodities with correlations above 0.90 are likely those that overlap directly between the two datasets, while those with lower correlations often do not appear in the HKM table. Nevertheless, the strong alignment for major contracts supports the validity of using the GSCI index as an effective proxy for replicating the HKM methodology.</p>
+<p>This interpretation is further supported by Yang’s table: although our replication remains an approximation—since HKM does not explicitly use GSCI data—we observe that the highly correlated tickers typically have at least 275 monthly observations in Yang’s datasets. This pattern suggests that these commodities were very likely included in the original HKM selection due to their long return histories.</p>
+</section>
+<section id="alternative-approach-1">
+<h2>Alternative Approach 1<a class="headerlink" href="#alternative-approach-1" title="Link to this heading">#</a></h2>
+<p>To closely follow the methodology of He, Kelly, and Manela (2017), we construct commodity return series based on constant one-month maturity futures prices. In their original approach, HKM derive such prices by linearly interpolating between the nearest, second-nearest, and third-nearest futures contracts. To approximate this, we use London Metal Exchange (LME) data where both cash and three-month futures prices are available, and compute a synthetic one-month price using a linear interpolation: <span class="math notranslate nohighlight">\(P_{1m} = P_{\text{cash}} + \frac{1}{3}(P_{3m} - P_{\text{cash}})\)</span>. This allows us to construct a monthly price series that mirrors the one-month maturity logic applied in HKM. For other commodities, we adopt the second-nearest (month-2) Bloomberg generic contracts (e.g., CO2 Comdty, NG2 Comdty) as a practical proxy for the interpolated price. Although this is a simplification, it maintains consistency with the spirit of HKM’s approach and ensures comparability across commodities where interpolation is not feasible.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">commodity_futures_df</span> <span class="o">=</span> <span class="n">load_futures_data</span><span class="o">.</span><span class="n">load_commodities_future</span><span class="p">(</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;commodities&quot;</span>
+<span class="p">)</span>
+<span class="n">lme_df</span> <span class="o">=</span> <span class="n">load_futures_data</span><span class="o">.</span><span class="n">load_lme_metals</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;commodities&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">metal_map</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Aluminum&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;LMAHDY Comdty_PX_LAST&quot;</span><span class="p">,</span> <span class="s2">&quot;LMAHDS03 Comdty_PX_LAST&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Nickel&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;LMNIDY Comdty_PX_LAST&quot;</span><span class="p">,</span> <span class="s2">&quot;LMNIDS03 Comdty_PX_LAST&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Lead&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;LMPBDY Comdty_PX_LAST&quot;</span><span class="p">,</span> <span class="s2">&quot;LMPBDS03 Comdty_PX_LAST&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Zinc&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;LMZSDY Comdty_PX_LAST&quot;</span><span class="p">,</span> <span class="s2">&quot;LMZSDS03 Comdty_PX_LAST&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Copper&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;LMCADY Comdty_PX_LAST&quot;</span><span class="p">,</span> <span class="s2">&quot;LMCADS03 Comdty_PX_LAST&quot;</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">monthly_1mprice</span> <span class="o">=</span> <span class="n">calc_commodities_returns</span><span class="o">.</span><span class="n">calc_lme_monthly_1mprice</span><span class="p">(</span>
+    <span class="n">lme_df</span><span class="p">,</span> <span class="n">metal_map</span><span class="p">,</span> <span class="n">date_col</span><span class="o">=</span><span class="s2">&quot;index&quot;</span>
+<span class="p">)</span>
+
+<span class="n">lme_monthly_return</span> <span class="o">=</span> <span class="n">calc_commodities_returns</span><span class="o">.</span><span class="n">calc_lme_monthly_return</span><span class="p">(</span><span class="n">monthly_1mprice</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">lme_monthly_return</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   yyyymm       Date  Aluminum    Nickel      Lead  Zinc    Copper
+0  198709 1987-09-30  0.101317 -0.019891 -0.137613   NaN  0.073357
+1  198710 1987-10-31 -0.058047  0.026383  0.016215   NaN  0.080608
+2  198711 1987-11-30 -0.071148  0.073554  0.127458   NaN  0.378630
+3  198712 1987-12-31  0.204262  0.350032  0.002539   NaN  0.113221
+4  198801 1988-01-31 -0.036728 -0.042974  0.005976   NaN -0.249536
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cmt_monthly_return</span> <span class="o">=</span> <span class="n">calc_commodities_returns</span><span class="o">.</span><span class="n">compute_second_contract_return</span><span class="p">(</span>
+    <span class="n">commodity_futures_df</span>
+<span class="p">)</span>
+<span class="n">cmt_monthly_return</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>yyyymm</th>
+      <th>Date</th>
+      <th>CO2 Comdty_PX_LAST</th>
+      <th>QS2 Comdty_PX_LAST</th>
+      <th>CL2 Comdty_PX_LAST</th>
+      <th>XB2 Comdty_PX_LAST</th>
+      <th>HO2 Comdty_PX_LAST</th>
+      <th>NG2 Comdty_PX_LAST</th>
+      <th>HU2 Comdty_PX_LAST</th>
+      <th>CT2 Comdty_PX_LAST</th>
+      <th>...</th>
+      <th>C 2 Comdty_PX_LAST</th>
+      <th>W 2 Comdty_PX_LAST</th>
+      <th>LH2 Comdty_PX_LAST</th>
+      <th>FC2 Comdty_PX_LAST</th>
+      <th>LC2 Comdty_PX_LAST</th>
+      <th>HG2 Comdty_PX_LAST</th>
+      <th>GC2 Comdty_PX_LAST</th>
+      <th>SI2 Comdty_PX_LAST</th>
+      <th>PA2 Comdty_PX_LAST</th>
+      <th>PL2 Comdty_PX_LAST</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>195907</td>
+      <td>1959-07-31</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>195908</td>
+      <td>1959-08-31</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.011952</td>
+      <td>...</td>
+      <td>-0.015385</td>
+      <td>0.005096</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>195909</td>
+      <td>1959-09-30</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>-0.003609</td>
+      <td>...</td>
+      <td>0.014509</td>
+      <td>0.018378</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>195910</td>
+      <td>1959-10-31</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.005927</td>
+      <td>...</td>
+      <td>0.005501</td>
+      <td>0.016179</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>195911</td>
+      <td>1959-11-30</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.011457</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>-0.004287</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 30 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">combined_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">cmt_monthly_return</span><span class="p">,</span>
+    <span class="n">lme_monthly_return</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]),</span>
+    <span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span>
+    <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;yyyymm&quot;</span><span class="p">],</span>
+    <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;_LME&quot;</span><span class="p">),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;yyyymm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">common_idx</span> <span class="o">=</span> <span class="n">hkm_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">combined_df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">he_kelly_sub</span> <span class="o">=</span> <span class="n">hkm_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_idx</span><span class="p">]</span>
+<span class="n">carry_sub</span> <span class="o">=</span> <span class="n">combined_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_idx</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corr_matrix2</span> <span class="o">=</span> <span class="n">generate_corr_matrix</span><span class="p">(</span><span class="n">he_kelly_sub</span><span class="p">,</span> <span class="n">carry_sub</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">corr_matrix_float2</span> <span class="o">=</span> <span class="n">corr_matrix2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+    <span class="n">corr_matrix_float2</span><span class="p">,</span>
+    <span class="n">annot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">cbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation Heatmap&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/028a6a15b58cb90c958d8f505c46dd862d54139d32227b706f061677418d7bf6.png" src="../_images/028a6a15b58cb90c958d8f505c46dd862d54139d32227b706f061677418d7bf6.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimal_pairs_df2</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">,</span> <span class="n">col_ind</span> <span class="o">=</span> <span class="n">decide_optimal_pairs</span><span class="p">(</span><span class="n">corr_matrix_float2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ticker_to_commodity</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;CO2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Crude Oil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;QS2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Gasoil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CL2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;WTI Crude&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;XB2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Unl. Gasoline&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HO2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Heating Oil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NG2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Natural Gas&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CT2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Cotton&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KC2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Coffee&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CC2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Cocoa&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SB2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Sugar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;S 2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Soybeans&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KW2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Kansas Wheat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;C 2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Corn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;W 2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Wheat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LH2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Lean Hogs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FC2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Feeder Cattle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LC2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Live Cattle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GC2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Gold&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SI2 Comdty_PX_LAST&quot;</span><span class="p">:</span> <span class="s2">&quot;Silver&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Aluminum&quot;</span><span class="p">:</span> <span class="s2">&quot;Aluminum&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Nickel&quot;</span><span class="p">:</span> <span class="s2">&quot;Nickel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lead&quot;</span><span class="p">:</span> <span class="s2">&quot;Lead&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Zinc&quot;</span><span class="p">:</span> <span class="s2">&quot;Zinc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Copper&quot;</span><span class="p">:</span> <span class="s2">&quot;Copper&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">optimal_pairs_df2</span><span class="p">[</span><span class="s2">&quot;Commodity_Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimal_pairs_df2</span><span class="p">[</span><span class="s2">&quot;Commodity_2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="n">ticker_to_commodity</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimal_pairs_df2</span><span class="p">[[</span><span class="s2">&quot;Commodity_Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Commodity_1&quot;</span><span class="p">,</span> <span class="s2">&quot;Correlation&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Commodity_Name</th>
+      <th>Commodity_1</th>
+      <th>Correlation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Gold</td>
+      <td>Commod_06</td>
+      <td>0.996136</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Silver</td>
+      <td>Commod_20</td>
+      <td>0.990287</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NaN</td>
+      <td>Commod_16</td>
+      <td>0.989176</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Cocoa</td>
+      <td>Commod_02</td>
+      <td>0.983713</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>NaN</td>
+      <td>Commod_15</td>
+      <td>0.978422</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Soybeans</td>
+      <td>Commod_19</td>
+      <td>0.976728</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Coffee</td>
+      <td>Commod_10</td>
+      <td>0.971527</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NaN</td>
+      <td>Commod_21</td>
+      <td>0.970256</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>NaN</td>
+      <td>Commod_09</td>
+      <td>0.969427</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>WTI Crude</td>
+      <td>Commod_03</td>
+      <td>0.961483</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Heating Oil</td>
+      <td>Commod_08</td>
+      <td>0.960983</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Corn</td>
+      <td>Commod_01</td>
+      <td>0.953613</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Copper</td>
+      <td>Commod_07</td>
+      <td>0.952118</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Wheat</td>
+      <td>Commod_22</td>
+      <td>0.949708</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>NaN</td>
+      <td>Commod_14</td>
+      <td>0.936757</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Feeder Cattle</td>
+      <td>Commod_05</td>
+      <td>0.930403</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Cotton</td>
+      <td>Commod_04</td>
+      <td>0.925083</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>NaN</td>
+      <td>Commod_11</td>
+      <td>0.914295</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>NaN</td>
+      <td>Commod_18</td>
+      <td>0.868244</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>Crude Oil</td>
+      <td>Commod_17</td>
+      <td>0.854062</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Live Cattle</td>
+      <td>Commod_12</td>
+      <td>0.825750</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Lean Hogs</td>
+      <td>Commod_13</td>
+      <td>0.703030</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Kansas Wheat</td>
+      <td>Commod_23</td>
+      <td>0.429840</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">list_of_return_ticker</span> <span class="o">=</span> <span class="n">optimal_pairs_df2</span><span class="p">[</span><span class="s2">&quot;Commodity_2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gsci_replication_df</span> <span class="o">=</span> <span class="n">wide_to_long_returns</span><span class="p">(</span><span class="n">combined_df</span><span class="p">,</span> <span class="n">list_of_return_ticker</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gsci_replication_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>unique_id</th>
+      <th>ds</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>C 2 Comdty_PX_LAST</td>
+      <td>1987-09-30</td>
+      <td>0.130631</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>C 2 Comdty_PX_LAST</td>
+      <td>1987-10-31</td>
+      <td>-0.018592</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C 2 Comdty_PX_LAST</td>
+      <td>1987-11-30</td>
+      <td>0.063599</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>C 2 Comdty_PX_LAST</td>
+      <td>1987-12-31</td>
+      <td>-0.026718</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>C 2 Comdty_PX_LAST</td>
+      <td>1988-01-31</td>
+      <td>0.058824</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="alternative-approach-2-spot-commodities-futures">
+<h2>Alternative Approach 2 – Spot Commodities Futures<a class="headerlink" href="#alternative-approach-2-spot-commodities-futures" title="Link to this heading">#</a></h2>
+<p>In this approach we use similar method as the previous approach but instead construct a “cash” return panel by combining two sources of prices. For precious metals, we use Bloomberg USD spot series obtained from <code class="docutils literal notranslate"><span class="pre">Curncy</span></code> tickers (XAUUSD, XAGUSD, XPTUSD, XPDUSD). For other commodities that lack a robust spot series in this module, we use a transparent proxy built from the first generic futures contract (<code class="docutils literal notranslate"><span class="pre">…1</span> <span class="pre">Comdty</span></code>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">commodity_spot_df</span> <span class="o">=</span> <span class="n">pull_bbg_commodities_basis</span><span class="o">.</span><span class="n">load_commodity_spot_proxies</span><span class="p">(</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;commodities&quot;</span>
+<span class="p">)</span>
+<span class="n">precious_metal_spot_df</span> <span class="o">=</span> <span class="n">pull_bbg_commodities_basis</span><span class="o">.</span><span class="n">load_precious_metals_spot</span><span class="p">(</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;commodities&quot;</span>
+<span class="p">)</span>
+<span class="n">spot_df</span> <span class="o">=</span> <span class="n">commodity_spot_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">precious_metal_spot_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spot_df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;index&#39;, &#39;CO1 Comdty_PX_LAST&#39;, &#39;QS1 Comdty_PX_LAST&#39;,
+       &#39;CL1 Comdty_PX_LAST&#39;, &#39;RB1 Comdty_PX_LAST&#39;, &#39;XB1 Comdty_PX_LAST&#39;,
+       &#39;HO1 Comdty_PX_LAST&#39;, &#39;NG1 Comdty_PX_LAST&#39;, &#39;HU1 Comdty_PX_LAST&#39;,
+       &#39;CT1 Comdty_PX_LAST&#39;, &#39;KC1 Comdty_PX_LAST&#39;, &#39;CC1 Comdty_PX_LAST&#39;,
+       &#39;SB1 Comdty_PX_LAST&#39;, &#39;LB1 Comdty_PX_LAST&#39;, &#39;O 1 Comdty_PX_LAST&#39;,
+       &#39;JO1 Comdty_PX_LAST&#39;, &#39;RR1 Comdty_PX_LAST&#39;, &#39;SM1 Comdty_PX_LAST&#39;,
+       &#39;WC1 Comdty_PX_LAST&#39;, &#39;S 1 Comdty_PX_LAST&#39;, &#39;KW1 Comdty_PX_LAST&#39;,
+       &#39;C 1 Comdty_PX_LAST&#39;, &#39;W 1 Comdty_PX_LAST&#39;, &#39;LH1 Comdty_PX_LAST&#39;,
+       &#39;FC1 Comdty_PX_LAST&#39;, &#39;LC1 Comdty_PX_LAST&#39;, &#39;AL1 Comdty_PX_LAST&#39;,
+       &#39;HG1 Comdty_PX_LAST&#39;, &#39;GC1 Comdty_PX_LAST&#39;, &#39;SI1 Comdty_PX_LAST&#39;,
+       &#39;PA1 Comdty_PX_LAST&#39;, &#39;PL1 Comdty_PX_LAST&#39;, &#39;XAUUSD Curncy_PX_LAST&#39;,
+       &#39;XAGUSD Curncy_PX_LAST&#39;, &#39;XPTUSD Curncy_PX_LAST&#39;,
+       &#39;XPDUSD Curncy_PX_LAST&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">monthly_return</span> <span class="o">=</span> <span class="n">calc_commodities_returns</span><span class="o">.</span><span class="n">monthly_returns_mixed_prices</span><span class="p">(</span><span class="n">spot_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/jbejarano/GitRepositories/ftsfr/src/commodities/calc_commodities_returns.py:322: FutureWarning: The default fill_method=&#39;pad&#39; in DataFrame.pct_change is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change or specify &#39;fill_method=None&#39; to not fill NA values.
+  rets = monthly_px.pct_change()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">common_idx</span> <span class="o">=</span> <span class="n">hkm_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">monthly_return</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">he_kelly_sub</span> <span class="o">=</span> <span class="n">hkm_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_idx</span><span class="p">]</span>
+<span class="n">carry_sub</span> <span class="o">=</span> <span class="n">monthly_return</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_idx</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corr_matrix3</span> <span class="o">=</span> <span class="n">generate_corr_matrix</span><span class="p">(</span><span class="n">he_kelly_sub</span><span class="p">,</span> <span class="n">carry_sub</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">corr_matrix_float3</span> <span class="o">=</span> <span class="n">corr_matrix3</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+    <span class="n">corr_matrix_float3</span><span class="p">,</span>
+    <span class="n">annot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">cbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation Heatmap&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/125979dcdcf373ee4f51e5d87dfe054031c5c40d66e24ba9ac309b84d26e089d.png" src="../_images/125979dcdcf373ee4f51e5d87dfe054031c5c40d66e24ba9ac309b84d26e089d.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimal_pairs_df3</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">,</span> <span class="n">col_ind</span> <span class="o">=</span> <span class="n">decide_optimal_pairs</span><span class="p">(</span><span class="n">corr_matrix_float3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ticker_to_name</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;GC1&quot;</span><span class="p">:</span> <span class="s2">&quot;Gold&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SI1&quot;</span><span class="p">:</span> <span class="s2">&quot;Silver&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PL1&quot;</span><span class="p">:</span> <span class="s2">&quot;Platinum&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CC1&quot;</span><span class="p">:</span> <span class="s2">&quot;Cocoa&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KC1&quot;</span><span class="p">:</span> <span class="s2">&quot;Coffee&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;S 1&quot;</span><span class="p">:</span> <span class="s2">&quot;Soybeans&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PA1&quot;</span><span class="p">:</span> <span class="s2">&quot;Palladium&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;JO1&quot;</span><span class="p">:</span> <span class="s2">&quot;Orange Juice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;C 1&quot;</span><span class="p">:</span> <span class="s2">&quot;Corn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CL1&quot;</span><span class="p">:</span> <span class="s2">&quot;WTI Crude Oil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SM1&quot;</span><span class="p">:</span> <span class="s2">&quot;Soybean Meal&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;W 1&quot;</span><span class="p">:</span> <span class="s2">&quot;Wheat (SRW)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;O 1&quot;</span><span class="p">:</span> <span class="s2">&quot;Oats&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CT1&quot;</span><span class="p">:</span> <span class="s2">&quot;Cotton&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LB1&quot;</span><span class="p">:</span> <span class="s2">&quot;Lumber&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HO1&quot;</span><span class="p">:</span> <span class="s2">&quot;Heating Oil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FC1&quot;</span><span class="p">:</span> <span class="s2">&quot;Feeder Cattle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HG1&quot;</span><span class="p">:</span> <span class="s2">&quot;Copper&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CO1&quot;</span><span class="p">:</span> <span class="s2">&quot;Brent Crude Oil&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RR1&quot;</span><span class="p">:</span> <span class="s2">&quot;Rough Rice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LC1&quot;</span><span class="p">:</span> <span class="s2">&quot;Live Cattle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LH1&quot;</span><span class="p">:</span> <span class="s2">&quot;Lean Hogs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KW1&quot;</span><span class="p">:</span> <span class="s2">&quot;Kansas Wheat (HRW)&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">optimal_pairs_df3</span><span class="p">[</span><span class="s2">&quot;Commodity_Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimal_pairs_df3</span><span class="p">[</span><span class="s2">&quot;Commodity_2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="n">ticker_to_name</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimal_pairs_df3</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Commodity_1</th>
+      <th>Commodity_2</th>
+      <th>Correlation</th>
+      <th>Commodity_Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Commod_06</td>
+      <td>GC1</td>
+      <td>0.995406</td>
+      <td>Gold</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Commod_20</td>
+      <td>SI1</td>
+      <td>0.994950</td>
+      <td>Silver</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Commod_16</td>
+      <td>PL1</td>
+      <td>0.989246</td>
+      <td>Platinum</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Commod_02</td>
+      <td>CC1</td>
+      <td>0.981584</td>
+      <td>Cocoa</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Commod_10</td>
+      <td>KC1</td>
+      <td>0.977102</td>
+      <td>Coffee</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Commod_19</td>
+      <td>S 1</td>
+      <td>0.964628</td>
+      <td>Soybeans</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Commod_15</td>
+      <td>PA1</td>
+      <td>0.961944</td>
+      <td>Palladium</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Commod_09</td>
+      <td>JO1</td>
+      <td>0.953366</td>
+      <td>Orange Juice</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Commod_01</td>
+      <td>C 1</td>
+      <td>0.953333</td>
+      <td>Corn</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Commod_03</td>
+      <td>CL1</td>
+      <td>0.952918</td>
+      <td>WTI Crude Oil</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Commod_21</td>
+      <td>SM1</td>
+      <td>0.946333</td>
+      <td>Soybean Meal</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Commod_22</td>
+      <td>W 1</td>
+      <td>0.946209</td>
+      <td>Wheat (SRW)</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Commod_14</td>
+      <td>O 1</td>
+      <td>0.922051</td>
+      <td>Oats</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Commod_04</td>
+      <td>CT1</td>
+      <td>0.914998</td>
+      <td>Cotton</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Commod_11</td>
+      <td>LB1</td>
+      <td>0.914780</td>
+      <td>Lumber</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Commod_08</td>
+      <td>HO1</td>
+      <td>0.899496</td>
+      <td>Heating Oil</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Commod_05</td>
+      <td>FC1</td>
+      <td>0.899395</td>
+      <td>Feeder Cattle</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Commod_07</td>
+      <td>HG1</td>
+      <td>0.873174</td>
+      <td>Copper</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Commod_17</td>
+      <td>CO1</td>
+      <td>0.848048</td>
+      <td>Brent Crude Oil</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>Commod_18</td>
+      <td>RR1</td>
+      <td>0.843108</td>
+      <td>Rough Rice</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Commod_12</td>
+      <td>LC1</td>
+      <td>0.762189</td>
+      <td>Live Cattle</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Commod_13</td>
+      <td>LH1</td>
+      <td>0.741484</td>
+      <td>Lean Hogs</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Commod_23</td>
+      <td>KW1</td>
+      <td>0.400043</td>
+      <td>Kansas Wheat (HRW)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="summary_cip_ipynb.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="summary_corp_bond_returns_ipynb.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Cleaning Summary: Corporate Bond Returns</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach1-gsci-indices">Approach1 – GSCI Indices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matching-procedure">Matching Procedure</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-standardized-table">Generate Standardized table</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-approach-1">Alternative Approach 1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-approach-2-spot-commodities-futures">Alternative Approach 2 – Spot Commodities Futures</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

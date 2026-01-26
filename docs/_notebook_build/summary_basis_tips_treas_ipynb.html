@@ -1,0 +1,1139 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>TIPS-Treasury Arbitrage Replication (2004-2025) &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_notebook_build/summary_basis_tips_treas_ipynb';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2F_notebook_build/summary_basis_tips_treas_ipynb.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_notebook_build/summary_basis_tips_treas_ipynb.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>TIPS-Treasury Arbitrage Replication (2004-2025)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#replication-strategy">Replication Strategy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-data">Load Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-summary-statistics">Generate Summary Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#correlation-heatmap-as-in-figure-2">Correlation Heatmap (as in Figure 2)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-tips-treasury-spreads">Plot TIPS-Treasury Spreads</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-implementation">Practical Implementation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="tips-treasury-arbitrage-replication-2004-2025">
+<h1>TIPS-Treasury Arbitrage Replication (2004-2025)<a class="headerlink" href="#tips-treasury-arbitrage-replication-2004-2025" title="Link to this heading">#</a></h1>
+<p>This notebook replicates the TIPS-Treasury arbitrage strategy for the period 2004-2025 following the methodology of Fleckenstein et al. (2014). It also outlines how a trader could implement this strategy in practice.</p>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
+<section id="replication-strategy">
+<h3>Replication Strategy<a class="headerlink" href="#replication-strategy" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p><strong>Data Sources</strong>:</p>
+<ul class="simple">
+<li><p><strong>TIPS Data:</strong> Daily yield data for TIPS from U.S. Treasury sources.</p></li>
+<li><p><strong>Inflation Swap Data:</strong> Zero-coupon inflation swap rates from Bloomberg.</p></li>
+<li><p><strong>Nominal Treasury Data:</strong> Daily nominal Treasury yields from CRSP.</p></li>
+</ul>
+</li>
+<li><p><strong>Synthetic Yield Construction:</strong></p>
+<p>For a given maturity (\tau):</p>
+<div class="amsmath math notranslate nohighlight" id="equation-ae37e9fa-6f61-424f-b434-709a5c985954">
+<span class="eqno">()<a class="headerlink" href="#equation-ae37e9fa-6f61-424f-b434-709a5c985954" title="Permalink to this equation">#</a></span>\[\begin{equation}
+\text{Synthetic Yield}_{t,\tau} = s_{t,\tau} + f_{t,\tau}
+\end{equation}\]</div>
+<p>where (s_{t,\tau}) is the TIPS yield and (f_{t,\tau}) is the fixed rate from the inflation swap. The arbitrage spread is then:</p>
+<div class="amsmath math notranslate nohighlight" id="equation-06228f23-d9d4-4cef-b19f-374e7dbe924c">
+<span class="eqno">()<a class="headerlink" href="#equation-06228f23-d9d4-4cef-b19f-374e7dbe924c" title="Permalink to this equation">#</a></span>\[\begin{equation}
+\text{Spread}_{t,\tau} = (s_{t,\tau} + f_{t,\tau}) - y_{T,t,\tau}
+\end{equation}\]</div>
+<p>A positive spread indicates that nominal Treasuries are overpriced relative to the synthetic yield.</p>
+</li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import necessary libraries</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">config</span><span class="p">(</span><span class="s2">&quot;DATA_DIR&quot;</span><span class="p">)</span>
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;basis_tips_treas&quot;</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+<span class="c1"># sns.set_theme(style=&quot;dark&quot;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="load-data">
+<h3>Load Data<a class="headerlink" href="#load-data" title="Link to this heading">#</a></h3>
+<p>The following cell loads the TIPS-Treasury arbitrage data from a parquet file. This file is generated from <code class="docutils literal notranslate"><span class="pre">compute_tips_treasury.py</span></code>. This formulates a tidy set of the data.</p>
+<ul class="simple">
+<li><p>Columns starting with “real_”: TIPS real yields for each tenor (e.g., real_cc2, real_cc5, real_cc10, real_cc20)
+expressed in decimal form (e.g., 0.02 for 2%).</p></li>
+<li><p>Columns starting with “nom_”: Computed nominal zero-coupon Treasury yields for each tenor
+(e.g., nom_zc2, nom_zc5, nom_zc10, nom_zc20) expressed in basis points.</p></li>
+<li><p>Columns starting with “tips_”: TIPS-implied risk-free rates (e.g., tips_treas_2_rf, tips_treas_5_rf,
+tips_treas_10_rf, tips_treas_20_rf) expressed in basis points.</p></li>
+<li><p>Columns starting with “arb_”: Arbitrage measures (e.g., arb_2, arb_5, arb_10, arb_20) representing the
+difference between the TIPS-implied risk-free rate and the corresponding nominal yield (tips_treas_{t}_rf - nom_zc{t}).</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;tips_treasury_implied_rf.parquet&quot;</span><span class="p">)</span>
+<span class="n">rf</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>real_cc2</th>
+      <th>real_cc5</th>
+      <th>real_cc10</th>
+      <th>real_cc20</th>
+      <th>nom_zc2</th>
+      <th>nom_zc5</th>
+      <th>nom_zc10</th>
+      <th>nom_zc20</th>
+      <th>tips_treas_2_rf</th>
+      <th>tips_treas_5_rf</th>
+      <th>tips_treas_10_rf</th>
+      <th>tips_treas_20_rf</th>
+      <th>arb_2</th>
+      <th>arb_5</th>
+      <th>arb_10</th>
+      <th>arb_20</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2004-07-21</td>
+      <td>0.002795</td>
+      <td>0.013971</td>
+      <td>0.020961</td>
+      <td>0.024929</td>
+      <td>274.469131</td>
+      <td>381.943476</td>
+      <td>486.902452</td>
+      <td>569.379486</td>
+      <td>284.705618</td>
+      <td>417.531353</td>
+      <td>504.901556</td>
+      <td>577.425063</td>
+      <td>10.236487</td>
+      <td>35.587877</td>
+      <td>17.999104</td>
+      <td>8.045577</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2004-07-22</td>
+      <td>0.002626</td>
+      <td>0.013880</td>
+      <td>0.020744</td>
+      <td>0.024903</td>
+      <td>272.969168</td>
+      <td>380.469345</td>
+      <td>485.214196</td>
+      <td>568.153509</td>
+      <td>277.954502</td>
+      <td>413.541475</td>
+      <td>499.559342</td>
+      <td>572.023980</td>
+      <td>4.985334</td>
+      <td>33.072130</td>
+      <td>14.345146</td>
+      <td>3.870471</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2004-07-23</td>
+      <td>0.002470</td>
+      <td>0.013651</td>
+      <td>0.020509</td>
+      <td>0.024673</td>
+      <td>271.900835</td>
+      <td>378.434972</td>
+      <td>482.215854</td>
+      <td>565.120885</td>
+      <td>279.358684</td>
+      <td>415.212026</td>
+      <td>502.195843</td>
+      <td>573.692614</td>
+      <td>7.457849</td>
+      <td>36.777054</td>
+      <td>19.979989</td>
+      <td>8.571729</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2004-07-26</td>
+      <td>0.003111</td>
+      <td>0.014217</td>
+      <td>0.020913</td>
+      <td>0.024938</td>
+      <td>276.842808</td>
+      <td>383.168618</td>
+      <td>486.199853</td>
+      <td>568.322601</td>
+      <td>285.949867</td>
+      <td>418.065747</td>
+      <td>506.439590</td>
+      <td>575.469761</td>
+      <td>9.107059</td>
+      <td>34.897129</td>
+      <td>20.239737</td>
+      <td>7.147160</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2004-07-27</td>
+      <td>0.004170</td>
+      <td>0.015276</td>
+      <td>0.021982</td>
+      <td>0.026130</td>
+      <td>286.096130</td>
+      <td>395.376011</td>
+      <td>499.630783</td>
+      <td>581.181498</td>
+      <td>298.856814</td>
+      <td>431.135114</td>
+      <td>518.699203</td>
+      <td>588.083236</td>
+      <td>12.760684</td>
+      <td>35.759103</td>
+      <td>19.068420</td>
+      <td>6.901738</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5392</th>
+      <td>2025-05-23</td>
+      <td>0.012503</td>
+      <td>0.016390</td>
+      <td>0.021932</td>
+      <td>0.027144</td>
+      <td>406.400952</td>
+      <td>414.760648</td>
+      <td>469.424879</td>
+      <td>531.103253</td>
+      <td>420.263469</td>
+      <td>425.857063</td>
+      <td>477.439649</td>
+      <td>526.837258</td>
+      <td>13.862517</td>
+      <td>11.096415</td>
+      <td>8.014770</td>
+      <td>-4.265994</td>
+    </tr>
+    <tr>
+      <th>5394</th>
+      <td>2025-05-27</td>
+      <td>0.012454</td>
+      <td>0.015897</td>
+      <td>0.021200</td>
+      <td>0.026298</td>
+      <td>402.873780</td>
+      <td>408.253456</td>
+      <td>460.717940</td>
+      <td>521.071892</td>
+      <td>416.927915</td>
+      <td>420.190042</td>
+      <td>469.670803</td>
+      <td>517.072940</td>
+      <td>14.054135</td>
+      <td>11.936585</td>
+      <td>8.952863</td>
+      <td>-3.998952</td>
+    </tr>
+    <tr>
+      <th>5395</th>
+      <td>2025-05-28</td>
+      <td>0.012810</td>
+      <td>0.016234</td>
+      <td>0.021556</td>
+      <td>0.026623</td>
+      <td>405.953487</td>
+      <td>412.136459</td>
+      <td>464.840275</td>
+      <td>524.239211</td>
+      <td>419.877339</td>
+      <td>423.742891</td>
+      <td>473.429343</td>
+      <td>520.933148</td>
+      <td>13.923852</td>
+      <td>11.606432</td>
+      <td>8.589068</td>
+      <td>-3.306063</td>
+    </tr>
+    <tr>
+      <th>5396</th>
+      <td>2025-05-29</td>
+      <td>0.012289</td>
+      <td>0.015975</td>
+      <td>0.021004</td>
+      <td>0.026197</td>
+      <td>401.001431</td>
+      <td>406.567456</td>
+      <td>459.159409</td>
+      <td>518.536619</td>
+      <td>411.402772</td>
+      <td>420.952041</td>
+      <td>467.261529</td>
+      <td>515.702793</td>
+      <td>10.401341</td>
+      <td>14.384585</td>
+      <td>8.102119</td>
+      <td>-2.833827</td>
+    </tr>
+    <tr>
+      <th>5397</th>
+      <td>2025-05-30</td>
+      <td>0.011741</td>
+      <td>0.015502</td>
+      <td>0.020599</td>
+      <td>0.025781</td>
+      <td>397.184964</td>
+      <td>403.518778</td>
+      <td>457.705687</td>
+      <td>518.242104</td>
+      <td>406.083383</td>
+      <td>414.348321</td>
+      <td>462.053382</td>
+      <td>511.195776</td>
+      <td>8.898419</td>
+      <td>10.829543</td>
+      <td>4.347695</td>
+      <td>-7.046328</td>
+    </tr>
+  </tbody>
+</table>
+<p>5200 rows × 17 columns</p>
+</div></div></div>
+</div>
+<p>Selected region</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">rf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[[</span><span class="s2">&quot;arb_2&quot;</span><span class="p">,</span> <span class="s2">&quot;arb_5&quot;</span><span class="p">,</span> <span class="s2">&quot;arb_10&quot;</span><span class="p">,</span> <span class="s2">&quot;arb_20&quot;</span><span class="p">]]</span>
+<span class="n">test</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span>
+<span class="n">test</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span>
+<span class="n">test</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">test</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>arb_2</th>
+      <th>arb_5</th>
+      <th>arb_10</th>
+      <th>arb_20</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2004-07-21</th>
+      <td>10.236487</td>
+      <td>35.587877</td>
+      <td>17.999104</td>
+      <td>8.045577</td>
+    </tr>
+    <tr>
+      <th>2004-07-22</th>
+      <td>4.985334</td>
+      <td>33.072130</td>
+      <td>14.345146</td>
+      <td>3.870471</td>
+    </tr>
+    <tr>
+      <th>2004-07-23</th>
+      <td>7.457849</td>
+      <td>36.777054</td>
+      <td>19.979989</td>
+      <td>8.571729</td>
+    </tr>
+    <tr>
+      <th>2004-07-26</th>
+      <td>9.107059</td>
+      <td>34.897129</td>
+      <td>20.239737</td>
+      <td>7.147160</td>
+    </tr>
+    <tr>
+      <th>2004-07-27</th>
+      <td>12.760684</td>
+      <td>35.759103</td>
+      <td>19.068420</td>
+      <td>6.901738</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2025-05-23</th>
+      <td>13.862517</td>
+      <td>11.096415</td>
+      <td>8.014770</td>
+      <td>-4.265994</td>
+    </tr>
+    <tr>
+      <th>2025-05-27</th>
+      <td>14.054135</td>
+      <td>11.936585</td>
+      <td>8.952863</td>
+      <td>-3.998952</td>
+    </tr>
+    <tr>
+      <th>2025-05-28</th>
+      <td>13.923852</td>
+      <td>11.606432</td>
+      <td>8.589068</td>
+      <td>-3.306063</td>
+    </tr>
+    <tr>
+      <th>2025-05-29</th>
+      <td>10.401341</td>
+      <td>14.384585</td>
+      <td>8.102119</td>
+      <td>-2.833827</td>
+    </tr>
+    <tr>
+      <th>2025-05-30</th>
+      <td>8.898419</td>
+      <td>10.829543</td>
+      <td>4.347695</td>
+      <td>-7.046328</td>
+    </tr>
+  </tbody>
+</table>
+<p>5200 rows × 4 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="generate-summary-statistics">
+<h3>Generate Summary Statistics<a class="headerlink" href="#generate-summary-statistics" title="Link to this heading">#</a></h3>
+<p>The cell below computes summary statistics using <code class="docutils literal notranslate"><span class="pre">generate_figures.py</span></code> for each TIPS-Treasury arbitrage series over the period 2004-2025.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">generate_figures</span>
+
+<span class="c1"># Compute summary statistics for the period 2004-01-01 to 2025-01-01</span>
+<span class="n">summary_stats</span> <span class="o">=</span> <span class="n">generate_figures</span><span class="o">.</span><span class="n">generate_summary_statistics</span><span class="p">(</span>
+    <span class="n">test</span><span class="p">,</span> <span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-01-01&quot;</span>
+<span class="p">)</span>
+<span class="n">summary_stats</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Mean</th>
+      <th>p50</th>
+      <th>Std. Dev</th>
+      <th>Min</th>
+      <th>Max</th>
+      <th>AR1</th>
+      <th>First</th>
+      <th>Last</th>
+      <th>N</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>TIPS-Treasury 2Y</th>
+      <td>24</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>243</td>
+      <td>0.968</td>
+      <td>Jul-2004</td>
+      <td>Dec-2024</td>
+      <td>5023</td>
+    </tr>
+    <tr>
+      <th>TIPS-Treasury 5Y</th>
+      <td>27</td>
+      <td>22</td>
+      <td>22</td>
+      <td>0</td>
+      <td>220</td>
+      <td>0.989</td>
+      <td>Jul-2004</td>
+      <td>Dec-2024</td>
+      <td>5060</td>
+    </tr>
+    <tr>
+      <th>TIPS-Treasury 10Y</th>
+      <td>26</td>
+      <td>25</td>
+      <td>13</td>
+      <td>0</td>
+      <td>128</td>
+      <td>0.977</td>
+      <td>Jul-2004</td>
+      <td>Dec-2024</td>
+      <td>5094</td>
+    </tr>
+    <tr>
+      <th>TIPS-Treasury 20Y</th>
+      <td>25</td>
+      <td>24</td>
+      <td>12</td>
+      <td>0</td>
+      <td>108</td>
+      <td>0.965</td>
+      <td>Jul-2004</td>
+      <td>Dec-2024</td>
+      <td>5058</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="correlation-heatmap-as-in-figure-2">
+<h3>Correlation Heatmap (as in Figure 2)<a class="headerlink" href="#correlation-heatmap-as-in-figure-2" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the correlation matrix for &#39;test&#39;</span>
+<span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+<span class="c1"># Set up the matplotlib figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="c1"># Generate the heatmap using seaborn</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+    <span class="n">corr_matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+
+<span class="c1"># Add a title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation Heatmap for Arbitrage Spreads&quot;</span><span class="p">)</span>
+
+<span class="c1"># Display the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/19ba4ca92017291cb6ccff344178d79c2cd6427db968e7eadc52930d292b1ca8.png" src="../_images/19ba4ca92017291cb6ccff344178d79c2cd6427db968e7eadc52930d292b1ca8.png" />
+</div>
+</div>
+</section>
+<section id="plot-tips-treasury-spreads">
+<h3>Plot TIPS-Treasury Spreads<a class="headerlink" href="#plot-tips-treasury-spreads" title="Link to this heading">#</a></h3>
+<p>The following cell plots the arbitrage spreads for various maturities (2Y, 5Y, 10Y, 20Y) over the period 2004-07-21 to 2025-05-30.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;arb_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">Y&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;TIPS Treasury Arbitrage Spreads&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Arbitrage Spread (bps)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper center&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">),</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c5472b0330edc6f3c10b73382e89796d8e9cf2cc89e510c48d3588a9fc8f4da8.png" src="../_images/c5472b0330edc6f3c10b73382e89796d8e9cf2cc89e510c48d3588a9fc8f4da8.png" />
+</div>
+</div>
+</section>
+<section id="practical-implementation">
+<h3>Practical Implementation<a class="headerlink" href="#practical-implementation" title="Link to this heading">#</a></h3>
+<p>A trader could use the following steps to exploit the arbitrage opportunity:</p>
+<ol class="arabic simple">
+<li><p><strong>Signal Identification:</strong> Continuously monitor the arbitrage spread using updated TIPS, inflation swap, and Treasury data. A consistently positive spread signals an opportunity.</p></li>
+<li><p><strong>Position Construction:</strong></p>
+<ul class="simple">
+<li><p><strong>Long Position:</strong> Purchase TIPS and enter into corresponding zero-coupon inflation swap contracts to convert the real cash flows into fixed nominal cash flows.</p></li>
+<li><p><strong>Short Position:</strong> Short the nominal Treasury bond (or use Treasury futures/repurchase agreements as a proxy).</p></li>
+</ul>
+</li>
+<li><p><strong>Cash Flow Matching:</strong> Utilize Treasury STRIPS or additional derivatives to ensure that the cash flows from the long and short positions align, thereby locking in the arbitrage profit.</p></li>
+<li><p><strong>Risk Management:</strong> Monitor execution costs, margin requirements, and liquidity risks. Funding constraints and counterparty risks must also be managed.</p></li>
+</ol>
+<p>This strategy, while theoretically risk-free, requires meticulous execution and risk management in practice.</p>
+</section>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
+<p>The analysis confirms that a positive TIPS-Treasury arbitrage spread persisted throughout 2010-2020. Although the magnitude of the mispricing is lower than during the earlier period covered by Fleckenstein et al. (2014), the spread remains statistically and economically significant. This persistence underscores the impact of market frictions and funding constraints on arbitrage opportunities. In practice, traders could exploit this anomaly by constructing synthetic nominal positions using TIPS, inflation swaps, and nominal Treasury bonds, while carefully managing execution and funding risks.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#replication-strategy">Replication Strategy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-data">Load Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-summary-statistics">Generate Summary Statistics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#correlation-heatmap-as-in-figure-2">Correlation Heatmap (as in Figure 2)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-tips-treasury-spreads">Plot TIPS-Treasury Spreads</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-implementation">Practical Implementation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

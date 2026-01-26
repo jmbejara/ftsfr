@@ -1,0 +1,1637 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Financial Time Series Forecasting Repository (FTSFR) &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Sources and Data Sets" href="data_sources_and_modules.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1 current active">
+                <a class="reference internal" href="#">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="cleaning_options.html">Cleaning Summary: Options Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="_notebook_build/portfolios.html">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/index.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Financial Time Series Forecasting Repository (FTSFR)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectives">Objectives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#our-solution">Our Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datasets">Datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-overview">Dataset Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-statistics">Dataset Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#forecasting-results">Forecasting Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overall-model-performance">Overall Model Performance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance-by-dataset-category">Performance by Dataset Category</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-findings">Key Findings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#important-links">Important Links</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-sources">Data Sources</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">Contributing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgments">Acknowledgments</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#project-team">Project Team</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation">Citation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and Tables</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="financial-time-series-forecasting-repository-ftsfr">
+<h1>Financial Time Series Forecasting Repository (FTSFR)<a class="headerlink" href="#financial-time-series-forecasting-repository-ftsfr" title="Link to this heading">#</a></h1>
+<p><strong>A standardized macro-finance data repository for global time series forecasting research</strong></p>
+<p><a class="reference external" href="https://github.com/jmbejara/ftsfr/"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-Repository-blue" /></a></p>
+<hr class="docutils" />
+<section id="objectives">
+<h2>Objectives<a class="headerlink" href="#objectives" title="Link to this heading">#</a></h2>
+<p>The Financial Time Series Forecasting Repository (FTSFR) addresses a critical gap in quantitative finance research: the lack of standardized datasets for evaluating and comparing time series forecasting models. When researchers evaluate their own forecasting models on their own arbitrarily chosen datasets, apples-to-apples comparisons across forecasting algorithms are not possible.</p>
+<p>This repository provides a comprehensive collection of financial and macroeconomic datasets that have been cleaned, formatted, and standardized according to academic best practices. We hope that this repository will serve as a useful time series forecasting benchmark for the research community.</p>
+<p><strong>Key objectives:</strong></p>
+<ul class="simple">
+<li><p>Provide <strong>apples-to-apples comparisons</strong> for time series forecasting algorithms</p></li>
+<li><p>Ensure datasets are prepared using consistent methodology</p></li>
+<li><p>Follow academic standards from published research</p></li>
+<li><p>Enable reproducible forecasting benchmarks across financial domains</p></li>
+</ul>
+<p>We are inspired by the work of the <a class="reference external" href="https://forecastingdata.org/">Monash Time Series Forecasting Repository</a>, which provides freely available datasets for benchmarking time series forecasting models. However, we focus on datasets from finance and economics, which often require subscriptions to access but are commonly available at universities through services like WRDS (Wharton Research Data Services).</p>
+<section id="our-solution">
+<h3>Our Solution<a class="headerlink" href="#our-solution" title="Link to this heading">#</a></h3>
+<p>Although most of the data in this repository requires a subscription to access, we provide a codebase that <strong>automates the end-to-end process</strong> for assembling various financial and macroeconomic data, from the data pull step to the final cleaning and transformation step. Our <a class="reference internal" href="data_sources_and_modules.html#installation"><span class="std std-ref">quickstart guide</span></a> provides a simple guide to get you started.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="datasets">
+<h2>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">#</a></h2>
+<p>Our benchmark includes <strong>25 datasets</strong> spanning multiple financial domains. Each dataset follows cleaning procedures from published academic papers, ensuring that benchmarks reflect established best practices.</p>
+<section id="dataset-overview">
+<h3>Dataset Overview<a class="headerlink" href="#dataset-overview" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Dataset Name</p></th>
+<th class="head text-left"><p>Description</p></th>
+<th class="head text-left"><p>Citation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Returns Data</strong></p></td>
+<td class="text-left"><p></p></td>
+<td class="text-left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>CDS Contract</p></td>
+<td class="text-left"><p>Monthly returns for individual CDS contracts (follows Palhares 2012)</p></td>
+<td class="text-left"><p>Palhares (2012)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>CDS Portfolio</p></td>
+<td class="text-left"><p>20 CDS portfolios by tenor and credit quality</p></td>
+<td class="text-left"><p>He, Kelly, Manela (2017)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Commodity</p></td>
+<td class="text-left"><p>Monthly returns for commodity futures</p></td>
+<td class="text-left"><p>Yang (2013)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Corporate Bond</p></td>
+<td class="text-left"><p>Monthly returns for individual corporate bonds from TRACE</p></td>
+<td class="text-left"><p>Dickerson et al. (2024); Nozawa (2017)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Corporate Portfolio</p></td>
+<td class="text-left"><p>Monthly returns for corporate bond portfolios by credit spread</p></td>
+<td class="text-left"><p>Nozawa (2017)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>CRSP Stock</p></td>
+<td class="text-left"><p>Monthly stock returns from CRSP database</p></td>
+<td class="text-left"><p>Fama &amp; French (1993)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>FF25 Size-BM</p></td>
+<td class="text-left"><p>Daily Fama-French 25 portfolios: size and book-to-market</p></td>
+<td class="text-left"><p>Fama &amp; French (1993)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>FX</p></td>
+<td class="text-left"><p>Daily foreign exchange returns vs USD</p></td>
+<td class="text-left"><p>Lettau et al. (2014)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>SPX Options Portfolios</p></td>
+<td class="text-left"><p>Monthly returns for individual SPX option contracts</p></td>
+<td class="text-left"><p>Constantinides et al. (2013)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Treasury Bond</p></td>
+<td class="text-left"><p>Monthly returns for individual Treasury bonds from CRSP</p></td>
+<td class="text-left"><p>Gürkaynak et al. (2007)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Treasury Portfolio</p></td>
+<td class="text-left"><p>Monthly returns for Treasury bond portfolios by maturity</p></td>
+<td class="text-left"><p>Gürkaynak et al. (2007)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Basis Spread Data</strong></p></td>
+<td class="text-left"><p></p></td>
+<td class="text-left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>CDS-Bond</p></td>
+<td class="text-left"><p>Monthly CDS-bond basis spreads</p></td>
+<td class="text-left"><p>Siriwardane et al. (2022)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>CIP</p></td>
+<td class="text-left"><p>Monthly covered interest parity deviations</p></td>
+<td class="text-left"><p>Du et al. (2018)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>TIPS-Treasury</p></td>
+<td class="text-left"><p>Monthly TIPS-Treasury basis spreads</p></td>
+<td class="text-left"><p>Fleckenstein et al. (2014)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Treasury-SF</p></td>
+<td class="text-left"><p>Monthly Treasury-SF arbitrage spreads</p></td>
+<td class="text-left"><p>Jermann (2020)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Treasury-Swap</p></td>
+<td class="text-left"><p>Monthly Treasury-Swap arbitrage spreads</p></td>
+<td class="text-left"><p>Siriwardane et al. (2022)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Other Financial Data</strong></p></td>
+<td class="text-left"><p></p></td>
+<td class="text-left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Bank Cash Liquidity</p></td>
+<td class="text-left"><p>Quarterly cash liquidity from call report data</p></td>
+<td class="text-left"><p>Drechsler et al. (2017)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Bank Leverage</p></td>
+<td class="text-left"><p>Quarterly leverage ratios from call report data</p></td>
+<td class="text-left"><p>Drechsler et al. (2017)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>BHC Cash Liquidity</p></td>
+<td class="text-left"><p>Quarterly bank holding company cash liquidity</p></td>
+<td class="text-left"><p>Drechsler et al. (2017)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>BHC Leverage</p></td>
+<td class="text-left"><p>Quarterly bank holding company leverage ratios</p></td>
+<td class="text-left"><p>Drechsler et al. (2017)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>HKM Daily Factor</p></td>
+<td class="text-left"><p>Intermediary risk factors (capital ratio, risk factor, returns, leverage)</p></td>
+<td class="text-left"><p>He, Kelly, Manela (2017)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>HKM Monthly Factor</p></td>
+<td class="text-left"><p>Same as above, but monthly</p></td>
+<td class="text-left"><p>He, Kelly, Manela (2017)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Treasury Yield Curve</p></td>
+<td class="text-left"><p>Daily Nelson-Siegel-Svensson zero-coupon yields (1-30 years)</p></td>
+<td class="text-left"><p>Gürkaynak et al. (2007)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Source: Authors’ analysis</em></p>
+</section>
+<section id="dataset-statistics">
+<h3>Dataset Statistics<a class="headerlink" href="#dataset-statistics" title="Link to this heading">#</a></h3>
+<p>The following table provides key statistics for each dataset after filtering and cleaning:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Dataset</p></th>
+<th class="head text-left"><p>Frequency</p></th>
+<th class="head text-right"><p>Entities (Before)</p></th>
+<th class="head text-right"><p>Entities (After)</p></th>
+<th class="head text-right"><p>Retention</p></th>
+<th class="head text-right"><p>Median Length (After)</p></th>
+<th class="head text-left"><p>Date Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Basis Spreads</strong></p></td>
+<td class="text-left"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>CDS-Bond</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>3,402</p></td>
+<td class="text-right"><p>1,516</p></td>
+<td class="text-right"><p>44.6%</p></td>
+<td class="text-right"><p>57</p></td>
+<td class="text-left"><p>2002-09 to 2022-09</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>CIP</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>272</p></td>
+<td class="text-left"><p>2001-12 to 2025-02</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>TIPS-Treasury</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>251</p></td>
+<td class="text-left"><p>2004-07 to 2025-05</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Treasury-SF</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>247</p></td>
+<td class="text-left"><p>2004-06 to 2025-01</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Treasury-Swap</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>7</p></td>
+<td class="text-right"><p>7</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>207</p></td>
+<td class="text-left"><p>2001-12 to 2025-08</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Returns (Portfolios)</strong></p></td>
+<td class="text-left"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>CDS Portfolio</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>20</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>20.0%</p></td>
+<td class="text-right"><p>276</p></td>
+<td class="text-left"><p>2001-01 to 2023-12</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Corporate Portfolio</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>10</p></td>
+<td class="text-right"><p>10</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>242</p></td>
+<td class="text-left"><p>2002-08 to 2022-09</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>FF25 Size-BM</p></td>
+<td class="text-left"><p>Daily</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>36,160</p></td>
+<td class="text-left"><p>1926-07 to 2025-06</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>SPX Options Portfolios</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>18</p></td>
+<td class="text-right"><p>18</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>288</p></td>
+<td class="text-left"><p>1996-01 to 2019-12</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Treasury Portfolio</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>10</p></td>
+<td class="text-right"><p>10</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>668</p></td>
+<td class="text-left"><p>1970-01 to 2025-08</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Returns (Disaggregated)</strong></p></td>
+<td class="text-left"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>CDS Contract</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>6,552</p></td>
+<td class="text-right"><p>234</p></td>
+<td class="text-right"><p>3.6%</p></td>
+<td class="text-right"><p>54</p></td>
+<td class="text-left"><p>2001-02 to 2023-12</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>CRSP Stock</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>26,757</p></td>
+<td class="text-right"><p>25,095</p></td>
+<td class="text-right"><p>93.8%</p></td>
+<td class="text-right"><p>94</p></td>
+<td class="text-left"><p>1926-01 to 2024-12</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>CRSP Stock (ex-div)</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>26,757</p></td>
+<td class="text-right"><p>25,095</p></td>
+<td class="text-right"><p>93.8%</p></td>
+<td class="text-right"><p>94</p></td>
+<td class="text-left"><p>1926-01 to 2024-12</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Commodity</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>23</p></td>
+<td class="text-right"><p>23</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>511</p></td>
+<td class="text-left"><p>1970-01 to 2025-08</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Corporate Bond</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>23,473</p></td>
+<td class="text-right"><p>16,719</p></td>
+<td class="text-right"><p>71.2%</p></td>
+<td class="text-right"><p>52</p></td>
+<td class="text-left"><p>2002-08 to 2022-09</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>FX</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>9</p></td>
+<td class="text-right"><p>9</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>276</p></td>
+<td class="text-left"><p>1999-02 to 2025-02</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Treasuries</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>2,054</p></td>
+<td class="text-right"><p>1,912</p></td>
+<td class="text-right"><p>93.1%</p></td>
+<td class="text-right"><p>49</p></td>
+<td class="text-left"><p>1970-01 to 2025-08</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Other</strong></p></td>
+<td class="text-left"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-right"><p></p></td>
+<td class="text-left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>BHC Cash Liquidity</p></td>
+<td class="text-left"><p>Quarterly</p></td>
+<td class="text-right"><p>13,770</p></td>
+<td class="text-right"><p>6,351</p></td>
+<td class="text-right"><p>46.1%</p></td>
+<td class="text-right"><p>69</p></td>
+<td class="text-left"><p>1976-03 to 2020-03</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>BHC Leverage</p></td>
+<td class="text-left"><p>Quarterly</p></td>
+<td class="text-right"><p>13,761</p></td>
+<td class="text-right"><p>6,653</p></td>
+<td class="text-right"><p>48.3%</p></td>
+<td class="text-right"><p>67</p></td>
+<td class="text-left"><p>1976-03 to 2020-03</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Bank Cash Liquidity</p></td>
+<td class="text-left"><p>Quarterly</p></td>
+<td class="text-right"><p>23,862</p></td>
+<td class="text-right"><p>17,383</p></td>
+<td class="text-right"><p>72.8%</p></td>
+<td class="text-right"><p>82</p></td>
+<td class="text-left"><p>1976-03 to 2020-03</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Bank Leverage</p></td>
+<td class="text-left"><p>Quarterly</p></td>
+<td class="text-right"><p>22,965</p></td>
+<td class="text-right"><p>17,295</p></td>
+<td class="text-right"><p>75.3%</p></td>
+<td class="text-right"><p>82</p></td>
+<td class="text-left"><p>1976-03 to 2020-03</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>HKM All Factor</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>516</p></td>
+<td class="text-left"><p>1970-01 to 2012-12</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>HKM Daily Factor</p></td>
+<td class="text-left"><p>Daily</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>6,918</p></td>
+<td class="text-left"><p>2000-01 to 2018-12</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>HKM Monthly Factor</p></td>
+<td class="text-left"><p>Monthly</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>587</p></td>
+<td class="text-left"><p>1970-01 to 2018-11</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Treasury Yield Curve</p></td>
+<td class="text-left"><p>Daily</p></td>
+<td class="text-right"><p>30</p></td>
+<td class="text-right"><p>30</p></td>
+<td class="text-right"><p>100.0%</p></td>
+<td class="text-right"><p>17,902</p></td>
+<td class="text-left"><p>1961-06 to 2025-09</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Source: Generated automatically from dataset processing pipeline</em></p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="forecasting-results">
+<h2>Forecasting Results<a class="headerlink" href="#forecasting-results" title="Link to this heading">#</a></h2>
+<p>We provide comprehensive baseline results across all datasets using a diverse set of forecasting models, from classical statistical methods to modern deep learning architectures. Results are evaluated using multiple metrics to provide complementary perspectives on forecasting performance.</p>
+<section id="overall-model-performance">
+<h3>Overall Model Performance<a class="headerlink" href="#overall-model-performance" title="Link to this heading">#</a></h3>
+<p>The table below shows median and mean performance statistics across all 25 datasets. <strong>MASE</strong> (Mean Absolute Scaled Error) is the primary metric used in forecasting literature, with values &lt; 1.0 indicating better performance than a seasonal naive benchmark. <strong>Relative MASE</strong> compares each model to the Historic Average baseline. <strong>R²</strong> (out-of-sample R²) measures the percentage reduction in mean squared error relative to predicting the historical average.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Model</p></th>
+<th class="head text-right"><p>N</p></th>
+<th class="head text-right"><p>Med MASE</p></th>
+<th class="head text-right"><p>Mean MASE</p></th>
+<th class="head text-right"><p>Med Rel MASE</p></th>
+<th class="head text-right"><p>Mean Rel MASE</p></th>
+<th class="head text-right"><p>Med R²</p></th>
+<th class="head text-right"><p>Mean R²</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>NBEATS</strong></p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p><strong>0.786</strong></p></td>
+<td class="text-right"><p>0.950</p></td>
+<td class="text-right"><p><strong>0.477</strong></p></td>
+<td class="text-right"><p>0.606</p></td>
+<td class="text-right"><p>0.098</p></td>
+<td class="text-right"><p>-0.062</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>NHITS</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.806</p></td>
+<td class="text-right"><p><strong>0.912</strong></p></td>
+<td class="text-right"><p>0.488</p></td>
+<td class="text-right"><p>0.611</p></td>
+<td class="text-right"><p>0.333</p></td>
+<td class="text-right"><p>-0.077</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Theta</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.814</p></td>
+<td class="text-right"><p>0.927</p></td>
+<td class="text-right"><p>0.505</p></td>
+<td class="text-right"><p><strong>0.599</strong></p></td>
+<td class="text-right"><p><strong>0.379</strong></p></td>
+<td class="text-right"><p>-0.019</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>DLinear</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.829</p></td>
+<td class="text-right"><p>0.977</p></td>
+<td class="text-right"><p>0.554</p></td>
+<td class="text-right"><p>0.606</p></td>
+<td class="text-right"><p>0.307</p></td>
+<td class="text-right"><p>0.019</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NLinear</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.837</p></td>
+<td class="text-right"><p>0.944</p></td>
+<td class="text-right"><p>0.518</p></td>
+<td class="text-right"><p>0.612</p></td>
+<td class="text-right"><p>0.353</p></td>
+<td class="text-right"><p>-1.755</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>ARIMA</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.841</p></td>
+<td class="text-right"><p>0.933</p></td>
+<td class="text-right"><p>0.498</p></td>
+<td class="text-right"><p>0.622</p></td>
+<td class="text-right"><p>0.359</p></td>
+<td class="text-right"><p><strong>0.278</strong></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Transformer</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.852</p></td>
+<td class="text-right"><p>0.998</p></td>
+<td class="text-right"><p>0.491</p></td>
+<td class="text-right"><p>0.602</p></td>
+<td class="text-right"><p>0.245</p></td>
+<td class="text-right"><p>0.185</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>KAN</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.861</p></td>
+<td class="text-right"><p>1.063</p></td>
+<td class="text-right"><p>0.481</p></td>
+<td class="text-right"><p>0.641</p></td>
+<td class="text-right"><p>-0.030</p></td>
+<td class="text-right"><p>0.003</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>TiDE</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>0.875</p></td>
+<td class="text-right"><p>0.969</p></td>
+<td class="text-right"><p>0.586</p></td>
+<td class="text-right"><p>0.634</p></td>
+<td class="text-right"><p>0.234</p></td>
+<td class="text-right"><p>-0.200</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>SES</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>1.020</p></td>
+<td class="text-right"><p>1.359</p></td>
+<td class="text-right"><p>0.638</p></td>
+<td class="text-right"><p>0.700</p></td>
+<td class="text-right"><p>0.169</p></td>
+<td class="text-right"><p>-0.043</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>DeepAR</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>1.148</p></td>
+<td class="text-right"><p>1.791</p></td>
+<td class="text-right"><p>0.851</p></td>
+<td class="text-right"><p>0.837</p></td>
+<td class="text-right"><p>-0.081</p></td>
+<td class="text-right"><p>-4.514</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>HistAvg</p></td>
+<td class="text-right"><p>25</p></td>
+<td class="text-right"><p>1.819</p></td>
+<td class="text-right"><p>2.957</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p>0.000</p></td>
+<td class="text-right"><p>0.000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Note: MASE shows absolute performance (lower is better), Relative MASE shows performance relative to Historic Average (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE. Bold indicates best performance in each column.</em></p>
+<p><em>Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S&amp;P Global, Authors’ analysis</em></p>
+</section>
+<section id="performance-by-dataset-category">
+<h3>Performance by Dataset Category<a class="headerlink" href="#performance-by-dataset-category" title="Link to this heading">#</a></h3>
+<p>Model rankings vary significantly across different types of financial data. The table below disaggregates performance by dataset category:</p>
+<p><strong>Basis Spreads</strong></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Model</p></th>
+<th class="head text-right"><p>N</p></th>
+<th class="head text-right"><p>Med MASE</p></th>
+<th class="head text-right"><p>Mean MASE</p></th>
+<th class="head text-right"><p>Med Rel MASE</p></th>
+<th class="head text-right"><p>Mean Rel MASE</p></th>
+<th class="head text-right"><p>Med R²</p></th>
+<th class="head text-right"><p>Mean R²</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>NLinear</strong></p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p><strong>0.395</strong></p></td>
+<td class="text-right"><p><strong>0.637</strong></p></td>
+<td class="text-right"><p>0.299</p></td>
+<td class="text-right"><p><strong>0.407</strong></p></td>
+<td class="text-right"><p>0.514</p></td>
+<td class="text-right"><p><strong>0.651</strong></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Theta</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.411</p></td>
+<td class="text-right"><p>0.672</p></td>
+<td class="text-right"><p>0.297</p></td>
+<td class="text-right"><p>0.449</p></td>
+<td class="text-right"><p>0.544</p></td>
+<td class="text-right"><p>0.529</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Transformer</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.421</p></td>
+<td class="text-right"><p>0.723</p></td>
+<td class="text-right"><p>0.305</p></td>
+<td class="text-right"><p>0.475</p></td>
+<td class="text-right"><p>0.581</p></td>
+<td class="text-right"><p>0.563</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>ARIMA</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.446</p></td>
+<td class="text-right"><p>0.700</p></td>
+<td class="text-right"><p>0.306</p></td>
+<td class="text-right"><p>0.457</p></td>
+<td class="text-right"><p>0.539</p></td>
+<td class="text-right"><p>0.588</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>DLinear</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.455</p></td>
+<td class="text-right"><p>0.836</p></td>
+<td class="text-right"><p>0.495</p></td>
+<td class="text-right"><p>0.466</p></td>
+<td class="text-right"><p>0.431</p></td>
+<td class="text-right"><p>0.562</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>NHITS</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.464</p></td>
+<td class="text-right"><p>0.664</p></td>
+<td class="text-right"><p><strong>0.272</strong></p></td>
+<td class="text-right"><p>0.446</p></td>
+<td class="text-right"><p>0.580</p></td>
+<td class="text-right"><p>0.550</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>KAN</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.465</p></td>
+<td class="text-right"><p>0.766</p></td>
+<td class="text-right"><p>0.337</p></td>
+<td class="text-right"><p>0.497</p></td>
+<td class="text-right"><p>0.405</p></td>
+<td class="text-right"><p>0.509</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>TiDE</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.491</p></td>
+<td class="text-right"><p>0.862</p></td>
+<td class="text-right"><p>0.311</p></td>
+<td class="text-right"><p>0.627</p></td>
+<td class="text-right"><p>0.517</p></td>
+<td class="text-right"><p>0.185</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>DeepAR</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.567</p></td>
+<td class="text-right"><p>1.147</p></td>
+<td class="text-right"><p>0.693</p></td>
+<td class="text-right"><p>0.615</p></td>
+<td class="text-right"><p>0.186</p></td>
+<td class="text-right"><p>0.102</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>NBEATS</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.587</p></td>
+<td class="text-right"><p>0.685</p></td>
+<td class="text-right"><p>0.329</p></td>
+<td class="text-right"><p>0.441</p></td>
+<td class="text-right"><p><strong>0.706</strong></p></td>
+<td class="text-right"><p>0.552</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>SES</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>0.939</p></td>
+<td class="text-right"><p>1.208</p></td>
+<td class="text-right"><p>0.601</p></td>
+<td class="text-right"><p>0.672</p></td>
+<td class="text-right"><p>0.345</p></td>
+<td class="text-right"><p>0.250</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>HistAvg</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-right"><p>1.784</p></td>
+<td class="text-right"><p>2.126</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p>0.000</p></td>
+<td class="text-right"><p>0.000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Returns</strong></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Model</p></th>
+<th class="head text-right"><p>N</p></th>
+<th class="head text-right"><p>Med MASE</p></th>
+<th class="head text-right"><p>Mean MASE</p></th>
+<th class="head text-right"><p>Med Rel MASE</p></th>
+<th class="head text-right"><p>Mean Rel MASE</p></th>
+<th class="head text-right"><p>Med R²</p></th>
+<th class="head text-right"><p>Mean R²</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>KAN</strong></p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p><strong>0.803</strong></p></td>
+<td class="text-right"><p>1.183</p></td>
+<td class="text-right"><p>0.959</p></td>
+<td class="text-right"><p>0.893</p></td>
+<td class="text-right"><p>-0.073</p></td>
+<td class="text-right"><p>-0.267</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Transformer</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.815</p></td>
+<td class="text-right"><p>1.119</p></td>
+<td class="text-right"><p>0.948</p></td>
+<td class="text-right"><p>0.840</p></td>
+<td class="text-right"><p>-0.043</p></td>
+<td class="text-right"><p>-0.099</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NBEATS</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.825</p></td>
+<td class="text-right"><p>1.024</p></td>
+<td class="text-right"><p>0.955</p></td>
+<td class="text-right"><p>0.858</p></td>
+<td class="text-right"><p>-0.059</p></td>
+<td class="text-right"><p>-0.513</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>DLinear</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.827</p></td>
+<td class="text-right"><p>0.988</p></td>
+<td class="text-right"><p>0.974</p></td>
+<td class="text-right"><p>0.837</p></td>
+<td class="text-right"><p>-0.029</p></td>
+<td class="text-right"><p>-0.469</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NLinear</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.845</p></td>
+<td class="text-right"><p>1.015</p></td>
+<td class="text-right"><p>0.992</p></td>
+<td class="text-right"><p>0.876</p></td>
+<td class="text-right"><p>-0.184</p></td>
+<td class="text-right"><p>-4.149</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>SES</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.853</p></td>
+<td class="text-right"><p>1.501</p></td>
+<td class="text-right"><p>0.965</p></td>
+<td class="text-right"><p>0.899</p></td>
+<td class="text-right"><p>-0.021</p></td>
+<td class="text-right"><p>-0.437</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>TiDE</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.859</p></td>
+<td class="text-right"><p><strong>0.975</strong></p></td>
+<td class="text-right"><p><strong>0.913</strong></p></td>
+<td class="text-right"><p><strong>0.833</strong></p></td>
+<td class="text-right"><p>-0.077</p></td>
+<td class="text-right"><p>-0.742</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Theta</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.860</p></td>
+<td class="text-right"><p>1.045</p></td>
+<td class="text-right"><p>0.965</p></td>
+<td class="text-right"><p>0.862</p></td>
+<td class="text-right"><p>-0.015</p></td>
+<td class="text-right"><p>-0.614</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NHITS</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.869</p></td>
+<td class="text-right"><p>1.000</p></td>
+<td class="text-right"><p>0.996</p></td>
+<td class="text-right"><p>0.881</p></td>
+<td class="text-right"><p>-0.156</p></td>
+<td class="text-right"><p>-0.675</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>ARIMA</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.873</p></td>
+<td class="text-right"><p>1.035</p></td>
+<td class="text-right"><p>1.003</p></td>
+<td class="text-right"><p>0.902</p></td>
+<td class="text-right"><p>-0.073</p></td>
+<td class="text-right"><p>-0.009</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>HistAvg</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>0.873</p></td>
+<td class="text-right"><p>2.519</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p><strong>0.000</strong></p></td>
+<td class="text-right"><p><strong>0.000</strong></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>DeepAR</p></td>
+<td class="text-right"><p>12</p></td>
+<td class="text-right"><p>1.181</p></td>
+<td class="text-right"><p>2.071</p></td>
+<td class="text-right"><p>1.007</p></td>
+<td class="text-right"><p>1.075</p></td>
+<td class="text-right"><p>-0.125</p></td>
+<td class="text-right"><p>-7.815</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Other (Bank Metrics, Factors, Yield Curve)</strong></p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Model</p></th>
+<th class="head text-right"><p>N</p></th>
+<th class="head text-right"><p>Med MASE</p></th>
+<th class="head text-right"><p>Mean MASE</p></th>
+<th class="head text-right"><p>Med Rel MASE</p></th>
+<th class="head text-right"><p>Mean Rel MASE</p></th>
+<th class="head text-right"><p>Med R²</p></th>
+<th class="head text-right"><p>Mean R²</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>NHITS</strong></p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p><strong>0.796</strong></p></td>
+<td class="text-right"><p>0.937</p></td>
+<td class="text-right"><p>0.327</p></td>
+<td class="text-right"><p>0.308</p></td>
+<td class="text-right"><p>0.465</p></td>
+<td class="text-right"><p>0.429</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Theta</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.811</p></td>
+<td class="text-right"><p><strong>0.908</strong></p></td>
+<td class="text-right"><p><strong>0.313</strong></p></td>
+<td class="text-right"><p><strong>0.298</strong></p></td>
+<td class="text-right"><p>0.474</p></td>
+<td class="text-right"><p><strong>0.531</strong></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>ARIMA</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.830</p></td>
+<td class="text-right"><p>0.926</p></td>
+<td class="text-right"><p>0.328</p></td>
+<td class="text-right"><p>0.305</p></td>
+<td class="text-right"><p><strong>0.481</strong></p></td>
+<td class="text-right"><p>0.514</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>DLinear</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.839</p></td>
+<td class="text-right"><p>1.049</p></td>
+<td class="text-right"><p>0.378</p></td>
+<td class="text-right"><p>0.346</p></td>
+<td class="text-right"><p>0.380</p></td>
+<td class="text-right"><p>0.411</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NBEATS</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.867</p></td>
+<td class="text-right"><p>1.004</p></td>
+<td class="text-right"><p>0.380</p></td>
+<td class="text-right"><p>0.331</p></td>
+<td class="text-right"><p>0.459</p></td>
+<td class="text-right"><p>0.232</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Transformer</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.888</p></td>
+<td class="text-right"><p>0.988</p></td>
+<td class="text-right"><p>0.363</p></td>
+<td class="text-right"><p>0.326</p></td>
+<td class="text-right"><p>0.437</p></td>
+<td class="text-right"><p>0.375</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>KAN</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.912</p></td>
+<td class="text-right"><p>1.069</p></td>
+<td class="text-right"><p>0.404</p></td>
+<td class="text-right"><p>0.353</p></td>
+<td class="text-right"><p>0.413</p></td>
+<td class="text-right"><p>0.090</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>TiDE</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.918</p></td>
+<td class="text-right"><p>1.028</p></td>
+<td class="text-right"><p>0.362</p></td>
+<td class="text-right"><p>0.341</p></td>
+<td class="text-right"><p>0.414</p></td>
+<td class="text-right"><p>0.372</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NLinear</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>0.925</p></td>
+<td class="text-right"><p>1.031</p></td>
+<td class="text-right"><p>0.412</p></td>
+<td class="text-right"><p>0.344</p></td>
+<td class="text-right"><p>0.398</p></td>
+<td class="text-right"><p>0.333</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>SES</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>1.118</p></td>
+<td class="text-right"><p>1.242</p></td>
+<td class="text-right"><p>0.491</p></td>
+<td class="text-right"><p>0.421</p></td>
+<td class="text-right"><p>0.292</p></td>
+<td class="text-right"><p>0.364</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>DeepAR</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>1.359</p></td>
+<td class="text-right"><p>1.773</p></td>
+<td class="text-right"><p>0.473</p></td>
+<td class="text-right"><p>0.619</p></td>
+<td class="text-right"><p>0.043</p></td>
+<td class="text-right"><p>-2.446</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>HistAvg</p></td>
+<td class="text-right"><p>8</p></td>
+<td class="text-right"><p>2.653</p></td>
+<td class="text-right"><p>4.132</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p>—</p></td>
+<td class="text-right"><p>0.000</p></td>
+<td class="text-right"><p>0.000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Note: Metrics are computed within each dataset category. Lower MASE/Relative MASE values indicate better performance; higher R² values indicate better performance. Bold indicates best performance in each column.</em></p>
+</section>
+<section id="key-findings">
+<h3>Key Findings<a class="headerlink" href="#key-findings" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Basis spreads</strong> exhibit pronounced seasonal structure and mean reversion, where models like <strong>NLinear</strong>, <strong>NHITS</strong>, and <strong>NBEATS</strong> excel by decomposing series into trend and seasonal components</p></li>
+<li><p><strong>Asset returns</strong> are notoriously difficult to forecast, with nearly all models achieving R² values near zero—consistent with decades of empirical asset pricing research showing that the historical mean is hard to beat</p></li>
+<li><p><strong>Other datasets</strong> (bank metrics, intermediary factors, yield curves) favor classical approaches like <strong>Theta</strong> and <strong>ARIMA</strong>, which balance flexibility with parsimony</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="important-links">
+<h2>Important Links<a class="headerlink" href="#important-links" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>GitHub Repository</strong>: <a class="github reference external" href="https://github.com/jmbejara/ftsfr/">jmbejara/ftsfr</a></p></li>
+<li><p><strong>Documentation</strong>: Browse the sections below for detailed information</p></li>
+<li><p><strong>Paper</strong>: Bejarano, J. et al. (2024). Financial Time Series Forecasting Repository: A Standardized Macro-Finance Data Repository for Global Time Series Forecasting. <em>[Working Paper]</em></p></li>
+</ul>
+<section id="data-sources">
+<h3>Data Sources<a class="headerlink" href="#data-sources" title="Link to this heading">#</a></h3>
+<p>Our repository leverages both <strong>publicly available</strong> and <strong>subscription-based</strong> data sources:</p>
+<p><strong>Public Data Sources</strong> <em>(No subscription required)</em></p>
+<ul class="simple">
+<li><p>He, Kelly, Manela test portfolios</p></li>
+<li><p>Ken French Data Library</p></li>
+<li><p>Federal Reserve economic data (FRED)</p></li>
+<li><p>NYU Call Report archive</p></li>
+<li><p>Open Source Bond Asset Pricing</p></li>
+</ul>
+<p><strong>Academic Subscription Sources</strong> <em>(Commonly available via university subscriptions)</em></p>
+<ul class="simple">
+<li><p>WRDS Compustat North America</p></li>
+<li><p>WRDS CRSP (Stocks, Bonds, Treasury)</p></li>
+<li><p>WRDS Markit CDS data</p></li>
+<li><p>WRDS Bond Returns</p></li>
+<li><p>WRDS Mergent FISD</p></li>
+<li><p>WRDS Bank Premium</p></li>
+<li><p>Bloomberg Terminal</p></li>
+<li><p>OptionMetrics IvyDB</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While some datasets require paid subscriptions, they are commonly available through academic institutions. Our code automates the data retrieval process once you have the appropriate access credentials. If you don’t have access to any of the above data sources, you can still use our code to pull from only the data sources that you have subscriptions for.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Installation</strong>: Follow our <a class="reference internal" href="data_sources_and_modules.html#installation"><span class="std std-ref">quickstart guide</span></a> to set up the environment</p></li>
+<li><p><strong>Configuration</strong>: Set up your data source credentials and specify available subscriptions</p></li>
+<li><p><strong>Data Download</strong>: Run the automated ETL pipeline to build your standardized datasets</p></li>
+<li><p><strong>Benchmarking</strong>: Use our baseline models to establish performance benchmarks</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-1-merge-the-redcodes-of-firms-on-to-the-corporate-bonds">Step 1: Merge the Redcodes of firms on to the corporate bonds.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-2-cds-data-pull-and-cds-data-processing">Step 2: CDS data pull and CDS data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-3-processing">Step 3: Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_bond_basis_ipynb.html#step-4-results">Step 4: Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cleaning_options.html">Cleaning Summary: Options Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_notebook_build/summary_treasury_bond_returns_ipynb.html#treasury-bond-returns-summary">Treasury Bond Returns Summary</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+</div>
+</section>
+<hr class="docutils" />
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>📡 <strong>Streamlined data collection</strong> from multiple sources (WRDS, FRED, Bloomberg, etc.)</p></li>
+<li><p>🎯 <strong>Academic standards</strong>: Replicates cleaning procedures from academic literature</p></li>
+<li><p>🤖 <strong>Fully reproducible</strong> data preparation workflows</p></li>
+<li><p>📈 <strong>Spans multiple financial domains</strong>:</p>
+<ul>
+<li><p>Equity Markets: Returns, portfolios, and characteristics</p></li>
+<li><p>Fixed Income: Treasury, corporate, and sovereign bonds</p></li>
+<li><p>Credit Markets: CDS spreads and bond-CDS basis</p></li>
+<li><p>Derivatives: Options and futures data</p></li>
+<li><p>Foreign Exchange: Currency portfolios and rates</p></li>
+<li><p>Commodities: Futures and spot prices</p></li>
+<li><p>Banking: Call report data and bank-specific metrics</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h2>
+<p>We welcome contributions from the research community. Whether you’re:</p>
+<ul class="simple">
+<li><p>Adding new data sources</p></li>
+<li><p>Improving cleaning methodologies</p></li>
+<li><p>Implementing additional forecasting benchmarks</p></li>
+<li><p>Enhancing documentation</p></li>
+</ul>
+<p>Please see our contribution guidelines for more information.</p>
+</section>
+<hr class="docutils" />
+<section id="acknowledgments">
+<h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Link to this heading">#</a></h2>
+<p>We would like to thank the following individuals. With their permission, we have adapted and used pieces of their code in this repository:</p>
+<ul class="simple">
+<li><p><strong>Om Mehta and Kunj Shah</strong>, for their replication of the Covered Interest Rate Parity (CIP) arbitrage spreads (Siriwardane et al. 2022; Rime et al. 2017), available at <a class="github reference external" href="https://github.com/Kunj121/CIP">Kunj121/CIP</a></p></li>
+<li><p><strong>Kyle Parran and Duncan Park</strong>, for their replication of the construction of commodity futures returns (He et al. 2017; Yang 2013), available at <a class="github reference external" href="https://github.com/kyleparran/final_project_group_09">kyleparran/final_project_group_09</a></p></li>
+<li><p><strong>Haoshu Wang and Guanyu Chen</strong>, for their replication of the Treasury Spot-Futures basis (Siriwardane et al. 2022)</p></li>
+<li><p><strong>Arsh Kumar and Raiden Egbert</strong>, for their replication of the Treasury Swap basis (Siriwardane et al. 2022)</p></li>
+<li><p><strong>Bailey Meche and Raul Renteria</strong>, for their replication of the TIPS-Treasury basis (Siriwardane et al. 2022)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="project-team">
+<h2>Project Team<a class="headerlink" href="#project-team" title="Link to this heading">#</a></h2>
+<p><strong>Project Lead:</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jeremybejarano.com/">Jeremiah Bejarano</a>, Office of Financial Research, U.S. Department of the Treasury and Financial Mathematics Program, University of Chicago</p></li>
+</ul>
+<p><strong>Project Collaborators:</strong></p>
+<ul class="simple">
+<li><p>Viren Desai</p></li>
+<li><p>Kausthub Keshava</p></li>
+<li><p>Arsh Kumar</p></li>
+<li><p>Zixiao Wang</p></li>
+<li><p>Vincent Hanyang Xu</p></li>
+<li><p>Yangge Xu</p></li>
+</ul>
+<p><em>Views and opinions expressed are those of the authors and do not necessarily represent official positions or policy of the Office of Financial Research (OFR) or the U.S. Department of the Treasury.</em></p>
+</section>
+<hr class="docutils" />
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Link to this heading">#</a></h2>
+<p>If you use FTSFR in your research, please cite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bejarano</span><span class="p">,</span> <span class="n">J</span><span class="o">.</span> <span class="n">et</span> <span class="n">al</span><span class="o">.</span> <span class="p">(</span><span class="mi">2024</span><span class="p">)</span><span class="o">.</span> <span class="n">Financial</span> <span class="n">Time</span> <span class="n">Series</span> <span class="n">Forecasting</span> <span class="n">Repository</span><span class="p">:</span>
+<span class="n">A</span> <span class="n">Standardized</span> <span class="n">Macro</span><span class="o">-</span><span class="n">Finance</span> <span class="n">Data</span> <span class="n">Repository</span> <span class="k">for</span> <span class="n">Global</span> <span class="n">Time</span> <span class="n">Series</span> <span class="n">Forecasting</span><span class="o">.</span>
+<span class="p">[</span><span class="n">Working</span> <span class="n">Paper</span><span class="p">]</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Academic Collaboration</strong>: This project represents a collaborative effort among researchers to advance the state of financial time series forecasting. We encourage academic partnerships and welcome contributors who are interested in pushing the boundaries of empirical finance research.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="indices-and-tables">
+<h2>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="data_sources_and_modules.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Data Sources and Data Sets</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectives">Objectives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#our-solution">Our Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datasets">Datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-overview">Dataset Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-statistics">Dataset Statistics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#forecasting-results">Forecasting Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overall-model-performance">Overall Model Performance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance-by-dataset-category">Performance by Dataset Category</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-findings">Key Findings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#important-links">Important Links</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-sources">Data Sources</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">Contributing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgments">Acknowledgments</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#project-team">Project Team</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation">Citation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and Tables</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

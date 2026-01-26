@@ -1,0 +1,3330 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Imports &#8212; Financial Time Series Forecasting Repository</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37919675" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_notebook_build/portfolios';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cleaning Summary: Treasury Bond Returns" href="summary_treasury_bond_returns_ipynb.html" />
+    <link rel="prev" title="Imports" href="combined_filters.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Financial Time Series Forecasting Repository - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Financial Time Series Forecasting Repository - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Financial Time Series Forecasting Repository (FTSFR)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">📚 Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../data_sources_and_modules.html">Data Sources and Data Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ftsfr_datasets_info.html">FTSFR Datasets Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses.html">Data Glimpses Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_glimpses_ftsfr.html">Data Glimpses Report: FTSFR only</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">📊 Data Cleaning Procedure Summaries</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_bond_basis_ipynb.html">Cleaning Summary: CDS Bond Basis</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="summary_cds_returns_ipynb.html">Cleaning Summary: CDS Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_cip_ipynb.html">Cleaning Summary: Covered Interest Parity (CIP) Arbitrage Spreads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_commodities.html">Cleaning Summary: Commodities Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_corp_bond_returns_ipynb.html">Cleaning Summary: Corporate Bond Returns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spx_options_description.html">He, Kelly, Manela (HKM) Test Portfolios: Options</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../cleaning_options.html">Cleaning Summary: Options Data</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="combined_filters.html">Imports</a></li>
+
+
+
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Imports</a></li>
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="summary_treasury_bond_returns_ipynb.html">Cleaning Summary: Treasury Bond Returns</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">🔧 Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../myst_markdown_demos.html">MyST Markdown Demos 💡</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/jmbejara/ftsfr/issues/new?title=Issue%20on%20page%20%2F_notebook_build/portfolios.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_notebook_build/portfolios.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Imports</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Imports</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#execution">Execution</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs">Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#process">Process</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussian-kernel-weighting">1. Gaussian Kernel Weighting</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#option-elasticity">2. Option Elasticity</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-return-of-option-i">3. Arithmetic Return of Option <span class="math notranslate nohighlight">\(i\)</span></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#leverage-adjusted-portfolio-construction">4. Leverage-Adjusted Portfolio Construction</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#build-the-ftsfa-id-for-each-portfolio">1. Build the FTSFA ID for each portfolio</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-option-elasticity-and-daily-kernel-weighting-for-candidate-options-for-each-portfolio">2. Calculate option elasticity and daily kernel weighting for candidate options for each portfolio.</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-options-from-the-portfolio-with-weights-lower-than-1">3. Remove options from the portfolio with weights lower than 1%</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-the-daily-arithmetic-return-and-the-leverage-adjusted-return-of-each-portfolio">4. Calculate the daily arithmetic return and the leverage-adjusted return of each portfolio.</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#to-be-implemented-filling-nans">5. (to be implemented) Filling NaNs</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs">6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017">Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio-returns-analysis">Portfolio Returns Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tests-for-normality-of-returns-in-the-54-cjs-portfolios">Tests for Normality of Returns in the 54 CJS Portfolios</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tests-for-normality-of-returns-in-the-18-hkm-portfolios">Tests for Normality of Returns in the 18 HKM Portfolios</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="imports">
+<h1>Imports<a class="headerlink" href="#imports" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;./../&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span><span class="p">,</span> <span class="n">stats</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">shapiro</span><span class="p">,</span> <span class="n">jarque_bera</span><span class="p">,</span> <span class="n">normaltest</span><span class="p">,</span> <span class="n">skew</span><span class="p">,</span> <span class="n">kurtosis</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
+
+<span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;OUTPUT_DIR&quot;</span><span class="p">))</span>
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;DATA_DIR&quot;</span><span class="p">))</span>
+<span class="n">WRDS_USERNAME</span> <span class="o">=</span> <span class="n">config</span><span class="p">(</span><span class="s2">&quot;WRDS_USERNAME&quot;</span><span class="p">)</span>
+
+<span class="n">START_DATE_01</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">1996</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">END_DATE_01</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+
+<span class="n">START_DATE_02</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">END_DATE_02</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DATE_RANGE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">START_DATE_01</span><span class="p">)</span><span class="si">:</span><span class="s2">%Y-%m</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">END_DATE_02</span><span class="p">)</span><span class="si">:</span><span class="s2">%Y-%m</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="functions">
+<h1>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- Black-Scholes elasticity ---</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bs_elasticity</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">option_type</span><span class="o">=</span><span class="s2">&quot;call&quot;</span><span class="p">):</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">S</span> <span class="o">/</span> <span class="n">K</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">T</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">option_type</span> <span class="o">==</span> <span class="s2">&quot;call&quot;</span><span class="p">:</span>
+        <span class="n">price</span> <span class="o">=</span> <span class="n">S</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span> <span class="o">-</span> <span class="n">K</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">r</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span>
+            <span class="n">d1</span> <span class="o">-</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">price</span> <span class="o">=</span> <span class="n">K</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">r</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="n">d1</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">T</span><span class="p">))</span> <span class="o">-</span> <span class="n">S</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span>
+            <span class="o">-</span><span class="n">d1</span>
+        <span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="o">-</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="n">d1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">delta</span> <span class="o">*</span> <span class="n">S</span> <span class="o">/</span> <span class="n">price</span><span class="p">),</span> <span class="n">price</span>
+
+
+<span class="c1"># Gaussian kernel function</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">kernel_weights</span><span class="p">(</span><span class="n">m_grid</span><span class="p">,</span> <span class="n">ttm_grid</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">ttm</span><span class="p">,</span> <span class="n">bw_m</span><span class="o">=</span><span class="mf">0.0125</span><span class="p">,</span> <span class="n">bw_t</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">m_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m_grid</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">ttm_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ttm_grid</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">m_grid</span> <span class="o">-</span> <span class="n">k_s</span><span class="p">)</span> <span class="o">/</span> <span class="n">bw_m</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">ttm_grid</span> <span class="o">-</span> <span class="n">ttm</span><span class="p">)</span> <span class="o">/</span> <span class="n">bw_t</span>
+    <span class="n">dist_sq</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">dist_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">if</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+
+
+<span class="c1"># --- Construct a single day portfolio ---</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_portfolio</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k_s_target</span><span class="p">,</span> <span class="n">ttm_target</span><span class="p">,</span> <span class="n">option_type</span><span class="o">=</span><span class="s2">&quot;call&quot;</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+    <span class="n">subset</span> <span class="o">=</span> <span class="n">data</span><span class="p">[(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;option_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">option_type</span><span class="p">)]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">kernel_weights</span><span class="p">(</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;moneyness&quot;</span><span class="p">],</span> <span class="n">subset</span><span class="p">[</span><span class="s2">&quot;ttm&quot;</span><span class="p">],</span> <span class="n">k_s_target</span><span class="p">,</span> <span class="n">ttm_target</span><span class="p">)</span>
+    <span class="n">subset</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">subset</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">]</span>
+    <span class="n">subset</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="n">subset</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># Leverage-adjusted returns</span>
+    <span class="n">elast</span><span class="p">,</span> <span class="n">price</span> <span class="o">=</span> <span class="n">bs_elasticity</span><span class="p">(</span>
+        <span class="n">S</span><span class="o">=</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;underlying&quot;</span><span class="p">],</span>
+        <span class="n">K</span><span class="o">=</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;strike&quot;</span><span class="p">],</span>
+        <span class="n">T</span><span class="o">=</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;ttm&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">365</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="o">=</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;iv&quot;</span><span class="p">],</span>
+        <span class="n">option_type</span><span class="o">=</span><span class="n">option_type</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">subset</span><span class="p">[</span><span class="s2">&quot;leverage_return&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="s2">&quot;daily_return&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">elast</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">subset</span><span class="p">[</span><span class="s2">&quot;leverage_return&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">subset</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+
+<span class="c1"># --- Main Loop (simplified) ---</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_portfolios</span><span class="p">(</span><span class="n">option_data</span><span class="p">,</span> <span class="n">m_grid</span><span class="p">,</span> <span class="n">ttm_grid</span><span class="p">,</span> <span class="n">option_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;call&quot;</span><span class="p">,</span> <span class="s2">&quot;put&quot;</span><span class="p">]):</span>
+    <span class="n">portfolios</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">opt_type</span> <span class="ow">in</span> <span class="n">option_types</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k_s</span> <span class="ow">in</span> <span class="n">m_grid</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ttm</span> <span class="ow">in</span> <span class="n">ttm_grid</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">construct_portfolio</span><span class="p">(</span><span class="n">option_data</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">ttm</span><span class="p">,</span> <span class="n">option_type</span><span class="o">=</span><span class="n">opt_type</span><span class="p">)</span>
+                <span class="n">portfolios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">opt_type</span><span class="p">,</span> <span class="s2">&quot;moneyness&quot;</span><span class="p">:</span> <span class="n">k_s</span><span class="p">,</span> <span class="s2">&quot;ttm&quot;</span><span class="p">:</span> <span class="n">ttm</span><span class="p">,</span> <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="n">ret</span><span class="p">}</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">portfolios</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_kernel_weights</span><span class="p">(</span><span class="n">spx_mod</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate kernel weights for each option in the SPX dataset based on moneyness and maturity targets.</span>
+<span class="sd">    This function iterates through predefined moneyness and maturity targets, applies kernel weights to candidate options.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Define moneyness and maturity targets from the paper</span>
+    <span class="n">moneyness_targets</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.925</span><span class="p">,</span> <span class="mf">0.950</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">1.000</span><span class="p">,</span> <span class="mf">1.025</span><span class="p">,</span> <span class="mf">1.050</span><span class="p">,</span> <span class="mf">1.075</span><span class="p">,</span> <span class="mf">1.100</span><span class="p">]</span>
+    <span class="n">maturity_targets</span> <span class="o">=</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span>
+    <span class="n">cp_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Preprocess base DataFrame</span>
+    <span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;days_to_maturity_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;days_to_maturity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">days</span>
+    <span class="n">spx_mod</span> <span class="o">=</span> <span class="n">spx_mod</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;original_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spx_mod</span><span class="o">.</span><span class="n">index</span>
+
+    <span class="n">weight_results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Iterate through each strategy target</span>
+    <span class="k">for</span> <span class="n">cp_flag</span> <span class="ow">in</span> <span class="n">cp_flags</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">target_moneyness</span> <span class="ow">in</span> <span class="n">moneyness_targets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">target_ttm</span> <span class="ow">in</span> <span class="n">maturity_targets</span><span class="p">:</span>
+                <span class="c1"># Filter candidate options</span>
+                <span class="n">candidate_options</span> <span class="o">=</span> <span class="n">spx_mod</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">cp_flag</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;moneyness_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target_moneyness</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;maturity_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target_ttm</span><span class="p">)</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">candidate_options</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">candidate_options</span><span class="p">[</span><span class="s2">&quot;kernel_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+                <span class="c1"># Apply kernel weights per date</span>
+                <span class="k">for</span> <span class="n">date</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">candidate_options</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">):</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">index</span>
+                    <span class="n">weights</span> <span class="o">=</span> <span class="n">kernel_weights</span><span class="p">(</span>
+                        <span class="n">g</span><span class="p">[</span><span class="s2">&quot;moneyness&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                        <span class="n">g</span><span class="p">[</span><span class="s2">&quot;days_to_maturity_int&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                        <span class="n">k_s</span><span class="o">=</span><span class="n">target_moneyness</span><span class="p">,</span>
+                        <span class="n">ttm</span><span class="o">=</span><span class="n">target_ttm</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">candidate_options</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;kernel_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span>
+
+                <span class="n">weight_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">candidate_options</span><span class="p">[[</span><span class="s2">&quot;original_index&quot;</span><span class="p">,</span> <span class="s2">&quot;kernel_weight&quot;</span><span class="p">]]</span>
+                <span class="p">)</span>
+
+    <span class="c1"># Merge weights back into spx_mod</span>
+    <span class="k">if</span> <span class="n">weight_results</span><span class="p">:</span>
+        <span class="n">all_weights</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">weight_results</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;original_index&quot;</span><span class="p">)</span>
+        <span class="n">spx_mod</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;original_index&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;kernel_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_weights</span><span class="p">[</span><span class="s2">&quot;kernel_weight&quot;</span><span class="p">]</span>
+        <span class="n">spx_mod</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No matching options found for any target.&quot;</span><span class="p">)</span>
+
+    <span class="n">spx_mod</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;original_index&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spx_mod</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calc_option_delta_elasticity</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">T</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;days_to_maturity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">days</span> <span class="o">/</span> <span class="mf">365.0</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;strike_price&quot;</span><span class="p">]</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;tb_m3&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;IV&quot;</span><span class="p">]</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">S</span> <span class="o">/</span> <span class="n">K</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">T</span><span class="p">))</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+        <span class="n">option_delta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">d1</span><span class="p">),</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">option_elasticity</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;option_delta&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;mid_price&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">read_option_data</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="c1"># Example string interval: &#39;(0.9, 0.95]&#39;</span>
+    <span class="c1"># Remove whitespace and parse the string into tuples</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_interval_string</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="c1"># Handle missing or malformed entries gracefully</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">NA</span>  <span class="c1"># or np.nan</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">NA</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="c1"># restore the &#39;moneyness_bin&#39; column as intervals</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;moneyness_bin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;moneyness_bin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">parse_interval_string</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_cjs_return_leverage_investment</span><span class="p">(</span><span class="n">spx_mod</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">spx_mod</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Lag price</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;mid_price_lag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">)[</span><span class="s2">&quot;mid_price&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Return and daily risk-free rate</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;option_return&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;mid_price&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;mid_price_lag&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;mid_price_lag&quot;</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;daily_rf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;tb_m3&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">/</span> <span class="mi">252</span>
+
+    <span class="c1"># Weighted dollar investment and return contribution</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;inv_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;kernel_weight&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;option_elasticity&quot;</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;inv_return&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;inv_weight&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;option_return&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Group and aggregate</span>
+    <span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;ftfsa_id&quot;</span><span class="p">])</span>
+
+    <span class="n">port</span> <span class="o">=</span> <span class="n">grouped</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+        <span class="n">total_inv_weight</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;inv_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">),</span>
+        <span class="n">total_inv_return</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;inv_return&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">),</span>
+        <span class="n">daily_rf</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;daily_rf&quot;</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">),</span>
+        <span class="n">cp_flag</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">),</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="c1"># Apply CJS logic</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adjusted_return</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;total_inv_return&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;total_inv_weight&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;daily_rf&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;total_inv_return&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;total_inv_weight&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;daily_rf&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="n">port</span><span class="p">[</span><span class="s2">&quot;portfolio_return&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">adjusted_return</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">port</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Function to compute normality metrics</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normality_summary</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">shapiro_p</span> <span class="o">=</span> <span class="n">shapiro</span><span class="p">(</span><span class="n">series</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">jb_stat</span><span class="p">,</span> <span class="n">jb_p</span> <span class="o">=</span> <span class="n">jarque_bera</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+        <span class="n">normaltest_p</span> <span class="o">=</span> <span class="n">normaltest</span><span class="p">(</span><span class="n">series</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">skew_val</span> <span class="o">=</span> <span class="n">skew</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+        <span class="n">kurt_val</span> <span class="o">=</span> <span class="n">kurtosis</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">fisher</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Series&quot;</span><span class="p">:</span> <span class="n">col</span><span class="p">,</span>
+                <span class="s2">&quot;Shapiro_p&quot;</span><span class="p">:</span> <span class="n">shapiro_p</span><span class="p">,</span>
+                <span class="s2">&quot;JarqueBera_p&quot;</span><span class="p">:</span> <span class="n">jb_p</span><span class="p">,</span>
+                <span class="s2">&quot;Normaltest_p&quot;</span><span class="p">:</span> <span class="n">normaltest_p</span><span class="p">,</span>
+                <span class="s2">&quot;Skewness&quot;</span><span class="p">:</span> <span class="n">skew_val</span><span class="p">,</span>
+                <span class="s2">&quot;Kurtosis&quot;</span><span class="p">:</span> <span class="n">kurt_val</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="execution">
+<h1>Execution<a class="headerlink" href="#execution" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># read filtered data</span>
+<span class="n">source_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;spx_filtered_final_</span><span class="si">{</span><span class="n">DATE_RANGE</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)</span>
+<span class="n">spx_filtered</span> <span class="o">=</span> <span class="n">read_option_data</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">source_file</span><span class="p">)</span>
+<span class="n">spx_filtered</span> <span class="o">=</span> <span class="n">spx_filtered</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="c1"># create the moneyness ID from the moneyness_bin column, using the right edge of the interval</span>
+<span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;moneyness_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;moneyness_bin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<span class="p">)</span>
+<span class="c1"># drop any rows where moneyness_id is NaN</span>
+<span class="n">spx_filtered</span> <span class="o">=</span> <span class="n">spx_filtered</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;moneyness_id&quot;</span><span class="p">])</span>
+
+<span class="n">spx_filtered</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>exdate</th>
+      <th>moneyness</th>
+      <th>secid</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>...</th>
+      <th>days_to_maturity</th>
+      <th>pc_parity_int_rate</th>
+      <th>intrinsic</th>
+      <th>log_iv</th>
+      <th>fitted_iv</th>
+      <th>rel_distance_iv</th>
+      <th>moneyness_bin</th>
+      <th>stdev_iv_moneyness_bin</th>
+      <th>is_outlier_iv</th>
+      <th>moneyness_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>0.987534</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.082711</td>
+      <td>5.04</td>
+      <td>444.0</td>
+      <td>...</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>7.70</td>
+      <td>-2.492403</td>
+      <td>-2.377298</td>
+      <td>4.841838</td>
+      <td>(0.975, 1.0]</td>
+      <td>3.516840</td>
+      <td>False</td>
+      <td>1.000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.019913</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.097356</td>
+      <td>5.04</td>
+      <td>4022.0</td>
+      <td>...</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.329381</td>
+      <td>-2.285771</td>
+      <td>1.907866</td>
+      <td>(1.0, 1.025]</td>
+      <td>5.219336</td>
+      <td>False</td>
+      <td>1.025</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.028007</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.101756</td>
+      <td>5.04</td>
+      <td>1627.0</td>
+      <td>...</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.285177</td>
+      <td>-2.264082</td>
+      <td>0.931727</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.036102</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.100588</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>16 days</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.296722</td>
+      <td>-2.242870</td>
+      <td>2.401027</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1996-01-04</td>
+      <td>1996-02-17</td>
+      <td>0.963251</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.071852</td>
+      <td>5.04</td>
+      <td>3.0</td>
+      <td>...</td>
+      <td>44 days</td>
+      <td>0.014622</td>
+      <td>22.70</td>
+      <td>-2.633147</td>
+      <td>-2.563785</td>
+      <td>2.705450</td>
+      <td>(0.95, 0.975]</td>
+      <td>2.301503</td>
+      <td>False</td>
+      <td>0.975</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>3195881</th>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.044639</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.117063</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>144.22</td>
+      <td>-2.145043</td>
+      <td>-2.132215</td>
+      <td>0.601630</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+    </tr>
+    <tr>
+      <th>3195882</th>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.052377</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.113900</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>169.22</td>
+      <td>-2.172434</td>
+      <td>-2.165558</td>
+      <td>0.317525</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+    </tr>
+    <tr>
+      <th>3195883</th>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.060116</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.110925</td>
+      <td>1.52</td>
+      <td>20.0</td>
+      <td>...</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>194.22</td>
+      <td>-2.198901</td>
+      <td>-2.199596</td>
+      <td>-0.031616</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+    </tr>
+    <tr>
+      <th>3195884</th>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.067854</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.108540</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>219.22</td>
+      <td>-2.220637</td>
+      <td>-2.234330</td>
+      <td>-0.612848</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+    </tr>
+    <tr>
+      <th>3195885</th>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.075592</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.106814</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>171 days</td>
+      <td>0.014769</td>
+      <td>244.22</td>
+      <td>-2.236666</td>
+      <td>-2.269758</td>
+      <td>-1.457925</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+    </tr>
+  </tbody>
+</table>
+<p>2676696 rows × 26 columns</p>
+</div></div></div>
+</div>
+<section id="construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs">
+<h2>Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS<a class="headerlink" href="#construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs" title="Link to this heading">#</a></h2>
+<section id="process">
+<h3>Process<a class="headerlink" href="#process" title="Link to this heading">#</a></h3>
+<p>The construction of the 27 call and 27 put portfolios in CJS is a multi-step process, with the objective of developing portfolio returns series that are stationary and only moderately skewed. Note that the discrete bucketing of moneyness and days to maturity lead to multiple candidate options for each portfolio on each trading day. These options  are given weights according to a <strong>bivariate Gaussian weighting kernel</strong> in moneyness and maturity (bandwidths: <em>0.0125 in moneyness</em> and <em>10 days to maturity</em>).</p>
+<p>Each portfolio’s daily returns are initially calculated as simple arithmetic return, assuming the option is bought and sold at its bid-ask midpoint at each rebalancing. The one-day arithmetic return is then converted to a <strong>leverage-adjusted return</strong>. This procedure is achieved by calculating the one-day return of a hypothetical portfolio with <span class="math notranslate nohighlight">\(\omega_{BSM}^{-1}\)</span> dollars invested in the option, and <span class="math notranslate nohighlight">\((1 - \omega^{-1})\)</span> dollars invested in the risk-free rate, where <span class="math notranslate nohighlight">\(\omega_{BSM}\)</span> is the BSM elasticity based on the implied volatility of the option.</p>
+<div class="amsmath math notranslate nohighlight" id="equation-6fd8b486-a5ed-4334-b888-eca33b81f6ec">
+<span class="eqno">(1)<a class="headerlink" href="#equation-6fd8b486-a5ed-4334-b888-eca33b81f6ec" title="Permalink to this equation">#</a></span>\[\begin{align}
+\omega_{\text{BSM, Call}} &amp;= \frac{\partial C_{\text{BSM}}}{\partial S} \cdot \frac{S}{C_{\text{BSM}}} &gt; 1 \\
+\omega_{\text{BSM, Put}}  &amp;= \frac{\partial P_{\text{BSM}}}{\partial S} \cdot \frac{S}{P_{\text{BSM}}} &lt; -1
+\end{align}\]</div>
+<p>Each <strong>leverage-adjusted call portfolio</strong> comprises of a long position in a fraction of a call, and some investment in the risk-free rate.</p>
+<p>Each <strong>leverage-adjusted put portfolio</strong> comprises of a short position in a fraction of a put, and &gt;100% investment in the risk-free rate.</p>
+<p><font color="blue"><em>For clarity, we present below the mathematics behind CJS’ descriptions of the portfolio construction process. The following applies for a single trading day <span class="math notranslate nohighlight">\(t\)</span>, for a set of candidate call or put options. Portfolios in CJS are identified by 3 characteristics: option type (call or put), moneyness (9 discrete targets), and time to maturity (3 discrete targets). On any given day, it is rare to find options that exactly match the moneyness and maturity targets. Instead, there may be multiple options that are “close to” the target moneyness / maturity (each a <strong>“candidate option”</strong>). Furthermore, each candidate option has its own price and price sensitivity to changes in the underlying SPX index level. In order to arrive at a “price” for an option portfolio, CJS applies a <strong>Gaussian weighting kernel</strong> in moneyness and maturity, as described below. This kernel-weighted price across the candidate options on a given day is used as the price of the <strong>option component</strong> of the portfolio (the other component being the risk-free rate). This portfolio is leverage-adjusted using the BSM elasticity, in order to standardize the sensitivity of OTM and ITM portfolios to changes in the underlying.</em></font></p>
+<section id="gaussian-kernel-weighting">
+<h4>1. Gaussian Kernel Weighting<a class="headerlink" href="#gaussian-kernel-weighting" title="Link to this heading">#</a></h4>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(m_{i}\)</span> = moneyness of option <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tau_{i}\)</span> = days to maturity of option <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(k_{s}\)</span> = target moneyness</p></li>
+<li><p><span class="math notranslate nohighlight">\(\tau\)</span> = target maturity</p></li>
+<li><p><span class="math notranslate nohighlight">\(h_{m}\)</span>, <span class="math notranslate nohighlight">\(h_{\tau}\)</span> = bandwidths for moneyness and maturity</p></li>
+<li><p><span class="math notranslate nohighlight">\(d_{i}^2 = \left( \frac{m_{i} - k_{s}}{h_{m}} \right)^2 + \left( \frac{\tau_{i} - \tau}{h_{\tau}} \right)^2\)</span></p></li>
+</ul>
+<p>Then the unnormalized Gaussian weight for option <span class="math notranslate nohighlight">\(i\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[
+w_{i}^* = \exp\left( -\frac{1}{2} d_{i}^2 \right)
+\]</div>
+<p>The normalized kernel weight:</p>
+<div class="math notranslate nohighlight">
+\[
+w_{i} = \frac{w_{i}^*}{\sum_j w_j^*}
+\]</div>
+</section>
+<hr class="docutils" />
+<section id="option-elasticity">
+<h4>2. Option Elasticity<a class="headerlink" href="#option-elasticity" title="Link to this heading">#</a></h4>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(S_{t}\)</span> = underlying index level at time <span class="math notranslate nohighlight">\(t\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(P_{i}\)</span> = price of option <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\Delta_{i}\)</span> = option delta</p></li>
+</ul>
+<p>Then:</p>
+<div class="math notranslate nohighlight">
+\[
+\varepsilon_{i} = \frac{S_t \cdot \Delta_{i}}{P_{i}}
+\]</div>
+</section>
+<hr class="docutils" />
+<section id="arithmetic-return-of-option-i">
+<h4>3. Arithmetic Return of Option <span class="math notranslate nohighlight">\(i\)</span><a class="headerlink" href="#arithmetic-return-of-option-i" title="Link to this heading">#</a></h4>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(P_{i,t-1}\)</span> = price of option <span class="math notranslate nohighlight">\(i\)</span> at time <span class="math notranslate nohighlight">\(t-1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(P_{i,t}\)</span> = price of option <span class="math notranslate nohighlight">\(i\)</span> at time <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p>Then:</p>
+<div class="math notranslate nohighlight">
+\[
+r_{i} = \frac{P_{i,t} - P_{i,t-1}}{P_{i,t-1}}
+\]</div>
+</section>
+<hr class="docutils" />
+<section id="leverage-adjusted-portfolio-construction">
+<h4>4. Leverage-Adjusted Portfolio Construction<a class="headerlink" href="#leverage-adjusted-portfolio-construction" title="Link to this heading">#</a></h4>
+<p>Let:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(r_{f}\)</span> = risk-free rate on day <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p>The leverage-adjusted return of the call portfolio is:</p>
+<div class="math notranslate nohighlight">
+\[
+R_t^{call} = \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 - \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+\]</div>
+<p>The leverage-adjusted return of the put portfolio is:</p>
+<div class="math notranslate nohighlight">
+\[
+R_t^{put} = -\sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \cdot r_{i} + \left(1 + \sum_{i} w_{i} \cdot \frac{1}{\varepsilon_{i}} \right) \cdot r_f
+\]</div>
+<p>Below we implement this process.</p>
+</section>
+</section>
+<section id="implementation">
+<h3>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h3>
+<section id="build-the-ftsfa-id-for-each-portfolio">
+<h4>1. Build the FTSFA ID for each portfolio<a class="headerlink" href="#build-the-ftsfa-id-for-each-portfolio" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># identify the maturity ID based on the closest maturity to 30, 60, or 90 days</span>
+<span class="n">maturity_id</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;days_to_maturity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">days</span> <span class="o">-</span> <span class="mi">30</span><span class="p">),</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;days_to_maturity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">days</span> <span class="o">-</span> <span class="mi">60</span><span class="p">),</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;days_to_maturity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">days</span> <span class="o">-</span> <span class="mi">90</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">maturity_id</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span>
+<span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;maturity_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maturity_id</span><span class="o">.</span><span class="n">idxmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">]</span>
+    <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+    <span class="o">+</span> <span class="p">(</span><span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;moneyness_id&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+    <span class="o">+</span> <span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;maturity_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># set index to ftfsa_id and date</span>
+<span class="n">spx_filtered</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">spx_filtered</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>exdate</th>
+      <th>moneyness</th>
+      <th>secid</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>volume</th>
+      <th>open_interest</th>
+      <th>...</th>
+      <th>pc_parity_int_rate</th>
+      <th>intrinsic</th>
+      <th>log_iv</th>
+      <th>fitted_iv</th>
+      <th>rel_distance_iv</th>
+      <th>moneyness_bin</th>
+      <th>stdev_iv_moneyness_bin</th>
+      <th>is_outlier_iv</th>
+      <th>moneyness_id</th>
+      <th>maturity_id</th>
+    </tr>
+    <tr>
+      <th>ftfsa_id</th>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>C_1000_30</th>
+      <th>1996-01-04</th>
+      <td>1996-01-20</td>
+      <td>0.987534</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.082711</td>
+      <td>5.04</td>
+      <td>444.0</td>
+      <td>5905.0</td>
+      <td>...</td>
+      <td>0.015898</td>
+      <td>7.70</td>
+      <td>-2.492403</td>
+      <td>-2.377298</td>
+      <td>4.841838</td>
+      <td>(0.975, 1.0]</td>
+      <td>3.516840</td>
+      <td>False</td>
+      <td>1.000</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>C_1025_30</th>
+      <th>1996-01-04</th>
+      <td>1996-01-20</td>
+      <td>1.019913</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.097356</td>
+      <td>5.04</td>
+      <td>4022.0</td>
+      <td>5969.0</td>
+      <td>...</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.329381</td>
+      <td>-2.285771</td>
+      <td>1.907866</td>
+      <td>(1.0, 1.025]</td>
+      <td>5.219336</td>
+      <td>False</td>
+      <td>1.025</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">C_1050_30</th>
+      <th>1996-01-04</th>
+      <td>1996-01-20</td>
+      <td>1.028007</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.101756</td>
+      <td>5.04</td>
+      <td>1627.0</td>
+      <td>6224.0</td>
+      <td>...</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.285177</td>
+      <td>-2.264082</td>
+      <td>0.931727</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>1996-01-04</th>
+      <td>1996-01-20</td>
+      <td>1.036102</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.100588</td>
+      <td>5.04</td>
+      <td>0.0</td>
+      <td>6593.0</td>
+      <td>...</td>
+      <td>0.015898</td>
+      <td>0.00</td>
+      <td>-2.296722</td>
+      <td>-2.242870</td>
+      <td>2.401027</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>C_975_30</th>
+      <th>1996-01-04</th>
+      <td>1996-02-17</td>
+      <td>0.963251</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.071852</td>
+      <td>5.04</td>
+      <td>3.0</td>
+      <td>34.0</td>
+      <td>...</td>
+      <td>0.014622</td>
+      <td>22.70</td>
+      <td>-2.633147</td>
+      <td>-2.563785</td>
+      <td>2.705450</td>
+      <td>(0.95, 0.975]</td>
+      <td>2.301503</td>
+      <td>False</td>
+      <td>0.975</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>P_1050_90</th>
+      <th>2019-12-31</th>
+      <td>2020-06-19</td>
+      <td>1.044639</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.117063</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>395.0</td>
+      <td>...</td>
+      <td>0.014769</td>
+      <td>144.22</td>
+      <td>-2.145043</td>
+      <td>-2.132215</td>
+      <td>0.601630</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">P_1075_90</th>
+      <th>2019-12-31</th>
+      <td>2020-06-19</td>
+      <td>1.052377</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.113900</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>163.0</td>
+      <td>...</td>
+      <td>0.014769</td>
+      <td>169.22</td>
+      <td>-2.172434</td>
+      <td>-2.165558</td>
+      <td>0.317525</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>2019-12-31</th>
+      <td>2020-06-19</td>
+      <td>1.060116</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.110925</td>
+      <td>1.52</td>
+      <td>20.0</td>
+      <td>310.0</td>
+      <td>...</td>
+      <td>0.014769</td>
+      <td>194.22</td>
+      <td>-2.198901</td>
+      <td>-2.199596</td>
+      <td>-0.031616</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>2019-12-31</th>
+      <td>2020-06-19</td>
+      <td>1.067854</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.108540</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>12.0</td>
+      <td>...</td>
+      <td>0.014769</td>
+      <td>219.22</td>
+      <td>-2.220637</td>
+      <td>-2.234330</td>
+      <td>-0.612848</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>P_1100_90</th>
+      <th>2019-12-31</th>
+      <td>2020-06-19</td>
+      <td>1.075592</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.106814</td>
+      <td>1.52</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.014769</td>
+      <td>244.22</td>
+      <td>-2.236666</td>
+      <td>-2.269758</td>
+      <td>-1.457925</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+      <td>90</td>
+    </tr>
+  </tbody>
+</table>
+<p>2676696 rows × 26 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">portfolio_ids</span> <span class="o">=</span> <span class="n">spx_filtered</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="n">portfolio_ids</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;C_1000_30&#39;, &#39;C_1025_30&#39;, &#39;C_1050_30&#39;, &#39;C_975_30&#39;, &#39;C_1075_30&#39;,
+       &#39;C_950_60&#39;, &#39;C_975_60&#39;, &#39;C_1000_60&#39;, &#39;C_1025_60&#39;, &#39;C_1050_60&#39;,
+       &#39;C_1075_60&#39;, &#39;C_1100_30&#39;, &#39;C_900_60&#39;, &#39;C_925_60&#39;, &#39;C_950_30&#39;,
+       &#39;C_1100_60&#39;, &#39;C_925_30&#39;, &#39;C_900_30&#39;, &#39;C_900_90&#39;, &#39;C_925_90&#39;, &#39;C_950_90&#39;,
+       &#39;C_975_90&#39;, &#39;C_1050_90&#39;, &#39;C_1000_90&#39;, &#39;C_1025_90&#39;, &#39;C_1075_90&#39;,
+       &#39;C_1100_90&#39;, &#39;P_1000_30&#39;, &#39;P_1025_30&#39;, &#39;P_1050_30&#39;, &#39;P_975_30&#39;,
+       &#39;P_1075_30&#39;, &#39;P_950_60&#39;, &#39;P_975_60&#39;, &#39;P_1000_60&#39;, &#39;P_1025_60&#39;,
+       &#39;P_1050_60&#39;, &#39;P_1075_60&#39;, &#39;P_1100_30&#39;, &#39;P_900_60&#39;, &#39;P_925_60&#39;,
+       &#39;P_950_30&#39;, &#39;P_1100_60&#39;, &#39;P_925_30&#39;, &#39;P_900_30&#39;, &#39;P_900_90&#39;, &#39;P_925_90&#39;,
+       &#39;P_950_90&#39;, &#39;P_975_90&#39;, &#39;P_1050_90&#39;, &#39;P_1000_90&#39;, &#39;P_1025_90&#39;,
+       &#39;P_1075_90&#39;, &#39;P_1100_90&#39;],
+      dtype=&#39;object&#39;, name=&#39;ftfsa_id&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_filtered</span><span class="p">[</span><span class="s2">&quot;days_to_maturity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>count                       2676696
+mean     56 days 07:55:28.214186444
+std      36 days 18:30:26.100585916
+min                 7 days 00:00:00
+25%                29 days 00:00:00
+50%                49 days 00:00:00
+75%                74 days 00:00:00
+max               180 days 00:00:00
+Name: days_to_maturity, dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-option-elasticity-and-daily-kernel-weighting-for-candidate-options-for-each-portfolio">
+<h4>2. Calculate option elasticity and daily kernel weighting for candidate options for each portfolio.<a class="headerlink" href="#calculate-option-elasticity-and-daily-kernel-weighting-for-candidate-options-for-each-portfolio" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_mod</span> <span class="o">=</span> <span class="n">spx_filtered</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># calculate option delta and elasticity</span>
+<span class="n">spx_mod</span> <span class="o">=</span> <span class="n">calc_option_delta_elasticity</span><span class="p">(</span><span class="n">spx_mod</span><span class="p">)</span>
+<span class="c1"># calculate daily kernel weights for candidate options</span>
+<span class="n">spx_mod</span> <span class="o">=</span> <span class="n">calc_kernel_weights</span><span class="p">(</span><span class="n">spx_mod</span><span class="p">)</span>
+<span class="n">spx_mod</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ftfsa_id</th>
+      <th>date</th>
+      <th>exdate</th>
+      <th>moneyness</th>
+      <th>secid</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>...</th>
+      <th>rel_distance_iv</th>
+      <th>moneyness_bin</th>
+      <th>stdev_iv_moneyness_bin</th>
+      <th>is_outlier_iv</th>
+      <th>moneyness_id</th>
+      <th>maturity_id</th>
+      <th>option_delta</th>
+      <th>option_elasticity</th>
+      <th>days_to_maturity_int</th>
+      <th>kernel_weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>C_1000_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>0.987534</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.082711</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>4.841838</td>
+      <td>(0.975, 1.0]</td>
+      <td>3.516840</td>
+      <td>False</td>
+      <td>1.000</td>
+      <td>30</td>
+      <td>0.805272</td>
+      <td>48.826136</td>
+      <td>16</td>
+      <td>4.123556e-01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>C_1025_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.019913</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.097356</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>1.907866</td>
+      <td>(1.0, 1.025]</td>
+      <td>5.219336</td>
+      <td>False</td>
+      <td>1.025</td>
+      <td>30</td>
+      <td>0.198018</td>
+      <td>95.465702</td>
+      <td>16</td>
+      <td>1.000000e+00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C_1050_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.028007</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.101756</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>0.931727</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>30</td>
+      <td>0.118568</td>
+      <td>106.529727</td>
+      <td>16</td>
+      <td>2.829909e-01</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>C_1050_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.036102</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.100588</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>2.401027</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>30</td>
+      <td>0.058374</td>
+      <td>128.204965</td>
+      <td>16</td>
+      <td>7.170091e-01</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>C_975_30</td>
+      <td>1996-01-04</td>
+      <td>1996-02-17</td>
+      <td>0.963251</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.071852</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>2.705450</td>
+      <td>(0.95, 0.975]</td>
+      <td>2.301503</td>
+      <td>False</td>
+      <td>0.975</td>
+      <td>30</td>
+      <td>0.960529</td>
+      <td>23.041498</td>
+      <td>44</td>
+      <td>4.015525e-01</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2676691</th>
+      <td>P_1050_90</td>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.044639</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.117063</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>0.601630</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>90</td>
+      <td>-0.661333</td>
+      <td>-11.093570</td>
+      <td>171</td>
+      <td>5.365533e-16</td>
+    </tr>
+    <tr>
+      <th>2676692</th>
+      <td>P_1075_90</td>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.052377</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.113900</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>0.317525</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+      <td>90</td>
+      <td>-0.700041</td>
+      <td>-10.839582</td>
+      <td>171</td>
+      <td>1.775800e-16</td>
+    </tr>
+    <tr>
+      <th>2676693</th>
+      <td>P_1075_90</td>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.060116</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.110925</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-0.031616</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+      <td>90</td>
+      <td>-0.737984</td>
+      <td>-10.556841</td>
+      <td>171</td>
+      <td>4.495126e-16</td>
+    </tr>
+    <tr>
+      <th>2676694</th>
+      <td>P_1075_90</td>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.067854</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.108540</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-0.612848</td>
+      <td>(1.05, 1.075]</td>
+      <td>5.236635</td>
+      <td>False</td>
+      <td>1.075</td>
+      <td>90</td>
+      <td>-0.773579</td>
+      <td>-10.226122</td>
+      <td>171</td>
+      <td>7.756405e-16</td>
+    </tr>
+    <tr>
+      <th>2676695</th>
+      <td>P_1100_90</td>
+      <td>2019-12-31</td>
+      <td>2020-06-19</td>
+      <td>1.075592</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.106814</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-1.457925</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+      <td>90</td>
+      <td>-0.805867</td>
+      <td>-9.854573</td>
+      <td>171</td>
+      <td>3.015839e-16</td>
+    </tr>
+  </tbody>
+</table>
+<p>2676696 rows × 32 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Kernel weight check: All portfolios should sum to 1.0.&quot;</span><span class="p">)</span>
+<span class="n">spx_mod</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;ftfsa_id&quot;</span><span class="p">])[</span><span class="s2">&quot;kernel_weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Kernel weight check: All portfolios should sum to 1.0.
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>kernel_weight
+1.0    156522
+Name: count, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="remove-options-from-the-portfolio-with-weights-lower-than-1">
+<h4>3. Remove options from the portfolio with weights lower than 1%<a class="headerlink" href="#remove-options-from-the-portfolio-with-weights-lower-than-1" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spx_mod</span> <span class="o">=</span> <span class="n">spx_mod</span><span class="p">[</span><span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;kernel_weight&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.01</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">spx_mod</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ftfsa_id</th>
+      <th>date</th>
+      <th>exdate</th>
+      <th>moneyness</th>
+      <th>secid</th>
+      <th>open</th>
+      <th>close</th>
+      <th>cp_flag</th>
+      <th>IV</th>
+      <th>tb_m3</th>
+      <th>...</th>
+      <th>rel_distance_iv</th>
+      <th>moneyness_bin</th>
+      <th>stdev_iv_moneyness_bin</th>
+      <th>is_outlier_iv</th>
+      <th>moneyness_id</th>
+      <th>maturity_id</th>
+      <th>option_delta</th>
+      <th>option_elasticity</th>
+      <th>days_to_maturity_int</th>
+      <th>kernel_weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>C_1000_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>0.987534</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.082711</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>4.841838</td>
+      <td>(0.975, 1.0]</td>
+      <td>3.516840</td>
+      <td>False</td>
+      <td>1.000</td>
+      <td>30</td>
+      <td>0.805272</td>
+      <td>48.826136</td>
+      <td>16</td>
+      <td>0.412356</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>C_1025_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.019913</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.097356</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>1.907866</td>
+      <td>(1.0, 1.025]</td>
+      <td>5.219336</td>
+      <td>False</td>
+      <td>1.025</td>
+      <td>30</td>
+      <td>0.198018</td>
+      <td>95.465702</td>
+      <td>16</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C_1050_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.028007</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.101756</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>0.931727</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>30</td>
+      <td>0.118568</td>
+      <td>106.529727</td>
+      <td>16</td>
+      <td>0.282991</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>C_1050_30</td>
+      <td>1996-01-04</td>
+      <td>1996-01-20</td>
+      <td>1.036102</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.100588</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>2.401027</td>
+      <td>(1.025, 1.05]</td>
+      <td>4.396845</td>
+      <td>False</td>
+      <td>1.050</td>
+      <td>30</td>
+      <td>0.058374</td>
+      <td>128.204965</td>
+      <td>16</td>
+      <td>0.717009</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>C_975_30</td>
+      <td>1996-01-04</td>
+      <td>1996-02-17</td>
+      <td>0.963251</td>
+      <td>108105.0</td>
+      <td>621.32</td>
+      <td>617.70</td>
+      <td>C</td>
+      <td>0.071852</td>
+      <td>5.04</td>
+      <td>...</td>
+      <td>2.705450</td>
+      <td>(0.95, 0.975]</td>
+      <td>2.301503</td>
+      <td>False</td>
+      <td>0.975</td>
+      <td>30</td>
+      <td>0.960529</td>
+      <td>23.041498</td>
+      <td>44</td>
+      <td>0.401552</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1926209</th>
+      <td>P_1100_90</td>
+      <td>2019-12-31</td>
+      <td>2020-03-31</td>
+      <td>1.077139</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.102622</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-2.816445</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+      <td>90</td>
+      <td>-0.911590</td>
+      <td>-11.547335</td>
+      <td>91</td>
+      <td>0.066978</td>
+    </tr>
+    <tr>
+      <th>1926210</th>
+      <td>P_1100_90</td>
+      <td>2019-12-31</td>
+      <td>2020-03-31</td>
+      <td>1.080234</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.099399</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-2.052300</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+      <td>90</td>
+      <td>-0.927007</td>
+      <td>-11.357435</td>
+      <td>91</td>
+      <td>0.102163</td>
+    </tr>
+    <tr>
+      <th>1926211</th>
+      <td>P_1100_90</td>
+      <td>2019-12-31</td>
+      <td>2020-03-31</td>
+      <td>1.083330</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.102206</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-3.820268</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+      <td>90</td>
+      <td>-0.929031</td>
+      <td>-10.968371</td>
+      <td>91</td>
+      <td>0.146563</td>
+    </tr>
+    <tr>
+      <th>1926212</th>
+      <td>P_1100_90</td>
+      <td>2019-12-31</td>
+      <td>2020-03-31</td>
+      <td>1.091068</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.103736</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-5.884824</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+      <td>90</td>
+      <td>-0.943358</td>
+      <td>-10.241205</td>
+      <td>91</td>
+      <td>0.276281</td>
+    </tr>
+    <tr>
+      <th>1926213</th>
+      <td>P_1100_90</td>
+      <td>2019-12-31</td>
+      <td>2020-03-31</td>
+      <td>1.098806</td>
+      <td>108105.0</td>
+      <td>3215.18</td>
+      <td>3230.78</td>
+      <td>P</td>
+      <td>0.105558</td>
+      <td>1.52</td>
+      <td>...</td>
+      <td>-8.008885</td>
+      <td>(1.075, 1.1]</td>
+      <td>5.723928</td>
+      <td>False</td>
+      <td>1.100</td>
+      <td>90</td>
+      <td>-0.954434</td>
+      <td>-9.582242</td>
+      <td>91</td>
+      <td>0.355017</td>
+    </tr>
+  </tbody>
+</table>
+<p>1926214 rows × 32 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># check elasticity &gt; 1 for call options and &lt; -1 for put options</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Elasticity &gt; 1 for call options?&quot;</span><span class="p">)</span>
+<span class="n">spx_mod</span><span class="p">[</span><span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="s2">&quot;option_elasticity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()[</span><span class="s2">&quot;min&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.0</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Elasticity &gt; 1 for call options?
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.True_
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Elasticity &lt; -1 for put options?&quot;</span><span class="p">)</span>
+<span class="n">spx_mod</span><span class="p">[</span><span class="n">spx_mod</span><span class="p">[</span><span class="s2">&quot;cp_flag&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">][</span><span class="s2">&quot;option_elasticity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Elasticity &lt; -1 for put options?
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.True_
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-the-daily-arithmetic-return-and-the-leverage-adjusted-return-of-each-portfolio">
+<h4>4. Calculate the daily arithmetic return and the leverage-adjusted return of each portfolio.<a class="headerlink" href="#calculate-the-daily-arithmetic-return-and-the-leverage-adjusted-return-of-each-portfolio" title="Link to this heading">#</a></h4>
+<p>On each trading day, the return of a portfolio is calculated as the <u>weighted average return of the set of candidate options that comprise a single day’s option portfolio</u>. The weighting used is the Gaussian kernel weight calculated earlier. Thus the daily return from period <span class="math notranslate nohighlight">\(t\)</span> to <span class="math notranslate nohighlight">\(t+1\)</span> represents the return from holding a set of candidate options, weighted using the kernel weights as of <span class="math notranslate nohighlight">\(t\)</span>, from period <span class="math notranslate nohighlight">\(t\)</span> to <span class="math notranslate nohighlight">\(t+1\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">compute_cjs_return_leverage_investment</span><span class="p">(</span><span class="n">spx_mod</span><span class="p">)</span>
+
+<span class="c1"># Preview result</span>
+<span class="n">portfolio_returns</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;ftfsa_id&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">portfolio_returns</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
+    <span class="n">index</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;portfolio_return&quot;</span>
+<span class="p">)</span>
+<span class="c1"># daily_returns = pd.DataFrame(np.where(portfolio_returns &gt; 1.0, np.nan, portfolio_returns), index=portfolio_returns.index, columns=portfolio_returns.columns)</span>
+<span class="n">daily_returns</span> <span class="o">=</span> <span class="n">portfolio_returns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">daily_returns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>ftfsa_id</th>
+      <th>C_1000_30</th>
+      <th>C_1000_60</th>
+      <th>C_1000_90</th>
+      <th>C_1025_30</th>
+      <th>C_1025_60</th>
+      <th>C_1025_90</th>
+      <th>C_1050_30</th>
+      <th>C_1050_60</th>
+      <th>C_1050_90</th>
+      <th>C_1075_30</th>
+      <th>...</th>
+      <th>P_900_90</th>
+      <th>P_925_30</th>
+      <th>P_925_60</th>
+      <th>P_925_90</th>
+      <th>P_950_30</th>
+      <th>P_950_60</th>
+      <th>P_950_90</th>
+      <th>P_975_30</th>
+      <th>P_975_60</th>
+      <th>P_975_90</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1996-01-04</th>
+      <td>0.002171</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000198</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>-0.003106</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.003393</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1996-01-05</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>-0.002985</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.004674</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1996-01-09</th>
+      <td>-0.004362</td>
+      <td>-0.005736</td>
+      <td>NaN</td>
+      <td>0.011077</td>
+      <td>0.000193</td>
+      <td>NaN</td>
+      <td>0.039018</td>
+      <td>0.000195</td>
+      <td>NaN</td>
+      <td>0.008154</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000191</td>
+      <td>NaN</td>
+      <td>0.011241</td>
+      <td>0.007766</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1996-01-10</th>
+      <td>-0.001291</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>-0.003064</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>-0.005087</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1996-01-22</th>
+      <td>-0.002792</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>-0.004186</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.004054</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.016734</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019-12-24</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>-0.001959</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>0.000877</td>
+      <td>NaN</td>
+      <td>0.000702</td>
+      <td>-0.003096</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.007690</td>
+      <td>-0.007144</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2019-12-26</th>
+      <td>0.000177</td>
+      <td>-0.000588</td>
+      <td>-0.001565</td>
+      <td>0.049612</td>
+      <td>0.000451</td>
+      <td>-0.001096</td>
+      <td>0.001201</td>
+      <td>0.000729</td>
+      <td>NaN</td>
+      <td>0.001499</td>
+      <td>...</td>
+      <td>0.000925</td>
+      <td>0.000619</td>
+      <td>0.000816</td>
+      <td>0.001072</td>
+      <td>0.000456</td>
+      <td>0.000826</td>
+      <td>0.000696</td>
+      <td>0.002388</td>
+      <td>0.000837</td>
+      <td>0.000776</td>
+    </tr>
+    <tr>
+      <th>2019-12-27</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>0.001085</td>
+      <td>NaN</td>
+      <td>0.000463</td>
+      <td>0.002847</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.002921</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2019-12-30</th>
+      <td>0.000195</td>
+      <td>-0.000363</td>
+      <td>-0.000944</td>
+      <td>0.000539</td>
+      <td>0.000115</td>
+      <td>-0.001000</td>
+      <td>0.001502</td>
+      <td>-0.000179</td>
+      <td>-0.001638</td>
+      <td>0.000554</td>
+      <td>...</td>
+      <td>0.001061</td>
+      <td>0.000485</td>
+      <td>0.000862</td>
+      <td>0.000741</td>
+      <td>0.000373</td>
+      <td>0.000779</td>
+      <td>0.000816</td>
+      <td>0.000222</td>
+      <td>0.000845</td>
+      <td>0.001032</td>
+    </tr>
+    <tr>
+      <th>2019-12-31</th>
+      <td>0.000164</td>
+      <td>-0.000746</td>
+      <td>-0.001073</td>
+      <td>0.000216</td>
+      <td>-0.000542</td>
+      <td>-0.001064</td>
+      <td>0.000767</td>
+      <td>-0.000273</td>
+      <td>-0.000936</td>
+      <td>0.000142</td>
+      <td>...</td>
+      <td>0.000913</td>
+      <td>0.000537</td>
+      <td>0.000821</td>
+      <td>0.000914</td>
+      <td>0.000592</td>
+      <td>0.000825</td>
+      <td>0.000898</td>
+      <td>0.000382</td>
+      <td>0.000766</td>
+      <td>0.000936</td>
+    </tr>
+  </tbody>
+</table>
+<p>3740 rows × 54 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="to-be-implemented-filling-nans">
+<h4>5. (to be implemented) Filling NaNs<a class="headerlink" href="#to-be-implemented-filling-nans" title="Link to this heading">#</a></h4>
+<p>CJS implement an multi-step process to deal with options with missing prices (detailed in section <strong>1.3 Portfolio Formation</strong> of the paper). We reserve the implementation this NaN-filling process for a future version of this dataset. For the current version, we compound the daily portfolio returns into monthly returns, which is the final form of the data utilized in the paper.</p>
+</section>
+<section id="compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs">
+<h4>6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)<a class="headerlink" href="#compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs" title="Link to this heading">#</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cjs_returns</span> <span class="o">=</span> <span class="n">daily_returns</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;M&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">cjs_returns</span> <span class="o">=</span> <span class="n">cjs_returns</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span>
+    <span class="n">id_vars</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s2">&quot;return&quot;</span>
+<span class="p">)</span>
+<span class="n">cjs_returns</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cjs_&quot;</span> <span class="o">+</span> <span class="n">cjs_returns</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">]</span>
+<span class="n">cjs_returns</span> <span class="o">=</span> <span class="n">cjs_returns</span><span class="p">[[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;return&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="c1"># save to data directory</span>
+<span class="n">cjs_returns</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+    <span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cjs_portfolio_returns_</span><span class="si">{</span><span class="n">DATE_RANGE</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">cjs_returns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>return</th>
+    </tr>
+    <tr>
+      <th>ftfsa_id</th>
+      <th>date</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">cjs_C_1000_30</th>
+      <th>1996-01-31</th>
+      <td>-0.006272</td>
+    </tr>
+    <tr>
+      <th>1996-02-29</th>
+      <td>0.002888</td>
+    </tr>
+    <tr>
+      <th>1996-03-31</th>
+      <td>-0.002462</td>
+    </tr>
+    <tr>
+      <th>1996-04-30</th>
+      <td>0.036055</td>
+    </tr>
+    <tr>
+      <th>1996-05-31</th>
+      <td>0.003906</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">cjs_P_975_90</th>
+      <th>2019-08-31</th>
+      <td>0.007421</td>
+    </tr>
+    <tr>
+      <th>2019-09-30</th>
+      <td>0.000517</td>
+    </tr>
+    <tr>
+      <th>2019-10-31</th>
+      <td>0.138853</td>
+    </tr>
+    <tr>
+      <th>2019-11-30</th>
+      <td>0.009941</td>
+    </tr>
+    <tr>
+      <th>2019-12-31</th>
+      <td>0.007702</td>
+    </tr>
+  </tbody>
+</table>
+<p>15552 rows × 1 columns</p>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+<section id="construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017">
+<h2>Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)<a class="headerlink" href="#construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017" title="Link to this heading">#</a></h2>
+<p><em>HKM 2017</em> reduces the 54 portfolio return series constructed in CJS to 18 by taking an equal-weight average across the 3 maturities for the CJS portfolios with the same moneyness. Below we implement that procedure to obtain the final return series for the FTSFA.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hkm_returns</span> <span class="o">=</span> <span class="n">cjs_returns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">hkm_returns</span> <span class="o">=</span> <span class="n">hkm_returns</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">hkm_returns</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">moneyness_id</span><span class="o">=</span><span class="n">hkm_returns</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">]),</span>
+    <span class="n">maturity_id</span><span class="o">=</span><span class="n">hkm_returns</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]),</span>
+<span class="p">)</span>
+<span class="n">hkm_returns</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">hkm_returns</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;moneyness_id&quot;</span><span class="p">,</span> <span class="s2">&quot;maturity_id&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">hkm_returns</span> <span class="o">=</span> <span class="n">hkm_returns</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;moneyness_id&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">hkm_returns</span><span class="p">[</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;hkm_&quot;</span>
+    <span class="o">+</span> <span class="n">hkm_returns</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+    <span class="o">+</span> <span class="n">hkm_returns</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;moneyness_id&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">hkm_returns</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">hkm_returns</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;moneyness_id&quot;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="c1"># save to data directory</span>
+<span class="n">hkm_returns</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+    <span class="n">DATA_DIR</span> <span class="o">/</span> <span class="s2">&quot;options&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;hkm_portfolio_returns_</span><span class="si">{</span><span class="n">DATE_RANGE</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">hkm_returns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>return</th>
+    </tr>
+    <tr>
+      <th>ftfsa_id</th>
+      <th>date</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">hkm_C_1000</th>
+      <th>1996-01-31</th>
+      <td>-0.004002</td>
+    </tr>
+    <tr>
+      <th>1996-02-29</th>
+      <td>-0.000919</td>
+    </tr>
+    <tr>
+      <th>1996-03-31</th>
+      <td>-0.000821</td>
+    </tr>
+    <tr>
+      <th>1996-04-30</th>
+      <td>0.012018</td>
+    </tr>
+    <tr>
+      <th>1996-05-31</th>
+      <td>0.000912</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">hkm_P_975</th>
+      <th>2019-08-31</th>
+      <td>0.013859</td>
+    </tr>
+    <tr>
+      <th>2019-09-30</th>
+      <td>0.006864</td>
+    </tr>
+    <tr>
+      <th>2019-10-31</th>
+      <td>0.050960</td>
+    </tr>
+    <tr>
+      <th>2019-11-30</th>
+      <td>0.010639</td>
+    </tr>
+    <tr>
+      <th>2019-12-31</th>
+      <td>0.000444</td>
+    </tr>
+  </tbody>
+</table>
+<p>5184 rows × 1 columns</p>
+</div></div></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="portfolio-returns-analysis">
+<h2>Portfolio Returns Analysis<a class="headerlink" href="#portfolio-returns-analysis" title="Link to this heading">#</a></h2>
+<p>The objective of the data filtration process was to create portfolios whose returns were close to normal and only moderately skewed. Based on the process we implemented, we observed the following in the 54 CJS portfolios and 18 HKM portfolios.</p>
+<p><strong>Normality:</strong></p>
+<ul class="simple">
+<li><p><strong>CJS:</strong> virtually all portfolios reject normality.</p></li>
+<li><p><strong>HKM:</strong> a few portfolios might plausibly be normal (higher Jarque-Bera and Normaltest p-values).</p></li>
+</ul>
+<p><strong>Skewness:</strong> Both CJS and HKM have generally positive skew, with HKM portfolios showing a wider dispersion, with some portfolios extremely right-skewed.</p>
+<p><strong>Kurtosis:</strong></p>
+<ul class="simple">
+<li><p><strong>CJS:</strong> heavier tails on average (median 4.6).</p></li>
+<li><p><strong>HKM:</strong> median closer to normal (3.1), but with some extreme outliers (kurtosis &gt; 100).</p></li>
+</ul>
+<section id="tests-for-normality-of-returns-in-the-54-cjs-portfolios">
+<h3>Tests for Normality of Returns in the 54 CJS Portfolios<a class="headerlink" href="#tests-for-normality-of-returns-in-the-54-cjs-portfolios" title="Link to this heading">#</a></h3>
+<p>Distributions and Q-Q plots of the 54 CJS portfolios are shown below, based on the filtration and portfolio construction we have implemented.</p>
+<p><strong>Normality Tests (Shapiro, Jarque-Bera, Normaltest p-values):</strong> All means and medians ≈ 0, with maximums &lt; 0.05. This indicates systematic rejection of normality at conventional significance levels (1% and 5%) for essentially all portfolios. In other words: none of these return distributions look Gaussian.</p>
+<p><strong>Skewness:</strong> Mean skewness ≈ 1.64, median ≈ 0.77 → distributions tend to be right-skewed (long right tails). Wide spread (std ≈ 2.26; max ≈ 11.1, min ≈ -0.91) → some portfolios are extremely positively skewed, while a few have mild negative skew.</p>
+<p><strong>Kurtosis:</strong> Mean kurtosis ≈ 14.5, median ≈ 4.6 (close to normal’s 3, but slightly higher). Very large spread (std ≈ 23.8; max ≈ 152.7) → many distributions are leptokurtic (fat-tailed). Averages are pulled up by extreme outliers, meaning some portfolios experience rare but massive return shocks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">returns_df</span> <span class="o">=</span> <span class="n">cjs_returns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">returns_df</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;return&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Apply to returns dataframe</span>
+<span class="n">summary_df</span> <span class="o">=</span> <span class="n">normality_summary</span><span class="p">(</span><span class="n">returns_df</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">summary_df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">na_rep</span><span class="o">=</span><span class="s2">&quot;NaN&quot;</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">thousands</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+
+<span class="c1"># Plot histogram and QQ plot for each series</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">returns_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Histogram with KDE: </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">stats</span><span class="o">.</span><span class="n">probplot</span><span class="p">(</span><span class="n">returns_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q-Q Plot: </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_7220f">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_7220f_level0_col0" class="col_heading level0 col0" >Shapiro_p</th>
+      <th id="T_7220f_level0_col1" class="col_heading level0 col1" >JarqueBera_p</th>
+      <th id="T_7220f_level0_col2" class="col_heading level0 col2" >Normaltest_p</th>
+      <th id="T_7220f_level0_col3" class="col_heading level0 col3" >Skewness</th>
+      <th id="T_7220f_level0_col4" class="col_heading level0 col4" >Kurtosis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_7220f_level0_row0" class="row_heading level0 row0" >count</th>
+      <td id="T_7220f_row0_col0" class="data row0 col0" >54.00000</td>
+      <td id="T_7220f_row0_col1" class="data row0 col1" >54.00000</td>
+      <td id="T_7220f_row0_col2" class="data row0 col2" >54.00000</td>
+      <td id="T_7220f_row0_col3" class="data row0 col3" >54.00000</td>
+      <td id="T_7220f_row0_col4" class="data row0 col4" >54.00000</td>
+    </tr>
+    <tr>
+      <th id="T_7220f_level0_row1" class="row_heading level0 row1" >mean</th>
+      <td id="T_7220f_row1_col0" class="data row1 col0" >0.00000</td>
+      <td id="T_7220f_row1_col1" class="data row1 col1" >0.00228</td>
+      <td id="T_7220f_row1_col2" class="data row1 col2" >0.00276</td>
+      <td id="T_7220f_row1_col3" class="data row1 col3" >1.63759</td>
+      <td id="T_7220f_row1_col4" class="data row1 col4" >14.52659</td>
+    </tr>
+    <tr>
+      <th id="T_7220f_level0_row2" class="row_heading level0 row2" >std</th>
+      <td id="T_7220f_row2_col0" class="data row2 col0" >0.00000</td>
+      <td id="T_7220f_row2_col1" class="data row2 col1" >0.00805</td>
+      <td id="T_7220f_row2_col2" class="data row2 col2" >0.00801</td>
+      <td id="T_7220f_row2_col3" class="data row2 col3" >2.25902</td>
+      <td id="T_7220f_row2_col4" class="data row2 col4" >23.79816</td>
+    </tr>
+    <tr>
+      <th id="T_7220f_level0_row3" class="row_heading level0 row3" >min</th>
+      <td id="T_7220f_row3_col0" class="data row3 col0" >0.00000</td>
+      <td id="T_7220f_row3_col1" class="data row3 col1" >0.00000</td>
+      <td id="T_7220f_row3_col2" class="data row3 col2" >0.00000</td>
+      <td id="T_7220f_row3_col3" class="data row3 col3" >-0.90799</td>
+      <td id="T_7220f_row3_col4" class="data row3 col4" >1.83906</td>
+    </tr>
+    <tr>
+      <th id="T_7220f_level0_row4" class="row_heading level0 row4" >25%</th>
+      <td id="T_7220f_row4_col0" class="data row4 col0" >0.00000</td>
+      <td id="T_7220f_row4_col1" class="data row4 col1" >0.00000</td>
+      <td id="T_7220f_row4_col2" class="data row4 col2" >0.00000</td>
+      <td id="T_7220f_row4_col3" class="data row4 col3" >0.22364</td>
+      <td id="T_7220f_row4_col4" class="data row4 col4" >2.98662</td>
+    </tr>
+    <tr>
+      <th id="T_7220f_level0_row5" class="row_heading level0 row5" >50%</th>
+      <td id="T_7220f_row5_col0" class="data row5 col0" >0.00000</td>
+      <td id="T_7220f_row5_col1" class="data row5 col1" >0.00000</td>
+      <td id="T_7220f_row5_col2" class="data row5 col2" >0.00000</td>
+      <td id="T_7220f_row5_col3" class="data row5 col3" >0.77120</td>
+      <td id="T_7220f_row5_col4" class="data row5 col4" >4.61425</td>
+    </tr>
+    <tr>
+      <th id="T_7220f_level0_row6" class="row_heading level0 row6" >75%</th>
+      <td id="T_7220f_row6_col0" class="data row6 col0" >0.00000</td>
+      <td id="T_7220f_row6_col1" class="data row6 col1" >0.00000</td>
+      <td id="T_7220f_row6_col2" class="data row6 col2" >0.00003</td>
+      <td id="T_7220f_row6_col3" class="data row6 col3" >2.87608</td>
+      <td id="T_7220f_row6_col4" class="data row6 col4" >18.37195</td>
+    </tr>
+    <tr>
+      <th id="T_7220f_level0_row7" class="row_heading level0 row7" >max</th>
+      <td id="T_7220f_row7_col0" class="data row7 col0" >0.00000</td>
+      <td id="T_7220f_row7_col1" class="data row7 col1" >0.04874</td>
+      <td id="T_7220f_row7_col2" class="data row7 col2" >0.04428</td>
+      <td id="T_7220f_row7_col3" class="data row7 col3" >11.10561</td>
+      <td id="T_7220f_row7_col4" class="data row7 col4" >152.67355</td>
+    </tr>
+  </tbody>
+</table>
+</div><img alt="../_images/e65c53c1894bde5e09ede6145cac6dd3bba36f798b79da68958e746842d8c5f3.png" src="../_images/e65c53c1894bde5e09ede6145cac6dd3bba36f798b79da68958e746842d8c5f3.png" />
+<img alt="../_images/6674a0f8e21889400071f13bc5b9ec542a60d1fa7d3ddb6ef130f64a37328e41.png" src="../_images/6674a0f8e21889400071f13bc5b9ec542a60d1fa7d3ddb6ef130f64a37328e41.png" />
+<img alt="../_images/c988399e46662726772cb952548be98df4ef64444303076c5646213a5b56a626.png" src="../_images/c988399e46662726772cb952548be98df4ef64444303076c5646213a5b56a626.png" />
+<img alt="../_images/6c30002c29dd2cb69d19888e3cbcbc78b32ff9b523af1119cb02de620e47e1cb.png" src="../_images/6c30002c29dd2cb69d19888e3cbcbc78b32ff9b523af1119cb02de620e47e1cb.png" />
+<img alt="../_images/dcc7e95358e9eb12cb19fb697ea2207a56b26e23676344b180a674db7158ca92.png" src="../_images/dcc7e95358e9eb12cb19fb697ea2207a56b26e23676344b180a674db7158ca92.png" />
+<img alt="../_images/29cabbe8e92eb62566d00b364a60b0d7f6f3bf2b90d9d103771eb0dc12a919f0.png" src="../_images/29cabbe8e92eb62566d00b364a60b0d7f6f3bf2b90d9d103771eb0dc12a919f0.png" />
+<img alt="../_images/b6df65bfb1e071c4c5374c0998891f92e224088a1943a049c59ef31076643682.png" src="../_images/b6df65bfb1e071c4c5374c0998891f92e224088a1943a049c59ef31076643682.png" />
+<img alt="../_images/b97715c39da273ca7326678fdc2913eddd8df81037c4b5fc90976fa50ff77dcb.png" src="../_images/b97715c39da273ca7326678fdc2913eddd8df81037c4b5fc90976fa50ff77dcb.png" />
+<img alt="../_images/6eb86d64daac5a616282f6511b2c4441ad1619ec811607a00adea9890481fb9a.png" src="../_images/6eb86d64daac5a616282f6511b2c4441ad1619ec811607a00adea9890481fb9a.png" />
+<img alt="../_images/98198a529b4505687f1b4607f7ddd4c2bf694d1228fc2eedb0cc3de9e3a758ee.png" src="../_images/98198a529b4505687f1b4607f7ddd4c2bf694d1228fc2eedb0cc3de9e3a758ee.png" />
+<img alt="../_images/42b90946ec2d30adc173616baaf0f136f02a370a9ea0b965f087ce0b1f6ba19b.png" src="../_images/42b90946ec2d30adc173616baaf0f136f02a370a9ea0b965f087ce0b1f6ba19b.png" />
+<img alt="../_images/b08c115d9143463631763d1f2a3f95c04194d9408d7f8dd1312cffb50cad7536.png" src="../_images/b08c115d9143463631763d1f2a3f95c04194d9408d7f8dd1312cffb50cad7536.png" />
+<img alt="../_images/8fefa60b798dbd014097be01e82e18489036d194ad746f78f466f15d27d21634.png" src="../_images/8fefa60b798dbd014097be01e82e18489036d194ad746f78f466f15d27d21634.png" />
+<img alt="../_images/cd62d8be9f053af6776fe97eb5022b9f5e7f14841142399f34b63a97336554d6.png" src="../_images/cd62d8be9f053af6776fe97eb5022b9f5e7f14841142399f34b63a97336554d6.png" />
+<img alt="../_images/9b1282167f10d12f2fdc07784b257d977dfec5be5064449b981d64942751933c.png" src="../_images/9b1282167f10d12f2fdc07784b257d977dfec5be5064449b981d64942751933c.png" />
+<img alt="../_images/5ea95ca8889204729ba415a7e4b4be1e0aac9ab9fc3a2a6affae88890d3ffa4b.png" src="../_images/5ea95ca8889204729ba415a7e4b4be1e0aac9ab9fc3a2a6affae88890d3ffa4b.png" />
+<img alt="../_images/e78436bc557c4d61509be26732968b5dbbb8244897e96313059a72e92581f98d.png" src="../_images/e78436bc557c4d61509be26732968b5dbbb8244897e96313059a72e92581f98d.png" />
+<img alt="../_images/60c91e0069c43949b93236935311aab0bdb23435d15628f5afbfbd98c8d1dc6c.png" src="../_images/60c91e0069c43949b93236935311aab0bdb23435d15628f5afbfbd98c8d1dc6c.png" />
+<img alt="../_images/a36da2786bd4d5146afbfcc42badc4abe31a83f50d1e4a6fa5c31572750d60c2.png" src="../_images/a36da2786bd4d5146afbfcc42badc4abe31a83f50d1e4a6fa5c31572750d60c2.png" />
+<img alt="../_images/1af695d55d7da48433bd35b61e00bceef61fb029cd7c44056ea9a67e96705239.png" src="../_images/1af695d55d7da48433bd35b61e00bceef61fb029cd7c44056ea9a67e96705239.png" />
+<img alt="../_images/ec32533a6be890771d69118b180ef99cc7f956147f97b75a0877cff7e75ee00c.png" src="../_images/ec32533a6be890771d69118b180ef99cc7f956147f97b75a0877cff7e75ee00c.png" />
+<img alt="../_images/ea8a36b6d87db768607dd1b3e7d24d99b65b776fcedcd0f84ba08208b5cbc998.png" src="../_images/ea8a36b6d87db768607dd1b3e7d24d99b65b776fcedcd0f84ba08208b5cbc998.png" />
+<img alt="../_images/ccd35481992f6521138d8e6a2e4281b051e6fbebbae426487f80436a26871842.png" src="../_images/ccd35481992f6521138d8e6a2e4281b051e6fbebbae426487f80436a26871842.png" />
+<img alt="../_images/08f5f63c36dcc8eae7c8d0ad0e4b383aede9eb5fe7ff49443c62c1485166b8f7.png" src="../_images/08f5f63c36dcc8eae7c8d0ad0e4b383aede9eb5fe7ff49443c62c1485166b8f7.png" />
+<img alt="../_images/208e7dea42d65d924885400de1f42a006ddc698311a212bb99293059a3c64353.png" src="../_images/208e7dea42d65d924885400de1f42a006ddc698311a212bb99293059a3c64353.png" />
+<img alt="../_images/2577b782e5178fba7af3a496402d959fbd4faa5b7df3c6900d179a05e23559e2.png" src="../_images/2577b782e5178fba7af3a496402d959fbd4faa5b7df3c6900d179a05e23559e2.png" />
+<img alt="../_images/67fc242927256b1124ea9fb3deab41509fabb90bdbd4dfc451651a1d6da110ac.png" src="../_images/67fc242927256b1124ea9fb3deab41509fabb90bdbd4dfc451651a1d6da110ac.png" />
+<img alt="../_images/315c3b7c9deb6926d4b8bfd6fac823bd8e7c97c2f234e218ec0c183989bcad6f.png" src="../_images/315c3b7c9deb6926d4b8bfd6fac823bd8e7c97c2f234e218ec0c183989bcad6f.png" />
+<img alt="../_images/1247dfc738e4635c83e11e911d90fda79a15ff82ea7565a967d60c7e7cc9749e.png" src="../_images/1247dfc738e4635c83e11e911d90fda79a15ff82ea7565a967d60c7e7cc9749e.png" />
+<img alt="../_images/d7a1b58df0c34174065279ba07ce4f0c8b6ca611f60bc02f44242b64d2cb8aec.png" src="../_images/d7a1b58df0c34174065279ba07ce4f0c8b6ca611f60bc02f44242b64d2cb8aec.png" />
+<img alt="../_images/ab61e3327e3574c17ada00bc67bb4cddf970ec544ffdbc3d94a347ff2b2a9aa3.png" src="../_images/ab61e3327e3574c17ada00bc67bb4cddf970ec544ffdbc3d94a347ff2b2a9aa3.png" />
+<img alt="../_images/566f49209a0b304181faf705198dcc7665ac4626bef6e34ee3569e204d4e47d9.png" src="../_images/566f49209a0b304181faf705198dcc7665ac4626bef6e34ee3569e204d4e47d9.png" />
+<img alt="../_images/5a029c227b14ee6d180b0fc5807ea29ef261b8b37f2851906643529304595106.png" src="../_images/5a029c227b14ee6d180b0fc5807ea29ef261b8b37f2851906643529304595106.png" />
+<img alt="../_images/a1a227076a8f5ecaaf35c957c1e60410425efa7bf1688a0ab57160eece609f70.png" src="../_images/a1a227076a8f5ecaaf35c957c1e60410425efa7bf1688a0ab57160eece609f70.png" />
+<img alt="../_images/cc06fbcce464c5515c82054255d128fddb8f15e47bed013cae4f0b8e717ce324.png" src="../_images/cc06fbcce464c5515c82054255d128fddb8f15e47bed013cae4f0b8e717ce324.png" />
+<img alt="../_images/21515224b26475c87c64bcea4781fe291e6bea42da0dc1bc85983b1ab22efd28.png" src="../_images/21515224b26475c87c64bcea4781fe291e6bea42da0dc1bc85983b1ab22efd28.png" />
+<img alt="../_images/16b15126b81b90830fa973d88466fcf0c82e220d22e177d5b1500241ba5d405f.png" src="../_images/16b15126b81b90830fa973d88466fcf0c82e220d22e177d5b1500241ba5d405f.png" />
+<img alt="../_images/3718477508c45e8eac28715598be0c6e8f24e6c752f7901d7356ad964fe17fda.png" src="../_images/3718477508c45e8eac28715598be0c6e8f24e6c752f7901d7356ad964fe17fda.png" />
+<img alt="../_images/aaf5fa8123ae7e7998a1c4932d246bfa72704ab3dca5cb9ab43cbaf7dbddea8a.png" src="../_images/aaf5fa8123ae7e7998a1c4932d246bfa72704ab3dca5cb9ab43cbaf7dbddea8a.png" />
+<img alt="../_images/0cf7abc593664dd91ded41e9dfdb8d903b4fd7b1d894fdf517d90448e1c01297.png" src="../_images/0cf7abc593664dd91ded41e9dfdb8d903b4fd7b1d894fdf517d90448e1c01297.png" />
+<img alt="../_images/77ad1e82f2db494fac063395b3a9d60f60d420a7fbbe8132df3acac94c6a40e7.png" src="../_images/77ad1e82f2db494fac063395b3a9d60f60d420a7fbbe8132df3acac94c6a40e7.png" />
+<img alt="../_images/b0d6c67f3c9a239bc29049fea43d4da45af1f990bdc926240ee78a3cca46a903.png" src="../_images/b0d6c67f3c9a239bc29049fea43d4da45af1f990bdc926240ee78a3cca46a903.png" />
+<img alt="../_images/1c7d1bfeff900f2d0f475ccd36a4a4eb0a2d487e9724dd19f76435de6778cab7.png" src="../_images/1c7d1bfeff900f2d0f475ccd36a4a4eb0a2d487e9724dd19f76435de6778cab7.png" />
+<img alt="../_images/6cef7ac035c5db1e39c6e4899f98c865b8baea7abbfe18c45da5e438e0d9fe39.png" src="../_images/6cef7ac035c5db1e39c6e4899f98c865b8baea7abbfe18c45da5e438e0d9fe39.png" />
+<img alt="../_images/07ecd78864fc9a28b7447a66e105c1be2c7bcd0063a63b644fe5a3248c2196e5.png" src="../_images/07ecd78864fc9a28b7447a66e105c1be2c7bcd0063a63b644fe5a3248c2196e5.png" />
+<img alt="../_images/13abb94ecc7d066efb69cc4cf1cb6be936d8d4a867a2456726673eea7e0d1694.png" src="../_images/13abb94ecc7d066efb69cc4cf1cb6be936d8d4a867a2456726673eea7e0d1694.png" />
+<img alt="../_images/a5d9b5068a1c42368640dbc08066c03af97785695ed5e2296c961207bffbfb89.png" src="../_images/a5d9b5068a1c42368640dbc08066c03af97785695ed5e2296c961207bffbfb89.png" />
+<img alt="../_images/6fb498c39906acfd9035942904aae53b0c075f247a714a1f274ab841a918dceb.png" src="../_images/6fb498c39906acfd9035942904aae53b0c075f247a714a1f274ab841a918dceb.png" />
+<img alt="../_images/097b5f3b5a8d06a10c910c29c7e01551a0fd56efea878119dda9fa4ae10a4bcb.png" src="../_images/097b5f3b5a8d06a10c910c29c7e01551a0fd56efea878119dda9fa4ae10a4bcb.png" />
+<img alt="../_images/0e3be4bb6bd73c240d191d1efdbf3aeb42b145a9dfb84ac2cf7a63165545be17.png" src="../_images/0e3be4bb6bd73c240d191d1efdbf3aeb42b145a9dfb84ac2cf7a63165545be17.png" />
+<img alt="../_images/11a4993e92535ca1e49ee22d23d09c321f5e504006e7a3a8df3e9c263c3d2075.png" src="../_images/11a4993e92535ca1e49ee22d23d09c321f5e504006e7a3a8df3e9c263c3d2075.png" />
+<img alt="../_images/4829d0e23d2fcf57b4c852a032a032f7cf4e02cd792619a5d3ff9198e5003bce.png" src="../_images/4829d0e23d2fcf57b4c852a032a032f7cf4e02cd792619a5d3ff9198e5003bce.png" />
+<img alt="../_images/66dfcfa06940e9cd636b43dba72cd7bc0bd30264d7117bb84fbe90795ec676bb.png" src="../_images/66dfcfa06940e9cd636b43dba72cd7bc0bd30264d7117bb84fbe90795ec676bb.png" />
+<img alt="../_images/74518342fce5a8d811a449e746aed7d4db878915df50ceb2373d8aeb20a23cc6.png" src="../_images/74518342fce5a8d811a449e746aed7d4db878915df50ceb2373d8aeb20a23cc6.png" />
+</div>
+</div>
+<hr class="docutils" />
+</section>
+<section id="tests-for-normality-of-returns-in-the-18-hkm-portfolios">
+<h3>Tests for Normality of Returns in the 18 HKM Portfolios<a class="headerlink" href="#tests-for-normality-of-returns-in-the-18-hkm-portfolios" title="Link to this heading">#</a></h3>
+<p>Distributions and Q-Q plots of the 18 HKM portfolios are shown below, based on the filtration and portfolio construction we have implemented.</p>
+<p><strong>Normality Tests:</strong></p>
+<ul class="simple">
+<li><p><strong>Shapiro p-values:</strong> all 0 → normality always rejected.</p></li>
+<li><p><strong>Jarque-Bera &amp; Normaltest p-values:</strong> means ~0.05, with maximums up to ~0.70 and ~0.61 respectively. Some portfolios do not reject normality at the 5% level, unlike the first dataset (where rejection was universal). Suggests a few return distributions here are closer to Gaussian, but the majority still deviate.</p></li>
+</ul>
+<p><strong>Skewness:</strong> Mean ≈ 1.87, median ≈ 0.78, similar to the first set (mean ≈ 1.64). Distribution wider: standard deviation ≈ 2.64, maximum ≈ 9.8. Takeaway: again, portfolios are generally positively skewed, with several highly right-tailed portfolios.</p>
+<p><strong>Kurtosis:</strong> Mean ≈ 16.8, median ≈ 3.1. This median is much closer to normal (3.0) than in the first dataset (median ≈ 4.6). Spread large (std ≈ 30.3, max ≈ 129.3) → still evidence of extreme fat tails in some cases, but fewer portfolios appear strongly leptokurtic compared to the first set. Comparison with the 54-Portfolios Set</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">returns_df</span> <span class="o">=</span> <span class="n">hkm_returns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">returns_df</span> <span class="o">=</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;ftfsa_id&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;return&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Apply to returns dataframe</span>
+<span class="n">summary_df</span> <span class="o">=</span> <span class="n">normality_summary</span><span class="p">(</span><span class="n">returns_df</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">summary_df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">na_rep</span><span class="o">=</span><span class="s2">&quot;NaN&quot;</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">thousands</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+
+<span class="c1"># Plot histogram and QQ plot for each series</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">returns_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">returns_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Histogram with KDE: </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">stats</span><span class="o">.</span><span class="n">probplot</span><span class="p">(</span><span class="n">returns_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q-Q Plot: </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_3f94b">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_3f94b_level0_col0" class="col_heading level0 col0" >Shapiro_p</th>
+      <th id="T_3f94b_level0_col1" class="col_heading level0 col1" >JarqueBera_p</th>
+      <th id="T_3f94b_level0_col2" class="col_heading level0 col2" >Normaltest_p</th>
+      <th id="T_3f94b_level0_col3" class="col_heading level0 col3" >Skewness</th>
+      <th id="T_3f94b_level0_col4" class="col_heading level0 col4" >Kurtosis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_3f94b_level0_row0" class="row_heading level0 row0" >count</th>
+      <td id="T_3f94b_row0_col0" class="data row0 col0" >18.00000</td>
+      <td id="T_3f94b_row0_col1" class="data row0 col1" >18.00000</td>
+      <td id="T_3f94b_row0_col2" class="data row0 col2" >18.00000</td>
+      <td id="T_3f94b_row0_col3" class="data row0 col3" >18.00000</td>
+      <td id="T_3f94b_row0_col4" class="data row0 col4" >18.00000</td>
+    </tr>
+    <tr>
+      <th id="T_3f94b_level0_row1" class="row_heading level0 row1" >mean</th>
+      <td id="T_3f94b_row1_col0" class="data row1 col0" >0.00000</td>
+      <td id="T_3f94b_row1_col1" class="data row1 col1" >0.05090</td>
+      <td id="T_3f94b_row1_col2" class="data row1 col2" >0.04631</td>
+      <td id="T_3f94b_row1_col3" class="data row1 col3" >1.86917</td>
+      <td id="T_3f94b_row1_col4" class="data row1 col4" >16.77614</td>
+    </tr>
+    <tr>
+      <th id="T_3f94b_level0_row2" class="row_heading level0 row2" >std</th>
+      <td id="T_3f94b_row2_col0" class="data row2 col0" >0.00000</td>
+      <td id="T_3f94b_row2_col1" class="data row2 col1" >0.16958</td>
+      <td id="T_3f94b_row2_col2" class="data row2 col2" >0.15018</td>
+      <td id="T_3f94b_row2_col3" class="data row2 col3" >2.64475</td>
+      <td id="T_3f94b_row2_col4" class="data row2 col4" >30.26227</td>
+    </tr>
+    <tr>
+      <th id="T_3f94b_level0_row3" class="row_heading level0 row3" >min</th>
+      <td id="T_3f94b_row3_col0" class="data row3 col0" >0.00000</td>
+      <td id="T_3f94b_row3_col1" class="data row3 col1" >0.00000</td>
+      <td id="T_3f94b_row3_col2" class="data row3 col2" >0.00000</td>
+      <td id="T_3f94b_row3_col3" class="data row3 col3" >-0.70095</td>
+      <td id="T_3f94b_row3_col4" class="data row3 col4" >1.84262</td>
+    </tr>
+    <tr>
+      <th id="T_3f94b_level0_row4" class="row_heading level0 row4" >25%</th>
+      <td id="T_3f94b_row4_col0" class="data row4 col0" >0.00000</td>
+      <td id="T_3f94b_row4_col1" class="data row4 col1" >0.00000</td>
+      <td id="T_3f94b_row4_col2" class="data row4 col2" >0.00000</td>
+      <td id="T_3f94b_row4_col3" class="data row4 col3" >0.08527</td>
+      <td id="T_3f94b_row4_col4" class="data row4 col4" >2.46929</td>
+    </tr>
+    <tr>
+      <th id="T_3f94b_level0_row5" class="row_heading level0 row5" >50%</th>
+      <td id="T_3f94b_row5_col0" class="data row5 col0" >0.00000</td>
+      <td id="T_3f94b_row5_col1" class="data row5 col1" >0.00000</td>
+      <td id="T_3f94b_row5_col2" class="data row5 col2" >0.00000</td>
+      <td id="T_3f94b_row5_col3" class="data row5 col3" >0.77842</td>
+      <td id="T_3f94b_row5_col4" class="data row5 col4" >3.09835</td>
+    </tr>
+    <tr>
+      <th id="T_3f94b_level0_row6" class="row_heading level0 row6" >75%</th>
+      <td id="T_3f94b_row6_col0" class="data row6 col0" >0.00000</td>
+      <td id="T_3f94b_row6_col1" class="data row6 col1" >0.00001</td>
+      <td id="T_3f94b_row6_col2" class="data row6 col2" >0.00000</td>
+      <td id="T_3f94b_row6_col3" class="data row6 col3" >3.12405</td>
+      <td id="T_3f94b_row6_col4" class="data row6 col4" >20.20166</td>
+    </tr>
+    <tr>
+      <th id="T_3f94b_level0_row7" class="row_heading level0 row7" >max</th>
+      <td id="T_3f94b_row7_col0" class="data row7 col0" >0.00000</td>
+      <td id="T_3f94b_row7_col1" class="data row7 col1" >0.69876</td>
+      <td id="T_3f94b_row7_col2" class="data row7 col2" >0.60995</td>
+      <td id="T_3f94b_row7_col3" class="data row7 col3" >9.83980</td>
+      <td id="T_3f94b_row7_col4" class="data row7 col4" >129.33881</td>
+    </tr>
+  </tbody>
+</table>
+</div><img alt="../_images/e97f692a673f7a1184196441a59469d0f9c4f2ee25f533ac72866b23acf5cead.png" src="../_images/e97f692a673f7a1184196441a59469d0f9c4f2ee25f533ac72866b23acf5cead.png" />
+<img alt="../_images/c71a3d718672a23f3df104f13b5e39551eede83e53d705d325965d63a9bca6d4.png" src="../_images/c71a3d718672a23f3df104f13b5e39551eede83e53d705d325965d63a9bca6d4.png" />
+<img alt="../_images/2a19ec0348cf977b880647d0096c3fc14d4479cc9565bb1dc36124989b7a7e1d.png" src="../_images/2a19ec0348cf977b880647d0096c3fc14d4479cc9565bb1dc36124989b7a7e1d.png" />
+<img alt="../_images/d3a3eca5685d5adbc51bfee6d9533aca31bdbb5509884f6283f3e02bdcf37fbe.png" src="../_images/d3a3eca5685d5adbc51bfee6d9533aca31bdbb5509884f6283f3e02bdcf37fbe.png" />
+<img alt="../_images/bf87578e3e29823f4947db70004166ea7783dff8ee8cb6f4061dc6ff4e321372.png" src="../_images/bf87578e3e29823f4947db70004166ea7783dff8ee8cb6f4061dc6ff4e321372.png" />
+<img alt="../_images/068b5b8eda66678d39c64b8baeb9df70b2205ad433fdcd3ba3d812f97c663f0b.png" src="../_images/068b5b8eda66678d39c64b8baeb9df70b2205ad433fdcd3ba3d812f97c663f0b.png" />
+<img alt="../_images/a416e76b5c2fe8207dc8de764e1bf7d47bcd58d29b0adcd4fcc0377c68fcd527.png" src="../_images/a416e76b5c2fe8207dc8de764e1bf7d47bcd58d29b0adcd4fcc0377c68fcd527.png" />
+<img alt="../_images/fb42b30af8697ac0ccd60bcf1e5e807e7d1261c4c69372256347139c8612b798.png" src="../_images/fb42b30af8697ac0ccd60bcf1e5e807e7d1261c4c69372256347139c8612b798.png" />
+<img alt="../_images/3a09e6e2db6b169b2891942a452fa678205381e1c3c41efd0d58bb72318139fb.png" src="../_images/3a09e6e2db6b169b2891942a452fa678205381e1c3c41efd0d58bb72318139fb.png" />
+<img alt="../_images/b5ff7facdd1cf6b68e9876171d2714587229448bd3f4f6c36962f2a9b7d902d5.png" src="../_images/b5ff7facdd1cf6b68e9876171d2714587229448bd3f4f6c36962f2a9b7d902d5.png" />
+<img alt="../_images/a50eb6f2be9e9709cb08c7cf6d05590a4406add2eaf087d5ab74c2645a581ebe.png" src="../_images/a50eb6f2be9e9709cb08c7cf6d05590a4406add2eaf087d5ab74c2645a581ebe.png" />
+<img alt="../_images/db28bed4da568bf538985bdb7c710480b090265826c99ae06cc51b8d69dbe95f.png" src="../_images/db28bed4da568bf538985bdb7c710480b090265826c99ae06cc51b8d69dbe95f.png" />
+<img alt="../_images/f4420a70bca2812583df79902fc7d1cc7e893667c05ac55e77daa1bed57553ee.png" src="../_images/f4420a70bca2812583df79902fc7d1cc7e893667c05ac55e77daa1bed57553ee.png" />
+<img alt="../_images/cc21dc44a3facd8d0bfa8ddb477f12df2f08ac3fb62b3f931ebf77a42ae08143.png" src="../_images/cc21dc44a3facd8d0bfa8ddb477f12df2f08ac3fb62b3f931ebf77a42ae08143.png" />
+<img alt="../_images/3ccae97fbf81d9136ea634430824b88ce7c1ad9000d0c220c26ee00413e80d5d.png" src="../_images/3ccae97fbf81d9136ea634430824b88ce7c1ad9000d0c220c26ee00413e80d5d.png" />
+<img alt="../_images/0091286833511b7e95f4b5ec3ad13708bafacfa478bb920b58024c6c5152ecbf.png" src="../_images/0091286833511b7e95f4b5ec3ad13708bafacfa478bb920b58024c6c5152ecbf.png" />
+<img alt="../_images/071a7b83e7cd4edd6441bdfa99be07a0a99aadada8cfa89b39e28cb295a989ae.png" src="../_images/071a7b83e7cd4edd6441bdfa99be07a0a99aadada8cfa89b39e28cb295a989ae.png" />
+<img alt="../_images/2dfeb62bc3c8a5388d021aecff37ad6facccbe0b1914f437652fc9a12fecaf6e.png" src="../_images/2dfeb62bc3c8a5388d021aecff37ad6facccbe0b1914f437652fc9a12fecaf6e.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="combined_filters.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Imports</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="summary_treasury_bond_returns_ipynb.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Cleaning Summary: Treasury Bond Returns</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Imports</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#execution">Execution</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-monthly-leverage-adjusted-portfolio-returns-in-cjs">Construction of Monthly Leverage-Adjusted Portfolio Returns in CJS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#process">Process</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussian-kernel-weighting">1. Gaussian Kernel Weighting</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#option-elasticity">2. Option Elasticity</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-return-of-option-i">3. Arithmetic Return of Option <span class="math notranslate nohighlight">\(i\)</span></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#leverage-adjusted-portfolio-construction">4. Leverage-Adjusted Portfolio Construction</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#build-the-ftsfa-id-for-each-portfolio">1. Build the FTSFA ID for each portfolio</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-option-elasticity-and-daily-kernel-weighting-for-candidate-options-for-each-portfolio">2. Calculate option elasticity and daily kernel weighting for candidate options for each portfolio.</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-options-from-the-portfolio-with-weights-lower-than-1">3. Remove options from the portfolio with weights lower than 1%</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-the-daily-arithmetic-return-and-the-leverage-adjusted-return-of-each-portfolio">4. Calculate the daily arithmetic return and the leverage-adjusted return of each portfolio.</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#to-be-implemented-filling-nans">5. (to be implemented) Filling NaNs</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compound-daily-portfolio-returns-to-monthly-final-54-portfolios-in-cjs">6. Compound Daily Portfolio Returns to Monthly (final 54 portfolios in CJS)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construction-of-18-portfolio-return-series-in-he-kelly-manela-hkm-2017">Construction of 18 Portfolio Return Series in He, Kelly, Manela (HKM 2017)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio-returns-analysis">Portfolio Returns Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tests-for-normality-of-returns-in-the-54-cjs-portfolios">Tests for Normality of Returns in the 54 CJS Portfolios</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tests-for-normality-of-returns-in-the-18-hkm-portfolios">Tests for Normality of Returns in the 18 HKM Portfolios</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeremiah Bejarano
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jeremiah Bejarano.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
