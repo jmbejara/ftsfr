@@ -19,8 +19,12 @@ df_individual_bonds = pull_open_source_bond.load_corporate_bond_returns(
     data_dir=DATA_DIR
 )
 
+# Detect column format (old: bond_ret, new: ret_vw)
+cols = calc_corp_bond_returns.detect_column_format(df_individual_bonds)
+ret_col = cols["ret_col"]
+
 # Create long format DataFrame with unique_id, ds, and y columns
-df_individual_bonds_returns = df_individual_bonds[["cusip", "date", "bond_ret"]].copy()
+df_individual_bonds_returns = df_individual_bonds[["cusip", "date", ret_col]].copy()
 df_individual_bonds_returns.columns = ["unique_id", "ds", "y"]
 
 # Drop NaN values from y column

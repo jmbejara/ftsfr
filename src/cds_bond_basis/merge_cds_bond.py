@@ -18,17 +18,77 @@ FINAL_ANALYSIS_FILE_NAME = "final_data.parquet"
 RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
 
 
+def detect_column_format(df):
+    """
+    Detect whether the data uses old or new column format.
+
+    Old format (WRDS_MMN_Corrected_Data): CS, BOND_YIELD, tmt, size_ig, size_jk
+    New format (osbap_main_data_2025): cs, ytm, tmat, spc_rat/mdc_rat
+
+    Returns:
+        dict: Column name mappings and format identifier.
+    """
+    if "CS" in df.columns:
+        # Old format
+        return {
+            "format": "old",
+            "cs_col": "CS",
+            "yield_col": "BOND_YIELD",
+            "tmt_col": "tmt",
+            "tmt_to_days_factor": 30,  # tmt is in months, multiply by 30
+            "has_size_ig_jk": True,
+        }
+    elif "cs" in df.columns:
+        # New Open Source Bond format
+        return {
+            "format": "new",
+            "cs_col": "cs",
+            "yield_col": "ytm",
+            "tmt_col": "tmat",
+            "tmt_to_days_factor": 365,  # tmat is in years, multiply by 365
+            "has_size_ig_jk": False,
+            "rating_col": "spc_rat",  # Use S&P composite rating
+        }
+    else:
+        raise ValueError(
+            "Could not detect data format. Expected either 'CS' (old format) "
+            "or 'cs' (new Open Source Bond format) column."
+        )
+
+
+def derive_size_ig_jk(df, rating_col="spc_rat"):
+    """
+    Derive size_ig and size_jk from numeric rating column.
+
+    Rating scale: 1 (AAA) to 21 (CCC-), 22 = Default
+    Investment grade: rating <= 10 (BBB- and above)
+    Junk/speculative: rating > 10
+
+    Parameters:
+        df: DataFrame with rating column
+        rating_col: Name of the rating column
+
+    Returns:
+        DataFrame with size_ig and size_jk columns added
+    """
+    df = df.copy()
+    # Investment grade if rating <= 10 (BBB- and above)
+    df["size_ig"] = (df[rating_col] <= 10).astype(float)
+    # Junk/speculative if rating > 10
+    df["size_jk"] = (df[rating_col] > 10).astype(float)
+    # Handle missing ratings
+    df.loc[df[rating_col].isna(), "size_ig"] = np.nan
+    df.loc[df[rating_col].isna(), "size_jk"] = np.nan
+    return df
+
+
 def merge_red_code_into_bond_treas(bond_treas_df, red_c_df):
     """
-    bond_treas_df: dataframe containing merged corporate bond and treasury data, we will only use the below columnes
-        date, -- date when data was collected
-        cusip, -- cusip of bond itself
-        issuer_cusip, -- cusip of issuing firm
-        'BOND_YIELD', -- yield of bond removing market microstructure effects
-        CS, -- Credit Spread we replace Z-spread with
-        size_ig, -- 0 if no ig bonds in portfolio, 1 if yes
-        size_jk, -- 0 if no junk bonds in portfolio, 1 if yes
-        tmt, -- time to maturity in months where months are 30 days
+    bond_treas_df: dataframe containing merged corporate bond and treasury data.
+        Supports both old format (WRDS_MMN) and new format (osbap_2025).
+
+        Old format columns: date, cusip, issuer_cusip, BOND_YIELD, CS, size_ig, size_jk, tmt
+        New format columns: date, cusip, issuer_cusip, ytm, cs, tmat, spc_rat/mdc_rat
 
     red_c_df: dataframe containing red code merging information
         redcode, -- redcode of the issuer
@@ -42,12 +102,19 @@ def merge_red_code_into_bond_treas(bond_treas_df, red_c_df):
         date, -- date when data was collected
         cusip, -- unique bond identifier
         issuer_cusip, -- cusip of issuing firm
-        CS, -- Credit Spread we replace Z-spread with
+        BOND_YIELD, -- MMN adjusted bond yield (normalized column name)
+        CS, -- Credit Spread we replace Z-spread with (normalized column name)
         size_ig, -- 0 if no ig bonds in portfolio, 1 if yes
         size_jk, -- 0 if no junk bonds in portfolio, 1 if yes
         mat_days, -- time to maturity in days
         redcode -- redcode is issuer specific, used to merge CDS values later on
     """
+    # Detect column format
+    cols = detect_column_format(bond_treas_df)
+
+    # If new format, derive size_ig and size_jk from rating
+    if not cols["has_size_ig_jk"]:
+        bond_treas_df = derive_size_ig_jk(bond_treas_df, rating_col=cols["rating_col"])
 
     red_c_df = red_c_df[["obl_cusip", "redcode"]].dropna()
     red_c_df["issuer_cusip"] = red_c_df.apply(lambda row: row["obl_cusip"][:6], axis=1)
@@ -59,9 +126,16 @@ def merge_red_code_into_bond_treas(bond_treas_df, red_c_df):
 
     # should drop all uneeded elements
     merged_df = bond_treas_df.merge(red_c_df, on="issuer_cusip", how="inner")
-    merged_df["mat_days"] = (
-        merged_df["tmt"] * 30
-    )  # for maturity days, easier to cubic spline
+
+    # Calculate mat_days using the appropriate factor
+    merged_df["mat_days"] = merged_df[cols["tmt_col"]] * cols["tmt_to_days_factor"]
+
+    # Normalize column names to match expected output format
+    # Rename source columns to standard output names
+    merged_df = merged_df.rename(columns={
+        cols["yield_col"]: "BOND_YIELD",
+        cols["cs_col"]: "CS",
+    })
 
     return merged_df[
         [
