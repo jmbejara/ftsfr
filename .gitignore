@@ -6,7 +6,11 @@
 # Exclude _data folder, since it should all be pulled automatically (unless in the manual folder)
 /_data/*
 
-# Exclude _output directory since it's should generated automatically
+# Exclude _output directory since it's should generated automatically.
+# Note: reports/output/ and reports/docs_src/ ARE tracked — those are
+# committed caches of just the artifacts referenced by reports/*.tex,
+# populated by `python src/cache_latex_artifacts.py`. They keep reports/
+# self-contained so collaborators can compile without the full pipeline.
 /_output/*
 
 # files and dirs in models

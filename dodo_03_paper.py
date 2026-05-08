@@ -163,8 +163,70 @@ def task_run_example_forecasts():
     )
 
 
+def task_validate_latex_paths():
+    """Enforce that reports/*.tex stays self-contained (no `..`, _output, _data).
+
+    The reports/ directory is intended to be portable: a collaborator should
+    be able to copy reports/ alone and compile. This check fails the build
+    if any .tex file uses parent traversal or references the gitignored
+    _output/ or _data/ trees. Runs every build; needs nothing pre-built.
+    """
+    return {
+        "actions": ["python ./src/validate_latex_paths.py"],
+        "file_dep": [
+            "./src/validate_latex_paths.py",
+            "./reports/draft_ftsfr.tex",
+            "./reports/slides_ftsfr.tex",
+            "./reports/internet_appendix.tex",
+        ],
+        "verbosity": 2,
+    }
+
+
+def task_cache_latex_artifacts():
+    """Refresh reports/output/ and reports/docs_src/ from source artifacts.
+
+    Extracts \\input/\\includegraphics references from reports/*.tex and
+    copies just those files from ./_output/ and ./docs_src/ into the
+    self-contained caches under reports/. Authors run this after a full
+    pipeline refresh, before committing the cache. Not a dep of
+    compile_latex_docs so collaborators can compile from the committed
+    caches without ./_output/ present.
+    """
+    return {
+        "actions": ["python ./src/cache_latex_artifacts.py"],
+        "file_dep": [
+            "./src/cache_latex_artifacts.py",
+            "./reports/draft_ftsfr.tex",
+            "./reports/slides_ftsfr.tex",
+            "./reports/internet_appendix.tex",
+        ],
+        "uptodate": [False],
+        "verbosity": 2,
+    }
+
+
 def task_compile_latex_docs():
-    """Compile the LaTeX documents to PDFs using forecasting outputs"""
+    """Compile the LaTeX documents to PDFs.
+
+    Reads tables/figures from reports/output/ and reports/docs_src/ — the
+    committed caches populated by task_cache_latex_artifacts. The reports/
+    directory is self-contained, so this task works without ./_output/ or
+    the top-level ./docs_src/ being present. Validation runs first via
+    task_dep.
+    """
+    import glob
+    from pathlib import Path
+
+    cache_files: list[str] = []
+    for cache_dir in (Path("./reports/output"), Path("./reports/docs_src")):
+        if cache_dir.exists():
+            cache_files.extend(
+                f
+                for f in glob.glob(str(cache_dir / "**" / "*"), recursive=True)
+                if Path(f).is_file()
+            )
+    cache_files.sort()
 
     return {
         "actions": [
@@ -180,24 +242,12 @@ def task_compile_latex_docs():
             "./reports/slides_ftsfr.pdf",
             "./reports/internet_appendix.pdf",
         ],
+        "task_dep": ["validate_latex_paths"],
         "file_dep": [
-            "./src/forecasting/create_results_tables.py",
-            "./src/forecasting/create_dataset_statistics.py",
             "./reports/draft_ftsfr.tex",
             "./reports/slides_ftsfr.tex",
-            OUTPUT_DIR / "forecasting" / "paper" / "dataset_statistics_tabular.tex",
-            OUTPUT_DIR
-            / "forecasting"
-            / "paper"
-            / "filtered_dataset_statistics_tabular.tex",
-            OUTPUT_DIR / "forecasting" / "paper" / "mase_pivot_tabular.tex",
-            OUTPUT_DIR / "forecasting" / "paper" / "rmse_pivot_tabular.tex",
-            OUTPUT_DIR / "forecasting" / "paper" / "r2oos_pivot_tabular.tex",
-            OUTPUT_DIR / "forecasting" / "model_summary_statistics.tex",
-            OUTPUT_DIR / "forecasting" / "paper" / "median_mase_summary_tabular.tex",
-            OUTPUT_DIR / "forecasting" / "paper" / "mase_heatmap.png",
-            OUTPUT_DIR / "forecasting" / "paper" / "rmse_heatmap.png",
-            OUTPUT_DIR / "forecasting" / "paper" / "r2oos_heatmap.png",
+            "./reports/internet_appendix.tex",
+            *cache_files,
         ],
         "clean": True,
     }
