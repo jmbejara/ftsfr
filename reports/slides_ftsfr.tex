@@ -1,5 +1,5 @@
-\newcommand*{\PathToAssets}{../docs_src}%
-\newcommand*{\PathToOutput}{../_output}%
+\newcommand*{\PathToAssets}{./docs_src}%
+\newcommand*{\PathToOutput}{./output}%
 % \newcommand*{\PathToBibFile}{../../../bibliography.bib}%
 
 
@@ -148,7 +148,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \end{itemize}
   \begin{figure}
       \centering
-      \includegraphics[width=0.8\textwidth]{../docs_src/monash_website_table.png}
+      \includegraphics[width=0.8\textwidth]{\PathToAssets/monash_website_table.png}
   \end{figure}
   \end{frame}
 
@@ -164,7 +164,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \end{itemize}
     \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{../docs_src/ftsfr_github.png}
+    \includegraphics[width=0.5\textwidth]{\PathToAssets/ftsfr_github.png}
     \end{figure}
 \end{frame}
 
@@ -191,7 +191,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \frametitle{M-Competitions}
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{../docs_src/m_competitions.png}
+    \includegraphics[width=0.8\textwidth]{\PathToAssets/m_competitions.png}
 \end{figure}
 \end{frame}
 
@@ -328,7 +328,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
   \centering
   \vspace{0.2cm}
   \scalebox{0.9}{%
-    \input{../_output/forecasting/paper/dataset_statistics_tabular.tex}%
+    \input{\PathToOutput/forecasting/paper/dataset_statistics_tabular.tex}%
   }
 \end{frame}
 
@@ -359,7 +359,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
         \centering
         \caption{CIP Arbitrage spreads}
       \begin{tabular}{@{}c@{}}
-        \includegraphics[width=.95\linewidth]{../docs_src/CIP_replicate.png}
+        \includegraphics[width=.95\linewidth]{\PathToAssets/CIP_replicate.png}
       \end{tabular}
       \caption*{\emph{Sources: Bloomberg, Authors' creation}}
       \label{fig:cip_basis}
@@ -372,7 +372,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
         \centering
         \caption{Treasury Swap Arbitrage spreads}
         \begin{tabular}{@{}c@{}}
-          \includegraphics[width=.95\linewidth]{../docs_src/treasury_swap_arbitrage_spreads.png}
+          \includegraphics[width=.95\linewidth]{\PathToAssets/treasury_swap_arbitrage_spreads.png}
         \end{tabular}
         \caption*{\emph{Sources: Bloomberg, Authors' creation}}
         \label{fig:treasury_swap_arbitrage}
@@ -494,7 +494,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
 %     \centering
 %     \vspace{0.2cm}
 %     \scalebox{0.9}{%
-%     \input{../_output/forecasting/paper/filtered_dataset_statistics_tabular.tex}
+%     \input{\PathToOutput/forecasting/paper/filtered_dataset_statistics_tabular.tex}
 %     }
 %   \end{frame}
 
@@ -555,7 +555,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \textbf{MASE Results by Dataset and Model}\\
     {\scriptsize \textit{Lower values = better performance; Values $<1$ beat seasonal naive baseline}}\\
     \vspace{0.2cm}
-    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/mase_pivot_tabular.tex}}
+    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/mase_pivot_tabular.tex}}
   \end{frame}
   
   \begin{frame}[plain]
@@ -565,7 +565,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \textbf{Relative MASE Results by Dataset and Model}\\
     {\scriptsize \textit{Performance relative to Historic Average: $<1$ = better, $>1$ = worse}}\\
     \vspace{0.2cm}
-    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}}
+    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/relative_mase_pivot_tabular.tex}}
   \end{frame}
 
 \begin{frame}
@@ -642,7 +642,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \centering
     \textbf{Out-of-Sample $R^2$ Results by Dataset and Model}\\
     \vspace{0.2cm}
-    \input{../_output/forecasting/paper/r2oos_pivot_tabular.tex}
+    \input{\PathToOutput/forecasting/paper/r2oos_pivot_tabular.tex}
 \end{frame}
 
 \begin{frame}
@@ -660,7 +660,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \centering
     \textbf{Overall Model Performance Summary: MASE, Relative MASE, and $R^2_{\text{oos}}$ Across All Datasets}\\
     \vspace{0.2cm}
-    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/median_mase_summary_tabular.tex}}
+    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/median_mase_summary_tabular.tex}}
   \end{frame}
 
   \begin{frame}[plain]
@@ -670,7 +670,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \textbf{Model Performance by Dataset Category}\\
     {\scriptsize Basis Spreads vs Returns vs Other}\\
     \vspace{0.2cm}
-    \resizebox{0.98\textwidth}{!}{\input{../_output/forecasting/paper/model_summary_by_category_tabular.tex}}
+    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/model_summary_by_category_tabular.tex}}
   \end{frame}
 
 \begin{frame}

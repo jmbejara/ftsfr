@@ -1,3 +1,6 @@
+\newcommand*{\PathToAssets}{./docs_src}%
+\newcommand*{\PathToOutput}{./output}%
+
 \documentclass[11pt]{article}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
@@ -53,7 +56,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/RAW_1996-01_2019-12_iv.png}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{\PathToAssets/RAW_1996-01_2019-12_iv.png}
   \end{tabular}
   \caption{Some visualizations of the raw SPX options data, prior to application of any filters. Each dot / point on these charts represents a single option in the raw data. Note that the time dimension is not shown, so this is a cross-sectional view of all options in the dataset.}
   \label{fig:raw_spx_options_data}
@@ -62,7 +65,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L1_1996-01_2019-12_iv.png}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{\PathToAssets/L1_1996-01_2019-12_iv.png}
   \end{tabular}
   \caption{SPX options remaining after application of Level 1 filters. Notice reduction in outliers and cleaner distribution of volatility vs moneyness.}
   \label{fig:l1_spx_options_data}
@@ -72,7 +75,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 \begin{figure}[H]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L2_1996-01_2019-12_iv.png}
+    \includegraphics[width=\linewidth,height=0.666\linewidth]{\PathToAssets/L2_1996-01_2019-12_iv.png}
   \end{tabular}
   \caption{SPX options remaining after Level 2 filters.}
   \label{fig:l2_spx_options_data}
@@ -81,7 +84,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_1996-01_2019-12_iv.png}
+  \includegraphics[width=\linewidth,height=0.666\linewidth]{\PathToAssets/L3_IV_1996-01_2019-12_iv.png}
   \caption{SPX options remaining after the Level 3 Implied Volatility filter (only).}
   \label{fig:l3_iv_only_spx_options_data}
 \end{figure}
@@ -89,7 +92,7 @@ In order to minimize possible quoting errors, CJS filtered the raw options data 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth,height=0.666\linewidth]{../docs_src/L3_IV_PCP_1996-01_2019-12_iv.png}
+  \includegraphics[width=\linewidth,height=0.666\linewidth]{\PathToAssets/L3_IV_PCP_1996-01_2019-12_iv.png}
   \caption{SPX options remaining after the Level 3 Implied Volatility and Put-Call Parity filters. Note how we observe the emergence of a volatility smile after the application of these filters.}
   \label{fig:l3_iv_pcp_spx_options_data}
 \end{figure}

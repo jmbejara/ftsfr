@@ -1,4 +1,7 @@
 % !TeX root = draft_ftsfr.tex
+\newcommand*{\PathToAssets}{./docs_src}%
+\newcommand*{\PathToOutput}{./output}%
+
 \documentclass{article}
 
 % Language setting
@@ -324,7 +327,7 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 \centering
 \caption{Dataset Statistics Summary}
 \label{tab:dataset_stats}
-\input{../_output/forecasting/paper/dataset_statistics_tabular.tex}
+\input{\PathToOutput/forecasting/paper/dataset_statistics_tabular.tex}
 \vspace{0.1cm}
 \scriptsize
 % \textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.
@@ -362,7 +365,7 @@ An example of a few of the commodity futures returns are shown in Figure~\ref{fi
     \centering
     \caption{GSCI Commodity Returns}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/commod_gsci_return.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/commod_gsci_return.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:gsci_commodity_returns}
@@ -445,7 +448,7 @@ These spreads are shown in Figure~\ref{fig:cds_basis}.
     \centering
     \caption{CDS-Bond Basis spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/CDS_replicate.png}
   \end{tabular}
   \caption*{\emph{Sources: S\&P Global, WRDS TRACE, Authors' analysis}}
   \label{fig:cds_basis}
@@ -458,7 +461,7 @@ We replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for 
     \centering
     \caption{Covered Interest Parity (CIP) spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/CIP_replicate.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/CIP_replicate.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:cip_basis}
@@ -472,7 +475,7 @@ These spreads are shown in Figure~\ref{fig:tips_treasury_basis}.
     \caption{TIPS-Treasury Basis spreads}
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/tips_treasury_arbitrage_spreads.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/tips_treasury_arbitrage_spreads.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:tips_treasury_basis}
@@ -485,7 +488,7 @@ Following \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we co
     \centering
     \caption{Treasury Spot-Futures Basis (FTSFR Replication)}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/treasury_spot_futures_arbitrage.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/treasury_spot_futures_arbitrage.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:treasury_sf_basis}
@@ -507,7 +510,7 @@ These spreads are shown in Figure~\ref{fig:treasury_swap_arbitrage}.
   \centering
   \caption{Treasury-Swap Basis spreads}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/treasury_swap_arbitrage_spreads.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/treasury_swap_arbitrage_spreads.png}
   \end{tabular}
   \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
   \label{fig:treasury_swap_arbitrage}
@@ -732,7 +735,7 @@ To ensure fair model comparisons, our forecasting system applies a unified prepr
 \centering
 \caption{Impact of Robust Forecasting Preprocessing on Dataset Statistics}
 \label{tab:filtered_dataset_stats}
-\input{../_output/forecasting/paper/filtered_dataset_statistics_tabular.tex}
+\input{\PathToOutput/forecasting/paper/filtered_dataset_statistics_tabular.tex}
 \caption*{\scriptsize \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
 \end{table}
 
@@ -775,7 +778,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 \centering
 \caption{MASE Results by Dataset and Model}
 \label{tab:mase_results}
-\input{../_output/forecasting/paper/mase_pivot_tabular.tex}
+\input{\PathToOutput/forecasting/paper/mase_pivot_tabular.tex}
 \caption*{
 \noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
 \scriptsize
@@ -787,7 +790,7 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 % \begin{figure}[htbp]
 % \centering
 % \caption{MASE Results Heatmap by Dataset and Model}
-% \includegraphics[width=\textwidth]{../_output/forecasting/paper/mase_heatmap.png}
+% \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/mase_heatmap.png}
 % \caption*{\textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.
 
 % \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
@@ -800,7 +803,7 @@ To better understand the relative performance of sophisticated models compared t
 \centering
 \caption{Relative MASE Results by Dataset and Model}
 \label{tab:relative_mase_results}
-\input{../_output/forecasting/paper/relative_mase_pivot_tabular.tex}
+\input{\PathToOutput/forecasting/paper/relative_mase_pivot_tabular.tex}
 % \textit{Relative MASE table unavailable: requires Naive baseline model which is not present in current results.}
 \caption*{
     \scriptsize
@@ -814,7 +817,7 @@ Figure~\ref{fig:relative_mase_heatmap} provides a visual representation of the r
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{../_output/forecasting/paper/relative_mase_heatmap.png}
+    \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/relative_mase_heatmap.png}
     \caption{Relative MASE Results Heatmap by Dataset and Model. Values represent MASE ratios relative to the Historic Average baseline, with blue indicating better performance than the baseline ($<$ 1.0), white indicating equal performance, and red indicating worse performance ($>$ 1.0). The color scale is centered at 1.0 for optimal visual balance, and extreme outliers are marked with asterisks (*).}
     \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
     \label{fig:relative_mase_heatmap}
@@ -826,7 +829,7 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 \centering
 \caption{RMSE Results by Dataset and Model}
 \label{tab:rmse_results}
-\input{../_output/forecasting/paper/rmse_pivot_tabular.tex}
+\input{\PathToOutput/forecasting/paper/rmse_pivot_tabular.tex}
 \vspace{0.1cm}
 
 \caption*{\scriptsize 
@@ -840,7 +843,7 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 
 % \begin{figure}[htbp]
 % \centering
-% \includegraphics[width=\textwidth]{../_output/forecasting/paper/rmse_heatmap.png}
+% \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/rmse_heatmap.png}
 % \caption{RMSE Results Heatmap by Dataset and Model. Colors are capped at the 90th percentile to highlight performance differences across the majority of datasets, with extreme outliers marked with asterisks (*). The visualization reveals models that consistently perform well and datasets that pose particular forecasting challenges.}
 % \label{fig:rmse_heatmap}
 % \end{figure}
@@ -851,7 +854,7 @@ Table~\ref{tab:r2oos_results} presents the out-of-sample $R^2$ ($R^2_{\text{oos}
 \centering
 \caption{Out-of-Sample $R^2$ Results by Dataset and Model}
 \label{tab:r2oos_results}
-\input{../_output/forecasting/paper/r2oos_pivot_tabular.tex}
+\input{\PathToOutput/forecasting/paper/r2oos_pivot_tabular.tex}
 \caption*{
 \noindent {\scriptsize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
 \scriptsize
@@ -862,7 +865,7 @@ Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highl
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{../_output/forecasting/paper/r2oos_heatmap.png}
+    \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/r2oos_heatmap.png}
     \caption{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$) Heatmap by Dataset and Model. Warmer colors indicate larger improvements over the Historic Average baseline, while cooler colors indicate underperformance. Cells with extreme values are annotated to preserve readability.}
     \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
     \label{fig:r2oos_heatmap}
@@ -876,7 +879,7 @@ To synthesize performance across datasets, Table~\ref{tab:median_mase_summary} r
 \label{tab:median_mase_summary}
 \footnotesize
 \resizebox{\textwidth}{!}{%
-\input{../_output/forecasting/paper/median_mase_summary_tabular.tex}
+\input{\PathToOutput/forecasting/paper/median_mase_summary_tabular.tex}
 }
 \caption*{
     \scriptsize
@@ -893,7 +896,7 @@ Table~\ref{tab:model_summary_by_category} disaggregates these results by dataset
 \caption{Model Performance by Dataset Category}
 \label{tab:model_summary_by_category}
 \scriptsize
-\input{../_output/forecasting/paper/model_summary_by_category_tabular.tex}
+\input{\PathToOutput/forecasting/paper/model_summary_by_category_tabular.tex}
 \caption*{\scriptsize \textbf{Note:} Metrics are computed within each dataset category (Basis Spreads, Returns, Other). Lower MASE/Relative MASE values indicate better performance; higher $R^2_{\text{oos}}$ values indicate better performance.}
 \end{table}
 
@@ -971,7 +974,7 @@ the dataset is more diverse, leading to lower average returns and lower volatili
 \begin{figure}[h]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/daily_avg_returns_CRSP_COMPU.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/daily_avg_returns_CRSP_COMPU.png}
   \end{tabular}
   \caption{Average returns of all stocks for a given date}
   \label{fig:avg_returns_crsp}
@@ -980,7 +983,7 @@ the dataset is more diverse, leading to lower average returns and lower volatili
 \begin{figure}[h]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/Average_three_month_rolling_std.png}
+    \includegraphics[width=.95\linewidth]{\PathToAssets/Average_three_month_rolling_std.png}
   \end{tabular}
   \caption{Average three month rolling standard deviation for a given date}
   \label{fig:avg_rolling_std_crsp}
@@ -1007,7 +1010,7 @@ These filters, applied in the Gürkaynak, Sack, and Wright methodology, yield st
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\textwidth]{../docs_src/us_treasury_compare.png}
+  \includegraphics[width=0.8\textwidth]{\PathToAssets/us_treasury_compare.png}
   \caption{Comparison of He, Kelly, and Manela (2017) treasury bond returns dataset with FTSFR dataset}
   \label{fig:us_treasury_returns_comparison}
 \end{figure}
@@ -1026,7 +1029,7 @@ The final output is a dataset containing monthly corporate bond portfolio return
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{../docs_src/corporate_returns_compare.png}
+    \includegraphics[width=0.8\textwidth]{\PathToAssets/corporate_returns_compare.png}
     \caption{Comparison of He, Kelly, and Manela (2017) corporate bond returns dataset with FTSFR dataset}
     \label{fig:corp_bond_returns_comparison}
   \end{figure}
@@ -1049,7 +1052,7 @@ The process to construct our returns series involved two major phases: (1) Repli
   \centering
   \caption{The SPX options market has grown dramatically over time}
   \begin{tabular}{@{}c@{}}
-    \includegraphics[height=300pt,width=400pt]{../docs_src/spx_options_over_time.png}
+    \includegraphics[height=300pt,width=400pt]{\PathToAssets/spx_options_over_time.png}
   \end{tabular}
   \caption*{\emph{Sources: OptionMetrics, Authors' analysis}}
   \label{fig:spx_options_over_time}
@@ -1102,7 +1105,7 @@ where
 \begin{figure}
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.95\linewidth]{../docs_src/FX_returns.png} \\[\abovecaptionskip]
+    \includegraphics[width=.95\linewidth]{\PathToAssets/FX_returns.png} \\[\abovecaptionskip]
   \end{tabular}
 
   \caption{Foreign Currency Returns}
@@ -1149,7 +1152,7 @@ clusters of high-correlation matches alongside a handful of clear mismatches.
 \begin{figure}[htbp]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth]{../docs_src/commod_return_comparison.png} \\[\abovecaptionskip]
+    \includegraphics[width=\linewidth]{\PathToAssets/commod_return_comparison.png} \\[\abovecaptionskip]
   \end{tabular}
   \caption{Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
   \label{fig:commod_return_comparison}
@@ -1158,7 +1161,7 @@ clusters of high-correlation matches alongside a handful of clear mismatches.
 \begin{figure}[htbp]
   \centering
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=\linewidth]{../docs_src/commod_heatmap.png} \\[\abovecaptionskip]
+    \includegraphics[width=\linewidth]{\PathToAssets/commod_heatmap.png} \\[\abovecaptionskip]
   \end{tabular}
   \caption{Heatmap of Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
   \label{fig:commod_heatmap}
@@ -1212,14 +1215,14 @@ The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.
 % \begin{figure}
 %   \centering
 %   \begin{tabular}{@{}c@{}}
-%     \includegraphics[width=.95\linewidth,height=210pt,width=350pt]{../docs_src/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
+%     \includegraphics[width=.95\linewidth,height=210pt,width=350pt]{\PathToAssets/SegArb_CDS_Timeseries.png} \\[\abovecaptionskip]
 %     \small (a) Findings in Siriwardane et al. (2023)
 %   \end{tabular}
 
 %   \vspace{\floatsep}
 
 %   \begin{tabular}{@{}c@{}}
-%     \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png} \\[\abovecaptionskip]
+%     \includegraphics[width=.95\linewidth]{\PathToAssets/CDS_replicate.png} \\[\abovecaptionskip]
 %     \small (b) Our findings
 %   \end{tabular}
 
@@ -1231,7 +1234,7 @@ The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.
 \begin{figure}
     \centering
     \begin{tabular}{@{}c@{}}
-      \includegraphics[width=.95\linewidth]{../docs_src/CDS_replicate.png}
+      \includegraphics[width=.95\linewidth]{\PathToAssets/CDS_replicate.png}
     \end{tabular}
     \caption{Comparison of CDS Arbitrage spreads}
     \label{fig:CDS_replicate}
@@ -1262,14 +1265,14 @@ to those reported in their paper.
 \begin{figure}
   \centering
 %   \begin{tabular}{@{}c@{}}
-%     \includegraphics[width=.95\linewidth]{../docs_src/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
+%     \includegraphics[width=.95\linewidth]{\PathToAssets/SegArb_CIP_Timeseries.png} \\[\abovecaptionskip]
 %     \small (a) Findings in Siriwardane et al. (2023)
 %   \end{tabular}
 
 %   \vspace{\floatsep}
 
   \begin{tabular}{@{}c@{}}
-    \includegraphics[width=.99\linewidth]{../docs_src/CIP_replicate.png}
+    \includegraphics[width=.99\linewidth]{\PathToAssets/CIP_replicate.png}
   \end{tabular}
 
   \caption{Comparison of CIP Arbitrage spreads}
