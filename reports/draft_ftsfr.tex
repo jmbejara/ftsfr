@@ -1203,72 +1203,9 @@ where:
 A negative basis implies an investor could earn a positive arbitrage profit by going long the bond and purchasing CDS protection. 
 The investor would pay a lower par spread than the coupon of the bond itself and then receive value from the default.
 
-The value of $FR$ is substituted by the paper with Z-spread which we also modify in our construction. We address the substitution in detail later.
+The floating-rate spread is conventionally proxied by the bond's Z-spread, and the CDS par spread is interpolated to the bond maturity by cubic spline; we refer the reader to \citet{Siriwardane2021} for the full construction.
 
-The value of CDS par spread is interpolated by the authors using a cubic spline function as
-not all necessary tenors are present.
-
-Given the CDS spread from above, traditional construction of a risk-free rate for implied arbitrage implies the following return:
-
-\begin{equation}
-  rfr^{CDS}_{i,t,\tau} \;=\; y_{t,\tau} \;-\; CB_{i,t,\tau},
-\end{equation}
-
-where:
-\begin{itemize}
-  \item $y_{t,\tau}$ = maturity-matched Treasury yield at time $t$.
-\end{itemize}
-
-The implied risk-free arbitrage is then defined as the treasury yield in addition to the basis received when executing the CDS basis trade (investor benefits from negative basis).
-
-\paragraph{Z-Spread (Zero-Volatility Spread)}
-
-\paragraph*{Mathematical definition}
-For a bond with cash-flows $CF_t$ at times $t=1,\dots,N$ and Treasury spot rates $s_t$,
-\begin{equation*}
-P = \sum_{t=1}^{N} \frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}.
-\end{equation*}
-The constant $Z$ that solves this equation is the \textbf{Z-spread}.
-
-\paragraph*{Intuition}
-$Z$ is the uniform extra yield added to every point on the risk-free spot curve so that the discounted cash-flows equal the bond's dirty price $P$. It compensates investors for credit and liquidity risk relative to Treasuries.
-
-\paragraph*{Link to Yield-to-Maturity}
-Setting the Z-spread pricing equation equal to the standard YTM equation gives
-\begin{equation}
-\label{eq:ytm_z_spread}
-\sum_{t=1}^{N}\frac{CF_t}{(1+y)^t}
-=\sum_{t=1}^{N}\frac{CF_t}{\bigl(1+s_t+Z\bigr)^t}
-\end{equation}
-where $y$ is the bond's yield-to-maturity. Except for the trivial flat-curve case ($s_t=s$), equation (\ref{eq:ytm_z_spread}) has no algebraic solution-$y$ or $Z$ must be found numerically.
-
-\paragraph*{Continuous-Compounding Identity}
-Rewrite discounts as $e^{-r t}$. With PV-weights
-\begin{equation*}
-w_t=\frac{CF_t\,e^{-(s_t+Z)t}}{P},\qquad\sum_{t}w_t=1,
-\end{equation*}
-equation (\ref{eq:ytm_z_spread}) yields the convenient mean-value relationship
-\begin{equation}
-y \;=\; \sum_{t=1}^{N} w_t\,(s_t+Z)\tag{A2}
-\end{equation}
-Thus YTM is the PV-weighted average of the spot rates plus the Z-spread.
-
-\paragraph*{Practical Proxy: YTM Credit Spread}
-Analysts often approximate $Z$ with the \textbf{credit spread}
-\begin{equation*}
-\Delta y = y_{\text{bond}} - y_{\text{Treasury-DM}},
-\end{equation*}
-where $y_{\text{Treasury-DM}}$ is the yield on a Treasury portfolio matched to the bond's (modified) duration.
-
-\paragraph*{Why it works}
-\begin{enumerate}
-    \item A small parallel shift $Z$ applied to all discount rates changes price by $-D_{\text{mod}}\;Z$. For modest spreads, this produces nearly the same price change as replacing the spot curve with a single rate shift $\Delta y$.
-    \item Duration-matching the Treasury benchmark neutralises curve-shape effects, so $\Delta y$ isolates the average extra yield attributable to credit/liquidity risk.
-    \item Empirically, $\Delta y$ tracks $Z$ closely for plain-vanilla, option-free bonds, making it a ``good-enough'' proxy when full spot-curve data or iterative Z-spread calculations are impractical.
-\end{enumerate}
-
-\paragraph*{Note}
-Z-spread is said to be populated by Markit in the CDS dataset but during the reconstruction process we found no proxy. Thus, we chose our own construction.
+Our implementation draws bond observations from the Open Source Bond Asset Pricing panel of \citet{Dickerson2023} and CDS quotes from Markit via WRDS, restricting to USD-denominated senior unsecured contracts on US firms at the 1-, 3-, 5-, 7-, and 10-year tenors and joining the two sides through the RED CUSIP-to-Markit mapping table. The bond filters follow the source paper: senior unsecured USD debt with a valid ISIN, fixed coupon, one- to ten-year remaining maturity, outstanding principal of at least \$100{,}000, and we exclude putable bonds, convertible bonds, and bonds trading below half of par. The most consequential deviation from the published methodology concerns the floating-rate-spread input: the Z-spread field is not populated in our Markit extract, so we substitute a duration-matched credit spread (the bond yield less the yield on a Treasury portfolio matched to the bond's modified duration) and flag this as a known source of measurement difference relative to a Markit Z-spread construction. We require at least two distinct CDS tenors per firm-date for the cubic-spline interpolation and discard firm-dates that fail this requirement rather than extrapolating, and we drop observations whose implied risk-free rate exceeds 100 percent in absolute value.
 
 The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.
 
@@ -1312,22 +1249,7 @@ Heightened Counterparty-Credit Risk, Liquidity Constraints, or Regulatory Pressu
 In other periods, deviations from CIP typically stem from market inefficiencies and are
 small in magnitude and are short-lived in timeframe due to arbitrage activities.
 
-Our analysis examines CIP deviations across eight G10 currencies against the USD,
-using data from 1999 onwards sourced through Bloomberg Terminal.
-
-\paragraph{The dataset includes:}
-\begin{itemize}
-    \item Spot exchange rates for each currency pair
-    \item 3-month forward points for each currency pair
-    \item 3-month Overnight Index Swap (OIS) rates for each currency
-\end{itemize}
-
-\paragraph{Data Standardization:}
-\begin{itemize}
-    \item Forward points are scaled appropriately (per 10,000 for most currencies, per 100 for JPY)
-    \item Currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) are converted to reciprocal rates for consistency
-    \item OIS rates serve as our risk-free benchmark to align with other arbitrage spread studies
-\end{itemize}
+Our analysis examines CIP deviations across eight G10 currencies (AUD, CAD, CHF, EUR, GBP, JPY, NZD, and SEK) against the USD, using daily Bloomberg spot rates, three-month forward points, and three-month overnight index swap (OIS) rates from January 2010 onward; OIS serves as the risk-free benchmark, matching the convention of \citet{Siriwardane2021} so that CIP deviations are directly comparable to the other basis spreads in our benchmark. Two construction details are easy to get wrong and worth naming: forward points are scaled per 10{,}000 for every currency except JPY, which by market convention is scaled per 100, and the four currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) must be inverted to a foreign-per-USD convention before any CIP residual is computed---failure to do either produces sign errors that are large enough to swamp the actual deviations. We then remove outliers with a rolling 45-day median-absolute-deviation filter at a threshold of ten MADs (set empirically), flagging values to missing rather than dropping them so the calendar of business days is preserved across currencies.
 
 We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2023),
 as seen in
@@ -1363,7 +1285,7 @@ market stress, consistent with the conclusions drawn by Siriwardane et al. (2023
 
 \subsubsection{TIPS-Treasury Basis}
 
-Following \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we construct the TIPS-Treasury arbitrage spread by creating synthetic nominal yields from TIPS real yields and inflation swaps, then comparing them to observed Treasury yields. The core intuition is that a TIPS bond plus an inflation swap replicates a nominal Treasury bond; persistent deviations from this equivalence reveal market segmentation or funding frictions. Our implementation combines Federal Reserve zero-coupon TIPS yields for 2-, 5-, 10-, and 20-year maturities with Federal Reserve zero-coupon nominal Treasury yields (using the Gürkaynak-Sack-Wright model) and Bloomberg zero-coupon inflation swap rates for matching maturities. For each tenor, we construct a TIPS-implied risk-free rate by combining the TIPS real yield (in continuously compounded decimal form) with the inflation swap rate via the formula $\text{tips\_treas} = 10{,}000 \times (\exp(r + \log(1 + \pi)) - 1)$, where $r$ is the real yield and $\pi$ is the inflation swap rate. The arbitrage spread is then the difference between this synthetic rate and the observed Treasury yield in basis points. We convert TIPS yields from percentage to decimal form and Treasury yields to basis points using the exponential transformation $10{,}000 \times (\exp(y) - 1)$ to properly handle the continuously compounded GSW model output. Inflation swap data availability varies by tenor and begins later than the TIPS and Treasury series. We implement quality filters to exclude observations with missing values for three or more of the four tenors, ensuring sufficient cross-sectional coverage. The resulting spreads closely match the patterns documented in the literature: substantial positive values during 2008-2009 (often exceeding 100 basis points), narrowing during the post-crisis period, and renewed spikes during the March 2020 liquidity crisis. The 10-year and 20-year spreads exhibit high correlation (typically above 0.95), while the 2-year spread shows more independent variation due to differing inflation dynamics and liquidity effects at the short end. These patterns confirm that Treasury bonds are consistently expensive relative to TIPS during stress periods, consistent with the flight-to-quality premium documented by \citet{Fleckenstein2014}.
+Following \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we construct the TIPS-Treasury arbitrage spread by creating synthetic nominal yields from TIPS real yields and inflation swaps, then comparing them to observed Treasury yields. The core intuition is that a TIPS bond plus an inflation swap replicates a nominal Treasury bond; persistent deviations from this equivalence reveal market segmentation or funding frictions. Our implementation combines Federal Reserve zero-coupon TIPS yields for 2-, 5-, 10-, and 20-year maturities with Federal Reserve zero-coupon nominal Treasury yields (using the Gürkaynak-Sack-Wright model) and Bloomberg zero-coupon inflation swap rates for matching maturities. For each tenor, we construct a synthetic nominal yield in basis points as $10{,}000 \times (\exp(r + \log(1 + \pi)) - 1)$, where $r$ is the continuously compounded TIPS real yield and $\pi$ is the inflation swap rate. The arbitrage spread is then the difference between this synthetic rate and the observed Treasury yield in basis points. We convert TIPS yields from percentage to decimal form and Treasury yields to basis points using the exponential transformation $10{,}000 \times (\exp(y) - 1)$ to properly handle the continuously compounded GSW model output. Inflation swap data availability varies by tenor and begins later than the TIPS and Treasury series. We implement quality filters to exclude observations with missing values for three or more of the four tenors, ensuring sufficient cross-sectional coverage. The resulting spreads closely match the patterns documented in the literature: substantial positive values during 2008-2009 (often exceeding 100 basis points), narrowing during the post-crisis period, and renewed spikes during the March 2020 liquidity crisis. The 10-year and 20-year spreads exhibit high correlation (typically above 0.95), while the 2-year spread shows more independent variation due to differing inflation dynamics and liquidity effects at the short end. These patterns confirm that Treasury bonds are consistently expensive relative to TIPS during stress periods, consistent with the flight-to-quality premium documented by \citet{Fleckenstein2014}.
 
 \subsubsection{Treasury Spot-Futures Basis}
 
