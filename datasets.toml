@@ -193,6 +193,22 @@ frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
 
+[corp_bond_returns.ftsfr_corp_bond_cs_deciles_mmn_biased]
+description = """Value-weighted decile portfolios of corporate bonds sorted by the MMN-biased credit spread signal (`cs`, lower case in the OSBAP data). Used in the data-cleaning sensitivity case study."""
+short_name = "Corp Bond CS Deciles (MMN-biased)"
+table_name = "CS Deciles (MMN-biased)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
+[corp_bond_returns.ftsfr_corp_bond_cs_deciles_mmn_corrected]
+description = """Value-weighted decile portfolios of corporate bonds sorted by the MMN-corrected credit spread signal (`CS`, upper case in the OSBAP data) following Dickerson, Robotti, and Rossetti (2024). Used in the data-cleaning sensitivity case study."""
+short_name = "Corp Bond CS Deciles (MMN-corrected)"
+table_name = "CS Deciles (MMN-corrected)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
 ################################################################################
 [us_treasury_returns]
 required_data_sources = ["wrds_crsp", "he_kelly_manela"]
