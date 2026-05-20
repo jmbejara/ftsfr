@@ -281,3 +281,6 @@ _references/
 reports/slides_ftsfr.pdf
 
 reports/OFR_LOGO_WEB.png
+
+# Local Claude Code config and skills
+.claude/
