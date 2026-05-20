@@ -85,6 +85,22 @@ def main():
     df.to_csv(csv_path, index=False, float_format="%.4f")
     print(f"Wrote {csv_path}")
 
+    # Identify the best model in each level column.
+    # R^2_oos: higher is better. MASE: lower is better.
+    # Delta columns are sensitivity measures, not performance metrics, so
+    # they are not bolded.
+    best_idx = {
+        "R2oos_biased": df["R2oos_biased"].idxmax(),
+        "R2oos_corrected": df["R2oos_corrected"].idxmax(),
+        "MASE_biased": df["MASE_biased"].idxmin(),
+        "MASE_corrected": df["MASE_corrected"].idxmin(),
+    }
+
+    def bold_if_best(value_str, col, idx):
+        if idx == best_idx[col] and value_str != "--":
+            return f"\\textbf{{{value_str}}}"
+        return value_str
+
     # Write LaTeX tabular (no \begin{table}, just the tabular contents
     # so the .tex file can be \input{}-ed into the paper). With 12 models
     # the row block is taller, so we use scriptsize and tighter column sep
@@ -98,15 +114,15 @@ def main():
         "\\midrule\n"
     )
     body_rows = []
-    for _, r in df.iterrows():
+    for idx, r in df.iterrows():
         body_rows.append(
             " & ".join([
                 r["Model"],
-                fmt_dash(r["R2oos_biased"]),
-                fmt_dash(r["R2oos_corrected"]),
+                bold_if_best(fmt_dash(r["R2oos_biased"]), "R2oos_biased", idx),
+                bold_if_best(fmt_dash(r["R2oos_corrected"]), "R2oos_corrected", idx),
                 fmt_signed(r["dR2oos"]),
-                fmt_dash(r["MASE_biased"]),
-                fmt_dash(r["MASE_corrected"]),
+                bold_if_best(fmt_dash(r["MASE_biased"]), "MASE_biased", idx),
+                bold_if_best(fmt_dash(r["MASE_corrected"]), "MASE_corrected", idx),
                 fmt_signed(r["dMASE"]),
             ]) + " \\\\"
         )
