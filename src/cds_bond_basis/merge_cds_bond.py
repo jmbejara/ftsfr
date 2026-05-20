@@ -1,214 +1,231 @@
+"""
+Merge WRDS bond returns + RED-code mapping + Markit CDS spreads.
+
+ISIN-based bond-to-RED merge with CDS-coverage tie-breaking, then per-(redcode,
+date) cubic-spline interpolation of CDS par spreads onto each bond's
+time-to-maturity.
+
+Replaces the prior issuer_cusip-based merge so the panel can be priced with
+real Z-spreads (which need coupon, nextcoup, etc. from WRDS Bond Returns).
+"""
+
 import sys
-from pathlib import Path
 import warnings
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
 
 import numpy as np
 import pandas as pd
 from scipy.interpolate import CubicSpline
 
+from process_z_spread import year_fraction
 from settings import config
 
-DATA_DIR = config("DATA_DIR")
-BOND_RED_CODE_FILE_NAME = "corporate_bond_returns.parquet"
-CDS_FILE_NAME = "cds_final.parquet"
-FINAL_ANALYSIS_FILE_NAME = "final_data.parquet"
+DATA_DIR = Path(config("DATA_DIR")) / "cds_bond_basis"
+BOND_RED_CODE_FILE_NAME = "wrds_bondret_project.parquet"
+CDS_FILE_NAME = "markit_cds.parquet"
+FINAL_ANALYSIS_FILE_NAME = "Final_data.parquet"
 RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
+RED_MERGED_FILE_NAME = "Red_Data.parquet"
 
 
-def detect_column_format(df):
+def _compute_mat_days_from_zspread_convention(df: pd.DataFrame) -> pd.Series:
+    """Time-to-maturity in 365-day units using the same convention as process_z_spread."""
+    has_day_count = "day_count_basis" in df.columns
+
+    def _one_row(row):
+        d = row["date"]
+        m = row["maturity"]
+        if pd.isna(d) or pd.isna(m):
+            return np.nan
+        dcb = row["day_count_basis"] if has_day_count else "30/360"
+        return 365.0 * year_fraction(d, m, day_count_basis=dcb)
+
+    return df.apply(_one_row, axis=1)
+
+
+def merge_red_code_into_bond_treas(bond_treas_df, red_c_df, cds_df=None):
     """
-    Detect whether the data uses old or new column format.
+    Merge RED codes into the WRDS bondret panel using ISIN.
 
-    Old format (WRDS_MMN_Corrected_Data): CS, BOND_YIELD, tmt, size_ig, size_jk
-    New format (osbap_main_data_2025): cs, ytm, tmat, spc_rat/mdc_rat
-
-    Returns:
-        dict: Column name mappings and format identifier.
+    When an ISIN maps to multiple RED codes, prefer the RED code with more
+    Markit CDS observations (tie-broken by RED code ascending). Falls back to
+    "keep first" if no CDS panel is supplied.
     """
-    if "CS" in df.columns:
-        # Old format
-        return {
-            "format": "old",
-            "cs_col": "CS",
-            "yield_col": "BOND_YIELD",
-            "tmt_col": "tmt",
-            "tmt_to_days_factor": 30,  # tmt is in months, multiply by 30
-            "has_size_ig_jk": True,
-        }
-    elif "cs" in df.columns:
-        # New Open Source Bond format
-        return {
-            "format": "new",
-            "cs_col": "cs",
-            "yield_col": "ytm",
-            "tmt_col": "tmat",
-            "tmt_to_days_factor": 365,  # tmat is in years, multiply by 365
-            "has_size_ig_jk": False,
-            "rating_col": "spc_rat",  # Use S&P composite rating
-        }
-    else:
-        raise ValueError(
-            "Could not detect data format. Expected either 'CS' (old format) "
-            "or 'cs' (new Open Source Bond format) column."
-        )
+    if "isin" not in bond_treas_df.columns:
+        raise ValueError("bond_treas_df must include an 'isin' column.")
+    if "isin" not in red_c_df.columns or "redcode" not in red_c_df.columns:
+        raise ValueError("red_c_df must include 'isin' and 'redcode' columns.")
 
+    bond_df = bond_treas_df.copy()
+    map_df = red_c_df[["isin", "redcode"]].copy()
 
-def derive_size_ig_jk(df, rating_col="spc_rat"):
-    """
-    Derive size_ig and size_jk from numeric rating column.
+    bond_df["isin"] = bond_df["isin"].astype(str).str.strip().str.upper()
+    map_df["isin"] = map_df["isin"].astype(str).str.strip().str.upper()
+    map_df["redcode"] = map_df["redcode"].astype(str).str.strip().str.upper()
 
-    Rating scale: 1 (AAA) to 21 (CCC-), 22 = Default
-    Investment grade: rating <= 10 (BBB- and above)
-    Junk/speculative: rating > 10
+    invalid_isin = {"", "NAN", "NONE"}
+    invalid_red = {"", "NAN", "NONE"}
 
-    Parameters:
-        df: DataFrame with rating column
-        rating_col: Name of the rating column
-
-    Returns:
-        DataFrame with size_ig and size_jk columns added
-    """
-    df = df.copy()
-    # Investment grade if rating <= 10 (BBB- and above)
-    df["size_ig"] = (df[rating_col] <= 10).astype(float)
-    # Junk/speculative if rating > 10
-    df["size_jk"] = (df[rating_col] > 10).astype(float)
-    # Handle missing ratings
-    df.loc[df[rating_col].isna(), "size_ig"] = np.nan
-    df.loc[df[rating_col].isna(), "size_jk"] = np.nan
-    return df
-
-
-def merge_red_code_into_bond_treas(bond_treas_df, red_c_df):
-    """
-    bond_treas_df: dataframe containing merged corporate bond and treasury data.
-        Supports both old format (WRDS_MMN) and new format (osbap_2025).
-
-        Old format columns: date, cusip, issuer_cusip, BOND_YIELD, CS, size_ig, size_jk, tmt
-        New format columns: date, cusip, issuer_cusip, ytm, cs, tmat, spc_rat/mdc_rat
-
-    red_c_df: dataframe containing red code merging information
-        redcode, -- redcode of the issuer
-        ticker, -- ticker of the issuer
-        obl_cusip, -- cusip of an issue, the first 6 objects characters of the string should be the issuers tag
-        isin, -- these are product specific
-        tier -- tier of product
-
-
-    output: dataframe with the issuer cusip and red_code now added
-        date, -- date when data was collected
-        cusip, -- unique bond identifier
-        issuer_cusip, -- cusip of issuing firm
-        BOND_YIELD, -- MMN adjusted bond yield (normalized column name)
-        CS, -- Credit Spread we replace Z-spread with (normalized column name)
-        size_ig, -- 0 if no ig bonds in portfolio, 1 if yes
-        size_jk, -- 0 if no junk bonds in portfolio, 1 if yes
-        mat_days, -- time to maturity in days
-        redcode -- redcode is issuer specific, used to merge CDS values later on
-    """
-    # Detect column format
-    cols = detect_column_format(bond_treas_df)
-
-    # If new format, derive size_ig and size_jk from rating
-    if not cols["has_size_ig_jk"]:
-        bond_treas_df = derive_size_ig_jk(bond_treas_df, rating_col=cols["rating_col"])
-
-    red_c_df = red_c_df[["obl_cusip", "redcode"]].dropna()
-    red_c_df["issuer_cusip"] = red_c_df.apply(lambda row: row["obl_cusip"][:6], axis=1)
-
-    # only need these 2 to merge
-    red_c_df = (
-        red_c_df[["issuer_cusip", "redcode"]].drop_duplicates().reset_index(drop=True)
-    )
-
-    # should drop all uneeded elements
-    merged_df = bond_treas_df.merge(red_c_df, on="issuer_cusip", how="inner")
-
-    # Calculate mat_days using the appropriate factor
-    merged_df["mat_days"] = merged_df[cols["tmt_col"]] * cols["tmt_to_days_factor"]
-
-    # Normalize column names to match expected output format
-    # Rename source columns to standard output names
-    merged_df = merged_df.rename(columns={
-        cols["yield_col"]: "BOND_YIELD",
-        cols["cs_col"]: "CS",
-    })
-
-    return merged_df[
-        [
-            "date",
-            "cusip",
-            "issuer_cusip",
-            "BOND_YIELD",
-            "CS",
-            "size_ig",
-            "size_jk",
-            "mat_days",
-            "redcode",
-        ]
+    bond_df = bond_df[~bond_df["isin"].isin(invalid_isin)]
+    map_df = map_df[
+        (~map_df["isin"].isin(invalid_isin)) & (~map_df["redcode"].isin(invalid_red))
     ]
+
+    map_df = map_df.drop_duplicates(subset=["isin", "redcode"])
+    isin_multi_red = map_df.groupby("isin")["redcode"].nunique()
+    multi_count = int((isin_multi_red > 1).sum())
+    if multi_count > 0:
+        ambiguous_isins = set(isin_multi_red[isin_multi_red > 1].index)
+        if cds_df is not None and "redcode" in cds_df.columns:
+            red_counts = (
+                cds_df[["redcode"]]
+                .copy()
+                .assign(
+                    redcode=lambda d: d["redcode"].astype(str).str.strip().str.upper()
+                )
+            )
+            red_counts = red_counts[~red_counts["redcode"].isin(invalid_red)]
+            red_counts = (
+                red_counts.groupby("redcode")
+                .size()
+                .reset_index(name="cds_obs_count")
+            )
+
+            map_amb = map_df[map_df["isin"].isin(ambiguous_isins)].copy()
+            map_amb = map_amb.merge(red_counts, on="redcode", how="left")
+            map_amb["cds_obs_count"] = map_amb["cds_obs_count"].fillna(0)
+            map_amb = map_amb.sort_values(
+                ["isin", "cds_obs_count", "redcode"],
+                ascending=[True, False, True],
+            )
+            map_amb = map_amb.drop_duplicates(subset=["isin"], keep="first")
+            map_amb = map_amb[["isin", "redcode"]]
+
+            map_unamb = map_df[~map_df["isin"].isin(ambiguous_isins)]
+            map_df = pd.concat([map_unamb, map_amb], ignore_index=True)
+            warnings.warn(
+                f"{multi_count} ISINs map to multiple RED codes; "
+                "resolved using CDS coverage count (tie-break: redcode ascending)."
+            )
+        else:
+            map_df = map_df.drop_duplicates(subset=["isin"], keep="first")
+            warnings.warn(
+                f"{multi_count} ISINs map to multiple RED codes; "
+                "CDS data not provided, keeping first mapping per ISIN."
+            )
+    else:
+        map_df = map_df.drop_duplicates(subset=["isin"], keep="first")
+
+    merged_df = bond_df.merge(map_df, on="isin", how="inner")
+
+    if {"date", "maturity"}.issubset(merged_df.columns):
+        merged_df["date"] = pd.to_datetime(merged_df["date"], errors="coerce")
+        merged_df["maturity"] = pd.to_datetime(merged_df["maturity"], errors="coerce")
+        merged_df["mat_days"] = _compute_mat_days_from_zspread_convention(merged_df)
+
+    return merged_df.reset_index(drop=True)
 
 
 def merge_cds_into_bonds(bond_red_df, cds_df):
     """
-    bond_red_df: dataframe with the issuer cusip and red_code now added
-        date, -- date when data was collected
-        cusip, -- cusip of the entire bond issue, unique bond identifier
-        issuer_cusip, -- cusip of issuing firm
-        BOND_YIELD, -- MMN adjusted bond yield
-        CS, -- Credit Spread we replace Z-spread with
-        size_ig, -- 0 if no ig bonds in portfolio, 1 if yes
-        size_jk, -- 0 if no junk bonds in portfolio, 1 if yes
-        mat_days, -- time to maturity in days
-        redcode -- redcode is issuer specific, used to merge CDS values later on
-
-    cds_df: dataframe containing cds_data
-        date, -- date of report
-        'ticker', -- ticker of issuer
-        'redcode', -- redcode of issuer
-        'parspread', -- parspread
-        'tenor', -- tenor, how long
-        'tier', -- tier of debt
-        'country', -- country of issuer
-        'year' -- year of date
-
-    output: dataframe with par spread values merged into all values where there was a possible cubic spline
-        'cusip', -- cusip of the entire bond issue, unique bond identifier
-       'date', -- reporting date
-       'mat_days', -- days till maturity
-       'BOND_YIELD', -- MMN adjusted bond yield
-       'CS', -- credit spread
-        'size_ig', -- 0 if no ig bonds in portfolio, 1 if yes
-        'size_jk', -- 0 if no junk bonds in portfolio, 1 if yes
-       'par_spread', -- parspread of CDS, backed out by Cubic Spline
+    Merge CDS par spreads into bond data via per-(redcode, date) cubic spline
+    interpolation on tenor. Aligns each bond observation to the latest prior
+    CDS quote date in the same month.
     """
-    date_set = set(bond_red_df.date.unique())
-    cds_df = cds_df[cds_df["date"].isin(date_set)].dropna(
-        subset=["date", "parspread", "tenor", "redcode"]
-    )
+    required_bond_cols = {"date", "redcode", "mat_days"}
+    missing_bond = sorted(required_bond_cols.difference(bond_red_df.columns))
+    if missing_bond:
+        raise ValueError(f"bond_red_df is missing required columns: {missing_bond}")
 
-    # par spread values are roughly consistent for each tenor, make broad assumptions on true value on par spread
-    c_df_avg = cds_df.groupby(
-        cds_df.columns.difference(["parspread"]).tolist(), as_index=False
+    bond_df = bond_red_df.copy()
+    cds_work = cds_df.copy()
+
+    required_cds_cols = {"date", "redcode", "tenor", "parspread"}
+    missing_cds = sorted(required_cds_cols.difference(cds_work.columns))
+    if missing_cds:
+        raise ValueError(f"cds_df is missing required columns: {missing_cds}")
+
+    bond_df["date"] = pd.to_datetime(bond_df["date"], errors="coerce").dt.normalize()
+    bond_df["redcode"] = bond_df["redcode"].astype(str).str.strip().str.upper()
+    bond_df["mat_days"] = pd.to_numeric(bond_df["mat_days"], errors="coerce")
+    bond_df = bond_df.dropna(subset=["date", "redcode", "mat_days"])
+
+    cds_work["date"] = pd.to_datetime(cds_work["date"], errors="coerce").dt.normalize()
+    cds_work["redcode"] = cds_work["redcode"].astype(str).str.strip().str.upper()
+    cds_work["tenor"] = cds_work["tenor"].astype(str).str.strip().str.upper()
+    cds_work["parspread"] = pd.to_numeric(cds_work["parspread"], errors="coerce")
+
+    cds_work = cds_work.dropna(subset=["date", "parspread", "tenor", "redcode"])
+
+    cds_available_dates = pd.DatetimeIndex(
+        pd.to_datetime(cds_work["date"]).dropna().drop_duplicates().sort_values()
+    )
+    if cds_available_dates.empty:
+        warnings.warn("No usable CDS dates available after input cleaning.")
+        out = bond_df.iloc[0:0].copy()
+        out["par_spread"] = np.nan
+        return out
+
+    def _resolve_cds_date(target_date):
+        d = pd.Timestamp(target_date)
+        if d in cds_available_dates:
+            return d
+        prior = cds_available_dates[cds_available_dates <= d]
+        if len(prior) == 0:
+            return pd.NaT
+        candidate = prior[-1]
+        if candidate.to_period("M") == d.to_period("M"):
+            return candidate
+        return pd.NaT
+
+    date_map = {d: _resolve_cds_date(d) for d in bond_df["date"].dropna().unique()}
+    bond_df["cds_date"] = bond_df["date"].map(date_map)
+    dropped_no_cds_date = int(bond_df["cds_date"].isna().sum())
+    if dropped_no_cds_date > 0:
+        warnings.warn(
+            f"{dropped_no_cds_date} bond rows have no prior same-month CDS date; "
+            "dropping."
+        )
+    bond_df = bond_df.dropna(subset=["cds_date"]).copy()
+
+    if bond_df.empty:
+        warnings.warn("No bond rows remain after CDS date alignment.")
+        out = bond_df.iloc[0:0].copy()
+        if "cds_date" in out.columns:
+            out = out.drop(columns=["cds_date"])
+        out["par_spread"] = np.nan
+        return out
+
+    cds_date_set = set(bond_df["cds_date"].unique())
+    cds_work = cds_work[cds_work["date"].isin(cds_date_set)].copy()
+
+    c_df_avg = cds_work.groupby(
+        cds_work.columns.difference(["parspread"]).tolist(), as_index=False
     ).agg({"parspread": "median"})
 
     df_unique_count = (
         c_df_avg.groupby(["redcode", "date"])["tenor"].nunique().reset_index()
     )
     df_unique_count.rename(columns={"tenor": "unique_tenor_count"}, inplace=True)
-
-    # need at least 2 for cubic spline
     df_unique_count = df_unique_count[df_unique_count["unique_tenor_count"] > 1]
 
-    # grab the filtered_cds_df by using df_uni_count as a filter
     filtered_cds_df = c_df_avg.merge(
         df_unique_count[["redcode", "date"]], on=["redcode", "date"], how="inner"
     )
 
-    # my mapping to convert tenor to days to get a rough approximation of a daily spline
+    if filtered_cds_df.empty:
+        warnings.warn(
+            "No (redcode, date) groups with at least two CDS tenors; "
+            "returning empty CDS-bond merge output."
+        )
+        out = bond_df.iloc[0:0].copy()
+        if "cds_date" in out.columns:
+            out = out.drop(columns=["cds_date"])
+        out["par_spread"] = np.nan
+        return out
+
     tenor_to_days = {
         "1Y": 365,
         "3Y": 3 * 365,
@@ -219,117 +236,81 @@ def merge_cds_into_bonds(bond_red_df, cds_df):
 
     filtered_cds_df["tenor_days"] = filtered_cds_df["tenor"].map(tenor_to_days)
 
-    # Dictionary to store cubic splines for each (redcode, date) pair
     cubic_splines = {}
     WARN = False
-
-    # Group by (redcode, date) and create splines
     for (redcode, date), group in filtered_cds_df.groupby(["redcode", "date"]):
         x = group["tenor_days"].values
         y = group["parspread"].values
-
         sorted_indices = np.argsort(x)
         x_sorted, y_sorted = x[sorted_indices], y[sorted_indices]
-
-        # Fit cubic spline
         try:
             cubic_splines[(redcode, date)] = CubicSpline(x_sorted, y_sorted)
-        except:
+        except Exception:
             WARN = True
-            # print(x_sorted)
-            # print(y_sorted)
 
     if WARN:
-        warnings.warn("Failed to fit cubic spline for (redcode, date)")
+        warnings.warn("Failed to fit cubic spline for some (redcode, date) pairs")
 
-    # START filtering the bond dataframe to make the merge easier
     red_set = set(filtered_cds_df["redcode"].unique())
-    bond_red_df = bond_red_df[bond_red_df["redcode"].isin(red_set)]
+    bond_df = bond_df[bond_df["redcode"].isin(red_set)]
 
-    # vectorized function to grab the par spread
     def add_par_spread_vectorized(df):
-        # Create a copy to avoid SettingWithCopyWarning
         df = df.copy()
+        if df.empty:
+            df["par_spread"] = np.nan
+            return df
 
-        mask = df.set_index(["redcode", "date"]).index.isin(cubic_splines.keys())
-
-        # spline interpolation only for matching keys
+        mask = df.set_index(["redcode", "cds_date"]).index.isin(cubic_splines.keys())
         valid_rows = df.loc[mask]
         df.loc[mask, "par_spread"] = valid_rows.apply(
-            lambda row: cubic_splines[(row["redcode"], row["date"])](row["mat_days"]),
+            lambda row: cubic_splines[(row["redcode"], row["cds_date"])](
+                row["mat_days"]
+            ),
             axis=1,
         )
-
         df["par_spread"] = df["par_spread"].fillna(np.nan)
-
         return df
 
-    par_df = add_par_spread_vectorized(bond_red_df)
+    par_df = add_par_spread_vectorized(bond_df)
     par_df = par_df.dropna(subset=["par_spread"])
+    if "cds_date" in par_df.columns:
+        par_df = par_df.drop(columns=["cds_date"])
 
-    # keep only the important columns
-    par_df = par_df[
-        [
-            "cusip",
-            "date",
-            "mat_days",
-            "BOND_YIELD",
-            "CS",
-            "size_ig",
-            "size_jk",
-            "par_spread",
-        ]
-    ]
-
-    # have had issues with a phantom array column
     def safe_convert(x):
-        """Convert lists and arrays to tuples while keeping other data types unchanged."""
         if isinstance(x, list):
             return tuple(x)
         elif isinstance(x, np.ndarray):
-            return (
-                tuple(x.tolist()) if x.ndim > 0 else x.item()
-            )  # Convert array to tuple if not scalar
+            return tuple(x.tolist()) if x.ndim > 0 else x.item()
         else:
             return x
 
-    # Apply safe conversion
     par_df = par_df.map(safe_convert)
     par_df = par_df.drop_duplicates()
 
     return par_df
 
 
-# THIS MAIN FUNCTION IS NOT DONE YET, WILL BE RESOLVED SOON or not at all
-
-
 def main():
-    """
-    Main function to load data, process it, and merge Treasury data into Bonds.
-    """
     print("Loading data...")
-    # Keeping these global vars down here for now for ease of reference
-    RED_CODE_FILE_NAME = "RED_and_ISIN_mapping.parquet"
-    CORPORATES_MONTHLY_FILE_NAME = "corporate_bond_returns.parquet"
-    CDS_FILE_NAME = (
-        "markit_cds.parquet"  # Assuming this is the file name from Kaustaub's script
+    corp_bonds_data = pd.read_parquet(DATA_DIR / BOND_RED_CODE_FILE_NAME)
+    red_data = pd.read_parquet(DATA_DIR / RED_CODE_FILE_NAME)
+    cds_data = pd.read_parquet(DATA_DIR / CDS_FILE_NAME)
+
+    print("Merging RED codes into bond data...")
+    corp_red_data = merge_red_code_into_bond_treas(
+        corp_bonds_data, red_data, cds_data
     )
-
-    corp_bonds_data = pd.read_parquet(f"{DATA_DIR}/{CORPORATES_MONTHLY_FILE_NAME}")
-    red_data = pd.read_parquet(f"{DATA_DIR}/{RED_CODE_FILE_NAME}")
-    cds_data = pd.read_parquet(f"{DATA_DIR}/{CDS_FILE_NAME}")
-
-    corp_red_data = merge_red_code_into_bond_treas(corp_bonds_data, red_data)
+    print("Interpolating CDS spreads onto bond maturities...")
     final_data = merge_cds_into_bonds(corp_red_data, cds_data)
-    # Missing a step of "process final data" from the ipynb
 
     print("Saving processed data...")
-    corp_red_data.to_parquet(
-        f"{DATA_DIR}/{'Red_Data.parquet'}"
-    )  # change name of file as needed
-    final_data.to_parquet(f"{DATA_DIR}/{'Final_data.parquet'}")
+    corp_red_path = DATA_DIR / RED_MERGED_FILE_NAME
+    final_path = DATA_DIR / FINAL_ANALYSIS_FILE_NAME
+    corp_red_data.to_parquet(corp_red_path)
+    final_data.to_parquet(final_path)
 
-    print("Processing complete. Data saved.")
+    print(f"Saved RED-merged bond data: {corp_red_path} ({len(corp_red_data)} rows)")
+    print(f"Saved final CDS-bond merged data: {final_path} ({len(final_data)} rows)")
 
 
 if __name__ == "__main__":

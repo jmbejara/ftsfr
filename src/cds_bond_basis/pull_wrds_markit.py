@@ -18,7 +18,7 @@ from settings import config
 DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = pd.Timestamp("1925-01-01")
-END_DATE = pd.Timestamp("2024-01-01")
+END_DATE = pd.Timestamp(config("END_DATE", default="2025-12-31"))
 
 
 def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
@@ -34,7 +34,7 @@ def get_cds_data_as_dict(wrds_username=WRDS_USERNAME):
     """
     db = wrds.Connection(wrds_username=wrds_username)
     cds_data = {}
-    for year in range(2001, 2024):  # Loop from 2001 to 2005
+    for year in range(2001, END_DATE.year + 1):
         table_name = f"markit.CDS{year}"  # Generate table name dynamically
         query = f"""
         SELECT DISTINCT

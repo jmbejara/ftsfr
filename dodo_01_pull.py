@@ -107,20 +107,20 @@ def task_pull():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/pull_open_source_bond.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/pull_wrds_bond_ret.py --DATA_DIR={DATA_DIR}",
                 f"python ./src/{data_module}/pull_wrds_markit.py --DATA_DIR={DATA_DIR / data_module}",
                 f"python ./src/{data_module}/pull_markit_mapping.py --DATA_DIR={DATA_DIR / data_module}",
             ],
             "targets": [
-                DATA_DIR / data_module / "corporate_bond_returns.parquet",
-                DATA_DIR / data_module / "treasury_bond_returns.parquet",
+                DATA_DIR / data_module / "wrds_bondret_filtered.parquet",
+                DATA_DIR / data_module / "wrds_bondret_project.parquet",
                 DATA_DIR / data_module / "markit_cds.parquet",
                 DATA_DIR / data_module / "markit_red_crsp_link.parquet",
                 DATA_DIR / data_module / "markit_cds_subsetted_to_crsp.parquet",
                 DATA_DIR / data_module / "RED_and_ISIN_mapping.parquet",
             ],
             "file_dep": [
-                f"./src/{data_module}/pull_open_source_bond.py",
+                f"./src/{data_module}/pull_wrds_bond_ret.py",
                 f"./src/{data_module}/pull_wrds_markit.py",
                 f"./src/{data_module}/pull_markit_mapping.py",
             ],
@@ -442,17 +442,27 @@ def task_format():
         yield {
             "name": data_module,
             "actions": [
-                f"python ./src/{data_module}/merge_cds_bond.py --DATA_DIR={DATA_DIR / data_module}",
-                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR / data_module}",
+                f"python ./src/{data_module}/process_pipeline.py --DATA_DIR={DATA_DIR}",
+                f"python ./src/{data_module}/create_ftsfr_datasets.py --DATA_DIR={DATA_DIR}",
             ],
             "targets": [
                 DATA_DIR / data_module / "Red_Data.parquet",
                 DATA_DIR / data_module / "Final_data.parquet",
+                DATA_DIR / data_module / "final_data_with_z_spread.parquet",
+                DATA_DIR / data_module / "cds_basis_processed.parquet",
+                DATA_DIR / data_module / "cds_basis_aggregated.parquet",
+                DATA_DIR / data_module / "cds_basis_non_aggregated.parquet",
+                DATA_DIR / data_module / "cds_basis_summary_stats.csv",
                 DATA_DIR / data_module / "ftsfr_CDS_bond_basis_aggregated.parquet",
                 DATA_DIR / data_module / "ftsfr_CDS_bond_basis_non_aggregated.parquet",
             ],
             "file_dep": [
+                f"./src/{data_module}/process_pipeline.py",
                 f"./src/{data_module}/merge_cds_bond.py",
+                f"./src/{data_module}/merge_z_spread_bond.py",
+                f"./src/{data_module}/process_z_spread.py",
+                f"./src/{data_module}/gsw2006_yield_curve.py",
+                f"./src/{data_module}/process_final_product.py",
                 f"./src/{data_module}/create_ftsfr_datasets.py",
             ],
             "clean": [],
@@ -463,6 +473,7 @@ def task_format():
                 "notebook_path": "./src/cds_bond_basis/summary_cds_bond_basis_ipynb.py",
                 "file_dep": [
                     "./src/cds_bond_basis/merge_cds_bond.py",
+                    "./src/cds_bond_basis/process_final_product.py",
                 ],
                 "targets": [],
             },
