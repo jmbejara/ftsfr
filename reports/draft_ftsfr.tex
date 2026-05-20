@@ -283,7 +283,7 @@ Treasury Portfolio & ibid. \\
 \midrule
 \multicolumn{2}{c}{\textbf{Basis Spread Data}} \\
 \midrule
-CDS-Bond & WRDS TRACE, following Open Source Bond Asset Pricing; S\&P Global CDS and RED Entity (formerly Markit) \\
+CDS-Bond & WRDS Bond Returns (TRACE); CRSP daily Treasury panel; S\&P Global CDS and RED Entity (formerly Markit) \\
 CIP & Bloomberg Terminal \\
 TIPS-Treasury & ibid. \\
 Treasury-SF & ibid. \\
@@ -432,7 +432,7 @@ Each of these basis spreads are, themselves, constructed following methodologies
 
 \paragraph{CDS-Bond Basis}
 
-Leveraging the daily Markit pricing files used by \citet{Siriwardane2021}, we link cash bonds to matching single-name CDS and compute the basis after (i) retaining only USD-denominated senior unsecured issues with fixed coupons and 1-10-year maturities, (ii) discarding quotes with prices below 50¢, zero bids, or stale timestamps, and (iii) mapping each bond to a duration-matched CDS par spread via cubic-spline interpolation.  We further exclude callable/convertible structures, winsorize extreme 100\% bases, and require each bond to appear in our cleaned version of the public FINRA TRACE dataset to guarantee tradability, yielding a high-quality daily series that mirrors the investment-grade and high-yield bases reported in the original study.
+We follow \citet{Siriwardane2021} in defining the CDS-bond basis as the difference between a maturity-matched CDS par spread and the bond's floating-rate spread, and link single-name CDS quotes from S\&P Global (Markit) to corporate bonds on ISIN through the RED-ISIN obligation lookup table. Our bond panel is the WRDS Bond Returns project table, restricted to USD-denominated senior unsecured fixed-coupon issues with valid ISIN, one- to ten-year remaining maturity, outstanding principal of at least \$100{,}000, no convertible structures, and end-of-month price at least fifty cents on the dollar. The floating-rate spread is constructed as a bond-level Z-spread by fitting a Nelson--Siegel--Svensson Treasury curve on the CRSP daily Treasury panel \citep{Gurkaynak2007} and solving numerically for the constant continuous-compounded spread that reprices each bond's coupon and principal cash flows. The CDS par spread is interpolated by cubic spline across the 1Y, 3Y, 5Y, 7Y, and 10Y tenors. Because WRDS Bond Returns is a monthly end-of-month panel, our resulting basis series is monthly, whereas the daily index of \citet{Siriwardane2021} is constructed from daily Markit bond prices using WRDS Bond Returns only as a tradability filter on ISINs. Section~\ref{sec:cds_bond_basis_appendix} gives the full filter list, including our outlier handling.
 These spreads are shown in Figure~\ref{fig:cds_basis}.
 
 
@@ -1193,6 +1193,7 @@ Our Credit Default Swap (CDS) returns follow the methodology of \cite{Palhares20
 Following \cite{Siriwardane2021}, we construct various arbitrage spreads that measure market segmentation.
 
 \subsubsection{CDS-Bond Basis}
+\label{sec:cds_bond_basis_appendix}
 % Credit default swap vs cash bond arbitrage
 
 Credit Default Swaps (CDS) are "insurance contracts" against the default of underlying
@@ -1223,6 +1224,43 @@ The floating-rate spread is conventionally proxied by the bond's Z-spread, and t
 
 Our implementation draws bond observations from the WRDS Bond Returns (\texttt{wrdsapps\_bondret.bondret}) project panel and CDS quotes from Markit via WRDS, restricting to USD-denominated senior unsecured contracts on US firms at the 1-, 3-, 5-, 7-, and 10-year tenors and joining the two sides on ISIN through the RED-ISIN obligation lookup table. The bond filters follow the source paper: senior unsecured USD debt with a valid ISIN, fixed coupon, one- to ten-year remaining maturity, outstanding principal of at least \$100{,}000, no convertible structures, and end-of-month price at least fifty cents on the dollar. The floating-rate spread is constructed as a true bond-level Z-spread: for each (date, bond) we fit a Nelson--Siegel--Svensson Treasury curve on the CRSP daily Treasury panel following \citet{Gurkaynak2007}, fall back to the Federal Reserve's published NSS parameters on dates when the CRSP fit is pathological, and then solve numerically for the constant continuous-compounded spread that reprices the bond's coupon and principal cash flows off the fitted curve. The CDS par spread is interpolated by cubic spline across the 1Y, 3Y, 5Y, 7Y, and 10Y tenors and matched to the bond's days-to-maturity; we require at least two distinct CDS tenors per firm-date and discard firm-dates that fail this requirement rather than extrapolating. Finally, we drop Z-spread fits that hit the brentq solver boundary, drop bond-level bases beyond \(\pm\)1000 bps, and require at least five bonds per rating bucket and date when averaging into the IG and HY indices.
 
+\paragraph{Frequency difference vs.~\citet{Siriwardane2021}.}
+The most consequential implementation difference from the source paper is the
+output frequency.  \texttt{wrdsapps\_bondret.bondret} is a monthly
+end-of-month panel, with one observation per bond per month indexed on
+\texttt{price\_eom}, so our basis series is constructed at month-end and
+plotted in Figure~\ref{fig:CDS_replicate} as a monthly time series.
+\citet{Siriwardane2021}, in contrast, plot a daily series: they read
+bond prices directly from the Markit bond-pricing tables and use the WRDS
+Bond Return dataset only as a tradability filter on ISIN (``in a given
+month we only include bonds whose ISINs are included in the WRDS Bond
+Return dataset''). Reproducing the daily frequency would require adding a
+daily Markit bond pricing pull alongside the WRDS Bond Returns filter; the
+merge, NSS curve fitting, and Z-spread machinery in our pipeline would
+carry over unchanged.
+
+\paragraph{Outlier handling.}
+Three pieces of outlier handling are worth flagging explicitly because they
+affect the visible level of the IG and HY series. (i) On a handful of
+quote dates the CRSP NSS curve fit converges to a pathological local
+optimum (we observed, e.g., a 25\% fitted 1Y spot rate on 2010-06-30 and
+2011-10-31).  We detect this by comparing the fitted 1Y, 5Y, and 10Y spot
+rates to the Federal Reserve's published SVENY series for the same date
+and, when the absolute discrepancy exceeds 50 bps at any of those points,
+substitute the Fed's published NSS parameters for that date.  Without this
+fallback the Z-spreads on those days are essentially noise and produce
+month-end spikes of 800--1000~bps in the rating-bucket means. (ii) We
+discard individual Z-spread fits that hit the brentq solver's
+\(\pm 20\%\) bracket, which are failed fits rather than realized spreads.
+(iii) We discard bond-level bases whose magnitude exceeds 1{,}000~bps;
+these are typically driven by cubic-spline extrapolation of the CDS par
+spread to bonds whose maturity sits at the edge of the [1Y, 10Y] CDS
+tenor grid. After these filters, we still require at least five surviving
+bonds in a given (rating, date) cell before reporting a rating-bucket
+average; this last screen suppresses the single-bond ``spikes'' that
+otherwise dominate the early high-yield sub-sample where the CDS-covered
+HY universe is sparse.
+
 The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.
 
 % \begin{figure}
@@ -1249,7 +1287,7 @@ The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.
     \begin{tabular}{@{}c@{}}
       \includegraphics[width=.95\linewidth]{\PathToOutput/CDS_replicate.png}
     \end{tabular}
-    \caption{Comparison of CDS Arbitrage spreads}
+    \caption{CDS Arbitrage spreads, High Yield and Investment Grade}
     \label{fig:CDS_replicate}
 \end{figure}
 
