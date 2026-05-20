@@ -120,7 +120,7 @@ ds: min=2001-12-20 00:00:00, max=2025-08-11 00:00:00
 
 ## ftsfr_CDS_bond_basis_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_aggregated.parquet`
-**Size:** 5600 bytes | **Type:** Parquet | **Shape:** 368 rows × 3 columns
+**Size:** 7920 bytes | **Type:** Parquet | **Shape:** 546 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -133,37 +133,37 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-3.093328225349698, max=6.191714845203802, mean=1.99, median=1.9909478097509414
+y: min=-387.5177840337986, max=57.59304878255962, mean=-62.13, median=-47.59822949472496
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2002-09-30 00:00:00, max=2023-11-30 00:00:00
+ds: min=2002-07-31 00:00:00, max=2025-03-31 00:00:00
 ```
 
 ---
 
 ## ftsfr_CDS_bond_basis_non_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet`
-**Size:** 4.4 MB | **Type:** Parquet | **Shape:** 532,361 rows × 3 columns
+**Size:** 1.4 MB | **Type:** Parquet | **Shape:** 185,931 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
 ### Columns
 ```
-unique_id                                Categorical(ordering='physical')
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-99.97459322374101, max=99.8629400456488, mean=2.42, median=2.638552306016205
+y: min=-999.6092364237279, max=998.565884895731, mean=-62.44, median=-44.41025002527942
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2002-09-30 00:00:00, max=2023-11-30 00:00:00
+ds: min=2002-07-31 00:00:00, max=2025-04-30 00:00:00
 ```
 
 ---
@@ -330,14 +330,13 @@ ds: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ### Columns
 ```
-unique_id                                Float64        
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float32        
 ```
 
 ### Numeric Column Statistics
 ```
-unique_id: min=1.0, max=10.0, mean=5.50, median=5.5
 y: min=-0.29776981472969055, max=0.3147818148136139, mean=0.01, median=0.00559262465685606
 ```
 
@@ -350,13 +349,13 @@ ds: min=2002-08-31 00:00:00, max=2024-12-31 00:00:00
 
 ## ftsfr_corp_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_returns.parquet`
-**Size:** 8.5 MB | **Type:** Parquet | **Shape:** 1,859,498 rows × 3 columns
+**Size:** 7.6 MB | **Type:** Parquet | **Shape:** 1,859,498 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
 ### Columns
 ```
-unique_id                                Categorical(ordering='physical')
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float32        
 ```

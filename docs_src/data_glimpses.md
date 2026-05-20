@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Total files: 126
+Total files: 131
 
 ## Summary of Datasets by Task
 
@@ -23,6 +23,11 @@ Total files: 126
 #### Format: Cds Bond Basis
 - [`Final_data.parquet`](#final-data-parquet)
 - [`Red_Data.parquet`](#red-data-parquet)
+- [`cds_basis_aggregated.parquet`](#cds-basis-aggregated-parquet)
+- [`cds_basis_non_aggregated.parquet`](#cds-basis-non-aggregated-parquet)
+- [`cds_basis_processed.parquet`](#cds-basis-processed-parquet)
+- [`cds_basis_summary_stats.csv`](#cds-basis-summary-stats-csv)
+- [`final_data_with_z_spread.parquet`](#final-data-with-z-spread-parquet)
 - [`ftsfr_CDS_bond_basis_aggregated.parquet`](#ftsfr-cds-bond-basis-aggregated-parquet)
 - [`ftsfr_CDS_bond_basis_non_aggregated.parquet`](#ftsfr-cds-bond-basis-non-aggregated-parquet)
 #### Format: Cds Returns
@@ -120,11 +125,11 @@ Total files: 126
 - [`treasury_df.parquet`](#treasury-df-parquet)
 #### Pull: Cds Bond Basis
 - [`RED_and_ISIN_mapping.parquet`](#red-and-isin-mapping-parquet)
-- [`corporate_bond_returns.parquet`](#corporate-bond-returns-parquet)
 - [`markit_cds.parquet`](#markit-cds-parquet)
 - [`markit_cds_subsetted_to_crsp.parquet`](#markit-cds-subsetted-to-crsp-parquet)
 - [`markit_red_crsp_link.parquet`](#markit-red-crsp-link-parquet)
-- [`treasury_bond_returns.parquet`](#treasury-bond-returns-parquet)
+- [`wrds_bondret_filtered.parquet`](#wrds-bondret-filtered-parquet)
+- [`wrds_bondret_project.parquet`](#wrds-bondret-project-parquet)
 #### Pull: Cds Returns
 - [`fed_yield_curve.parquet`](#fed-yield-curve-parquet)
 - [`fred.parquet`](#fred-parquet)
@@ -1038,42 +1043,70 @@ __index_level_0__: min=2001-12-04, max=2025-08-11
 
 ## Final_data.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Final_data.parquet`
-**Size:** 15.4 MB | **Type:** Parquet | **Shape:** 576,726 rows × 9 columns
+**Size:** 9.3 MB | **Type:** Parquet | **Shape:** 186,684 rows × 25 columns
 
 ### Columns
 ```
-cusip                                    Categorical(ordering='physical')
 date                                     Datetime(time_unit='ns', time_zone=None)
+issue_id                                 Float64        
+isin                                     String         
+cusip                                    String         
+principal_amt                            Float64        
+amount_outstanding                       Float64        
+maturity                                 Datetime(time_unit='ns', time_zone=None)
+coupon                                   Float64        
+day_count_basis                          String         
+dated_date                               Datetime(time_unit='ns', time_zone=None)
+first_interest_date                      Datetime(time_unit='ns', time_zone=None)
+last_interest_date                       Datetime(time_unit='ns', time_zone=None)
+ncoups                                   Float64        
+nextcoup                                 Datetime(time_unit='ns', time_zone=None)
+remcoups                                 Float64        
+coupacc                                  Float64        
+price_eom                                Float64        
+tmt                                      Float64        
+t_volume                                 Float64         (3.1% null)
+t_dvolume                                Float64         (3.1% null)
+rating_class                             String         
+redcode                                  String         
 mat_days                                 Float64        
-BOND_YIELD                               Float64         (1.8% null)
-CS                                       Float64         (1.8% null)
-size_ig                                  Float64        
-size_jk                                  Float64        
 par_spread                               Float64        
 __index_level_0__                        Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-mat_days: min=365.72998046875, max=36468.9765625, mean=3639.52, median=2374.324951171875
-BOND_YIELD: min=-0.015356800518929958, max=1.6190356016159058, mean=0.05, median=0.04321911558508873
-CS: min=-0.048068951815366745, max=1.6071245670318604, mean=0.02, median=0.01305889105424285
-size_ig: min=0.0, max=1.0, mean=0.82, median=1.0
-size_jk: min=0.0, max=1.0, mean=0.18, median=0.0
-par_spread: min=-276.48738268530434, max=1305.8769624530403, mean=0.05, median=0.007527865578751484
-__index_level_0__: min=37, max=1494030, mean=732118.98, median=734494.5
+issue_id: min=54.0, max=1197532.0, mean=399727.15, median=400319.0
+principal_amt: min=1000.0, max=1000.0, mean=1000.00, median=1000.0
+amount_outstanding: min=112.15, max=9000000.0, mean=665344.16, median=500000.0
+coupon: min=0.55, max=13.25, mean=5.69, median=5.75
+ncoups: min=2.0, max=12.0, mean=2.01, median=2.0
+remcoups: min=2.0, max=120.0, mean=11.07, median=11.0
+coupacc: min=0.0, max=6.6431506849315065, mean=1.50, median=1.3315068493150686
+price_eom: min=50.0, max=3347.9645670033674, mean=103.80, median=104.11951190476191
+tmt: min=1.0138888888888888, max=10.147222222222222, mean=5.32, median=5.2
+t_volume: min=1000.0, max=18728526000.0, mean=65334773.85, median=24469000.0
+t_dvolume: min=900.0, max=18537484543.17349, mean=66036387.54, median=25179844.913310003
+mat_days: min=365.0, max=3650.0, mean=1914.37, median=1870.625
+par_spread: min=-0.21835338831352558, max=1.5957769900758496, mean=0.02, median=0.007952520124777214
+__index_level_0__: min=5, max=244948, mean=123818.46, median=123803.5
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=2002-09-30 00:00:00, max=2023-11-30 00:00:00
+date: min=2002-07-31 00:00:00, max=2025-04-30 00:00:00
+maturity: min=2003-08-15 00:00:00, max=2035-03-15 00:00:00
+dated_date: min=1986-04-15 00:00:00, max=2025-03-20 00:00:00
+first_interest_date: min=1986-10-15 00:00:00, max=2025-10-15 00:00:00
+last_interest_date: min=2003-02-15 00:00:00, max=2034-09-15 00:00:00
+nextcoup: min=2002-08-01 00:00:00, max=2025-10-15 00:00:00
 ```
 
 ---
 
 ## RED_and_ISIN_mapping.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/RED_and_ISIN_mapping.parquet`
-**Size:** 247740 bytes | **Type:** Parquet | **Shape:** 11,212 rows × 5 columns
+**Size:** 247766 bytes | **Type:** Parquet | **Shape:** 11,213 rows × 5 columns
 
 ### Columns
 ```
@@ -1088,334 +1121,309 @@ tier                                     String
 
 ## Red_Data.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/Red_Data.parquet`
-**Size:** 16.5 MB | **Type:** Parquet | **Shape:** 1,494,193 rows × 9 columns
+**Size:** 8.6 MB | **Type:** Parquet | **Shape:** 244,956 rows × 23 columns
 
 ### Columns
 ```
 date                                     Datetime(time_unit='ns', time_zone=None)
-cusip                                    Categorical(ordering='physical')
-issuer_cusip                             String         
-BOND_YIELD                               Float32         (2.0% null)
-CS                                       Float32         (3.4% null)
-size_ig                                  Float64        
-size_jk                                  Float64        
-mat_days                                 Float32        
+issue_id                                 Float64        
+isin                                     String         
+cusip                                    String         
+principal_amt                            Float64        
+amount_outstanding                       Float64        
+maturity                                 Datetime(time_unit='ns', time_zone=None)
+coupon                                   Float64        
+day_count_basis                          String         
+dated_date                               Datetime(time_unit='ns', time_zone=None)
+first_interest_date                      Datetime(time_unit='ns', time_zone=None)
+last_interest_date                       Datetime(time_unit='ns', time_zone=None)
+ncoups                                   Float64        
+nextcoup                                 Datetime(time_unit='ns', time_zone=None)
+remcoups                                 Float64        
+coupacc                                  Float64        
+price_eom                                Float64        
+tmt                                      Float64        
+t_volume                                 Float64         (3.8% null)
+t_dvolume                                Float64         (3.8% null)
+rating_class                             String         
 redcode                                  String         
+mat_days                                 Float64        
 ```
 
 ### Numeric Column Statistics
 ```
-BOND_YIELD: min=-0.015356800518929958, max=2.5348622798919678, mean=0.05, median=0.04613940417766571
-CS: min=-0.048068951815366745, max=2.507453203201294, mean=0.02, median=0.013475267216563225
-size_ig: min=0.0, max=1.0, mean=0.81, median=1.0
-size_jk: min=0.0, max=1.0, mean=0.19, median=0.0
-mat_days: min=365.72998046875, max=36468.9765625, mean=3628.58, median=2388.195068359375
+issue_id: min=54.0, max=1197532.0, mean=392980.05, median=388297.0
+principal_amt: min=1000.0, max=1000.0, mean=1000.00, median=1000.0
+amount_outstanding: min=112.15, max=9000000.0, mean=664128.51, median=500000.0
+coupon: min=0.55, max=13.25, mean=5.75, median=5.875
+ncoups: min=2.0, max=12.0, mean=2.01, median=2.0
+remcoups: min=2.0, max=120.0, mean=11.22, median=11.0
+coupacc: min=0.0, max=6.6431506849315065, mean=1.51, median=1.35013698630137
+price_eom: min=50.0, max=3347.9645670033674, mean=103.76, median=104.119
+tmt: min=1.0138888888888888, max=10.147222222222222, mean=5.40, median=5.288888888888889
+t_volume: min=1000.0, max=30795864000.0, mean=67589537.44, median=24157000.0
+t_dvolume: min=800.0, max=31083850350.194607, mean=68133790.35, median=24898663.189999998
+mat_days: min=365.0, max=3650.0, mean=1943.97, median=1903.0694444444443
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=2002-08-31 00:00:00, max=2025-03-31 00:00:00
+date: min=2002-07-31 00:00:00, max=2025-05-31 00:00:00
+maturity: min=2003-08-15 00:00:00, max=2035-03-15 00:00:00
+dated_date: min=1986-04-15 00:00:00, max=2025-03-20 00:00:00
+first_interest_date: min=1986-10-15 00:00:00, max=2025-10-15 00:00:00
+last_interest_date: min=2003-02-15 00:00:00, max=2034-09-15 00:00:00
+nextcoup: min=2002-08-01 00:00:00, max=2025-11-01 00:00:00
 ```
 
 ---
 
-## corporate_bond_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/corporate_bond_returns.parquet`
-**Size:** 1.2 GB | **Type:** Parquet | **Shape:** 1,859,546 rows × 140 columns
+## cds_basis_aggregated.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/cds_basis_aggregated.parquet`
+**Size:** 27270 bytes | **Type:** Parquet | **Shape:** 790 rows × 10 columns
 
 ### Columns
 ```
-cusip                                    Categorical(ordering='physical')
+c_rating                                 String         
 date                                     Datetime(time_unit='ns', time_zone=None)
-issuer_cusip                             Categorical(ordering='physical')
-permno                                   Float64         (10.8% null)
-permco                                   Float64         (100.0% null)
-gvkey                                    Float64         (100.0% null)
-144a                                     Int8           
-country                                  Categorical(ordering='physical') (0.0% null)
-call                                     Int8           
-ret_vw                                   Float32         (0.0% null)
-ret_vw_bgn                               Float32         (7.8% null)
-hprd                                     Int16          
-lib                                      Float32         (15.7% null)
-libd                                     Float32         (15.7% null)
-ret_type                                 Categorical(ordering='physical')
-spc_rat                                  Int32          
-mdc_rat                                  Int32          
-ff17num                                  Int8           
-ff30num                                  Int8           
-fce_val                                  Int64          
-mcap_s                                   Float32         (0.0% null)
-mcap_e                                   Float32         (0.0% null)
-tret                                     Float32         (1.8% null)
-rfret                                    Float64        
-dt_s                                     Datetime(time_unit='ns', time_zone=None)
-dt_e                                     Datetime(time_unit='ns', time_zone=None)
-dt_s_bgn                                 Datetime(time_unit='ns', time_zone=None) (7.8% null)
-dt_e_bgn                                 Datetime(time_unit='ns', time_zone=None) (7.8% null)
-hprd_bgn                                 Int16           (7.8% null)
-igap_bgn                                 Int8            (7.8% null)
-sig_dt                                   Datetime(time_unit='ns', time_zone=None) (3.5% null)
-sig_gap                                  Float64         (3.5% null)
-tmat                                     Float32        
-age                                      Float32        
-ytm                                      Float32         (3.5% null)
-cs                                       Float32         (5.3% null)
-md_dur                                   Float32         (3.5% null)
-convx                                    Float32         (3.5% null)
-bbtm                                     Float32         (3.5% null)
-sze                                      Float32         (3.5% null)
-val_hz                                   Float32         (15.7% null)
-val_hz_dts                               Float32         (15.7% null)
-val_ipr                                  Float32         (15.7% null)
-val_ipr_dts                              Float32         (15.7% null)
-dcs6                                     Float32         (17.0% null)
-cs_mu12_1                                Float64         (16.4% null)
-pi                                       Float64         (17.4% null)
-ami                                      Float32         (14.8% null)
-ami_v                                    Float64         (14.8% null)
-lix                                      Float32         (15.0% null)
-ilq                                      Float32         (17.4% null)
-roll                                     Float32         (17.4% null)
-spd_abs                                  Float64         (5.4% null)
-spd_rel                                  Float64         (5.4% null)
-cs_sprd                                  Float64         (11.4% null)
-ar_sprd                                  Float64         (11.4% null)
-p_zro                                    Float64         (0.9% null)
-p_fht                                    Float64         (14.8% null)
-vov                                      Float64         (14.8% null)
-dvol                                     Float64         (14.8% null)
-dskew                                    Float64         (14.8% null)
-dkurt                                    Float64         (14.8% null)
-db_mkt                                   Float64         (14.8% null)
-dvol_sys                                 Float64         (14.8% null)
-dvol_idio                                Float64         (14.8% null)
-rvol                                     Float64         (14.8% null)
-rsj                                      Float64         (14.8% null)
-rsk                                      Float64         (14.8% null)
-rkt                                      Float64         (14.8% null)
-b_vix                                    Float64         (14.8% null)
-b_dvixd                                  Float64         (14.8% null)
-b_mktrf_mkt                              Float64         (21.7% null)
-b_mktb_mkt                               Float64         (21.7% null)
-ivol_mkt                                 Float64         (21.7% null)
-ivol_bbw                                 Float64         (23.8% null)
-b_mktbx_dcapm                            Float64         (21.7% null)
-b_term_dcapm                             Float64         (21.7% null)
-b_dvix_va                                Float64         (22.3% null)
-b_dvix_vp                                Float64         (22.3% null)
-ivol_vp                                  Float64         (22.3% null)
-b_psb_m                                  Float64         (23.8% null)
-b_amd_m                                  Float64         (23.8% null)
-b_dvix                                   Float64         (21.7% null)
-b_cpi_vol6                               Float64         (21.7% null)
-b_dunc                                   Float64         (21.7% null)
-b_unc                                    Float64         (21.7% null)
-b_dunc3                                  Float64         (21.7% null)
-b_dunc6                                  Float64         (21.7% null)
-b_duncr                                  Float64         (21.7% null)
-b_duncf                                  Float64         (21.7% null)
-b_dcredit                                Float64         (21.7% null)
-b_credit                                 Float64         (21.7% null)
-b_dcpi                                   Float64         (21.7% null)
-b_cptlt                                  Float64         (20.2% null)
-b_rvol                                   Float64         (23.8% null)
-b_rsj                                    Float64         (23.8% null)
-b_psb                                    Float64         (23.8% null)
-b_amd                                    Float64         (23.8% null)
-b_illiq                                  Float64         (23.8% null)
-b_dvix_dn                                Float64         (20.2% null)
-b_dvix_up                                Float64         (20.2% null)
-b_coskew                                 Float64         (21.7% null)
-iskew                                    Float64         (21.7% null)
-b_defb                                   Float64         (21.7% null)
-b_termb                                  Float64         (21.7% null)
-b_drf                                    Float64         (21.7% null)
-b_crf                                    Float64         (21.7% null)
-b_lrf                                    Float64         (23.8% null)
-b_mktb                                   Float64         (21.7% null)
-b_lvl                                    Float64         (20.2% null)
-b_ysp                                    Float64         (20.2% null)
-b_mktb_dn                                Float64         (20.2% null)
-b_mktb_up                                Float64         (20.2% null)
-b_epu                                    Float64         (21.7% null)
-b_epum                                   Float64         (21.7% null)
-b_eput                                   Float64         (21.7% null)
-sysmom3_1                                Float64         (21.7% null)
-sysmom6_1                                Float64         (21.7% null)
-sysmom12_1                               Float64         (21.7% null)
-idimom3_1                                Float64         (21.7% null)
-idimom6_1                                Float64         (21.7% null)
-idimom12_1                               Float64         (21.7% null)
-mom3_1                                   Float64         (3.8% null)
-mom6_1                                   Float64         (9.7% null)
-mom9_1                                   Float64         (15.1% null)
-mom12_1                                  Float64         (20.2% null)
-mom12_7                                  Float64         (20.2% null)
-ltr48_12                                 Float64         (20.2% null)
-ltr30_6                                  Float64         (20.2% null)
-ltr24_3                                  Float64         (20.2% null)
-imom1                                    Float64         (1.7% null)
-imom3_1                                  Float64         (1.7% null)
-imom12_1                                 Float64         (1.9% null)
-iltr48_12                                Float64         (1.9% null)
-iltr30_6                                 Float64         (1.9% null)
-iltr24_3                                 Float64         (1.9% null)
-var_90                                   Float64         (20.2% null)
-es_90                                    Float64         (20.2% null)
-var_95                                   Float64         (20.2% null)
-str                                      Float32         (3.5% null)
+cds_basis_spread                         Float64        
+cds_basis_spread_bps                     Float64        
+rfr                                      Float64        
+n_bonds                                  Int64          
+analysis_period                          String         
+period_label                             String         
+period_start                             Datetime(time_unit='ms', time_zone=None)
+period_end                               Datetime(time_unit='ms', time_zone=None)
 ```
 
 ### Numeric Column Statistics
 ```
-permno: min=10025.0, max=93436.0, mean=52827.38, median=59408.0
-permco: min=N/A, max=N/A, mean=N/A, median=N/A
-gvkey: min=N/A, max=N/A, mean=N/A, median=N/A
-144a: min=0, max=1, mean=0.11, median=0.0
-call: min=0, max=1, mean=0.79, median=1.0
-ret_vw: min=-0.9981083273887634, max=9.000757217407227, mean=0.00, median=0.0037167782429605722
-ret_vw_bgn: min=-0.9983446598052979, max=5.195072174072266, mean=0.00, median=0.0033784452825784683
-hprd: min=19, max=27, mean=21.83, median=22.0
-lib: min=-0.973014771938324, max=12.419955253601074, mean=0.00, median=0.00012955942656844854
-libd: min=-0.9030926823616028, max=6.2988667488098145, mean=0.00, median=0.000412673776736483
-spc_rat: min=1, max=11, mean=3.28, median=1.0
-mdc_rat: min=1, max=11, mean=3.41, median=1.0
-ff17num: min=1, max=17, mean=13.08, median=16.0
-ff30num: min=1, max=30, mean=21.87, median=23.0
-fce_val: min=1, max=15000000, mean=642054.33, median=500000.0
-mcap_s: min=0.0005666689830832183, max=19236.90625, mean=662.98, median=500.82421875
-mcap_e: min=0.0005666689830832183, max=19236.90625, mean=661.95, median=500.2959899902344
-tret: min=-0.13225233554840088, max=0.1337672770023346, mean=0.00, median=0.0013065884122624993
-rfret: min=0.0, max=0.0048, mean=0.00, median=0.0007000000000000001
-hprd_bgn: min=10, max=22, mean=18.95, median=19.0
-igap_bgn: min=1, max=5, mean=1.50, median=1.0
-sig_gap: min=1.0, max=10.0, mean=1.68, median=1.0
-tmat: min=1.0019999742507935, max=100.00800323486328, mean=9.60, median=6.385000228881836
-age: min=0.06023271754384041, max=90.08076477050781, mean=4.76, median=3.4113621711730957
-ytm: min=-0.04614030942320824, max=2.721390962600708, mean=0.05, median=0.047989167273044586
-cs: min=-0.06119731813669205, max=2.70243239402771, mean=0.03, median=0.014648811891674995
-md_dur: min=0.0020000000949949026, max=31.981000900268555, mean=6.39, median=5.2210001945495605
-convx: min=0.0, max=1763.532958984375, mean=79.79, median=32.972999572753906
-bbtm: min=0.4797283709049225, max=10000.0, mean=1.06, median=0.9841357469558716
-sze: min=0.0005786875262856483, max=19338.623046875, mean=677.21, median=507.9854736328125
-val_hz: min=-0.9998649954795837, max=142.27110290527344, mean=-0.02, median=-0.08415959775447845
-val_hz_dts: min=-1.613982081413269, max=141.39512634277344, mean=-0.01, median=-0.056984465569257736
-val_ipr: min=-9.075562477111816, max=4.1725897789001465, mean=-0.01, median=-0.017367485910654068
-val_ipr_dts: min=-8.863336563110352, max=4.067607402801514, mean=-0.01, median=-0.021380119025707245
-dcs6: min=-7.619980335235596, max=9.141984939575195, mean=0.03, median=0.04934856295585632
-cs_mu12_1: min=-0.024122654099483044, max=1.338869116523049, mean=0.02, median=0.015327041095588356
-pi: min=-220116.11126050615, max=252451.11623131274, mean=0.09, median=-0.002887648014614448
-ami: min=5.5002133194648195e-06, max=11261.7197265625, mean=0.43, median=0.03748023509979248
-ami_v: min=1.898147538026151e-06, max=33781.174592976786, mean=0.84, median=0.0700974930586428
-lix: min=-6.50123405456543, max=3.886056661605835, mean=-2.06, median=-2.1623404026031494
-ilq: min=-1611.2640380859375, max=22880.57421875, mean=1.25, median=0.06175573915243149
-roll: min=0.0, max=302.5265197753906, mean=0.99, median=0.49701404571533203
-spd_abs: min=-52.806768012988265, max=58.13458872349912, mean=0.81, median=0.3896629564018568
-spd_rel: min=-1.3269233892484076, max=1.5555555555555556, mean=0.01, median=0.0038568535239435478
-cs_sprd: min=0.0, max=1.0887068794278045, mean=0.02, median=0.011000985011970398
-ar_sprd: min=0.0, max=0.6825942233517418, mean=0.01, median=0.0037143170528098476
-p_zro: min=0.0, max=0.9565217391304348, mean=0.38, median=0.3333333333333333
-p_fht: min=0.0, max=15.711365328752144, mean=0.01, median=0.0027885779328675276
-vov: min=0.004739881523082324, max=24.495708357263034, mean=0.16, median=0.10383591991925235
-dvol: min=6.62803696248082e-05, max=1.9247870524640667, mean=0.01, median=0.006136453422900886
-dskew: min=-3.904577907525174, max=3.963940556537785, mean=-0.01, median=-0.008043051545831155
-dkurt: min=-2.3042875238492657, max=14.707639232780267, mean=-0.48, median=-0.7352938805202567
-db_mkt: min=-767.6241313386747, max=1014.9879485030154, mean=1.06, median=0.7726074505490964
-dvol_sys: min=9.880121329243227e-10, max=1.137658235596538, mean=0.00, median=0.0020537248509415436
-dvol_idio: min=6.600825984144691e-05, max=1.8055832418167057, mean=0.01, median=0.00501586906796703
-rvol: min=0.0002391533418205396, max=6.333745516324725, mean=0.03, median=0.022569586954749338
-rsj: min=-2141.6772056155773, max=2253.992254986454, mean=5.16, median=1.7649089193920995
-rsk: min=-4.518947188434787, max=4.5837456975927235, mean=0.13, median=0.15202991954760917
-rkt: min=1.001834093620052, max=21.349185152078885, mean=3.04, median=2.7021762537580702
-b_vix: min=-169.3116788293221, max=688.1213439446273, mean=-0.07, median=-0.026851225622083207
-b_dvixd: min=-215.11658561764497, max=390.61722381838985, mean=-0.11, median=-0.046471023094628194
-b_mktrf_mkt: min=-85.58295968818375, max=13.473917571284812, mean=0.01, median=-0.039641704556200676
-b_mktb_mkt: min=-14.405918400980934, max=170.39430558616135, mean=1.12, median=0.9521306507907795
-ivol_mkt: min=0.0003569400869152177, max=6.910424133267597, mean=0.02, median=0.015369921510589715
-ivol_bbw: min=0.00034410968306700703, max=4.110724649433245, mean=0.02, median=0.013472404310933859
-b_mktbx_dcapm: min=-20.92293193492868, max=127.0479098491878, mean=1.18, median=0.8803630729633298
-b_term_dcapm: min=-205.3212790837008, max=48.87627924179838, mean=1.05, median=0.9483883714164307
-b_dvix_va: min=-128.26995282028028, max=308.6952823764602, mean=-0.56, median=-0.24894236395060884
-b_dvix_vp: min=-365.20180613955307, max=186.22502053076602, mean=-0.56, median=-0.2739403143781042
-ivol_vp: min=0.00038744069537006043, max=4.173845563328997, mean=0.03, median=0.020321889118026588
-b_psb_m: min=-1.186675040969698, max=0.8684993301975288, mean=-0.00, median=7.346809040883115e-05
-b_amd_m: min=-6.424601049147454, max=6.072206148528057, mean=-0.01, median=-0.0008399845540484655
-b_dvix: min=-293.1417391008838, max=188.6230664168538, mean=-0.02, median=0.01078308664960558
-b_cpi_vol6: min=-2.3716752563975434, max=17.51276348780078, mean=0.00, median=-0.0003543312172933246
-b_dunc: min=-159.18943550544117, max=38.913764139392114, mean=-0.02, median=0.007105239990899664
-b_unc: min=-13.355788778005765, max=40.4972478741288, mean=0.00, median=0.0022285606942160233
-b_dunc3: min=-70.16926385045053, max=14.223933885858681, mean=-0.02, median=0.002479336168631455
-b_dunc6: min=-19.050309091104676, max=40.4071200847731, mean=-0.01, median=0.00229094337277027
-b_duncr: min=-108.1913350914576, max=82.55265467583655, mean=-0.01, median=0.016140191538525406
-b_duncf: min=-87.19789808710185, max=17.615900440881113, mean=-0.01, median=0.010068991217926669
-b_dcredit: min=-177.7817410442719, max=72.45623255601421, mean=-0.13, median=0.036373391575193995
-b_credit: min=-56.86551689920585, max=128.8614372316075, mean=0.02, median=0.03269527246560874
-b_dcpi: min=-6.364872059270202, max=0.6653882756087045, mean=-0.00, median=-0.00037267885651232844
-b_cptlt: min=-53.35294165107803, max=10.543988409133894, mean=-0.00, median=-0.02734132735010685
-b_rvol: min=-282.15402161165474, max=86.40056112760051, mean=-0.18, median=-0.014321130644890268
-b_rsj: min=-96.30041912469851, max=42.849339757488316, mean=-0.03, median=0.011501846018483863
-b_psb: min=-1.0623691681743486, max=0.7934206064520152, mean=-0.00, median=2.5674988685123922e-05
-b_amd: min=-5.607574161549745, max=6.471978741334538, mean=-0.01, median=0.00019521553646572362
-b_illiq: min=-1.6662071942572245, max=2.0464688896926604, mean=-0.00, median=-1.5152214288905028e-06
-b_dvix_dn: min=-268.3492061307264, max=237.64591845017165, mean=-0.12, median=-0.03940212067880317
-b_dvix_up: min=-310.8153707313046, max=738.3689260345268, mean=-0.06, median=-0.0944107701869242
-b_coskew: min=-2186.2498021535766, max=6214.0782117769995, mean=-0.14, median=-0.24519657383883656
-iskew: min=-5.923646756488455, max=5.951195066011716, mean=0.04, median=0.021456734685039114
-b_defb: min=-19.707557940860166, max=113.19607815278158, mean=0.95, median=0.6290080862943398
-b_termb: min=-242.25557743692107, max=26.01660663297699, mean=0.55, median=0.5909307824318598
-b_drf: min=-13.77334996107455, max=66.0468990652739, mean=0.73, median=0.5615997730442012
-b_crf: min=-11.888600458649844, max=80.01716129874758, mean=0.04, median=-0.04374332697487936
-b_lrf: min=-31.327649363665977, max=156.0292483182653, mean=1.30, median=0.910468961715085
-b_mktb: min=-20.568083008187894, max=87.76094417232656, mean=1.13, median=0.9432266946705217
-b_lvl: min=-576.3479212264855, max=104.35858530013812, mean=-0.89, median=-0.46287165060533375
-b_ysp: min=-297.94888173718516, max=434.52592674986613, mean=-0.89, median=-0.7171007231786972
-b_mktb_dn: min=-339.11290868244765, max=190.82764721172305, mean=1.11, median=0.9491867656708515
-b_mktb_up: min=-47.250916018969754, max=187.78408429570902, mean=1.15, median=0.890312773169611
-b_epu: min=-21.19472055175888, max=110.38191252913546, mean=-0.01, median=-0.0015436846646421272
-b_epum: min=-19.004805323455475, max=15.404934164416341, mean=-0.01, median=0.005876901459016893
-b_eput: min=-15.169183198094766, max=63.0141346502362, mean=-0.01, median=-0.005979063460477949
-sysmom3_1: min=-2.4602093772536393, max=4.415956272554328, mean=0.01, median=0.009205217615070397
-sysmom6_1: min=-1.8219240248214277, max=3.9550107866378497, mean=0.02, median=0.02276765833031702
-sysmom12_1: min=-2.3224812657050746, max=14.805356344544732, mean=0.05, median=0.047632609914670145
-idimom3_1: min=-2.7636804953091274, max=12.621122631728706, mean=-0.00, median=-0.0004378214904601947
-idimom6_1: min=-4.93701632068136, max=10.717609092898318, mean=-0.00, median=-0.0004976374273692424
-idimom12_1: min=-15.579423105680787, max=9.246582938571109, mean=-0.00, median=-0.0003318518933694836
-mom3_1: min=-0.9984032940903846, max=14.023292216513314, mean=0.01, median=0.007300352216242552
-mom6_1: min=-0.998724492372518, max=17.727042009465, mean=0.02, median=0.019701793433238513
-mom9_1: min=-0.9987351047053308, max=19.554431302837777, mean=0.04, median=0.032789218772054846
-mom12_1: min=-0.9987762901512514, max=22.24953677162908, mean=0.05, median=0.04365855485255758
-mom12_7: min=-0.9969631052866385, max=17.727042009465, mean=0.02, median=0.019976711847260804
-ltr48_12: min=-0.999120335386223, max=24.33498729394523, mean=0.15, median=0.12109223547816957
-ltr30_6: min=-0.999120335386223, max=33.746061105712194, mean=0.10, median=0.08830042347087241
-ltr24_3: min=-0.9986076823939898, max=35.43124187124598, mean=0.09, median=0.0804354701354928
-imom1: min=-0.9856957793235779, max=30.30000114440918, mean=0.01, median=0.00541091554232561
-imom3_1: min=-0.9915952526916385, max=162.4797853309825, mean=0.01, median=0.009945651756952029
-imom12_1: min=-0.9735327661171094, max=1280.3074852379725, mean=0.06, median=0.053953128571829184
-iltr48_12: min=-0.9944900021193184, max=1361.6001879849698, mean=0.21, median=0.18735278746447886
-iltr30_6: min=-0.9944900021193184, max=1309.5947971445098, mean=0.13, median=0.1122625728010583
-iltr24_3: min=-0.9944900021193184, max=1323.1085131643338, mean=0.11, median=0.10045731169759901
-var_90: min=-0.020391881465911865, max=0.8333333134651184, mean=0.03, median=0.022077342495322227
-es_90: min=-0.009837267687544227, max=0.8842830061912537, mean=0.05, median=0.03451567143201828
-var_95: min=-0.006537846755236387, max=0.981425940990448, mean=0.05, median=0.034091219305992126
-str: min=-0.9772710204124451, max=7.744128227233887, mean=0.00, median=0.002901438158005476
+cds_basis_spread: min=-0.03875177840337986, max=0.005759304878255962, mean=-0.01, median=-0.005077361744679458
+cds_basis_spread_bps: min=-387.5177840337986, max=57.59304878255962, mean=-63.16, median=-50.773617446794574
+rfr: min=-3.8751778403379857, max=0.5759304878255962, mean=-0.63, median=-0.5077361744679457
+n_bonds: min=52, max=667, mean=345.42, median=266.5
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=2002-08-31 00:00:00, max=2025-03-31 00:00:00
-dt_s: min=2002-07-25 00:00:00, max=2025-02-28 00:00:00
-dt_e: min=2002-08-26 00:00:00, max=2025-03-31 00:00:00
-dt_s_bgn: min=2002-08-01 00:00:00, max=2025-03-07 00:00:00
-dt_e_bgn: min=2002-08-26 00:00:00, max=2025-03-31 00:00:00
-sig_dt: min=2002-08-19 00:00:00, max=2025-03-28 00:00:00
+date: min=2002-07-31 00:00:00, max=2025-03-31 00:00:00
+period_start: min=1900-01-01 00:00:00, max=2010-01-01 00:00:00
+period_end: min=2020-02-29 00:00:00, max=2099-12-31 00:00:00
+```
+
+---
+
+## cds_basis_non_aggregated.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/cds_basis_non_aggregated.parquet`
+**Size:** 7.3 MB | **Type:** Parquet | **Shape:** 272,882 rows × 10 columns
+
+### Columns
+```
+isin                                     String         
+date                                     Datetime(time_unit='ns', time_zone=None)
+cds_basis_spread                         Float64        
+cds_basis_spread_bps                     Float64        
+rfr                                      Float64        
+c_rating                                 String         
+analysis_period                          String         
+period_label                             String         
+period_start                             Datetime(time_unit='ms', time_zone=None)
+period_end                               Datetime(time_unit='ms', time_zone=None)
+```
+
+### Numeric Column Statistics
+```
+cds_basis_spread: min=-0.09996092364237279, max=0.0998565884895731, mean=-0.01, median=-0.004390498359997167
+cds_basis_spread_bps: min=-999.6092364237279, max=998.565884895731, mean=-60.36, median=-43.90498359997167
+rfr: min=-9.99609236423728, max=9.98565884895731, mean=-0.60, median=-0.43904983599971675
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=2002-07-31 00:00:00, max=2025-04-30 00:00:00
+period_start: min=1900-01-01 00:00:00, max=2010-01-01 00:00:00
+period_end: min=2020-02-29 00:00:00, max=2099-12-31 00:00:00
+```
+
+---
+
+## cds_basis_processed.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/cds_basis_processed.parquet`
+**Size:** 18.4 MB | **Type:** Parquet | **Shape:** 185,931 rows × 32 columns
+
+### Columns
+```
+date                                     Datetime(time_unit='ns', time_zone=None)
+issue_id                                 Float64        
+isin                                     String         
+cusip                                    String         
+principal_amt                            Float64        
+amount_outstanding                       Float64        
+maturity                                 Datetime(time_unit='ns', time_zone=None)
+coupon                                   Float64        
+day_count_basis                          String         
+dated_date                               Datetime(time_unit='ns', time_zone=None)
+first_interest_date                      Datetime(time_unit='ns', time_zone=None)
+last_interest_date                       Datetime(time_unit='ns', time_zone=None)
+ncoups                                   Float64        
+nextcoup                                 Datetime(time_unit='ns', time_zone=None)
+remcoups                                 Float64        
+coupacc                                  Float64        
+price_eom                                Float64        
+tmt                                      Float64        
+t_volume                                 Float64         (3.1% null)
+t_dvolume                                Float64         (3.1% null)
+rating_class                             String         
+redcode                                  String         
+mat_days                                 Float64        
+par_spread                               Float64        
+z_spread                                 Float64        
+z_spread_bps                             Float64        
+z_model_price                            Float64        
+z_status                                 String         
+cds_basis_spread                         Float64        
+cds_basis_spread_bps                     Float64        
+rfr                                      Float64        
+c_rating                                 String         
+```
+
+### Numeric Column Statistics
+```
+issue_id: min=54.0, max=1197532.0, mean=400372.89, median=400683.0
+principal_amt: min=1000.0, max=1000.0, mean=1000.00, median=1000.0
+amount_outstanding: min=112.15, max=9000000.0, mean=666120.14, median=500000.0
+coupon: min=0.55, max=13.25, mean=5.68, median=5.75
+ncoups: min=2.0, max=12.0, mean=2.01, median=2.0
+remcoups: min=2.0, max=120.0, mean=11.08, median=11.0
+coupacc: min=0.0, max=6.6431506849315065, mean=1.49, median=1.3290410958904109
+price_eom: min=50.0, max=159.86533333333333, mean=103.92, median=104.15362511052166
+tmt: min=1.0138888888888888, max=10.147222222222222, mean=5.33, median=5.2
+t_volume: min=1000.0, max=18728526000.0, mean=65208275.96, median=24450000.0
+t_dvolume: min=900.0, max=18537484543.17349, mean=66034914.62, median=25208288.760035
+mat_days: min=365.0, max=3650.0, mean=1916.88, median=1870.625
+par_spread: min=-0.02966791982851654, max=0.27952275780645713, mean=0.02, median=0.00791411154392868
+z_spread: min=-0.0728823100429355, max=0.18997336127511041, mean=0.02, median=0.01377923182459763
+z_spread_bps: min=-728.8231004293549, max=1899.7336127511041, mean=216.73, median=137.7923182459763
+z_model_price: min=50.22089041088563, max=163.46319634703198, mean=105.42, median=105.6386986301717
+cds_basis_spread: min=-0.09996092364237279, max=0.0998565884895731, mean=-0.01, median=-0.004441025002527942
+cds_basis_spread_bps: min=-999.6092364237279, max=998.565884895731, mean=-62.44, median=-44.41025002527942
+rfr: min=-9.99609236423728, max=9.98565884895731, mean=-0.62, median=-0.4441025002527942
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=2002-07-31 00:00:00, max=2025-04-30 00:00:00
+maturity: min=2003-08-15 00:00:00, max=2035-03-15 00:00:00
+dated_date: min=1986-04-15 00:00:00, max=2025-03-20 00:00:00
+first_interest_date: min=1986-10-15 00:00:00, max=2025-10-15 00:00:00
+last_interest_date: min=2003-02-15 00:00:00, max=2034-09-15 00:00:00
+nextcoup: min=2002-08-01 00:00:00, max=2025-10-15 00:00:00
+```
+
+---
+
+## cds_basis_summary_stats.csv
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/cds_basis_summary_stats.csv`
+**Size:** 1102 bytes | **Type:** Csv | **Shape:** 6 rows × 11 columns
+
+### Columns
+```
+group                                    String         
+n_obs                                    Int64          
+start_date                               String         
+end_date                                 String         
+mean_bps                                 Float64        
+median_bps                               Float64        
+std_bps                                  Float64        
+analysis_period                          String         
+period_label                             String         
+period_start                             String         
+period_end                               String         
+```
+
+### Numeric Column Statistics
+```
+n_obs: min=122, max=274, mean=197.83, median=197.5
+mean_bps: min=-87.88312887907333, max=-43.07622307151497, mean=-61.36, median=-56.19612884795198
+median_bps: min=-88.74664652091406, max=-42.040734719080206, mean=-55.98, median=-49.5963173883094
+std_bps: min=18.170221150048054, max=65.32294185834945, mean=39.57, median=41.23651953197041
+```
+
+---
+
+## final_data_with_z_spread.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/final_data_with_z_spread.parquet`
+**Size:** 14.3 MB | **Type:** Parquet | **Shape:** 186,684 rows × 29 columns
+
+### Columns
+```
+date                                     Datetime(time_unit='ns', time_zone=None)
+issue_id                                 Float64        
+isin                                     String         
+cusip                                    String         
+principal_amt                            Float64        
+amount_outstanding                       Float64        
+maturity                                 Datetime(time_unit='ns', time_zone=None)
+coupon                                   Float64        
+day_count_basis                          String         
+dated_date                               Datetime(time_unit='ns', time_zone=None)
+first_interest_date                      Datetime(time_unit='ns', time_zone=None)
+last_interest_date                       Datetime(time_unit='ns', time_zone=None)
+ncoups                                   Float64        
+nextcoup                                 Datetime(time_unit='ns', time_zone=None)
+remcoups                                 Float64        
+coupacc                                  Float64        
+price_eom                                Float64        
+tmt                                      Float64        
+t_volume                                 Float64         (3.1% null)
+t_dvolume                                Float64         (3.1% null)
+rating_class                             String         
+redcode                                  String         
+mat_days                                 Float64        
+par_spread                               Float64        
+z_spread                                 Float64         (0.2% null)
+z_spread_bps                             Float64         (0.2% null)
+z_model_price                            Float64         (0.2% null)
+z_status                                 String         
+__index_level_0__                        Int64          
+```
+
+### Numeric Column Statistics
+```
+issue_id: min=54.0, max=1197532.0, mean=399727.15, median=400319.0
+principal_amt: min=1000.0, max=1000.0, mean=1000.00, median=1000.0
+amount_outstanding: min=112.15, max=9000000.0, mean=665344.16, median=500000.0
+coupon: min=0.55, max=13.25, mean=5.69, median=5.75
+ncoups: min=2.0, max=12.0, mean=2.01, median=2.0
+remcoups: min=2.0, max=120.0, mean=11.07, median=11.0
+coupacc: min=0.0, max=6.6431506849315065, mean=1.50, median=1.3315068493150686
+price_eom: min=50.0, max=3347.9645670033674, mean=103.80, median=104.11951190476191
+tmt: min=1.0138888888888888, max=10.147222222222222, mean=5.32, median=5.2
+t_volume: min=1000.0, max=18728526000.0, mean=65334773.85, median=24469000.0
+t_dvolume: min=900.0, max=18537484543.17349, mean=66036387.54, median=25179844.913310003
+mat_days: min=365.0, max=3650.0, mean=1914.37, median=1870.625
+par_spread: min=-0.21835338831352558, max=1.5957769900758496, mean=0.02, median=0.007952520124777214
+z_spread: min=-0.17947285478152816, max=0.19980038637349926, mean=0.02, median=0.01380365823895746
+z_spread_bps: min=-1794.7285478152817, max=1998.0038637349926, mean=218.75, median=138.0365823895746
+z_model_price: min=50.22089041088563, max=435.3553410689643, mean=105.37, median=105.62174912704698
+__index_level_0__: min=5, max=244948, mean=123818.46, median=123803.5
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=2002-07-31 00:00:00, max=2025-04-30 00:00:00
+maturity: min=2003-08-15 00:00:00, max=2035-03-15 00:00:00
+dated_date: min=1986-04-15 00:00:00, max=2025-03-20 00:00:00
+first_interest_date: min=1986-10-15 00:00:00, max=2025-10-15 00:00:00
+last_interest_date: min=2003-02-15 00:00:00, max=2034-09-15 00:00:00
+nextcoup: min=2002-08-01 00:00:00, max=2025-10-15 00:00:00
 ```
 
 ---
 
 ## ftsfr_CDS_bond_basis_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/ftsfr_CDS_bond_basis_aggregated.parquet`
-**Size:** 7783 bytes | **Type:** Parquet | **Shape:** 368 rows × 3 columns
+**Size:** 10634 bytes | **Type:** Parquet | **Shape:** 546 rows × 3 columns
 
 ### Columns
 ```
@@ -1426,42 +1434,42 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-3.093328225349698, max=6.191714845203802, mean=1.99, median=1.9909478097509414
+y: min=-387.5177840337986, max=57.59304878255962, mean=-62.13, median=-47.59822949472496
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2002-09-30 00:00:00, max=2023-11-30 00:00:00
+ds: min=2002-07-31 00:00:00, max=2025-03-31 00:00:00
 ```
 
 ---
 
 ## ftsfr_CDS_bond_basis_non_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet`
-**Size:** 4.8 MB | **Type:** Parquet | **Shape:** 532,361 rows × 3 columns
+**Size:** 1.9 MB | **Type:** Parquet | **Shape:** 185,931 rows × 3 columns
 
 ### Columns
 ```
-unique_id                                Categorical(ordering='physical')
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-99.97459322374101, max=99.8629400456488, mean=2.42, median=2.638552306016205
+y: min=-999.6092364237279, max=998.565884895731, mean=-62.44, median=-44.41025002527942
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2002-09-30 00:00:00, max=2023-11-30 00:00:00
+ds: min=2002-07-31 00:00:00, max=2025-04-30 00:00:00
 ```
 
 ---
 
 ## markit_cds.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_cds.parquet`
-**Size:** 508.9 MB | **Type:** Parquet | **Shape:** 46,851,870 rows × 7 columns
+**Size:** 544.3 MB | **Type:** Parquet | **Shape:** 49,845,056 rows × 7 columns
 
 ### Columns
 ```
@@ -1476,20 +1484,20 @@ year                                     Int64
 
 ### Numeric Column Statistics
 ```
-parspread: min=6.57e-06, max=491.84276269, mean=0.02, median=0.00783918991183272
-year: min=2001, max=2023, mean=2011.46, median=2010.0
+parspread: min=6.57e-06, max=491.84276269, mean=0.02, median=0.007751308685956962
+year: min=2001, max=2025, mean=2012.24, median=2011.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=2001-01-02 00:00:00, max=2023-12-29 00:00:00
+date: min=2001-01-02 00:00:00, max=2025-12-31 00:00:00
 ```
 
 ---
 
 ## markit_cds_subsetted_to_crsp.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_cds_subsetted_to_crsp.parquet`
-**Size:** 476.4 MB | **Type:** Parquet | **Shape:** 36,347,932 rows × 12 columns
+**Size:** 503.7 MB | **Type:** Parquet | **Shape:** 38,362,435 rows × 12 columns
 
 ### Columns
 ```
@@ -1509,24 +1517,24 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-parspread: min=2.001e-05, max=491.84276269, mean=0.02, median=0.007761624636253026
-year: min=2001.0, max=2023.0, mean=2010.78, median=2009.0
-permno: min=10025, max=93423, mean=53222.68, median=57665.0
-permco: min=7, max=60547, mean=21769.01, median=21158.0
-nameRatio: min=50, max=100, mean=88.17, median=90.0
-__index_level_0__: min=0, max=37813472, mean=18329783.48, median=18207816.5
+parspread: min=2.001e-05, max=491.84276269, mean=0.02, median=0.007675912252479227
+year: min=2001.0, max=2025.0, mean=2011.50, median=2010.0
+permno: min=10025, max=93423, mean=53175.27, median=57568.0
+permco: min=7, max=60547, mean=21785.81, median=21158.0
+nameRatio: min=50, max=100, mean=88.29, median=90.0
+__index_level_0__: min=0, max=39851586, mean=19335997.10, median=19215068.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-date: min=2001-01-02 00:00:00, max=2023-12-29 00:00:00
+date: min=2001-01-02 00:00:00, max=2025-12-31 00:00:00
 ```
 
 ---
 
 ## markit_red_crsp_link.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/markit_red_crsp_link.parquet`
-**Size:** 545049 bytes | **Type:** Parquet | **Shape:** 4,852 rows × 25 columns
+**Size:** 545047 bytes | **Type:** Parquet | **Shape:** 4,852 rows × 25 columns
 
 ### Columns
 ```
@@ -1566,25 +1574,177 @@ nameRatio: min=20, max=100, mean=79.26, median=85.0
 
 ---
 
-## treasury_bond_returns.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/treasury_bond_returns.parquet`
-**Size:** 36.8 MB | **Type:** Parquet | **Shape:** 2,381,340 rows × 5 columns
+## wrds_bondret_filtered.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/wrds_bondret_filtered.parquet`
+**Size:** 163.6 MB | **Type:** Parquet | **Shape:** 2,497,623 rows × 59 columns
 
 ### Columns
 ```
-DATE                                     Int64          
-CUSIP                                    String         
-tr_return                                Float64         (17.6% null)
-tr_ytm_match                             Float64         (26.7% null)
-tau                                      Float64        
+date                                     Datetime(time_unit='ns', time_zone=None)
+issue_id                                 Float64        
+cusip                                    String         
+bond_sym_id                              String          (0.0% null)
+bsym                                     String          (100.0% null)
+isin                                     String         
+company_symbol                           String          (0.0% null)
+bond_type                                String         
+security_level                           String         
+conv                                     Float64        
+offering_date                            Datetime(time_unit='ns', time_zone=None) (0.0% null)
+offering_amt                             Float64        
+offering_price                           Float64         (8.4% null)
+principal_amt                            Float64        
+maturity                                 Datetime(time_unit='ns', time_zone=None)
+treasury_maturity                        String          (78.0% null)
+coupon                                   Float64         (0.0% null)
+day_count_basis                          String          (0.1% null)
+dated_date                               Datetime(time_unit='ns', time_zone=None) (0.0% null)
+first_interest_date                      Datetime(time_unit='ns', time_zone=None) (0.0% null)
+last_interest_date                       Datetime(time_unit='ns', time_zone=None)
+ncoups                                   Float64        
+t_date                                   Datetime(time_unit='ns', time_zone=None)
+t_volume                                 Float64         (42.4% null)
+t_dvolume                                Float64         (42.4% null)
+t_spread                                 Float64         (50.8% null)
+t_yld_pt                                 Float64         (53.4% null)
+yield                                    Float64         (0.4% null)
+amount_outstanding                       Float64        
+price_eom                                Float64        
+price_ldm                                Float64         (68.7% null)
+price_l5m                                Float64         (54.5% null)
+gap                                      Float64         (4.9% null)
+coupmonth                                Float64         (0.0% null)
+nextcoup                                 Datetime(time_unit='ns', time_zone=None) (46.1% null)
+coupamt                                  Float64         (0.0% null)
+coupacc                                  Float64        
+multicoups                               Float64        
+ret_eom                                  Float64         (4.9% null)
+ret_ldm                                  Float64         (76.3% null)
+ret_l5m                                  Float64         (62.1% null)
+tmt                                      Float64        
+remcoups                                 Float64        
+duration                                 Float64         (0.6% null)
+r_sp                                     String          (10.0% null)
+r_mr                                     String          (37.0% null)
+r_fr                                     String          (12.0% null)
+n_sp                                     Float64         (57.2% null)
+n_mr                                     Float64         (51.6% null)
+n_fr                                     Float64         (67.5% null)
+rating_num                               Float64         (45.9% null)
+rating_cat                               String         
+rating_class                             String         
+defaulted                                String          (0.2% null)
+default_date                             Datetime(time_unit='ns', time_zone=None) (99.0% null)
+default_type                             String          (99.0% null)
+reinstated                               String          (99.1% null)
+reinstated_date                          Datetime(time_unit='ns', time_zone=None) (99.1% null)
+year                                     Int64          
 ```
 
 ### Numeric Column Statistics
 ```
-DATE: min=20020731, max=20231231, mean=20144649.88, median=20151031.0
-tr_return: min=-21.35429959, max=53.313886279, mean=0.22, median=0.09404580914999999
-tr_ytm_match: min=0.0039308304, max=8.9466184087, mean=2.47, median=2.355498754
-tau: min=-0.167123288, max=180.1260274, mean=7.98, median=4.7123287671
+issue_id: min=2.0, max=1211945.0, mean=670824.11, median=697829.0
+conv: min=0.0, max=0.0, mean=0.00, median=0.0
+offering_amt: min=1.0, max=11000000.0, mean=303617.60, median=14449.0
+offering_price: min=0.0, max=8100.0, mean=99.10, median=100.0
+principal_amt: min=10.0, max=1000.0, mean=999.65, median=1000.0
+coupon: min=0.0, max=31.0, mean=2.78, median=2.0
+ncoups: min=0.0, max=12.0, mean=1.17, median=2.0
+t_volume: min=0.66, max=58263035000.0, mean=47663006.98, median=11200000.0
+t_dvolume: min=0.64912452, max=451940000000.0, mean=48288336.44, median=11516593.91499
+t_spread: min=0.0, max=1.9999999625923506, mean=0.00, median=0.002638800927222033
+t_yld_pt: min=0.0, max=387414.83453481656, mean=4.97, median=4.101237650330576
+yield: min=-2.4346319825548317, max=0.9757631689210376, mean=0.01, median=0.01968926734252144
+amount_outstanding: min=101.0, max=11000000.0, mean=293970.46, median=12182.0
+price_eom: min=50.0, max=6532.5, mean=110.30, median=100.021875
+price_ldm: min=50.0, max=6532.5, mean=102.23, median=101.68400174825175
+price_l5m: min=50.0, max=6532.5, mean=103.95, median=102.03643277310924
+gap: min=1.0, max=1.0, mean=1.00, median=1.0
+coupmonth: min=-1.0, max=1134.0, mean=35.59, median=19.0
+coupamt: min=0.0, max=12.0, mean=0.22, median=0.0
+coupacc: min=0.0, max=20.4, mean=0.70, median=0.1534246575342466
+multicoups: min=1.0, max=1.0, mean=1.00, median=1.0
+ret_eom: min=-0.9854726368159205, max=154.1496466867339, mean=0.01, median=0.0
+ret_ldm: min=-0.9854726368159205, max=100.9697964543664, mean=0.00, median=0.0032104524894270604
+ret_l5m: min=-0.9854726368159205, max=100.9697964543664, mean=0.00, median=0.0033266223406132438
+tmt: min=1.0138888888888888, max=10.147222222222222, mean=4.04, median=3.55
+remcoups: min=1.0, max=120.0, mean=6.31, median=3.0
+duration: min=0.4805505628438583, max=261.4938874340617, mean=3.65, median=3.38240296983532
+n_sp: min=1.0, max=22.0, mean=8.42, median=8.0
+n_mr: min=1.0, max=21.0, mean=8.17, median=8.0
+n_fr: min=1.0, max=22.0, mean=7.92, median=8.0
+rating_num: min=1.0, max=22.0, mean=8.15, median=8.0
+year: min=2002, max=2025, mean=2017.11, median=2019.0
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=2002-07-31 00:00:00, max=2025-05-31 00:00:00
+offering_date: min=1930-03-01 00:00:00, max=2030-03-15 00:00:00
+maturity: min=2003-08-01 00:00:00, max=2035-03-31 00:00:00
+dated_date: min=1930-03-01 00:00:00, max=2025-12-03 00:00:00
+first_interest_date: min=1930-09-01 00:00:00, max=2030-03-15 00:00:00
+last_interest_date: min=2000-05-15 00:00:00, max=2035-03-30 00:00:00
+t_date: min=2002-07-01 00:00:00, max=2025-03-31 00:00:00
+nextcoup: min=2002-08-01 00:00:00, max=2026-07-28 00:00:00
+default_date: min=2002-09-03 00:00:00, max=2023-10-15 00:00:00
+reinstated_date: min=2003-02-10 00:00:00, max=2024-11-07 00:00:00
+```
+
+---
+
+## wrds_bondret_project.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/cds_bond_basis/wrds_bondret_project.parquet`
+**Size:** 77.2 MB | **Type:** Parquet | **Shape:** 2,496,531 rows × 21 columns
+
+### Columns
+```
+date                                     Datetime(time_unit='ns', time_zone=None)
+issue_id                                 Float64        
+isin                                     String         
+cusip                                    String         
+principal_amt                            Float64        
+amount_outstanding                       Float64        
+maturity                                 Datetime(time_unit='ns', time_zone=None)
+coupon                                   Float64        
+day_count_basis                          String          (0.1% null)
+dated_date                               Datetime(time_unit='ns', time_zone=None) (0.0% null)
+first_interest_date                      Datetime(time_unit='ns', time_zone=None) (0.0% null)
+last_interest_date                       Datetime(time_unit='ns', time_zone=None)
+ncoups                                   Float64        
+nextcoup                                 Datetime(time_unit='ns', time_zone=None) (46.1% null)
+remcoups                                 Float64        
+coupacc                                  Float64        
+price_eom                                Float64        
+tmt                                      Float64        
+t_volume                                 Float64         (42.4% null)
+t_dvolume                                Float64         (42.4% null)
+rating_class                             String         
+```
+
+### Numeric Column Statistics
+```
+issue_id: min=2.0, max=1211945.0, mean=670792.24, median=697800.0
+principal_amt: min=10.0, max=1000.0, mean=999.65, median=1000.0
+amount_outstanding: min=101.0, max=11000000.0, mean=294097.72, median=12215.0
+coupon: min=0.0, max=31.0, mean=2.78, median=2.0
+ncoups: min=0.0, max=12.0, mean=1.17, median=2.0
+remcoups: min=1.0, max=120.0, mean=6.31, median=3.0
+coupacc: min=0.0, max=20.4, mean=0.70, median=0.1541095890410959
+price_eom: min=50.0, max=6532.5, mean=110.30, median=100.02302025276242
+tmt: min=1.0138888888888888, max=10.147222222222222, mean=4.04, median=3.55
+t_volume: min=0.66, max=58263035000.0, mean=47671518.95, median=11205000.0
+t_dvolume: min=0.64912452, max=451940000000.0, mean=48296967.11, median=11522910.137545
+```
+
+### Date/Datetime Column Statistics
+```
+date: min=2002-07-31 00:00:00, max=2025-05-31 00:00:00
+maturity: min=2003-08-01 00:00:00, max=2035-03-31 00:00:00
+dated_date: min=1930-03-01 00:00:00, max=2025-12-03 00:00:00
+first_interest_date: min=1930-09-01 00:00:00, max=2030-03-15 00:00:00
+last_interest_date: min=2000-05-15 00:00:00, max=2035-03-30 00:00:00
+nextcoup: min=2002-08-01 00:00:00, max=2026-07-28 00:00:00
 ```
 
 ---
@@ -2345,18 +2505,17 @@ sig_dt: min=2002-08-19 00:00:00, max=2025-03-28 00:00:00
 
 ## ftsfr_corp_bond_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/ftsfr_corp_bond_portfolio_returns.parquet`
-**Size:** 22423 bytes | **Type:** Parquet | **Shape:** 2,690 rows × 3 columns
+**Size:** 22372 bytes | **Type:** Parquet | **Shape:** 2,690 rows × 3 columns
 
 ### Columns
 ```
-unique_id                                Float64        
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float32        
 ```
 
 ### Numeric Column Statistics
 ```
-unique_id: min=1.0, max=10.0, mean=5.50, median=5.5
 y: min=-0.29776981472969055, max=0.3147818148136139, mean=0.01, median=0.00559262465685606
 ```
 
@@ -2369,11 +2528,11 @@ ds: min=2002-08-31 00:00:00, max=2024-12-31 00:00:00
 
 ## ftsfr_corp_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/corp_bond_returns/ftsfr_corp_bond_returns.parquet`
-**Size:** 9.9 MB | **Type:** Parquet | **Shape:** 1,859,498 rows × 3 columns
+**Size:** 9.6 MB | **Type:** Parquet | **Shape:** 1,859,498 rows × 3 columns
 
 ### Columns
 ```
-unique_id                                Categorical(ordering='physical')
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float32        
 ```
@@ -2844,7 +3003,7 @@ ds: min=2001-12-20 00:00:00, max=2025-08-11 00:00:00
 
 ## ftsfr_CDS_bond_basis_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_aggregated.parquet`
-**Size:** 5600 bytes | **Type:** Parquet | **Shape:** 368 rows × 3 columns
+**Size:** 7920 bytes | **Type:** Parquet | **Shape:** 546 rows × 3 columns
 
 ### Columns
 ```
@@ -2855,35 +3014,35 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-3.093328225349698, max=6.191714845203802, mean=1.99, median=1.9909478097509414
+y: min=-387.5177840337986, max=57.59304878255962, mean=-62.13, median=-47.59822949472496
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2002-09-30 00:00:00, max=2023-11-30 00:00:00
+ds: min=2002-07-31 00:00:00, max=2025-03-31 00:00:00
 ```
 
 ---
 
 ## ftsfr_CDS_bond_basis_non_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_non_aggregated.parquet`
-**Size:** 4.4 MB | **Type:** Parquet | **Shape:** 532,361 rows × 3 columns
+**Size:** 1.4 MB | **Type:** Parquet | **Shape:** 185,931 rows × 3 columns
 
 ### Columns
 ```
-unique_id                                Categorical(ordering='physical')
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float64        
 ```
 
 ### Numeric Column Statistics
 ```
-y: min=-99.97459322374101, max=99.8629400456488, mean=2.42, median=2.638552306016205
+y: min=-999.6092364237279, max=998.565884895731, mean=-62.44, median=-44.41025002527942
 ```
 
 ### Date/Datetime Column Statistics
 ```
-ds: min=2002-09-30 00:00:00, max=2023-11-30 00:00:00
+ds: min=2002-07-31 00:00:00, max=2025-04-30 00:00:00
 ```
 
 ---
@@ -3036,14 +3195,13 @@ ds: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ### Columns
 ```
-unique_id                                Float64        
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float32        
 ```
 
 ### Numeric Column Statistics
 ```
-unique_id: min=1.0, max=10.0, mean=5.50, median=5.5
 y: min=-0.29776981472969055, max=0.3147818148136139, mean=0.01, median=0.00559262465685606
 ```
 
@@ -3056,11 +3214,11 @@ ds: min=2002-08-31 00:00:00, max=2024-12-31 00:00:00
 
 ## ftsfr_corp_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_returns.parquet`
-**Size:** 8.5 MB | **Type:** Parquet | **Shape:** 1,859,498 rows × 3 columns
+**Size:** 7.6 MB | **Type:** Parquet | **Shape:** 1,859,498 rows × 3 columns
 
 ### Columns
 ```
-unique_id                                Categorical(ordering='physical')
+unique_id                                String         
 ds                                       Datetime(time_unit='ns', time_zone=None)
 y                                        Float32        
 ```
