@@ -169,6 +169,11 @@ def build_canonical_grid(df, frequency):
     """Build canonical time grid using fill_gaps with per_serie start/end."""
     print("  Building canonical time grid...")
 
+    # Normalize unique_id to String so joins against the grid don't fail when
+    # source parquets store it as Categorical/Int/Float.
+    if df.schema["unique_id"] != pl.String:
+        df = df.with_columns(pl.col("unique_id").cast(pl.String))
+
     if frequency == "ME":
         # For month-end data that's already normalized, create a proper canonical grid
         # by filling gaps manually to ensure alignment
