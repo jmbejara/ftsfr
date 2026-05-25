@@ -217,6 +217,7 @@ def pull_CRSP_treasury_consolidated(
     start_date="1970-01-01",
     end_date=datetime.today().strftime("%Y-%m-%d"),
     wrds_username=WRDS_USERNAME,
+    include_callables=False,
 ):
     """Pull consolidated CRSP Treasury data with all relevant fields.
 
@@ -309,8 +310,11 @@ def pull_CRSP_treasury_consolidated(
         PDINT is the coupon payable on the interest payment date.
     """
 
+    # itype 1: noncallable bond, 2: noncallable note, 3: callable bond,
+    # 4: callable note. Bills (5+) are excluded either way.
+    itype_clause = "iss.itype IN (1, 2, 3, 4)" if include_callables else "iss.itype IN (1, 2)"
     query = f"""
-    SELECT 
+    SELECT
         tfz.kytreasno, tfz.kycrspid, iss.tcusip,
         tfz.caldt,
         iss.tdatdt,
@@ -330,16 +334,16 @@ def pull_CRSP_treasury_consolidated(
         ROUND((iss.tmatdt - tfz.caldt) / 365.0) AS years_to_maturity,
         tfz.tdduratn,
         tfz.tdretnua
-    FROM 
+    FROM
         crspm.tfz_dly AS tfz
-    LEFT JOIN 
-        crspm.tfz_iss AS iss 
-    ON 
-        tfz.kytreasno = iss.kytreasno AND 
+    LEFT JOIN
+        crspm.tfz_iss AS iss
+    ON
+        tfz.kytreasno = iss.kytreasno AND
         tfz.kycrspid = iss.kycrspid
-    WHERE 
-        tfz.caldt BETWEEN '{start_date}' AND '{end_date}' AND 
-        iss.itype IN (1, 2)
+    WHERE
+        tfz.caldt BETWEEN '{start_date}' AND '{end_date}' AND
+        {itype_clause}
     """
 
     db = wrds.Connection(wrds_username=wrds_username)
@@ -390,7 +394,9 @@ def load_CRSP_treasury_info(data_dir=DATA_DIR):
     return df
 
 
-def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
+def load_CRSP_treasury_consolidated(
+    data_dir=DATA_DIR, with_runness=True, include_callables=False
+):
     """Load consolidated CRSP Treasury data from a Parquet file.
 
     Parameters
@@ -400,6 +406,9 @@ def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
     with_runness : bool, default=True
         If True, load the file with runness information included.
         If False, load the file without runness information.
+    include_callables : bool, default=False
+        If True, load the variant that includes callable bonds and notes
+        (itype 1-4). If False, load the noncallable-only variant (itype 1-2).
 
     Returns
     -------
@@ -408,10 +417,14 @@ def load_CRSP_treasury_consolidated(data_dir=DATA_DIR, with_runness=True):
         docstring for details on the columns. If with_runness=True, also includes a 'run'
         column indicating the runness measure for each security.
     """
-    if with_runness:
-        path = data_dir / "CRSP_TFZ_with_runness.parquet"
+    if include_callables:
+        suffix = "_all_itypes"
     else:
-        path = data_dir / "CRSP_TFZ_consolidated.parquet"
+        suffix = ""
+    if with_runness:
+        path = data_dir / f"CRSP_TFZ_with_runness{suffix}.parquet"
+    else:
+        path = data_dir / f"CRSP_TFZ_consolidated{suffix}.parquet"
     df = pd.read_parquet(path)
     return df
 
@@ -449,3 +462,15 @@ if __name__ == "__main__":
     df = calc_runness(df)
     path = DATA_DIR / "CRSP_TFZ_with_runness.parquet"
     df.to_parquet(path)
+
+    # Also pull the all-itypes variant (includes callable bonds and notes)
+    # for the cleaning-sensitivity case study.
+    df_all = pull_CRSP_treasury_consolidated(
+        wrds_username=WRDS_USERNAME, include_callables=True
+    )
+    path = DATA_DIR / "CRSP_TFZ_consolidated_all_itypes.parquet"
+    df_all.to_parquet(path)
+
+    df_all = calc_runness(df_all)
+    path = DATA_DIR / "CRSP_TFZ_with_runness_all_itypes.parquet"
+    df_all.to_parquet(path)
