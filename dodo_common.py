@@ -159,7 +159,17 @@ def debug_action(cmd):
 
 # Helper functions for handling Jupyter Notebook tasks
 def jupyter_execute_notebook(notebook_path):
-    return f"jupyter nbconvert --execute --to notebook --ClearMetadataPreprocessor.enabled=True --inplace {notebook_path}"
+    # Pin to the `ftsfr` kernel so execution uses the project conda env even
+    # when `doit` is invoked from a different env (e.g. `base`). Install the
+    # kernel once with:
+    #   path/to/ftsfr/bin/python -m ipykernel install --user --name ftsfr \
+    #       --display-name "Python (ftsfr)"
+    return (
+        "jupyter nbconvert --execute --to notebook "
+        "--ClearMetadataPreprocessor.enabled=True "
+        "--ExecutePreprocessor.kernel_name=ftsfr "
+        f"--inplace {notebook_path}"
+    )
 
 
 def jupyter_to_html(notebook_path, output_dir=OUTPUT_DIR):
