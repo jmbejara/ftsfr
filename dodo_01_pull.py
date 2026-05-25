@@ -8,7 +8,6 @@ This file contains all tasks related to:
 - Building documentation
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -277,6 +276,8 @@ def task_pull():
                 DATA_DIR / data_module / "CRSP_TFZ_INFO.parquet",
                 DATA_DIR / data_module / "CRSP_TFZ_CONSOLIDATED.parquet",
                 DATA_DIR / data_module / "CRSP_TFZ_with_runness.parquet",
+                DATA_DIR / data_module / "CRSP_TFZ_consolidated_all_itypes.parquet",
+                DATA_DIR / data_module / "CRSP_TFZ_with_runness_all_itypes.parquet",
             ],
             "file_dep": [
                 f"./src/{data_module}/pull_treasury_auction_stats.py",
@@ -607,41 +608,6 @@ def task_format():
                 "targets": [],
             }
         )
-
-        # Dickerson, Robotti, and Rossetti (2026) short-term-reversal exhibit.
-        # Sourced from the case_study_clean_trace pipeline's stage1 daily
-        # panel, not OSBAP. The build script honors a CLEAN_TRACE_DIR env
-        # override, defaulting to ~/GitRepositories/finm-32900-ALL/case_study_clean_trace.
-        # We list the external stage1_latest.parquet as a file_dep so doit
-        # invalidates on upstream pipeline reruns, but if the path is missing
-        # the build script emits a clear error.
-        clean_trace_dir = Path(
-            os.environ.get(
-                "CLEAN_TRACE_DIR",
-                Path.home()
-                / "GitRepositories"
-                / "finm-32900-ALL"
-                / "case_study_clean_trace",
-            )
-        )
-        clean_trace_stage1 = clean_trace_dir / "_data" / "stage1" / "stage1_latest.parquet"
-        if clean_trace_stage1.exists():
-            yield {
-                "name": f"{data_module}_str_dickerson",
-                "actions": [
-                    f"python ./src/{data_module}/build_str_dickerson_panels.py",
-                ],
-                "targets": [
-                    DATA_DIR / data_module / "ftsfr_corp_bond_str_deciles_naive.parquet",
-                    DATA_DIR / data_module / "ftsfr_corp_bond_str_deciles_return_gap.parquet",
-                ],
-                "file_dep": [
-                    f"./src/{data_module}/build_str_dickerson_panels.py",
-                    str(clean_trace_stage1),
-                ],
-                "clean": [],
-                "verbosity": 2,
-            }
 
     data_module = "foreign_exchange"
     if module_requirements[data_module]:

@@ -14,7 +14,8 @@ FTSFR is an open benchmark for evaluating time-series forecasting methods across
 - `dodo_00_pull_bloomberg.py` – Bloomberg Terminal pulls (run only where Bloomberg Desktop API is available)
 - `dodo_01_pull.py` – Core data pulls, formatting, and documentation tasks
 - `dodo_02_forecasting.py` – Forecast generation pipeline
-- `dodo_03_paper.py` – Report and website assembly
+- `dodo_03_sensitivity.py` – Data-cleaning sensitivity analysis (alternate-cleaning panels and LaTeX exhibits)
+- `dodo_04_paper.py` – Report and website assembly
 - `_data/` – Raw and processed data artifacts produced by the pipeline
 - `_output/` – Forecasts, diagnostics, documentation assets, and timing logs
 - `reports/` – LaTeX sources for the draft paper (`draft_ftsfr.tex` is the current manuscript)
@@ -75,17 +76,29 @@ Only the modules enabled in `subscriptions.toml` with `bloomberg = true` will ex
 doit -f dodo_01_pull.py
 ```
 
-### 3. Run Forecasts
+### 3. Build Sensitivity Panels (optional)
+`dodo_03_sensitivity.py` builds the alternate-cleaning panels referenced in the paper's "Sensitivity to cleaning method" section. The panel builders and the standalone replication tables do not depend on forecasting and should be run before the forecasting step so the new datasets are picked up automatically:
+```bash
+doit -f dodo_03_sensitivity.py build_sensitivity_panels build_replication_tables
+```
+
+### 4. Run Forecasts
 Forecasting jobs live in `dodo_02_forecasting.py` and the `src/forecasting/` package. Typical usage:
 ```bash
 doit -f dodo_02_forecasting.py
 ```
 Job definitions are generated from `subscriptions.toml`, `datasets.toml`, and `src/forecasting/models_config.toml`. Results (error metrics, predictions, timing) land in `_output/forecasting/`.
 
-### 4. Build Documentation and Paper (optional)
-Use `dodo_03_paper.py` to rebuild the website and LaTeX report once data and forecasts are in place:
+### 5. Build Sensitivity Tables (optional)
+Once forecasting has finished on the sensitivity panels, render the LaTeX exhibits that aggregate per-model metrics:
 ```bash
-doit -f dodo_03_paper.py
+doit -f dodo_03_sensitivity.py build_sensitivity_tables
+```
+
+### 6. Build Documentation and Paper (optional)
+Use `dodo_04_paper.py` to rebuild the website and LaTeX report once data and forecasts are in place:
+```bash
+doit -f dodo_04_paper.py
 ```
 This compiles the manuscript in `reports/draft_ftsfr.tex` and refreshes site assets under `docs/`.
 
