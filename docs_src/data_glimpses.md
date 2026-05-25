@@ -1,5 +1,5 @@
 # Data Glimpses Report
-Total files: 131
+Total files: 143
 
 ## Summary of Datasets by Task
 
@@ -92,10 +92,14 @@ Total files: 131
 - [`ftsfr_CDS_portfolio_returns.parquet`](#ftsfr-cds-portfolio-returns-parquet)
 - [`ftsfr_CIP_spreads.parquet`](#ftsfr-cip-spreads-parquet)
 - [`ftsfr_commodities_returns.parquet`](#ftsfr-commodities-returns-parquet)
+- [`ftsfr_corp_bond_cs_deciles_clean_trace_mmn_avg5.parquet`](#ftsfr-corp-bond-cs-deciles-clean-trace-mmn-avg5-parquet)
+- [`ftsfr_corp_bond_cs_deciles_clean_trace_naive.parquet`](#ftsfr-corp-bond-cs-deciles-clean-trace-naive-parquet)
 - [`ftsfr_corp_bond_cs_deciles_mmn_biased.parquet`](#ftsfr-corp-bond-cs-deciles-mmn-biased-parquet)
 - [`ftsfr_corp_bond_cs_deciles_mmn_corrected.parquet`](#ftsfr-corp-bond-cs-deciles-mmn-corrected-parquet)
 - [`ftsfr_corp_bond_portfolio_returns.parquet`](#ftsfr-corp-bond-portfolio-returns-parquet)
 - [`ftsfr_corp_bond_returns.parquet`](#ftsfr-corp-bond-returns-parquet)
+- [`ftsfr_corp_bond_str_deciles_naive.parquet`](#ftsfr-corp-bond-str-deciles-naive-parquet)
+- [`ftsfr_corp_bond_str_deciles_return_gap.parquet`](#ftsfr-corp-bond-str-deciles-return-gap-parquet)
 - [`ftsfr_treas_yield_curve_zero_coupon.parquet`](#ftsfr-treas-yield-curve-zero-coupon-parquet)
 - [`ftsfr_FX_returns.parquet`](#ftsfr-fx-returns-parquet)
 - [`ftsfr_he_kelly_manela_all.parquet`](#ftsfr-he-kelly-manela-all-parquet)
@@ -109,11 +113,17 @@ Total files: 131
 - [`ftsfr_nyu_call_report_holding_company_leverage.parquet`](#ftsfr-nyu-call-report-holding-company-leverage-parquet)
 - [`ftsfr_nyu_call_report_leverage.parquet`](#ftsfr-nyu-call-report-leverage-parquet)
 - [`ftsfr_cjs_option_returns.parquet`](#ftsfr-cjs-option-returns-parquet)
+- [`ftsfr_cjs_option_returns_l1_filters.parquet`](#ftsfr-cjs-option-returns-l1-filters-parquet)
+- [`ftsfr_cjs_option_returns_l3_filters.parquet`](#ftsfr-cjs-option-returns-l3-filters-parquet)
 - [`ftsfr_hkm_option_returns.parquet`](#ftsfr-hkm-option-returns-parquet)
 - [`ftsfr_treas_bond_portfolio_returns.parquet`](#ftsfr-treas-bond-portfolio-returns-parquet)
 - [`ftsfr_treas_bond_returns.parquet`](#ftsfr-treas-bond-returns-parquet)
+- [`ftsfr_treas_portfolios_permissive.parquet`](#ftsfr-treas-portfolios-permissive-parquet)
+- [`ftsfr_treas_portfolios_strict.parquet`](#ftsfr-treas-portfolios-strict-parquet)
 - [`ftsfr_CRSP_monthly_stock_ret.parquet`](#ftsfr-crsp-monthly-stock-ret-parquet)
 - [`ftsfr_CRSP_monthly_stock_retx.parquet`](#ftsfr-crsp-monthly-stock-retx-parquet)
+- [`ftsfr_ff25_size_bm_crsp_breaks.parquet`](#ftsfr-ff25-size-bm-crsp-breaks-parquet)
+- [`ftsfr_ff25_size_bm_nyse_breaks.parquet`](#ftsfr-ff25-size-bm-nyse-breaks-parquet)
 
 ### Pull
 #### Pull: Basis Tips Treas
@@ -162,7 +172,9 @@ Total files: 131
 - [`CRSP_TFZ_CONSOLIDATED.parquet`](#crsp-tfz-consolidated-parquet)
 - [`CRSP_TFZ_DAILY.parquet`](#crsp-tfz-daily-parquet)
 - [`CRSP_TFZ_INFO.parquet`](#crsp-tfz-info-parquet)
+- [`CRSP_TFZ_consolidated_all_itypes.parquet`](#crsp-tfz-consolidated-all-itypes-parquet)
 - [`CRSP_TFZ_with_runness.parquet`](#crsp-tfz-with-runness-parquet)
+- [`CRSP_TFZ_with_runness_all_itypes.parquet`](#crsp-tfz-with-runness-all-itypes-parquet)
 - [`treasury_auction_stats.parquet`](#treasury-auction-stats-parquet)
 #### Pull: Wrds Bank Premium
 - [`idrssd_to_lei.parquet`](#idrssd-to-lei-parquet)
@@ -2215,21 +2227,21 @@ date: min=2002-08-31 00:00:00, max=2024-12-31 00:00:00
 
 ### Columns
 ```
-cusip                                    Categorical(ordering='physical')
+cusip                                    Categorical    
 date                                     Datetime(time_unit='ns', time_zone=None)
-issuer_cusip                             Categorical(ordering='physical')
+issuer_cusip                             Categorical    
 permno                                   Float64         (10.8% null)
 permco                                   Float64         (100.0% null)
 gvkey                                    Float64         (100.0% null)
 144a                                     Int8           
-country                                  Categorical(ordering='physical') (0.0% null)
+country                                  Categorical     (0.0% null)
 call                                     Int8           
 ret_vw                                   Float32         (0.0% null)
 ret_vw_bgn                               Float32         (7.8% null)
 hprd                                     Int16          
 lib                                      Float32         (15.7% null)
 libd                                     Float32         (15.7% null)
-ret_type                                 Categorical(ordering='physical')
+ret_type                                 Categorical    
 spc_rat                                  Int32          
 mdc_rat                                  Int32          
 ff17num                                  Int8           
@@ -2934,7 +2946,7 @@ date: min=1971-01-31 00:00:00, max=2025-01-31 00:00:00
 
 ## ftsfr_tips_treasury_basis.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/basis_tips_treas/ftsfr_tips_treasury_basis.parquet`
-**Size:** 206422 bytes | **Type:** Parquet | **Shape:** 20,647 rows × 3 columns
+**Size:** 206374 bytes | **Type:** Parquet | **Shape:** 20,647 rows × 3 columns
 
 ### Columns
 ```
@@ -2957,7 +2969,7 @@ ds: min=2004-07-21 00:00:00, max=2025-05-30 00:00:00
 
 ## ftsfr_treasury_sf_basis.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/basis_treas_sf/ftsfr_treasury_sf_basis.parquet`
-**Size:** 175480 bytes | **Type:** Parquet | **Shape:** 24,537 rows × 3 columns
+**Size:** 175432 bytes | **Type:** Parquet | **Shape:** 24,537 rows × 3 columns
 
 ### Columns
 ```
@@ -2980,7 +2992,7 @@ ds: min=2004-06-23 00:00:00, max=2025-01-08 00:00:00
 
 ## ftsfr_treasury_swap_basis.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/basis_treas_swap/ftsfr_treasury_swap_basis.parquet`
-**Size:** 169285 bytes | **Type:** Parquet | **Shape:** 32,022 rows × 3 columns
+**Size:** 169214 bytes | **Type:** Parquet | **Shape:** 32,022 rows × 3 columns
 
 ### Columns
 ```
@@ -3003,7 +3015,7 @@ ds: min=2001-12-20 00:00:00, max=2025-08-11 00:00:00
 
 ## ftsfr_CDS_bond_basis_aggregated.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_bond_basis/ftsfr_CDS_bond_basis_aggregated.parquet`
-**Size:** 7920 bytes | **Type:** Parquet | **Shape:** 546 rows × 3 columns
+**Size:** 7872 bytes | **Type:** Parquet | **Shape:** 546 rows × 3 columns
 
 ### Columns
 ```
@@ -3074,7 +3086,7 @@ ds: min=2001-01-01 00:00:00, max=2023-12-01 00:00:00
 
 ## ftsfr_CDS_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cds_returns/ftsfr_CDS_portfolio_returns.parquet`
-**Size:** 57490 bytes | **Type:** Parquet | **Shape:** 5,510 rows × 4 columns
+**Size:** 57422 bytes | **Type:** Parquet | **Shape:** 5,510 rows × 4 columns
 
 ### Columns
 ```
@@ -3099,7 +3111,7 @@ ds: min=2001-01-01 00:00:00, max=2023-12-01 00:00:00
 
 ## ftsfr_CIP_spreads.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/cip/ftsfr_CIP_spreads.parquet`
-**Size:** 405254 bytes | **Type:** Parquet | **Shape:** 43,490 rows × 3 columns
+**Size:** 405282 bytes | **Type:** Parquet | **Shape:** 43,490 rows × 3 columns
 
 ### Columns
 ```
@@ -3122,7 +3134,7 @@ ds: min=2001-12-04 00:00:00, max=2025-02-28 00:00:00
 
 ## ftsfr_commodities_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/commodities/ftsfr_commodities_returns.parquet`
-**Size:** 96115 bytes | **Type:** Parquet | **Shape:** 11,553 rows × 3 columns
+**Size:** 96067 bytes | **Type:** Parquet | **Shape:** 11,553 rows × 3 columns
 
 ### Columns
 ```
@@ -3143,9 +3155,55 @@ ds: min=1970-01-30 00:00:00, max=2025-08-12 00:00:00
 
 ---
 
+## ftsfr_corp_bond_cs_deciles_clean_trace_mmn_avg5.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_cs_deciles_clean_trace_mmn_avg5.parquet`
+**Size:** 24574 bytes | **Type:** Parquet | **Shape:** 2,720 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.22357092935502973, max=0.25356670278634535, mean=0.00, median=0.0016059214131858583
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=2002-07-31 00:00:00, max=2025-02-28 00:00:00
+```
+
+---
+
+## ftsfr_corp_bond_cs_deciles_clean_trace_naive.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_cs_deciles_clean_trace_naive.parquet`
+**Size:** 24402 bytes | **Type:** Parquet | **Shape:** 2,700 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.2248109225996762, max=0.2596163986608802, mean=0.00, median=0.0013400098346253945
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=2002-07-31 00:00:00, max=2024-12-31 00:00:00
+```
+
+---
+
 ## ftsfr_corp_bond_cs_deciles_mmn_biased.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_cs_deciles_mmn_biased.parquet`
-**Size:** 21895 bytes | **Type:** Parquet | **Shape:** 2,420 rows × 3 columns
+**Size:** 21847 bytes | **Type:** Parquet | **Shape:** 2,420 rows × 3 columns
 
 ### Columns
 ```
@@ -3168,7 +3226,7 @@ ds: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ## ftsfr_corp_bond_cs_deciles_mmn_corrected.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_cs_deciles_mmn_corrected.parquet`
-**Size:** 21927 bytes | **Type:** Parquet | **Shape:** 2,420 rows × 3 columns
+**Size:** 21879 bytes | **Type:** Parquet | **Shape:** 2,420 rows × 3 columns
 
 ### Columns
 ```
@@ -3191,7 +3249,7 @@ ds: min=2002-08-31 00:00:00, max=2022-09-30 00:00:00
 
 ## ftsfr_corp_bond_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_portfolio_returns.parquet`
-**Size:** 15518 bytes | **Type:** Parquet | **Shape:** 2,690 rows × 3 columns
+**Size:** 15470 bytes | **Type:** Parquet | **Shape:** 2,690 rows × 3 columns
 
 ### Columns
 ```
@@ -3235,6 +3293,52 @@ ds: min=2002-08-31 00:00:00, max=2025-03-31 00:00:00
 
 ---
 
+## ftsfr_corp_bond_str_deciles_naive.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_str_deciles_naive.parquet`
+**Size:** 24399 bytes | **Type:** Parquet | **Shape:** 2,710 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.2352337616651138, max=0.29116162225490994, mean=0.00, median=0.0051665858754277845
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=2002-08-31 00:00:00, max=2025-02-28 00:00:00
+```
+
+---
+
+## ftsfr_corp_bond_str_deciles_return_gap.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/corp_bond_returns/ftsfr_corp_bond_str_deciles_return_gap.parquet`
+**Size:** 24365 bytes | **Type:** Parquet | **Shape:** 2,710 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.2416465447245652, max=0.2608625376225763, mean=0.00, median=0.004795266069267316
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=2002-08-31 00:00:00, max=2025-02-28 00:00:00
+```
+
+---
+
 ## ftsfr_treas_yield_curve_zero_coupon.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/fed_yield_curve/ftsfr_treas_yield_curve_zero_coupon.parquet`
 **Size:** 2.4 MB | **Type:** Parquet | **Shape:** 374,312 rows × 4 columns
@@ -3262,7 +3366,7 @@ ds: min=1961-06-14 00:00:00, max=2025-09-12 00:00:00
 
 ## ftsfr_FX_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/foreign_exchange/ftsfr_FX_returns.parquet`
-**Size:** 552562 bytes | **Type:** Parquet | **Shape:** 52,473 rows × 4 columns
+**Size:** 548157 bytes | **Type:** Parquet | **Shape:** 52,473 rows × 4 columns
 
 ### Columns
 ```
@@ -3287,7 +3391,7 @@ ds: min=1999-02-09 00:00:00, max=2025-02-28 00:00:00
 
 ## ftsfr_he_kelly_manela_all.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_all.parquet`
-**Size:** 14743 bytes | **Type:** Parquet | **Shape:** 2,064 rows × 3 columns
+**Size:** 14697 bytes | **Type:** Parquet | **Shape:** 2,064 rows × 3 columns
 
 ### Columns
 ```
@@ -3310,7 +3414,7 @@ ds: min=1970-01-01 00:00:00, max=2012-12-01 00:00:00
 
 ## ftsfr_he_kelly_manela_factors_daily.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_factors_daily.parquet`
-**Size:** 210081 bytes | **Type:** Parquet | **Shape:** 19,063 rows × 3 columns
+**Size:** 210033 bytes | **Type:** Parquet | **Shape:** 19,063 rows × 3 columns
 
 ### Columns
 ```
@@ -3333,7 +3437,7 @@ ds: min=2000-01-03 00:00:00, max=2018-12-11 00:00:00
 
 ## ftsfr_he_kelly_manela_factors_monthly.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_factors_monthly.parquet`
-**Size:** 19765 bytes | **Type:** Parquet | **Shape:** 2,348 rows × 3 columns
+**Size:** 19717 bytes | **Type:** Parquet | **Shape:** 2,348 rows × 3 columns
 
 ### Columns
 ```
@@ -3356,7 +3460,7 @@ ds: min=1970-01-01 00:00:00, max=2018-11-01 00:00:00
 
 ## ftsfr_french_portfolios_25_daily_size_and_bm.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/ken_french_data_library/ftsfr_french_portfolios_25_daily_size_and_bm.parquet`
-**Size:** 2.2 MB | **Type:** Parquet | **Shape:** 650,575 rows × 3 columns
+**Size:** 2.5 MB | **Type:** Parquet | **Shape:** 650,575 rows × 3 columns
 
 ### Columns
 ```
@@ -3379,7 +3483,7 @@ ds: min=1926-07-01 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_french_portfolios_25_daily_size_and_inv.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/ken_french_data_library/ftsfr_french_portfolios_25_daily_size_and_inv.parquet`
-**Size:** 947632 bytes | **Type:** Parquet | **Shape:** 390,075 rows × 3 columns
+**Size:** 1.1 MB | **Type:** Parquet | **Shape:** 390,075 rows × 3 columns
 
 ### Columns
 ```
@@ -3402,7 +3506,7 @@ ds: min=1963-07-01 00:00:00, max=2025-06-30 00:00:00
 
 ## ftsfr_french_portfolios_25_daily_size_and_op.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/ken_french_data_library/ftsfr_french_portfolios_25_daily_size_and_op.parquet`
-**Size:** 948984 bytes | **Type:** Parquet | **Shape:** 390,075 rows × 3 columns
+**Size:** 1.1 MB | **Type:** Parquet | **Shape:** 390,075 rows × 3 columns
 
 ### Columns
 ```
@@ -3517,7 +3621,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_cjs_option_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_cjs_option_returns.parquet`
-**Size:** 91689 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+**Size:** 91630 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
 
 ### Columns
 ```
@@ -3538,9 +3642,55 @@ ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
 
 ---
 
+## ftsfr_cjs_option_returns_l1_filters.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_cjs_option_returns_l1_filters.parquet`
+**Size:** 119573 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.3413078648038207, max=24.599734066365862, mean=0.13, median=0.023890004198871218
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
+```
+
+---
+
+## ftsfr_cjs_option_returns_l3_filters.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_cjs_option_returns_l3_filters.parquet`
+**Size:** 90982 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.2751718446073923, max=2.617761613342477, mean=0.03, median=0.0061104551525184014
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
+```
+
+---
+
 ## ftsfr_hkm_option_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_hkm_option_returns.parquet`
-**Size:** 39862 bytes | **Type:** Parquet | **Shape:** 5,184 rows × 3 columns
+**Size:** 39817 bytes | **Type:** Parquet | **Shape:** 5,184 rows × 3 columns
 
 ### Columns
 ```
@@ -3563,7 +3713,7 @@ ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
 
 ## ftsfr_treas_bond_portfolio_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_bond_portfolio_returns.parquet`
-**Size:** 59620 bytes | **Type:** Parquet | **Shape:** 6,659 rows × 3 columns
+**Size:** 59572 bytes | **Type:** Parquet | **Shape:** 6,659 rows × 3 columns
 
 ### Columns
 ```
@@ -3586,7 +3736,7 @@ ds: min=1970-01-31 00:00:00, max=2025-08-31 00:00:00
 
 ## ftsfr_treas_bond_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_bond_returns.parquet`
-**Size:** 918854 bytes | **Type:** Parquet | **Shape:** 121,827 rows × 3 columns
+**Size:** 919213 bytes | **Type:** Parquet | **Shape:** 121,827 rows × 3 columns
 
 ### Columns
 ```
@@ -3604,6 +3754,52 @@ y: min=-0.15135394584216577, max=0.1751899693786838, mean=0.00, median=0.0030169
 ### Date/Datetime Column Statistics
 ```
 ds: min=1970-01-31 00:00:00, max=2025-08-31 00:00:00
+```
+
+---
+
+## ftsfr_treas_portfolios_permissive.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_portfolios_permissive.parquet`
+**Size:** 60565 bytes | **Type:** Parquet | **Shape:** 6,739 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.06045740780772699, max=0.1210504349533954, mean=0.00, median=0.0037053095216066164
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1970-01-31 00:00:00, max=2026-04-30 00:00:00
+```
+
+---
+
+## ftsfr_treas_portfolios_strict.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/us_treasury_returns/ftsfr_treas_portfolios_strict.parquet`
+**Size:** 60430 bytes | **Type:** Parquet | **Shape:** 6,737 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.062063648538674354, max=0.1210504349533954, mean=0.00, median=0.003803967966345523
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1970-01-31 00:00:00, max=2026-04-30 00:00:00
 ```
 
 ---
@@ -3652,6 +3848,52 @@ y: min=-1.0, max=26.583827, mean=0.01, median=0.0
 ### Date/Datetime Column Statistics
 ```
 ds: min=1926-01-30 00:00:00, max=2024-12-31 00:00:00
+```
+
+---
+
+## ftsfr_ff25_size_bm_crsp_breaks.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/wrds_crsp_compustat/ftsfr_ff25_size_bm_crsp_breaks.parquet`
+**Size:** 151778 bytes | **Type:** Parquet | **Shape:** 18,798 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.356376960504943, max=0.5612853884390135, mean=0.01, median=0.012013706464488216
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1961-07-31 00:00:00, max=2024-12-31 00:00:00
+```
+
+---
+
+## ftsfr_ff25_size_bm_nyse_breaks.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/wrds_crsp_compustat/ftsfr_ff25_size_bm_nyse_breaks.parquet`
+**Size:** 151760 bytes | **Type:** Parquet | **Shape:** 18,798 rows × 3 columns
+
+### Columns
+```
+unique_id                                String         
+ds                                       Datetime(time_unit='ns', time_zone=None)
+y                                        Float64        
+```
+
+### Numeric Column Statistics
+```
+y: min=-0.34166685527837604, max=0.42345806932975555, mean=0.01, median=0.01303340016647999
+```
+
+### Date/Datetime Column Statistics
+```
+ds: min=1961-07-31 00:00:00, max=2024-12-31 00:00:00
 ```
 
 ---
@@ -5319,7 +5561,7 @@ date: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
 
 ## CRSP_TFZ_CONSOLIDATED.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_CONSOLIDATED.parquet`
-**Size:** 94.7 MB | **Type:** Parquet | **Shape:** 2,501,597 rows × 23 columns
+**Size:** 97.2 MB | **Type:** Parquet | **Shape:** 2,559,674 rows × 23 columns
 
 ### Columns
 ```
@@ -5335,7 +5577,7 @@ tdask                                    Float64         (0.0% null)
 tdaccint                                 Float64        
 tdyld                                    Float64         (0.0% null)
 price                                    Float64         (0.0% null)
-tdpubout                                 Float64         (2.4% null)
+tdpubout                                 Float64         (2.3% null)
 tdtotout                                 Float64         (0.9% null)
 tdpdint                                  Float64        
 tcouprt                                  Float64        
@@ -5350,29 +5592,29 @@ callable                                 Boolean
 
 ### Numeric Column Statistics
 ```
-kytreasno: min=200636.0, max=208448.0, mean=204546.38, median=204055.0
-tdbid: min=43.5, max=176.328125, mean=104.45, median=100.953125
-tdask: min=43.546875, max=176.390625, mean=104.53, median=101.01171875
-tdaccint: min=0.0, max=11.86908390823, mean=1.34, median=0.91160220994475
-tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.0001155821303717
-price: min=44.05672554347826, max=182.7192679558011, mean=105.83, median=102.3286401098901
-tdpubout: min=1.0, max=120001.0, mean=19730.94, median=14604.0
-tdtotout: min=4.0, max=148501.0, mean=24755.12, median=18941.0
+kytreasno: min=200636.0, max=208559.0, mean=204616.77, median=204063.0
+tdbid: min=43.5, max=176.328125, mean=104.23, median=100.87890619999999
+tdask: min=43.546875, max=176.390625, mean=104.31, median=100.9375
+tdaccint: min=0.0, max=11.86908390823, mean=1.33, median=0.90421195652174
+tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.000114636933176755
+price: min=44.05672554347826, max=182.7192679558011, mean=105.60, median=102.2386675824176
+tdpubout: min=1.0, max=120001.0, mean=20405.02, median=15005.0
+tdtotout: min=4.0, max=148501.0, mean=25547.93, median=19798.0
 tdpdint: min=0.0, max=11.913043478261, mean=0.02, median=0.0
-tcouprt: min=0.125, max=16.25, mean=5.40, median=4.75
+tcouprt: min=0.125, max=16.25, mean=5.35, median=4.75
 itype: min=1.0, max=2.0, mean=1.75, median=2.0
-original_maturity: min=1.0, max=40.0, mean=11.03, median=7.0
-years_to_maturity: min=0.0, max=30.0, mean=6.21, median=3.0
-tdduratn: min=-1.0, max=9160.066986023601, mean=1653.01, median=1112.0144269626
-tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014492729480761
-days_to_maturity: min=1, max=11053, mean=2265.57, median=1212.0
+original_maturity: min=1.0, max=40.0, mean=11.07, median=7.0
+years_to_maturity: min=0.0, max=30.0, mean=6.24, median=3.0
+tdduratn: min=-1.0, max=9160.066986023601, mean=1663.23, median=1115.9104028816
+tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014439069901748
+days_to_maturity: min=1, max=11053, mean=2277.19, median=1215.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-caldt: min=1970-01-02 00:00:00, max=2025-08-29 00:00:00
-tdatdt: min=1955-02-15 00:00:00, max=2025-08-31 00:00:00
-tmatdt: min=1970-02-15 00:00:00, max=2055-08-15 00:00:00
+caldt: min=1970-01-02 00:00:00, max=2026-04-30 00:00:00
+tdatdt: min=1955-02-15 00:00:00, max=2026-04-30 00:00:00
+tmatdt: min=1970-02-15 00:00:00, max=2056-02-15 00:00:00
 tfcaldt: min=1970-01-01 00:00:00, max=1970-01-01 00:00:00
 ```
 
@@ -5380,7 +5622,7 @@ tfcaldt: min=1970-01-01 00:00:00, max=1970-01-01 00:00:00
 
 ## CRSP_TFZ_DAILY.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_DAILY.parquet`
-**Size:** 123.5 MB | **Type:** Parquet | **Shape:** 3,183,517 rows × 14 columns
+**Size:** 123.3 MB | **Type:** Parquet | **Shape:** 3,183,517 rows × 14 columns
 
 ### Columns
 ```
@@ -5425,7 +5667,7 @@ caldt: min=1970-01-02 00:00:00, max=2023-12-29 00:00:00
 
 ## CRSP_TFZ_INFO.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_INFO.parquet`
-**Size:** 79525 bytes | **Type:** Parquet | **Shape:** 2,244 rows × 8 columns
+**Size:** 80696 bytes | **Type:** Parquet | **Shape:** 2,282 rows × 8 columns
 
 ### Columns
 ```
@@ -5441,23 +5683,23 @@ original_maturity                        Float64         (0.0% null)
 
 ### Numeric Column Statistics
 ```
-kytreasno: min=200018.0, max=208448.0, mean=204573.06, median=204016.5
-tcouprt: min=0.125, max=16.25, mean=4.62, median=4.0
+kytreasno: min=200018.0, max=208559.0, mean=204638.55, median=204036.5
+tcouprt: min=0.125, max=16.25, mean=4.61, median=4.0
 itype: min=1.0, max=2.0, mean=1.91, median=2.0
-original_maturity: min=1.0, max=40.0, mean=6.06, median=5.0
+original_maturity: min=1.0, max=40.0, mean=6.07, median=5.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-tdatdt: min=1916-01-01 00:00:00, max=2025-08-31 00:00:00
-tmatdt: min=1926-03-15 00:00:00, max=2055-08-15 00:00:00
+tdatdt: min=1916-01-01 00:00:00, max=2026-04-30 00:00:00
+tmatdt: min=1926-03-15 00:00:00, max=2056-02-15 00:00:00
 ```
 
 ---
 
-## CRSP_TFZ_with_runness.parquet
-**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_with_runness.parquet`
-**Size:** 94.8 MB | **Type:** Parquet | **Shape:** 2,501,597 rows × 24 columns
+## CRSP_TFZ_consolidated_all_itypes.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_consolidated_all_itypes.parquet`
+**Size:** 116.2 MB | **Type:** Parquet | **Shape:** 3,063,408 rows × 23 columns
 
 ### Columns
 ```
@@ -5473,7 +5715,68 @@ tdask                                    Float64         (0.0% null)
 tdaccint                                 Float64        
 tdyld                                    Float64         (0.0% null)
 price                                    Float64         (0.0% null)
-tdpubout                                 Float64         (2.4% null)
+tdpubout                                 Float64         (18.4% null)
+tdtotout                                 Float64         (2.3% null)
+tdpdint                                  Float64        
+tcouprt                                  Float64        
+itype                                    Float64        
+original_maturity                        Float64        
+years_to_maturity                        Float64        
+tdduratn                                 Float64        
+tdretnua                                 Float64         (0.2% null)
+days_to_maturity                         Int64          
+callable                                 Boolean        
+```
+
+### Numeric Column Statistics
+```
+kytreasno: min=200629.0, max=208559.0, mean=204505.40, median=204045.0
+tdbid: min=43.5, max=176.328125, mean=103.28, median=100.13671875
+tdask: min=43.546875, max=176.390625, mean=103.35, median=100.1875
+tdaccint: min=0.0, max=11.86908390823, mean=1.11, median=0.65247252747253
+tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.000116403958569855
+price: min=44.05672554347826, max=182.7192679558011, mean=104.43, median=101.09777424061453
+tdpubout: min=1.0, max=120001.0, mean=20405.02, median=15005.0
+tdtotout: min=4.0, max=313912.0, mean=26715.50, median=20086.0
+tdpdint: min=0.0, max=11.913043478261, mean=0.02, median=0.0
+tcouprt: min=0.0, max=16.25, mean=4.47, median=3.75
+itype: min=1.0, max=4.0, mean=2.12, median=2.0
+original_maturity: min=0.0, max=40.0, mean=9.31, median=5.0
+years_to_maturity: min=0.0, max=30.0, mean=5.24, median=2.0
+tdduratn: min=-1.0, max=9160.066986023601, mean=1409.63, median=841.59329381127
+tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00013590322677276
+days_to_maturity: min=1, max=11053, mean=1922.64, median=893.0
+```
+
+### Date/Datetime Column Statistics
+```
+caldt: min=1970-01-02 00:00:00, max=2026-04-30 00:00:00
+tdatdt: min=1955-02-15 00:00:00, max=2026-05-07 00:00:00
+tmatdt: min=1970-01-08 00:00:00, max=2056-02-15 00:00:00
+tfcaldt: min=1970-01-01 00:00:00, max=1970-01-01 00:00:00
+```
+
+---
+
+## CRSP_TFZ_with_runness.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_with_runness.parquet`
+**Size:** 97.3 MB | **Type:** Parquet | **Shape:** 2,559,674 rows × 24 columns
+
+### Columns
+```
+kytreasno                                Float64        
+kycrspid                                 String         
+tcusip                                   String         
+caldt                                    Datetime(time_unit='ns', time_zone=None)
+tdatdt                                   Datetime(time_unit='ns', time_zone=None)
+tmatdt                                   Datetime(time_unit='ns', time_zone=None)
+tfcaldt                                  Datetime(time_unit='ns', time_zone=None)
+tdbid                                    Float64         (0.0% null)
+tdask                                    Float64         (0.0% null)
+tdaccint                                 Float64        
+tdyld                                    Float64         (0.0% null)
+price                                    Float64         (0.0% null)
+tdpubout                                 Float64         (2.3% null)
 tdtotout                                 Float64         (0.9% null)
 tdpdint                                  Float64        
 tcouprt                                  Float64        
@@ -5489,30 +5792,93 @@ run                                      Int64
 
 ### Numeric Column Statistics
 ```
-kytreasno: min=200636.0, max=208448.0, mean=204546.38, median=204055.0
-tdbid: min=43.5, max=176.328125, mean=104.45, median=100.953125
-tdask: min=43.546875, max=176.390625, mean=104.53, median=101.01171875
-tdaccint: min=0.0, max=11.86908390823, mean=1.34, median=0.91160220994475
-tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.0001155821303717
-price: min=44.05672554347826, max=182.7192679558011, mean=105.83, median=102.3286401098901
-tdpubout: min=1.0, max=120001.0, mean=19730.94, median=14604.0
-tdtotout: min=4.0, max=148501.0, mean=24755.12, median=18941.0
+kytreasno: min=200636.0, max=208559.0, mean=204616.77, median=204063.0
+tdbid: min=43.5, max=176.328125, mean=104.23, median=100.87890619999999
+tdask: min=43.546875, max=176.390625, mean=104.31, median=100.9375
+tdaccint: min=0.0, max=11.86908390823, mean=1.33, median=0.90421195652174
+tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.000114636933176755
+price: min=44.05672554347826, max=182.7192679558011, mean=105.60, median=102.2386675824176
+tdpubout: min=1.0, max=120001.0, mean=20405.02, median=15005.0
+tdtotout: min=4.0, max=148501.0, mean=25547.93, median=19798.0
 tdpdint: min=0.0, max=11.913043478261, mean=0.02, median=0.0
-tcouprt: min=0.125, max=16.25, mean=5.40, median=4.75
+tcouprt: min=0.125, max=16.25, mean=5.35, median=4.75
 itype: min=1.0, max=2.0, mean=1.75, median=2.0
-original_maturity: min=1.0, max=40.0, mean=11.03, median=7.0
-years_to_maturity: min=0.0, max=30.0, mean=6.21, median=3.0
-tdduratn: min=-1.0, max=9160.066986023601, mean=1653.01, median=1112.0144269626
-tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014492729480761
-days_to_maturity: min=1, max=11053, mean=2265.57, median=1212.0
-run: min=0, max=84, mean=19.07, median=14.0
+original_maturity: min=1.0, max=40.0, mean=11.07, median=7.0
+years_to_maturity: min=0.0, max=30.0, mean=6.24, median=3.0
+tdduratn: min=-1.0, max=9160.066986023601, mean=1663.23, median=1115.9104028816
+tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00014439069901748
+days_to_maturity: min=1, max=11053, mean=2277.19, median=1215.0
+run: min=0, max=84, mean=19.32, median=14.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-caldt: min=1970-01-02 00:00:00, max=2025-08-29 00:00:00
-tdatdt: min=1955-02-15 00:00:00, max=2025-08-31 00:00:00
-tmatdt: min=1970-02-15 00:00:00, max=2055-08-15 00:00:00
+caldt: min=1970-01-02 00:00:00, max=2026-04-30 00:00:00
+tdatdt: min=1955-02-15 00:00:00, max=2026-04-30 00:00:00
+tmatdt: min=1970-02-15 00:00:00, max=2056-02-15 00:00:00
+tfcaldt: min=1970-01-01 00:00:00, max=1970-01-01 00:00:00
+```
+
+---
+
+## CRSP_TFZ_with_runness_all_itypes.parquet
+**Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/CRSP_TFZ_with_runness_all_itypes.parquet`
+**Size:** 116.4 MB | **Type:** Parquet | **Shape:** 3,063,408 rows × 24 columns
+
+### Columns
+```
+kytreasno                                Float64        
+kycrspid                                 String         
+tcusip                                   String         
+caldt                                    Datetime(time_unit='ns', time_zone=None)
+tdatdt                                   Datetime(time_unit='ns', time_zone=None)
+tmatdt                                   Datetime(time_unit='ns', time_zone=None)
+tfcaldt                                  Datetime(time_unit='ns', time_zone=None)
+tdbid                                    Float64         (0.0% null)
+tdask                                    Float64         (0.0% null)
+tdaccint                                 Float64        
+tdyld                                    Float64         (0.0% null)
+price                                    Float64         (0.0% null)
+tdpubout                                 Float64         (18.4% null)
+tdtotout                                 Float64         (2.3% null)
+tdpdint                                  Float64        
+tcouprt                                  Float64        
+itype                                    Float64        
+original_maturity                        Float64        
+years_to_maturity                        Float64        
+tdduratn                                 Float64        
+tdretnua                                 Float64         (0.2% null)
+days_to_maturity                         Int64          
+callable                                 Boolean        
+run                                      Int64          
+```
+
+### Numeric Column Statistics
+```
+kytreasno: min=200629.0, max=208559.0, mean=204505.40, median=204045.0
+tdbid: min=43.5, max=176.328125, mean=103.28, median=100.13671875
+tdask: min=43.546875, max=176.390625, mean=103.35, median=100.1875
+tdaccint: min=0.0, max=11.86908390823, mean=1.11, median=0.65247252747253
+tdyld: min=-0.016641617296462, max=0.0065577934599587, mean=0.00, median=0.000116403958569855
+price: min=44.05672554347826, max=182.7192679558011, mean=104.43, median=101.09777424061453
+tdpubout: min=1.0, max=120001.0, mean=20405.02, median=15005.0
+tdtotout: min=4.0, max=313912.0, mean=26715.50, median=20086.0
+tdpdint: min=0.0, max=11.913043478261, mean=0.02, median=0.0
+tcouprt: min=0.0, max=16.25, mean=4.47, median=3.75
+itype: min=1.0, max=4.0, mean=2.12, median=2.0
+original_maturity: min=0.0, max=40.0, mean=9.31, median=5.0
+years_to_maturity: min=0.0, max=30.0, mean=5.24, median=2.0
+tdduratn: min=-1.0, max=9160.066986023601, mean=1409.63, median=841.59329381127
+tdretnua: min=-0.10941117224377, max=0.12811078405138, mean=0.00, median=0.00013590322677276
+days_to_maturity: min=1, max=11053, mean=1922.64, median=893.0
+run: min=0, max=84, mean=17.50, median=12.0
+```
+
+### Date/Datetime Column Statistics
+```
+caldt: min=1970-01-02 00:00:00, max=2026-04-30 00:00:00
+tdatdt: min=1955-02-15 00:00:00, max=2026-05-07 00:00:00
+tmatdt: min=1970-01-08 00:00:00, max=2056-02-15 00:00:00
 tfcaldt: min=1970-01-01 00:00:00, max=1970-01-01 00:00:00
 ```
 
@@ -5616,7 +5982,7 @@ date: min=1979-11-15 00:00:00, max=2025-09-19 00:00:00
 
 ## treasury_auction_stats.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/us_treasury_returns/treasury_auction_stats.parquet`
-**Size:** 1.9 MB | **Type:** Parquet | **Shape:** 10,689 rows × 120 columns
+**Size:** 2.0 MB | **Type:** Parquet | **Shape:** 10,982 rows × 120 columns
 
 ### Columns
 ```
@@ -5632,7 +5998,7 @@ announcementDate                         Datetime(time_unit='ns', time_zone=None
 auctionDate                              Datetime(time_unit='ns', time_zone=None)
 auctionDateYear                          String         
 datedDate                                Datetime(time_unit='ns', time_zone=None) (74.9% null)
-accruedInterestPer1000                   Float64         (84.9% null)
+accruedInterestPer1000                   Float64         (85.0% null)
 accruedInterestPer100                    Float64         (99.0% null)
 adjustedAccruedInterestPer1000           Float64         (97.6% null)
 adjustedPrice                            Float64         (97.6% null)
@@ -5641,13 +6007,13 @@ allocationPercentageDecimals             String
 announcedCusip                           String         
 auctionFormat                            String         
 averageMedianDiscountRate                Float64         (25.1% null)
-averageMedianInvestmentRate              Float64         (77.9% null)
-averageMedianPrice                       Float64         (54.4% null)
+averageMedianInvestmentRate              Float64         (78.5% null)
+averageMedianPrice                       Float64         (55.6% null)
 averageMedianDiscountMargin              String         
 averageMedianYield                       String         
 backDated                                Null            (100.0% null)
-backDatedDate                            Datetime(time_unit='ns', time_zone=None) (91.2% null)
-bidToCoverRatio                          Float64         (30.1% null)
+backDatedDate                            Datetime(time_unit='ns', time_zone=None) (91.0% null)
+bidToCoverRatio                          Float64         (29.3% null)
 callDate                                 Datetime(time_unit='ns', time_zone=None) (99.8% null)
 callable                                 Null            (100.0% null)
 calledDate                               Datetime(time_unit='ns', time_zone=None) (99.8% null)
@@ -5686,7 +6052,7 @@ lowInvestmentRate                        String
 lowPrice                                 String         
 lowDiscountMargin                        String         
 lowYield                                 String         
-maturingDate                             Datetime(time_unit='ns', time_zone=None) (26.9% null)
+maturingDate                             Datetime(time_unit='ns', time_zone=None) (26.2% null)
 maximumCompetitiveAward                  String         
 maximumNoncompetitiveAward               String         
 maximumSingleBid                         String         
@@ -5701,8 +6067,8 @@ noncompetitiveAccepted                   String
 noncompetitiveTendersAccepted            String         
 offeringAmount                           String         
 originalCusip                            String         
-originalDatedDate                        Datetime(time_unit='ns', time_zone=None) (94.8% null)
-originalIssueDate                        Datetime(time_unit='ns', time_zone=None) (31.3% null)
+originalDatedDate                        Datetime(time_unit='ns', time_zone=None) (94.7% null)
+originalIssueDate                        Datetime(time_unit='ns', time_zone=None) (31.5% null)
 originalSecurityTerm                     String         
 pdfFilenameAnnouncement                  String         
 pdfFilenameCompetitiveResults            String         
@@ -5738,42 +6104,42 @@ xmlFilenameCompetitiveResults            String
 xmlFilenameSpecialAnnouncement           String         
 tintCusip1                               String         
 tintCusip2                               String         
-tintCusip1DueDate                        Datetime(time_unit='ns', time_zone=None) (99.8% null)
+tintCusip1DueDate                        Datetime(time_unit='ns', time_zone=None) (99.6% null)
 tintCusip2DueDate                        Datetime(time_unit='ns', time_zone=None) (100.0% null)
 ```
 
 ### Numeric Column Statistics
 ```
-interestRate: min=0.125, max=16.25, mean=4.11, median=3.25
-accruedInterestPer1000: min=0.0, max=36.72798, mean=1.50, median=0.00689
-accruedInterestPer100: min=0.000250021, max=0.940779263, mean=0.20, median=0.07978114550000001
-adjustedAccruedInterestPer1000: min=0.0, max=9.15983, mean=1.40, median=0.48441999999999996
-adjustedPrice: min=81.754227, max=132.953297, mean=101.51, median=100.067434
-allocationPercentage: min=0.01, max=100.0, mean=49.66, median=49.74
-averageMedianDiscountRate: min=0.0, max=18.48, mean=3.48, median=3.13
+interestRate: min=0.125, max=16.25, mean=4.10, median=3.375
+accruedInterestPer1000: min=0.0, max=36.72798, mean=1.54, median=0.01374
+accruedInterestPer100: min=0.000250021, max=0.940779263, mean=0.21, median=0.088379605
+adjustedAccruedInterestPer1000: min=0.0, max=9.15983, mean=1.44, median=0.49716499999999997
+adjustedPrice: min=81.754227, max=132.953297, mean=101.45, median=100.004056
+allocationPercentage: min=0.01, max=100.0, mean=49.67, median=49.765
+averageMedianDiscountRate: min=0.0, max=18.48, mean=3.48, median=3.33
 averageMedianInvestmentRate: min=2.73, max=18.88, mean=7.46, median=6.53
 averageMedianPrice: min=0.0, max=105.27, mean=58.24, median=95.758
-bidToCoverRatio: min=1.11, max=10.72, mean=3.08, median=2.91
-totalAccepted: min=25000000.0, max=100283646300.0, mean=27478211782.21, median=24000050500.0
-totalTendered: min=72950000.0, max=287396859400.0, mean=81018594262.77, median=59400546800.0
+bidToCoverRatio: min=1.11, max=10.72, mean=3.07, median=2.91
+totalAccepted: min=25000000.0, max=110357985100.0, mean=28725959551.95, median=24001125900.0
+totalTendered: min=72950000.0, max=321826290000.0, mean=84408771620.68, median=62277908250.0
 ```
 
 ### Date/Datetime Column Statistics
 ```
-issueDate: min=1979-11-15 00:00:00, max=2025-09-30 00:00:00
-maturityDate: min=1980-04-03 00:00:00, max=2055-08-15 00:00:00
-announcementDate: min=1979-10-24 00:00:00, max=2025-09-18 00:00:00
-auctionDate: min=1979-10-31 00:00:00, max=2025-09-25 00:00:00
-datedDate: min=1979-11-15 00:00:00, max=2025-09-30 00:00:00
-backDatedDate: min=2008-01-15 00:00:00, max=2025-08-31 00:00:00
+issueDate: min=1979-11-15 00:00:00, max=2026-06-01 00:00:00
+maturityDate: min=1980-04-03 00:00:00, max=2056-05-15 00:00:00
+announcementDate: min=1979-10-24 00:00:00, max=2026-05-21 00:00:00
+auctionDate: min=1979-10-31 00:00:00, max=2026-05-28 00:00:00
+datedDate: min=1979-11-15 00:00:00, max=2026-05-31 00:00:00
+backDatedDate: min=2008-01-15 00:00:00, max=2026-05-31 00:00:00
 callDate: min=2004-11-15 00:00:00, max=2009-11-15 00:00:00
 calledDate: min=2004-11-15 00:00:00, max=2009-11-15 00:00:00
-firstInterestPaymentDate: min=1980-05-15 00:00:00, max=2026-03-31 00:00:00
-maturingDate: min=1996-02-15 00:00:00, max=2025-09-30 00:00:00
-originalDatedDate: min=2005-02-15 00:00:00, max=2025-08-15 00:00:00
-originalIssueDate: min=1979-01-18 00:00:00, max=2025-09-02 00:00:00
-tintCusip1DueDate: min=2027-12-15 00:00:00, max=2055-08-15 00:00:00
-tintCusip2DueDate: min=2055-02-15 00:00:00, max=2055-02-15 00:00:00
+firstInterestPaymentDate: min=1980-05-15 00:00:00, max=2026-11-30 00:00:00
+maturingDate: min=1996-02-15 00:00:00, max=2026-05-31 00:00:00
+originalDatedDate: min=2005-02-15 00:00:00, max=2026-04-30 00:00:00
+originalIssueDate: min=1979-01-18 00:00:00, max=2026-04-30 00:00:00
+tintCusip1DueDate: min=2027-12-15 00:00:00, max=2056-05-15 00:00:00
+tintCusip2DueDate: min=2055-02-15 00:00:00, max=2056-02-15 00:00:00
 ```
 
 ---
@@ -6911,7 +7277,7 @@ ds: min=1926-01-30 00:00:00, max=2024-12-31 00:00:00
 
 ## available_datasets.csv
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_output/available_datasets.csv`
-**Size:** 3845 bytes | **Type:** Csv | **Shape:** 25 rows × 4 columns
+**Size:** 5461 bytes | **Type:** Csv | **Shape:** 35 rows × 4 columns
 
 ### Columns
 ```
@@ -6923,7 +7289,7 @@ seasonality                              Int64
 
 ### Numeric Column Statistics
 ```
-seasonality: min=1, max=12, mean=3.40, median=1.0
+seasonality: min=1, max=12, mean=2.71, median=1.0
 ```
 
 ---
