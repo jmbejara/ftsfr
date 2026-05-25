@@ -209,6 +209,22 @@ group = "returns_portfolios"
 frequency = "ME"
 seasonality = 1
 
+[corp_bond_returns.ftsfr_corp_bond_str_deciles_naive]
+description = """Value-weighted decile portfolios of corporate bonds sorted on short-term reversal (past-month return), built from the case_study_clean_trace stage1 daily panel using Dickerson, Robotti, and Rossetti's (2026) Approach 1: signal at month-end t, return measured month-end t to month-end t+1. The same month-end TRACE price enters both the signal and the return denominator, embedding the CEIV/Latent Implementation Bias documented in their paper. Used in the data-cleaning sensitivity case study."""
+short_name = "Corp Bond STR Deciles (naive)"
+table_name = "STR Deciles (naive)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
+[corp_bond_returns.ftsfr_corp_bond_str_deciles_return_gap]
+description = """Value-weighted decile portfolios of corporate bonds sorted on short-term reversal (past-month return), built from the case_study_clean_trace stage1 daily panel using Dickerson, Robotti, and Rossetti's (2026) Approach 3: signal at month-end t, return measured from month-begin t+1 (first available price in the first 5 business days of t+1) to month-end t+1. The return-start price is separated from the signal-date price, breaking the CEIV mechanical link. Used in the data-cleaning sensitivity case study."""
+short_name = "Corp Bond STR Deciles (return gap)"
+table_name = "STR Deciles (return gap)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
 ################################################################################
 [us_treasury_returns]
 required_data_sources = ["wrds_crsp", "he_kelly_manela"]
@@ -231,6 +247,22 @@ group = "returns_portfolios"
 frequency = "ME"
 # seasonality = 12
 seasonality = 1 # No seasonality for returns
+
+[us_treasury_returns.ftsfr_treas_portfolios_permissive]
+description = """Maturity-bucketed Treasury bond portfolios built from CRSP TFZ with no GSW cleaning filters: callables are kept (itype in {1,2,3,4}) and on-the-run + 1st off-the-run issues are kept. Used in the data-cleaning sensitivity case study."""
+short_name = "Treasury Portfolios (permissive)"
+table_name = "Treasury Portfolios (permissive)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
+[us_treasury_returns.ftsfr_treas_portfolios_strict]
+description = """Maturity-bucketed Treasury bond portfolios built from CRSP TFZ with the Gurkaynak, Sack, and Wright (2007) cleaning filters: callables dropped and on-the-run + 1st off-the-run issues dropped for post-1980 securities. Used in the data-cleaning sensitivity case study."""
+short_name = "Treasury Portfolios (GSW strict)"
+table_name = "Treasury Portfolios (GSW strict)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
 
 
 ################################################################################
@@ -318,6 +350,38 @@ group = "returns_portfolios"
 frequency = "D"
 # seasonality = 252
 seasonality = 1 # No seasonality for returns
+
+[wrds_crsp_compustat.ftsfr_ff25_size_bm_nyse_breaks]
+description = """Value-weighted 5x5 size x book-to-market portfolios constructed from raw CRSP/Compustat with NYSE-only quintile breakpoints (the Fama-French canonical convention). Used in the data-cleaning sensitivity case study."""
+short_name = "FF25 Size-BM (NYSE breaks)"
+table_name = "FF25 Size-BM (NYSE)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
+[wrds_crsp_compustat.ftsfr_ff25_size_bm_crsp_breaks]
+description = """Value-weighted 5x5 size x book-to-market portfolios constructed from raw CRSP/Compustat with all-CRSP quintile breakpoints (NYSE + AMEX + NASDAQ common stocks). Used in the data-cleaning sensitivity case study."""
+short_name = "FF25 Size-BM (CRSP breaks)"
+table_name = "FF25 Size-BM (CRSP)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
+[options.ftsfr_cjs_option_returns_l1_filters]
+description = """SPX CJS 54-portfolio returns built from options data filtered with Level-1 filters only (identical-quote removal, identical-but-price, zero-bid, zero-volume). Used in the data-cleaning sensitivity case study."""
+short_name = "CJS Options (L1 filters)"
+table_name = "CJS Options (L1)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
+
+[options.ftsfr_cjs_option_returns_l3_filters]
+description = """SPX CJS 54-portfolio returns built from options data filtered with the full Level-1+Level-2+Level-3 stack (Constantinides, Jackwerth, Savov 2013). Used in the data-cleaning sensitivity case study."""
+short_name = "CJS Options (L3 filters)"
+table_name = "CJS Options (L3)"
+group = "returns_portfolios"
+frequency = "ME"
+seasonality = 1
 
 # [ken_french_data_library.ftsfr_french_portfolios_25_daily_size_and_op]
 # description = """Daily Fama-French 25 portfolios based on size and operating profitability"""
