@@ -162,11 +162,13 @@ def main() -> None:
 
     # Emit a self-contained tabular for the paper.
     tex_rows = []
+    # Row labels are intentionally short; the realised-return convention is
+    # fully explained in the table caption note.
     label_map = {
         "ret_vw (signal-date contaminated)":
-            r"\texttt{ret\_vw} (signal-date contaminated)",
+            r"\texttt{ret\_vw} (contaminated)",
         "ret_vw_bgn (implementable)":
-            r"\texttt{ret\_vw\_bgn} (implementable, \citealp{Dickerson2024})",
+            r"\texttt{ret\_vw\_bgn} (implementable)",
     }
     for i, r in df.iterrows():
         cells = [

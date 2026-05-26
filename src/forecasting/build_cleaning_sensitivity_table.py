@@ -54,8 +54,9 @@ PANELS = [
         "Panel D: Corp bond STR (clean\\_trace)",
         "ftsfr_corp_bond_str_deciles_naive",
         "ftsfr_corp_bond_str_deciles_return_gap",
-        "Naive (Approach 1)",
-        "Return gap (Approach 3)",
+        # Short headers; Approach 1 vs Approach 3 detail is in the caption note.
+        "Naive",
+        "Return gap",
     ),
 ]
 

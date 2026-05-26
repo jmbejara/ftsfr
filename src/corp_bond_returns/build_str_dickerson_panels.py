@@ -348,11 +348,12 @@ def emit_paper_tabular(naive_stats: dict, gap_stats: dict) -> None:
     delta_yr = gap_stats["ls_pct_yr"] - naive_stats["ls_pct_yr"]
     rel_pct = (delta_yr / naive_stats["ls_pct_yr"]) * 100.0 if naive_stats["ls_pct_yr"] != 0 else float("nan")
 
+    # Row labels are intentionally short; Approach 1 / Approach 3 mechanics
+    # are fully explained in the table caption note.
     rows = [
-        # Approach 1 (naive)
         " & ".join(
             [
-                r"Approach 1: month-end signal, month-end return (\textit{naive})",
+                r"Approach 1 (\textit{naive})",
                 f"{naive_stats['ls_pct_mo']:+.3f}",
                 f"({naive_stats['t_stat']:+.2f})",
                 f"{naive_stats['ls_pct_yr']:+.2f}",
@@ -360,10 +361,9 @@ def emit_paper_tabular(naive_stats: dict, gap_stats: dict) -> None:
             ]
         )
         + r" \\",
-        # Approach 3 (return gap)
         " & ".join(
             [
-                r"Approach 3: month-end signal, month-begin return gap (\textit{implementable})",
+                r"Approach 3 (\textit{return gap})",
                 f"{gap_stats['ls_pct_mo']:+.3f}",
                 f"({gap_stats['t_stat']:+.2f})",
                 f"{gap_stats['ls_pct_yr']:+.2f}",
