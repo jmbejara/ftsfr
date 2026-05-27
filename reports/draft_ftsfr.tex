@@ -686,21 +686,26 @@ Table~\ref{tab:model_properties} summarizes how these baselines differ across a 
 \caption{Key Properties of Baseline Forecasting Models}
 \label{tab:model_properties}
 \begin{threeparttable}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccc}
 \toprule
-Model & Category & Seasonal & Exogenous & Prob. \\
+Model & Seasonal & Exogenous & Prob. \\
 \midrule
-Theta & Statistical & \checkmark & -- & -- \\
-SES/ETS & Statistical & \checkmark & -- & -- \\
-ARIMA & Statistical & \checkmark & \checkmark & \checkmark \\
-DeepAR & Deep Learning & -- & \checkmark & \checkmark \\
-N-BEATS & Deep Learning & \checkmark & --$^{\dagger}$ & -- \\
-N-HiTS & Deep Learning & \checkmark & -- & -- \\
-DLinear & Hybrid & \checkmark & \checkmark & -- \\
-NLinear & Hybrid & -- & \checkmark & -- \\
-Vanilla Transformer & Deep Learning & \checkmark & \checkmark & -- \\
-TiDE & Deep Learning & -- & \checkmark & -- \\
-KAN & Deep Learning & -- & \checkmark & -- \\
+\multicolumn{4}{l}{\textit{Classical Statistical}} \\
+Theta & \checkmark & -- & -- \\
+SES/ETS & \checkmark & -- & -- \\
+ARIMA & \checkmark & \checkmark & \checkmark \\
+\midrule
+\multicolumn{4}{l}{\textit{Hybrid}} \\
+DLinear & \checkmark & \checkmark & -- \\
+NLinear & -- & \checkmark & -- \\
+\midrule
+\multicolumn{4}{l}{\textit{Deep Learning}} \\
+DeepAR & -- & \checkmark & \checkmark \\
+N-BEATS & \checkmark & --$^{\dagger}$ & -- \\
+N-HiTS & \checkmark & -- & -- \\
+Vanilla Transformer & \checkmark & \checkmark & -- \\
+TiDE & -- & \checkmark & -- \\
+KAN & -- & \checkmark & -- \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
@@ -899,6 +904,18 @@ Basis spreads tell a different story. Across MASE and Relative MASE, \texttt{NLi
 The "Other" category, which includes bank regulatory filings, volatility indicators, and macro-financial composites, leans back toward classical approaches. \texttt{Theta} delivers the strongest mix of low MASE and positive $R^2_{\text{oos}}$, with \texttt{NHITS} and \texttt{ARIMA} close behind. These datasets are typically longer and smoother than the high-volatility returns series but lack the strong seasonal spikes of basis spreads, so the flexible trend extrapolation in Theta and the parsimonious ARIMA dynamics fit naturally. The auto cross-validation also helps these simpler models stay calibrated without overfitting idiosyncratic shocks.
 
 Taken together, the cross-metric evidence confirms that performance is conditional: MASE-based rankings highlight the strength of NBEATS/NHITS on error scales commonly used by practitioners, while out-of-sample $R^2$ favors Theta and ARIMA when the economic question is whether we beat the historical mean. Analysts selecting a forecast should therefore align the evaluation metric with the economic decision—$R^2_{\text{oos}}$ for return forecasting where the historical mean is a credible trading benchmark, and scaled absolute errors for arbitrage spreads or supervisory indicators where seasonal accuracy matters more than mean-squared scorekeeping.
+
+Tables~\ref{tab:median_mase_summary}--\ref{tab:model_summary_by_category} rank individual models, but a practitioner often asks a coarser question: as a class, do deep-learning architectures actually beat classical statistical methods, or do the recent hybrid decomposition-based models bridge the gap? Table~\ref{tab:model_summary_by_type} aggregates the same metrics into three groups of models, using the taxonomy from Table~\ref{tab:model_properties}: \textit{classical statistical} (Historic Average, ARIMA, SES, Theta), \textit{hybrid} (DLinear, NLinear), and \textit{deep learning} (DeepAR, N-BEATS, N-HiTS, Vanilla Transformer, TiDE, KAN). Panel~A pools across all datasets; Panel~B repeats the comparison within each dataset category.
+
+\begin{table}[htbp]
+\centering
+\caption{Model Performance by Forecasting Method Type}
+\label{tab:model_summary_by_type}
+\input{\PathToOutput/forecasting/paper/model_summary_by_type_tabular.tex}
+\caption*{\scriptsize \textbf{Note:} Each row aggregates every (model $\times$ dataset) observation whose model belongs to the indicated method type. ``\# Models'' counts distinct models in the type and ``N'' counts (model $\times$ dataset) observations. Lower MASE / Relative MASE indicates better performance; higher $R^2_{\text{oos}}$ indicates better performance. Best values within each panel (or, in Panel~B, within each dataset category) are bolded. The Classical row's Relative MASE excludes the Historic Average benchmark by construction. \emph{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis.}}
+\end{table}
+
+The aggregated view sharpens the qualitative picture from the model-level tables. On the MASE scale the three families finish much closer than the individual rankings might suggest, with the hybrid and deep-learning aggregates trading the top spot for median MASE while classical models retain a slight edge on out-of-sample $R^2$. Panel~B shows that the gap between the families is overwhelmingly driven by the basis-spreads category: deep-learning and hybrid models exploit the seasonal structure of funding-related spreads and beat the classical aggregate by a non-trivial margin, while in the returns category every family clusters within a few hundredths of MASE and around zero $R^2_{\text{oos}}$. The takeaway is not that one family dominates uniformly, but that the value-add of moving from a classical baseline to a deep or hybrid architecture is concentrated in segments with persistent seasonal or cross-sectional structure, and is essentially absent in segments where the historical mean is already an oracle.
 
 \subsection{Sensitivity to Cleaning Method}
 \label{subsec:cleaning_sensitivity}

@@ -99,6 +99,8 @@ def task_create_results_tables():
             OUTPUT_DIR / "forecasting" / "paper" / "rmse_pivot_table.csv",
             OUTPUT_DIR / "forecasting" / "paper" / "r2oos_pivot_table.csv",
             OUTPUT_DIR / "forecasting" / "paper" / "median_mase_summary.csv",
+            OUTPUT_DIR / "forecasting" / "paper" / "model_summary_by_type_overall.csv",
+            OUTPUT_DIR / "forecasting" / "paper" / "model_summary_by_type_tabular.tex",
             # Heatmap plots (PNG files)
             OUTPUT_DIR / "forecasting" / "paper" / "mase_heatmap.png",
             OUTPUT_DIR / "forecasting" / "paper" / "rmse_heatmap.png",

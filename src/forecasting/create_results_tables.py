@@ -1911,6 +1911,348 @@ def create_grouped_model_summary_table():
     return category_summaries
 
 
+MODEL_TYPE_ORDER = ["Classical Statistical", "Hybrid", "Deep Learning"]
+
+MODEL_TYPE_MAPPING = {
+    "Historic Average": "Classical Statistical",
+    "Auto ARIMA": "Classical Statistical",
+    "ARIMA": "Classical Statistical",
+    "Simple Exponential Smoothing": "Classical Statistical",
+    "SES": "Classical Statistical",
+    "Theta": "Classical Statistical",
+    "Auto DLinear": "Hybrid",
+    "DLinear": "Hybrid",
+    "Auto NLinear": "Hybrid",
+    "NLinear": "Hybrid",
+    "Auto DeepAR": "Deep Learning",
+    "DeepAR": "Deep Learning",
+    "Auto KAN": "Deep Learning",
+    "KAN": "Deep Learning",
+    "Auto N-BEATS": "Deep Learning",
+    "N-BEATS": "Deep Learning",
+    "Auto N-HiTS": "Deep Learning",
+    "N-HiTS": "Deep Learning",
+    "Auto TiDE": "Deep Learning",
+    "TiDE": "Deep Learning",
+    "Auto Vanilla Transformer": "Deep Learning",
+    "Vanilla Transformer": "Deep Learning",
+}
+
+
+def assign_model_type(model_name):
+    """Map a model display name to its high-level type."""
+    if not isinstance(model_name, str):
+        return "Other"
+    if model_name in MODEL_TYPE_MAPPING:
+        return MODEL_TYPE_MAPPING[model_name]
+    stripped = model_name[5:] if model_name.startswith("Auto ") else model_name
+    return MODEL_TYPE_MAPPING.get(stripped, "Other")
+
+
+def _aggregate_model_type_metrics(group_results, relative_available):
+    """Aggregate MASE / Relative MASE / R2oos statistics within a slice of results."""
+
+    if group_results.empty:
+        return None
+
+    n_models = group_results["model_name"].nunique()
+    n_obs = len(group_results)
+
+    mase_series = group_results["MASE_numeric"].dropna()
+    r2_series = group_results["R2oos_numeric"].dropna()
+
+    summary = {
+        "N_Models": n_models,
+        "N_Obs": n_obs,
+        "Median_MASE": round(mase_series.median(), 4) if not mase_series.empty else pd.NA,
+        "Mean_MASE": round(mase_series.mean(), 4) if not mase_series.empty else pd.NA,
+        "Median_R2oos": round(r2_series.median(), 4) if not r2_series.empty else pd.NA,
+        "Mean_R2oos": round(r2_series.mean(), 4) if not r2_series.empty else pd.NA,
+    }
+
+    if relative_available:
+        # Historic Average has Relative_MASE = NA by construction, so omit it from
+        # the relative aggregates so the Classical row reflects only models that
+        # are actually compared to the baseline.
+        rel_series = group_results.loc[
+            group_results["model_name"] != "Historic Average",
+            "Relative_MASE",
+        ].dropna()
+        summary["Median_Relative_MASE"] = (
+            round(rel_series.median(), 4) if not rel_series.empty else pd.NA
+        )
+        summary["Mean_Relative_MASE"] = (
+            round(rel_series.mean(), 4) if not rel_series.empty else pd.NA
+        )
+
+    return summary
+
+
+def create_model_type_summary_table():
+    """Create summary tables that compare performance by model type (Classical Statistical,
+    Hybrid, Deep Learning), both overall and within each dataset category."""
+
+    print("Creating model performance summary by model type...")
+
+    results, relative_available = load_filtered_results_for_summary()
+
+    results = results.copy()
+    results["model_type"] = results["model_name"].map(assign_model_type)
+
+    unmapped = sorted(set(results.loc[results["model_type"] == "Other", "model_name"].unique()))
+    if unmapped:
+        print(f"Warning: models without a type assignment: {unmapped}")
+
+    columns_full = [
+        "N_Models",
+        "N_Obs",
+        "Median_MASE",
+        "Mean_MASE",
+    ]
+    if relative_available:
+        columns_full += ["Median_Relative_MASE", "Mean_Relative_MASE"]
+    columns_full += ["Median_R2oos", "Mean_R2oos"]
+
+    # Panel A: overall by model type
+    overall_rows = []
+    for model_type in MODEL_TYPE_ORDER:
+        slice_df = results[results["model_type"] == model_type]
+        agg = _aggregate_model_type_metrics(slice_df, relative_available)
+        if agg is None:
+            continue
+        row = {"Model Type": model_type, **agg}
+        overall_rows.append(row)
+
+    overall_df = pd.DataFrame(overall_rows).set_index("Model Type")
+    overall_df = overall_df.reindex(columns=columns_full, fill_value=pd.NA)
+
+    # Panel B: by dataset category x model type
+    category_rows = []
+    for category in DATASET_CATEGORY_ORDER:
+        cat_results = results[results["dataset_category"] == category]
+        if cat_results.empty:
+            continue
+        for model_type in MODEL_TYPE_ORDER:
+            slice_df = cat_results[cat_results["model_type"] == model_type]
+            agg = _aggregate_model_type_metrics(slice_df, relative_available)
+            if agg is None:
+                continue
+            row = {"Category": category, "Model Type": model_type, **agg}
+            category_rows.append(row)
+
+    category_df = pd.DataFrame(category_rows)
+    if not category_df.empty:
+        category_df = category_df.set_index(["Category", "Model Type"])
+        category_df = category_df.reindex(columns=columns_full, fill_value=pd.NA)
+
+    # Save CSV outputs
+    overall_csv = FORECAST_DIR / "model_summary_by_type_overall.csv"
+    overall_df.to_csv(overall_csv)
+    print(f"Saved overall model-type summary (CSV) to: {overall_csv}")
+
+    PAPER_DIR.mkdir(parents=True, exist_ok=True)
+    overall_df.to_csv(PAPER_DIR / "model_summary_by_type_overall.csv")
+
+    if not category_df.empty:
+        category_csv = FORECAST_DIR / "model_summary_by_type_by_category.csv"
+        category_df.to_csv(category_csv)
+        print(f"Saved by-category model-type summary (CSV) to: {category_csv}")
+        category_df.to_csv(PAPER_DIR / "model_summary_by_type_by_category.csv")
+
+    # Build the combined LaTeX table (Panel A on top, Panel B underneath).
+    # Column display names are kept as "Med X" / "Mean X" pairs in the CSV and
+    # in the dataframe for compatibility with format_best_values_for_table,
+    # but the LaTeX header is post-processed below to collapse the six paired
+    # columns into three multicolumn groups (MASE | Rel MASE | R^2), each
+    # with a "Med | Mean" sub-header. This keeps the table narrow enough to
+    # fit on the page without losing any data.
+    column_name_mapping = {
+        "N_Models": "\\# Models",
+        "N_Obs": "N",
+        "Median_MASE": "Med MASE",
+        "Mean_MASE": "Mean MASE",
+        "Median_Relative_MASE": "Med Rel MASE",
+        "Mean_Relative_MASE": "Mean Rel MASE",
+        "Median_R2oos": "Med R$^2$",
+        "Mean_R2oos": "Mean R$^2$",
+    }
+
+    rename_cols = {c: column_name_mapping.get(c, c) for c in columns_full}
+    overall_display = overall_df.rename(columns=rename_cols).copy()
+    overall_display.index.name = "Model Type"
+
+    lower_is_better = {"Med MASE", "Mean MASE", "Med Rel MASE", "Mean Rel MASE"}
+    higher_is_better = {"Med R$^2$", "Mean R$^2$"}
+    integer_cols = {"\\# Models", "N"}
+
+    def _apply_grouped_header(tabular_str: str, n_index_cols: int) -> str:
+        """Replace the flat header block (between \\toprule and \\midrule) with
+        a two-row multicolumn-grouped header.
+
+        Expected source layout (auto-generated by pandas.to_latex):
+            \\toprule
+             & ... & Med MASE & Mean MASE & Med Rel MASE & Mean Rel MASE & Med R$^2$ & Mean R$^2$ \\\\
+            <optional index-name row with empty data cells>
+            \\midrule
+            <data rows>
+            \\bottomrule
+
+        Replacement:
+            \\toprule
+            <blanks for index + bookkeeping cols> & \\multicolumn{2}{c}{MASE}
+                & \\multicolumn{2}{c}{Rel MASE} & \\multicolumn{2}{c}{R$^2$} \\\\
+            \\cmidrule(lr){a-b}\\cmidrule(lr){c-d}\\cmidrule(lr){e-f}
+            <index labels> & \\# Models & N & Med & Mean & Med & Mean & Med & Mean \\\\
+            \\midrule
+        """
+        # The last six data columns are always (Med MASE, Mean MASE, Med Rel
+        # MASE, Mean Rel MASE, Med R$^2$, Mean R$^2$); the two columns before
+        # them are # Models and N; n_index_cols index columns sit at the front.
+        first_metric_col = n_index_cols + 2 + 1  # 1-indexed LaTeX column #
+        mase_span = (first_metric_col, first_metric_col + 1)
+        rel_span = (first_metric_col + 2, first_metric_col + 3)
+        r2_span = (first_metric_col + 4, first_metric_col + 5)
+
+        # Index-column headers: "Model Type" alone (1) or "Category & Model Type" (2).
+        if n_index_cols == 1:
+            index_label_row = "Model Type"
+        else:
+            index_label_row = "Category & Model Type"
+
+        # Top row: blanks for index + bookkeeping cols, then the 3 grouped headers.
+        top_blanks = " & ".join([""] * (n_index_cols + 2))
+        top_row = (
+            f"{top_blanks} & \\multicolumn{{2}}{{c}}{{MASE}}"
+            f" & \\multicolumn{{2}}{{c}}{{Rel MASE}}"
+            f" & \\multicolumn{{2}}{{c}}{{R$^2$}} \\\\"
+        )
+        cmidrules = (
+            f"\\cmidrule(lr){{{mase_span[0]}-{mase_span[1]}}}"
+            f"\\cmidrule(lr){{{rel_span[0]}-{rel_span[1]}}}"
+            f"\\cmidrule(lr){{{r2_span[0]}-{r2_span[1]}}}"
+        )
+        bottom_row = (
+            f"{index_label_row} & \\# Models & N"
+            " & Med & Mean & Med & Mean & Med & Mean \\\\"
+        )
+        new_header_block = "\n".join([top_row, cmidrules, bottom_row])
+
+        # Surgically replace everything strictly between \toprule and \midrule.
+        lines = tabular_str.splitlines()
+        try:
+            top_idx = next(i for i, line in enumerate(lines) if "\\toprule" in line)
+            mid_idx = next(
+                i for i, line in enumerate(lines) if "\\midrule" in line and i > top_idx
+            )
+        except StopIteration:
+            return tabular_str  # don't break on unexpected input
+        return "\n".join(
+            lines[: top_idx + 1] + [new_header_block] + lines[mid_idx:]
+        )
+
+    overall_formatted = format_best_values_for_table(
+        overall_display,
+        lower_is_better=lower_is_better,
+        higher_is_better=higher_is_better,
+        integer_columns=integer_cols,
+    )
+
+    num_cols = len(overall_display.columns) + 1
+    column_format = "l" + "r" * (num_cols - 1)
+    overall_tabular = overall_formatted.to_latex(
+        escape=False,
+        column_format=column_format,
+    )
+    overall_tabular = extract_tabular_content(overall_tabular)
+    overall_tabular = _apply_grouped_header(overall_tabular, n_index_cols=1)
+
+    if not category_df.empty:
+        category_display = category_df.rename(columns=rename_cols).copy()
+        # Order rows: category groups in DATASET_CATEGORY_ORDER, model types in MODEL_TYPE_ORDER
+        category_display = category_display.reindex(
+            pd.MultiIndex.from_product(
+                [
+                    [c for c in DATASET_CATEGORY_ORDER if c in category_display.index.get_level_values(0)],
+                    MODEL_TYPE_ORDER,
+                ],
+                names=["Category", "Model Type"],
+            )
+        ).dropna(how="all")
+
+        category_formatted = format_best_values_for_table(
+            category_display,
+            lower_is_better=lower_is_better,
+            higher_is_better=higher_is_better,
+            integer_columns=integer_cols,
+            group_level=0,
+        )
+
+        cat_num_cols = len(category_display.columns) + 2
+        cat_column_format = "ll" + "r" * (cat_num_cols - 2)
+        category_tabular = category_formatted.to_latex(
+            escape=False,
+            multicolumn=True,
+            multirow=True,
+            column_format=cat_column_format,
+        )
+        category_tabular = extract_tabular_content(category_tabular)
+        category_tabular = _apply_grouped_header(category_tabular, n_index_cols=2)
+    else:
+        category_tabular = ""
+        cat_num_cols = num_cols
+
+    # Compose a single tabular-only output with two panels
+    panel_a_header = "\\noindent\\textit{Panel A: Overall (all datasets)}\\par\\vspace{0.25em}"
+    panel_b_header = "\\noindent\\textit{Panel B: By Dataset Category}\\par\\vspace{0.25em}"
+
+    combined = [
+        "% Model Summary by Type - tabular content only",
+        "% Generated automatically by create_results_tables.py",
+        "\\scriptsize",
+        "\\setlength{\\tabcolsep}{4pt}",
+        "\\renewcommand{\\arraystretch}{1.0}",
+        "\\begin{minipage}{\\linewidth}",
+        "\\centering",
+        panel_a_header,
+        overall_tabular,
+        "",
+    ]
+    if category_tabular:
+        combined.extend(
+            [
+                "\\vspace{0.75em}",
+                panel_b_header,
+                category_tabular,
+            ]
+        )
+    combined.append("\\end{minipage}")
+
+    combined_tex = "\n".join(combined)
+
+    tabular_file = PAPER_DIR / "model_summary_by_type_tabular.tex"
+    with open(tabular_file, "w") as f:
+        f.write(combined_tex)
+    print(f"Saved model summary by type tabular (LaTeX) to: {tabular_file}")
+
+    # Also save a full table environment version under FORECAST_DIR for inspection
+    full_tex = "\n".join(
+        [
+            "\\begin{table}[htbp]",
+            "\\centering",
+            "\\caption{Model Performance by Forecasting Method Type}",
+            "\\label{tab:model_summary_by_type}",
+            combined_tex,
+            "\\end{table}",
+        ]
+    )
+    full_file = FORECAST_DIR / "model_summary_by_type.tex"
+    with open(full_file, "w") as f:
+        f.write(full_tex)
+    print(f"Saved model summary by type (LaTeX) to: {full_file}")
+
+    return overall_df, category_df
+
+
 def create_sectioned_latex_table(df, caption, label="tab:mase_results"):
     """Create a LaTeX table with dataset grouping sections"""
 
@@ -2743,6 +3085,9 @@ if __name__ == "__main__":
     # Create grouped model performance summary table
     grouped_model_summary = create_grouped_model_summary_table()
 
+    # Create comparison by forecasting method type (Classical / Hybrid / Deep Learning)
+    model_type_summary = create_model_type_summary_table()
+
     # Create summary statistics (now with quality filtering)
     summary_stats = create_summary_statistics()
 
@@ -2795,3 +3140,6 @@ if __name__ == "__main__":
     print(f"  - {PAPER_DIR / 'model_summary_by_category.csv'}")
     print(f"  - {PAPER_DIR / 'model_summary_by_category.tex'}")
     print(f"  - {PAPER_DIR / 'model_summary_by_category_tabular.tex'}")
+    print(f"  - {PAPER_DIR / 'model_summary_by_type_overall.csv'}")
+    print(f"  - {PAPER_DIR / 'model_summary_by_type_by_category.csv'}")
+    print(f"  - {PAPER_DIR / 'model_summary_by_type_tabular.tex'}")
