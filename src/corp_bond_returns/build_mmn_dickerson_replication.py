@@ -162,13 +162,15 @@ def main() -> None:
 
     # Emit a self-contained tabular for the paper.
     tex_rows = []
-    # Row labels are intentionally short; the realised-return convention is
-    # fully explained in the table caption note.
+    # Row labels match the math notation introduced in the prose / caption
+    # ($R^{\text{end}}$ and $R^{\text{bgn}}$); we deliberately avoid surfacing
+    # the underlying OSBAP variable names (`ret_vw`, `ret_vw_bgn`) in the
+    # table itself.
     label_map = {
         "ret_vw (signal-date contaminated)":
-            r"\texttt{ret\_vw} (contaminated)",
+            r"$R^{\text{end}}$ (contaminated)",
         "ret_vw_bgn (implementable)":
-            r"\texttt{ret\_vw\_bgn} (implementable)",
+            r"$R^{\text{bgn}}$ (implementable)",
     }
     for i, r in df.iterrows():
         cells = [
