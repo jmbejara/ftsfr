@@ -1911,10 +1911,10 @@ def create_grouped_model_summary_table():
     return category_summaries
 
 
-MODEL_TYPE_ORDER = ["Classical Statistical", "Hybrid", "Deep Learning"]
+MODEL_TYPE_ORDER = ["Benchmark", "Classical Statistical", "Hybrid", "Deep Learning"]
 
 MODEL_TYPE_MAPPING = {
-    "Historic Average": "Classical Statistical",
+    "Historic Average": "Benchmark",
     "Auto ARIMA": "Classical Statistical",
     "ARIMA": "Classical Statistical",
     "Simple Exponential Smoothing": "Classical Statistical",
@@ -1971,9 +1971,9 @@ def _aggregate_model_type_metrics(group_results, relative_available):
     }
 
     if relative_available:
-        # Historic Average has Relative_MASE = NA by construction, so omit it from
-        # the relative aggregates so the Classical row reflects only models that
-        # are actually compared to the baseline.
+        # Historic Average has Relative_MASE = NA by construction (it is the
+        # denominator of Relative_MASE), so omit it from the relative aggregates
+        # so each row only reflects models that are actually compared to the baseline.
         rel_series = group_results.loc[
             group_results["model_name"] != "Historic Average",
             "Relative_MASE",

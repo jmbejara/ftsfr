@@ -12,7 +12,8 @@
 \cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
 Model Type & \# Models & N & Med & Mean & Med & Mean & Med & Mean \\
 \midrule
-Classical Statistical & 4 & 108 & 0.960 & 1.550 & 0.687 & 0.673 & 0.000 & \textbf{0.047} \\
+Benchmark & 1 & 27 & 1.826 & 2.808 & . & . & 0.000 & 0.000 \\
+Classical Statistical & 3 & 81 & 0.895 & 1.131 & 0.687 & 0.673 & 0.192 & \textbf{0.062} \\
 Hybrid & 2 & 54 & \textbf{0.839} & \textbf{1.006} & \textbf{0.631} & \textbf{0.634} & \textbf{0.288} & -0.792 \\
 Deep Learning & 6 & 162 & 0.877 & 1.165 & 0.672 & 0.683 & 0.167 & -0.713 \\
 \bottomrule
@@ -26,17 +27,20 @@ Deep Learning & 6 & 162 & 0.877 & 1.165 & 0.672 & 0.683 & 0.167 & -0.713 \\
 \cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}
 Category & Model Type & \# Models & N & Med & Mean & Med & Mean & Med & Mean \\
 \midrule
-\multirow[t]{3}{*}{Basis Spreads} & Classical Statistical & 4 & 20 & 0.915 & 0.976 & 0.545 & 0.567 & 0.155 & 0.296 \\
+\multirow[t]{4}{*}{Basis Spreads} & Benchmark & 1 & 5 & 1.784 & 1.638 & . & . & 0.000 & 0.000 \\
+ & Classical Statistical & 3 & 15 & 0.691 & 0.755 & 0.545 & 0.567 & 0.345 & 0.395 \\
  & Hybrid & 2 & 10 & \textbf{0.442} & \textbf{0.621} & 0.570 & \textbf{0.471} & \textbf{0.450} & \textbf{0.548} \\
  & Deep Learning & 6 & 30 & 0.478 & 0.731 & \textbf{0.517} & 0.562 & 0.336 & 0.395 \\
 \cline{1-10}
-\multirow[t]{3}{*}{Returns} & Classical Statistical & 4 & 56 & 0.895 & 1.611 & 1.000 & 0.900 & \textbf{0.000} & \textbf{-0.217} \\
+\multirow[t]{4}{*}{Returns} & Benchmark & 1 & 14 & 1.141 & 2.468 & . & . & \textbf{0.000} & \textbf{0.000} \\
+ & Classical Statistical & 3 & 42 & 0.895 & 1.325 & 1.000 & 0.900 & -0.025 & -0.289 \\
  & Hybrid & 2 & 28 & 0.897 & \textbf{1.125} & 0.943 & \textbf{0.857} & -0.019 & -1.937 \\
  & Deep Learning & 6 & 84 & \textbf{0.880} & 1.338 & \textbf{0.940} & 0.900 & -0.043 & -1.426 \\
 \cline{1-10}
-\multirow[t]{3}{*}{Other} & Classical Statistical & 4 & 32 & 1.118 & 1.802 & 0.369 & \textbf{0.341} & 0.388 & 0.352 \\
- & Hybrid & 2 & 16 & \textbf{0.841} & \textbf{1.040} & 0.412 & 0.345 & 0.380 & \textbf{0.372} \\
- & Deep Learning & 6 & 48 & 0.927 & 1.133 & \textbf{0.364} & 0.380 & \textbf{0.436} & -0.158 \\
+\multirow[t]{4}{*}{Other} & Benchmark & 1 & 8 & 2.653 & 4.132 & . & . & 0.000 & 0.000 \\
+ & Classical Statistical & 3 & 24 & 0.983 & \textbf{1.025} & 0.369 & \textbf{0.341} & \textbf{0.462} & \textbf{0.470} \\
+ & Hybrid & 2 & 16 & \textbf{0.841} & 1.040 & 0.412 & 0.345 & 0.380 & 0.372 \\
+ & Deep Learning & 6 & 48 & 0.927 & 1.133 & \textbf{0.364} & 0.380 & 0.436 & -0.158 \\
 \cline{1-10}
 \bottomrule
 \end{tabular}
