@@ -48,7 +48,7 @@ from neuralforecast.auto import (
     AutoTiDE,
     AutoKAN,
 )
-from neuralforecast.losses.pytorch import MAE, DistributionLoss
+from neuralforecast.losses.pytorch import MAE, MSE, DistributionLoss
 
 from statsforecast import StatsForecast
 from statsforecast.models import HistoricAverage, SeasonalNaive
@@ -875,7 +875,8 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=DistributionLoss(distribution="Normal"),
+            loss=DistributionLoss(distribution="StudentT"),
+            valid_loss=MSE(),
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
