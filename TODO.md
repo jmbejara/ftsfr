@@ -9,6 +9,47 @@ stocks, individual corporate bonds, BHC leverage).
 See [src/forecasting/forecast_neural_auto.py](src/forecasting/forecast_neural_auto.py)
 for the current Auto wrapper configuration.
 
+## Status
+
+- **2026-05-29/30**: Items (2) and (3) applied **to AutoDeepAR only**. DeepAR
+  now uses `DistributionLoss(distribution="StudentT")` and `valid_loss=MSE()`.
+  Full 32-dataset DeepAR sweep on Apple-Silicon MPS took **~7.4h wall** (down
+  from ~15.3h pre-StudentT; the speedup is from faster convergence in the new
+  Optuna search, not from compute). Requires `PYTORCH_ENABLE_MPS_FALLBACK=1`
+  because StudentT sampling needs `aten::_standard_gamma` which is not yet on
+  MPS — only the predict-time sampling op falls back to CPU.
+
+  Effect on the catastrophic-blowup datasets that motivated this TODO:
+
+  | dataset                                          | old R² | new R² |
+  | ------------------------------------------------ | -----: | -----: |
+  | ftsfr_CRSP_monthly_stock_ret                     | −27.92 |  −0.77 |
+  | ftsfr_CRSP_monthly_stock_retx                    | −35.59 |  −0.58 |
+  | ftsfr_corp_bond_returns                          | −29.04 |  −0.10 |
+  | ftsfr_corp_bond_str_deciles_naive                |  −4.01 |  +0.06 |
+  | ftsfr_nyu_call_report_holding_company_leverage   | −15.78 |  −0.04 |
+  | ftsfr_nyu_call_report_holding_company_cash_liq.  |  −2.75 |  +0.35 |
+  | ftsfr_nyu_call_report_leverage                   |  −2.94 |  −0.01 |
+  | ftsfr_FX_returns                                 |  −0.79 |  +0.94 |
+
+  Across all 32 datasets, mean DeepAR R² went **−3.64 → +0.06**, median
+  **−0.09 → +0.10**, and the count of datasets with R² < −1 fell **7 → 1**
+  (only `ftsfr_treasury_sf_basis` remains, at −1.27).
+
+  A handful of well-behaved datasets regressed mildly (e.g., tips_treasury_basis
+  0.87 → 0.61, treasury_swap_basis 0.96 → 0.94, treas_portfolios_strict
+  0.22 → 0.11). Net effect on aggregate metrics is strongly positive.
+
+- **Compute extrapolation for the big fix (item 1 + dual-fit across all
+  neural models)**: 7.4h for DeepAR alone over 32 datasets. The seven other
+  Auto wrappers (NBEATS, NHITS, DLinear, NLinear, VanillaTransformer, TiDE,
+  KAN) currently use `MAE()` only. A dual-fit pipeline doubles that, and
+  applies to all eight neural models, so a rough budget is
+  `7.4h × 2 (loss variants) × 8 (models) / 1 (DeepAR baseline) ≈ 120h` of
+  serial MPS compute — call it ~5 days serial, or a weekend on a multi-GPU
+  box. Items (3) and (4) are essentially free once we are already paying for
+  (1). This is the number to make the go/no-go call from.
+
 ## 1. Metric-aligned dual fitting (HIGH IMPACT)
 
 Currently the Auto wrappers train all models with `MAE()` and select
