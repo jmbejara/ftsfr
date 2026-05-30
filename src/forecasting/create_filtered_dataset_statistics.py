@@ -60,7 +60,11 @@ def load_active_datasets():
             # Look for dataset entries within each module
             for key, value in module_config.items():
                 if isinstance(value, dict) and key.startswith("ftsfr_"):
-                    # This is a dataset entry
+                    # Skip sensitivity-only datasets: they belong to the
+                    # dedicated cleaning-sensitivity section, not the main
+                    # results tables.
+                    if value.get("paper_use") == "sensitivity_only":
+                        continue
                     dataset_info = {
                         "dataset_name": key,
                         "table_name": value.get("table_name", key),
