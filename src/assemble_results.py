@@ -62,6 +62,29 @@ def normalize_model_name(model_name):
     return model_name
 
 
+def parse_csv_stem(stem: str):
+    """Split a CSV file stem into (model_name, loss, scale_entity).
+
+    Naming convention used by forecast_neural_auto.py:
+        {model}__{loss}                 -> dual-fit, no entity scaling
+        {model}__{loss}__entityscale    -> dual-fit, per-entity scaling
+        {model}                         -> legacy: classical, or pre-bundle neural
+
+    Returns:
+        Tuple (model_name, loss, scale_entity) where loss is one of
+        {'mae', 'mse', 'NA'} and scale_entity is bool.
+    """
+    parts = stem.split("__")
+    if len(parts) == 1:
+        return parts[0], "NA", False
+    if len(parts) == 2 and parts[1] in ("mae", "mse"):
+        return parts[0], parts[1], False
+    if len(parts) == 3 and parts[1] in ("mae", "mse") and parts[2] == "entityscale":
+        return parts[0], parts[1], True
+    # Unrecognized pattern; fall back to treating the whole stem as the model.
+    return stem, "NA", False
+
+
 def load_all_csv_files():
     """
     Load all CSV files from the error_metrics directory structure.
@@ -82,7 +105,7 @@ def load_all_csv_files():
 
         # Iterate through model CSV files
         for csv_file in dataset_dir.glob("*.csv"):
-            model_name = csv_file.stem
+            parsed_model, parsed_loss, parsed_scale = parse_csv_stem(csv_file.stem)
 
             try:
                 df = pd.read_csv(csv_file)
@@ -94,9 +117,21 @@ def load_all_csv_files():
                         continue
                     df = df.head(1)  # Take first row if multiple
 
+                # The CSV row may already contain a 'loss' / 'scale_entity' column
+                # (forecast_neural_auto.py writes them); fall back to what we
+                # parsed from the filename when absent.
+                if "loss" not in df.columns:
+                    df["loss"] = parsed_loss
+                if "scale_entity" not in df.columns:
+                    df["scale_entity"] = parsed_scale
+
+                # Force model_name to the base (loss-suffix stripped) so the
+                # auto-vs-non-auto filter and downstream pivots see one model.
+                df["model_name"] = parsed_model
+
                 # Add file path info for debugging
                 df["_dataset_from_path"] = dataset_name
-                df["_model_from_path"] = model_name
+                df["_model_from_path"] = csv_file.stem
 
                 all_results.append(df)
 
@@ -115,82 +150,112 @@ def load_all_csv_files():
     return results_df
 
 
-def filter_auto_vs_nonuto_duplicates(df):
+def _pick_source_row(rows, side: str):
+    """Pick the best row for a given metric side ('mae' or 'mse').
+
+    Preference within each (dataset, normalized_model, scale_entity) group:
+      1. Auto row matching the target loss, if is_valid_result
+      2. Legacy auto row with loss='NA' (pre-bundle CSVs), if is_valid_result
+         — preserves the historical auto-first preference for back-compat.
+      3. Non-auto row with loss='NA' (forecast_neural.py output), if is_valid_result
+      4. Any auto row for the OTHER loss as last resort
+      5. First row if nothing else is valid
     """
-    Filter auto vs non-auto model duplicates for each dataset.
-    Prefer auto version if valid, otherwise use non-auto version.
+    target_auto = [r for r in rows if r["model_name"].startswith("auto_") and r.get("loss") == side]
+    legacy_auto_na = [r for r in rows if r["model_name"].startswith("auto_") and r.get("loss") == "NA"]
+    non_auto_na = [r for r in rows if not r["model_name"].startswith("auto_") and r.get("loss") == "NA"]
+    other_auto = [
+        r for r in rows
+        if r["model_name"].startswith("auto_") and r.get("loss") in ("mae", "mse") and r.get("loss") != side
+    ]
+
+    for bucket in (target_auto, legacy_auto_na, non_auto_na, other_auto):
+        for r in bucket:
+            if is_valid_result(r):
+                return r
+    # Nothing valid; fall back to the first row of the first non-empty bucket
+    for bucket in (target_auto, legacy_auto_na, non_auto_na, other_auto, rows):
+        if bucket:
+            return bucket[0] if isinstance(bucket, list) else next(iter(bucket))
+    return None
+
+
+def filter_auto_vs_nonuto_duplicates(df):
+    """Assemble one metric-aligned row per (dataset, normalized_model, scale_entity).
+
+    MASE/MASE-derived columns come from the best mae-side source row;
+    MSE/RMSE/R2oos come from the best mse-side source row. The auto-vs-non-auto
+    fallback now operates *within* the metric-side pick, so a missing
+    `auto_X__mae.csv` will be back-filled by the legacy single-loss `X.csv`
+    (non-auto, loss=NA) or the pre-bundle `auto_X.csv`.
     """
     filtered_results = []
 
-    # Group by dataset
     for dataset_name in df["dataset_name"].unique():
         dataset_df = df[df["dataset_name"] == dataset_name].copy()
 
-        # Group models by their normalized names
+        # Group rows by (normalized model name, scale_entity).
         model_groups = {}
         for _, row in dataset_df.iterrows():
-            model_name = row["model_name"]
-            normalized_name = normalize_model_name(model_name)
+            normalized_name = normalize_model_name(row["model_name"])
+            group_key = (
+                normalized_name,
+                bool(row.get("scale_entity", False)),
+            )
+            model_groups.setdefault(group_key, []).append(row)
 
-            if normalized_name not in model_groups:
-                model_groups[normalized_name] = []
-            model_groups[normalized_name].append(row)
+        # For each (normalized_model, scale_entity) group, build a metric-aligned row
+        for (normalized_name, scale_tag), rows in model_groups.items():
+            mae_src = _pick_source_row(rows, "mae")
+            mse_src = _pick_source_row(rows, "mse")
 
-        # For each model group, decide which version to keep
-        for normalized_name, rows in model_groups.items():
-            if len(rows) == 1:
-                # Only one version exists, keep it
-                chosen_row = rows[0].copy()
-                chosen_row["auto"] = chosen_row["model_name"].startswith("auto_")
+            if mae_src is None and mse_src is None:
+                continue
+
+            # If only one side is found, mirror it to the other so MASE and
+            # R2-side both have *some* value (lets legacy/classical pipelines
+            # work unchanged).
+            if mae_src is None:
+                mae_src = mse_src
+            if mse_src is None:
+                mse_src = mae_src
+
+            combined = mae_src.copy()
+            combined["MASE"] = mae_src["MASE"]
+            combined["MSE"] = mse_src["MSE"]
+            combined["RMSE"] = mse_src["RMSE"]
+            combined["R2oos"] = mse_src["R2oos"]
+            # Carry the legacy per-series-mean R² through if present, so the
+            # paper can report it as a sensitivity column.
+            if "R2oos_per_series_mean" in mse_src.index:
+                combined["R2oos_per_series_mean"] = mse_src["R2oos_per_series_mean"]
+            time_mae = pd.to_numeric(mae_src.get("time_taken", 0), errors="coerce")
+            time_mse = pd.to_numeric(mse_src.get("time_taken", 0), errors="coerce")
+            if mae_src is mse_src:
+                combined["time_taken"] = time_mae
             else:
-                # Multiple versions exist, apply filtering logic
-                auto_rows = [r for r in rows if r["model_name"].startswith("auto_")]
-                non_auto_rows = [
-                    r for r in rows if not r["model_name"].startswith("auto_")
-                ]
+                combined["time_taken"] = (
+                    (0 if pd.isna(time_mae) else time_mae)
+                    + (0 if pd.isna(time_mse) else time_mse)
+                )
 
-                # Try to find valid auto version first
-                valid_auto = None
-                for row in auto_rows:
-                    if is_valid_result(row):
-                        valid_auto = row
-                        break
+            mae_is_auto = mae_src["model_name"].startswith("auto_")
+            mse_is_auto = mse_src["model_name"].startswith("auto_")
+            combined["auto"] = bool(mae_is_auto and mse_is_auto)
 
-                if valid_auto is not None:
-                    # Use valid auto version
-                    chosen_row = valid_auto.copy()
-                    chosen_row["auto"] = True
-                    # Only print for datasets where we're choosing between versions
-                    if len(rows) > 1:
-                        print(
-                            f"Dataset {dataset_name}, model {normalized_name}: Using auto version (valid)"
-                        )
-                elif non_auto_rows:
-                    # Use non-auto version
-                    chosen_row = non_auto_rows[0].copy()
-                    chosen_row["auto"] = False
-                    print(
-                        f"Dataset {dataset_name}, model {normalized_name}: Using non-auto version (auto invalid/missing)"
-                    )
-                elif auto_rows:
-                    # Use auto version even if invalid (last resort)
-                    chosen_row = auto_rows[0].copy()
-                    chosen_row["auto"] = True
-                    print(
-                        f"Dataset {dataset_name}, model {normalized_name}: Using auto version (only option, but invalid)"
-                    )
-                else:
-                    # This shouldn't happen, but handle it
-                    chosen_row = rows[0].copy()
-                    chosen_row["auto"] = chosen_row["model_name"].startswith("auto_")
-                    print(
-                        f"Dataset {dataset_name}, model {normalized_name}: Using first available (fallback)"
-                    )
+            mae_loss = mae_src.get("loss", "NA")
+            mse_loss = mse_src.get("loss", "NA")
+            if mae_loss == "mae" and mse_loss == "mse":
+                combined["loss"] = "dual"
+            elif mae_loss == mse_loss:
+                combined["loss"] = mae_loss
+            else:
+                combined["loss"] = f"{mae_loss}|{mse_loss}"
 
-            # Normalize the model name
-            chosen_row["model_name"] = normalized_name
+            combined["model_name"] = normalized_name
+            combined["scale_entity"] = scale_tag
 
-            filtered_results.append(chosen_row)
+            filtered_results.append(combined)
 
     return pd.DataFrame(filtered_results)
 
@@ -228,24 +293,47 @@ def main():
         "MASE",
         "MSE",
         "RMSE",
-        "R2oos",
+        "R2oos",  # pooled / panel-wide (headline)
+        "R2oos_per_series_mean",  # legacy formula (kept for sensitivity)
         "time_taken",
         "auto",
+        "loss",
+        "scale_entity",
     ]
+    # Some legacy CSVs lack loss/scale_entity columns; backfill if missing
+    if "loss" not in filtered_df.columns:
+        filtered_df["loss"] = "NA"
+    if "scale_entity" not in filtered_df.columns:
+        filtered_df["scale_entity"] = False
+    if "R2oos_per_series_mean" not in filtered_df.columns:
+        # Older CSVs only have the (then-headline) per-series-mean R² stored
+        # under R2oos; surface that as the sensitivity column so the
+        # downstream table builder still sees something.
+        filtered_df["R2oos_per_series_mean"] = filtered_df["R2oos"]
     final_df = filtered_df[columns_to_keep].copy()
 
     # Sort for consistent output
-    final_df = final_df.sort_values(["dataset_name", "model_name"])
+    final_df = final_df.sort_values(["dataset_name", "model_name", "loss", "scale_entity"])
 
-    # Save results
+    # final_df rows are already metric-aligned by filter_auto_vs_nonuto_duplicates
+    # (one row per (dataset, normalized_model, scale_entity) with MASE-side from
+    # mae-loss source and R2-side from mse-loss source). Split by scale_entity
+    # so create_results_tables.py keeps reading a single results_all.csv shape.
     output_file = FORECASTING_DIR / "results_all.csv"
-    final_df.to_csv(output_file, index=False)
-    print(f"\nSaved results to: {output_file}")
+    main_df = final_df[~final_df["scale_entity"]].drop(columns=["scale_entity"])
+    main_df.to_csv(output_file, index=False)
+    print(f"\nSaved metric-aligned results (no entity-scaling) to: {output_file}")
 
-    # Show some quality stats
-    print("\nData quality summary:")
-    mase_valid = pd.to_numeric(final_df["MASE"], errors="coerce")
-    r2oos_valid = pd.to_numeric(final_df["R2oos"], errors="coerce")
+    scaled_subset = final_df[final_df["scale_entity"]].drop(columns=["scale_entity"])
+    if not scaled_subset.empty:
+        scaled_out = FORECASTING_DIR / "results_all_entityscaled.csv"
+        scaled_subset.to_csv(scaled_out, index=False)
+        print(f"Saved metric-aligned entity-scaled results to: {scaled_out}")
+
+    # Show some quality stats (over the metric-aligned, no-scaling table)
+    print("\nData quality summary (metric-aligned, no entity scaling):")
+    mase_valid = pd.to_numeric(main_df["MASE"], errors="coerce")
+    r2oos_valid = pd.to_numeric(main_df["R2oos"], errors="coerce")
 
     print(
         f"  MASE - Valid: {mase_valid.notna().sum()}, Invalid: {mase_valid.isna().sum()}"
