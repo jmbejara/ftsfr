@@ -53,17 +53,31 @@ def task_run_forecasting_jobs():
 
         dataset = None
         model = None
+        loss = None
+        scale_entity = "--scale-entity" in parts
         if "--dataset" in parts:
             dataset = parts[parts.index("--dataset") + 1]
         if "--model" in parts:
             model = parts[parts.index("--model") + 1]
+        if "--loss" in parts:
+            loss = parts[parts.index("--loss") + 1]
 
-        task_name = f"{dataset or 'unknown_dataset'}:{model or 'unknown_model'}"
+        run_suffix = ""
+        if loss in ("mae", "mse"):
+            run_suffix = f"__{loss}"
+            if scale_entity:
+                run_suffix += "__entityscale"
+
+        task_name = f"{dataset or 'unknown_dataset'}:{model or 'unknown_model'}{run_suffix}"
 
         targets = []
         if dataset and model:
             targets.append(
-                OUTPUT_DIR / "forecasting" / "error_metrics" / dataset / f"{model}.csv"
+                OUTPUT_DIR
+                / "forecasting"
+                / "error_metrics"
+                / dataset
+                / f"{model}{run_suffix}.csv"
             )
 
         yield {

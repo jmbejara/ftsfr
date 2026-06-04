@@ -1,12 +1,20 @@
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model historic_average --skip-existing
@@ -19,14 +27,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_bond_basis_non_ag
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_bond_basis_non_aggregated --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_contract_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_contract_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_contract_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_contract_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_contract_returns --model historic_average --skip-existing
@@ -39,14 +55,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_contract_returns 
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_contract_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_contract_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_portfolio_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CDS_portfolio_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_portfolio_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_portfolio_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_portfolio_returns --model historic_average --skip-existing
@@ -59,14 +83,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_CDS_portfolio_returns
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_portfolio_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CDS_portfolio_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CIP_spreads --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CIP_spreads --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CIP_spreads --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CIP_spreads --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CIP_spreads --model historic_average --skip-existing
@@ -79,14 +111,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_CIP_spreads --model t
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CIP_spreads --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CIP_spreads --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_ret --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_ret --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_ret --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_ret --model historic_average --skip-existing
@@ -99,14 +139,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_re
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_ret --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_ret --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_CRSP_monthly_stock_retx --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_retx --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_retx --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_retx --model historic_average --skip-existing
@@ -119,14 +167,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_CRSP_monthly_stock_re
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_retx --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_CRSP_monthly_stock_retx --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_FX_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_FX_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_FX_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_FX_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_FX_returns --model historic_average --skip-existing
@@ -139,14 +195,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_FX_returns --model th
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_FX_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_FX_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l1_filters --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l1_filters --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l1_filters --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_cjs_option_returns_l1_filters --model historic_average --skip-existing
@@ -159,14 +223,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_cjs_option_returns_l1
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l1_filters --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l1_filters --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_cjs_option_returns_l3_filters --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l3_filters --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l3_filters --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_cjs_option_returns_l3_filters --model historic_average --skip-existing
@@ -179,14 +251,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_cjs_option_returns_l3
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l3_filters --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_cjs_option_returns_l3_filters --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_commodities_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_commodities_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_commodities_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_commodities_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_commodities_returns --model historic_average --skip-existing
@@ -199,14 +279,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_commodities_returns -
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_commodities_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_commodities_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model historic_average --skip-existing
@@ -219,14 +307,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_cs_deciles_
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_biased --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model historic_average --skip-existing
@@ -239,14 +335,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_cs_deciles_
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_cs_deciles_mmn_corrected --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_portfolio_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_portfolio_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_portfolio_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_portfolio_returns --model historic_average --skip-existing
@@ -259,14 +363,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_portfolio_r
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_portfolio_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_portfolio_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_returns --model historic_average --skip-existing
@@ -279,14 +391,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_returns --m
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_naive --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_naive --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_naive --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_str_deciles_naive --model historic_average --skip-existing
@@ -299,14 +419,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_str_deciles
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_naive --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_naive --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model historic_average --skip-existing
@@ -319,14 +447,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_corp_bond_str_deciles
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_corp_bond_str_deciles_return_gap --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model historic_average --skip-existing
@@ -339,14 +475,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_ff25_size_bm_crsp_bre
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_crsp_breaks --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model historic_average --skip-existing
@@ -359,14 +503,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_ff25_size_bm_nyse_bre
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_ff25_size_bm_nyse_breaks --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model historic_average --skip-existing
@@ -379,14 +531,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_french_portfolios_25_
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_french_portfolios_25_daily_size_and_bm --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_all --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_all --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_all --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_all --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_all --model historic_average --skip-existing
@@ -399,14 +559,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_all -
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_all --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_all --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_daily --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_daily --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_daily --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_daily --model historic_average --skip-existing
@@ -419,14 +587,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_facto
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_daily --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_daily --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_he_kelly_manela_factors_monthly --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_monthly --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_monthly --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_factors_monthly --model historic_average --skip-existing
@@ -439,14 +615,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_he_kelly_manela_facto
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_monthly --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_he_kelly_manela_factors_monthly --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_hkm_option_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_hkm_option_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_hkm_option_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_hkm_option_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_hkm_option_returns --model historic_average --skip-existing
@@ -459,14 +643,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_hkm_option_returns --
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_hkm_option_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_hkm_option_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_cash_liquidity --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_cash_liquidity --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_cash_liquidity --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_cash_liquidity --model historic_average --skip-existing
@@ -479,14 +671,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_cash_
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_cash_liquidity --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_cash_liquidity --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model historic_average --skip-existing
@@ -499,14 +699,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holdi
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_cash_liquidity --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model historic_average --skip-existing
@@ -519,14 +727,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_holdi
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_holding_company_leverage --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_leverage --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_nyu_call_report_leverage --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_leverage --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_leverage --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_leverage --model historic_average --skip-existing
@@ -539,14 +755,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_nyu_call_report_lever
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_leverage --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_nyu_call_report_leverage --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_tips_treasury_basis --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis --model historic_average --skip-existing
@@ -559,14 +783,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_tips_treasury_basis -
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_tips_treasury_basis --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_portfolio_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_portfolio_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_portfolio_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_portfolio_returns --model historic_average --skip-existing
@@ -579,14 +811,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_portfolio_
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_portfolio_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_portfolio_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_returns --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_bond_returns --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_returns --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_returns --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_returns --model historic_average --skip-existing
@@ -599,14 +839,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_bond_returns --
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_returns --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_bond_returns --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_portfolios_permissive --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_permissive --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_permissive --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_permissive --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_portfolios_permissive --model historic_average --skip-existing
@@ -619,14 +867,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_portfolios_perm
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_permissive --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_permissive --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_portfolios_strict --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_portfolios_strict --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_strict --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_strict --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_portfolios_strict --model historic_average --skip-existing
@@ -639,14 +895,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_portfolios_stri
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_strict --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_portfolios_strict --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treas_yield_curve_zero_coupon --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_yield_curve_zero_coupon --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_yield_curve_zero_coupon --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_yield_curve_zero_coupon --model historic_average --skip-existing
@@ -659,14 +923,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_treas_yield_curve_zer
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_yield_curve_zero_coupon --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treas_yield_curve_zero_coupon --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_sf_basis --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --model historic_average --skip-existing
@@ -679,14 +951,22 @@ python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_sf_basis --m
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model tide --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_sf_basis --model vanilla_transformer --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_swap_basis --model auto_arima --skip-existing
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_deepar --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_dlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_kan --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nbeats --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nhits --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nlinear --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_tide --skip-existing --skip-daily
-python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_vanilla_transformer --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_deepar --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_deepar --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_dlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_dlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_kan --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_kan --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nbeats --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nbeats --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nhits --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nhits --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nlinear --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_nlinear --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_tide --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_tide --loss mse --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_vanilla_transformer --loss mae --skip-existing --skip-daily
+python ./src/forecasting/forecast_neural_auto.py --dataset ftsfr_treasury_swap_basis --model auto_vanilla_transformer --loss mse --skip-existing --skip-daily
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model deepar --skip-existing
 python ./src/forecasting/forecast_neural.py --dataset ftsfr_treasury_swap_basis --model dlinear --skip-existing
 python ./src/forecasting/forecast_stats.py --dataset ftsfr_treasury_swap_basis --model historic_average --skip-existing

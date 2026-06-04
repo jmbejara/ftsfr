@@ -68,6 +68,8 @@ def generate_job_commands(
     models: List[Dict[str, str]],
     skip_existing: bool = False,
     skip_daily: bool = False,
+    losses: List[str] = ("mae", "mse"),
+    scale_entity: bool = False,
 ) -> List[str]:
     """Generate job commands for all dataset x model combinations.
 
@@ -76,6 +78,11 @@ def generate_job_commands(
         models: List of model configurations
         skip_existing: If True, add --skip-existing flag to commands
         skip_daily: If True, add --skip-daily flag to auto model commands
+        losses: Loss variants to emit for neural (forecast_neural_auto.py) models.
+            One command is generated per (dataset, neural-model, loss). Classical
+            models (forecast_stats.py) are emitted once per (dataset, model) since
+            they do not expose a loss choice.
+        scale_entity: If True, add --scale-entity to neural-model commands.
     """
     commands = []
 
@@ -83,13 +90,24 @@ def generate_job_commands(
         for model in models:
             model_name = model["name"]
             script_name = model["script"]
-            command = f"python ./src/forecasting/{script_name} --dataset {dataset} --model {model_name}"
-            if skip_existing:
-                command += " --skip-existing"
-            # Add --skip-daily flag only to auto models (forecast_neural_auto.py)
-            if skip_daily and script_name == "forecast_neural_auto.py":
-                command += " --skip-daily"
-            commands.append(command)
+            is_neural = script_name == "forecast_neural_auto.py"
+
+            # Neural models: emit one command per loss variant.
+            # Classical models: emit a single command per (dataset, model).
+            loss_variants = list(losses) if is_neural else [None]
+
+            for loss in loss_variants:
+                command = f"python ./src/forecasting/{script_name} --dataset {dataset} --model {model_name}"
+                if is_neural and loss is not None:
+                    command += f" --loss {loss}"
+                if is_neural and scale_entity:
+                    command += " --scale-entity"
+                if skip_existing:
+                    command += " --skip-existing"
+                # Add --skip-daily flag only to auto models (forecast_neural_auto.py)
+                if skip_daily and is_neural:
+                    command += " --skip-daily"
+                commands.append(command)
 
     return commands
 
@@ -124,6 +142,18 @@ def main():
         action="store_true",
         help="Add --skip-daily flag to auto model commands",
     )
+    parser.add_argument(
+        "--losses",
+        nargs="+",
+        choices=["mae", "mse"],
+        default=["mae", "mse"],
+        help="Loss variants to emit for neural models (defaults to both).",
+    )
+    parser.add_argument(
+        "--scale-entity",
+        action="store_true",
+        help="Append --scale-entity to all neural model commands.",
+    )
     args = parser.parse_args()
 
     # Define file paths
@@ -156,7 +186,12 @@ def main():
 
     # Generate job commands
     commands = generate_job_commands(
-        datasets, models, skip_existing=args.skip_existing, skip_daily=args.skip_daily
+        datasets,
+        models,
+        skip_existing=args.skip_existing,
+        skip_daily=args.skip_daily,
+        losses=args.losses,
+        scale_entity=args.scale_entity,
     )
     total_jobs = len(commands)
 
