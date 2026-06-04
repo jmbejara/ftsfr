@@ -316,7 +316,25 @@ def convert_pandas_freq_to_polars(pandas_freq):
 
 
 def calculate_oos_r2(cv_df, train_df, models, benchmark_model="HistoricAverage"):
-    """Calculate out-of-sample R-squared: R2oos = 1 - MSE_model / MSE_benchmark."""
+    """Calculate out-of-sample R-squared two ways.
+
+    Returns a tuple ``(r2_per_series_df, r2_pooled)`` where:
+
+    - ``r2_per_series_df`` is a Polars DataFrame keyed by ``unique_id`` with
+      one column per model containing per-series ``1 - MSE_model / MSE_benchmark``.
+      Series whose benchmark MSE is below ``1e-12`` are nulled out to avoid
+      divide-by-near-zero blowups.
+
+    - ``r2_pooled`` is a dict ``{model_name -> float}`` giving the panel-wide
+      (pooled) R²oos: ``1 - sum_all_obs (y - y_hat)^2 / sum_all_obs (y - benchmark)^2``.
+      This is the standard asset-pricing / Welch-Goyal-Gu-Kelly-Xiu definition
+      and is robust to heterogeneous per-series benchmark variance — a single
+      low-variance series cannot dominate it the way it does the per-series
+      mean. Reported as the headline R² in the paper as of 2026-06.
+
+    Mean across the per-series column of the first return is kept for
+    sensitivity/comparison purposes. It is *not* the headline number.
+    """
 
     benchmark_col = None
     if benchmark_model:
@@ -342,17 +360,24 @@ def calculate_oos_r2(cv_df, train_df, models, benchmark_model="HistoricAverage")
         )
 
     mse_benchmark_by_series = benchmark_errors.group_by("unique_id").agg(
-        pl.col("se_benchmark").mean().alias("MSE_benchmark")
+        pl.col("se_benchmark").mean().alias("MSE_benchmark"),
+        pl.col("se_benchmark").sum().alias("SS_benchmark"),
+        pl.col("se_benchmark").count().alias("N_benchmark"),
     )
 
     r2_results = []
+    r2_pooled: dict = {}
     for model in models:
+        per_obs = cv_df.with_columns(
+            ((pl.col("y") - pl.col(model)) ** 2).alias("se_model")
+        )
         mse_model_by_series = (
-            cv_df.with_columns(
-                ((pl.col("y") - pl.col(model)) ** 2).alias("se_model")
-            )
+            per_obs
             .group_by("unique_id")
-            .agg(pl.col("se_model").mean().alias("MSE_model"))
+            .agg(
+                pl.col("se_model").mean().alias("MSE_model"),
+                pl.col("se_model").sum().alias("SS_model"),
+            )
         )
 
         r2_by_series = (
@@ -363,16 +388,26 @@ def calculate_oos_r2(cv_df, train_df, models, benchmark_model="HistoricAverage")
                 .otherwise(1 - (pl.col("MSE_model") / pl.col("MSE_benchmark")))
                 .alias(model)
             )
-            .select("unique_id", model)
         )
 
-        r2_results.append(r2_by_series)
+        # Pooled R² over all observations (skip the series we already null-out
+        # for the per-series formula so both aggregations see the same support
+        # set; otherwise reviewers will rightly complain).
+        retained = r2_by_series.filter(pl.col(model).is_not_null())
+        ss_model_total = retained["SS_model"].sum()
+        ss_bench_total = retained["SS_benchmark"].sum()
+        if ss_bench_total and ss_bench_total > 0:
+            r2_pooled[model] = float(1.0 - ss_model_total / ss_bench_total)
+        else:
+            r2_pooled[model] = float("nan")
+
+        r2_results.append(r2_by_series.select("unique_id", model))
 
     final_r2 = r2_results[0]
     for r2_df in r2_results[1:]:
         final_r2 = final_r2.join(r2_df, on="unique_id")
 
-    return final_r2
+    return final_r2, r2_pooled
 
 
 def evaluate_cv(cv_df, train_df, seasonality):
@@ -449,9 +484,9 @@ def evaluate_cv(cv_df, train_df, seasonality):
     rmse_scores = rmse(cv_df, models=actual_model_cols)
 
     # Calculate out-of-sample R-squared
-    r2oos_scores = calculate_oos_r2(cv_df, train_df, actual_model_cols)
+    r2oos_scores, r2oos_pooled = calculate_oos_r2(cv_df, train_df, actual_model_cols)
 
-    return mase_scores, mse_scores, rmse_scores, r2oos_scores, actual_model_cols
+    return mase_scores, mse_scores, rmse_scores, r2oos_scores, r2oos_pooled, actual_model_cols
 
 
 def align_train_data_with_cutoffs(train_df, cv_df, cutoff_col="cutoff"):
@@ -537,12 +572,15 @@ def get_minimum_requirements_by_frequency(frequency, test_size, seasonality=1):
     }
 
 
-def should_skip_forecast(dataset_name, model_name, verbose=True):
+def should_skip_forecast(dataset_name, model_name, run_suffix="", verbose=True):
     """Check if forecast should be skipped because valid results already exist.
 
     Args:
         dataset_name: Name of the dataset
         model_name: Name of the model (as used in filename, e.g., 'ses', 'auto_deepar')
+        run_suffix: Optional filename suffix (e.g., '__mae', '__mse', '__mse__entityscale')
+            to distinguish dual-fit and per-entity-scaled variants from the
+            legacy `{model}.csv`. Empty string preserves the original behaviour.
         verbose: If True, print messages about skip decision
 
     Returns:
@@ -554,7 +592,7 @@ def should_skip_forecast(dataset_name, model_name, verbose=True):
 
     # Construct the path to the error metrics CSV
     csv_path = Path(
-        f"./_output/forecasting/error_metrics/{dataset_name}/{model_name}.csv"
+        f"./_output/forecasting/error_metrics/{dataset_name}/{model_name}{run_suffix}.csv"
     )
 
     # Check if file exists

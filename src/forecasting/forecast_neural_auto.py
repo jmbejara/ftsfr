@@ -135,6 +135,8 @@ def create_auto_config_nhits(
                 (6, 12) if debug else (12, 24, 48),  # Smaller for debug
             ),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
             "n_blocks": 5 * [1],
             "mlp_units": 5 * [[64, 64]],
             "n_pool_kernel_size": trial.suggest_categorical(
@@ -219,6 +221,8 @@ def create_auto_config_lstm(seasonality, debug=False, hardware_config=None):
             ),
             "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
             "decoder_layers": trial.suggest_categorical(
                 "decoder_layers",
                 (1, 2),  # Add decoder configuration
@@ -269,6 +273,8 @@ def create_auto_config_simple(
             ),
             "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -315,6 +321,8 @@ def create_auto_config_deepar(
             "batch_size": trial.suggest_categorical("batch_size", (32, 64, 128)),
             "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -367,6 +375,8 @@ def create_auto_config_nbeats(
             ),
             "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -407,6 +417,8 @@ def create_auto_config_transformer(
             "batch_size": trial.suggest_categorical("batch_size", (32, 64)),
             "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -453,6 +465,8 @@ def create_auto_config_tide(
             "batch_size": trial.suggest_categorical("batch_size", (32, 64)),
             "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -495,6 +509,8 @@ def create_auto_config_kan(
             "batch_size": trial.suggest_categorical("batch_size", (32, 64)),
             "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
+            "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
+            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -551,6 +567,21 @@ def main():
         action="store_true",
         help="Skip datasets with business day (B) or daily (D) frequency",
     )
+    parser.add_argument(
+        "--loss",
+        choices=["mae", "mse"],
+        default="mae",
+        help="Loss for training and validation. Point-forecast models use MAE() "
+        "or MSE() directly; DeepAR keeps its DistributionLoss(StudentT) for "
+        "training and uses this only for valid_loss (Optuna search objective).",
+    )
+    parser.add_argument(
+        "--scale-entity",
+        action="store_true",
+        help="Apply leak-safe per-entity standardization: median/IQR computed "
+        "from the train portion only, applied to both train and test before CV, "
+        "inverse-transformed before metric evaluation.",
+    )
     args = parser.parse_args()
 
     DATASET_NAME = args.dataset
@@ -558,10 +589,19 @@ def main():
     DEBUG_MODE = args.debug
     SKIP_EXISTING = args.skip_existing
     SKIP_DAILY = args.skip_daily
+    LOSS_NAME = args.loss
+    SCALE_ENTITY = args.scale_entity
+
+    # Output filename suffix encoding the run variant
+    run_suffix = f"__{LOSS_NAME}"
+    if SCALE_ENTITY:
+        run_suffix += "__entityscale"
 
     # Check if we should skip this forecast
-    if SKIP_EXISTING and should_skip_forecast(DATASET_NAME, MODEL_NAME, verbose=True):
-        print(f"Skipping {MODEL_NAME} for {DATASET_NAME} - valid metrics already exist")
+    if SKIP_EXISTING and should_skip_forecast(
+        DATASET_NAME, MODEL_NAME, run_suffix=run_suffix, verbose=True
+    ):
+        print(f"Skipping {MODEL_NAME}{run_suffix} for {DATASET_NAME} - valid metrics already exist")
         sys.exit(0)
 
     print("=" * 60)
@@ -851,6 +891,61 @@ def main():
         f"  Neural: {len(df_neural):,} observations, {df_neural['unique_id'].n_unique()} series"
     )
 
+    # Leak-safe per-entity standardization (median / IQR).
+    # Stats are fit on the imputed train portion of each entity ONLY (which
+    # ends at the per-series train cutoff produced by robust_preprocess_pipeline).
+    # We apply the transform to df_baseline and df_neural so CV sees normalized
+    # inputs; cv_df predictions and y get inverse-transformed back to raw units
+    # before metrics are computed, so MSE/RMSE remain comparable across runs.
+    # train_data (used by evaluate_cv for the MASE seasonal-naive denominator)
+    # is built later from the unmodified train_df, so it stays raw and consistent
+    # with the inverse-transformed cv_df.
+    scalers_df = None
+    if SCALE_ENTITY:
+        import numpy as np
+
+        print("\n2.5 Computing leak-safe per-entity scalers (median, IQR) from train portion only")
+        print("-" * 40)
+        y_train_col = "y_imputed" if "y_imputed" in train_df.columns else "y"
+        uids: list = []
+        locs: list = []
+        scales: list = []
+        for uid in train_df["unique_id"].unique().to_list():
+            y_arr = (
+                train_df.filter(pl.col("unique_id") == uid)[y_train_col]
+                .drop_nulls()
+                .to_numpy()
+            )
+            uids.append(uid)
+            if len(y_arr) < 5:
+                locs.append(0.0)
+                scales.append(1.0)
+                continue
+            med = float(np.median(y_arr))
+            iqr = float(np.percentile(y_arr, 75) - np.percentile(y_arr, 25))
+            scale = iqr if iqr > 1e-9 else max(float(np.std(y_arr, ddof=1)), 1.0)
+            locs.append(med)
+            scales.append(scale)
+        scalers_df = pl.DataFrame({"unique_id": uids, "_loc": locs, "_scale": scales})
+        sc_arr = np.asarray(scales)
+        print(
+            f"  Computed scalers for {len(uids)} series. "
+            f"Scale median={np.median(sc_arr):.4g}, range [{sc_arr.min():.4g}, {sc_arr.max():.4g}]"
+        )
+
+        def _apply_scale(df: pl.DataFrame, ycol: str) -> pl.DataFrame:
+            return (
+                df.join(scalers_df, on="unique_id", how="left")
+                .with_columns(
+                    ((pl.col(ycol) - pl.col("_loc")) / pl.col("_scale")).alias(ycol)
+                )
+                .drop(["_loc", "_scale"])
+            )
+
+        df_baseline = _apply_scale(df_baseline, "y")
+        df_neural = _apply_scale(df_neural, "y")
+        print("  Applied per-entity (y - median) / IQR to df_baseline and df_neural")
+
     # Define models
     print("\n3. Setting Up Models")
     print("-" * 40)
@@ -861,9 +956,17 @@ def main():
         SeasonalNaive(season_length=seasonality),
     ]
 
-    # Create output directories early
-    lightning_logs_dir = f"./_output/forecasting/logs/{DATASET_NAME}/{MODEL_NAME}"
+    # Create output directories early. Logs dir includes the run suffix so
+    # parallel mae/mse/scaled variants don't clobber each other's lightning logs.
+    lightning_logs_dir = (
+        f"./_output/forecasting/logs/{DATASET_NAME}/{MODEL_NAME}{run_suffix}"
+    )
     os.makedirs(lightning_logs_dir, exist_ok=True)
+
+    # Training loss for point-forecast models is parameterized by --loss.
+    # DeepAR keeps its distributional training loss and only varies valid_loss.
+    training_loss = MAE() if LOSS_NAME == "mae" else MSE()
+    print(f"Training loss: {LOSS_NAME.upper()} (valid_loss matches)")
 
     # Create the selected neural model with custom configuration and lightning logs path
     model_mapping = {
@@ -876,7 +979,7 @@ def main():
                 hardware_config=hardware_config,
             ),
             loss=DistributionLoss(distribution="StudentT"),
-            valid_loss=MSE(),
+            valid_loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -889,7 +992,7 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=MAE(),
+            loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -901,7 +1004,7 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=MAE(),
+            loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -913,7 +1016,7 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=MAE(),
+            loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -925,7 +1028,7 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=MAE(),
+            loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -937,7 +1040,7 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=MAE(),
+            loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -949,7 +1052,7 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=MAE(),
+            loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -961,7 +1064,7 @@ def main():
                 debug=DEBUG_MODE,
                 hardware_config=hardware_config,
             ),
-            loss=MAE(),
+            loss=training_loss,
             backend="optuna",
             num_samples=NUM_SAMPLES,
         ),
@@ -1126,6 +1229,27 @@ def main():
         neural_cv_df.drop(["y", "cutoff"]), on=["unique_id", "ds"], how="left"
     )
 
+    # If we standardized per entity before CV, inverse-transform predictions
+    # AND the test y in cv_df back to raw units so downstream MSE/RMSE remain
+    # comparable to the unscaled runs. train_data below is built from the
+    # unmodified train_df, so it is already in raw units.
+    if SCALE_ENTITY and scalers_df is not None:
+        id_time_cols = {"unique_id", "ds", "cutoff"}
+        inverse_cols = [c for c in cv_df.columns if c not in id_time_cols]
+        cv_df = (
+            cv_df.join(scalers_df, on="unique_id", how="left")
+            .with_columns(
+                [
+                    (pl.col(c) * pl.col("_scale") + pl.col("_loc")).alias(c)
+                    for c in inverse_cols
+                ]
+            )
+            .drop(["_loc", "_scale"])
+        )
+        print(
+            f"  Inverse-transformed {len(inverse_cols)} columns in cv_df back to raw units"
+        )
+
     # Create training data aligned with per-series cutoffs
     if "y_imputed" in train_df.columns:
         train_data_for_eval = train_df.select(["unique_id", "ds", "y_imputed"]).rename(
@@ -1139,9 +1263,14 @@ def main():
     print("\n7. Evaluating Model Performance")
     print("-" * 40)
 
-    mase_scores, mse_scores, rmse_scores, r2oos_scores, actual_model_cols = evaluate_cv(
-        cv_df, train_data, seasonality
-    )
+    (
+        mase_scores,
+        mse_scores,
+        rmse_scores,
+        r2oos_scores,
+        r2oos_pooled,
+        actual_model_cols,
+    ) = evaluate_cv(cv_df, train_data, seasonality)
 
     # Calculate average metrics across all series
     avg_metrics = {}
@@ -1168,7 +1297,10 @@ def main():
             "MASE": mase_scores[model_col].mean(),
             "MSE": mse_scores[model_col].mean(),
             "RMSE": rmse_scores[model_col].mean(),
-            "R2oos": r2oos_scores[model_col].mean(),
+            # Headline R²oos is the pooled (panel-wide) value as of 2026-06.
+            # The per-series-mean is kept alongside for sensitivity reporting.
+            "R2oos": r2oos_pooled.get(model_col, float("nan")),
+            "R2oos_per_series_mean": r2oos_scores[model_col].mean(),
         }
 
     # Create comparison table
@@ -1230,6 +1362,7 @@ def main():
         mse_val = avg_metrics[neural_model_name]["MSE"]
         rmse_val = avg_metrics[neural_model_name]["RMSE"]
         r2oos_val = avg_metrics[neural_model_name]["R2oos"]
+        r2oos_legacy_val = avg_metrics[neural_model_name]["R2oos_per_series_mean"]
 
         # Check for invalid metric values
         import numpy as np
@@ -1269,12 +1402,15 @@ def main():
             "MASE": [mase_val],
             "MSE": [mse_val],
             "RMSE": [rmse_val],
-            "R2oos": [r2oos_val],
+            "R2oos": [r2oos_val],  # pooled / panel-wide, paper headline (2026-06)
+            "R2oos_per_series_mean": [r2oos_legacy_val],  # legacy formula, kept for sensitivity
             "time_taken": [neural_time],
+            "loss": [LOSS_NAME],
+            "scale_entity": [SCALE_ENTITY],
         }
 
         metrics_df = pl.DataFrame(metrics_data)
-        csv_path = f"{error_metrics_dir}/{MODEL_NAME}.csv"
+        csv_path = f"{error_metrics_dir}/{MODEL_NAME}{run_suffix}.csv"
         metrics_df.write_csv(csv_path)
         print(f"Error metrics saved to: {csv_path}")
     else:

@@ -353,9 +353,14 @@ def main():
         train_data_for_eval = train_df.select(["unique_id", "ds", "y"])
     train_data = align_train_data_with_cutoffs(train_data_for_eval, cv_df)
 
-    mase_scores, mse_scores, rmse_scores, r2oos_scores, actual_model_cols = evaluate_cv(
-        cv_df, train_data, seasonality
-    )
+    (
+        mase_scores,
+        mse_scores,
+        rmse_scores,
+        r2oos_scores,
+        r2oos_pooled,
+        actual_model_cols,
+    ) = evaluate_cv(cv_df, train_data, seasonality)
 
     # Calculate average metrics across all series
     avg_metrics = {}
@@ -382,7 +387,8 @@ def main():
             "MASE": mase_scores[model_col].mean(),
             "MSE": mse_scores[model_col].mean(),
             "RMSE": rmse_scores[model_col].mean(),
-            "R2oos": r2oos_scores[model_col].mean(),
+            "R2oos": r2oos_pooled.get(model_col, float("nan")),
+            "R2oos_per_series_mean": r2oos_scores[model_col].mean(),
         }
 
     # Create comparison table
@@ -424,6 +430,7 @@ def main():
         mse_val = avg_metrics[metrics_key]["MSE"]
         rmse_val = avg_metrics[metrics_key]["RMSE"]
         r2oos_val = avg_metrics[metrics_key]["R2oos"]
+        r2oos_legacy_val = avg_metrics[metrics_key]["R2oos_per_series_mean"]
 
         # Check for invalid metric values
         import numpy as np
@@ -459,7 +466,8 @@ def main():
             "MASE": [mase_val],
             "MSE": [mse_val],
             "RMSE": [rmse_val],
-            "R2oos": [r2oos_val],
+            "R2oos": [r2oos_val],  # pooled / panel-wide, paper headline (2026-06)
+            "R2oos_per_series_mean": [r2oos_legacy_val],
             "time_taken": [cv_time],
         }
 
