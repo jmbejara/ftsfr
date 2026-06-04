@@ -49,6 +49,9 @@ report/images/*
 
 models/*/lightning_logs
 
+# Stray PyTorch Lightning logs written to repo root as a fallback location
+/lightning_logs/
+
 ##############
 #Excluded PDFs
 ##############
