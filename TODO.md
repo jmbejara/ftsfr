@@ -11,6 +11,62 @@ for the current Auto wrapper configuration.
 
 ## Status
 
+- **2026-06-02** — **Phase C complete**: bundled dual-fit (item 1) + DeepAR
+  StudentT (item 2) + grad-clip + early-stopping (item 4) ran across all 8
+  auto neural models × 2 loss variants × 32 datasets = **560 jobs in 40.3h
+  wall** with 4-way parallelism (3.97× effective speedup over serial; 159.8h
+  serial-equivalent). No failures. Per-entity scaling (item 6) was implemented
+  and canary-tested but **dropped** — mean ΔR² ≈ 0 across 32 canary pairs with
+  multiple catastrophic losses on CRSP_ret (DLinear, NHITS, Transformer all
+  -5 to -9 worse under scaling). See **2026-05-31 canary** below.
+
+  Per-model picture from final dual-fit results (35 datasets each):
+
+  | model       | mean R² | median R² | min R² | #R²<-1 |
+  | ----------- | ------: | --------: | -----: | -----: |
+  | arima       |  +0.21  |   +0.17   | -0.42  | 0 |
+  | deepar      |  -0.08  |   +0.05   | -1.85  | 2 |
+  | dlinear     |  +0.13  |   +0.14   | -0.99  | 0 |
+  | kan         |  -1.88  |   -0.03   | -40.59 | 4 |
+  | nbeats      |  -0.06  |   +0.00   | -1.37  | 4 |
+  | nhits       |  -0.20  |   +0.16   | -5.86  | 5 |
+  | nlinear     |  -0.08  |   +0.16   | -3.26  | 3 |
+  | ses         |  +0.01  |   +0.18   | -3.04  | 2 |
+  | theta       |  +0.02  |   +0.20   | -4.32  | 2 |
+  | tide        |  +0.07  |   +0.09   | -1.60  | 1 |
+  | transformer |  -0.02  |   +0.10   | -1.84  | 4 |
+
+  Changes vs the StudentT-only (DeepAR) baseline of 2026-05-29:
+
+  - **NLinear**: legacy mean R² −1.27 → now −0.08 (median essentially flat,
+    but the −34.73 CRSP_ret pathology that motivated item (4) is **gone**
+    — gradient clipping did exactly what it was supposed to, dropping the
+    NLinear minimum from −34.73 to −3.26).
+  - **DLinear**: mean +0.01 → +0.13, blowup count 2 → 0. Clean win.
+  - **TiDE**: mean −0.14 → +0.07, min −6.07 → −1.60. Clear improvement.
+  - **NBEATS**: similar median, slightly improved tail.
+  - **DeepAR**: mean +0.06 → −0.08 — slightly **worse** mean (gain on most
+    datasets but a new −1.85 on `corp_bond_str_naive` that didn't exist at
+    StudentT-only). The MAE side of dual-fit is what regressed.
+  - **KAN**: from −0.03 to −1.88 mean — net regression driven entirely by
+    one −40.59 on `ftsfr_CDS_contract_returns` (median moved 0). KAN is the
+    odd model out and the only one that arguably needs revisiting.
+  - **NHITS, Transformer**: roughly unchanged mean; tail moderately better.
+
+  Aggregate catastrophic-blowup count (R² < −2) across all 8 neural ×
+  35 datasets = 280 cells: **8 left** (KAN×3, NHITS×2, NLinear×1, plus 2
+  classical-only on CRSP). That's a strong improvement on the headline
+  table even with KAN's regression baked in.
+
+- **2026-05-31 — canary verdict on `--scale-entity` (DROPPED)**: 4
+  datasets × 8 models × `--loss mse` × {scale, no-scale} = 64 jobs, 22.6h
+  wall. 13 wins / 12 losses / 7 ties; mean ΔR² = −0.057 with worst loss
+  −8.59 (NHITS on CRSP_ret). The catastrophic losses on DLinear / NHITS /
+  Transformer on CRSP datasets dominated the wins (KAN +22.8 on
+  `corp_bond_str_naive` was the only large gain). Implementation is in
+  `forecast_neural_auto.py` behind `--scale-entity` and stays available
+  for sensitivity work; default off.
+
 - **2026-05-29/30**: Items (2) and (3) applied **to AutoDeepAR only**. DeepAR
   now uses `DistributionLoss(distribution="StudentT")` and `valid_loss=MSE()`.
   Full 32-dataset DeepAR sweep on Apple-Silicon MPS took **~7.4h wall** (down
