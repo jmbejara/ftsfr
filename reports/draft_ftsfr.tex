@@ -731,7 +731,7 @@ To ensure fair model comparisons, our forecasting system applies a unified prepr
 \subsection{Error Metrics}\label{subsec:error_metrics}
 We evaluate forecasting performance using two complementary error metrics: Mean Absolute Scaled Error (MASE) and out-of-sample $R^2$ ($R^2_{\text{oos}}$). We use MASE because it is the standard accuracy measure in time series forecasting \citep{Hyndman2006}, while $R^2_{\text{oos}}$ is standard in finance for evaluating predictive models \citep{Campbell2008}. Both metrics are scale-free and benchmark model performance against simple baselines, but they differ in their treatment of errors: MASE uses absolute errors (robust to outliers), while $R^2_{\text{oos}}$ uses squared errors (emphasizing large misses).
 
-\paragraph{Notation.} Let $\{y_t\}_{t=1}^T$ be targets in the test window, $\{\hat y_t\}_{t=1}^T$ the corresponding forecasts, and $\bar{y}_{\text{train}}$ the training sample mean.
+\paragraph{Notation.} Let $\{y_{s,t}\}$ denote the target value for series $s$ at time $t$, $\{\hat y_{s,t}\}$ the corresponding forecast, $T_s$ the length of the test window for series $s$, and $\bar{y}_{\text{train},s}$ the training-sample mean of series $s$. When a metric is computed for a single series we suppress the $s$ subscript.
 
 \medskip
 \noindent\textbf{Mean Absolute Scaled Error (MASE).}
@@ -749,11 +749,11 @@ The denominator is the in-sample MAE of a seasonal naïve forecast on the traini
 This compares each model's MASE to the Historic Average (HA) baseline on the same dataset. Values below 1.0 indicate a model improves upon the Historic Average, while values above 1.0 indicate weaker performance than the baseline.
 
 \medskip
-\noindent\textbf{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$).}
+\noindent\textbf{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$).} For each (dataset, model) cell we report the pooled, panel-wide $R^2_{\text{oos}}$:
 \[
-R^2_{\text{oos}} = 1 - \frac{\sum_{t=1}^T (y_t-\hat y_t)^2}{\sum_{t=1}^T (y_t-\bar{y}_{\text{train}})^2}
+R^2_{\text{oos}} = 1 - \frac{\sum_{s}\sum_{t=1}^{T_s} (y_{s,t}-\hat y_{s,t})^2}{\sum_{s}\sum_{t=1}^{T_s} (y_{s,t}-\bar{y}_{\text{train},s})^2}.
 \]
-This measures the percentage reduction in MSE achieved by the model relative to predicting the training sample mean. Positive values indicate the model outperforms the historical average benchmark; zero or negative values indicate underperformance.
+Squared errors are summed across all series and all test-window observations in the dataset; the benchmark is each series' own training-sample mean (the Historic Average baseline). This is the standard panel definition in the asset-pricing forecasting literature \citep{Campbell2008,Gu2020}. Positive values indicate the model outperforms the historical-average benchmark on the dataset as a whole; zero or negative values indicate underperformance. We pool rather than averaging per-series $R^2$ values because, on disaggregated panels with heterogeneous variance (e.g.\ CRSP equity returns, individual TRACE bonds, CDS contracts), per-series ratios are sensitive to a handful of low-variance series whose benchmark $\sum_t (y_{s,t}-\bar{y}_{\text{train},s})^2$ is small, which can dominate a simple mean.
 
 \section{Baseline Results and Analysis}
 \label{sec:results}

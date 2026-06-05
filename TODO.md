@@ -11,61 +11,64 @@ for the current Auto wrapper configuration.
 
 ## Status
 
-- **2026-06-02** — **Phase C complete**: bundled dual-fit (item 1) + DeepAR
-  StudentT (item 2) + grad-clip + early-stopping (item 4) ran across all 8
-  auto neural models × 2 loss variants × 32 datasets = **560 jobs in 40.3h
-  wall** with 4-way parallelism (3.97× effective speedup over serial; 159.8h
-  serial-equivalent). No failures. Per-entity scaling (item 6) was implemented
-  and canary-tested but **dropped** — mean ΔR² ≈ 0 across 32 canary pairs with
-  multiple catastrophic losses on CRSP_ret (DLinear, NHITS, Transformer all
-  -5 to -9 worse under scaling). See **2026-05-31 canary** below.
+- **2026-06-05** — **Phase C v2 complete; R²oos formula changed to pooled
+  panel-wide.** While investigating why KAN went from legacy R²=−0.085 to
+  Phase C v1 R²=−40.59 on `ftsfr_CDS_contract_returns`, the diagnostic ran
+  in `/tmp/diagnose_kan.py` showed KAN's predictions were unchanged. The
+  collapse was an **aggregation artifact**: the legacy formula computed
+  per-series `1 − MSE_model/MSE_HistAvg` and then averaged across series,
+  so a handful of CDS contracts with extremely low return variance
+  (`MSE_HistAvg` ≈ 1e-7) blew up the mean. We switched to the canonical
+  pooled definition
 
-  Per-model picture from final dual-fit results (35 datasets each):
+      R²oos = 1 − Σ_{s,t} (y - ŷ)² / Σ_{s,t} (y - ȳ_train,s)²
 
-  | model       | mean R² | median R² | min R² | #R²<-1 |
-  | ----------- | ------: | --------: | -----: | -----: |
-  | arima       |  +0.21  |   +0.17   | -0.42  | 0 |
-  | deepar      |  -0.08  |   +0.05   | -1.85  | 2 |
-  | dlinear     |  +0.13  |   +0.14   | -0.99  | 0 |
-  | kan         |  -1.88  |   -0.03   | -40.59 | 4 |
-  | nbeats      |  -0.06  |   +0.00   | -1.37  | 4 |
-  | nhits       |  -0.20  |   +0.16   | -5.86  | 5 |
-  | nlinear     |  -0.08  |   +0.16   | -3.26  | 3 |
-  | ses         |  +0.01  |   +0.18   | -3.04  | 2 |
-  | theta       |  +0.02  |   +0.20   | -4.32  | 2 |
-  | tide        |  +0.07  |   +0.09   | -1.60  | 1 |
-  | transformer |  -0.02  |   +0.10   | -1.84  | 4 |
+  (Gu-Kelly-Xiu 2020, Campbell-Thompson 2008). `calculate_oos_r2` now
+  returns both; the CSV `R2oos` column is the headline pooled value,
+  `R2oos_per_series_mean` is kept as a hidden diagnostic. Paper §
+  *Error Metrics* in [reports/draft_ftsfr.tex](reports/draft_ftsfr.tex)
+  reflects the change; the legacy formula is not mentioned in the draft.
 
-  Changes vs the StudentT-only (DeepAR) baseline of 2026-05-29:
+  Re-ran all 560 dual-fit jobs (45h wall, 4-way parallel, 0 failures).
+  Predictions identical to v1, only the reported R² changes. Backup of
+  v1 CSVs (with the legacy R² as headline) is at
+  `_output/forecasting/error_metrics_backup_phase_c_v1_persmean_r2/`.
 
-  - **NLinear**: legacy mean R² −1.27 → now −0.08 (median essentially flat,
-    but the −34.73 CRSP_ret pathology that motivated item (4) is **gone**
-    — gradient clipping did exactly what it was supposed to, dropping the
-    NLinear minimum from −34.73 to −3.26).
-  - **DLinear**: mean +0.01 → +0.13, blowup count 2 → 0. Clean win.
-  - **TiDE**: mean −0.14 → +0.07, min −6.07 → −1.60. Clear improvement.
-  - **NBEATS**: similar median, slightly improved tail.
-  - **DeepAR**: mean +0.06 → −0.08 — slightly **worse** mean (gain on most
-    datasets but a new −1.85 on `corp_bond_str_naive` that didn't exist at
-    StudentT-only). The MAE side of dual-fit is what regressed.
-  - **KAN**: from −0.03 to −1.88 mean — net regression driven entirely by
-    one −40.59 on `ftsfr_CDS_contract_returns` (median moved 0). KAN is the
-    odd model out and the only one that arguably needs revisiting.
-  - **NHITS, Transformer**: roughly unchanged mean; tail moderately better.
+  Per-model picture from pooled R² (Phase C v2):
 
-  Aggregate catastrophic-blowup count (R² < −2) across all 8 neural ×
-  35 datasets = 280 cells: **8 left** (KAN×3, NHITS×2, NLinear×1, plus 2
-  classical-only on CRSP). That's a strong improvement on the headline
-  table even with KAN's regression baked in.
+  | model       | mean R² | median R² | min R² | #R²<-1 | #R²<-2 |
+  | ----------- | ------: | --------: | -----: | -----: | -----: |
+  | arima       |  +0.21  |   +0.17   | -0.42  | 0 | 0 |
+  | deepar      |  +0.11  |   +0.03   | -1.05  | 1 | 0 |
+  | dlinear     |  +0.21  |   +0.10   | -2.08  | 1 | 1 |
+  | kan         |  +0.06  |   +0.07   | -3.82  | 1 | 1 |
+  | nbeats      |  -0.19  |   +0.03   | -5.12  | 4 | 3 |
+  | nhits       |  +0.04  |   +0.02   | -1.71  | 3 | 0 |
+  | nlinear     |  +0.06  |   +0.02   | -4.59  | 2 | 1 |
+  | ses         |  +0.01  |   +0.18   | -3.04  | 2 | 2 |
+  | theta       |  +0.02  |   +0.20   | -4.32  | 2 | 2 |
+  | tide        |  +0.19  |   +0.04   | -0.80  | 0 | 0 |
+  | transformer |  +0.11  |   +0.03   | -1.50  | 1 | 0 |
+
+  **Headline narrative change**: across all 420 (dataset, model) cells,
+  mean pooled R² = **+0.068**, median = +0.028, only **10 cells with
+  R² < −2** (was 33 under v1's per-series mean). The v1 framing of
+  "deep learning has positive median but catastrophic mean R²" was
+  largely an aggregation artifact. Under pooled aggregation, every
+  neural model has a positive mean R² except NBEATS (which still has
+  3 R² < −2 cells; worth a follow-up). The "DeepAR catastrophic
+  blowups on CRSP/corp_bond" narrative that motivated item (2) of this
+  TODO was also partly an artifact — DeepAR's pooled R² on those
+  datasets was small-negative even pre-StudentT.
 
 - **2026-05-31 — canary verdict on `--scale-entity` (DROPPED)**: 4
   datasets × 8 models × `--loss mse` × {scale, no-scale} = 64 jobs, 22.6h
-  wall. 13 wins / 12 losses / 7 ties; mean ΔR² = −0.057 with worst loss
-  −8.59 (NHITS on CRSP_ret). The catastrophic losses on DLinear / NHITS /
-  Transformer on CRSP datasets dominated the wins (KAN +22.8 on
-  `corp_bond_str_naive` was the only large gain). Implementation is in
-  `forecast_neural_auto.py` behind `--scale-entity` and stays available
-  for sensitivity work; default off.
+  wall. 13 wins / 12 losses / 7 ties; mean Δ per-series-mean R² ≈ 0 with
+  worst loss −8.59 (NHITS on CRSP_ret under legacy R²). Implementation
+  is in `forecast_neural_auto.py` behind `--scale-entity` and stays
+  available for sensitivity work; default off. Note: the canary measured
+  ΔR² under the v1 per-series-mean formula; the verdict may shift under
+  the new pooled formula but a re-canary is unlikely to be worth ~30h.
 
 - **2026-05-29/30**: Items (2) and (3) applied **to AutoDeepAR only**. DeepAR
   now uses `DistributionLoss(distribution="StudentT")` and `valid_loss=MSE()`.
