@@ -415,7 +415,7 @@ and hardware-aware Lightning settings.
 
 # %%
 nf = NeuralForecast(models=neural_models, freq="BME")
-nf.fit(df=train_df)
+nf.fit(df=train_df, val_size=test_size)
 
 neural_forecasts_df = nf.predict()
 neural_forecasts_df.head()
