@@ -41,12 +41,17 @@ def convert_intermediary_to_long_format(df):
         Long format DataFrame with columns: unique_id, ds, y
         where unique_id contains the variable names, ds contains dates, and y contains values
     """
-    # Define the columns to convert to long format
+    # Keep only return-like series for the forecasting benchmark. The other
+    # two HKM variables (`intermediary_capital_ratio` and
+    # `intermediary_leverage_ratio_squared`) are state-variable *levels*, not
+    # returns, with a per-series variance roughly 10^4-10^7 times larger than
+    # the tradable factors. Mixing them into the same panel makes a pooled
+    # R^2oos meaningless: the state variables dominate the sum of squares and
+    # any model with weak trend-following hits R^2 close to 1 just because
+    # those two series happen to be persistent.
     value_columns = [
-        "intermediary_capital_ratio",
         "intermediary_capital_risk_factor",
         "intermediary_value_weighted_investment_return",
-        "intermediary_leverage_ratio_squared",
     ]
 
     # Use pandas melt to convert from wide to long format
