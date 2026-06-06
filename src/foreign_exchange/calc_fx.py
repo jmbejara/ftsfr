@@ -19,9 +19,6 @@ Data Sources:
     - Bloomberg FX spot rates
     - Bloomberg interest rates (OIS)
 
-Note: The implementation in implied_daily_fx_returns() appears to have the spot ratio
-inverted compared to the documented formula. This should be verified and corrected if needed.
-
 Code adapted with permission from https://github.com/Kunj121/CIP
 """
 
@@ -140,27 +137,39 @@ def implied_daily_fx_returns(fx_data, currency_list):
     """
     Calculate implied daily return time series for USD invested in foreign currencies.
 
-    This function implements the investment strategy where USD is converted to a foreign
-    currency, invested in that currency's overnight market, then converted back to USD.
+    Strategy: at end of day t-1, convert USD to currency $i$ at the spot rate,
+    earn the day-$t$ overnight interest in that currency, convert back at the
+    day-$t$ spot rate. With ``spot`` quoted as foreign-per-USD (after the
+    reciprocal step in :func:`prepare_fx_data`):
 
-    WARNING: The current implementation appears to have issues:
-    1. The spot ratio is inverted (using spot_t/spot_{t-1} instead of spot_{t-1}/spot_t)
-    2. Interest rates are used directly without converting from annual percentage to daily returns
+        ret_{t,i} = (spot_{t-1,i} / spot_{t,i}) * (1 + r_{f,t,i}) - 1
+
+    where ``r_{f,t,i}`` is the per-day decimal interest return. The raw
+    interest-rate inputs (``CUR_ir``) are annualised quoted in percent (7.0 =
+    7\%); FX overnight conventions are ACT/360, so we convert with
+    ``r_daily = ir_pct / 100 / 360``. For the USD leg the strategy is just
+    "earn USD overnight," so the return is ``r_USD,daily``.
+
+    The previous implementation multiplied the spot ratio by the *annualised
+    percent* interest rate directly, producing values dominated by the
+    interest level (~1-3 per day) rather than a return (~1e-4). That bug is
+    fixed here. See ``WARNING`` block in the prior module docstring.
 
     Parameters
     ----------
     fx_data : pd.DataFrame
         Foreign currency data containing:
-        - CUR_spot: Spot exchange rate (how much 1 USD is worth in currency CUR)
-        - CUR_ir: Annualized interest rate of CUR in percent space (7.0 = 7%)
+        - CUR_spot: Spot exchange rate (foreign-per-USD after the reciprocal
+          step for EUR/GBP/AUD/NZD).
+        - CUR_ir: Annualised interest rate of CUR in percent space (7.0 = 7%).
     currency_list : list
-        List of currency codes to generate returns for
+        List of currency codes to generate returns for.
 
     Returns
     -------
     pd.DataFrame
         Daily return time series with columns:
-        - CUR_return: Daily return of USD invested in currency CUR (not in % space)
+        - CUR_return: Daily decimal return of USD invested in currency CUR.
     """
     fx_df = fx_data.copy()
     fx_df = fx_df.ffill()
@@ -171,23 +180,25 @@ def implied_daily_fx_returns(fx_data, currency_list):
     for curr_name in currency_list:
         int_col = f"{curr_name}_ir"
 
-        if curr_name == "USD":
-            fx_df["USD_return"] = fx_df[
-                int_col
-            ]  # change to daily annualized returns in % space
+        # Convert annualised % to per-day decimal (ACT/360, FX convention).
+        daily_decimal = fx_df[int_col] / 100.0 / 360.0
 
+        if curr_name == "USD":
+            # USD invested in USD overnight: return is just the daily USD rate.
+            fx_df["USD_return"] = daily_decimal
             continue
 
         spot_col = f"{curr_name}_spot"
         fx_df[f"{spot_col}_ratio"] = (
             fx_df[spot_col].shift(1) / fx_df[spot_col]
-        )  # change in spot price ratio
+        )  # spot_{t-1} / spot_t  (foreign-per-USD)
         curr_ret_col = f"{curr_name}_return"
 
-        # keep interest conversion consistent with US
+        # USD invested overnight in currency $i$:
+        # ret_t = spot_{t-1}/spot_t * (1 + r_f,daily) - 1
         fx_df[curr_ret_col] = (
-            fx_df[f"{spot_col}_ratio"] * fx_df[int_col]
-        )  # combine spot change and interest
+            fx_df[f"{spot_col}_ratio"] * (1.0 + daily_decimal) - 1.0
+        )
         ret_cols.append(curr_ret_col)
 
     # filter just for returns
