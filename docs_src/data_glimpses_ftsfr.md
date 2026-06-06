@@ -511,7 +511,7 @@ ds: min=1961-06-14 00:00:00, max=2025-09-12 00:00:00
 
 ## ftsfr_FX_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/foreign_exchange/ftsfr_FX_returns.parquet`
-**Size:** 552562 bytes | **Type:** Parquet | **Shape:** 52,473 rows × 4 columns
+**Size:** 540474 bytes | **Type:** Parquet | **Shape:** 52,473 rows × 4 columns
 
 **All rows unique:** ✅ Yes
 
@@ -525,7 +525,7 @@ __index_level_0__                        Int64
 
 ### Numeric Column Statistics
 ```
-y: min=-1.0326500049101444, max=8.548700375536482, mean=1.77, median=1.0010820813484795
+y: min=-0.0871113821876851, max=0.21402418151392366, mean=0.00, median=3.297222222222222e-05
 __index_level_0__: min=726, max=61109, mean=30845.96, median=31254.0
 ```
 
@@ -538,7 +538,7 @@ ds: min=1999-02-09 00:00:00, max=2025-02-28 00:00:00
 
 ## ftsfr_he_kelly_manela_all.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_all.parquet`
-**Size:** 14743 bytes | **Type:** Parquet | **Shape:** 2,064 rows × 3 columns
+**Size:** 10082 bytes | **Type:** Parquet | **Shape:** 1,032 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -551,7 +551,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.2811, max=2012.9658, mean=95.79, median=0.0509
+y: min=-0.2811, max=0.3965, mean=0.00, median=0.00395
 ```
 
 ### Date/Datetime Column Statistics
@@ -563,7 +563,7 @@ ds: min=1970-01-01 00:00:00, max=2012-12-01 00:00:00
 
 ## ftsfr_he_kelly_manela_factors_daily.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_factors_daily.parquet`
-**Size:** 210081 bytes | **Type:** Parquet | **Shape:** 19,063 rows × 3 columns
+**Size:** 121548 bytes | **Type:** Parquet | **Shape:** 9,531 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -576,7 +576,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.1603005169783573, max=4698.062377977052, mean=77.57, median=0.0327419481774856
+y: min=-0.1603005169783553, max=0.1935092357636356, mean=0.00, median=0.0002479190852231
 ```
 
 ### Date/Datetime Column Statistics
@@ -588,7 +588,7 @@ ds: min=2000-01-03 00:00:00, max=2018-12-11 00:00:00
 
 ## ftsfr_he_kelly_manela_factors_monthly.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/he_kelly_manela/ftsfr_he_kelly_manela_factors_monthly.parquet`
-**Size:** 19765 bytes | **Type:** Parquet | **Shape:** 2,348 rows × 3 columns
+**Size:** 12487 bytes | **Type:** Parquet | **Shape:** 1,174 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -601,7 +601,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.2811, max=2012.9658, mean=92.06, median=0.052500000000000005
+y: min=-0.2811, max=0.3965, mean=0.01, median=0.004699999999999999
 ```
 
 ### Date/Datetime Column Statistics
@@ -788,7 +788,7 @@ ds: min=1976-03-31 00:00:00, max=2020-03-31 00:00:00
 
 ## ftsfr_cjs_option_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_cjs_option_returns.parquet`
-**Size:** 91689 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+**Size:** 86028 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -801,7 +801,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.13864600229548996, max=2.791869182116687, mean=0.02, median=0.0
+y: min=-0.4527408759578536, max=1.546129568151272, mean=-0.01, median=0.0
 ```
 
 ### Date/Datetime Column Statistics
@@ -813,7 +813,7 @@ ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
 
 ## ftsfr_cjs_option_returns_l1_filters.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_cjs_option_returns_l1_filters.parquet`
-**Size:** 119621 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+**Size:** 119884 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -826,7 +826,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.3413078648038207, max=24.599734066365862, mean=0.13, median=0.023890004198871218
+y: min=-0.345428230125723, max=0.7833790941426158, mean=-0.00, median=-0.006498290569884879
 ```
 
 ### Date/Datetime Column Statistics
@@ -838,7 +838,7 @@ ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
 
 ## ftsfr_cjs_option_returns_l3_filters.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_cjs_option_returns_l3_filters.parquet`
-**Size:** 91032 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
+**Size:** 86229 bytes | **Type:** Parquet | **Shape:** 15,552 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -851,7 +851,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.2751718446073923, max=2.617761613342477, mean=0.03, median=0.0061104551525184014
+y: min=-0.41676144499828416, max=2.000989147256664, mean=-0.00, median=0.0
 ```
 
 ### Date/Datetime Column Statistics
@@ -863,7 +863,7 @@ ds: min=1996-01-31 00:00:00, max=2019-12-31 00:00:00
 
 ## ftsfr_hkm_option_returns.parquet
 **Path:** `/Users/jbejarano/GitRepositories/ftsfr/_data/formatted/options/ftsfr_hkm_option_returns.parquet`
-**Size:** 39862 bytes | **Type:** Parquet | **Shape:** 5,184 rows × 3 columns
+**Size:** 37424 bytes | **Type:** Parquet | **Shape:** 5,184 rows × 3 columns
 
 **All rows unique:** ✅ Yes
 
@@ -876,7 +876,7 @@ y                                        Float64
 
 ### Numeric Column Statistics
 ```
-y: min=-0.07194785160690693, max=0.9284949815963346, mean=0.02, median=0.004017050151524223
+y: min=-0.4007418311074428, max=0.8153642585692351, mean=-0.01, median=-0.0010693203501211206
 ```
 
 ### Date/Datetime Column Statistics
