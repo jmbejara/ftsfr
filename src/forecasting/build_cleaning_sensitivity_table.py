@@ -78,12 +78,52 @@ MODELS = [
 ]
 
 
+_RESULTS_ALL_PATH = OUTPUT_DIR / "forecasting" / "results_all.csv"
+_RESULTS_ALL_CACHE = None
+
+
+def _load_results_all():
+    global _RESULTS_ALL_CACHE
+    if _RESULTS_ALL_CACHE is None:
+        _RESULTS_ALL_CACHE = pd.read_csv(_RESULTS_ALL_PATH)
+    return _RESULTS_ALL_CACHE
+
+
+# Map the table's per-CSV model keys (e.g. ``auto_nlinear``) to the
+# loss-deduplicated model names stored in ``results_all.csv`` (e.g. ``nlinear``).
+# This lets us reuse the same dual-loss selection that assemble_results.py
+# already applies, instead of reading stale legacy ``{model}.csv`` files.
+_RESULTS_MODEL_MAP = {
+    "historic_average": "historic_average",
+    "auto_arima": "arima",
+    "ses": "ses",
+    "theta": "theta",
+    "auto_dlinear": "dlinear",
+    "auto_deepar": "deepar",
+    "auto_kan": "kan",
+    "auto_nbeats": "nbeats",
+    "auto_nhits": "nhits",
+    "auto_nlinear": "nlinear",
+    "auto_tide": "tide",
+    "auto_vanilla_transformer": "vanilla_transformer",
+}
+
+
 def load_metric(dataset: str, model: str):
-    p = METRICS_DIR / dataset / f"{model}.csv"
-    if not p.exists():
-        return None
-    df = pd.read_csv(p)
-    return {"MASE": float(df["MASE"].iloc[0]), "R2oos": float(df["R2oos"].iloc[0])}
+    results_model = _RESULTS_MODEL_MAP.get(model, model)
+    df = _load_results_all()
+    sel = df[(df["dataset_name"] == dataset) & (df["model_name"] == results_model)]
+    if sel.empty:
+        # Fallback to legacy per-CSV (handles datasets not in results_all.csv).
+        p = METRICS_DIR / dataset / f"{model}.csv"
+        if not p.exists():
+            return None
+        legacy = pd.read_csv(p)
+        return {
+            "MASE": float(legacy["MASE"].iloc[0]),
+            "R2oos": float(legacy["R2oos"].iloc[0]),
+        }
+    return {"MASE": float(sel["MASE"].iloc[0]), "R2oos": float(sel["R2oos"].iloc[0])}
 
 
 def fmt_dash(x, n=3):
