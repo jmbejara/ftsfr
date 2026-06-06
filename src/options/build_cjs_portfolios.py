@@ -133,20 +133,56 @@ def _bsm_elasticity(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _daily_portfolio_returns(df: pd.DataFrame) -> pd.DataFrame:
-    """Compute leverage-adjusted daily returns per (date, ftsfa_id).
+    """Compute leverage-adjusted daily portfolio returns per (date, ftsfa_id).
 
-    Returns the inv_weight aggregate so that the call/put adjustment can be
-    applied with the daily risk-free rate.
+    The portfolio is *formed* at t-1 and *held* to t, exactly as in CJS:
+
+    - The single-option return is measured over one *contract* held from t-1 to
+      t -- NOT across the heterogeneous strikes/expiries that merely share a
+      portfolio cell on a given day. Contract identity is
+      (secid, cp_flag, strike_price, exdate); secid is constant in this SPX
+      panel but is included for safety.
+    - The kernel weight, BSM elasticity and risk-free rate are all taken at the
+      FORMATION date t-1 (lagged by contract), so the realized t-1->t move
+      cannot leak into its own weighting (no look-ahead).
+    - The 1% kernel-weight floor and the renormalization-to-1 are applied to
+      those formation weights, so each day's basket is a proper weighted
+      average of the contracts actually held.
     """
-    df = df.sort_values(["ftsfa_id", "date"]).copy()
-    df["mid_price_lag"] = df.groupby("ftsfa_id")["mid_price"].shift(1)
+    contract_keys = [
+        c
+        for c in ["secid", "cp_flag", "strike_price", "exdate"]
+        if c in df.columns
+    ]
+    df = df.sort_values(contract_keys + ["date"]).copy()
+    g = df.groupby(contract_keys)
+    df["mid_price_lag"] = g["mid_price"].shift(1)
+    # Formation-date (t-1) basket inputs, lagged within each contract.
+    df["w_form"] = g["kernel_weight"].shift(1)
+    df["elast_form"] = g["option_elasticity"].shift(1)
+    if "tb_m3" in df.columns:
+        df["daily_rf"] = g["tb_m3"].shift(1) / 100.0 / 252.0
+    else:
+        df["daily_rf"] = 0.0
+
     df["option_return"] = (df["mid_price"] - df["mid_price_lag"]) / df["mid_price_lag"]
-    df["daily_rf"] = (
-        (df["tb_m3"] / 100.0 / 252.0) if "tb_m3" in df.columns else 0.0
-    )
+    # Keep only rows with a complete formation basket and a realized return
+    # (drops each contract's first observation, which has no t-1 to form from).
+    df = df[
+        df["option_return"].notna()
+        & df["w_form"].notna()
+        & df["elast_form"].notna()
+    ].copy()
+
+    # CJS basket selection is as of formation: drop tiny formation weights, then
+    # renormalize the survivors so the kernel weights sum to 1 within (date,cell).
+    df = df[df["w_form"] >= MIN_KERNEL_WEIGHT].copy()
+    df["w_form"] = df["w_form"] / df.groupby(["date", "ftsfa_id"])[
+        "w_form"
+    ].transform("sum")
 
     # weight = kernel_weight / elasticity ; return_contrib = weight * option_return
-    df["inv_weight"] = df["kernel_weight"] / df["option_elasticity"]
+    df["inv_weight"] = df["w_form"] / df["elast_form"]
     df["inv_return"] = df["inv_weight"] * df["option_return"]
 
     grouped = df.groupby(["date", "ftsfa_id"])
@@ -199,9 +235,12 @@ def build_cjs_portfolios(
     df = df[df["ttm_days"].between(7, 180)]
     df = _assign_cells(df)
     df = _attach_kernel_weights(df)
-    df = df[df["kernel_weight"] >= MIN_KERNEL_WEIGHT]
     df = _bsm_elasticity(df)
     df = df[df["option_elasticity"].notna()]
+    # NOTE: the 1% kernel-weight floor is intentionally NOT applied here. It is
+    # applied inside _daily_portfolio_returns on the *formation-date* (lagged)
+    # weights, together with renormalization, so basket selection and weighting
+    # are both as of t-1 (no look-ahead).
     port_daily = _daily_portfolio_returns(df)
     panel = _compound_monthly(port_daily, label_prefix=label_prefix)
     return panel
