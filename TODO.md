@@ -11,6 +11,71 @@ for the current Auto wrapper configuration.
 
 ## Status
 
+- **2026-06-05** — **Data fixes on FX_returns and hkm_factors_monthly /
+  hkm_all; ~6h targeted re-run.** While auditing the high pooled R² values
+  from Phase C v2, found two genuine data bugs:
+
+  1. **`src/foreign_exchange/calc_fx.py`** was computing
+     `ret = spot_ratio * annualized_interest_pct` — i.e.\ multiplying the
+     daily spot ratio (≈ 1) by the foreign interest rate **in annualised
+     percent space** (e.g.\ 1.7 for 1.7\%). The result was essentially a
+     "trajectory of foreign interest rates" with massive persistence, so any
+     forecaster trivially achieved R² ≈ 0.99. The script's own docstring
+     flagged the issue. Fix: convert annualised % to per-day decimal
+     (ACT/360) and apply the carry-trade formula
+     `ret = (S_{t-1}/S_t)(1 + r_f,daily) - 1`. After the fix, FX daily
+     returns have std ≈ 0.5-0.8\% (correct), with the 2015 SNB peg break
+     showing up as a +21\% outlier on CHF.
+
+  2. **`src/he_kelly_manela/create_ftsfr_datasets.py`** was mixing two
+     return series (intermediary capital risk factor and value-weighted
+     investment return) with two state variables
+     (`intermediary_capital_ratio`, `intermediary_leverage_ratio_squared`)
+     in the same panel. The leverage-ratio-squared series had variance
+     ~10^7× the returns, so the pooled R² was dominated by it. Fix: keep
+     only the two return series.
+
+  Affected: `ftsfr_FX_returns`, `ftsfr_he_kelly_manela_factors_monthly`,
+  `ftsfr_he_kelly_manela_all` (and unused
+  `ftsfr_he_kelly_manela_factors_daily`). 60-job re-run (8 auto neural × 2
+  losses + 4 classical = 20 per dataset) at 4-way parallel: 5.8h wall. Plus
+  one wasted prior 4h run because I updated `_data/<module>/` but not
+  `_data/formatted/<module>/` — the forecasting pipeline reads from
+  `_data/formatted/`. Lesson: always overwrite the formatted copy too.
+
+  Backup of pre-fix CSVs at
+  `_output/forecasting/error_metrics_backup_phase_c_v2_pre_data_fixes/`.
+
+  Post-fix R²oos picture (pooled, 420 cells):
+
+  - Mean: -0.092 (was +0.068 — FX/hkm artifacts had inflated it)
+  - Median: 0.000
+  - Min: -5.12, Max: 0.982 (legit: `treasury_swap_basis`, persistent basis
+    spread)
+  - #R²<-1: 24, #R²<-2: 15, #R²<-5: 1
+
+  Per-model: ARIMA mean +0.11, TiDE +0.04, DLinear +0.02; NBEATS worst at
+  -0.44 (still has 6 R²<-1 cells, mostly disaggregated panels). NHITS on
+  `hkm_factors_monthly` achieves +0.44 (genuine — that dataset has only 2
+  return series, so the panel is well-conditioned). `treasury_swap_basis`
+  R²>0.97 across the board: basis spreads ARE highly forecastable in the
+  literature.
+
+  The paper narrative "asset returns have R²oos near zero, basis spreads
+  are where ML helps" is *more* supported after these fixes, not less. FX
+  return R² now ≈ 0 for the best models (consistent with Welch-Goyal-style
+  results); basis spreads stay at R² ≈ 1.
+
+  **cjs_options flagged but not changed**: 54 option-portfolio series have
+  3160× variance heterogeneity, and pooled R² hits 0.998 for most models.
+  Hard to disentangle whether this is (a) real predictability driven by a
+  few high-variance OTM call contracts that dominate the panel sum or
+  (b) a data construction artifact — separate investigation underway.
+  Also: nearly every series has `min y > 0`, which is unusual since
+  calls/puts held to expiration should sometimes return -100%. Worth
+  digging into the source paper's exact return definition; left for the
+  options-thread.
+
 - **2026-06-05** — **Phase C v2 complete; R²oos formula changed to pooled
   panel-wide.** While investigating why KAN went from legacy R²=−0.085 to
   Phase C v1 R²=−40.59 on `ftsfr_CDS_contract_returns`, the diagnostic ran
