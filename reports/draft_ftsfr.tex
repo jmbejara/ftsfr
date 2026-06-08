@@ -30,6 +30,9 @@
 \usepackage[table]{xcolor} % For coloring table cells
 \usepackage{threeparttable} % For table footnotes
 
+% Uniform "Source" note rendered below every figure and table (consistent size and styling)
+\newcommand{\floatsource}[1]{\caption*{\scriptsize\emph{#1}}}
+
 % \title{An Open-Source Financial Time Series Forecasting Benchmark}
 % \title{Benchmarking Forecasting Methods for Financial Stability}
 \title{An Open Benchmark for Evaluating Time Series Forecasting Methods across Financial Markets}
@@ -137,7 +140,7 @@ Source & Name & Coverage of Finance Domain & Website \\
 \cite{Aksu2024} & GIFT-EVAL & Anonymous data, unclear & \href{https://github.com/SalesforceAIResearch/gift-eval}{Link}\\
 \bottomrule
 \end{tabular}
-\caption*{\emph{Source: Authors' analysis}}
+\floatsource{Source: Authors' analysis}
 \end{table}
 
 
@@ -161,7 +164,7 @@ Complementing firm-level exercises, broad cyclic risk gauges, such as the ECB's 
     Detken, Fahr, and Lang (2018), ECB Financial Stability Review (May 2018) Special Feature. See \url{https://www.ecb.europa.eu/press/financial-stability-publications/fsr/special/html/ecb.fsrart201805_2.en.html}.
 }
 
-A large literature shows that exploiting many predictors improves forecast performance when common factors drive co-movements across series. In approximate factor models, principal components (diffusion indexes) summarize large panels into a few latent indexes that deliver competitive, often superior, forecasts relative to small VARs and univariate benchmarks \citep{Stock2002,Stock2002a,Stock}. The Office of Financial Research's own Financial Stress Index (FSI) applies a closely related approach: a factor model that essentially uses the first principal component of a broad, daily panel of market indicators (see \citet{Monin2019} and \citep{Bejarano2023}). Another example is the Systemic Assessment of Financial Environment (SAFE) early warning system, developed by researchers from the Federal Reserve Bank of Cleveland, which integrates supervisory and market data to forecast episodes of systemic stress \citep{Oet2011}. Together, these results motivate evaluating modern, panel-based forecasting methods on financial-stability-relevant datasets.
+A large literature shows that exploiting many predictors improves forecast performance when common factors drive co-movements across series. In approximate factor models, principal components (diffusion indexes) summarize large panels into a few latent indexes that deliver competitive, often superior, forecasts relative to small VARs and univariate benchmarks \citep{Stock2002,Stock2002a,Stock}. The Office of Financial Research's Financial Stress Index (FSI) applies a closely related approach: a factor model that essentially uses the first principal component of a broad, daily panel of market indicators (see \citet{Monin2019} and \citet{Bejarano2023}). Another example is the Systemic Assessment of Financial Environment (SAFE) early warning system, developed by researchers from the Federal Reserve Bank of Cleveland, which integrates supervisory and market data to forecast episodes of systemic stress \citep{Oet2011}. Together, these results motivate evaluating modern, panel-based forecasting methods on financial-stability-relevant datasets.
 
 
 \subsection{Global Time Series Forecasting Methods}
@@ -196,7 +199,7 @@ Finance faces an active debate about a potential ``replication crisis.'' \citet{
 
 The corporate bond literature illustrates the point starkly. \citet{Bai2019} reported a set of priced factors in the cross-section of corporate bond returns that became a standard reference for bond asset pricing; the paper was subsequently retracted after errors in the underlying data construction came to light. \citet{Dickerson2024} document the broader pattern: many published bond anomalies depend on bid--ask-bounce contamination in the TRACE return series, and applying a market-microstructure-noise correction roughly halves the apparent credit-spread return and substantially weakens the cross-section of priced anomalies.\footnote{See \citet{Lee2023} at \href{https://www.bloomberg.com/news/articles/2023-12-01/a-grad-school-number-cruncher-shakes-up-the-world-of-bond-quants}{Bloomberg} for the popular account of the bond-data episode.} Headline results, and forecasting evaluations built on the same return series, are sensitive to data-construction choices that are largely invisible from the published text.
 
-Two open-source efforts demonstrate that this irreproducibility is at least partly fixable by infrastructure rather than by tighter statistical discipline alone. \citet{Chen2022}, in their Open Source Asset Pricing (OSAP) project, show that transparent, version-controlled construction of equity anomaly portfolios eliminates a large share of the researcher degrees of freedom that drive cross-study disagreement. The Open Source Bond Asset Pricing (OSBAP) project that grew out of \citet{Dickerson2023} plays an analogous role for fixed income: it releases public code for constructing and pricing corporate bond portfolios, so that any subsequent claim about bond predictability can be traced back to a specific, auditable data pipeline. Our benchmark adopts the same philosophy and extends it across asset classes. We open-source every step of the download, clean, and format pipeline; only the raw data remain subject to vendor licensing. Any researcher can reproduce each series exactly. Running new methods on the same data then isolates method skill from cleaning skill. The same infrastructure also makes systemic-risk monitoring at financial regulators more auditable.
+Two open-source efforts demonstrate that this irreproducibility is at least partly fixable by infrastructure rather than by tighter statistical discipline alone. \citet{Chen2022}, in their Open Source Asset Pricing (OSAP) project, show that transparent, version-controlled construction of equity anomaly portfolios eliminates a large share of the researcher degrees of freedom that drive cross-study disagreement. The Open Source Bond Asset Pricing (OSBAP) project that grew out of \citet{Dickerson2023} plays an analogous role for fixed income: it releases public code for constructing and pricing corporate bond portfolios, so that any subsequent claim about bond predictability can be traced back to a specific, auditable data pipeline. Our benchmark adopts the same philosophy and extends it across asset classes. We open-source every step of the download, clean, and format pipeline; only the raw data remain subject to vendor licensing. Any researcher can reproduce each series exactly. Running new methods on the same data then isolates method skill from cleaning skill.
 
 
 \section{Benchmark Datasets}
@@ -207,7 +210,7 @@ The code that automates the data pull, cleaning, and formatting is available on 
 \subsection{Dataset Selection Rationale}
 Our dataset selection is grounded in the intermediary asset pricing literature, which provides both theoretical justification and practical relevance for financial stability monitoring. Following \citet{He2017} (HKM), we focus on assets that are primarily accessible to financial intermediaries rather than retail investors, who typically invest only in equities. This distinction is crucial because intermediary budget constraints create risk factors that drive pricing across asset classes, with stronger effects for assets that only intermediaries can trade, such as credit default swaps, options, corporate bonds, and commodity futures. These assets are therefore essential indicators for monitoring financial stability, as distress in intermediary balance sheets manifests first and most strongly in these markets.
 
-Beyond the asset returns themselves, we include a comprehensive set of basis spreads following \citet{Siriwardane2021}, as these spreads serve as critical early warning indicators of stress in the financial system. When intermediaries face funding constraints or balance sheet pressures, arbitrage opportunities persist and basis spreads widen, signaling potential systemic stress. Our methodological approach follows the principle established by \citet{He2017} of using canonical cleaning procedures from seminal papers in each asset class, ensuring that our datasets reflect established best practices without reinventing data processing methods. This approach, combined with additional financial stability indicators such as the HKM intermediary factors and bank regulatory data, provides comprehensive coverage of the assets and indicators most critical for understanding and predicting financial stability risks. Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. 
+Beyond the asset returns themselves, we include a comprehensive set of basis spreads following \citet{Siriwardane2021}, as these spreads serve as critical early warning indicators of stress in the financial system. When intermediaries face funding constraints or balance sheet pressures, arbitrage opportunities persist and basis spreads widen, signaling potential systemic stress. Our methodological approach follows the principle established by HKM of using canonical cleaning procedures from seminal papers in each asset class, ensuring that our datasets reflect established best practices without reinventing data processing methods. This approach, combined with additional financial stability indicators such as the HKM intermediary factors and bank regulatory data, provides comprehensive coverage of the assets and indicators most critical for understanding and predicting financial stability risks. Table~\ref{tab:datasets} provides a comprehensive overview of all datasets included in our benchmark, organized by asset class and methodology. 
 
 \begin{table}[htbp]
 \centering
@@ -226,11 +229,11 @@ Commodity & Monthly returns for commodity futures & \cite{Yang2013} \\
 Corporate Bond & Monthly returns for individual corporate bonds from TRACE. Authors cleaning builds on Nozawa (2017). & \cite{Dickerson2024} \\
 Corporate Portfolio & Monthly returns for corporate bond portfolios by credit spread & \cite{Nozawa2017} \\
 CRSP Stock & Monthly stock returns from CRSP database & \cite{Fama1993} \\
-FF25 Size-BM & Daily Fama-French 25 portfolios: size and book-to-market & ibid. \\
+FF25 Size-BM & Daily Fama-French 25 portfolios: size and book-to-market & \cite{Fama1993} \\
 FX & Daily foreign exchange returns vs USD & \cite{Lettau2014} \\
 SPX Options Portfolios & Monthly leverage-adjusted returns for SPX option portfolios (54 CJS + 18 HKM) & \cite{Constantinides2013} \\
 Treasury Bond & Monthly returns for individual Treasury bonds from CRSP & \cite{Gurkaynak2007} \\
-Treasury Portfolio & Monthly returns for Treasury bond portfolios by maturity & ibid. \\
+Treasury Portfolio & Monthly returns for Treasury bond portfolios by maturity & \cite{Gurkaynak2007} \\
 \midrule
 \multicolumn{3}{c}{\textbf{Basis Spread Data}} \\
 \midrule
@@ -243,15 +246,15 @@ Treasury-Swap & Monthly Treasury-Swap arbitrage spreads & \cite{Siriwardane2021}
 \multicolumn{3}{c}{\textbf{Other Financial Data}} \\
 \midrule
 Bank Cash Liquidity & Quarterly cash liquidity from call report data & \cite{Drechsler2017} \\
-Bank Leverage & Quarterly leverage ratios from call report data & ibid. \\
-BHC Cash Liquidity & Quarterly bank holding company cash liquidity & ibid. \\
-BHC Leverage & Quarterly bank holding company leverage ratios & ibid. \\
+Bank Leverage & Quarterly leverage ratios from call report data & \cite{Drechsler2017} \\
+BHC Cash Liquidity & Quarterly bank holding company cash liquidity & \cite{Drechsler2017} \\
+BHC Leverage & Quarterly bank holding company leverage ratios & \cite{Drechsler2017} \\
 HKM Daily Factor & Intermediary risk factors: the capital risk factor (AR(1) innovation in the capital ratio) and the value-weighted intermediary investment return & \cite{He2017} \\
-HKM Monthly Factor & Same as above, but monthly & ibid. \\
+HKM Monthly Factor & Same as above, but monthly & \cite{He2017} \\
 Treasury Yield Curve & Daily Nelson-Siegel-Svensson zero-coupon yields, 1-30 years & \cite{Gurkaynak2007} \\
 \bottomrule
 \end{tabular}
-\caption*{\emph{Source: Authors' analysis}}
+\floatsource{Source: Authors' analysis}
 \end{table}
 
 Table~\ref{tab:data_sources} shows the specific data sources required for each dataset in our benchmark. The table illustrates the diverse range of financial data providers needed to construct the datasets.
@@ -269,35 +272,35 @@ Dataset Name & Data Sources \\
 \multicolumn{2}{c}{\textbf{Returns Data}} \\
 \midrule
 CDS Contract & S\&P Global CDS (formerly Markit)  \\
-CDS Portfolio & ibid. \\
+CDS Portfolio & S\&P Global CDS (formerly Markit) \\
 Commodity & Bloomberg Terminal \\
 Corporate Bond & WRDS TRACE, following Open Source Bond Asset Pricing$^{a}$  \\
-Corporate Portfolio & ibid. \\
+Corporate Portfolio & WRDS TRACE, following Open Source Bond Asset Pricing \\
 CRSP Stock & Center for Research in Security Prices (CRSP) \\
-CRSP Stock (ex-div) & ibid. \\
+CRSP Stock (ex-div) & Center for Research in Security Prices (CRSP) \\
 FF25 Size-BM & CRSP and Compustat, following \citet{Fama2023}$^{b}$ \\
 FX & Bloomberg Terminal \\
 SPX Options Portfolios & OptionMetrics IvyDB\\
 Treasury Bond & Center for Research in Security Prices \\
-Treasury Portfolio & ibid. \\
+Treasury Portfolio & Center for Research in Security Prices \\
 \midrule
 \multicolumn{2}{c}{\textbf{Basis Spread Data}} \\
 \midrule
 CDS-Bond & WRDS Bond Returns (TRACE); CRSP daily Treasury panel; S\&P Global CDS and RED Entity (formerly Markit) \\
 CIP & Bloomberg Terminal \\
-TIPS-Treasury & ibid. \\
-Treasury-SF & ibid. \\
-Treasury-Swap & ibid. \\
+TIPS-Treasury & Bloomberg Terminal \\
+Treasury-SF & Bloomberg Terminal \\
+Treasury-Swap & Bloomberg Terminal \\
 \midrule
 \multicolumn{2}{c}{\textbf{Other Financial Data}} \\
 \midrule
 Bank Cash Liquidity & WRDS Bank Regulatory Call Reports, following \citet{Drechsler2017}$^{c}$ \\
-Bank Leverage & ibid. \\
-BHC Cash Liquidity & ibid. \\
-BHC Leverage & ibid. \\
+Bank Leverage & WRDS Bank Regulatory Call Reports, following \citet{Drechsler2017} \\
+BHC Cash Liquidity & WRDS Bank Regulatory Call Reports, following \citet{Drechsler2017} \\
+BHC Leverage & WRDS Bank Regulatory Call Reports, following \citet{Drechsler2017} \\
 HKM Daily Factor & CRSP and Compustat, following \citet{He2017}$^{d}$\\
-HKM Monthly Factor & ibid. \\
-HKM All Factor & ibid. \\
+HKM Monthly Factor & CRSP and Compustat, following \citet{He2017} \\
+HKM All Factor & CRSP and Compustat, following \citet{He2017} \\
 Treasury Yield Curve & Yield Curve Data from Board of Governors of the Federal Reserve System$^{e}$ \\
 \bottomrule
 \end{tabular}
@@ -310,10 +313,10 @@ Treasury Yield Curve & Yield Curve Data from Board of Governors of the Federal R
 \item[$^{e}$] See \url{https://www.federalreserve.gov/data/nominal-yield-curve.htm}
 \end{tablenotes}
 \end{threeparttable}
-\caption*{\emph{Source: Authors' analysis}}
+\floatsource{Source: Authors' analysis}
 \end{table}
 
-Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in our benchmark, including entity counts, time series characteristics, and temporal coverage. The table shows substantial variation across datasets, with disaggregated series (individual bonds, stocks, options contracts) containing thousands of entities, while portfolio-level datasets typically contain 10-50 series. The cutoff dates indicate the train/test split boundary used in our forecasting evaluation, with most datasets providing substantial out-of-sample periods for robust model comparison.
+Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in our benchmark, including entity counts, time series characteristics, and temporal coverage. The table shows substantial variation across datasets, with disaggregated series (individual bonds, stocks, options contracts) containing thousands of entities, while portfolio-level datasets typically contain 10-50 series. The date columns indicate each dataset's coverage span, with most datasets providing substantial histories for robust model comparison.
 
 \begin{table}[htbp]
 \centering
@@ -321,9 +324,8 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 \label{tab:dataset_stats}
 \input{\PathToOutput/forecasting/paper/dataset_statistics_tabular.tex}
 \vspace{0.1cm}
-\scriptsize
 % \textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.
-\caption*{\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
@@ -331,12 +333,12 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 % A full detailed accounting of the cleaning procedure will be given later. These are short introduction glimpses of the why for each Each paragraph should be 2-3 sentences.
 
 \subsection{Asset Class Datasets}
-Our repository provides comprehensive datasets across seven major asset classes, each cleaned according to canonical methods established in the academic literature. We replicate each of the asset classes examined in \cite{He2017}, which are commodities, corporate bonds, credit default swaps (CDS), equities, foreign exchange markets, options, and US government bonds (Treasuries). 
+Our repository provides comprehensive datasets across seven major asset classes, each cleaned according to canonical methods established in the academic literature. We replicate each of the asset classes examined in HKM, which are commodities, corporate bonds, credit default swaps (CDS), equities, foreign exchange markets, options, and US government bonds (Treasuries). 
 This paper references a seminal paper in each asset class 
 and uses the data cleaning procedures from that paper to construct test portfolios within that asset class.
 
-For each asset class, we provide both aggregated portfolio returns (matching the test portfolios used in \cite{He2017}) and disaggregated security-level data. The disaggregated datasets apply identical filtering criteria, subsampling, and transformations as specified in the original papers, but preserve individual security information rather than aggregating into portfolios. 
-To validate our data cleaning procedures, we replicate key summary statistics and cross-sectional patterns from each source paper cited within \cite{He2017}. For instance, our corporate bond portfolios match the credit spread patterns in \cite{Nozawa2017} and our options portfolios reproduce the volatility risk premium patterns found in \cite{Constantinides2013}. These validation exercises ensure that our standardized datasets faithfully represent the canonical cleaning methods established in the literature while providing a unified framework for cross-asset forecasting research. This approach allows researchers to both replicate existing studies (which typically use the aggregated portfolios) as well as to use the disaggregated data for richer analysis using the global time
+For each asset class, we provide both aggregated portfolio returns (matching the test portfolios used in HKM) and disaggregated security-level data. The disaggregated datasets apply identical filtering criteria, subsampling, and transformations as specified in the original papers, but preserve individual security information rather than aggregating into portfolios. 
+To validate our data cleaning procedures, we replicate key summary statistics and cross-sectional patterns from each source paper cited within HKM. For instance, our corporate bond portfolios match the credit spread patterns in \cite{Nozawa2017} and our options portfolios reproduce the volatility risk premium patterns found in \cite{Constantinides2013}. These validation exercises ensure that our standardized datasets faithfully represent the canonical cleaning methods established in the literature while providing a unified framework for cross-asset forecasting research. This approach allows researchers to both replicate existing studies (which typically use the aggregated portfolios) as well as to use the disaggregated data for richer analysis using the global time
 series forecasting methods.
 
 
@@ -359,12 +361,12 @@ An example of a few of the commodity futures returns are shown in Figure~\ref{fi
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToAssets/commod_gsci_return.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
+  \floatsource{Sources: Bloomberg, Authors' analysis}
   \label{fig:gsci_commodity_returns}
 \end{figure}
 
 \paragraph{Corporate Bonds}
-To obtain corporate bond returns, we use data from the TRACE dataset, available via WRDS. We use the same cleaning procedure from the Open Source Bond Asset Pricing (OSBAP) project\footnote{See \url{https://openbondassetpricing.com/}}, which begins with the full TRACE transaction tape and then applies the market--microstructure--noise (MMN) correction procedure of \citet{Dickerson2024}.  Using MMN--adjusted ``clean'' prices is essential: the bid--ask--averaged quotes in raw TRACE embed a mechanical reversal that can be mis-interpreted as illiquidity and lead researchers to overstate corporate bond excess returns.  With the cleaned data we replicate and extend the ten value-weighted credit-spread deciles of \citet{Nozawa2017}, sorting on option-adjusted spreads each month.  Relative to unadjusted TRACE figures, the MMN correction eliminates roughly half of the apparent return spread and aligns liquidity estimates with quote-based ICE data, illustrating that much of the perceived illiquidity premium is an artifact of noise rather than compensation for trading frictions. The OSBAP procedure also furnishes auxiliary fields such as modified duration, amount outstanding, coupon rate, and matched-Treasury yields, which we exploit later for duration-matched excess-return calculations. We validate our cleaning procedure by matching the construction of corporate bond portfolios in \cite{He2017}.
+To obtain corporate bond returns, we use data from the TRACE dataset, available via WRDS. We use the same cleaning procedure from the Open Source Bond Asset Pricing (OSBAP) project\footnote{See \url{https://openbondassetpricing.com/}}, which begins with the full TRACE transaction tape and then applies the market--microstructure--noise (MMN) correction procedure of \citet{Dickerson2024}.  Using MMN--adjusted ``clean'' prices is essential: the bid--ask--averaged quotes in raw TRACE embed a mechanical reversal that can be mis-interpreted as illiquidity and lead researchers to overstate corporate bond excess returns.  With the cleaned data we replicate and extend the ten value-weighted credit-spread deciles of \citet{Nozawa2017}, sorting on option-adjusted spreads each month.  Relative to unadjusted TRACE figures, the MMN correction eliminates roughly half of the apparent return spread and aligns liquidity estimates with quote-based ICE data, illustrating that much of the perceived illiquidity premium is an artifact of noise rather than compensation for trading frictions. The OSBAP procedure also furnishes auxiliary fields such as modified duration, amount outstanding, coupon rate, and matched-Treasury yields, which we exploit later for duration-matched excess-return calculations. We validate our cleaning procedure by matching the construction of corporate bond portfolios in HKM.
 
 % \paragraph{Foreign Sovereign Bonds}
 % For sovereign bonds, we implement the methodology of \cite{Borri2011}, creating
@@ -390,7 +392,7 @@ discontinuities, stale quote reversals, and documentation clause
 inconsistencies.
 
 \paragraph{Equities}
-For equities we adopt the same filters applied in \cite{Fama1993}. We begin with data from the Center for Research in Security Prices (CRSP) and Compustat by Standard \& Poor's. These data sets are the gold standard for research in equity markets. The filtering methodology applies multiple layers of restrictions to ensure data quality and consistency with canonical equity research. We filter to the common stock universe, restrict to U.S. incorporated firms with corporate issuer types, and limit to actively traded stocks on major exchanges (NYSE, AMEX, NASDAQ).
+For equities we adopt the same filters applied in \cite{Fama1993}. We begin with data from the Center for Research in Security Prices (CRSP) and Compustat by Standard \& Poor's. These data sets are the gold standard for research in equity markets. The filtering methodology applies multiple layers of restrictions to ensure data quality and consistency with canonical equity research. We filter to the common stock universe, restrict to U.S. incorporated firms with corporate issuer types, and limit to actively traded stocks on major exchanges (e.g., NYSE and NASDAQ).
 
 
 \paragraph{Foreign Exchange}
@@ -416,11 +418,8 @@ various yield curve data publications available on the Federal Reserve Board's w
 \subsection{Basis Spread Datasets}
 
 In well-functioning markets, basis spreads, which are deviations from classical no-arbitrage conditions like covered interest parity (CIP) or put-call parity, should be essentially zero. Persistent or large basis spreads signal that arbitrageurs are unable or unwilling to close riskless profit opportunities, often due to funding frictions or balance sheet constraints. Since the Global Financial Crisis (GFC), researchers have documented several such anomalies across asset classes, and these have important implications for financial stability.
-For example, the Covered interest parity (CIP), once ``the closest thing to a physical law in international finance," has been systematically violated since 2008 \citep{Du2018}.
-During crisis episodes, these CIP deviations tend to spike sharply, revealing strains in global funding liquidity. For example, in 2008 and again in March 2020, the USD cross-currency basis for major currencies widened dramatically, indicating that foreign institutions were scrambling for dollar liquidity.
-\citep{BoardofGovernorsoftheFederalReserveSystem2020}.
-Central banks and financial regulators closely monitor and respond to these metrics.
-And the Federal Reserve's swap lines are agreements with other central banks to exchange currencies, primarily to provide U.S. dollars to foreign institutions during times of market stress.
+Covered interest parity (CIP), once ``the closest thing to a physical law in international finance,'' is a leading example: it has been systematically violated since 2008 \citep{Du2018}. The size of the violation is measured by the cross-currency basis, the gap between the cost of borrowing dollars directly and the cost of borrowing them synthetically by lending a foreign currency and hedging the exchange rate forward. When dollar funding is scarce, foreign institutions bid up the synthetic route and the basis widens, so the basis is effectively a price of dollar funding stress. It spikes sharply during crises: in 2008 and again in March 2020 the basis against major currencies widened dramatically as foreign institutions scrambled for dollars \citep{BoardofGovernorsoftheFederalReserveSystem2020}.
+Because the basis is such a direct gauge of funding stress, central banks monitor it: the Federal Reserve's central-bank swap lines, which lend dollars to foreign central banks during market stress, are designed precisely to relieve the dollar shortage that drives these deviations.
 
 In this paper and its associated code repository, we provide code that will allow researchers to replicate a number of basis spreads across several different asset classes. We replicate many of the basis spreads in \cite{Siriwardane2021}, including the CDS-bond basis, covered interest parity (CIP), TIPS-Treasury basis, Treasury spot-futures basis, and Treasury-swap basis.
 Each of these basis spreads are, themselves, constructed following methodologies that are well-established in the literature. To validate our replication, we follow the papers recommended in \cite{Siriwardane2021} and replicate key summary statistics from each source paper.
@@ -442,11 +441,11 @@ These spreads are shown in Figure~\ref{fig:cds_basis}.
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToOutput/CDS_replicate.png}
   \end{tabular}
-  \caption*{\emph{Sources: S\&P Global, WRDS Bond Returns, CRSP Treasury, Authors' analysis}}
+  \floatsource{Sources: S\&P Global, WRDS Bond Returns, CRSP Treasury, Authors' analysis}
   \label{fig:cds_basis}
 \end{figure}
 
-\paragraph{Covered Interest Parity (CIP)}
+\paragraph{Covered Interest Parity}
 We replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for spot rates, 3-month forwards, and maturity-matched OIS curves.  Core filters rescale forward points (and invert USD-quoted pairs), synchronize all legs to the 17:00 ET close while dropping holiday or stale quotes, and winsorize the extreme 1\% of annualized spreads with spline interpolation for any missing OIS tenors to remove scaling, timing, and rate-sourcing distortions. These spreads are shown in Figure~\ref{fig:cip_basis}.
 
 \begin{figure}[h]
@@ -455,7 +454,7 @@ We replicate the G10 series in \citet{Du2018}, merging Bloomberg mid-quotes for 
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToAssets/CIP_replicate.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
+  \floatsource{Sources: Bloomberg, Authors' analysis}
   \label{fig:cip_basis}
 \end{figure}
 
@@ -469,12 +468,12 @@ These spreads are shown in Figure~\ref{fig:tips_treasury_basis}.
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToAssets/tips_treasury_arbitrage_spreads.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
+  \floatsource{Sources: Bloomberg, Authors' analysis}
   \label{fig:tips_treasury_basis}
 \end{figure}
 
 \paragraph{Treasury Spot-Futures Basis}
-Following \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we construct the Treasury spot-futures basis using Bloomberg cheapest-to-deliver implied repo rates for 2-, 5-, 10-, 20-, and 30-year Treasury futures contracts. For each tenor and date, we use only the first-deferred contract to avoid delivery option distortions documented by \citet{Burghardt2005}. We compute days-to-maturity for each contract based on the last business day of the delivery month, then linearly interpolate OIS rates across available tenors (1-week through 1-year) to match the futures horizon. The basis is the difference between the futures-implied repo rate and the interpolated OIS rate. We restrict the sample to post-June-2004 observations, require positive trading volume in the deferred contract, and remove outliers using a rolling 45-day median absolute deviation filter with a threshold of 10 times the MAD. Missing values are forward-filled for up to 5 days. These spreads are shown in Figure~\ref{fig:treasury_sf_basis}.
+Following \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we construct the Treasury spot-futures basis using Bloomberg cheapest-to-deliver implied repo rates for 2-, 5-, 10-, 20-, and 30-year Treasury futures contracts. For each tenor and date, we use only the first-deferred contract to avoid delivery option distortions documented by \citet{Burghardt2005}. We compute days-to-maturity for each contract based on the last business day of the delivery month, then linearly interpolate OIS rates across available tenors (1-week through 1-year) to match the futures horizon. The basis is the difference between the futures-implied repo rate and the interpolated OIS rate. We restrict the sample to post-June-2004 observations, require positive trading volume in the deferred contract, and remove outliers using a rolling 45-day median absolute deviation filter with a threshold of 10 times the mean absolute deviation. Missing values are forward-filled for up to 5 days. These spreads are shown in Figure~\ref{fig:treasury_sf_basis}.
 
 \begin{figure}[h]
     \centering
@@ -482,7 +481,7 @@ Following \citet{Fleckenstein2020} as employed by \citet{Siriwardane2021}, we co
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToAssets/treasury_spot_futures_arbitrage.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
+  \floatsource{Sources: Bloomberg, Authors' analysis}
   \label{fig:treasury_sf_basis}
 \end{figure}
 
@@ -504,7 +503,7 @@ These spreads are shown in Figure~\ref{fig:treasury_swap_arbitrage}.
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToAssets/treasury_swap_arbitrage_spreads.png}
   \end{tabular}
-  \caption*{\emph{Sources: Bloomberg, Authors' analysis}}
+  \floatsource{Sources: Bloomberg, Authors' analysis}
   \label{fig:treasury_swap_arbitrage}
 \end{figure}
 
@@ -532,7 +531,7 @@ We take the off-the-shelf Gürkaynak-Sack-Wright (GSW) nominal zero-coupon curve
 \subsection{A Note about Potential Cross-Panel Interactions}\label{subsec:cross_panel}
 
 We would like to note that these various datasets may also be combined to create richer forecasts.
-Information embedded in, say, covered interest parity (CIP) deviations could plausibly help forecast credit default swap (CDS) bond basis spreads, and liquidity stress in one asset class might foreshadow strains elsewhere. Similarly, macroeconomic announcements or regulatory indicators may serve as valuable covariates for certain panels while acting as leading indicators for others.
+Information embedded in, say, covered interest parity (CIP) deviations could plausibly help forecast credit default swap (CDS) bond basis spreads, and liquidity stress in one asset class might foreshadow strains elsewhere. Similarly, macroeconomic announcements or bank indicators may serve as valuable covariates for certain panels while acting as leading indicators for others.
 In section~\ref{subsec:univariate_multivariate}, we explained that while we acknowledge the opportunity
 to create richer forecasts in this way, forecasting methodologies that do so are outside of the scope of this paper.
 Consequently, the comparative results in Table~\ref{tab:model_summary_by_category} remain panel-specific by construction, even though the underlying data resources support broader experimentation. Exploring these cross-panel dynamics and exogenous-variable augmentations is an important avenue for future work. Our goal in this release is to provide clean, panel-specific baselines. The modular data construction and standardized preprocessing allow researchers to layer on cross-panel pooling or covariate-informed architectures when tackling those broader questions.
@@ -710,9 +709,9 @@ KAN & -- & \checkmark & -- \\
 \end{tabular}
 \begin{tablenotes}
 \item \textit{Notes:} ``Seasonal'' indicates built-in mechanisms for seasonal components; ``Exogenous'' denotes native support for additional regressors; ``Prob.'' captures whether the implementation produces full predictive distributions rather than point forecasts. $^{\dagger}$N-BEATSx extends the architecture to exogenous inputs. Attributes are assessed from the original model publications and Nixtla documentation.\footnote{\url{https://nixtlaverse.nixtla.io/}}
-\item \textit{Source:} Authors' analysis.
 \end{tablenotes}
 \end{threeparttable}
+\floatsource{Source: Authors' analysis}
 \end{table}
 
 
@@ -761,10 +760,8 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 \caption{MASE Results by Dataset and Model}
 \label{tab:mase_results}
 \input{\PathToOutput/forecasting/paper/mase_pivot_tabular.tex}
-\caption*{
-\noindent {\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
-\scriptsize
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
+\caption*{\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE results from Table~\ref{tab:mase_results}. The color-coded heatmap makes it easy to identify patterns in model performance across different dataset types, with cooler colors (blues) indicating better performance and warmer colors (reds) indicating poorer performance.
@@ -773,9 +770,8 @@ Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE resul
 \centering
 \caption{MASE Results Heatmap by Dataset and Model}
 \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/mase_heatmap.png}
-\caption*{\textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.
-
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
+\caption*{\scriptsize \textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \label{fig:mase_heatmap}
 \end{figure}
 
@@ -788,11 +784,8 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 \input{\PathToOutput/forecasting/paper/rmse_pivot_tabular.tex}
 \vspace{0.1cm}
 
-\caption*{\scriptsize 
-\textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.
-
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
-}
+\caption*{\scriptsize \textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 % Figure~\ref{fig:rmse_heatmap} visualizes the RMSE results, complementing the numerical table with a clear color-coded representation of relative model performance across all datasets.
@@ -811,10 +804,8 @@ Table~\ref{tab:r2oos_results} presents the out-of-sample $R^2$ ($R^2_{\text{oos}
 \caption{Out-of-Sample $R^2$ Results by Dataset and Model}
 \label{tab:r2oos_results}
 \input{\PathToOutput/forecasting/paper/r2oos_pivot_tabular.tex}
-\caption*{
-\noindent {\scriptsize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
-\scriptsize
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
+\caption*{\scriptsize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highlighting which datasets and models deliver the greatest gains over the historical average benchmark. The diverging color scale emphasizes positive predictive power while clearly flagging underperformance.
@@ -822,12 +813,13 @@ Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highl
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/r2oos_heatmap.png}
-    \caption{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$) Heatmap by Dataset and Model. Warmer colors indicate larger improvements over the Historic Average baseline, while cooler colors indicate underperformance. Cells with extreme values are annotated to preserve readability.}
-    \caption*{\scriptsize\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
+    \caption{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$) Heatmap by Dataset and Model}
+    \caption*{\scriptsize \textbf{Note:} Warmer colors indicate larger improvements over the Historic Average baseline, while cooler colors indicate underperformance. Cells with extreme values are annotated to preserve readability.}
+    \floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
     \label{fig:r2oos_heatmap}
 \end{figure}
 
-To synthesize performance across datasets, Table~\ref{tab:median_mase_summary} reports median and mean statistics for MASE and out-of-sample $R^2$. Because MASE is the workhorse metric in the forecasting literature, we use it to anchor the discussion: \texttt{NBEATS} delivers the lowest median MASE (0.779), with \texttt{NHITS} (0.806), \texttt{TiDE} (0.806), and \texttt{DLinear} (0.790) within a few hundredths. All of these auto-deep models handily outperform classical baselines such as the Historic Average, the seasonal naïve benchmark, and simple exponential smoothing. Their automated hyperparameter search concentrates capacity on recurring seasonal windows, which is particularly valuable for the high-frequency panels in our benchmark. When we pivot to $R^2_{\text{oos}}$, however, the magnitudes shrink dramatically: \emph{every} model in the suite, including the classical baselines, posts a median $R^2_{\text{oos}}$ within $\pm 0.03$ of zero. \texttt{ARIMA} produces the strongest mean (0.159), with \texttt{TiDE} (0.098) the only other model in solidly positive territory; among the rest, \texttt{Theta} and \texttt{KAN} sit near $-0.13$ to $-0.14$ mean while \texttt{NBEATS} ($-0.486$) is the clear laggard. The takeaway from the pivot is that an aggregate $R^2_{\text{oos}}$ near zero is the rule rather than the exception in this univariate benchmark: the historical-average benchmark itself is already the right forecaster for the typical panel, and gains on MASE come from sharpening the level forecast rather than from extracting time-series predictability that would translate into a positive $R^2_{\text{oos}}$.
+To synthesize performance across datasets, Table~\ref{tab:median_mase_summary} reports median and mean statistics for MASE and out-of-sample $R^2$. Because MASE is the workhorse metric in the forecasting literature, we use it to anchor the discussion: \texttt{NBEATS} delivers the lowest median MASE (0.779), with \texttt{NHITS} (0.806), \texttt{TiDE} (0.806), and \texttt{DLinear} (0.790) within a few hundredths. All of these auto-deep models handily outperform classical baselines such as the Historic Average, the seasonal naïve benchmark, and simple exponential smoothing. Their automated hyperparameter search concentrates capacity on recurring seasonal windows, which is particularly valuable for the high-frequency panels in our benchmark. When we pivot to $R^2_{\text{oos}}$, however, the magnitudes shrink dramatically: \emph{every} model in the suite, including the classical baselines, posts a median $R^2_{\text{oos}}$ within $\pm 0.08$ of zero (and all but \texttt{Theta}, at $0.072$, within $\pm 0.03$). \texttt{ARIMA} produces the strongest mean (0.159), with \texttt{TiDE} (0.098) the only other model in solidly positive territory; among the rest, \texttt{Theta} and \texttt{KAN} sit near $-0.13$ to $-0.14$ mean while \texttt{NBEATS} ($-0.486$) is the clear laggard. The takeaway from the pivot is that an aggregate $R^2_{\text{oos}}$ near zero is the rule rather than the exception in this univariate benchmark: the historical-average benchmark itself is already the right forecaster for the typical panel, and gains on MASE come from sharpening the level forecast rather than from extracting time-series predictability that would translate into a positive $R^2_{\text{oos}}$.
 
 \begin{table}[htbp]
 \centering
@@ -837,12 +829,8 @@ To synthesize performance across datasets, Table~\ref{tab:median_mase_summary} r
 % \resizebox{\textwidth}{!}{%
 \input{\PathToOutput/forecasting/paper/median_mase_summary_tabular.tex}
 % }
-\caption*{
-    \scriptsize
-\textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.
-
-\emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
-}
+\caption*{\scriptsize \textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Table~\ref{tab:model_summary_by_category} disaggregates these results by dataset type. Each panel focuses on the models' performance across basis spreads, returns, or other datasets, highlighting how relative rankings shift as the data generating process changes and underscoring that the ``best'' model depends both on the metric and the market segment.
@@ -854,13 +842,14 @@ Table~\ref{tab:model_summary_by_category} disaggregates these results by dataset
 \scriptsize
 \input{\PathToOutput/forecasting/paper/model_summary_by_category_tabular.tex}
 \caption*{\scriptsize \textbf{Note:} Metrics are computed within each dataset category (Basis Spreads, Returns, Other). Lower MASE values indicate better performance; higher $R^2_{\text{oos}}$ values indicate better performance.}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Error-metric choice is especially consequential for the returns category. Out-of-sample $R^2$ is the most informative measure here because the Historic Average is already a hard-to-beat benchmark for asset returns. The table shows that nearly every model evaluated here, including the auto deep networks, posts $R^2_{\text{oos}}$ values clustered around zero for equity, bond, FX, and option returns. We emphasize that this finding pertains to the class of models we evaluate: univariate global forecasts without exogenous regressors (see Section~\ref{subsec:univariate_multivariate}). Within that class, simply forecasting the historical mean is nearly optimal, an outcome that mirrors decades of empirical asset-pricing research and reinforces how difficult it is to extract persistent return predictability without conditioning information. Extending the benchmark to methods that admit exogenous regressors (ARIMAX, DeepAR with covariates, Temporal Fusion Transformers) or to multivariate-panel methods (VARs, state-space systems) could in principle close part of this gap; we leave that comparison to follow-up work.
 
 Basis spreads tell a different story. On median MASE the multi-resolution \texttt{NBEATS} variant leads (0.407), with the classical \texttt{Theta} (0.411), \texttt{NLinear} (0.425), and \texttt{KAN} (0.430) methods clustered closely behind. These deep architectures excel because they decompose the series into trend and seasonal components while borrowing strength across entities through global training. Basis spreads exhibit pronounced seasonal structure (e.g., quarter-end funding pressure) and medium-term mean reversion, and the auto wrappers concentrate the search on those horizons. The clear separation appears on $R^2_{\text{oos}}$: the deep models (NHITS, NLinear, NBEATS, TiDE) all post median $R^2_{\text{oos}}$ above 0.64, well clear of the best classical contender (\texttt{ARIMA} at 0.53), so they deliver large improvements over the Historic Average and simple exponential smoothing baselines and widen the gap over classical methods on these spreads.
 
-The ``Other" category, which includes bank regulatory filings, volatility indicators, and macro-financial composites, is more nuanced. \texttt{Theta} delivers the lowest median MASE (0.811) by a hair over \texttt{NHITS} (0.823) and \texttt{NLinear}/\texttt{DLinear} (0.820), and \texttt{NHITS} edges out \texttt{Theta} on median $R^2_{\text{oos}}$ (0.458 vs.\ 0.455), with \texttt{ARIMA} just behind (0.442). These three deliver materially stronger gains over the Historic Average than any of the heavier deep models or DeepAR on this segment. These datasets are typically longer and smoother than the high-volatility returns series but lack the strong seasonal spikes of basis spreads, so the flexible trend extrapolation in Theta, the multi-resolution decomposition in NHITS, and the parsimonious ARIMA dynamics all fit naturally. The auto cross-validation helps these simpler structures stay calibrated without overfitting idiosyncratic shocks.
+The ``Other" category, which includes bank regulatory filings, volatility indicators, and macro-financial composites, is more nuanced. \texttt{Theta} delivers the lowest median MASE (0.811) by a hair over \texttt{NHITS} (0.823), \texttt{NLinear} (0.820), and \texttt{DLinear} (0.821), and \texttt{NHITS} edges out \texttt{Theta} on median $R^2_{\text{oos}}$ (0.458 vs.\ 0.455), with \texttt{ARIMA} just behind (0.442). These three deliver materially stronger gains over the Historic Average than any of the heavier deep models or DeepAR on this segment. These datasets are typically longer and smoother than the high-volatility returns series but lack the strong seasonal spikes of basis spreads, so the flexible trend extrapolation in Theta, the multi-resolution decomposition in NHITS, and the parsimonious ARIMA dynamics all fit naturally. The auto cross-validation helps these simpler structures stay calibrated without overfitting idiosyncratic shocks.
 
 Taken together, the cross-metric evidence confirms that performance is conditional: MASE-based rankings highlight the strength of NBEATS/NHITS/TiDE/DLinear on error scales commonly used by practitioners, while out-of-sample $R^2$ separates a small set of methods (\texttt{ARIMA}, \texttt{TiDE}) that beat the historical mean on average from a much larger set that does not. Analysts selecting a forecast should therefore align the evaluation metric with the economic decision. $R^2_{\text{oos}}$ is appropriate for return forecasting, where the historical mean is a credible trading benchmark. Scaled absolute errors are appropriate for arbitrage spreads, where seasonal accuracy matters more than mean-squared scorekeeping, and for bank and intermediary indicators, where parsimonious level forecasts capture most of the persistent dynamics.
 
@@ -871,7 +860,8 @@ Tables~\ref{tab:median_mase_summary}--\ref{tab:model_summary_by_category} rank i
 \caption{Model Performance by Forecasting Method Type}
 \label{tab:model_summary_by_type}
 \input{\PathToOutput/forecasting/paper/model_summary_by_type_tabular.tex}
-\caption*{\scriptsize \textbf{Note:} Each row aggregates every (model $\times$ dataset) observation whose model belongs to the indicated method type. ``\# Models'' counts distinct models in the type and ``N'' counts (model $\times$ dataset) observations. The Historic Average benchmark is reported in its own row because it is the benchmark against which $R^2_{\text{oos}}$ is defined. Lower MASE indicates better performance; higher $R^2_{\text{oos}}$ indicates better performance. Best values within each panel (or, in Panel~B, within each dataset category) are bolded. \emph{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis.}}
+\caption*{\scriptsize \textbf{Note:} Each row aggregates every (model $\times$ dataset) observation whose model belongs to the indicated method type. ``\# Models'' counts distinct models in the type and ``N'' counts (model $\times$ dataset) observations. The Historic Average benchmark is reported in its own row because it is the benchmark against which $R^2_{\text{oos}}$ is defined. Lower MASE indicates better performance; higher $R^2_{\text{oos}}$ indicates better performance. Best values within each panel (or, in Panel~B, within each dataset category) are bolded.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis.}
 \end{table}
 
 The aggregated view sharpens the qualitative picture from the model-level tables. On the MASE scale the three method families finish much closer than the individual rankings might suggest: hybrid wins median MASE (0.805), with deep learning and classical within a few hundredths (0.839 and 0.850 respectively). The out-of-sample $R^2$ column now tells a much milder story than the per-model variation suggested. All three families post a \emph{median} $R^2_{\text{oos}}$ within $0.01$ of zero (classical 0.010, hybrid 0.002, deep learning 0.006), and the \emph{mean} $R^2_{\text{oos}}$ is mildly negative for each family (classical $-0.034$, hybrid $-0.043$, deep learning $-0.110$). No family posts a solidly positive aggregate mean. The mild gap in the means reflects a small number of disaggregated panels on which deep learning underperforms the historical-average benchmark; the median---which is robust to those tail cases---is essentially zero for every family. Panel~B shows that the cross-family gap is concentrated in the basis-spreads category, where hybrid and deep-learning models exploit the seasonal structure of funding-related spreads and beat the classical aggregate on median MASE (0.478 and 0.541 vs.\ 0.691) and on $R^2_{\text{oos}}$ (median 0.647 and 0.643 vs.\ 0.345). On the Returns category every family clusters within a few hundredths of MASE and slightly negative $R^2_{\text{oos}}$. The Other category (bank regulatory filings and intermediary indicators) is the most nuanced: median $R^2_{\text{oos}}$ now favors deep learning (0.430) and classical statistical methods (0.393) almost equally, with hybrid behind (0.378), while mean $R^2_{\text{oos}}$ inverts the median ranking---classical (0.340) edges hybrid (0.270) and deep learning (0.073) because the classical baselines avoid the tail failures that drag the deep-learning mean. The takeaway is not that one family dominates uniformly. Rather, the value-add of moving from a classical method to a deep or hybrid architecture is concentrated in segments with persistent seasonal or cross-sectional structure (basis spreads), is essentially absent in segments where the historical mean is already an oracle (returns), and is more variable in segments where parsimony pays off (bank and intermediary indicators).
@@ -903,8 +893,8 @@ Before turning to forecasting, we confirm that the MMN correction is a meaningfu
 \label{tab:mmn_dickerson}
 \input{\PathToOutput/forecasting/paper/mmn_dickerson_tabular.tex}
 \caption*{\scriptsize
-\textbf{Note:} Each row reports the value-weighted long--short return (decile 10 minus decile 1) from sorting corporate bonds into ten value-weighted credit-spread deciles each month using the OSBAP credit-spread signal, then computing the realised return under the indicated convention. Both rows use identical bond universes, sort dates, decile assignments, and weighting variables. The only difference is the realised-return convention. $R^{\text{end}}$ uses month-end TRACE prices for both the signal at $t$ and the return-start at $t$, so any residual market-microstructure noise enters both; $R^{\text{bgn}}$ uses month-begin TRACE prices for the return-start at $t+1$, separating signal-date and return-start prices by a full bid--ask cycle. $t$-statistics are Newey--West uncorrected (i.i.d.\ assumption) and are reported only for relative comparison. Sample: 269 months, 2002--2024.
-\emph{Sources: openbondassetpricing.com (OSBAP 2025 main panel), Authors' analysis.}}
+\textbf{Note:} Each row reports the value-weighted long--short return (decile 10 minus decile 1) from sorting corporate bonds into ten value-weighted credit-spread deciles each month using the OSBAP credit-spread signal, then computing the realised return under the indicated convention. Both rows use identical bond universes, sort dates, decile assignments, and weighting variables. The only difference is the realised-return convention. $R^{\text{end}}$ uses month-end TRACE prices for both the signal at $t$ and the return-start at $t$, so any residual market-microstructure noise enters both; $R^{\text{bgn}}$ uses month-begin TRACE prices for the return-start at $t+1$, separating signal-date and return-start prices by a full bid--ask cycle. $t$-statistics are Newey--West uncorrected (i.i.d.\ assumption) and are reported only for relative comparison. Sample: 269 months, 2002--2024.}
+\floatsource{Sources: openbondassetpricing.com (OSBAP 2025 main panel), Authors' analysis.}
 \end{table}
 
 We now turn to the forecasting question. On the same OSBAP panel we build two parallel panels of value-weighted decile portfolios sorted on each cleaning convention of the signal itself, holding the universe and the realised-return series identical. The cross-decile rank correlation between the two signals is 0.98 and the resulting portfolio return time series are 98--99\% correlated within decile, yet the long--short spread (decile 10 minus decile 1) differs by roughly a factor of two (2.8\% per year under the MMN-biased signal versus 5.6\% per year under the MMN-corrected signal). The implication is that cleaning the signal does not merely reproduce the same portfolio with cosmetic differences: it changes which bonds occupy each decile in a way that reshuffles the cross-section enough to alter both the apparent premium and, as we show next, the relative ranking of forecasting models. On these two near-identical-but-not-quite panels we run the full twelve-model suite used elsewhere in this paper, under the same rolling-origin cross-validation protocol. Table~\ref{tab:mmn_sensitivity} reports the result.
@@ -915,13 +905,13 @@ We now turn to the forecasting question. On the same OSBAP panel we build two pa
 \label{tab:mmn_sensitivity}
 \input{\PathToOutput/forecasting/paper/mmn_sensitivity_tabular.tex}
 \caption*{\scriptsize
-\textbf{Note:} Out-of-sample $R^2$ ($R^2_{\text{oos}}$) and Mean Absolute Scaled Error (MASE) for the twelve forecasting models reported elsewhere in the paper, applied to two value-weighted decile-portfolio panels of corporate bonds. The MMN-biased panel sorts bonds by a credit spread constructed from MMN-contaminated TRACE prices. The MMN-corrected panel applies the correction of \citet{Dickerson2024}. The realized return, universe, and cross-validation protocol are held fixed; only the signal used for decile assignment differs. $\Delta$ columns report corrected minus biased. Bold values highlight the best performing model within each level column ($R^2_{\text{oos}}$ higher is better; MASE lower is better).
-\emph{Sources: openbondassetpricing.com, Authors' analysis.}}
+\textbf{Note:} Out-of-sample $R^2$ ($R^2_{\text{oos}}$) and Mean Absolute Scaled Error (MASE) for the twelve forecasting models reported elsewhere in the paper, applied to two value-weighted decile-portfolio panels of corporate bonds. The MMN-biased panel sorts bonds by a credit spread constructed from MMN-contaminated TRACE prices. The MMN-corrected panel applies the correction of \citet{Dickerson2024}. The realized return, universe, and cross-validation protocol are held fixed; only the signal used for decile assignment differs. $\Delta$ columns report corrected minus biased. Bold values highlight the best performing model within each level column ($R^2_{\text{oos}}$ higher is better; MASE lower is better).}
+\floatsource{Sources: openbondassetpricing.com, Authors' analysis.}
 \end{table}
 
 The four classical baselines (Historic Average, ARIMA, SES, Theta) and four of the deep models (NBEATS, DLinear, TiDE, DeepAR) are essentially indifferent to the cleaning choice: $|\Delta R^2_{\text{oos}}| \leq 0.04$ in all eight cases. The remaining four deep models swing by an order of magnitude more. NHITS moves by $+0.62$ (from $-0.53$ to $+0.09$), KAN by $-0.31$ (from $+0.28$ to $-0.03$), NLinear by $+0.23$ (from $+0.27$ to $+0.50$), and Transformer by $-0.12$ (from $+0.26$ to $+0.14$). Note the signs: cleaning the signal does not push every deep model in the same direction. Some architectures gain from the corrected signal, others lose. This is the entanglement between method skill and cleaning skill made concrete on a single pipeline.
 
-The reshuffling at the top of the leaderboard is sharper still. The strongest model on the MMN-biased panel is KAN, with $R^2_{\text{oos}} = +0.284$ and the lowest MASE (1.716). On the MMN-corrected panel the strongest model is NLinear, with $R^2_{\text{oos}} = +0.497$ and the lowest MASE (1.607). Both metrics identify the same winner within each panel, so the reshuffling is not an artefact of metric choice: a practitioner who picks ``the best forecaster'' for credit-spread decile portfolios will pick a different architecture purely as a function of which cleaning convention they happened to apply. The bottom of the leaderboard is just as unstable. KAN falls from the top of the biased ranking to below the historical-average baseline once the signal is cleaned ($R^2_{\text{oos}} = -0.030$). NHITS makes the reverse journey, from worst in the biased ranking to the middle of the pack on the corrected ranking. Restricting attention to the simpler family does not help: the four classical baselines are stable across conventions, but none of them clears $R^2_{\text{oos}} = +0.20$ on either panel, so a researcher who wants the best available forecast in this setting will be drawn toward the very models that are most cleaning-sensitive. Two qualifications. First, the magnitude and direction of each deep model's swing is partly an interaction with the Auto hyperparameter search: small differences in the bonds that occupy each decile change the cross-validation surface enough that the Auto wrapper selects materially different configurations. Second, the table evaluates only a single forecasting setup (univariate, no exogenous regressors). The directional lesson is robust regardless: ex-ante prediction of which method will be cleaning-sensitive is unreliable, holding the data fixed is a prerequisite for comparing methods, and reproducible pipelines like FTSFR are what make that comparison possible.
+The reshuffling at the top of the leaderboard is sharper still. The strongest model on the MMN-biased panel is KAN, with $R^2_{\text{oos}} = +0.284$ and the lowest MASE (1.716). On the MMN-corrected panel the strongest model is NLinear, with $R^2_{\text{oos}} = +0.497$ and the lowest MASE (1.607). Both metrics identify the same winner within each panel, so the reshuffling is not an artefact of metric choice: a practitioner who picks ``the best forecaster'' for credit-spread decile portfolios will pick a different architecture purely as a function of which cleaning convention they happened to apply. The bottom of the leaderboard is just as unstable. KAN falls from the top of the biased ranking to below the historical-average baseline once the signal is cleaned ($R^2_{\text{oos}} = -0.030$). NHITS makes the reverse journey, from worst in the biased ranking to the lower-middle of the pack on the corrected ranking. Restricting attention to the simpler family does not help: the four classical baselines are stable across conventions, but none of them clears $R^2_{\text{oos}} = +0.20$ on either panel, so a researcher who wants the best available forecast in this setting will be drawn toward the very models that are most cleaning-sensitive. Two qualifications. First, the magnitude and direction of each deep model's swing is partly an interaction with the Auto hyperparameter search: small differences in the bonds that occupy each decile change the cross-validation surface enough that the Auto wrapper selects materially different configurations. Second, the table evaluates only a single forecasting setup (univariate, no exogenous regressors). The directional lesson is robust regardless: ex-ante prediction of which method will be cleaning-sensitive is unreliable, holding the data fixed is a prerequisite for comparing methods, and reproducible pipelines like FTSFR are what make that comparison possible.
 
 \subsection{Robustness Across Asset Classes}
 \label{subsec:cleaning_robustness}
@@ -937,15 +927,15 @@ The contrasts span a range of cleaning intensity, which we summarize by how corr
 \scriptsize
 \input{\PathToOutput/forecasting/paper/cleaning_sensitivity_tabular.tex}
 \caption*{\scriptsize
-\textbf{Note:} Out-of-sample $R^2$ ($R^2_{\text{oos}}$) and Mean Absolute Scaled Error (MASE) for the twelve forecasting models used elsewhere in the paper, applied to three pairs of panels. Panel A: SPX CJS 54-portfolio returns built from options data filtered with Level-1 filters only vs.\ the full Level-1+Level-2+Level-3 stack of \citet{Constantinides2013}. Panel B: 5$\times$5 size $\times$ book-to-market portfolios with NYSE-only breakpoints (\citealt{Fama1993} convention) vs.\ all-CRSP breakpoints. Panel C: maturity-bucketed Treasury bond portfolios with a permissive universe (callables and on-the-run issues kept) vs.\ the \citet{Gurkaynak2007} ``strict'' universe (callables dropped, on-the-run and first off-the-run dropped for post-1980 securities). Within each panel, the realized-return series, holding-period definition, and cross-validation protocol are held fixed; only the cleaning convention differs. $\Delta$ columns report the right-hand variant minus the left-hand variant. Bold values mark the best-performing model within each level column ($R^2_{\text{oos}}$ higher is better; MASE lower is better).
-\emph{Sources: WRDS (CRSP, Compustat, OptionMetrics), Authors' analysis.}}
+\textbf{Note:} Out-of-sample $R^2$ ($R^2_{\text{oos}}$) and Mean Absolute Scaled Error (MASE) for the twelve forecasting models used elsewhere in the paper, applied to three pairs of panels. Panel A: SPX CJS 54-portfolio returns built from options data filtered with Level-1 filters only vs.\ the full Level-1+Level-2+Level-3 stack of \citet{Constantinides2013}. Panel B: 5$\times$5 size $\times$ book-to-market portfolios with NYSE-only breakpoints (\citealt{Fama1993} convention) vs.\ all-CRSP breakpoints. Panel C: maturity-bucketed Treasury bond portfolios with a permissive universe (callables and on-the-run issues kept) vs.\ the \citet{Gurkaynak2007} ``strict'' universe (callables dropped, on-the-run and first off-the-run dropped for post-1980 securities). Within each panel, the realized-return series, holding-period definition, and cross-validation protocol are held fixed; only the cleaning convention differs. $\Delta$ columns report the right-hand variant minus the left-hand variant. Bold values mark the best-performing model within each level column ($R^2_{\text{oos}}$ higher is better; MASE lower is better).}
+\floatsource{Sources: WRDS (CRSP, Compustat, OptionMetrics), Authors' analysis.}
 \end{table}
 
-The Options panel (Panel~A) shows the same shape of lesson as the MMN case study: a reshuffled leaderboard rather than a uniform shift. No model clears $R^2_{\text{oos}} = +0.27$ on either variant, but within that band the ranking reorders sharply and in mixed directions, with three neural architectures (NBEATS, NHITS, KAN) gaining from the heavier L3 cleaning while five deep models and three classical baselines lose. The leaderboard top moves from DLinear/DeepAR on L1 to NHITS on L3, every one of the eight deep architectures shifts by $|\Delta R^2_{\text{oos}}| > 0.11$, and three cross zero, while the four classical baselines move by $0.15$ or less. The heavier L3 cleaning is also the defensible convention rather than a stylistic preference: its filters drop deep out-of-the-money and far-from-maturity options with bid--ask spreads exceeding 50\% of price and near-zero volume, quotes no market maker would fill at scale, so the L1 panel admits returns no investor could realise even in principle.
+The Options panel (Panel~A) shows the same shape of lesson as the MMN case study: a reshuffled leaderboard rather than a uniform shift. No model clears $R^2_{\text{oos}} = +0.27$ on either variant, but within that band the ranking reorders sharply and in mixed directions, with three neural architectures (NBEATS, NHITS, KAN) gaining from the heavier L3 cleaning while five deep models and three classical baselines lose. The leaderboard top moves from DLinear/DeepAR on L1 to NHITS on L3, every one of the eight deep architectures shifts by $|\Delta R^2_{\text{oos}}| > 0.11$, and five cross zero, while the four classical baselines move by $0.15$ or less. The heavier L3 cleaning is also the defensible convention rather than a stylistic preference: its filters drop deep out-of-the-money and far-from-maturity options with bid--ask spreads exceeding 50\% of price and near-zero volume, quotes no market maker would fill at scale, so the L1 panel admits returns no investor could realise even in principle.
 
 The FF25 panel (Panel~B) sits in the middle. Almost every $R^2_{\text{oos}}$ is negative (NLinear is the only model positive on either variant, and only barely), consistent with the broader equity-return result in Section~\ref{sec:results}. No model dominates either variant, so there is no leaderboard flip to report, but the deep models still swing materially (Transformer by $-0.441$, the largest in the panel, with NBEATS, DeepAR, KAN, and TiDE all moving by more than $0.13$) while the classical baselines are essentially unchanged ($|\Delta R^2_{\text{oos}}| \leq 0.04$). The magnitudes are large enough that a paper claiming a particular deep model ``works on FF25'' could see its claim reversed by switching breakpoint conventions.
 
-The Treasury panel (Panel~C) is the closest analogue to the MMN setting: the two universes are 99\%+ correlated within bucket, yet the leaderboard reorders sharply. The classical baselines hold the top three positions under both filter choices and barely move ($|\Delta R^2_{\text{oos}}| \leq 0.02$), while the deep models swing: TiDE falls from near the top on permissive ($0.272$) to negative on strict ($\Delta = -0.315$), NBEATS makes the largest fall in the panel ($\Delta = -0.375$), and NHITS and Transformer recover materially in the other direction. As in the TRACE case, the entire ranking volatility lives among the deep models, with classical baselines essentially stable.
+The Treasury panel (Panel~C) is the closest analogue to the MMN setting: the two universes are 99\%+ correlated within bucket, yet the leaderboard reorders sharply. The classical baselines dominate the top of the ranking under both filter choices---all three of the top spots under the strict filter, and two of the top three (ARIMA and Theta, with TiDE breaking in at second) under the permissive filter---and barely move ($|\Delta R^2_{\text{oos}}| \leq 0.02$), while the deep models swing: TiDE falls from near the top on permissive ($0.272$) to negative on strict ($\Delta = -0.315$), NBEATS makes the largest fall in the panel ($\Delta = -0.375$), and NHITS and Transformer recover materially in the other direction. As in the TRACE case, the entire ranking volatility lives among the deep models, with classical baselines essentially stable.
 
 Two qualifications carry over. First, the magnitude of each deep model's swing is partly an interaction with the Auto hyperparameter search: small universe changes shift the cross-validation surface enough that the Auto wrapper selects materially different configurations. Second, every panel evaluates the same univariate global setup without exogenous regressors. The robustness exercise does not turn on which cleaning convention is ``correct'' in any given case; the literature settles that question, often differently, in each one. It argues, rather, that any cross-paper comparison of forecasting methods that does not hold the cleaning recipe constant is at risk of confounding the comparison it intends to make. The Options panel adds a second warning: cleaning can flip not only the relative ranking of models but the sign of multiple deep architectures' $R^2_{\text{oos}}$, so even a coarse summary such as ``which model produces positive out-of-sample $R^2$'' is cleaning-dependent. Reproducible, version-controlled pipelines like FTSFR are what allow these comparisons to be made on fixed data, and they are what allow a reader to verify which side of each contrast they care about.
 
@@ -985,7 +975,7 @@ We would like to thank the following individuals. With their permission, we have
 \subsection{Asset Class Datasets}
 \label{sec:asset_classes}
 
-Following \cite{He2017}, we include comprehensive datasets across multiple asset classes, each cleaned according to canonical methods from the academic literature.
+Following HKM, we include comprehensive datasets across multiple asset classes, each cleaned according to canonical methods from the academic literature.
 
 \subsubsection{Equity Markets}
 \label{sec:equity}
@@ -1006,7 +996,8 @@ the dataset is more diverse, leading to lower average returns and lower volatili
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToAssets/daily_avg_returns_CRSP_COMPU.png}
   \end{tabular}
-  \caption{Average returns of all stocks for a given date}
+  \caption{Average returns of all stocks}
+  \floatsource{Sources: Center for Research in Security Prices, Authors' analysis}
   \label{fig:avg_returns_crsp}
 \end{figure}
 
@@ -1015,7 +1006,8 @@ the dataset is more diverse, leading to lower average returns and lower volatili
   \begin{tabular}{@{}c@{}}
     \includegraphics[width=.95\linewidth]{\PathToAssets/Average_three_month_rolling_std.png}
   \end{tabular}
-  \caption{Average three month rolling standard deviation for a given date}
+  \caption{Average three month rolling standard deviation}
+  \floatsource{Sources: Center for Research in Security Prices, Authors' analysis}
   \label{fig:avg_rolling_std_crsp}
 \end{figure}
 
@@ -1042,6 +1034,7 @@ These filters, applied in the Gürkaynak, Sack, and Wright methodology, yield st
   \centering
   \includegraphics[width=0.8\textwidth]{\PathToAssets/us_treasury_compare.png}
   \caption{Comparison of He, Kelly, and Manela (2017) treasury bond returns dataset with FTSFR dataset}
+  \floatsource{Sources: Center for Research in Security Prices, He, Kelly, and Manela (2017), Authors' analysis}
   \label{fig:us_treasury_returns_comparison}
 \end{figure}
 
@@ -1061,6 +1054,7 @@ The final output is a dataset containing monthly corporate bond portfolio return
     \centering
     \includegraphics[width=0.8\textwidth]{\PathToAssets/corporate_returns_compare.png}
     \caption{Comparison of He, Kelly, and Manela (2017) corporate bond returns dataset with FTSFR dataset}
+    \floatsource{Sources: WRDS TRACE, openbondassetpricing.com, He, Kelly, and Manela (2017), Authors' analysis}
     \label{fig:corp_bond_returns_comparison}
   \end{figure}
 
@@ -1084,7 +1078,7 @@ The process to construct our returns series involved two major phases: (1) Repli
   \begin{tabular}{@{}c@{}}
     \includegraphics[height=300pt,width=400pt]{\PathToAssets/spx_options_over_time.png}
   \end{tabular}
-  \caption*{\emph{Sources: OptionMetrics, Authors' analysis}}
+  \floatsource{Sources: OptionMetrics, Authors' analysis}
   \label{fig:spx_options_over_time}
 \end{figure}
 
@@ -1139,6 +1133,7 @@ where
   \end{tabular}
 
   \caption{Foreign Currency Returns}
+  \floatsource{Sources: Bloomberg, Authors' analysis}
   \label{fig:fx_returns}
 \end{figure}
 
@@ -1162,16 +1157,16 @@ selecting the last observation in each calendar month, compute simple
 percentage returns, harmonize naming conventions, and drop missing values to
 ensure that each commodity return series is complete and comparable across
 the sample period. Finally, we compare these series
-with those published by \cite{He2017}. \cite{He2017} publish returns series for 23 commodities from a broader pool of 31 commodities, but do not provide the names of the commodities nor the exact pool of commodities they used. To identify the commodities in their dataset, we computed the pairwise correlations between our Bloomberg GSCI-based returns and the corresponding series in \cite{He2017}. We then used the linear assignment algorithm to find the optimal one-to-one commodity matches, maximizing the total correlation between the two datasets.
+with those published by HKM. HKM publish returns series for 23 commodities from a broader pool of 31 commodities, but do not provide the names of the commodities nor the exact pool of commodities they used. To identify the commodities in their dataset, we computed the pairwise correlations between our Bloomberg GSCI-based returns and the corresponding series in HKM. We then used the linear assignment algorithm to find the optimal one-to-one commodity matches, maximizing the total correlation between the two datasets.
 
 The following figures illustrate the outcome of this replication exercise. 
 Figure~\ref{fig:commod_return_comparison} reports the pairwise correlations between our 
-Bloomberg GSCI-based returns and the corresponding series in \cite{He2017}. 
+Bloomberg GSCI-based returns and the corresponding series in HKM. 
 While many commodities show very high alignment, several pairs exhibit unusually 
 low correlations. We interpret these discrepancies as arising from ticker
 mismatches and differences in the underlying datasets used: the lists provided by \cite{Koijen2018} and \cite{Yang2013} do not 
 perfectly overlap, and it is unclear which exact subset was ultimately adopted 
-in \cite{He2017}. Furthermore, \cite{He2017} uses a different datasource than
+in HKM. Furthermore, HKM uses a different datasource than
 Bloomberg, which we use.
 In other words, low-correlation pairs likely reflect incorrect 
 matches rather than genuine return differences. The accompanying heatmap in 
@@ -1184,6 +1179,7 @@ clusters of high-correlation matches alongside a handful of clear mismatches.
     \includegraphics[width=\linewidth]{\PathToAssets/commod_return_comparison.png} \\[\abovecaptionskip]
   \end{tabular}
   \caption{Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
+  \floatsource{Sources: Bloomberg, He, Kelly, and Manela (2017), Authors' analysis}
   \label{fig:commod_return_comparison}
 \end{figure}
 
@@ -1193,6 +1189,7 @@ clusters of high-correlation matches alongside a handful of clear mismatches.
     \includegraphics[width=\linewidth]{\PathToAssets/commod_heatmap.png} \\[\abovecaptionskip]
   \end{tabular}
   \caption{Heatmap of Pairwise Correlations between GSCI Commodity Returns and Yang (2013) Commodity Returns}
+  \floatsource{Sources: Bloomberg, He, Kelly, and Manela (2017), Authors' analysis}
   \label{fig:commod_heatmap}
 \end{figure}
 
@@ -1303,6 +1300,7 @@ The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.
       \includegraphics[width=.95\linewidth]{\PathToOutput/CDS_replicate.png}
     \end{tabular}
     \caption{CDS Arbitrage spreads, High Yield and Investment Grade}
+    \floatsource{Sources: S\&P Global, WRDS Bond Returns, CRSP Treasury, Authors' analysis}
     \label{fig:CDS_replicate}
 \end{figure}
 
@@ -1312,13 +1310,12 @@ The CDS-Bond basis is plotted in Figure \ref{fig:CDS_replicate}.
 
 During periods of market stress, such as the 2008 financial crisis and the 2020 COVID-19
 pandemic, covered interest parity (CIP) may no longer hold as the forward-spot differential
-no longer exactly offsets interest-rate differentials. Factors contributing to this phenomenon include:
-Heightened Counterparty-Credit Risk, Liquidity Constraints, or Regulatory Pressures.
+no longer exactly offsets interest-rate differentials. Factors contributing to this phenomenon include heightened counterparty-credit risk or liquidity constraints.
 
 In other periods, deviations from CIP typically stem from market inefficiencies and are
 small in magnitude and are short-lived in timeframe due to arbitrage activities.
 
-Our analysis examines CIP deviations across eight G10 currencies (AUD, CAD, CHF, EUR, GBP, JPY, NZD, and SEK) against the USD, using daily Bloomberg spot rates, three-month forward points, and three-month overnight index swap (OIS) rates from January 2010 onward; OIS serves as the risk-free benchmark, matching the convention of \citet{Siriwardane2021} so that CIP deviations are directly comparable to the other basis spreads in our benchmark. Two construction details are easy to get wrong and worth naming: forward points are scaled per 10{,}000 for every currency except JPY, which by market convention is scaled per 100, and the four currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) must be inverted to a foreign-per-USD convention before any CIP residual is computed. Failure to do either produces sign errors that are large enough to swamp the actual deviations. We then remove outliers with a rolling 45-day median-absolute-deviation filter at a threshold of ten MADs (set empirically), flagging values to missing rather than dropping them so the calendar of business days is preserved across currencies.
+Our analysis examines CIP deviations across eight G10 currencies (AUD, CAD, CHF, EUR, GBP, JPY, NZD, and SEK) against the USD, using daily Bloomberg spot rates, three-month forward points, and three-month overnight index swap (OIS) rates from January 2010 onward; OIS serves as the risk-free benchmark, matching the convention of \citet{Siriwardane2021} so that CIP deviations are directly comparable to the other basis spreads in our benchmark. Two construction details are easy to get wrong and worth naming: forward points are scaled per 10{,}000 for every currency except JPY, which by market convention is scaled per 100, and the four currencies conventionally quoted as USD-per-foreign-currency (EUR, GBP, AUD, NZD) must be inverted to a foreign-per-USD convention before any CIP residual is computed. Failure to do either produces sign errors that are large enough to swamp the actual deviations. We then remove outliers with a rolling 45-day median-absolute-deviation filter at a threshold of ten mean absolute deviations (set empirically), flagging values to missing rather than dropping them so the calendar of business days is preserved across currencies.
 
 We successfully replicate the CIP spreads as calculated by Siriwardane et al. (2023),
 as seen in
@@ -1342,6 +1339,7 @@ to those reported in their paper.
   \end{tabular}
 
   \caption{Comparison of CIP Arbitrage spreads}
+  \floatsource{Sources: Bloomberg, Authors' analysis}
   \label{fig:cip_comparison}
 \end{figure}
 
@@ -1360,7 +1358,7 @@ Following \citet{Fleckenstein2014} as implemented in \citet{Siriwardane2021}, we
 
 Following \citet{Fleckenstein2020} and \citet{Siriwardane2021}, we construct the Treasury spot-futures basis by extracting implied repo rates from Bloomberg data for 2-, 5-, 10-, 20-, and 30-year Treasury futures contracts and comparing them to maturity-matched OIS rates. For each tenor and date, we pull both the near contract and the first-deferred contract, using Bloomberg's cheapest-to-deliver implied repo rate calculation along with trading volume and contract month specifications. To avoid the delivery option distortions documented by \citet{Burghardt2005}, we compute the basis using only the first-deferred contract, which by construction is not in its delivery month.
 
-The core technical challenge lies in constructing a clean maturity-matched benchmark. We parse each contract's expiration month and year to compute days-to-maturity relative to the last business day of the delivery month, then linearly interpolate OIS rates across available tenors (1-week through 1-year) to match the futures contract horizon. The basis is simply the difference between the futures-implied repo rate and this interpolated OIS rate, expressed in basis points. We restrict to post-June-2004 data, require positive trading volume in the deferred contract, and remove outliers using a rolling 45-day median absolute deviation filter with a threshold of 10 times the MAD. Missing values are forward-filled for up to 5 days. The resulting series successfully replicates the persistent positive spreads documented in \citet{Siriwardane2021}, particularly during stress episodes in 2008-2009 and March 2020, when funding market frictions cause the futures-implied rate to exceed OIS by substantial margins.
+The core technical challenge lies in constructing a clean maturity-matched benchmark. We parse each contract's expiration month and year to compute days-to-maturity relative to the last business day of the delivery month, then linearly interpolate OIS rates across available tenors (1-week through 1-year) to match the futures contract horizon. The basis is simply the difference between the futures-implied repo rate and this interpolated OIS rate, expressed in basis points. We restrict to post-June-2004 data, require positive trading volume in the deferred contract, and remove outliers using a rolling 45-day median absolute deviation filter with a threshold of 10 times the mean absolute deviation. Missing values are forward-filled for up to 5 days. The resulting series successfully replicates the persistent positive spreads documented in \citet{Siriwardane2021}, particularly during stress episodes in 2008-2009 and March 2020, when funding market frictions cause the futures-implied rate to exceed OIS by substantial margins.
 
 \subsubsection{Treasury-Swap Basis}
 
@@ -1376,7 +1374,7 @@ Table~\ref{tab:filtered_dataset_stats} reports the impact of the unified preproc
 \caption{Impact of Robust Forecasting Preprocessing on Dataset Statistics}
 \label{tab:filtered_dataset_stats}
 \input{\PathToOutput/forecasting/paper/filtered_dataset_statistics_tabular.tex}
-\caption*{\scriptsize \emph{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}}
+\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 \end{appendices}
