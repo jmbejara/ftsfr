@@ -558,27 +558,8 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/mase_pivot_tabular.tex}}
   \end{frame}
   
-  \begin{frame}[plain]
-    \tiny
-    \vspace{-0.2cm}
-    \centering
-    \textbf{Relative MASE Results by Dataset and Model}\\
-    {\scriptsize \textit{Performance relative to Historic Average: $<1$ = better, $>1$ = worse}}\\
-    \vspace{0.2cm}
-    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/relative_mase_pivot_tabular.tex}}
-  \end{frame}
-
 \begin{frame}
-  \frametitle{Relative MASE Heatmap: Performance vs Historic Average}
-  \centering
-  \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/relative_mase_heatmap.png}
-  \vspace{0.2cm}
-
-  Blue = outperforms Historic Average ($<1$), Red = underperforms baseline ($>1$)
-\end{frame}
-
-\begin{frame}
-  \frametitle{Relative MASE Analysis: Key Patterns}
+  \frametitle{MASE Analysis: Key Patterns}
   \begin{itemize}
   \item \alert{Auto deep models lead on MASE:} NBEATS (median) and NHITS (mean) post the lowest scaled errors, beating DAR, Historic Average, and simple exponential smoothing by comfortable margins
   \vspace{0.3cm}
@@ -658,7 +639,7 @@ Qiu et al. (2024) & TFB & NN5 Bank Cash Withdrawals, Equity (NYSE/NASDAQ), Forei
     \tiny
     \vspace{-0.2cm}
     \centering
-    \textbf{Overall Model Performance Summary: MASE, Relative MASE, and $R^2_{\text{oos}}$ Across All Datasets}\\
+    \textbf{Overall Model Performance Summary: MASE and $R^2_{\text{oos}}$ Across All Datasets}\\
     \vspace{0.2cm}
     \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/median_mase_summary_tabular.tex}}
   \end{frame}
