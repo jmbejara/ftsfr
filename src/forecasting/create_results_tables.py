@@ -1093,219 +1093,6 @@ def create_rmse_pivot_table():
 # Note: sMAPE and MAE functions removed as they are not available in the new forecasting format
 
 
-def create_relative_mase_pivot_table():
-    """Create a pivot table with MASE values relative to Historic Average: datasets as rows, models as columns"""
-
-    print("Creating Relative MASE pivot table...")
-
-    # Read the assembled results from new location
-    results_file = FORECAST_DIR / "results_all.csv"
-    if not results_file.exists():
-        print(f"Error: Results file not found at {results_file}")
-        print("Please run the assemble_results2 task first")
-        sys.exit(1)
-
-    results = pd.read_csv(results_file)
-    print(f"Loaded {len(results)} result rows")
-
-    # Load dataset short names and apply to results
-    dataset_short_names = load_dataset_short_names()
-    results["Dataset_Short"] = (
-        results["dataset_name"].map(dataset_short_names).fillna(results["dataset_name"])
-    )
-
-    # Additional consistency fixes
-    results["model_name"] = results["model_name"].replace("AutoARIMA Fast", "AutoARIMA")
-
-    # Filter to only include active models from config (do this BEFORE converting to display names)
-    results = filter_results_by_active_models(results)
-
-    # Filter to only include active datasets from config
-    results = filter_results_by_active_datasets(results)
-
-    # Apply quality filtering
-    results = filter_quality_results(results)
-
-    # Now map model keys to display names for consistency (do this AFTER filtering)
-    display_mapping = get_model_display_mapping()
-
-    # Replace model keys with display names
-    results["model_name"] = (
-        results["model_name"].map(display_mapping).fillna(results["model_name"])
-    )
-
-    # Check if we have the required columns and Historic Average model
-    if "MASE" not in results.columns:
-        print("Error: MASE column not found in results")
-        print(f"Available columns: {list(results.columns)}")
-        sys.exit(1)
-
-    if "Historic Average" not in results["model_name"].values:
-        print(
-            "Warning: Historic Average model not found in results - skipping relative MASE calculations"
-        )
-        print(f"Available models: {sorted(results['model_name'].unique())}")
-        return None
-
-    # Create pivot table: datasets as rows, models as columns, values as MASE
-    mase_pivot = results.pivot_table(
-        index="Dataset_Short",  # Short dataset names as rows
-        columns="model_name",  # Models as columns (display name)
-        values="MASE",
-        aggfunc="first",  # In case of duplicates, take the first value
-    )
-
-    print(
-        f"Created initial pivot table with {len(mase_pivot)} datasets and {len(mase_pivot.columns)} models"
-    )
-
-    # Check if Historic Average column exists in the pivot table
-    if "Historic Average" not in mase_pivot.columns:
-        print(
-            "Warning: Historic Average column not found in pivot table - skipping relative calculations"
-        )
-        print(f"Available columns: {list(mase_pivot.columns)}")
-        return None
-
-    # Create relative MASE table by dividing each model by Historic Average
-    relative_mase_pivot = mase_pivot.copy()
-    historic_avg_values = mase_pivot["Historic Average"]
-
-    for col in mase_pivot.columns:
-        if col != "Historic Average":  # Don't divide Historic Average by itself
-            relative_mase_pivot[col] = mase_pivot[col] / historic_avg_values
-
-    # Remove the Historic Average column since it would always be 1.0
-    relative_mase_pivot = relative_mase_pivot.drop(columns=["Historic Average"])
-
-    print(
-        f"Created relative MASE table with {len(relative_mase_pivot)} datasets and {len(relative_mase_pivot.columns)} models"
-    )
-
-    # Apply model ordering based on models_config.toml
-    model_order = load_model_order()
-    if model_order:
-        # Create ordered list of display names that exist in the data (excluding Historic Average)
-        ordered_display_names = [
-            model["display_name"]
-            for model in model_order
-            if model["display_name"] != "Historic Average"
-        ]
-        # Filter to only include columns that actually exist in the pivot table
-        existing_ordered_columns = [
-            col for col in ordered_display_names if col in relative_mase_pivot.columns
-        ]
-        # Add any columns not in the config (shouldn't happen, but safety check)
-        remaining_columns = [
-            col
-            for col in relative_mase_pivot.columns
-            if col not in existing_ordered_columns
-        ]
-        final_column_order = existing_ordered_columns + remaining_columns
-        # Reorder the columns
-        relative_mase_pivot = relative_mase_pivot.reindex(columns=final_column_order)
-        print("Reordered model columns according to models_config.toml")
-
-    # Apply grouped dataset ordering (same as LaTeX tables)
-    dataset_groups, dataset_table_names = load_dataset_groups_and_names()
-    relative_mase_pivot = apply_grouped_dataset_ordering(
-        relative_mase_pivot, dataset_groups, dataset_table_names
-    )
-
-    # Save as CSV for inspection
-    csv_file = FORECAST_DIR / "relative_mase_pivot_table.csv"
-    relative_mase_pivot.to_csv(csv_file)
-    print(f"Saved Relative MASE pivot table (CSV) to: {csv_file}")
-
-    # Save also to paper directory for organized access
-    paper_csv_file = PAPER_DIR / "relative_mase_pivot_table.csv"
-    paper_csv_file.parent.mkdir(parents=True, exist_ok=True)
-    relative_mase_pivot.to_csv(paper_csv_file)
-    print(f"Saved Relative MASE pivot table (CSV) to: {paper_csv_file}")
-
-    # Convert to LaTeX table
-    latex_output = create_latex_table(
-        relative_mase_pivot,
-        "Relative MASE Results by Dataset and Model",
-        "tab:relative_mase_results",
-    )
-    latex_tabular_output = create_latex_tabular_only(
-        relative_mase_pivot,
-        "Relative MASE Results by Dataset and Model",
-        "tab:relative_mase_results",
-    )
-
-    # Save LaTeX version to paper directory as well
-    paper_tex_file = PAPER_DIR / "relative_mase_pivot_table.tex"
-    with open(paper_tex_file, "w") as f:
-        f.write(latex_output)
-    print(f"Saved Relative MASE pivot table (LaTeX) to: {paper_tex_file}")
-
-    # Save tabular-only version to paper directory
-    paper_tabular_file = PAPER_DIR / "relative_mase_pivot_tabular.tex"
-    with open(paper_tabular_file, "w") as f:
-        f.write(latex_tabular_output)
-    print(f"Saved Relative MASE pivot tabular (LaTeX) to: {paper_tabular_file}")
-
-    # Save as .tex file
-    tex_file = FORECAST_DIR / "relative_mase_pivot_table.tex"
-    with open(tex_file, "w") as f:
-        f.write(latex_output)
-    print(f"Saved Relative MASE pivot table (LaTeX) to: {tex_file}")
-
-    # Save tabular-only version
-    tabular_file = FORECAST_DIR / "relative_mase_pivot_tabular.tex"
-    with open(tabular_file, "w") as f:
-        f.write(latex_tabular_output)
-    print(f"Saved Relative MASE pivot tabular (LaTeX) to: {tabular_file}")
-
-    # Print summary statistics
-    print("\nSummary Statistics:")
-    print(f"Number of datasets: {len(relative_mase_pivot)}")
-    print(f"Number of models: {len(relative_mase_pivot.columns)}")
-
-    # Count missing values
-    total_cells = len(relative_mase_pivot) * len(relative_mase_pivot.columns)
-    missing_cells = relative_mase_pivot.isna().sum().sum()
-    print(
-        f"Missing values: {missing_cells} out of {total_cells} ({missing_cells / total_cells * 100:.1f}%)"
-    )
-
-    # Performance statistics relative to Naive
-    valid_data = relative_mase_pivot.dropna(
-        how="all", axis=0
-    )  # Remove rows with all NaN
-    if not valid_data.empty:
-        print("\nRelative Performance Statistics (compared to Naive baseline):")
-        # Count how many models beat Naive (< 1.0) for each dataset
-        better_than_naive_count = (valid_data < 1.0).sum(axis=1)
-        print(
-            f"Average models beating Naive per dataset: {better_than_naive_count.mean():.1f}"
-        )
-
-        # Show best and worst performing models overall
-        overall_performance = (
-            valid_data.mean()
-        )  # Average relative performance across datasets
-        best_model = overall_performance.idxmin()
-        worst_model = overall_performance.idxmax()
-        print(
-            f"Best overall model: {best_model} (avg ratio: {overall_performance[best_model]:.3f})"
-        )
-        print(
-            f"Worst overall model: {worst_model} (avg ratio: {overall_performance[worst_model]:.3f})"
-        )
-
-    if missing_cells > 0:
-        print("\nDatasets with missing results:")
-        for dataset in relative_mase_pivot.index:
-            missing_count = relative_mase_pivot.loc[dataset].isna().sum()
-            if missing_count > 0:
-                print(f"  {dataset}: {missing_count} missing models")
-
-    return relative_mase_pivot
-
-
 def create_r2oos_pivot_table():
     """Create a pivot table with R2oos values: datasets as rows, models as columns"""
 
@@ -1522,32 +1309,9 @@ def create_median_mase_summary_table():
         "Mean_R2oos",
     ]
 
-    # Calculate Relative MASE (relative to Historic Average)
-    # First, get Historic Average MASE values for each dataset
-    relative_mase_summary = pd.DataFrame()
-    if relative_available:
-        relative_mase_data = results[
-            (results["model_name"] != "Historic Average")
-            & results["Relative_MASE"].notna()
-        ].copy()
-        if not relative_mase_data.empty:
-            relative_mase_summary = (
-                relative_mase_data.groupby("model_name")["Relative_MASE"]
-                .agg(["median", "mean"])
-                .round(4)
-            )
-
-            relative_mase_summary.columns = [
-                "Median_Relative_MASE",
-                "Mean_Relative_MASE",
-            ]
-
     # Combine all summaries
     model_summary = mase_summary.copy()
     model_summary = model_summary.join(r2oos_summary, how="left")
-
-    if not relative_mase_summary.empty:
-        model_summary = model_summary.join(relative_mase_summary, how="left")
 
     # Sort by median MASE (ascending - lower is better)
     model_summary = model_summary.sort_values("Median_MASE")
@@ -1601,16 +1365,6 @@ def create_median_mase_summary_table():
         "Median_R2oos",
         "Mean_R2oos",
     ]
-    if "Median_Relative_MASE" in model_summary_latex.columns:
-        columns_to_show = [
-            "N_Datasets",
-            "Median_MASE",
-            "Mean_MASE",
-            "Median_Relative_MASE",
-            "Mean_Relative_MASE",
-            "Median_R2oos",
-            "Mean_R2oos",
-        ]
 
     # Filter to only include columns that exist
     available_columns = [
@@ -1648,7 +1402,7 @@ def create_median_mase_summary_table():
     column_format = "l" + "r" * (num_cols - 1)
 
     latex_output = formatted_summary.to_latex(
-        caption="Model Performance Summary: MASE, Relative MASE, and R² Across All Datasets",
+        caption="Model Performance Summary: MASE and R² Across All Datasets",
         label="tab:median_mase_summary",
         column_format=column_format,
         escape=False,
@@ -1720,24 +1474,13 @@ def create_grouped_model_summary_table():
     }
     model_table_names = load_model_table_names()
 
-    if relative_available:
-        columns_full = [
-            "N_Datasets",
-            "Median_MASE",
-            "Mean_MASE",
-            "Median_Relative_MASE",
-            "Mean_Relative_MASE",
-            "Median_R2oos",
-            "Mean_R2oos",
-        ]
-    else:
-        columns_full = [
-            "N_Datasets",
-            "Median_MASE",
-            "Mean_MASE",
-            "Median_R2oos",
-            "Mean_R2oos",
-        ]
+    columns_full = [
+        "N_Datasets",
+        "Median_MASE",
+        "Mean_MASE",
+        "Median_R2oos",
+        "Mean_R2oos",
+    ]
 
     category_summaries = []
 
@@ -1761,27 +1504,6 @@ def create_grouped_model_summary_table():
         cat_r2.columns = ["Median_R2oos", "Mean_R2oos"]
 
         cat_summary = cat_mase.join(cat_r2, how="left")
-
-        if relative_available:
-            cat_rel = cat_results[
-                (cat_results["model_name"] != "Historic Average")
-                & cat_results["Relative_MASE"].notna()
-            ].copy()
-
-            if not cat_rel.empty:
-                cat_rel_summary = (
-                    cat_rel.groupby("model_name")["Relative_MASE"]
-                    .agg(["median", "mean"])
-                    .round(4)
-                )
-                cat_rel_summary.columns = [
-                    "Median_Relative_MASE",
-                    "Mean_Relative_MASE",
-                ]
-                cat_summary = cat_summary.join(cat_rel_summary, how="left")
-            else:
-                cat_summary["Median_Relative_MASE"] = pd.NA
-                cat_summary["Mean_Relative_MASE"] = pd.NA
 
         if model_order:
             cat_summary["Order"] = cat_summary.index.map(
@@ -1867,7 +1589,7 @@ def create_grouped_model_summary_table():
     label = "tab:model_summary_by_category"
     note = (
         "\\textbf{Note:} Metrics are computed within each dataset category (Basis Spreads, Returns, Other). "
-        "Lower MASE/Relative MASE values indicate better performance; higher $R^2_{\\text{oos}}$ values indicate "
+        "Lower MASE values indicate better performance; higher $R^2_{\\text{oos}}$ values indicate "
         "better performance."
     )
 
@@ -1974,21 +1696,6 @@ def _aggregate_model_type_metrics(group_results, relative_available):
         "Mean_R2oos": round(r2_series.mean(), 4) if not r2_series.empty else pd.NA,
     }
 
-    if relative_available:
-        # Historic Average has Relative_MASE = NA by construction (it is the
-        # denominator of Relative_MASE), so omit it from the relative aggregates
-        # so each row only reflects models that are actually compared to the baseline.
-        rel_series = group_results.loc[
-            group_results["model_name"] != "Historic Average",
-            "Relative_MASE",
-        ].dropna()
-        summary["Median_Relative_MASE"] = (
-            round(rel_series.median(), 4) if not rel_series.empty else pd.NA
-        )
-        summary["Mean_Relative_MASE"] = (
-            round(rel_series.mean(), 4) if not rel_series.empty else pd.NA
-        )
-
     return summary
 
 
@@ -2012,10 +1719,9 @@ def create_model_type_summary_table():
         "N_Obs",
         "Median_MASE",
         "Mean_MASE",
+        "Median_R2oos",
+        "Mean_R2oos",
     ]
-    if relative_available:
-        columns_full += ["Median_Relative_MASE", "Mean_Relative_MASE"]
-    columns_full += ["Median_R2oos", "Mean_R2oos"]
 
     # Panel A: overall by model type
     overall_rows = []
@@ -2095,7 +1801,7 @@ def create_model_type_summary_table():
 
         Expected source layout (auto-generated by pandas.to_latex):
             \\toprule
-             & ... & Med MASE & Mean MASE & Med Rel MASE & Mean Rel MASE & Med R$^2$ & Mean R$^2$ \\\\
+             & ... & Med MASE & Mean MASE & Med R$^2$ & Mean R$^2$ \\\\
             <optional index-name row with empty data cells>
             \\midrule
             <data rows>
@@ -2104,18 +1810,17 @@ def create_model_type_summary_table():
         Replacement:
             \\toprule
             <blanks for index + bookkeeping cols> & \\multicolumn{2}{c}{MASE}
-                & \\multicolumn{2}{c}{Rel MASE} & \\multicolumn{2}{c}{R$^2$} \\\\
-            \\cmidrule(lr){a-b}\\cmidrule(lr){c-d}\\cmidrule(lr){e-f}
-            <index labels> & \\# Models & N & Med & Mean & Med & Mean & Med & Mean \\\\
+                & \\multicolumn{2}{c}{R$^2$} \\\\
+            \\cmidrule(lr){a-b}\\cmidrule(lr){c-d}
+            <index labels> & \\# Models & N & Med & Mean & Med & Mean \\\\
             \\midrule
         """
-        # The last six data columns are always (Med MASE, Mean MASE, Med Rel
-        # MASE, Mean Rel MASE, Med R$^2$, Mean R$^2$); the two columns before
-        # them are # Models and N; n_index_cols index columns sit at the front.
+        # The last four data columns are always (Med MASE, Mean MASE, Med
+        # R$^2$, Mean R$^2$); the two columns before them are # Models and N;
+        # n_index_cols index columns sit at the front.
         first_metric_col = n_index_cols + 2 + 1  # 1-indexed LaTeX column #
         mase_span = (first_metric_col, first_metric_col + 1)
-        rel_span = (first_metric_col + 2, first_metric_col + 3)
-        r2_span = (first_metric_col + 4, first_metric_col + 5)
+        r2_span = (first_metric_col + 2, first_metric_col + 3)
 
         # Index-column headers: "Model Type" alone (1) or "Category & Model Type" (2).
         if n_index_cols == 1:
@@ -2123,21 +1828,19 @@ def create_model_type_summary_table():
         else:
             index_label_row = "Category & Model Type"
 
-        # Top row: blanks for index + bookkeeping cols, then the 3 grouped headers.
+        # Top row: blanks for index + bookkeeping cols, then the 2 grouped headers.
         top_blanks = " & ".join([""] * (n_index_cols + 2))
         top_row = (
             f"{top_blanks} & \\multicolumn{{2}}{{c}}{{MASE}}"
-            f" & \\multicolumn{{2}}{{c}}{{Rel MASE}}"
             f" & \\multicolumn{{2}}{{c}}{{R$^2$}} \\\\"
         )
         cmidrules = (
             f"\\cmidrule(lr){{{mase_span[0]}-{mase_span[1]}}}"
-            f"\\cmidrule(lr){{{rel_span[0]}-{rel_span[1]}}}"
             f"\\cmidrule(lr){{{r2_span[0]}-{r2_span[1]}}}"
         )
         bottom_row = (
             f"{index_label_row} & \\# Models & N"
-            " & Med & Mean & Med & Mean & Med & Mean \\\\"
+            " & Med & Mean & Med & Mean \\\\"
         )
         new_header_block = "\n".join([top_row, cmidrules, bottom_row])
 
@@ -2597,12 +2300,6 @@ def create_heatmap_plots():
         ("MASE", "MASE", "mase_heatmap.png", "Mean Absolute Scaled Error (MASE)"),
         ("RMSE", "RMSE", "rmse_heatmap.png", "Root Mean Square Error (RMSE)"),
         ("R2oos", "R2oos", "r2oos_heatmap.png", "Out-of-Sample R-squared (R²oos)"),
-        (
-            "Relative_MASE",
-            "Relative MASE",
-            "relative_mase_heatmap.png",
-            "Relative MASE (vs Historic Average Baseline)",
-        ),
     ]
 
     for metric_col, metric_short, filename, metric_long in error_metrics:
@@ -3076,13 +2773,6 @@ if __name__ == "__main__":
     # Create R2oos pivot table (new metric)
     r2oos_table = create_r2oos_pivot_table()
 
-    # Create relative MASE pivot table (comparing to Historic Average baseline)
-    relative_mase_table = create_relative_mase_pivot_table()
-    if relative_mase_table is None:
-        print(
-            "Skipping relative MASE table creation - Historic Average model not available"
-        )
-
     # Create median MASE summary table (overall model ranking)
     median_mase_summary = create_median_mase_summary_table()
 
@@ -3119,8 +2809,6 @@ if __name__ == "__main__":
     if r2oos_table is not None:
         print(f"  - {FORECAST_DIR / 'r2oos_pivot_table.csv'}")
         print(f"  - {FORECAST_DIR / 'r2oos_pivot_table.tex'}")
-    print(f"  - {FORECAST_DIR / 'relative_mase_pivot_table.csv'}")
-    print(f"  - {FORECAST_DIR / 'relative_mase_pivot_table.tex'}")
     print(f"  - {FORECAST_DIR / 'model_summary_statistics.csv'}")
     print(f"  - {FORECAST_DIR / 'model_summary_statistics.tex'}")
     print(f"  - {FORECAST_DIR / 'model_summary_by_category.csv'}")
@@ -3137,8 +2825,6 @@ if __name__ == "__main__":
     if r2oos_table is not None:
         print(f"  - {PAPER_DIR / 'r2oos_pivot_table.csv'}")
         print(f"  - {PAPER_DIR / 'r2oos_pivot_table.tex'}")
-    print(f"  - {PAPER_DIR / 'relative_mase_pivot_table.csv'}")
-    print(f"  - {PAPER_DIR / 'relative_mase_pivot_table.tex'}")
     print(f"  - {PAPER_DIR / 'median_mase_summary.csv'}")
     print(f"  - {PAPER_DIR / 'median_mase_summary.tex'}")
     print(f"  - {PAPER_DIR / 'model_summary_by_category.csv'}")

@@ -6,42 +6,42 @@
 \begin{minipage}{\linewidth}
 \centering
 \noindent\textit{Panel A: Overall (all datasets)}\par\vspace{0.25em}
-\begin{tabular}{lrrrrrrrr}
+\begin{tabular}{lrrrrrr}
 \toprule
- &  &  & \multicolumn{2}{c}{MASE} & \multicolumn{2}{c}{Rel MASE} & \multicolumn{2}{c}{R$^2$} \\
-\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
-Model Type & \# Models & N & Med & Mean & Med & Mean & Med & Mean \\
+ &  &  & \multicolumn{2}{c}{MASE} & \multicolumn{2}{c}{R$^2$} \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Model Type & \# Models & N & Med & Mean & Med & Mean \\
 \midrule
-Benchmark & 1 & 25 & 0.947 & 1.960 & . & . & 0.000 & \textbf{0.000} \\
-Classical Statistical & 3 & 75 & 0.850 & 0.932 & 0.930 & 0.760 & \textbf{0.010} & -0.034 \\
-Hybrid & 2 & 50 & \textbf{0.805} & \textbf{0.825} & 0.761 & \textbf{0.723} & 0.002 & -0.043 \\
-Deep Learning & 6 & 150 & 0.839 & 0.866 & \textbf{0.718} & 0.747 & 0.006 & -0.110 \\
+Benchmark & 1 & 25 & 0.947 & 1.960 & 0.000 & \textbf{0.000} \\
+Classical Statistical & 3 & 75 & 0.850 & 0.932 & \textbf{0.010} & -0.034 \\
+Hybrid & 2 & 50 & \textbf{0.805} & \textbf{0.825} & 0.002 & -0.043 \\
+Deep Learning & 6 & 150 & 0.839 & 0.866 & 0.006 & -0.110 \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.75em}
 \noindent\textit{Panel B: By Dataset Category}\par\vspace{0.25em}
-\begin{tabular}{llrrrrrrrr}
+\begin{tabular}{llrrrrrr}
 \toprule
- &  &  &  & \multicolumn{2}{c}{MASE} & \multicolumn{2}{c}{Rel MASE} & \multicolumn{2}{c}{R$^2$} \\
-\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}
-Category & Model Type & \# Models & N & Med & Mean & Med & Mean & Med & Mean \\
+ &  &  &  & \multicolumn{2}{c}{MASE} & \multicolumn{2}{c}{R$^2$} \\
+\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+Category & Model Type & \# Models & N & Med & Mean & Med & Mean \\
 \midrule
-\multirow[t]{4}{*}{Basis Spreads} & Benchmark & 1 & 5 & 1.784 & 1.638 & . & . & 0.000 & 0.000 \\
- & Classical Statistical & 3 & 15 & 0.691 & 0.755 & 0.545 & 0.567 & 0.345 & 0.395 \\
- & Hybrid & 2 & 10 & \textbf{0.478} & \textbf{0.606} & 0.519 & \textbf{0.470} & \textbf{0.647} & \textbf{0.518} \\
- & Deep Learning & 6 & 30 & 0.541 & 0.704 & \textbf{0.510} & 0.530 & 0.643 & 0.345 \\
-\cline{1-10}
-\multirow[t]{4}{*}{Returns} & Benchmark & 1 & 12 & 0.859 & 0.978 & . & . & \textbf{0.000} & \textbf{0.000} \\
- & Classical Statistical & 3 & 36 & 0.850 & 0.966 & 1.000 & 0.992 & -0.031 & -0.461 \\
- & Hybrid & 2 & 24 & 0.851 & 0.858 & 0.990 & 0.961 & -0.132 & -0.484 \\
- & Deep Learning & 6 & 72 & \textbf{0.825} & \textbf{0.850} & \textbf{0.989} & \textbf{0.935} & -0.125 & -0.422 \\
-\cline{1-10}
-\multirow[t]{4}{*}{Other} & Benchmark & 1 & 8 & 2.244 & 3.633 & . & . & 0.000 & 0.000 \\
- & Classical Statistical & 3 & 24 & 0.907 & 0.992 & 0.450 & 0.534 & 0.393 & \textbf{0.340} \\
- & Hybrid & 2 & 16 & \textbf{0.820} & \textbf{0.913} & \textbf{0.421} & \textbf{0.525} & 0.378 & 0.270 \\
- & Deep Learning & 6 & 48 & 0.910 & 0.991 & 0.427 & 0.600 & \textbf{0.430} & 0.073 \\
-\cline{1-10}
+\multirow[t]{4}{*}{Basis Spreads} & Benchmark & 1 & 5 & 1.784 & 1.638 & 0.000 & 0.000 \\
+ & Classical Statistical & 3 & 15 & 0.691 & 0.755 & 0.345 & 0.395 \\
+ & Hybrid & 2 & 10 & \textbf{0.478} & \textbf{0.606} & \textbf{0.647} & \textbf{0.518} \\
+ & Deep Learning & 6 & 30 & 0.541 & 0.704 & 0.643 & 0.345 \\
+\cline{1-8}
+\multirow[t]{4}{*}{Returns} & Benchmark & 1 & 12 & 0.859 & 0.978 & \textbf{0.000} & \textbf{0.000} \\
+ & Classical Statistical & 3 & 36 & 0.850 & 0.966 & -0.031 & -0.461 \\
+ & Hybrid & 2 & 24 & 0.851 & 0.858 & -0.132 & -0.484 \\
+ & Deep Learning & 6 & 72 & \textbf{0.825} & \textbf{0.850} & -0.125 & -0.422 \\
+\cline{1-8}
+\multirow[t]{4}{*}{Other} & Benchmark & 1 & 8 & 2.244 & 3.633 & 0.000 & 0.000 \\
+ & Classical Statistical & 3 & 24 & 0.907 & 0.992 & 0.393 & \textbf{0.340} \\
+ & Hybrid & 2 & 16 & \textbf{0.820} & \textbf{0.913} & 0.378 & 0.270 \\
+ & Deep Learning & 6 & 48 & 0.910 & 0.991 & \textbf{0.430} & 0.073 \\
+\cline{1-8}
 \bottomrule
 \end{tabular}
 \end{minipage}
