@@ -30,8 +30,10 @@
 \usepackage[table]{xcolor} % For coloring table cells
 \usepackage{threeparttable} % For table footnotes
 
+% Center every caption (title, Note, and Source) uniformly across all figures and tables
+\captionsetup{justification=centering}
 % Uniform "Source" note rendered below every figure and table (consistent size and styling)
-\newcommand{\floatsource}[1]{\caption*{\scriptsize\emph{#1}}}
+\newcommand{\floatsource}[1]{\caption*{\footnotesize\emph{#1}}}
 
 % \title{An Open-Source Financial Time Series Forecasting Benchmark}
 % \title{Benchmarking Forecasting Methods for Financial Stability}
@@ -140,7 +142,7 @@ Source & Name & Coverage of Finance Domain & Website \\
 \cite{Aksu2024} & GIFT-EVAL & Anonymous data, unclear & \href{https://github.com/SalesforceAIResearch/gift-eval}{Link}\\
 \bottomrule
 \end{tabular}
-\floatsource{Source: Authors' analysis}
+\floatsource{Sources: Authors' analysis}
 \end{table}
 
 
@@ -254,7 +256,7 @@ HKM Monthly Factor & Same as above, but monthly & \cite{He2017} \\
 Treasury Yield Curve & Daily Nelson-Siegel-Svensson zero-coupon yields, 1-30 years & \cite{Gurkaynak2007} \\
 \bottomrule
 \end{tabular}
-\floatsource{Source: Authors' analysis}
+\floatsource{Sources: Authors' analysis}
 \end{table}
 
 Table~\ref{tab:data_sources} shows the specific data sources required for each dataset in our benchmark. The table illustrates the diverse range of financial data providers needed to construct the datasets.
@@ -313,7 +315,7 @@ Treasury Yield Curve & Yield Curve Data from Board of Governors of the Federal R
 \item[$^{e}$] See \url{https://www.federalreserve.gov/data/nominal-yield-curve.htm}
 \end{tablenotes}
 \end{threeparttable}
-\floatsource{Source: Authors' analysis}
+\floatsource{Sources: Authors' analysis}
 \end{table}
 
 Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in our benchmark, including entity counts, time series characteristics, and temporal coverage. The table shows substantial variation across datasets, with disaggregated series (individual bonds, stocks, options contracts) containing thousands of entities, while portfolio-level datasets typically contain 10-50 series. The date columns indicate each dataset's coverage span, with most datasets providing substantial histories for robust model comparison.
@@ -325,7 +327,7 @@ Table~\ref{tab:dataset_stats} provides detailed statistics for each dataset in o
 \input{\PathToOutput/forecasting/paper/dataset_statistics_tabular.tex}
 \vspace{0.1cm}
 % \textbf{Notes:} Unique Entities = distinct time series identifiers; Min/Median/Max Length = time series lengths per entity.
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 % Please create a paragraph for each asset class and then within each paragraph, I don't want to talk about how the portfolios are constructed, but rather I want to talk about the essential cleaning, filtering, and transformations applied, because I want to stress to the reader why, like what is unique or interesting or what is our contribution by open sourcing the cleaning procedure used in this paper. So I guess for each, if you want to establish why is this paper considered canonical, And what are the essential filters and transformations applied by this paper? 
@@ -684,7 +686,6 @@ Table~\ref{tab:model_properties} summarizes how these baselines differ across a 
 \small
 \caption{Key Properties of Baseline Forecasting Models}
 \label{tab:model_properties}
-\begin{threeparttable}
 \begin{tabular}{lccc}
 \toprule
 Model & Seasonal & Exogenous & Prob. \\
@@ -707,11 +708,8 @@ TiDE & -- & \checkmark & -- \\
 KAN & -- & \checkmark & -- \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item \textit{Notes:} ``Seasonal'' indicates built-in mechanisms for seasonal components; ``Exogenous'' denotes native support for additional regressors; ``Prob.'' captures whether the implementation produces full predictive distributions rather than point forecasts. $^{\dagger}$N-BEATSx extends the architecture to exogenous inputs. Attributes are assessed from the original model publications and Nixtla documentation.\footnote{\url{https://nixtlaverse.nixtla.io/}}
-\end{tablenotes}
-\end{threeparttable}
-\floatsource{Source: Authors' analysis}
+\caption*{\footnotesize \textbf{Note:} ``Seasonal'' indicates built-in mechanisms for seasonal components; ``Exogenous'' denotes native support for additional regressors; ``Prob.'' captures whether the implementation produces full predictive distributions rather than point forecasts. $^{\dagger}$N-BEATSx extends the architecture to exogenous inputs. Attributes are assessed from the original model publications and Nixtla documentation (\url{https://nixtlaverse.nixtla.io/}).}
+\floatsource{Sources: Authors' analysis}
 \end{table}
 
 
@@ -760,8 +758,8 @@ Table~\ref{tab:mase_results} shows MASE results for all model-dataset combinatio
 \caption{MASE Results by Dataset and Model}
 \label{tab:mase_results}
 \input{\PathToOutput/forecasting/paper/mase_pivot_tabular.tex}
-\caption*{\scriptsize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\caption*{\footnotesize \textbf{Note:} Values show Mean Absolute Scaled Error (MASE). Lower values indicate better performance. -- indicates missing results.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE results from Table~\ref{tab:mase_results}. The color-coded heatmap makes it easy to identify patterns in model performance across different dataset types, with cooler colors (blues) indicating better performance and warmer colors (reds) indicating poorer performance.
@@ -770,8 +768,8 @@ Figure~\ref{fig:mase_heatmap} provides a visual representation of the MASE resul
 \centering
 \caption{MASE Results Heatmap by Dataset and Model}
 \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/mase_heatmap.png}
-\caption*{\scriptsize \textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.}
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\caption*{\footnotesize \textbf{Note:} Cooler colors (blue) indicate better performance (lower error), while warmer colors (red) indicate poorer performance (higher error). Color scaling is capped at the 90th percentile to highlight differences among the majority of values; extreme outliers are marked with asterisks (*) and show actual values.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \label{fig:mase_heatmap}
 \end{figure}
 
@@ -784,8 +782,8 @@ Table~\ref{tab:rmse_results} presents the corresponding RMSE results using the s
 \input{\PathToOutput/forecasting/paper/rmse_pivot_tabular.tex}
 \vspace{0.1cm}
 
-\caption*{\scriptsize \textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.}
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\caption*{\footnotesize \textbf{Note:} Values show Root Mean Square Error (RMSE). Lower values indicate better performance. -- indicates missing results.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 % Figure~\ref{fig:rmse_heatmap} visualizes the RMSE results, complementing the numerical table with a clear color-coded representation of relative model performance across all datasets.
@@ -804,8 +802,8 @@ Table~\ref{tab:r2oos_results} presents the out-of-sample $R^2$ ($R^2_{\text{oos}
 \caption{Out-of-Sample $R^2$ Results by Dataset and Model}
 \label{tab:r2oos_results}
 \input{\PathToOutput/forecasting/paper/r2oos_pivot_tabular.tex}
-\caption*{\scriptsize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\caption*{\footnotesize \textbf{Note:} Values show out-of-sample $R^2$ ($R^2_{\text{oos}}$). Positive values indicate better performance than the historical average baseline; negative values indicate underperformance. Higher values indicate better performance. Bold values highlight the best performing model for each dataset.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highlighting which datasets and models deliver the greatest gains over the historical average benchmark. The diverging color scale emphasizes positive predictive power while clearly flagging underperformance.
@@ -814,8 +812,8 @@ Figure~\ref{fig:r2oos_heatmap} visualizes the out-of-sample $R^2$ results, highl
     \centering
     \includegraphics[width=\textwidth]{\PathToOutput/forecasting/paper/r2oos_heatmap.png}
     \caption{Out-of-Sample $R^2$ ($R^2_{\text{oos}}$) Heatmap by Dataset and Model}
-    \caption*{\scriptsize \textbf{Note:} Warmer colors indicate larger improvements over the Historic Average baseline, while cooler colors indicate underperformance. Cells with extreme values are annotated to preserve readability.}
-    \floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+    \caption*{\footnotesize \textbf{Note:} Warmer colors indicate larger improvements over the Historic Average baseline, while cooler colors indicate underperformance. Cells with extreme values are annotated to preserve readability.}
+    \floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
     \label{fig:r2oos_heatmap}
 \end{figure}
 
@@ -829,8 +827,8 @@ To synthesize performance across datasets, Table~\ref{tab:median_mase_summary} r
 % \resizebox{\textwidth}{!}{%
 \input{\PathToOutput/forecasting/paper/median_mase_summary_tabular.tex}
 % }
-\caption*{\scriptsize \textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.}
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\caption*{\footnotesize \textbf{Note:} Summary statistics across all datasets for each model. MASE shows absolute performance (lower is better), and R² shows out-of-sample predictive power (higher is better). Models are sorted by median MASE.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Table~\ref{tab:model_summary_by_category} disaggregates these results by dataset type. Each panel focuses on the models' performance across basis spreads, returns, or other datasets, highlighting how relative rankings shift as the data generating process changes and underscoring that the ``best'' model depends both on the metric and the market segment.
@@ -841,8 +839,8 @@ Table~\ref{tab:model_summary_by_category} disaggregates these results by dataset
 \label{tab:model_summary_by_category}
 \scriptsize
 \input{\PathToOutput/forecasting/paper/model_summary_by_category_tabular.tex}
-\caption*{\scriptsize \textbf{Note:} Metrics are computed within each dataset category (Basis Spreads, Returns, Other). Lower MASE values indicate better performance; higher $R^2_{\text{oos}}$ values indicate better performance.}
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\caption*{\footnotesize \textbf{Note:} Metrics are computed within each dataset category (Basis Spreads, Returns, Other). Lower MASE values indicate better performance; higher $R^2_{\text{oos}}$ values indicate better performance.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 Error-metric choice is especially consequential for the returns category. Out-of-sample $R^2$ is the most informative measure here because the Historic Average is already a hard-to-beat benchmark for asset returns. The table shows that nearly every model evaluated here, including the auto deep networks, posts $R^2_{\text{oos}}$ values clustered around zero for equity, bond, FX, and option returns. We emphasize that this finding pertains to the class of models we evaluate: univariate global forecasts without exogenous regressors (see Section~\ref{subsec:univariate_multivariate}). Within that class, simply forecasting the historical mean is nearly optimal, an outcome that mirrors decades of empirical asset-pricing research and reinforces how difficult it is to extract persistent return predictability without conditioning information. Extending the benchmark to methods that admit exogenous regressors (ARIMAX, DeepAR with covariates, Temporal Fusion Transformers) or to multivariate-panel methods (VARs, state-space systems) could in principle close part of this gap; we leave that comparison to follow-up work.
@@ -860,8 +858,8 @@ Tables~\ref{tab:median_mase_summary}--\ref{tab:model_summary_by_category} rank i
 \caption{Model Performance by Forecasting Method Type}
 \label{tab:model_summary_by_type}
 \input{\PathToOutput/forecasting/paper/model_summary_by_type_tabular.tex}
-\caption*{\scriptsize \textbf{Note:} Each row aggregates every (model $\times$ dataset) observation whose model belongs to the indicated method type. ``\# Models'' counts distinct models in the type and ``N'' counts (model $\times$ dataset) observations. The Historic Average benchmark is reported in its own row because it is the benchmark against which $R^2_{\text{oos}}$ is defined. Lower MASE indicates better performance; higher $R^2_{\text{oos}}$ indicates better performance. Best values within each panel (or, in Panel~B, within each dataset category) are bolded.}
-\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis.}
+\caption*{\footnotesize \textbf{Note:} Each row aggregates every (model $\times$ dataset) observation whose model belongs to the indicated method type. ``\# Models'' counts distinct models in the type and ``N'' counts (model $\times$ dataset) observations. The Historic Average benchmark is reported in its own row because it is the benchmark against which $R^2_{\text{oos}}$ is defined. Lower MASE indicates better performance; higher $R^2_{\text{oos}}$ indicates better performance. Best values within each panel (or, in Panel~B, within each dataset category) are bolded.}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 The aggregated view sharpens the qualitative picture from the model-level tables. On the MASE scale the three method families finish much closer than the individual rankings might suggest: hybrid wins median MASE (0.805), with deep learning and classical within a few hundredths (0.839 and 0.850 respectively). The out-of-sample $R^2$ column now tells a much milder story than the per-model variation suggested. All three families post a \emph{median} $R^2_{\text{oos}}$ within $0.01$ of zero (classical 0.010, hybrid 0.002, deep learning 0.006), and the \emph{mean} $R^2_{\text{oos}}$ is mildly negative for each family (classical $-0.034$, hybrid $-0.043$, deep learning $-0.110$). No family posts a solidly positive aggregate mean. The mild gap in the means reflects a small number of disaggregated panels on which deep learning underperforms the historical-average benchmark; the median---which is robust to those tail cases---is essentially zero for every family. Panel~B shows that the cross-family gap is concentrated in the basis-spreads category, where hybrid and deep-learning models exploit the seasonal structure of funding-related spreads and beat the classical aggregate on median MASE (0.478 and 0.541 vs.\ 0.691) and on $R^2_{\text{oos}}$ (median 0.647 and 0.643 vs.\ 0.345). On the Returns category every family clusters within a few hundredths of MASE and slightly negative $R^2_{\text{oos}}$. The Other category (bank regulatory filings and intermediary indicators) is the most nuanced: median $R^2_{\text{oos}}$ now favors deep learning (0.430) and classical statistical methods (0.393) almost equally, with hybrid behind (0.378), while mean $R^2_{\text{oos}}$ inverts the median ranking---classical (0.340) edges hybrid (0.270) and deep learning (0.073) because the classical baselines avoid the tail failures that drag the deep-learning mean. The takeaway is not that one family dominates uniformly. Rather, the value-add of moving from a classical method to a deep or hybrid architecture is concentrated in segments with persistent seasonal or cross-sectional structure (basis spreads), is essentially absent in segments where the historical mean is already an oracle (returns), and is more variable in segments where parsimony pays off (bank and intermediary indicators).
@@ -892,9 +890,9 @@ Before turning to forecasting, we confirm that the MMN correction is a meaningfu
 \caption{Replicating \citet{Dickerson2024}: Decile-10-Minus-Decile-1 Long--Short by Realised-Return Convention}
 \label{tab:mmn_dickerson}
 \input{\PathToOutput/forecasting/paper/mmn_dickerson_tabular.tex}
-\caption*{\scriptsize
+\caption*{\footnotesize
 \textbf{Note:} Each row reports the value-weighted long--short return (decile 10 minus decile 1) from sorting corporate bonds into ten value-weighted credit-spread deciles each month using the OSBAP credit-spread signal, then computing the realised return under the indicated convention. Both rows use identical bond universes, sort dates, decile assignments, and weighting variables. The only difference is the realised-return convention. $R^{\text{end}}$ uses month-end TRACE prices for both the signal at $t$ and the return-start at $t$, so any residual market-microstructure noise enters both; $R^{\text{bgn}}$ uses month-begin TRACE prices for the return-start at $t+1$, separating signal-date and return-start prices by a full bid--ask cycle. $t$-statistics are Newey--West uncorrected (i.i.d.\ assumption) and are reported only for relative comparison. Sample: 269 months, 2002--2024.}
-\floatsource{Sources: openbondassetpricing.com (OSBAP 2025 main panel), Authors' analysis.}
+\floatsource{Sources: openbondassetpricing.com (OSBAP 2025 main panel), Authors' analysis}
 \end{table}
 
 We now turn to the forecasting question. On the same OSBAP panel we build two parallel panels of value-weighted decile portfolios sorted on each cleaning convention of the signal itself, holding the universe and the realised-return series identical. The cross-decile rank correlation between the two signals is 0.98 and the resulting portfolio return time series are 98--99\% correlated within decile, yet the long--short spread (decile 10 minus decile 1) differs by roughly a factor of two (2.8\% per year under the MMN-biased signal versus 5.6\% per year under the MMN-corrected signal). The implication is that cleaning the signal does not merely reproduce the same portfolio with cosmetic differences: it changes which bonds occupy each decile in a way that reshuffles the cross-section enough to alter both the apparent premium and, as we show next, the relative ranking of forecasting models. On these two near-identical-but-not-quite panels we run the full twelve-model suite used elsewhere in this paper, under the same rolling-origin cross-validation protocol. Table~\ref{tab:mmn_sensitivity} reports the result.
@@ -904,9 +902,9 @@ We now turn to the forecasting question. On the same OSBAP panel we build two pa
 \caption{Forecasting Sensitivity to Signal Cleaning: Credit-Spread Decile Portfolios}
 \label{tab:mmn_sensitivity}
 \input{\PathToOutput/forecasting/paper/mmn_sensitivity_tabular.tex}
-\caption*{\scriptsize
+\caption*{\footnotesize
 \textbf{Note:} Out-of-sample $R^2$ ($R^2_{\text{oos}}$) and Mean Absolute Scaled Error (MASE) for the twelve forecasting models reported elsewhere in the paper, applied to two value-weighted decile-portfolio panels of corporate bonds. The MMN-biased panel sorts bonds by a credit spread constructed from MMN-contaminated TRACE prices. The MMN-corrected panel applies the correction of \citet{Dickerson2024}. The realized return, universe, and cross-validation protocol are held fixed; only the signal used for decile assignment differs. $\Delta$ columns report corrected minus biased. Bold values highlight the best performing model within each level column ($R^2_{\text{oos}}$ higher is better; MASE lower is better).}
-\floatsource{Sources: openbondassetpricing.com, Authors' analysis.}
+\floatsource{Sources: openbondassetpricing.com, Authors' analysis}
 \end{table}
 
 The four classical baselines (Historic Average, ARIMA, SES, Theta) and four of the deep models (NBEATS, DLinear, TiDE, DeepAR) are essentially indifferent to the cleaning choice: $|\Delta R^2_{\text{oos}}| \leq 0.04$ in all eight cases. The remaining four deep models swing by an order of magnitude more. NHITS moves by $+0.62$ (from $-0.53$ to $+0.09$), KAN by $-0.31$ (from $+0.28$ to $-0.03$), NLinear by $+0.23$ (from $+0.27$ to $+0.50$), and Transformer by $-0.12$ (from $+0.26$ to $+0.14$). Note the signs: cleaning the signal does not push every deep model in the same direction. Some architectures gain from the corrected signal, others lose. This is the entanglement between method skill and cleaning skill made concrete on a single pipeline.
@@ -926,9 +924,9 @@ The contrasts span a range of cleaning intensity, which we summarize by how corr
 \label{tab:cleaning_robustness}
 \scriptsize
 \input{\PathToOutput/forecasting/paper/cleaning_sensitivity_tabular.tex}
-\caption*{\scriptsize
+\caption*{\footnotesize
 \textbf{Note:} Out-of-sample $R^2$ ($R^2_{\text{oos}}$) and Mean Absolute Scaled Error (MASE) for the twelve forecasting models used elsewhere in the paper, applied to three pairs of panels. Panel A: SPX CJS 54-portfolio returns built from options data filtered with Level-1 filters only vs.\ the full Level-1+Level-2+Level-3 stack of \citet{Constantinides2013}. Panel B: 5$\times$5 size $\times$ book-to-market portfolios with NYSE-only breakpoints (\citealt{Fama1993} convention) vs.\ all-CRSP breakpoints. Panel C: maturity-bucketed Treasury bond portfolios with a permissive universe (callables and on-the-run issues kept) vs.\ the \citet{Gurkaynak2007} ``strict'' universe (callables dropped, on-the-run and first off-the-run dropped for post-1980 securities). Within each panel, the realized-return series, holding-period definition, and cross-validation protocol are held fixed; only the cleaning convention differs. $\Delta$ columns report the right-hand variant minus the left-hand variant. Bold values mark the best-performing model within each level column ($R^2_{\text{oos}}$ higher is better; MASE lower is better).}
-\floatsource{Sources: WRDS (CRSP, Compustat, OptionMetrics), Authors' analysis.}
+\floatsource{Sources: WRDS (CRSP, Compustat, OptionMetrics), Authors' analysis}
 \end{table}
 
 The Options panel (Panel~A) shows the same shape of lesson as the MMN case study: a reshuffled leaderboard rather than a uniform shift. No model clears $R^2_{\text{oos}} = +0.27$ on either variant, but within that band the ranking reorders sharply and in mixed directions, with three neural architectures (NBEATS, NHITS, KAN) gaining from the heavier L3 cleaning while five deep models and three classical baselines lose. The leaderboard top moves from DLinear/DeepAR on L1 to NHITS on L3, every one of the eight deep architectures shifts by $|\Delta R^2_{\text{oos}}| > 0.11$, and five cross zero, while the four classical baselines move by $0.15$ or less. The heavier L3 cleaning is also the defensible convention rather than a stylistic preference: its filters drop deep out-of-the-money and far-from-maturity options with bid--ask spreads exceeding 50\% of price and near-zero volume, quotes no market maker would fill at scale, so the L1 panel admits returns no investor could realise even in principle.
@@ -1374,7 +1372,7 @@ Table~\ref{tab:filtered_dataset_stats} reports the impact of the unified preproc
 \caption{Impact of Robust Forecasting Preprocessing on Dataset Statistics}
 \label{tab:filtered_dataset_stats}
 \input{\PathToOutput/forecasting/paper/filtered_dataset_statistics_tabular.tex}
-\floatsource{Sources: Bloomberg, Board Of Governors Of The Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
+\floatsource{Sources: Bloomberg, Board of Governors of the Federal Reserve System, Center for Research in Security Prices, U.S. Call Reports, WRDS TRACE, OptionMetrics, S\&P Global, Authors' analysis}
 \end{table}
 
 \end{appendices}
