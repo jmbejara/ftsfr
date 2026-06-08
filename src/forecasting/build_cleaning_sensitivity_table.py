@@ -9,6 +9,10 @@ demos as panels under a single tabular:
   Panel B: FF25 size x BM - NYSE vs CRSP breakpoints
   Panel C: Treasury portfolios - GSW strict vs permissive
 
+(A short-term-reversal corporate-bond panel was previously stacked here as
+Panel D but was removed; the robustness section now covers three asset
+classes distinct from the corporate-bond MMN case study.)
+
 Within each panel, rows are forecasting models and columns are
 (R^2_oos x {variant A, variant B}, MASE x {variant A, variant B}, deltas).
 """
@@ -49,14 +53,6 @@ PANELS = [
         "ftsfr_treas_portfolios_strict",
         "Permissive",
         "GSW strict",
-    ),
-    (
-        "Panel D: Corp bond STR (clean\\_trace)",
-        "ftsfr_corp_bond_str_deciles_naive",
-        "ftsfr_corp_bond_str_deciles_return_gap",
-        # Short headers; Approach 1 vs Approach 3 detail is in the caption note.
-        "Naive",
-        "Return gap",
     ),
 ]
 
