@@ -419,7 +419,9 @@ def create_auto_config_nbeats(
             "mlp_units": trial.suggest_categorical(
                 "mlp_units", ([[64, 64], [64, 64]], [[128, 128], [128, 128]])
             ),
-            "dropout_prob_theta": trial.suggest_float("dropout_prob_theta", 0.0, 0.3),
+            # NOTE: no dropout here — NBEATS accepts dropout_prob_theta in its
+            # signature but raises NotImplementedError('dropout') if it is > 0
+            # (neuralforecast 3.0.0). NHITS implements it; NBEATS does not.
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
             "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks

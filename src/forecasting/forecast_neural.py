@@ -793,6 +793,11 @@ def main():
         cfg = dict(model_config)
         cfg["random_seed"] = seed
         cfg["alias"] = f"{neural_model_name}_seed{seed}"
+        if MODEL_NAME == "nbeats" and test_size <= 1:
+            # Trend/seasonality basis expansions require h > 1; NBEATS raises
+            # "Horizon h=1 incompatible..." otherwise. Mirrors the guard in
+            # forecast_neural_auto.create_auto_config_nbeats.
+            cfg["stack_types"] = ["identity", "identity"]
         if MODEL_NAME == "deepar":
             return DeepAR(
                 h=test_size, loss=DistributionLoss(distribution="Normal"), **cfg
