@@ -717,6 +717,25 @@ KAN & -- & \checkmark & -- \\
 \end{table}
 
 
+\subsection{An Illustration: What Do These Forecasts Look Like?}
+\label{subsec:forecast_illustration}
+
+Before turning to the formal evaluation, Figure~\ref{fig:example_forecasts} offers a purely illustrative look at how differently these model families behave when extrapolating two contrasting kinds of data. To avoid singling out any individual series, each panel shows a cross-sectional average: we forecast every entity in the panel and then average both the realized series and the per-method forecasts across entities. Panel~(a) is the Treasury spot-futures (``cash-futures'') basis of Figure~\ref{fig:treasury_sf_basis}, averaged across its five tenors and forecast over the twelve months of 2019 (trained through December 2018). Panel~(b) is bank holding company (BHC) cash liquidity, averaged across the BHCs that report continuously over the window and forecast over the twelve quarters of 2017--2019 (trained through 2016). Both panels show the same representative quartet---one model from each family in our roster: the classical statistical workhorses ARIMA and Theta, the strongest hybrid linear method on basis spreads (NLinear), and the strongest pure deep-learning method on basis spreads (N-BEATS), per the basis-spread panel of Table~\ref{tab:model_summary_by_category}. We hold the quartet fixed across panels for comparability and train the neural models globally over each panel's entities, consistent with our univariate-global design.
+
+This exhibit is deliberately not an accuracy test. Whereas the benchmark evaluates each series one step ahead and rolls the origin forward (Section~\ref{sec:methodology}), here we generate a single twelve-step path so that the qualitative differences in shape are visible at a glance. The contrast across panels is the point. On the basis spread (Panel~a) the methods fan out: ARIMA and Theta anchor near recent levels and mean-revert, while the hybrid and deep-learning models trace more articulated paths that bend with the recent dynamics. On bank cash liquidity (Panel~b), by contrast, the four methods cluster much more tightly around the realized average, mirroring our finding that classical and machine-learning methods are roughly competitive on bank and intermediary indicators. None of this establishes which method forecasts best---that is the role of the error metrics in Section~\ref{sec:results}---but it conveys what ``a forecast'' concretely means for each family and why the appropriate default is task-specific.
+
+\begin{figure}[htbp]
+    \centering
+    \caption{Illustrative Forecasts: Basis Spread vs.\ Bank Cash Liquidity}
+  \begin{tabular}{@{}c@{}}
+    \includegraphics[width=.95\linewidth]{\PathToOutput/forecasting/paper/example_forecasts_illustration.png}
+  \end{tabular}
+  \caption*{\footnotesize \textbf{Note:} Each panel plots a cross-sectional average: every entity is forecast individually, and the realized series and per-method forecasts are then averaged across entities. \emph{Panel (a):} Treasury spot-futures basis averaged across its five tenors (monthly), trained through December 2018 (dotted line) and forecast over 2019. \emph{Panel (b):} BHC cash liquidity averaged across banks reporting continuously over the window (quarterly), trained through 2016~Q4 and forecast over 2017--2019. One representative model is shown from each family: the classical statistical methods (ARIMA, Theta), the best hybrid linear method on basis spreads (NLinear), and the best pure deep-learning method on basis spreads (N-BEATS). The figure illustrates the qualitative shape of each family's forecast and is not an accuracy comparison; for that, see Section~\ref{sec:results}.}
+  \floatsource{Sources: Bloomberg, Call Reports, Authors' analysis}
+  \label{fig:example_forecasts}
+\end{figure}
+
+
 \subsection{Data Preprocessing}
 
 To ensure fair model comparisons, our forecasting system applies a unified preprocessing pipeline before any model is trained. We summarize the rules below and report per-dataset retention statistics, median series lengths, and adaptive minimum observation thresholds in Table~\ref{tab:filtered_dataset_stats} of Appendix~\ref{app:forecasting_preprocessing}.
