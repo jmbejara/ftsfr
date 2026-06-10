@@ -30,7 +30,12 @@ from forecast_utils import (
     convert_pandas_freq_to_polars,
     evaluate_cv,
     get_test_size_from_frequency,
+    get_val_size_from_frequency,
     determine_cv_windows,
+    compute_clip_bounds,
+    clip_cv_forecasts,
+    save_cv_forecasts,
+    CLIP_IQR_MULTIPLIER,
     MAX_CV_WINDOWS,
     read_dataset_config,
     should_skip_forecast,
@@ -137,7 +142,10 @@ def create_config_nhits(
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
         "windows_batch_size": 256,
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
     }
     if lightning_logs_dir:
         config_dict["default_root_dir"] = lightning_logs_dir
@@ -163,7 +171,10 @@ def create_config_lstm(
         "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
         "start_padding_enabled": True,
         "decoder_layers": 1,
         "decoder_hidden_size": 128,
@@ -190,7 +201,10 @@ def create_config_simple(
         "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
         "start_padding_enabled": True,
     }
     if lightning_logs_dir:
@@ -218,7 +232,10 @@ def create_config_deepar(
         "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 64,
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
         "start_padding_enabled": True,
     }
     if lightning_logs_dir:
@@ -246,7 +263,10 @@ def create_config_nbeats(
         "stack_types": ["trend", "seasonality"],
         "n_blocks": [2, 2],
         "mlp_units": [[64, 64], [64, 64]],
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
         "start_padding_enabled": True,
     }
     if lightning_logs_dir:
@@ -273,7 +293,10 @@ def create_config_transformer(
         "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
         "start_padding_enabled": True,
     }
     if lightning_logs_dir:
@@ -302,7 +325,10 @@ def create_config_tide(
         "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
         "start_padding_enabled": True,
     }
     if lightning_logs_dir:
@@ -331,7 +357,10 @@ def create_config_kan(
         "scaler_type": "robust",
         "max_steps": 200 if debug else 500,
         "batch_size": 32,
-        "random_seed": 42,
+        "gradient_clip_val": 1.0,
+        "early_stop_patience_steps": 5,
+        "val_check_steps": 50,
+        "optimizer_kwargs": {"weight_decay": 1e-4},
         "start_padding_enabled": True,
     }
     if lightning_logs_dir:
@@ -381,12 +410,22 @@ def main():
         action="store_true",
         help="Skip if valid error metrics already exist",
     )
+    parser.add_argument(
+        "--n-seeds",
+        type=int,
+        default=5,
+        help="Number of random seeds ensembled for the fixed-config fit; the "
+        "point forecasts of the seed members are averaged.",
+    )
     args = parser.parse_args()
 
     DATASET_NAME = args.dataset
     MODEL_NAME = args.model
     DEBUG_MODE = args.debug
     SKIP_EXISTING = args.skip_existing
+    N_ENSEMBLE_SEEDS = max(1, args.n_seeds)
+    if DEBUG_MODE:
+        N_ENSEMBLE_SEEDS = min(N_ENSEMBLE_SEEDS, 2)
 
     # Check if we should skip this forecast
     if SKIP_EXISTING and should_skip_forecast(DATASET_NAME, MODEL_NAME, verbose=True):
@@ -729,36 +768,47 @@ def main():
 
     model_config = config_mapping[MODEL_NAME]
 
-    # Create model instances with fixed hyperparameters
-    # Each model needs its own specific configuration
-    if MODEL_NAME == "deepar":
-        selected_model = DeepAR(
-            h=test_size, loss=DistributionLoss(distribution="Normal"), **model_config
-        )
-    elif MODEL_NAME == "nbeats":
-        selected_model = NBEATS(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "nhits":
-        selected_model = NHITS(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "dlinear":
-        selected_model = DLinear(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "nlinear":
-        selected_model = NLinear(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "vanilla_transformer":
-        selected_model = VanillaTransformer(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "tide":
-        selected_model = TiDE(h=test_size, loss=MAE(), **model_config)
-    elif MODEL_NAME == "kan":
-        selected_model = KAN(h=test_size, loss=MAE(), **model_config)
-    else:
+    model_class_mapping = {
+        "deepar": DeepAR,
+        "nbeats": NBEATS,
+        "nhits": NHITS,
+        "dlinear": DLinear,
+        "nlinear": NLinear,
+        "vanilla_transformer": VanillaTransformer,
+        "tide": TiDE,
+        "kan": KAN,
+    }
+    if MODEL_NAME not in model_class_mapping:
         raise ValueError(f"Unknown model name: {MODEL_NAME}")
+    model_class = model_class_mapping[MODEL_NAME]
+    neural_model_name = model_class.__name__
 
-    neural_models = [selected_model]
+    # Seed ensemble: train the same fixed config under several random seeds
+    # and average the point forecasts. Averaging reduces training-run variance,
+    # which is what produces the catastrophic negative-R2oos outliers.
+    ensemble_seeds = list(range(1, N_ENSEMBLE_SEEDS + 1))
+    member_cols = [f"{neural_model_name}_seed{seed}" for seed in ensemble_seeds]
+
+    def build_member(seed):
+        cfg = dict(model_config)
+        cfg["random_seed"] = seed
+        cfg["alias"] = f"{neural_model_name}_seed{seed}"
+        if MODEL_NAME == "deepar":
+            return DeepAR(
+                h=test_size, loss=DistributionLoss(distribution="Normal"), **cfg
+            )
+        return model_class(h=test_size, loss=MAE(), **cfg)
+
+    neural_models = [build_member(seed) for seed in ensemble_seeds]
 
     baseline_model_names = [type(model).__name__ for model in baseline_models]
-    neural_model_names = [type(model).__name__ for model in neural_models]
+    neural_model_names = [neural_model_name]
 
     print(f"Baseline Models: {', '.join(baseline_model_names)}")
-    print(f"Neural Model: {', '.join(neural_model_names)}")
+    print(
+        f"Neural Model: {neural_model_name} "
+        f"(ensemble of {len(ensemble_seeds)} seeds: {ensemble_seeds})"
+    )
 
     # Perform cross-validation with baseline models first
     print("\n4. Performing Cross-Validation with Baseline Models")
@@ -869,11 +919,16 @@ def main():
     if cv_windows < MAX_CV_WINDOWS:
         print("  Neural windows limited by available history.")
 
+    # Validation window for EarlyStopping. The legacy val_size=test_size gave
+    # a 1-step validation for monthly/quarterly data.
+    val_size = get_val_size_from_frequency(frequency, test_size, panel_df=df_neural)
+    print(f"  Neural validation window (early stopping): {val_size}")
+
     start_time = time.time()
     try:
         neural_cv_df = nf.cross_validation(
             df=df_neural,
-            val_size=test_size,
+            val_size=val_size,
             n_windows=cv_windows,
             step_size=test_size,
         )
@@ -905,10 +960,51 @@ def main():
     print("\n6. Combining Results")
     print("-" * 40)
 
+    # Average the seed members' point forecasts into the headline column.
+    # NaN -> null first so mean_horizontal skips bad member values instead of
+    # propagating them.
+    present_member_cols = [c for c in member_cols if c in neural_cv_df.columns]
+    neural_cv_df = neural_cv_df.with_columns(
+        [
+            pl.when(pl.col(c).is_nan()).then(None).otherwise(pl.col(c)).alias(c)
+            for c in present_member_cols
+        ]
+    )
+    neural_cv_df = neural_cv_df.with_columns(
+        pl.mean_horizontal([pl.col(c) for c in present_member_cols]).alias(
+            neural_model_name
+        )
+    )
+    print(
+        f"Averaged {len(present_member_cols)} seed members into {neural_model_name}"
+    )
+
     # Join baseline and neural forecasts
     cv_df = baseline_cv_df.join(
         neural_cv_df.drop(["y", "cutoff"]), on=["unique_id", "ds"], how="left"
     )
+
+    # Persist raw CV forecasts, then clip to leak-safe per-series train bounds.
+    print("\n6.5 Forecast Clipping and CV-Forecast Persistence")
+    print("-" * 40)
+    id_cols = ["unique_id", "ds", "cutoff", "y"]
+    model_cols_all = [c for c in cv_df.columns if c not in id_cols]
+    clip_bounds = compute_clip_bounds(df_baseline, cv_df, k=CLIP_IQR_MULTIPLIER)
+    save_cv_forecasts(
+        cv_df.join(clip_bounds, on="unique_id", how="left"),
+        DATASET_NAME,
+        MODEL_NAME,
+    )
+    cv_df = clip_cv_forecasts(cv_df, clip_bounds, model_cols_all)
+    print(
+        f"  Clipped {len(model_cols_all)} forecast columns to "
+        f"[train_min - {CLIP_IQR_MULTIPLIER}*IQR, train_max + {CLIP_IQR_MULTIPLIER}*IQR]"
+    )
+
+    # Restrict metric evaluation to the baselines and the ensembled headline
+    # column; seed members and any distributional extras stay in the parquet.
+    keep_cols = id_cols + baseline_model_names + [neural_model_name]
+    cv_df = cv_df.select([c for c in keep_cols if c in cv_df.columns])
 
     # Align training data with per-series cutoffs from cross-validation
     if "y_imputed" in train_df.columns:
@@ -923,9 +1019,14 @@ def main():
     print("\n7. Evaluating Model Performance")
     print("-" * 40)
 
-    mase_scores, mse_scores, rmse_scores, r2oos_scores, actual_model_cols = evaluate_cv(
-        cv_df, train_data, seasonality
-    )
+    (
+        mase_scores,
+        mse_scores,
+        rmse_scores,
+        r2oos_scores,
+        r2oos_pooled,
+        actual_model_cols,
+    ) = evaluate_cv(cv_df, train_data, seasonality)
 
     # Calculate average metrics across all series
     avg_metrics = {}
@@ -952,7 +1053,10 @@ def main():
             "MASE": mase_scores[model_col].mean(),
             "MSE": mse_scores[model_col].mean(),
             "RMSE": rmse_scores[model_col].mean(),
-            "R2oos": r2oos_scores[model_col].mean(),
+            # Headline R²oos is the pooled (panel-wide) value, matching
+            # forecast_stats.py / forecast_neural_auto.py.
+            "R2oos": r2oos_pooled.get(model_col, float("nan")),
+            "R2oos_per_series_mean": r2oos_scores[model_col].mean(),
         }
 
     # Create comparison table
@@ -1014,6 +1118,7 @@ def main():
         mse_val = avg_metrics[neural_model_name]["MSE"]
         rmse_val = avg_metrics[neural_model_name]["RMSE"]
         r2oos_val = avg_metrics[neural_model_name]["R2oos"]
+        r2oos_legacy_val = avg_metrics[neural_model_name]["R2oos_per_series_mean"]
 
         # Check for invalid metric values
         import numpy as np
@@ -1053,8 +1158,12 @@ def main():
             "MASE": [mase_val],
             "MSE": [mse_val],
             "RMSE": [rmse_val],
-            "R2oos": [r2oos_val],
+            "R2oos": [r2oos_val],  # pooled / panel-wide, paper headline
+            "R2oos_per_series_mean": [r2oos_legacy_val],
             "time_taken": [neural_time],
+            "val_size": [val_size],
+            "n_ensemble_seeds": [len(present_member_cols)],
+            "clip_k": [CLIP_IQR_MULTIPLIER],
         }
 
         metrics_df = pl.DataFrame(metrics_data)

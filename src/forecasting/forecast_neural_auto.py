@@ -14,6 +14,7 @@ import time
 import argparse
 import polars as pl
 import pandas as pd
+from copy import deepcopy
 from pathlib import Path
 from tabulate import tabulate
 import os
@@ -30,7 +31,12 @@ from forecast_utils import (
     convert_pandas_freq_to_polars,
     evaluate_cv,
     get_test_size_from_frequency,
+    get_val_size_from_frequency,
     determine_cv_windows,
+    compute_clip_bounds,
+    clip_cv_forecasts,
+    save_cv_forecasts,
+    CLIP_IQR_MULTIPLIER,
     MAX_CV_WINDOWS,
     read_dataset_config,
     should_skip_forecast,
@@ -48,6 +54,16 @@ from neuralforecast.auto import (
     AutoTiDE,
     AutoKAN,
 )
+from neuralforecast.models import (
+    DeepAR,
+    NBEATS,
+    NHITS,
+    DLinear,
+    NLinear,
+    VanillaTransformer,
+    TiDE,
+    KAN,
+)
 from neuralforecast.losses.pytorch import MAE, MSE, DistributionLoss
 
 from statsforecast import StatsForecast
@@ -57,6 +73,19 @@ warnings.filterwarnings("ignore")
 
 # Default NUM_SAMPLES - overridden by debug mode
 NUM_SAMPLES = 20
+
+# Plain (non-Auto) model classes used for the seed-ensemble refit of the best
+# Optuna config. Keys match the --model CLI choices.
+PLAIN_MODEL_CLASSES = {
+    "auto_deepar": DeepAR,
+    "auto_nbeats": NBEATS,
+    "auto_nhits": NHITS,
+    "auto_dlinear": DLinear,
+    "auto_nlinear": NLinear,
+    "auto_vanilla_transformer": VanillaTransformer,
+    "auto_tide": TiDE,
+    "auto_kan": KAN,
+}
 
 
 # Hardware detection functions
@@ -132,11 +161,17 @@ def create_auto_config_nhits(
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
             "n_blocks": 5 * [1],
             "mlp_units": 5 * [[64, 64]],
             "n_pool_kernel_size": trial.suggest_categorical(
@@ -147,6 +182,7 @@ def create_auto_config_nhits(
                 "n_freq_downsample",
                 ([1, 1, 1, 1, 1], [2, 2, 1, 1, 1]),  # Less aggressive downsampling
             ),
+            "dropout_prob_theta": trial.suggest_float("dropout_prob_theta", 0.0, 0.3),
             "learning_rate": trial.suggest_float(
                 "learning_rate",
                 low=1e-4,
@@ -165,11 +201,6 @@ def create_auto_config_nhits(
             "windows_batch_size": trial.suggest_categorical(
                 "windows_batch_size",
                 (128, 256),
-            ),
-            "random_seed": trial.suggest_int(
-                "random_seed",
-                low=1,
-                high=20,
             ),
         }
         if lightning_logs_dir:
@@ -194,7 +225,7 @@ def create_auto_config_lstm(seasonality, debug=False, hardware_config=None):
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "encoder_hidden_size": trial.suggest_categorical(
                 "encoder_hidden_size",
@@ -219,10 +250,15 @@ def create_auto_config_lstm(seasonality, debug=False, hardware_config=None):
                 "batch_size",
                 (32, 64),  # Larger batches for stability
             ),
-            "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
             "decoder_layers": trial.suggest_categorical(
                 "decoder_layers",
                 (1, 2),  # Add decoder configuration
@@ -254,7 +290,7 @@ def create_auto_config_simple(
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "learning_rate": trial.suggest_float(
                 "learning_rate",
@@ -271,10 +307,15 @@ def create_auto_config_simple(
                 "batch_size",
                 (32, 64),  # Larger batches for stability
             ),
-            "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -300,7 +341,7 @@ def create_auto_config_deepar(
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "lstm_hidden_size": trial.suggest_categorical(
                 "lstm_hidden_size", (64, 128, 256)
@@ -319,10 +360,15 @@ def create_auto_config_deepar(
                 (100, 200) if debug else (500, 1000),  # Reduced for debug
             ),
             "batch_size": trial.suggest_categorical("batch_size", (32, 64, 128)),
-            "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -357,7 +403,7 @@ def create_auto_config_nbeats(
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "max_steps": trial.suggest_categorical(
                 "max_steps",
@@ -373,10 +419,16 @@ def create_auto_config_nbeats(
             "mlp_units": trial.suggest_categorical(
                 "mlp_units", ([[64, 64], [64, 64]], [[128, 128], [128, 128]])
             ),
-            "random_seed": trial.suggest_int("random_seed", low=1, high=20),
+            "dropout_prob_theta": trial.suggest_float("dropout_prob_theta", 0.0, 0.3),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -402,10 +454,11 @@ def create_auto_config_transformer(
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "hidden_size": trial.suggest_categorical("hidden_size", (64, 128, 256)),
             "n_head": trial.suggest_categorical("n_head", (4, 8)),
+            "dropout": trial.suggest_float("dropout", 0.0, 0.3),
             "learning_rate": trial.suggest_float(
                 "learning_rate", low=1e-4, high=1e-2, log=True
             ),
@@ -415,10 +468,15 @@ def create_auto_config_transformer(
                 (100, 200) if debug else (500, 1000),  # Reduced for debug
             ),
             "batch_size": trial.suggest_categorical("batch_size", (32, 64)),
-            "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -444,7 +502,7 @@ def create_auto_config_tide(
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "hidden_size": trial.suggest_categorical("hidden_size", (256, 512)),
             "decoder_output_dim": trial.suggest_categorical(
@@ -463,10 +521,15 @@ def create_auto_config_tide(
                 (100, 200) if debug else (500, 1000),  # Reduced for debug
             ),
             "batch_size": trial.suggest_categorical("batch_size", (32, 64)),
-            "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -492,7 +555,7 @@ def create_auto_config_kan(
         config_dict = {
             "input_size": trial.suggest_categorical(
                 "input_size",
-                (6, 12) if debug else (12, 24, 48),  # Smaller for debug
+                (6, 12) if debug else (6, 12, 24, 48),  # include short lookbacks for low-signal panels
             ),
             "grid_size": trial.suggest_categorical("grid_size", (3, 5, 7)),
             "spline_order": trial.suggest_categorical("spline_order", (3, 4)),
@@ -507,10 +570,15 @@ def create_auto_config_kan(
                 (100, 200) if debug else (500, 1000),  # Reduced for debug
             ),
             "batch_size": trial.suggest_categorical("batch_size", (32, 64)),
-            "random_seed": trial.suggest_int("random_seed", low=1, high=20),
             "start_padding_enabled": True,  # Enable padding for short series
             "gradient_clip_val": 1.0,  # Prevent rare gradient explosions on heavy-tailed panels
-            "early_stop_patience_steps": 20,  # Stop when val loss plateaus; passes through to Lightning EarlyStopping
+            "early_stop_patience_steps": 5,  # Stop after 5 stagnant val checks
+            "val_check_steps": 50,  # Check val loss every 50 steps so early stopping can actually fire within max_steps
+            "optimizer_kwargs": {
+                "weight_decay": trial.suggest_float(
+                    "weight_decay", low=1e-6, high=1e-2, log=True
+                )
+            },
         }
         if lightning_logs_dir:
             config_dict["default_root_dir"] = lightning_logs_dir
@@ -582,6 +650,14 @@ def main():
         "from the train portion only, applied to both train and test before CV, "
         "inverse-transformed before metric evaluation.",
     )
+    parser.add_argument(
+        "--n-seeds",
+        type=int,
+        default=5,
+        help="Number of random seeds ensembled for the final best-config fit. "
+        "The Auto refit (class-default seed 1) counts as the first member; "
+        "n-1 additional refits are trained and the point forecasts averaged.",
+    )
     args = parser.parse_args()
 
     DATASET_NAME = args.dataset
@@ -591,6 +667,9 @@ def main():
     SKIP_DAILY = args.skip_daily
     LOSS_NAME = args.loss
     SCALE_ENTITY = args.scale_entity
+    N_ENSEMBLE_SEEDS = max(1, args.n_seeds)
+    if DEBUG_MODE:
+        N_ENSEMBLE_SEEDS = min(N_ENSEMBLE_SEEDS, 2)
 
     # Output filename suffix encoding the run variant
     run_suffix = f"__{LOSS_NAME}"
@@ -900,6 +979,11 @@ def main():
     # train_data (used by evaluate_cv for the MASE seasonal-naive denominator)
     # is built later from the unmodified train_df, so it stays raw and consistent
     # with the inverse-transformed cv_df.
+    # Raw-units snapshot of the panel, taken BEFORE any entity scaling. Used
+    # to compute leak-safe forecast clip bounds in the same units as the
+    # inverse-transformed cv_df.
+    df_baseline_raw = df_baseline
+
     scalers_df = None
     if SCALE_ENTITY:
         import numpy as np
@@ -1188,11 +1272,17 @@ def main():
     if cv_windows < MAX_CV_WINDOWS:
         print("  Neural windows limited by available history.")
 
+    # Validation window for Optuna's objective and EarlyStopping. The legacy
+    # val_size=test_size gave a 1-step validation for monthly/quarterly data,
+    # which made hyperparameter selection essentially noise.
+    val_size = get_val_size_from_frequency(frequency, test_size, panel_df=df_neural)
+    print(f"  Neural validation window (HPO/early-stop): {val_size}")
+
     start_time = time.time()
     try:
         neural_cv_df = nf.cross_validation(
             df=df_neural,
-            val_size=test_size,
+            val_size=val_size,
             n_windows=cv_windows,
             step_size=test_size,
         )
@@ -1219,6 +1309,69 @@ def main():
             )
 
         raise  # Re-raise the exception
+
+    # Seed-ensemble refit: training-run variance is a major driver of the
+    # catastrophic out-of-sample errors on low-signal panels. Refit the best
+    # Optuna config under additional random seeds and average the point
+    # forecasts. The Auto model's own refit uses the class-default seed (1),
+    # so it serves as the first ensemble member for free.
+    neural_model_name = neural_model_names[0]
+    member_cols = []
+    if N_ENSEMBLE_SEEDS > 1:
+        print("\n5.5 Seed-Ensemble Refit of Best Config")
+        print("-" * 40)
+        ens_start = time.time()
+        try:
+            auto_model = nf.models[0]
+            best_cfg = dict(auto_model.results.best_trial.user_attrs["ALL_PARAMS"])
+            best_cfg.pop("random_seed", None)
+            extra_seeds = list(range(2, N_ENSEMBLE_SEEDS + 1))
+            members = []
+            for seed in extra_seeds:
+                cfg = deepcopy(best_cfg)
+                cfg["random_seed"] = seed
+                cfg["alias"] = f"{neural_model_name}_seed{seed}"
+                members.append(PLAIN_MODEL_CLASSES[MODEL_NAME](**cfg))
+            nf_ens = NeuralForecast(models=members, freq=polars_frequency)
+            ens_cv_df = nf_ens.cross_validation(
+                df=df_neural,
+                val_size=val_size,
+                n_windows=cv_windows,
+                step_size=test_size,
+            )
+            member_cols = [f"{neural_model_name}_seed{seed}" for seed in extra_seeds]
+            neural_cv_df = neural_cv_df.join(
+                ens_cv_df.select(["unique_id", "ds", "cutoff"] + member_cols),
+                on=["unique_id", "ds", "cutoff"],
+                how="left",
+            )
+            # NaN -> null so mean_horizontal skips bad member values instead
+            # of propagating them into the ensemble.
+            ensemble_inputs = [neural_model_name] + member_cols
+            neural_cv_df = neural_cv_df.with_columns(
+                [
+                    pl.when(pl.col(c).is_nan())
+                    .then(None)
+                    .otherwise(pl.col(c))
+                    .alias(c)
+                    for c in ensemble_inputs
+                ]
+            )
+            neural_cv_df = neural_cv_df.with_columns(
+                pl.mean_horizontal([pl.col(c) for c in ensemble_inputs]).alias(
+                    neural_model_name
+                )
+            )
+            print(
+                f"Averaged {len(ensemble_inputs)} seed members into "
+                f"{neural_model_name} in {time.time() - ens_start:.2f} seconds"
+            )
+        except Exception as e:
+            member_cols = []
+            print(
+                f"Warning: seed-ensemble refit failed ({e}); "
+                "continuing with single-seed forecasts"
+            )
 
     # Combine results
     print("\n6. Combining Results")
@@ -1249,6 +1402,32 @@ def main():
         print(
             f"  Inverse-transformed {len(inverse_cols)} columns in cv_df back to raw units"
         )
+
+    # Persist raw CV forecasts, then clip to leak-safe per-series train bounds.
+    # Persisting BEFORE clipping (with the bounds attached) lets post-hoc
+    # experiments re-derive both the clipped and unclipped metrics without
+    # refitting anything.
+    print("\n6.5 Forecast Clipping and CV-Forecast Persistence")
+    print("-" * 40)
+    id_cols = ["unique_id", "ds", "cutoff", "y"]
+    model_cols_all = [c for c in cv_df.columns if c not in id_cols]
+    clip_bounds = compute_clip_bounds(df_baseline_raw, cv_df, k=CLIP_IQR_MULTIPLIER)
+    save_cv_forecasts(
+        cv_df.join(clip_bounds, on="unique_id", how="left"),
+        DATASET_NAME,
+        MODEL_NAME,
+        run_suffix=run_suffix,
+    )
+    cv_df = clip_cv_forecasts(cv_df, clip_bounds, model_cols_all)
+    print(
+        f"  Clipped {len(model_cols_all)} forecast columns to "
+        f"[train_min - {CLIP_IQR_MULTIPLIER}*IQR, train_max + {CLIP_IQR_MULTIPLIER}*IQR]"
+    )
+
+    # Restrict metric evaluation to the baselines and the (ensembled) headline
+    # column; seed members and any distributional extras stay in the parquet.
+    keep_cols = id_cols + baseline_model_names + [neural_model_name]
+    cv_df = cv_df.select([c for c in keep_cols if c in cv_df.columns])
 
     # Create training data aligned with per-series cutoffs
     if "y_imputed" in train_df.columns:
@@ -1407,6 +1586,9 @@ def main():
             "time_taken": [neural_time],
             "loss": [LOSS_NAME],
             "scale_entity": [SCALE_ENTITY],
+            "val_size": [val_size],
+            "n_ensemble_seeds": [1 + len(member_cols)],
+            "clip_k": [CLIP_IQR_MULTIPLIER],
         }
 
         metrics_df = pl.DataFrame(metrics_data)
