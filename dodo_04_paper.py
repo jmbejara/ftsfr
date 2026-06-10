@@ -164,6 +164,31 @@ def task_run_example_forecasts():
         }
     )
 
+    # Standalone two-panel illustration figure used in the Forecasting
+    # Methodology section of the paper (Figure: "Illustrative Forecasts"). It
+    # forecasts every entity in two contrasting panels -- the Treasury
+    # spot-futures basis (by tenor) and BHC cash liquidity (by bank) -- and plots
+    # the cross-entity average of the realized series and of each method's
+    # forecast. This demonstrates forecast *shape*, not benchmark accuracy.
+    yield from notebook_subtask(
+        {
+            "name": "example_forecasts_illustration_ipynb",
+            "notebook_path": "./src/forecasting/example_forecasts_illustration_ipynb.py",
+            "file_dep": [
+                "./src/forecasting/example_forecasts_illustration_ipynb.py",
+                "./src/forecasting/forecast_neural_auto.py",
+                DATA_DIR / "formatted" / "basis_treas_sf" / "ftsfr_treasury_sf_basis.parquet",
+                DATA_DIR
+                / "formatted"
+                / "nyu_call_report"
+                / "ftsfr_nyu_call_report_holding_company_cash_liquidity.parquet",
+            ],
+            "targets": [
+                OUTPUT_DIR / "forecasting" / "paper" / "example_forecasts_illustration.png",
+            ],
+        }
+    )
+
 
 def task_validate_latex_paths():
     """Enforce that reports/*.tex stays self-contained (no `..`, _output, _data).
