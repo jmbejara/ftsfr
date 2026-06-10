@@ -27,6 +27,10 @@ from forecast_utils import (
     evaluate_cv,
     get_test_size_from_frequency,
     determine_cv_windows,
+    compute_clip_bounds,
+    clip_cv_forecasts,
+    save_cv_forecasts,
+    CLIP_IQR_MULTIPLIER,
     MAX_CV_WINDOWS,
     read_dataset_config,
     should_skip_forecast,
@@ -340,6 +344,24 @@ def main():
     cv_time = time.time() - start_time
     print(f"Cross-validation completed in {cv_time:.2f} seconds")
 
+    # Persist raw CV forecasts, then clip to leak-safe per-series train bounds
+    # (same rule applied to every model in the benchmark, classical and neural).
+    print("\n4.5 Forecast Clipping and CV-Forecast Persistence")
+    print("-" * 40)
+    id_cols = ["unique_id", "ds", "cutoff", "y"]
+    model_cols_all = [c for c in cv_df.columns if c not in id_cols]
+    clip_bounds = compute_clip_bounds(df, cv_df, k=CLIP_IQR_MULTIPLIER)
+    save_cv_forecasts(
+        cv_df.join(clip_bounds, on="unique_id", how="left"),
+        DATASET_NAME,
+        MODEL_NAME,
+    )
+    cv_df = clip_cv_forecasts(cv_df, clip_bounds, model_cols_all)
+    print(
+        f"  Clipped {len(model_cols_all)} forecast columns to "
+        f"[train_min - {CLIP_IQR_MULTIPLIER}*IQR, train_max + {CLIP_IQR_MULTIPLIER}*IQR]"
+    )
+
     # Evaluate models (cv_df is already in Polars format)
     print("\n5. Evaluating Model Performance")
     print("-" * 40)
@@ -469,6 +491,7 @@ def main():
             "R2oos": [r2oos_val],  # pooled / panel-wide, paper headline (2026-06)
             "R2oos_per_series_mean": [r2oos_legacy_val],
             "time_taken": [cv_time],
+            "clip_k": [CLIP_IQR_MULTIPLIER],
         }
 
         metrics_df = pl.DataFrame(metrics_data)

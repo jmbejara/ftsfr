@@ -16,6 +16,25 @@ REPO_ROOT = FILE_DIR.parent.parent
 
 MAX_CV_WINDOWS = 6
 
+# Multiplier on the train-window IQR used by the leak-safe forecast clip
+# (bounds = [train_min - k*IQR, train_max + k*IQR]). Applied uniformly to
+# every model, classical and neural, before metrics are computed.
+CLIP_IQR_MULTIPLIER = 1.0
+
+# Validation-window length used for neural hyperparameter selection and early
+# stopping. The forecast horizon itself stays at get_test_size_from_frequency
+# (1 step for monthly/quarterly); these are deliberately much longer so the
+# Optuna objective and EarlyStopping see a meaningful signal instead of a
+# single observation per series.
+VAL_SIZE_BY_FREQUENCY = {
+    "ME": 12,  # Monthly: 1 year
+    "MS": 12,
+    "QE": 8,  # Quarterly: 2 years
+    "QS": 8,
+    "B": 63,  # Business day: ~3 trading months
+    "D": 90,  # Calendar day: ~3 months
+}
+
 
 def convert_frequency_to_statsforecast(frequency):
     """Convert pandas/dataset frequency to StatsForecast frequency format."""
@@ -295,6 +314,101 @@ def determine_cv_windows(
     min_length = int(lengths["length"].min())
     possible_windows = max(1, min_length // horizon)
     return max(1, min(max_windows, possible_windows))
+
+
+def get_val_size_from_frequency(frequency, test_size, panel_df=None):
+    """Validation-window length for neural HPO/early stopping.
+
+    Returns the frequency-based target from VAL_SIZE_BY_FREQUENCY, capped so
+    short panels keep enough training history: when ``panel_df`` is given the
+    target is limited to a third of the shortest series. Never smaller than
+    the forecast horizon (``test_size``), which is the legacy behavior.
+    """
+
+    target = VAL_SIZE_BY_FREQUENCY.get(frequency, 12)
+    if panel_df is not None and panel_df.height > 0:
+        min_length = int(panel_df.group_by("unique_id").len()["len"].min())
+        target = min(target, max(test_size, min_length // 3))
+    return max(target, test_size)
+
+
+def compute_clip_bounds(panel_df, cv_df, k=CLIP_IQR_MULTIPLIER):
+    """Leak-safe per-series clip bounds for CV forecasts.
+
+    Bounds are computed only from observations available at the FIRST
+    forecast origin (ds <= the series' earliest CV cutoff), so no test-window
+    information leaks into them even though later CV windows train on more
+    history:
+
+        [train_min - k*IQR, train_max + k*IQR]
+
+    Returns a DataFrame keyed by unique_id with ``_clip_lo``/``_clip_hi``.
+    ``panel_df`` must be in raw units (pre entity-scaling) with a ``y`` column.
+    """
+
+    first_cutoffs = cv_df.group_by("unique_id").agg(
+        pl.col("cutoff").min().alias("_first_cutoff")
+    )
+    hist = (
+        panel_df.select(["unique_id", "ds", "y"])
+        .join(first_cutoffs, on="unique_id", how="inner")
+        .filter(pl.col("ds") <= pl.col("_first_cutoff"))
+        .filter(pl.col("y").is_not_null() & pl.col("y").is_not_nan())
+    )
+    bounds = (
+        hist.group_by("unique_id")
+        .agg(
+            pl.col("y").min().alias("_y_min"),
+            pl.col("y").max().alias("_y_max"),
+            (pl.col("y").quantile(0.75) - pl.col("y").quantile(0.25)).alias("_iqr"),
+        )
+        .with_columns(
+            (pl.col("_y_min") - k * pl.col("_iqr")).alias("_clip_lo"),
+            (pl.col("_y_max") + k * pl.col("_iqr")).alias("_clip_hi"),
+        )
+        .select(["unique_id", "_clip_lo", "_clip_hi"])
+    )
+    return bounds
+
+
+def clip_cv_forecasts(cv_df, bounds, model_cols):
+    """Clip model forecast columns to per-series leak-safe bounds.
+
+    Null predictions stay null, and series without bounds (e.g. dropped from
+    the history join) pass through unclipped. ``y`` is never touched.
+    """
+
+    out = cv_df.join(bounds, on="unique_id", how="left")
+    clip_exprs = []
+    for col in model_cols:
+        clipped = pl.min_horizontal(
+            pl.max_horizontal(pl.col(col), pl.col("_clip_lo")), pl.col("_clip_hi")
+        )
+        clip_exprs.append(
+            pl.when(pl.col(col).is_null() | pl.col("_clip_lo").is_null())
+            .then(pl.col(col))
+            .otherwise(clipped)
+            .alias(col)
+        )
+    out = out.with_columns(clip_exprs).drop(["_clip_lo", "_clip_hi"])
+    return out
+
+
+def save_cv_forecasts(cv_df, dataset_name, model_name, run_suffix=""):
+    """Persist per-observation CV forecasts so post-hoc experiments
+    (alternative clipping rules, ensembling, shrinkage) don't require refits.
+
+    Saved in raw units (post inverse entity-scaling), unclipped, with the
+    ``_clip_lo``/``_clip_hi`` columns attached when present so the headline
+    clipped metrics can be reproduced exactly.
+    """
+
+    forecasts_dir = REPO_ROOT / "_output" / "forecasting" / "cv_forecasts" / dataset_name
+    forecasts_dir.mkdir(parents=True, exist_ok=True)
+    path = forecasts_dir / f"{model_name}{run_suffix}.parquet"
+    cv_df.write_parquet(path)
+    print(f"CV forecasts saved to: {path}")
+    return path
 
 
 def convert_pandas_freq_to_polars(pandas_freq):
