@@ -46,12 +46,27 @@ MODELS = [
 ]
 
 
+def _read(path):
+    return pd.read_csv(path) if path.exists() else None
+
+
 def load_metric(dataset, model):
-    p = METRICS_DIR / dataset / f"{model}.csv"
-    if not p.exists():
+    """Metric-aligned load mirroring assemble_results.py: MASE comes from the
+    MAE-trained fit (``{model}__mae.csv``) and R2oos from the MSE-trained fit
+    (``{model}__mse.csv``); the bare ``{model}.csv`` covers stats models and
+    legacy single-loss runs."""
+    base = METRICS_DIR / dataset
+    plain = _read(base / f"{model}.csv")
+    mae = _read(base / f"{model}__mae.csv")
+    mse = _read(base / f"{model}__mse.csv")
+    mase_src = mae if mae is not None else plain
+    r2_src = mse if mse is not None else plain
+    if mase_src is None or r2_src is None:
         return None
-    df = pd.read_csv(p)
-    return {"MASE": float(df["MASE"].iloc[0]), "R2oos": float(df["R2oos"].iloc[0])}
+    return {
+        "MASE": float(mase_src["MASE"].iloc[0]),
+        "R2oos": float(r2_src["R2oos"].iloc[0]),
+    }
 
 
 def fmt_dash(x, n=3):
