@@ -369,18 +369,9 @@ Aksu et al. (2024) & GIFT-EVAL & Anonymous data, unclear \\
 
 \begin{frame}[plain]
     \tiny
-    \vspace{-0.2cm}
-    \centering
     \textbf{Headline: Model Performance by Dataset Category}\\
-    {\scriptsize Lower MASE = better; higher $R^2_{\text{oos}}$ = better}\\
     \vspace{0.2cm}
     \resizebox{0.7\textwidth}{!}{\input{\PathToOutput/forecasting/paper/model_summary_by_category_tabular.tex}}
-
-    \vspace{0.2cm}
-    \scriptsize
-    \alert{Basis spreads:} NBEATS best median MASE (0.407); NLinear/NHITS lead $R^2_{\text{oos}}$ ($\sim$0.65).\quad
-    \alert{Returns:} every $R^2_{\text{oos}}\approx 0$ or negative.\quad
-    \alert{Other:} Theta \& NHITS lead.
 \end{frame}
 
 \begin{frame}[plain]
@@ -389,12 +380,54 @@ Aksu et al. (2024) & GIFT-EVAL & Anonymous data, unclear \\
     \centering
     \textbf{Model Performance by Method Family}\\
     \vspace{0.2cm}
-    \resizebox{0.85\textwidth}{!}{\input{\PathToOutput/forecasting/paper/model_summary_by_type_tabular.tex}}
-
-    \vspace{0.2cm}
-    \scriptsize
-    \alert{Hybrid} posts the best overall MASE (0.805 med). On \alert{basis spreads}, Hybrid (median $R^2$ 0.647) and Deep (0.643) crush Classical (0.345). On \alert{returns}, all families are negative. On \alert{Other}, Deep leads median $R^2$ (0.430) but Classical leads the mean (0.340) by avoiding tail failures.
+    \resizebox{1.1\textwidth}{!}{\input{\PathToOutput/forecasting/paper/model_summary_by_type_tabular.tex}}
 \end{frame}
+
+\begin{frame}[plain]
+    \tiny
+    \vspace{-0.2cm}
+    \centering
+    \textbf{MASE Results by Dataset and Model}\\
+    {\scriptsize \textit{Lower values = better; Values $<1$ beat seasonal naïve baseline}}\\
+    \vspace{0.2cm}
+    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/mase_pivot_tabular.tex}}
+  \end{frame}
+
+\begin{frame}
+  \frametitle{MASE Heatmap: No Universal Best Model}
+  \centering
+  \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/mase_heatmap.png}
+  \vspace{0.2cm}
+
+  Performance relative to naïve baseline (blue = better, red = worse)
+\end{frame}
+
+\begin{frame}[plain]
+    \tiny
+    \vspace{-0.5cm}
+    \centering
+    \textbf{Out-of-Sample $R^2$ Results by Dataset and Model}\\
+    \vspace{0.2cm}
+    \input{\PathToOutput/forecasting/paper/r2oos_pivot_tabular.tex}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Out-of-Sample $R^2$ Heatmap}
+  \centering
+  \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/r2oos_heatmap.png}
+  \vspace{0.2cm}
+
+  Positive values = better than historical mean, negative = worse
+\end{frame}
+
+\begin{frame}[plain]
+    \tiny
+    \vspace{-0.2cm}
+    \centering
+    \textbf{Overall Model Performance Summary: MASE and $R^2_{\text{oos}}$ Across All Datasets}\\
+    \vspace{0.2cm}
+    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/median_mase_summary_tabular.tex}}
+  \end{frame}
 
 \begin{frame}
   \frametitle{Interpreting the Results: Metric and Segment Both Matter}
@@ -504,56 +537,6 @@ Aksu et al. (2024) & GIFT-EVAL & Anonymous data, unclear \\
   \centering
   \textbf{Appendix}
 \end{frame}
-
-% ---------------------------------------------------------------------------
-% Detailed per-dataset results (moved from main body)
-% ---------------------------------------------------------------------------
-
-\begin{frame}[plain]
-    \tiny
-    \vspace{-0.2cm}
-    \centering
-    \textbf{MASE Results by Dataset and Model}\\
-    {\scriptsize \textit{Lower values = better; Values $<1$ beat seasonal naïve baseline}}\\
-    \vspace{0.2cm}
-    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/mase_pivot_tabular.tex}}
-  \end{frame}
-
-\begin{frame}
-  \frametitle{MASE Heatmap: No Universal Best Model}
-  \centering
-  \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/mase_heatmap.png}
-  \vspace{0.2cm}
-
-  Performance relative to naïve baseline (blue = better, red = worse)
-\end{frame}
-
-\begin{frame}[plain]
-    \tiny
-    \vspace{-0.5cm}
-    \centering
-    \textbf{Out-of-Sample $R^2$ Results by Dataset and Model}\\
-    \vspace{0.2cm}
-    \input{\PathToOutput/forecasting/paper/r2oos_pivot_tabular.tex}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Out-of-Sample $R^2$ Heatmap}
-  \centering
-  \includegraphics[width=0.9\textwidth]{\PathToOutput/forecasting/paper/r2oos_heatmap.png}
-  \vspace{0.2cm}
-
-  Positive values = better than historical mean, negative = worse
-\end{frame}
-
-\begin{frame}[plain]
-    \tiny
-    \vspace{-0.2cm}
-    \centering
-    \textbf{Overall Model Performance Summary: MASE and $R^2_{\text{oos}}$ Across All Datasets}\\
-    \vspace{0.2cm}
-    \resizebox{0.98\textwidth}{!}{\input{\PathToOutput/forecasting/paper/median_mase_summary_tabular.tex}}
-  \end{frame}
 
 \begin{frame}[plain]
   \tiny
