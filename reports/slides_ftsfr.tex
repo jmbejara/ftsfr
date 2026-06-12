@@ -61,7 +61,7 @@ An Open Benchmark for Evaluating Time Series Forecasting Methods across Financia
   \item \alert{No Free Lunch:}
   The only way to know is to test methods on \alert{domain-specific (financial) data}, holding the data fixed across methods.
   \item \alert{Obstacle:}
-  Each new method or paper brings its own data and its own cleaning, so comparisons entangle \alert{method skill with cleaning skill}. Cleaning financial data also takes real domain expertise.
+  Each new method or paper brings its own data and its own cleaning, so comparisons entangle \alert{the forecasting method with the cleaning method}. Cleaning financial data also takes real domain expertise.
   \item \alert{Contribution:}
   FTSFR gathers canonical, domain-expert cleaning procedures for \alert{25 financial datasets in one place}, so the data stays fixed across 12 forecasting methods. Fully reproducible pipeline.
   \item \alert{Findings:}
@@ -122,7 +122,7 @@ An Open Benchmark for Evaluating Time Series Forecasting Methods across Financia
   \item Short-term reversal premium falls by \alert{over 90\%} (from $\sim$0.90\%/month to $\approx$0)
 \end{itemize}
 \vspace{0.2cm}
-\item So a cleaning choice, not the method, can drive measured predictability. \alert{Comparisons across studies entangle method skill with cleaning skill}
+\item So a cleaning choice, not the method, can drive measured predictability. \alert{Comparisons across studies entangle the forecasting method with the cleaning method}
 \end{itemize}
 \end{frame}
 
@@ -159,7 +159,7 @@ Aksu et al. (2024) & GIFT-EVAL & Anonymous data, unclear \\
     \item Each dataset uses the cleaning recipe from its canonical paper (tradability screens, faulty-contract removal, liquidity filters, known data fixes)
     \item We validate every replication against published figures or statistics
   \end{itemize}
-  \item \alert{Running new methods on the same fixed data isolates method skill from cleaning skill}
+  \item \alert{Running new methods on the same fixed data isolates the forecasting method from the cleaning method}
   \item Financial data carry licensing restrictions, so we open-source the full \alert{download $\to$ clean $\to$ format} pipeline rather than the data
   \begin{itemize}
     \item Any researcher with WRDS / Bloomberg subscriptions reproduces each series exactly; pinned environments give consistent results across machines
@@ -319,6 +319,23 @@ Aksu et al. (2024) & GIFT-EVAL & Anonymous data, unclear \\
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Rolling-Origin Cross-Validation}
+  \begin{columns}[c]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{assets/test_train_split.png}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{assets/cross_validation.png}
+    \end{column}
+  \end{columns}
+  \vspace{0.3cm}
+  \footnotesize
+  \alert{Outer loop:} up to 6 expanding train/test windows; we average each split's test error. \alert{Inner loop:} the Auto wrappers tune hyperparameters on a held-out validation slice, so tuning never sees the test data.
+\end{frame}
+
 \section{An Illustration}
 
 \begin{frame}
@@ -433,7 +450,7 @@ Aksu et al. (2024) & GIFT-EVAL & Anonymous data, unclear \\
   \vspace{0.3cm}
   \item The volatility is concentrated in exactly the \alert{deep models a practitioner would reach for}; classical baselines are stable but rarely the best available forecast
   \vspace{0.3cm}
-  \item \alert{Implication:} any cross-paper comparison that does not hold the cleaning recipe fixed \alert{confounds method skill with cleaning skill}
+  \item \alert{Implication:} any cross-paper comparison that does not hold the cleaning recipe fixed \alert{confounds the forecasting method with the cleaning method}
   \vspace{0.3cm}
   \item Even coarse summaries (``which model gives positive $R^2_{\text{oos}}$?'') are cleaning-dependent
   \vspace{0.3cm}
